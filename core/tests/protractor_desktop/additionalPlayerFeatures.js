@@ -26,39 +26,25 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Full exploration editor', function() {
-  var adminPage = null;
-  var collectionEditorPage = null;
-  var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
 
   var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
-  var parentExplorationId = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
@@ -134,7 +120,7 @@ describe('Full exploration editor', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 1'));
+      await forms.toRichText('this is card 1'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     await (
       await explorationEditorMainTab.getResponseEditor('default')
@@ -158,8 +144,8 @@ describe('Full exploration editor', function() {
 
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
-    var backButton = element(by.css('.protractor-test-back-button'));
-    var nextCardButton = element(by.css('.protractor-test-next-card-button'));
+    var backButton = element(by.css('.e2e-test-back-button'));
+    var nextCardButton = element(by.css('.e2e-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('CodeRepl');
     await waitFor.visibilityOf(
@@ -222,160 +208,6 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it('should give option for redirection when author has specified ' +
-      'a refresher exploration ID', async function() {
-    await users.createCollectionEditor('testadm@collections.com', 'testadm');
-    await users.login('testadm@collections.com');
-    await adminPage.addRole('testadm', 'curriculum admin');
-
-    // Create Parent Exploration not added to collection.
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.clickCreateActivityButton();
-    await creatorDashboardPage.clickCreateExplorationButton();
-    await explorationEditorMainTab.exitTutorial();
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle(
-      'Parent Exp not in collection');
-    await explorationEditorSettingsTab.setCategory('Algebra');
-    await explorationEditorSettingsTab.setObjective(
-      'This is a parent exploration');
-    await explorationEditorPage.navigateToMainTab();
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('Parent Exploration Content'));
-    await explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [
-        await forms.toRichText('Correct'),
-        await forms.toRichText('Incorrect'),
-        await forms.toRichText('Wrong'),
-        await forms.toRichText('Not correct')
-      ]);
-    await explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', null, 'card 2', true,
-      'Equals', 'Correct');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setFeedback(await forms.toRichText('try again'));
-    await explorationEditorMainTab.moveToState('card 2');
-    await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.saveChanges();
-    await workflow.publishExploration();
-
-    // Create Parent Exploration added in collection.
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.clickCreateActivityButton();
-    await creatorDashboardPage.clickCreateExplorationButton();
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle(
-      'Parent Exploration in collection');
-    await explorationEditorSettingsTab.setCategory('Algebra');
-    await explorationEditorSettingsTab.setObjective(
-      'This is a parent exploration');
-    await explorationEditorPage.navigateToMainTab();
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Parent Exploration Content'));
-    await explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [
-        await forms.toRichText('Correct'),
-        await forms.toRichText('Incorrect'),
-        await forms.toRichText('Wrong'),
-        await forms.toRichText('Not correct')
-      ]);
-    await explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', null, 'card 2', true,
-      'Equals', 'Correct');
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setFeedback(await forms.toRichText('try again'));
-    await explorationEditorMainTab.moveToState('card 2');
-    await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.saveChanges();
-    await workflow.publishExploration();
-    parentExplorationId = await general.getExplorationIdFromEditor();
-
-    // Create Refresher Exploration.
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.clickCreateActivityButton();
-    await creatorDashboardPage.clickCreateExplorationButton();
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Refresher Exploration');
-    await explorationEditorSettingsTab.setCategory('Algebra');
-    await explorationEditorSettingsTab.setObjective(
-      'This is the refresher exploration');
-    await explorationEditorPage.navigateToMainTab();
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Refresher Exploration Content'));
-    await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.saveChanges();
-    await workflow.publishExploration();
-    // Add refresher exploration's Id to both parent explorations.
-    var refresherExplorationId = await general.getExplorationIdFromEditor();
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration(
-      'Parent Exploration in collection');
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setDestination(null, false, refresherExplorationId);
-    await explorationEditorPage.publishChanges(
-      'Add Refresher Exploration Id');
-
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration(
-      'Parent Exp not in collection');
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setDestination(null, false, refresherExplorationId);
-    await explorationEditorPage.publishChanges(
-      'Add Refresher Exploration Id');
-
-    // Create collection and add created exploration.
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.clickCreateActivityButton();
-    await creatorDashboardPage.clickCreateCollectionButton();
-    await collectionEditorPage.addExistingExploration(parentExplorationId);
-    await collectionEditorPage.saveDraft();
-    await collectionEditorPage.closeSaveModal();
-    await collectionEditorPage.publishCollection();
-    await collectionEditorPage.setTitle('Test Collection');
-    await collectionEditorPage.setObjective('This is a test collection.');
-    await collectionEditorPage.setCategory('Algebra');
-    await collectionEditorPage.saveChanges();
-
-    // Play-test exploration and visit the refresher exploration.
-    await libraryPage.get();
-    await libraryPage.findExploration('Parent Exp not in collection');
-    await libraryPage.playExploration('Parent Exp not in collection');
-    await explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput', 'Incorrect');
-    await explorationPlayerPage.clickConfirmRedirectionButton();
-    await explorationPlayerPage.expectExplorationNameToBe(
-      'Refresher Exploration');
-    await explorationPlayerPage.clickOnReturnToParentButton();
-    await explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput', 'Incorrect');
-    await explorationPlayerPage.clickCancelRedirectionButton();
-    await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('Parent Exploration Content'));
-    await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
-
-    await libraryPage.get();
-    await libraryPage.findCollection('Test Collection');
-    await libraryPage.playCollection('Test Collection');
-    // Click first exploration in collection.
-    await element.all(by.css(
-      '.protractor-test-collection-exploration')).first().click();
-    await explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput', 'Incorrect');
-    await explorationPlayerPage.clickConfirmRedirectionButton();
-    // Check the current url to see if collection_id is present in it.
-    var url = await browser.getCurrentUrl();
-    var pathname = url.split('/');
-    expect(
-      pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
-    await users.logout();
-  });
-
   it('should navigate multiple states correctly, with parameters',
     async function() {
       await users.createUser(
@@ -385,7 +217,7 @@ describe('Full exploration editor', function() {
       await workflow.createExploration(true);
       await explorationEditorMainTab.setStateName('card 1');
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('this is card 1'));
+        await forms.toRichText('this is card 1'), true);
       await explorationEditorMainTab.setInteraction('NumericInput');
       await explorationEditorMainTab.addResponse(
         'NumericInput', null, 'final card', true, 'Equals', 21);
@@ -425,6 +257,7 @@ describe('Full exploration editor', function() {
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 2 with previous answer 21'));
       await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
+
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
       await explorationPlayerPage.submitAnswer('NumericInput', 21);
@@ -448,7 +281,7 @@ describe('Full exploration editor', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Introduction');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('What language is Oppia?'));
+      await forms.toRichText('What language is Oppia?'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'),
@@ -528,7 +361,7 @@ describe('Full exploration editor', function() {
     await libraryPage.findExploration('Exploration with Recommendation');
     await libraryPage.playExploration('Exploration with Recommendation');
     var recommendedExplorationTile = element(
-      by.css('.protractor-test-exp-summary-tile-title'));
+      by.css('.e2e-test-exp-summary-tile-title'));
     var recommendedExplorationName = await action.getText(
       'Recommended Exploration Tile', recommendedExplorationTile);
     expect(recommendedExplorationName).toEqual('Recommended Exploration 1');

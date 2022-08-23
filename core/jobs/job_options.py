@@ -48,13 +48,16 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
                 (unmodified) because PipelineOptions, a parent class, needs it.
             **job_options: dict(str: *). One of the options defined in the class
                 JOB_OPTIONS dict.
+
+        Raises:
+            ValueError. Unsupported job option(s).
         """
         unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
         if unsupported_options:
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError(
                 'Unsupported option(s): %s' % joined_unsupported_options)
-        super(JobOptions, self).__init__(
+        super().__init__(
             # Needed by PipelineOptions.
             flags=flags,
             # Needed by GoogleCloudOptions.

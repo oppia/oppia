@@ -1,0 +1,33 @@
+<div class="modal-body oppia-preview-set-params-modal">
+  <p>Please enter values for the following parameters:</p>
+  <table class="oppia-preview-set-params-modal-table">
+    <tr *ngFor="let paramChange of manualParamChanges">
+      <td class="oppia-preview-set-params-modal-td">
+        {{ paramChange.name }}
+      </td>
+      <td class="oppia-preview-set-params-modal-td">
+        <input type="text" [(ngModel)]="paramChange.customizationArgs.value">
+      </td>
+    </tr>
+  </table>
+  <div class="modal-footer">
+    <button class="btn btn-success" (click)="confirm()">
+      OK
+    </button>
+    <button class="btn btn-danger" (click)="cancel()">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<style>
+  .oppia-preview-set-params-modal {
+    padding: 15px 10px 15px 10px;
+  }
+  .oppia-preview-set-params-modal .oppia-preview-set-params-modal-table {
+    margin: 5px 0 15px 0
+  }
+  .oppia-preview-set-params-modal .oppia-preview-set-params-modal-td {
+    padding: 1px 5px;
+  }
+</style>

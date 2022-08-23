@@ -16,26 +16,28 @@
 
 from __future__ import annotations
 
+import builtins
 import subprocess
 
-from core import python_utils
 from core.tests import test_utils
 from scripts import common
 from scripts import install_chrome_for_ci
 
+from typing import Iterable, List, NoReturn
+
 URL = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'
-    'google-chrome-stable_89.0.4389.90-1_amd64.deb'
+    'google-chrome-stable_102.0.5005.61-1_amd64.deb'
 )
-DOWNLOAD_VERSION = '89.0.4389.90-1'
-INSTALLED_VERSION = '89.0.4389.90'
+DOWNLOAD_VERSION = '102.0.5005.61-1'
+INSTALLED_VERSION = '102.0.5005.61'
 CHROME_DEB_FILE = 'google-chrome.deb'
 
 
 class InstallChromeTests(test_utils.GenericTestBase):
 
-    def test_success(self):
-        def mock_run_cmd(unused_tokens):
+    def test_success(self) -> None:
+        def mock_run_cmd(unused_tokens: List[str]) -> str:
             return ''
 
         run_cmd_swap = self.swap_with_checks(
@@ -55,8 +57,8 @@ class InstallChromeTests(test_utils.GenericTestBase):
         with run_cmd_swap:
             install_chrome_for_ci.install_chrome(DOWNLOAD_VERSION)
 
-    def test_fail(self):
-        def mock_run_cmd(tokens):
+    def test_fail(self) -> None:
+        def mock_run_cmd(tokens: Iterable[str]) -> NoReturn:
             command = ' '.join(tokens)
             raise subprocess.CalledProcessError(1, command, '')
 
@@ -67,7 +69,7 @@ class InstallChromeTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 subprocess.CalledProcessError,
                 'Command \'sudo apt-get update\' returned non-zero exit '
                 'status 1'
@@ -77,8 +79,8 @@ class InstallChromeTests(test_utils.GenericTestBase):
 
 class GetChromeVersionTests(test_utils.GenericTestBase):
 
-    def test_real_example(self):
-        def mock_run_cmd(unused_tokens):
+    def test_real_example(self) -> None:
+        def mock_run_cmd(unused_tokens: List[str]) -> str:
             return 'Google Chrome 88.0.4324.96 '
 
         run_cmd_swap = self.swap_with_checks(
@@ -91,8 +93,8 @@ class GetChromeVersionTests(test_utils.GenericTestBase):
             version = install_chrome_for_ci.get_chrome_version()
             self.assertEqual(version, '88.0.4324.96')
 
-    def test_fails(self):
-        def mock_run_cmd(tokens):
+    def test_fails(self) -> None:
+        def mock_run_cmd(tokens: Iterable[str]) -> NoReturn:
             command = ' '.join(tokens)
             raise subprocess.CalledProcessError(1, command, '')
 
@@ -103,7 +105,7 @@ class GetChromeVersionTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 subprocess.CalledProcessError,
                 'Command \'google-chrome --version\' returned non-zero exit '
                 'status 1'
@@ -113,14 +115,14 @@ class GetChromeVersionTests(test_utils.GenericTestBase):
 
 class MainTests(test_utils.GenericTestBase):
 
-    def test_success(self):
-        def mock_install_chrome(unused_version):
+    def test_success(self) -> None:
+        def mock_install_chrome(unused_version: str) -> None:
             return
 
-        def mock_get_chrome_version():
+        def mock_get_chrome_version() -> str:
             return INSTALLED_VERSION
 
-        def mock_print(unused_string):
+        def mock_print(unused_string: str) -> None:
             return
 
         install_chrome_swap = self.swap_with_checks(
@@ -134,7 +136,7 @@ class MainTests(test_utils.GenericTestBase):
             mock_get_chrome_version,
             expected_args=[tuple()])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 (
                     'Chrome version {} installed.'.format(
@@ -146,11 +148,11 @@ class MainTests(test_utils.GenericTestBase):
         with install_chrome_swap, get_version_swap, print_swap:
             install_chrome_for_ci.main()
 
-    def test_version_mismatch(self):
-        def mock_install_chrome(unused_version):
+    def test_version_mismatch(self) -> None:
+        def mock_install_chrome(unused_version: str) -> None:
             return
 
-        def mock_get_chrome_version():
+        def mock_get_chrome_version() -> str:
             return '123.0.12.45'
 
         install_chrome_swap = self.swap_with_checks(
@@ -165,7 +167,7 @@ class MainTests(test_utils.GenericTestBase):
             expected_args=[tuple()])
 
         with install_chrome_swap, get_version_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 RuntimeError, (
                     'Chrome version {} should have been installed. '
                     'Version 123.0.12.45 was found instead.'

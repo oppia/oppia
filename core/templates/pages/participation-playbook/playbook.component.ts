@@ -25,6 +25,9 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
+import './playbook.component.css';
+
+
 @Component({
   selector: 'participation-playbook',
   templateUrl: './playbook.component.html',
@@ -39,7 +42,7 @@ export class PlaybookPageComponent implements OnInit {
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
   ) {}
 
   ngOnInit(): void {}

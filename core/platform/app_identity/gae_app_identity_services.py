@@ -32,6 +32,9 @@ def get_application_id() -> str:
 
     Returns:
         str. The application ID.
+
+    Raises:
+        ValueError. Value can't be None for application id.
     """
     app_id = os.getenv('GOOGLE_CLOUD_PROJECT')
     if app_id is None:

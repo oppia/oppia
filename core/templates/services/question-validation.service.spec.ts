@@ -50,6 +50,7 @@ describe('Question Validation Service', () => {
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'content_5',
                 html: ''
@@ -66,6 +67,7 @@ describe('Question Validation Service', () => {
           }, {
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'content_5',
                 html: ''
@@ -92,6 +94,7 @@ describe('Question Validation Service', () => {
           },
           default_outcome: {
             dest: null,
+            dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
               content_id: 'content_2'
@@ -146,9 +149,9 @@ describe('Question Validation Service', () => {
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
-          '1', 'misc1', 'notes1', 'feedback1', true),
+          1, 'misc1', 'notes1', 'feedback1', true),
         misconceptionObjectFactory.create(
-          '2', 'misc2', 'notes2', 'feedback1', false)
+          2, 'misc2', 'notes2', 'feedback1', false)
       ]
     };
   });
@@ -183,5 +186,9 @@ describe('Question Validation Service', () => {
     let question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
+  });
+
+  it('should return false if question is not valid', () => {
+    expect(qvs.isQuestionValid(undefined, mockMisconceptionObject)).toBeFalse();
   });
 });

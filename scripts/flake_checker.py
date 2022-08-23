@@ -19,8 +19,6 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import python_utils
-
 import requests
 
 FLAKE_CHECK_AND_REPORT_URL = (
@@ -56,6 +54,15 @@ REQUEST_EXCEPTIONS = (
     requests.RequestException, requests.ConnectionError,
     requests.HTTPError, requests.TooManyRedirects, requests.Timeout)
 
+# Rerun policy overrides from logging server.
+
+# Yes, rerun, even if rerun policy says otherwise.
+RERUN_YES = 'rerun yes'
+# No, do not rerun, even if rerun policy says otherwise.
+RERUN_NO = 'rerun no'
+# No instructions from logging server, so follow rerun policy.
+RERUN_UNKNOWN = 'rerun unknown'
+
 
 def _print_color_message(message):
     """Prints the given message in red color.
@@ -64,7 +71,7 @@ def _print_color_message(message):
         message: str. The success message to print.
     """
     # \033[91m is the ANSI escape sequences for green color.
-    python_utils.PRINT('\033[92m' + message + '\033[0m\n')
+    print('\033[92m' + message + '\033[0m\n')
 
 
 def check_if_on_ci():
@@ -132,8 +139,21 @@ def report_pass(suite_name):
             PASS_REPORT_URL))
 
 
-def is_test_output_flaky(output_lines, suite_name):
-    """Returns whether the test output matches any flaky test log."""
+def check_test_flakiness(output_lines, suite_name):
+    """Checks whether the test output matches any flaky test log.
+
+    Whether the test is flaky is printed to the console.
+
+    Args:
+        output_lines: list(str). The output from the test run.
+        suite_name: str. Name of the E2E test suite.
+
+    Returns:
+        bool. Whether the test should be rerun.
+
+    Raises:
+        ValueError. Raised if the response from the logging server is invalid.
+    """
     build_info = _get_build_info()
     payload = {
         'suite': suite_name,
@@ -164,6 +184,7 @@ def is_test_output_flaky(output_lines, suite_name):
         report = response.json()
     except ValueError as e:
         _print_color_message('Unable to convert json response: %s' % e)
+        return False
 
     if 'log' in report:
         log_str = '\n'.join(report['log'])
@@ -180,4 +201,13 @@ def is_test_output_flaky(output_lines, suite_name):
         _print_color_message('    Test: %s' % flake['test'])
         _print_color_message(
             '    Error Message: %s' % flake['flake_id'])
-    return flaky
+    rerun = report['rerun']
+    if rerun not in (RERUN_YES, RERUN_NO):
+        _print_color_message(
+            'Invalid rerun instruction from logging server: %s' % rerun)
+        return False
+    else:
+        _print_color_message(
+            'Rerun instruction from logging server: %s' %
+            'rerun' if rerun == RERUN_YES else 'do not rerun')
+    return rerun == RERUN_YES

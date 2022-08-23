@@ -21,8 +21,6 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-data-backend-api.service.ts');
-require(
-  'pages/exploration-editor-page/modal-templates/help-modal.controller.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
@@ -37,30 +35,32 @@ require(
   'pages/exploration-editor-page/services/' +
    'user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { HelpModalComponent } from 'pages/exploration-editor-page/modal-templates/help-modal.component';
 
 angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ChangeListService',
+    '$q', '$rootScope', '$scope', '$timeout', 'ChangeListService',
     'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
     'ExplorationWarningsService',
-    'InternetConnectivityService', 'RouterService', 'SiteAnalyticsService',
-    'StateTutorialFirstTimeService',
+    'InternetConnectivityService', 'NgbModal', 'RouterService',
+    'SiteAnalyticsService', 'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
+        $q, $rootScope, $scope, $timeout, ChangeListService,
         ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
         ExplorationWarningsService,
-        InternetConnectivityService, RouterService, SiteAnalyticsService,
-        StateTutorialFirstTimeService,
+        InternetConnectivityService, NgbModal, RouterService,
+        SiteAnalyticsService, StateTutorialFirstTimeService,
         ThreadDataBackendApiService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService) {
@@ -70,12 +70,8 @@ angular.module('oppia').component('editorNavigation', {
         SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/modal-templates/' +
-            'help-modal.template.html'),
+        NgbModal.open(HelpModalComponent, {
           backdrop: true,
-          controller: 'HelpModalController',
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
@@ -83,6 +79,7 @@ angular.module('oppia').component('editorNavigation', {
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
             StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
+          $rootScope.$applyAsync();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -147,13 +144,13 @@ angular.module('oppia').component('editorNavigation', {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
-        ExplorationSaveService.saveChanges(
+        ExplorationSaveService.saveChangesAsync(
           $scope.showLoadingDots, $scope.hideLoadingDots)
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
             $scope.$applyAsync();
-          });
+          }, () => {});
         $scope.$applyAsync();
       };
 

@@ -1,13 +1,13 @@
 <div class="oppia-learner-answer-info-card">
   <div class="oppia-enter-answer-details">
-    <textarea class="form-control protractor-test-answer-details-text-area"
+    <textarea class="form-control e2e-test-answer-details-text-area"
               [(ngModel)]="answerDetails" rows="4"
               placeholder="Enter your explanation here">
     </textarea>
   </div>
   <div class="oppia-submit-button">
     <button mat-button
-            class="oppia-learner-confirm-button protractor-test-answer-details-submit-button"
+            class="oppia-learner-confirm-button e2e-test-answer-details-submit-button"
             [disabled]="!answerDetails"
             (click)="submitLearnerAnswerInfo()">
             SUBMIT

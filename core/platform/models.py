@@ -22,7 +22,6 @@ import inspect
 from types import ModuleType  # pylint: disable=import-only-modules
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
 from typing import List, Tuple, Type
@@ -31,20 +30,14 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models  # pylint: disable=unused-import
 
-# Valid model names.
-NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job',
-    'blog', 'classifier', 'collection', 'config', 'email', 'exploration',
-    'feedback', 'improvements', 'job', 'opportunity', 'question',
-    'recommendations', 'skill', 'statistics', 'activity', 'audit', 'auth',
-    'base_model', 'classifier', 'collection', 'config', 'email', 'exploration',
-    'feedback', 'improvements', 'job', 'opportunity', 'question',
-    'recommendations', 'skill', 'statistics', 'story', 'subtopic', 'suggestion',
-    'topic', 'translation', 'user')
+# Constant for valid model names.
+NAMES = feconf.VALID_MODEL_NAMES
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
+
+
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
@@ -59,7 +52,7 @@ class Platform:
 
     @classmethod
     def import_models(
-            cls, unused_model_names: List[str]
+            cls, unused_model_names: List[NAMES]
     ) -> Tuple[ModuleType, ...]:
         """An abstract method that should be implemented on inherited
         classes.
@@ -81,7 +74,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -125,6 +118,10 @@ class _Gae(Platform):
                 from core.storage.classifier import (
                     gae_models as classifier_models)
                 returned_models.append(classifier_models)
+            elif name == NAMES.classroom:
+                from core.storage.classroom import (
+                    gae_models as classroom_models)
+                returned_models.append(classroom_models)
             elif name == NAMES.collection:
                 from core.storage.collection import (
                     gae_models as collection_models)
@@ -148,6 +145,10 @@ class _Gae(Platform):
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
+            elif name == NAMES.learner_group:
+                from core.storage.learner_group import (
+                    gae_models as learner_group_models)
+                returned_models.append(learner_group_models)
             elif name == NAMES.opportunity:
                 from core.storage.opportunity import (
                     gae_models as opportunity_models)
@@ -193,8 +194,8 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]
-    ) -> List[base_models.BaseModel]:
+        cls, model_names: List[NAMES]
+    ) -> List[Type[base_models.BaseModel]]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -218,7 +219,7 @@ class _Gae(Platform):
         return model_classes
 
     @classmethod
-    def get_all_storage_model_classes(cls) -> List[base_models.BaseModel]:
+    def get_all_storage_model_classes(cls) -> List[Type[base_models.BaseModel]]:
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).
@@ -411,7 +412,7 @@ class Registry:
         return klass
 
     @classmethod
-    def import_models(cls, model_names: List[str]) -> Tuple[ModuleType, ...]:
+    def import_models(cls, model_names: List[NAMES]) -> Tuple[ModuleType, ...]:
         """Imports and returns the storage modules listed in model_names.
 
         Args:
@@ -424,8 +425,8 @@ class Registry:
 
     @classmethod
     def get_storage_model_classes(
-            cls, model_names: List[str]
-    ) -> List[base_models.BaseModel]:
+        cls, model_names: List[NAMES]
+    ) -> List[Type[base_models.BaseModel]]:
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -438,7 +439,7 @@ class Registry:
         return cls._get().get_storage_model_classes(model_names)
 
     @classmethod
-    def get_all_storage_model_classes(cls) -> List[base_models.BaseModel]:
+    def get_all_storage_model_classes(cls) -> List[Type[base_models.BaseModel]]:
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).

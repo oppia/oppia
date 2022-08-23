@@ -19,13 +19,15 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { CustomSchema } from 'services/schema-default-value.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { UtilsService } from 'services/utils.service';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
 
@@ -46,18 +48,19 @@ export interface Region {
 })
 export class ImageWithRegionsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  @Input() value!: { labeledRegions: Region[]; imagePath: string; };
+  @Input() value!: { labeledRegions: Region[]; imagePath: string };
+
   @Output() valueChanged = new EventEmitter();
   errorText!: string;
-  SCHEMA!: { type: string; 'obj_type': string; };
+  SCHEMA!: { type: string; 'obj_type': string };
   mouseX!: number;
   mouseY!: number;
   originalMouseX!: number;
   originalMouseY!: number;
-  originalRectArea!: { x: number; y: number; width: number; height: number; };
+  originalRectArea!: { x: number; y: number; width: number; height: number };
   rectX!: number;
   rectY!: number;
   rectWidth!: number;
@@ -79,13 +82,17 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   hoveredRegion: number | null = null;
   // Selected Region will be null if no region is selected.
   selectedRegion: number | null = null;
+  editorIsInitialized: boolean = false;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
+    private changeDetectorDef: ChangeDetectorRef,
     private el: ElementRef,
+    private imageLocalStorageService: ImageLocalStorageService,
     private utilsService: UtilsService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   // Calculates the dimensions of the image, assuming that the width
@@ -122,6 +129,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   private convertCoordsToFraction(coords: number[], dimensions: number[]) {
     return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
   }
+
   // Convert to and from region area (which is stored as a fraction of
   // image width and height) and actual width and height.
   private regionAreaFromCornerAndDimensions(
@@ -201,14 +209,32 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.alwaysEditable = true;
-    // The initializeEditor function is written separately since it
-    // is also called in resetEditor function.
-    this.initializeEditor();
-    this.imageValueChanged(this.value.imagePath);
+    // The following check is used to prevent cases when the value is not
+    // defined. This is a dynamically created component and in some cases we get
+    // undefined. This happens when ngOnInit runs before we can assign
+    // this.value the value that is supposed to be passed from object editor
+    // component.
+    if (this.value) {
+      // The initializeEditor function is written separately since it
+      // is also called in resetEditor function.
+      this.initializeEditor();
+      this.imageValueChanged(this.value.imagePath);
+    }
     this.SCHEMA = {
       type: 'custom',
       obj_type: 'Filepath'
     };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      !changes.value ||
+      !changes.value.currentValue ||
+      changes.value.previousValue === changes.value.currentValue
+    ) {
+      return;
+    }
+    this.initializeEditor();
   }
 
   // Dynamically defines the CSS style for the region rectangle.
@@ -253,6 +279,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   initializeEditor(): void {
+    if (this.editorIsInitialized) {
+      return;
+    }
     // All coordinates have origin at top-left,
     // increasing in x to the right and increasing in y down
     // Current mouse position in SVG coordinates.
@@ -303,21 +332,64 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     this.selectedRegion = null;
     // Message to displayed when there is an error.
     this.errorText = '';
+    this.editorIsInitialized = true;
   }
+
   // Use these two functions to get the calculated image width and
   // height.
   getImageWidth(): number {
-    return this._calculateImageDimensions().width;
+    const width = this._calculateImageDimensions().width;
+    return isNaN(width) ? 0 : width;
   }
+
   getImageHeight(): number {
-    return this._calculateImageDimensions().height;
+    const height = this._calculateImageDimensions().height;
+    return isNaN(height) ? 0 : height;
   }
 
   getPreviewUrl(imageUrl: string): string {
-    return this.assetsBackendApiService.getImageUrlForPreview(
-      AppConstants.ENTITY_TYPE.EXPLORATION,
-      this.contextService.getExplorationId(),
-      encodeURIComponent(imageUrl));
+    const entityType: string = this.contextService.getEntityType() as string;
+    if (
+      this.contextService.getImageSaveDestination() ===
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+      this.imageLocalStorageService.isInStorage(imageUrl)
+    ) {
+      const base64Url = this.imageLocalStorageService.getRawImageData(
+        imageUrl);
+      // This throws "TS2322: Type 'string | null' is not assignable to type
+      // 'string'" We need to suppress this error because the method
+      // 'getRawImageData' will return null only when an
+      // image is not in local storage. This scenario is explicitly checked
+      // above, before accessing the image data. So, the typescript check can
+      // be ignored here.
+      // @ts-ignore
+      const mimeType = base64Url.split(';')[0];
+      if (mimeType === AppConstants.SVG_MIME_TYPE) {
+        return this.svgSanitizerService.removeAllInvalidTagsAndAttributes(
+          // This throws "TS2322: Type 'string | null' is not assignable to type
+          // 'string'" We need to suppress this error because the method
+          // 'getRawImageData' will return null only when an
+          // image is not in local storage. This scenario is explicitly checked
+          // above, before accessing the image data. So, the typescript check
+          // can be ignored here.
+          // @ts-ignore
+          base64Url);
+      } else {
+        // This throws "TS2322: Type 'string | null' is not assignable to type
+        // 'string'" We need to suppress this error because the method
+        // 'getRawImageData' will return null only when an
+        // image is not in local storage. This scenario is explicitly checked
+        // above, before accessing the image data. So, the typescript check can
+        // be ignored here.
+        // @ts-ignore
+        return base64Url;
+      }
+    } else {
+      return this.assetsBackendApiService.getImageUrlForPreview(
+        entityType,
+        this.contextService.getEntityId(),
+        encodeURIComponent(imageUrl));
+    }
   }
 
   regionLabelSetter(label: string): void {
@@ -447,7 +519,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
           }
         };
         this.value.labeledRegions.push(newRegion);
-        this.valueChanged.emit(this.value);
+        // In order to trigger change detection, we emit a new object by
+        // using the spread operator. This is because adding/modifying
+        // properties in an Object/Array doesn't always trigger
+        // change-detection cycles.
+        this.valueChanged.emit({...this.value});
         this.selectedRegion = (
           this.value.labeledRegions.length - 1);
       }
@@ -571,6 +647,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       backdrop: 'static',
       keyboard: false,
     }).result.then(() => {
+      this.editorIsInitialized = false;
       this.value.imagePath = '';
       this.value.labeledRegions = [];
       this.imageValueChanged('');
@@ -594,7 +671,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.hoveredRegion--;
     }
     this.value.labeledRegions.splice(index, 1);
-    this.valueChanged.emit(this.value);
+    // In order to trigger change detection, we emit a new object by
+    // using the spread operator. This is because adding/modifying
+    // properties in an Object/Array doesn't always trigger
+    // change-detection cycles.
+    this.valueChanged.emit({...this.value});
   }
 
   imageValueChanged(newVal: string): void {
@@ -613,7 +694,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       img.onload = function() {
         setHeightAndWidth(this as HTMLCanvasElement);
       };
-      img.src = this.getPreviewUrl(newVal);
+      img.src = this.getPreviewUrl(newVal) as string;
     }
     this.valueChanged.emit(this.value);
   }

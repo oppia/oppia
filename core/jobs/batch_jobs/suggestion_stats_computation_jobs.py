@@ -21,19 +21,25 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
+from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, Iterable, Optional, Tuple, Union
+import result
+
+from typing import Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -41,10 +47,20 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(opportunity_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.opportunity, models.NAMES.suggestion])
+(opportunity_models, suggestion_models) = models.Registry.import_models([
+    models.NAMES.opportunity, models.NAMES.suggestion
+])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class TranslationContributionsStatsDict(TypedDict):
+    """Type for the translation contributions stats dictionary."""
+
+    suggestion_status: str
+    edited_by_reviewer: bool
+    content_word_count: int
+    last_updated_date: datetime.date
 
 
 class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
@@ -62,8 +78,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Get all non-deleted suggestion models' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
                     include_deleted=False))
-            # We need to window the models so that CoGroupByKey below
-            # works properly.
             | 'Filter translate suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
@@ -78,15 +92,13 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(
                 opportunity_models.ExplorationOpportunitySummaryModel.get_all(
                     include_deleted=False))
-            # We need to window the models so that CoGroupByKey below
-            # works properly.
             | 'Transform to opportunity domain object' >> beam.Map(
                 opportunity_services.
                 get_exploration_opportunity_summary_from_model)
             | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
         )
 
-        new_user_stats_models = (
+        user_stats_results = (
             {
                 'suggestion': suggestions_grouped_by_target,
                 'opportunity': exp_opportunities
@@ -99,33 +111,56 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None
                 ))
+        )
+
+        user_stats_models = (
+            user_stats_results
+            | 'Filter ok results' >> beam.Filter(
+                lambda key_and_result: key_and_result[1].is_ok())
+            | 'Unpack result' >> beam.MapTuple(
+                lambda key, result: (key, result.unwrap()))
             | 'Combine the stats' >> beam.CombinePerKey(CombineStats())
             | 'Generate models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
         )
 
+        user_stats_error_job_run_results = (
+            user_stats_results
+            | 'Filter err results' >> beam.Filter(
+                lambda key_and_result: key_and_result[1].is_err())
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Remove keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Transform result to job run result' >> (
+                job_result_transforms.ResultsToJobRunResults())
+        )
+
         unused_put_result = (
-            new_user_stats_models
+            user_stats_models
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
+        user_stats_models_job_run_results = (
+            user_stats_models
+            | 'Create job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
+        )
+
         return (
-            new_user_stats_models
-            | 'Count all new models' >> (
-                beam.combiners.Count.Globally().without_defaults())
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS %s' % x)
-                )
+            (
+                user_stats_error_job_run_results,
+                user_stats_models_job_run_results
+            )
+            | 'Merge job run results' >> beam.Flatten()
         )
 
     @staticmethod
     def _generate_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary]
-    ) -> Iterable[Tuple[str, Dict[str, Union[bool, int, str]]]]:
+    ) -> Iterator[
+        Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
+    ]:
         """Generates translation contribution stats for each suggestion.
 
         Args:
@@ -150,22 +185,44 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            # Count the number of words in the original content, ignoring any
-            # HTML tags and attributes.
-            content_plain_text = html_cleaner.strip_html_tags( # type: ignore[no-untyped-call]
-                suggestion.change.content_html) # type: ignore[attr-defined]
-            content_word_count = len(content_plain_text.split())
-
             key = (
                 suggestion_models.TranslationContributionStatsModel.generate_id(
                     suggestion.language_code, suggestion.author_id, topic_id))
-            translation_contribution_stats_dict = {
-                'suggestion_status': suggestion.status,
-                'edited_by_reviewer': suggestion.edited_by_reviewer,
-                'content_word_count': content_word_count,
-                'last_updated_date': suggestion.last_updated.date().isoformat()
-            }
-            yield (key, translation_contribution_stats_dict)
+            try:
+                change = suggestion.change
+                # In the new translation command the content in set format is
+                # a list, content in unicode and html format is a string.
+                # This code normalizes the content to the list type so that
+                # we can easily count words.
+                if (
+                        change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
+                        state_domain.WrittenTranslation.is_data_format_list(  # type: ignore[no-untyped-call]
+                            change.data_format
+                        )
+                ):
+                    content_items: Union[str, List[str]] = change.content_html
+                else:
+                    content_items = [change.content_html]
+
+                content_word_count = 0
+                for item in content_items:
+                    # Count the number of words in the original content,
+                    # ignoring any HTML tags and attributes.
+                    content_plain_text = html_cleaner.strip_html_tags(item)
+                    content_word_count += len(content_plain_text.split())
+
+                translation_contribution_stats_dict = {
+                    'suggestion_status': suggestion.status,
+                    'edited_by_reviewer': suggestion.edited_by_reviewer,
+                    'content_word_count': content_word_count,
+                    'last_updated_date': (
+                        suggestion.last_updated.date().isoformat())
+                }
+                yield (key, result.Ok(translation_contribution_stats_dict))
+            except Exception as e:
+                yield (
+                    key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+                )
 
     @staticmethod
     def _generate_translation_contribution_model(
@@ -212,6 +269,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             return translation_contributions_stats_model
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences of
+# stubs in Typeshed, MyPy assuming CombineFn class is of type Any. Thus to
+# avoid MyPy's error (Class cannot subclass 'CombineFn' (has type 'Any')),
+# we added an ignore here.
 class CombineStats(beam.CombineFn):  # type: ignore[misc]
     """CombineFn for combining the stats."""
 
@@ -223,7 +284,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
     def add_input(
         self,
         accumulator: suggestion_registry.TranslationContributionStats,
-        translation: Dict[str, Union[bool, int, str]]
+        translation: TranslationContributionsStatsDict
     ) -> suggestion_registry.TranslationContributionStats:
         is_accepted = (
             translation['suggestion_status'] ==
@@ -238,7 +299,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
         word_count = translation['content_word_count']
         suggestion_date = datetime.datetime.strptime(
             str(translation['last_updated_date']), '%Y-%m-%d').date()
-        return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
+        return suggestion_registry.TranslationContributionStats(
             accumulator.language_code,
             accumulator.contributor_user_id,
             accumulator.topic_id,
@@ -265,7 +326,13 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
         self,
         accumulators: Iterable[suggestion_registry.TranslationContributionStats]
     ) -> suggestion_registry.TranslationContributionStats:
-        return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
+        contribution_dates: Set[datetime.date] = set()
+        all_contribution_dates = [
+            acc.contribution_dates for acc in accumulators
+        ]
+        contribution_dates = contribution_dates.union(*all_contribution_dates)
+
+        return suggestion_registry.TranslationContributionStats(
             list(accumulators)[0].language_code,
             list(accumulators)[0].contributor_user_id,
             list(accumulators)[0].topic_id,
@@ -279,7 +346,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
             sum(acc.accepted_translation_word_count for acc in accumulators),
             sum(acc.rejected_translations_count for acc in accumulators),
             sum(acc.rejected_translation_word_count for acc in accumulators),
-            set().union(*[acc.contribution_dates for acc in accumulators])
+            contribution_dates
         )
 
     def extract_output(

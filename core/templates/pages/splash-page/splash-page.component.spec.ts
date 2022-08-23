@@ -39,6 +39,10 @@ class MockI18nLanguageCodeService {
     return 'en';
   }
 
+  isCurrentLanguageRTL() {
+    return true;
+  }
+
   get onI18nLanguageCodeChange() {
     return this.codeChangeEventEmitter;
   }
@@ -46,7 +50,7 @@ class MockI18nLanguageCodeService {
 
 describe('Splash Page', () => {
   let siteAnalyticsService: SiteAnalyticsService;
-  let loaderService: LoaderService = null;
+  let loaderService: LoaderService;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
@@ -92,7 +96,7 @@ describe('Splash Page', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
-  let component;
+  let component: SplashPageComponent;
   beforeEach(() => {
     const splashPageComponent = TestBed.createComponent(SplashPageComponent);
     component = splashPageComponent.componentInstance;

@@ -18,7 +18,10 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { APP_BASE_HREF } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -50,8 +53,11 @@ describe('ImageUploaderComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         MatIconModule,
-        MockRouterModule,
-        HttpClientTestingModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule,
+        HttpClientTestingModule,
+        RouterModule.forRoot([])
       ],
       declarations: [
         ImageUploaderComponent,
@@ -59,7 +65,8 @@ describe('ImageUploaderComponent', () => {
       ],
       providers: [
         BlogDashboardPageService,
-        {provide: WindowRef, useValue: windowRef}
+        { provide: WindowRef, useValue: windowRef },
+        { provide: APP_BASE_HREF, useValue: '/' }
       ]
     }).compileComponents();
   }));

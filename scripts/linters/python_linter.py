@@ -21,27 +21,14 @@ from __future__ import annotations
 import io
 import os
 import re
-import sys
 
-from core import python_utils
+import isort.api
+import pycodestyle
+from pylint import lint
+from pylint.reporters import text
 
 from . import linter_utils
-from .. import common
 from .. import concurrent_task_utils
-
-_PATHS_TO_INSERT = [
-    common.PYLINT_PATH,
-    common.PYCODESTYLE_PATH,
-    common.PYLINT_QUOTES_PATH,
-    common.ISORT_PATH,
-]
-for path in _PATHS_TO_INSERT:
-    sys.path.insert(1, path)
-
-from pylint import lint  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.reporters import text  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-import isort.api  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 class ThirdPartyPythonLintChecksManager:
@@ -115,7 +102,7 @@ class ThirdPartyPythonLintChecksManager:
             current_files_to_lint = files_to_lint[
                 current_batch_start_index: current_batch_end_index]
 
-            pylint_report = python_utils.string_io()
+            pylint_report = io.StringIO()
             pylinter = lint.Run(
                 current_files_to_lint + [config_pylint],
                 reporter=text.TextReporter(pylint_report),
@@ -162,7 +149,7 @@ class ThirdPartyPythonLintChecksManager:
         error_messages = []
         files_to_check = self.all_filepaths
         failed = False
-        stdout = python_utils.string_io()
+        stdout = io.StringIO()
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
                 # This line prints the error message along with file path

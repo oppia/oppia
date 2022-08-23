@@ -26,8 +26,8 @@
         <div ng-if="mainTopicCardIsShown">
           <div class="oppia-mobile-collapsible-card-content">
             <div class="topic-name">
-              <label for="topicName" class="form-heading protractor-test-topic-name-heading">Name</label>
-              <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
+              <label for="topicName" class="form-heading e2e-test-topic-name-heading">Name</label>
+              <input id="topicName" type="text" class="form-control e2e-test-topic-name-field"
                      ng-disabled="!topicRights.canEditTopic()"
                      ng-model="editableName" ng-blur="updateTopicName(editableName)"
                      placeholder="Enter a name for the topic."
@@ -46,8 +46,8 @@
               </div>
             </div>
             <div class="topic-url-fragment">
-              <label for="topicUrlFragment" class="form-heading protractor-test-topic-url-fragment-heading">Topic URL Fragment</label>
-              <input id="topicUrlFragment" type="text" class="form-control protractor-test-topic-url-fragment-field"
+              <label for="topicUrlFragment" class="form-heading e2e-test-topic-url-fragment-heading">Topic URL Fragment</label>
+              <input id="topicUrlFragment" type="text" class="form-control e2e-test-topic-url-fragment-field"
                      ng-disabled="!topicRights.canEditTopic()"
                      ng-model="editableTopicUrlFragment" ng-blur="updateTopicUrlFragment(editableTopicUrlFragment)"
                      maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>" ng-trim="true"
@@ -66,8 +66,8 @@
               </div>
             </div>
             <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
-              <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
-              <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
+              <label for="topicDescription" class="form-heading e2e-test-topic-description-heading">Description</label>
+              <textarea type="text" class="form-control topic-description e2e-test-topic-description-field"
                         ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                         ng-change="updateTopicDescriptionStatus(editableDescription)"
                         ng-blur="updateTopicDescription(editableDescription)"
@@ -85,8 +85,8 @@
               </span>
             </div>
             <div class="topic-page-title" ng-class="{'has-error': editablePageTitleFragmentForWeb.length === 0}">
-              <label for="topicPageTitleFragmentForWeb" class="form-heading protractor-test-topic-page-title-fragment-label">Page Title Fragment For Web</label>
-              <textarea type="text" class="form-control topic-description protractor-test-topic-page-title-fragment-field"
+              <label for="topicPageTitleFragmentForWeb" class="form-heading e2e-test-topic-page-title-fragment-label">Page Title Fragment For Web</label>
+              <textarea type="text" class="form-control topic-description e2e-test-topic-page-title-fragment-field"
                         ng-model="editablePageTitleFragmentForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]>"
                         ng-blur="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
                         ng-disabled="!topicRights.canEditTopic()"
@@ -96,13 +96,13 @@
               <span class="oppia-input-box-subtitle">
                 <em>
                   Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn <[editableName]> | Add, Subtract, Multiply and Divide | Oppia".
-                  It should be at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
+                  It should be at least <[MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> and at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
                 </em>
               </span>
             </div>
             <div class="topic-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
-              <label for="topicMetaTagContent" class="form-heading protractor-test-topic-meta-tag-content-label">Meta Tag Content</label>
-              <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
+              <label for="topicMetaTagContent" class="form-heading e2e-test-topic-meta-tag-content-label">Meta Tag Content</label>
+              <textarea type="text" class="form-control topic-description e2e-test-topic-meta-tag-content-field"
                         ng-model="editableMetaTagContent" maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
                         ng-blur="updateTopicMetaTagContent(editableMetaTagContent)"
                         ng-disabled="!topicRights.canEditTopic()"
@@ -118,6 +118,7 @@
             </div>
             <label class="form-heading">Thumbnail</label>
             <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
+                                      [use-local-storage]="false"
                                       [filename]="topic.getThumbnailFilename()"
                                       (update-filename)="updateTopicThumbnailFilename($event)"
                                       [bg-color]="topic.getThumbnailBgColor()"
@@ -159,7 +160,7 @@
       <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(SUBTOPIC_LIST)">
         <div class="subtopic-reassign-header">
           <h3>Subtopics</h3>
-          <button class="reassign-button protractor-test-reassign-skill-button"
+          <button class="reassign-button e2e-test-reassign-skill-button"
                   ng-click="reassignSkillsInSubtopics()"
                   ng-disabled="!topicRights.canEditTopic()">
             REASSIGN
@@ -177,17 +178,17 @@
       <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
         <div>
           <label>
-            <input class="practice-tab-checkbox protractor-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)" ng-disabled="!topicRights.canEditTopic()">
+            <input class="practice-tab-checkbox e2e-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)" ng-disabled="!topicRights.canEditTopic() || (!editablePracticeIsDisplayed && !doesTopicHaveMinimumPracticeQuestions())">
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>
           </label>
-          <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. It is recommended that this option be enabled only if there are at least 5 questions attached to the topic"></i>
+          <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. This can only be enabled if there are at least 10 questions attached to the topic."></i>
         </div>
-        <button class="btn add-subtopic-btn protractor-test-add-subtopic-button puppeteer-test-add-subtopic-button"
+        <button class="btn add-subtopic-btn e2e-test-add-subtopic-button puppeteer-test-add-subtopic-button"
                 ng-click="createSubtopic()"
                 ng-disabled="!topicRights.canEditTopic()">
           + ADD SUBTOPIC
         </button>
-        <button ng-if="skillCreationIsAllowed" class="btn add-skill-btn protractor-test-add-skill-button puppeteer-test-add-skill-button" ng-click="createSkill()">
+        <button ng-if="skillCreationIsAllowed" class="btn add-skill-btn e2e-test-add-skill-button puppeteer-test-add-skill-button" ng-click="createSkill()">
           + ADD SKILL
         </button>
         <div ng-if="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">
@@ -198,7 +199,7 @@
           <div class="subtopic-name-header skills-invalid" ng-if="uncategorizedSkillSummaries.length">
             <span>Uncategorized Skills</span>
           </div>
-          <div ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index" class="subtopic-skill skills-list-item protractor-test-skill-item">
+          <div ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index" class="subtopic-skill skills-list-item e2e-test-skill-item">
             <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
               <span class="clickable-item"><[skillSummary.getDescription()]></span>
             </a>
@@ -229,13 +230,13 @@
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
                   <span class="material-icons draggable-icon-indicator">drag_indicator</span>
-                  <span class="protractor-test-subtopic"><[subtopic.getTitle()]></span>
+                  <span class="e2e-test-subtopic"><[subtopic.getTitle()]></span>
                 </span>
                 <div class="subtopic-edit-options-container edit-options-container">
                   <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
-                  <i class="fa fa-ellipsis-v protractor-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
+                  <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
                   <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
-                    <i class="fa fa-trash protractor-test-delete-subtopic-button"></i>
+                    <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
                     <span>Delete</span>
                   </div>
                 </div>
@@ -290,7 +291,7 @@
         </i>
       </div>
       <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
-        <button class="btn add-story-btn protractor-test-create-story-button oppia-autofocus"
+        <button class="btn add-story-btn e2e-test-create-story-button oppia-autofocus"
                 ng-click="createCanonicalStory()" focus-on="addStoryBtn" ng-disabled="!topicRights.canEditTopic()">
           + ADD STORY
         </button>
@@ -365,7 +366,7 @@
   }
 
   topic-editor-tab .topic-dashboard-link a {
-    color: #015F9C;
+    color: #015f9c;
     text-decoration: none;
   }
 
@@ -379,7 +380,7 @@
 
   .topic-editor .entity-count {
     align-items: center;
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid #aaaac1;
     border-radius: 6px;
     box-shadow: none;
@@ -480,7 +481,7 @@
   .topic-editor .add-skill-btn,
   .topic-editor .add-story-btn {
     background-color: #008098;
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     text-align: left;
   }
@@ -603,8 +604,8 @@
   }
 
   .topic-editor .skills-invalid {
-    background-color: #C55F4533;
-    border: 2px solid #C55F45;
+    background-color: #c55f4533;
+    border: 2px solid #c55f45;
   }
 
   .topic-editor .clickable-item:hover {
@@ -628,7 +629,7 @@
   .topic-editor .practice-tab-info-circle {
     background: #000;
     border-radius: 10px;
-    color: #FFF;
+    color: #fff;
     margin-left: 3px;
     padding: 1px;
   }
@@ -740,6 +741,7 @@
 
     .topic-editor .topic-info-container {
       margin-top: 0;
+      padding-bottom: 50px;
       width: 100%;
     }
 

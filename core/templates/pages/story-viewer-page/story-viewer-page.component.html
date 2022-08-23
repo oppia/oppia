@@ -1,12 +1,22 @@
-<div class="oppia-story-viewer-container">
+<div class="oppia-story-viewer-container" (click)="focusSkipButton($event.target, isLoggedIn)">
   <div *ngIf="storyIsLoaded">
     <div class="oppia-story-viewer-inner-container">
       <div *ngIf="storyPlaythroughObject" class="oppia-story-player-tiles-container">
         <div class="oppia-story-viewer-title">
-          {{ storyTitle }}
+          <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+            {{ storyTitle }}
+          </span>
+          <span *ngIf="isHackyStoryTitleTranslationDisplayed()">
+            {{ storyTitleTranslationKey | translate }}
+          </span>
         </div>
         <div class="oppia-story-viewer-description">
-          {{ storyDescription }}
+          <span *ngIf="!isHackyStoryDescTranslationDisplayed()">
+            {{ storyDescription }}
+          </span>
+          <span *ngIf="isHackyStoryDescTranslationDisplayed()">
+            {{ storyDescTranslationKey | translate }}
+          </span>
         </div>
 
         <div *ngIf="showChapters()" class="d-md-block oppia-story-viewer-card-container">
@@ -15,7 +25,7 @@
 
             <div>
               <div class="fx-row">
-                <div class="oppia-lesson-track protractor-test-lesson-track">
+                <div class="oppia-lesson-track e2e-test-lesson-track">
                   <svg *ngIf="!last"
                        width="9px"
                        height="530px"
@@ -29,20 +39,26 @@
                     </path>
                   </svg>
 
-                  <img class="oppia-lesson-icon-completed protractor-test-lesson-icon-completed"
+                  <img class="oppia-lesson-icon-completed e2e-test-lesson-icon-completed"
                        [src]="getStaticImageUrl('/general/collection_paw.svg')"
                        *ngIf="node.isCompleted()">
                   <div *ngIf="!node.isCompleted() && (node.getId() === storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted protractor-test-lesson-icon-uncompleted">
+                       class="oppia-lesson-icon-uncompleted e2e-test-lesson-icon-uncompleted">
                   </div>
                   <div *ngIf="!node.isCompleted() && (node.getId() !== storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable protractor-test-lesson-icon-uncompleted">
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable e2e-test-lesson-icon-uncompleted">
                   </div>
                 </div>
 
                 <div class="oppia-story-viewer-card">
-                  <span class="oppia-chapter-title protractor-test-chapter-title" aria-live="assertive">
-                    <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{index + 1}}: {{ node.getTitle() }}
+                  <span class="oppia-chapter-title e2e-test-chapter-title" aria-live="assertive">
+                    <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span>
+                    <span *ngIf="!isHackyStoryNodeTitleTranslationDisplayed(index)">
+                      {{index + 1}}: {{ node.getTitle() }}
+                    </span>
+                    <span *ngIf="isHackyStoryNodeTitleTranslationDisplayed(index)">
+                      {{index + 1}}: {{ storyNodesTitleTranslationKeys[index] | translate }}
+                    </span>
                   </span>
 
                   <div class="oppia-story-viewer-card-content">
@@ -81,7 +97,14 @@
                     </svg>
 
                     <div class="oppia-story-viewer-card-description-box">
-                      <p class="oppia-story-description-text">{{node.getDescription()}}</p>
+                      <p class="oppia-story-description-text">
+                        <span *ngIf="!isHackyStoryNodeDescTranslationDisplayed(index)">
+                          {{ node.getDescription() }}
+                        </span>
+                        <span *ngIf="isHackyStoryNodeDescTranslationDisplayed(index)">
+                          {{ storyNodesDescTranslationKeys[index] | translate }}
+                        </span>
+                      </p>
                     </div>
                   </div>
 
@@ -130,76 +153,20 @@
       </div>
     </div>
     <attribution-guide></attribution-guide>
-    <div *ngIf="!isLoggedIn"  class="story-viewer-login-container">
-      <h2>Learn More about {{ storyPlaythroughObject.topicName }}</h2>
-      <div class="mt-2">
-        <button class="mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
+    <div *ngIf="!isLoggedIn && showLoginOverlay" class="story-viewer-login-container" #overlay>
+      <h2 class="login-text">Save your progress</h2>
+      <div class="login-buttons">
+        <button class="btn mat-raised-button oppia-login-button text-light e2e-test-login-button" (click)="signIn()">
           LOG IN
         </button>
-        <span class="m-2 oppia-login-or-signup-text">or</span>
-        <button class="mat-raised-button oppia-sign-up-button text-light" (click)="signIn()">
+        <span class="m-3 oppia-login-or-signup-text">or</span>
+        <button class="btn mat-raised-button oppia-sign-up-button text-light" (click)="signIn()">
           SIGN UP
         </button>
+      </div>
+      <div class="skip-container d-flex justify-content-end">
+        <button class="btn skip-btn px-5" (click)="hideLoginOverlay()" #skip>SKIP</button>
       </div>
     </div>
   </div>
 </div>
-<style>
-  .oppia-story-viewer-container a {
-    text-decoration: none;
-  }
-
-  .oppia-story-viewer-container a:hover, a:hover span {
-    color: #0844aa;
-  }
-
-  .oppia-story-description-text {
-    font-size: 20px;
-  }
-
-  .oppia-story-viewer-card-description-box {
-    margin-left: 10px;
-  }
-
-  .story-viewer-login-container {
-    background-color: rgba(255, 255, 255, 0.8);
-    bottom: 0;
-    padding: 2em;
-    position: sticky;
-    text-align: center;
-    width: 100%;
-  }
-
-  .story-viewer-login-container .md-raised {
-    font-size: 1.2em;
-    min-width: max-content;
-    padding: 1em;
-    width: 8em;
-  }
-
-  .story-viewer-login-container .oppia-login-button.mat-raised-button {
-    background-color: #00645C;
-    font-size: 19.2px;
-    height: 60px;
-    width: 154px;
-  }
-
-  .story-viewer-login-container .oppia-login-or-signup-text {
-    display: inline;
-    padding: 10px;
-  }
-
-  .story-viewer-login-container .oppia-sign-up-button.mat-raised-button {
-    background-color: #00609C;
-    font-size: 19.2px;
-    height: 60px;
-    width: 154px;
-  }
-
-  @media screen and (max-width: 450px) {
-    .story-viewer-login-container .oppia-login-or-signup-text {
-      display: block;
-    }
-  }
-
-</style>

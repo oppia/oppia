@@ -35,7 +35,7 @@ describe('Progress tab Component', () => {
   let fixture: ComponentFixture<ProgressTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService = null;
+    LearnerDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void> = new EventEmitter();
 

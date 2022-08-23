@@ -1,18 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="combinatorics_1_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-	 y="0px" viewBox="0 0 186.9 187.2" enable-background="new 0 0 186.9 187.2" xml:space="preserve">
-<rect x="0.2" y="0" fill="none" width="186.7" height="186.7"/>
-<circle fill="#EFF4FB" cx="70.3" cy="95.7" r="4.4"/>
-<circle fill="#EFF4FB" cx="91.3" cy="116.7" r="4.4"/>
-<rect x="91.6" y="65.9" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 93.7289 225.5622)" fill="#EFF4FB" width="3.9" height="55"/>
-<circle fill="#EFF4FB" cx="70.3" cy="69.2" r="4.4"/>
-<circle fill="#EFF4FB" cx="70.3" cy="42.7" r="4.4"/>
-<circle fill="#EFF4FB" cx="117.7" cy="90.2" r="4.4"/>
-<path fill="#EFF4FB" d="M93.6,13.8C49.6,13.8,14,49.4,14,93.4c0,43.9,35.6,79.5,79.5,79.5c43.9,0,79.5-35.6,79.5-79.5
-	C173.1,49.4,137.5,13.8,93.6,13.8z M121.4,155.1c-2.3,2.3-6,2.3-8.2,0L31.8,73.8c-2.3-2.3-2.3-6,0-8.2l33.9-33.9
-	c2.3-2.3,6-2.3,8.2,0l81.4,81.4c2.3,2.3,2.3,6,0,8.2L121.4,155.1z"/>
-<circle fill="#EFF4FB" cx="144.2" cy="116.7" r="4.4"/>
-<circle fill="#EFF4FB" cx="117.7" cy="116.7" r="4.4"/>
-<circle fill="#EFF4FB" cx="117.7" cy="143.1" r="4.4"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 186.9 187.2" fill="#eff4fb" xmlns:v="https://vecta.io/nano"><circle cx="70.3" cy="95.7" r="4.4"/><circle cx="91.3" cy="116.7" r="4.4"/><path d="M75.556 114.194l-2.758-2.758 38.89-38.89 2.758 2.758z"/><circle cx="70.3" cy="69.2" r="4.4"/><circle cx="70.3" cy="42.7" r="4.4"/><circle cx="117.7" cy="90.2" r="4.4"/><path d="M93.6 13.8c-44 0-79.6 35.6-79.6 79.6 0 43.9 35.6 79.5 79.5 79.5S173 137.3 173 93.4c.1-44-35.5-79.6-79.4-79.6zm27.8 141.3c-2.3 2.3-6 2.3-8.2 0L31.8 73.8c-2.3-2.3-2.3-6 0-8.2l33.9-33.9c2.3-2.3 6-2.3 8.2 0l81.4 81.4c2.3 2.3 2.3 6 0 8.2l-33.9 33.8z"/><circle cx="144.2" cy="116.7" r="4.4"/><circle cx="117.7" cy="116.7" r="4.4"/><circle cx="117.7" cy="143.1" r="4.4"/></svg>

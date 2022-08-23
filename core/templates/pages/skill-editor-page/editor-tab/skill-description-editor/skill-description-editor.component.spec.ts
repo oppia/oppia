@@ -35,9 +35,9 @@ describe('Skill Description Editor Component', () => {
   let skillEditorStateService: SkillEditorStateService;
   let skillObjectFactory: SkillObjectFactory;
 
-  let sampleSkillRights: SkillRights = null;
-  let skillRightsDict: SkillRightsBackendDict = null;
-  let sampleSkill: Skill = null;
+  let sampleSkillRights: SkillRights;
+  let skillRightsDict: SkillRightsBackendDict;
+  let sampleSkill: Skill;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,7 +45,6 @@ describe('Skill Description Editor Component', () => {
       declarations: [SkillDescriptionEditorComponent],
       providers: [
         SkillUpdateService,
-        SkillEditorStateService,
         SkillEditorStateService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -104,9 +103,6 @@ describe('Skill Description Editor Component', () => {
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);
 
-    expect(component.skill).toBe(null);
-    expect(component.tmpSkillDescription).toBe(null);
-    expect(component.skillRights).toBe(null);
     expect(component.errorMsg).toBe('');
 
     component.ngOnInit();
@@ -120,7 +116,8 @@ describe('Skill Description Editor Component', () => {
 
   it('should save skill description successfully', () => {
     let saveSkillDescriptionSpy = spyOn(
-      skillUpdateService, 'setSkillDescription').and.returnValue(null);
+      skillUpdateService, 'setSkillDescription').and.callThrough();
+    spyOn(component.onSaveDescription, 'emit').and.callThrough();
     spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(true);
     component.ngOnInit();
     // Old Description.
@@ -128,11 +125,12 @@ describe('Skill Description Editor Component', () => {
 
     component.saveSkillDescription('newSkillDescription');
     expect(saveSkillDescriptionSpy).toHaveBeenCalled();
+    expect(component.onSaveDescription.emit).toHaveBeenCalled();
   });
 
   it('should not save skill description if it is old description', () => {
     let saveSkillDescriptionSpy = spyOn(
-      skillUpdateService, 'setSkillDescription').and.returnValue(null);
+      skillUpdateService, 'setSkillDescription').and.callThrough();
     component.ngOnInit();
     // Old Description.
     expect(component.tmpSkillDescription).toBe('Skill description loading');
@@ -143,7 +141,7 @@ describe('Skill Description Editor Component', () => {
 
   it('should not save skill description if it has invalid character', () => {
     let saveSkillDescriptionSpy = spyOn(
-      skillUpdateService, 'setSkillDescription').and.returnValue(null);
+      skillUpdateService, 'setSkillDescription').and.callThrough();
     spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(false);
     component.ngOnInit();
     // Old Description.

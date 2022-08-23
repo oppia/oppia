@@ -65,7 +65,8 @@ INVALID_NO_NEWLINE_FILEPATH = os.path.join(
 INVALID_URLOPEN_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlopen.py')
 INVALID_AUTHOR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_author.py')
-INVALID_NDB_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_ndb.py')
+INVALID_DATASTORE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_datastore.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pylint_id.py')
 INVALID_TABS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_tabs.py')
@@ -76,7 +77,7 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_copyright.py')
 INVALID_ANNOTATIONS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_annotations.py')
-CONSTANTS_FILEPATH = 'constants.ts'
+CONSTANTS_FILEPATH = os.path.join(os.getcwd(), 'assets', 'constants.ts')
 VALID_PY_IGNORE_PRAGMA_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py')
 
@@ -141,7 +142,7 @@ class PythonLintTests(test_utils.LinterTestBase):
 
     def test_invalid_use_of_ndb(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_NDB_FILEPATH], FILE_CACHE)
+            [INVALID_DATASTORE_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             ['Line 28: Please use datastore_services instead of ndb'],
@@ -162,26 +163,6 @@ class PythonLintTests(test_utils.LinterTestBase):
             'The id-to-message list can be seen '
             'here->http://pylint-messages.wikidot.com/all-codes'
             ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_urlopen(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_URLOPEN_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 42: Please use python_utils.url_open().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_request(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_REQUEST_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 44: Please use python_utils.url_request().'],
-            lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -225,10 +206,22 @@ class GeneralLintTests(test_utils.LinterTestBase):
             [INVALID_TODO_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
-            'Line 30: Please assign TODO comments to a user in the format'
-            ' TODO(username): XXX.'], lint_task_report.trimmed_messages)
+            'Line 30: Please link TODO comments to an issue in the format'
+            ' TODO(#issuenum): XXX.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
+
+    def test_error_message_includes_filepath(self):
+        def _mock_readlines_error(unused_self):
+            raise Exception('filecache error')
+
+        with self.swap(FILE_CACHE, 'readlines', _mock_readlines_error):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_ANNOTATIONS_FILEPATH], FILE_CACHE)
+            with self.assertRaisesRegex(
+                    Exception,
+                    '%s filecache error' % INVALID_ANNOTATIONS_FILEPATH):
+                linter.check_mandatory_patterns()
 
     def test_missing_unicode_literal(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
@@ -262,7 +255,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_invalid_dev_mode_in_constants_ts(self):
-        def mock_readlines(unused_self, unused_filepath):
+        def mock_readlines(unused_self):
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
                 ' * @fileoverview Initializes constants for '
@@ -270,25 +263,20 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 '"DEV_MODE": false,\n'
                 '"EMULATOR_MODE": true\n')
 
-        readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
-
-        with readlines_swap:
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
-        self.assertItemsEqual(
-            [
-                'constants.ts --> Please set the DEV_MODE variable in '
-                'constants.ts to true before committing.',
-            ],
-            lint_task_report.trimmed_messages
-        )
+        self.assertEqual(len(lint_task_report.trimmed_messages), 1)
+        self.assertTrue(lint_task_report.trimmed_messages[0].endswith(
+            'constants.ts --> Please set the DEV_MODE variable in '
+            'constants.ts to true before committing.'))
+
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
     def test_invalid_emulator_mode_in_constants_ts(self):
-        def mock_readlines(unused_self, unused_filepath):
+        def mock_readlines(unused_self):
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
                 ' * @fileoverview Initializes constants for '
@@ -296,20 +284,15 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 '"DEV_MODE": true,\n'
                 '"EMULATOR_MODE": false\n')
 
-        readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
-
-        with readlines_swap:
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
-        self.assertItemsEqual(
-            [
-                'constants.ts --> Please set the EMULATOR_MODE variable in '
-                'constants.ts to true before committing.',
-            ],
-            lint_task_report.trimmed_messages
-        )
+        self.assertEqual(len(lint_task_report.trimmed_messages), 1)
+        self.assertTrue(lint_task_report.trimmed_messages[0].endswith(
+            'constants.ts --> Please set the EMULATOR_MODE variable in '
+            'constants.ts to true before committing.'))
+
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

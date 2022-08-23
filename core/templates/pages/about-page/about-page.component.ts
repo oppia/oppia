@@ -25,6 +25,10 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from
   'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './about-page.component.css';
+
 
 @Component({
   selector: 'about-page',
@@ -47,7 +51,9 @@ export class AboutPageComponent {
     i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
     imageFilename: '/about/language_icon.svg'
   }];
+
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService) {

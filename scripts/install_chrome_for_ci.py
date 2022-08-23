@@ -23,11 +23,10 @@ from __future__ import annotations
 
 import re
 
-from core import python_utils
 from scripts import common
 
 
-CHROME_VERSION = '89.0.4389.90-1'
+CHROME_VERSION = '102.0.5005.61-1'
 URL_TEMPLATE = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'
     'google-chrome-stable_{}_amd64.deb'
@@ -35,7 +34,7 @@ URL_TEMPLATE = (
 CHROME_DEB_FILE = 'google-chrome.deb'
 
 
-def install_chrome(version):
+def install_chrome(version: str) -> None:
     """Install Chrome from the URL in URL_TEMPLATE.
 
     Args:
@@ -43,19 +42,19 @@ def install_chrome(version):
             of the versions available from
             github.com/webnicer/chrome-downloads.
     """
-    _ = common.run_cmd(['sudo', 'apt-get', 'update'])
-    _ = common.run_cmd(['sudo', 'apt-get', 'install', 'libappindicator3-1'])
-    _ = common.run_cmd([
+    common.run_cmd(['sudo', 'apt-get', 'update'])
+    common.run_cmd(['sudo', 'apt-get', 'install', 'libappindicator3-1'])
+    common.run_cmd([
         'curl', '-L', '-o', CHROME_DEB_FILE,
         URL_TEMPLATE.format(version)])
-    _ = common.run_cmd([
+    common.run_cmd([
         'sudo', 'sed', '-i',
         's|HERE/chrome\\"|HERE/chrome\\" --disable-setuid-sandbox|g',
         '/opt/google/chrome/google-chrome'])
-    _ = common.run_cmd(['sudo', 'dpkg', '-i', CHROME_DEB_FILE])
+    common.run_cmd(['sudo', 'dpkg', '-i', CHROME_DEB_FILE])
 
 
-def get_chrome_version():
+def get_chrome_version() -> str:
     """Get the current version of Chrome.
 
     Note that this only works on Linux systems. On macOS, for example,
@@ -69,7 +68,7 @@ def get_chrome_version():
     return chrome_version
 
 
-def main():
+def main() -> None:
     """Install Chrome and check the correct version was installed."""
     install_chrome(CHROME_VERSION)
     found_version = get_chrome_version()
@@ -80,8 +79,7 @@ def main():
                 'Version {} was found instead.'
             ).format(CHROME_VERSION, found_version)
         )
-    python_utils.PRINT(
-        'Chrome version {} installed.'.format(found_version))
+    print('Chrome version {} installed.'.format(found_version))
 
 
 if __name__ == '__main__':  # pragma: no cover

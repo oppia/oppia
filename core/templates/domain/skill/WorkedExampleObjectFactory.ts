@@ -24,8 +24,8 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 
 export interface WorkedExampleBackendDict {
-  question: SubtitledHtmlBackendDict,
-  explanation: SubtitledHtmlBackendDict
+  question: SubtitledHtmlBackendDict;
+  explanation: SubtitledHtmlBackendDict;
 }
 
 export class WorkedExample {

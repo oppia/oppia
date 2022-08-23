@@ -59,6 +59,7 @@ export class ContextService {
   init(editorName: string): void {
     this.editorContext = editorName;
   }
+
   // Following method helps to know the whether the context of editor is
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
@@ -66,6 +67,7 @@ export class ContextService {
   getEditorContext(): string | null {
     return this.editorContext;
   }
+
   // Returns a string representing the current tab of the editor (either
   // 'editor' or 'preview'), or null if the current tab is neither of these,
   // or the current page is not the editor.
@@ -79,6 +81,7 @@ export class ContextService {
       return null;
     }
   }
+
   // Returns a string representing the context of the current page.
   // This is PAGE_CONTEXT.EXPLORATION_EDITOR or
   // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
@@ -136,6 +139,7 @@ export class ContextService {
       return ServicesConstants.PAGE_CONTEXT.OTHER;
     }
   }
+
   // This is required in cases like when we need to access question player
   // from the skill editor preview tab.
   setQuestionPlayerIsOpen(): void {

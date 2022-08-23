@@ -16,18 +16,28 @@
  * @fileoverview Unit tests for the terms page root component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TermsPageRootComponent } from './terms-page-root.component';
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string): string {
+    return key;
+  }
+}
+
 describe('Terms Page Root', () => {
   let fixture: ComponentFixture<TermsPageRootComponent>;
   let component: TermsPageRootComponent;
   let pageHeadService: PageHeadService;
+  let translateService: TranslateService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -36,7 +46,11 @@ describe('Terms Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageHeadService
+        PageHeadService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -46,6 +60,7 @@ describe('Terms Page Root', () => {
     fixture = TestBed.createComponent(TermsPageRootComponent);
     component = fixture.componentInstance;
     pageHeadService = TestBed.inject(PageHeadService);
+    translateService = TestBed.inject(TranslateService);
   });
 
   it('should successfully instantiate the component',
@@ -53,10 +68,41 @@ describe('Terms Page Root', () => {
       expect(component).toBeDefined();
     });
 
-  it('should initialize', () => {
-    spyOn(pageHeadService, 'updateTitleAndMetaTags');
+  it('should initialize and subscribe to onLangChange', () => {
+    spyOn(translateService.onLangChange, 'subscribe');
+
     component.ngOnInit();
+
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+  });
+
+  it('should update page title whenever the language changes', () => {
+    component.ngOnInit();
+    spyOn(component, 'setPageTitleAndMetaTags');
+
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitleAndMetaTags).toHaveBeenCalled();
+  });
+
+  it('should obtain translated title and set the title and meta tags', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
+
+    component.setPageTitleAndMetaTags();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.TITLE);
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.META);
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });

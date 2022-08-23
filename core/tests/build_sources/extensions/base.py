@@ -42,7 +42,7 @@ import os
 import sys
 
 from core import feconf
-from core import python_utils
+from core import constants
 from core import utils
 from core.domain import object_registry
 from core.domain import visualization_registry
@@ -175,7 +175,7 @@ class BaseInteraction:
             return self._cached_rules_dict
 
         rules_index_dict = json.loads(
-            python_utils.get_package_file_contents(
+            constants.get_package_file_contents(
                 'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
         self._cached_rules_dict = rules_index_dict[self.id]
 

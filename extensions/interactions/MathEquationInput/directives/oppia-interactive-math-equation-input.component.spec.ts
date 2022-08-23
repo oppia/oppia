@@ -23,6 +23,14 @@ import { GuppyInitializationService, GuppyObject } from 'services/guppy-initiali
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveMathEquationInput } from './oppia-interactive-math-equation-input.component';
+import { TranslateService } from '@ngx-translate/core';
+import { MathEquationAnswer } from 'interactions/answer-defs';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('MathEquationInputInteractive', () => {
   let component: InteractiveMathEquationInput;
@@ -30,7 +38,7 @@ describe('MathEquationInputInteractive', () => {
   let windowRef: WindowRef;
   let guppyInitializationService: GuppyInitializationService;
   let deviceInfoService: DeviceInfoService;
-  let mockCurrentInteractionService;
+  let mockCurrentInteractionService: CurrentInteractionService;
   let mockGuppyObject = {
     divId: '1',
     guppyInstance: {
@@ -45,18 +53,23 @@ describe('MathEquationInputInteractive', () => {
     asciimath() {
       return 'Dummy value';
     }
+
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
       handler({focused: true});
     }
+
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: MathEquationAnswer, rulesService: CurrentInteractionService) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -70,6 +83,10 @@ describe('MathEquationInputInteractive', () => {
           {
             provide: CurrentInteractionService,
             useClass: MockCurrentInteractionService
+          },
+          {
+            provide: TranslateService,
+            useClass: MockTranslateService
           }
         ]
       }).compileComponents();
@@ -109,9 +126,9 @@ describe('MathEquationInputInteractive', () => {
   it('should submit the answer if valid', function() {
     component.hasBeenTouched = true;
     // Invalid answer.
-    component.value = '(x + y) = 3';
+    component.value = 'x + y = 3';
 
-    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue(
       ['x', 'y']);
     spyOn(mockCurrentInteractionService, 'onSubmit');
     component.submitAnswer();

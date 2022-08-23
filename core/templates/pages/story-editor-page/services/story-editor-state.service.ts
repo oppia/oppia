@@ -27,36 +27,49 @@ import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
+import { LoaderService } from 'services/loader.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoryEditorStateService {
-  constructor(
-    private alertsService: AlertsService,
-    private editableStoryBackendApiService: EditableStoryBackendApiService,
-    private storyObjectFactory: StoryObjectFactory,
-    private undoRedoService: UndoRedoService) {}
-
-  _story: Story = this.storyObjectFactory.createInterstitialStory();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  _story!: Story;
+  _topicName!: string;
+  _classroomUrlFragment!: string;
+  _topicUrlFragment!: string;
   _storyIsInitialized: boolean = false;
   _storyIsLoading: boolean = false;
   _storyIsBeingSaved: boolean = false;
-  _topicName: string = null;
   _storyIsPublished: boolean = false;
   _skillSummaries: SkillSummaryBackendDict[] = [];
   _expIdsChanged: boolean = false;
   _storyWithUrlFragmentExists: boolean = false;
-  _classroomUrlFragment: string = null;
-  _topicUrlFragment: string = null;
 
   _storyInitializedEventEmitter = new EventEmitter();
   _storyReinitializedEventEmitter = new EventEmitter();
   _viewStoryNodeEditorEventEmitter = new EventEmitter();
   _recalculateAvailableNodesEventEmitter = new EventEmitter();
 
+  constructor(
+    private alertsService: AlertsService,
+    private editableStoryBackendApiService: EditableStoryBackendApiService,
+    private loaderService: LoaderService,
+    private storyObjectFactory: StoryObjectFactory,
+    private undoRedoService: UndoRedoService) {}
+
   private _setStory(story: Story): void {
-    this._story.copyFromStory(story);
+    if (!this._story) {
+      // The Story is set directly for the first load.
+      this._story = story;
+    } else {
+      // After first initialization, the story object will be retained for
+      // the lifetime of the editor and on every data reload or update, the new
+      // contents will be copied into the same retained object.
+      this._story.copyFromStory(story);
+    }
     if (this._storyIsInitialized) {
       this._storyReinitializedEventEmitter.emit();
     } else {
@@ -102,6 +115,7 @@ export class StoryEditorStateService {
    */
   loadStory(storyId: string): void {
     this._storyIsLoading = true;
+    this.loaderService.showLoadingScreen('Loading Story Editor');
     this.editableStoryBackendApiService.fetchStoryAsync(storyId).then(
       (newBackendStoryObject) => {
         this._setTopicName(newBackendStoryObject.topicName);
@@ -113,6 +127,7 @@ export class StoryEditorStateService {
         this._setClassroomUrlFragment(
           newBackendStoryObject.classroomUrlFragment);
         this._setTopicUrlFragment(newBackendStoryObject.topicUrlFragment);
+        this.loaderService.hideLoadingScreen();
       }, error => {
         this.alertsService.addWarning(
           error || 'There was an error when loading the story.');
@@ -195,7 +210,7 @@ export class StoryEditorStateService {
   saveStory(
       commitMessage: string,
       successCallback: (value?: Object) => void,
-      errorCallback: (value?: Object) => void): boolean {
+      errorCallback: (value: string) => void): boolean {
     if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');
@@ -239,13 +254,14 @@ export class StoryEditorStateService {
   changeStoryPublicationStatus(
       newStoryStatusIsPublic: boolean,
       successCallback: (value?: Object) => void): boolean {
-    if (!this._storyIsInitialized) {
+    const storyId = this._story.getId();
+    if (!storyId || !this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot publish a story before one is loaded.');
+      return false;
     }
-
     this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
-      this._story.getId(), newStoryStatusIsPublic).then(
+      storyId, newStoryStatusIsPublic).then(
       (storyBackendObject) => {
         this._setStoryPublicationStatus(newStoryStatusIsPublic);
         if (successCallback) {
@@ -282,6 +298,7 @@ export class StoryEditorStateService {
   get onRecalculateAvailableNodes(): EventEmitter<unknown> {
     return this._recalculateAvailableNodesEventEmitter;
   }
+
   /**
    * Returns whether the story URL fragment already exists on the server.
    */

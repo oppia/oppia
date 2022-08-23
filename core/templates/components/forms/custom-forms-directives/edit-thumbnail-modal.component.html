@@ -26,11 +26,9 @@
       <div class="oppia-form-error" *ngIf="invalidFilenameWarningIsShown">
         Please upload a valid filename image i.e; The svg file must not start with a dot or have '/' or 2 consecutive dots.
       </div>
-      <div class="oppia-form-error" *ngIf="invalidTagsAndAttributes?.tags.length">
-        Unsupported SVG tags found: {{ invalidTagsAndAttributes.tags }}
-      </div>
-      <div class="oppia-form-error" *ngIf="invalidTagsAndAttributes?.attrs.length">
-        Unsupported SVG attributes found: {{ invalidTagsAndAttributes.attrs }}
+      <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
+           class="oppia-form-error oppia-unsupported-svg-tag-attribute-error"
+           [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }">
       </div>
       <div [hidden]="!uploadedImage">
         <div [hidden]="!allowedBgColors">
@@ -49,9 +47,9 @@
             </span>
           </div>
         </div>
-        <div @fade class="oppia-thumbnail-container protractor-test-thumbnail-container" *ngIf="uploadedImage"
+        <div @fade class="oppia-thumbnail-container e2e-test-thumbnail-container" *ngIf="uploadedImage"
              [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
-          <button class="btn btn-secondary oppia-thumbnail-reset-button protractor-thumbnail-reset-button protractor-test-thumbnail-reset-button" (click)="reset()">
+          <button class="btn btn-secondary oppia-thumbnail-reset-button e2e-thumbnail-reset-button e2e-test-thumbnail-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
           <div>
@@ -78,9 +76,9 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
-    <button class="btn btn-success protractor-test-photo-upload-submit"
+    <button class="btn btn-success e2e-test-photo-upload-submit"
             (click)="confirm()"
-            [disabled]="!uploadedImage">
+            [disabled]="!uploadedImage || !thumbnailHasChanged">
       Add Thumbnail
     </button>
   </div>
@@ -159,5 +157,11 @@
   .oppia-form-error {
     margin-top: 15px;
     word-break: break-word;
+  }
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    padding: 10px;
   }
 </style>

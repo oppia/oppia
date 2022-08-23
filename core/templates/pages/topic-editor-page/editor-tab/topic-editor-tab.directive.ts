@@ -16,6 +16,15 @@
  * @fileoverview Controller for the main topic editor.
  */
 
+import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/change-subtopic-assignment-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { Subscription } from 'rxjs';
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+import topicConstants from 'assets/constants';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -30,9 +39,6 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-    'change-subtopic-assignment-modal.template.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
@@ -51,12 +57,7 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('base-components/loading-message.component.ts');
-
-import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import topicConstants from 'assets/constants';
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -68,7 +69,7 @@ angular.module('oppia').directive('topicEditorTab', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
-        'ImageUploadHelperService',
+        'ImageUploadHelperService', 'NgbModal',
         'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
@@ -77,10 +78,11 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_META_TAG_CONTENT',
         'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+        'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
-            ImageUploadHelperService,
+            ImageUploadHelperService, NgbModal,
             PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
@@ -88,7 +90,8 @@ angular.module('oppia').directive('topicEditorTab', [
             WindowDimensionsService, WindowRef,
             MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
-            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -99,6 +102,8 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
           $scope.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+          $scope.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
           ctrl.initEditor = function() {
             $scope.skillCreationIsAllowed = (
               TopicEditorStateService.isSkillCreationAllowed());
@@ -199,13 +204,16 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                  'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before exiting the topic editor.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
@@ -217,13 +225,16 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.createSkill = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/modal-templates/' +
-                    'topic-save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: 'ConfirmOrCancelModalController'
-              }).result.then(function() {}, function() {
+              const modalRef = NgbModal.open(
+                SavePendingChangesModalComponent, {
+                  backdrop: true
+                });
+
+              modalRef.componentInstance.body = (
+                'Please save all pending changes ' +
+                'before exiting the topic editor.');
+
+              modalRef.result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
@@ -275,6 +286,9 @@ angular.module('oppia').directive('topicEditorTab', [
                   TopicUpdateService.setTopicUrlFragment(
                     $scope.topic, newTopicUrlFragment);
                   $rootScope.$applyAsync();
+                }, function() {
+                  TopicUpdateService.setTopicUrlFragment(
+                    $scope.topic, newTopicUrlFragment);
                 });
             } else {
               TopicUpdateService.setTopicUrlFragment(
@@ -288,6 +302,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicThumbnailFilename(
               $scope.topic, newThumbnailFilename);
+            $scope.$applyAsync();
           };
 
           $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
@@ -322,14 +337,29 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          // Only update the topic if 1) the creator is turning off the
+          // practice tab or 2) the creator is turning on the practice tab
+          // and it has enough practice questions.
           $scope.updatePracticeTabIsDisplayed = function(
               newPracticeTabIsDisplayed) {
-            if (
-              newPracticeTabIsDisplayed !==
-              $scope.topic.getPracticeTabIsDisplayed()) {
+            if (!newPracticeTabIsDisplayed ||
+              $scope.doesTopicHaveMinimumPracticeQuestions()
+            ) {
               TopicUpdateService.setPracticeTabIsDisplayed(
                 $scope.topic, newPracticeTabIsDisplayed);
+              $scope.editablePracticeIsDisplayed = newPracticeTabIsDisplayed;
             }
+          };
+
+          $scope.doesTopicHaveMinimumPracticeQuestions = function() {
+            const skillQuestionCounts = (
+              Object.values($scope.skillQuestionCountDict));
+            const numberOfPracticeQuestions = (
+              skillQuestionCounts.reduce((a: number, b: number) => a + b, 0));
+            return (
+              numberOfPracticeQuestions >=
+              topicConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE
+            );
           };
 
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
@@ -418,16 +448,14 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.changeSubtopicAssignment = function(
               oldSubtopicId, skillSummary) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                      'change-subtopic-assignment-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                subtopics: () => $scope.subtopics
-              },
-              controller: 'ChangeSubtopicAssignmentModalController'
-            }).result.then(function(newSubtopicId) {
+            const modalRef: NgbModalRef = NgbModal.open(
+              ChangeSubtopicAssignmentModalComponent, {
+                backdrop: 'static',
+                windowClass: 'oppia-change-subtopic-assignment-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.subtopics = $scope.subtopics;
+            modalRef.result.then(function(newSubtopicId) {
               if (oldSubtopicId === newSubtopicId) {
                 return;
               }

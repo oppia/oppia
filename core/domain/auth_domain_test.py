@@ -24,13 +24,18 @@ from core.domain import auth_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import auth_models
+    from mypy_imports import user_models
+
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
 class AuthIdUserIdPairTests(test_utils.TestBase):
 
-    def test_unpacking(self):
+    def test_unpacking(self) -> None:
         auth_id, user_id = auth_domain.AuthIdUserIdPair('aid', 'uid')
         self.assertEqual(auth_id, 'aid')
         self.assertEqual(user_id, 'uid')
@@ -38,20 +43,24 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
 
 class AuthClaimsTests(test_utils.TestBase):
 
-    def test_rejects_empty_auth_id(self):
-        with self.assertRaisesRegexp(Exception, 'auth_id must not be empty'):
-            auth_domain.AuthClaims(None, None, False)
-        with self.assertRaisesRegexp(Exception, 'auth_id must not be empty'):
+    def test_rejects_empty_auth_id(self) -> None:
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'auth_id must not be empty'
+        ):
+            auth_domain.AuthClaims('', None, False)
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            Exception, 'auth_id must not be empty'
+        ):
             auth_domain.AuthClaims('', None, True)
 
-    def test_attributes(self):
+    def test_attributes(self) -> None:
         auth = auth_domain.AuthClaims('sub', 'email@test.com', True)
 
         self.assertEqual(auth.auth_id, 'sub')
         self.assertEqual(auth.email, 'email@test.com')
         self.assertTrue(auth.role_is_super_admin)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         self.assertEqual(
             repr(auth_domain.AuthClaims('sub', 'email@test.com', False)),
             'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
@@ -61,14 +70,14 @@ class AuthClaimsTests(test_utils.TestBase):
             'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
                 'tub', None, True))
 
-    def test_comparison(self):
+    def test_comparison(self) -> None:
         auth = auth_domain.AuthClaims('sub', 'email@test.com', False)
 
         self.assertEqual(
             auth, auth_domain.AuthClaims('sub', 'email@test.com', False))
         self.assertNotEqual(auth, auth_domain.AuthClaims('tub', None, False))
 
-    def test_hash(self):
+    def test_hash(self) -> None:
         a = auth_domain.AuthClaims('a', 'a@a.com', False)
         b = auth_domain.AuthClaims('b', 'b@b.com', True)
 
@@ -83,18 +92,18 @@ class AuthClaimsTests(test_utils.TestBase):
 
 class UserAuthDetailsTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(UserAuthDetailsTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.user_auth_details_model = (
             auth_models.UserAuthDetailsModel.get(self.owner_id))
         self.user_auth_details = auth_services.get_user_auth_details_from_model(
             self.user_auth_details_model)
-        self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
+        self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.user_auth_details.validate()
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         self.assertEqual(
             repr(auth_domain.UserAuthDetails(
                 'uid', 'g_auth_id', 'f_auth_id', 'pid', True)),
@@ -102,7 +111,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             'parent_user_id=%r, deleted=%r)' % (
                 'uid', 'g_auth_id', 'f_auth_id', 'pid', True))
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         self.assertEqual(
             auth_domain.UserAuthDetails(
                 'uid', 'g_auth_id', 'f_auth_id', 'pid', True).to_dict(),
@@ -113,91 +122,105 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
                 'deleted': True,
             })
 
-    def test_validate_non_str_user_id(self):
-        self.user_auth_details.user_id = 123
-        self.assertRaisesRegexp(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_non_str_user_id(self) -> None:
+        self.user_auth_details.user_id = 123  # type: ignore[assignment]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'user_id must be a string',
             self.user_auth_details.validate)
 
-    def test_validate_user_id_enforces_all_lowercase_letters(self):
+    def test_validate_user_id_enforces_all_lowercase_letters(self) -> None:
         self.user_auth_details.user_id = 'uid_%s%s' % ('a' * 31, 'A')
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
-    def test_validate_user_id_enforces_length_to_be_at_least_36(self):
+    def test_validate_user_id_enforces_length_to_be_at_least_36(self) -> None:
         self.user_auth_details.user_id = 'uid_%s' % ('a' * 31)
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
-    def test_validate_user_id_enforces_uid_prefix(self):
+    def test_validate_user_id_enforces_uid_prefix(self) -> None:
         self.user_auth_details.user_id = 'a' * 36
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
-    def test_validate_empty_user_id(self):
+    def test_validate_empty_user_id(self) -> None:
         self.user_auth_details.user_id = ''
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'No user_id specified',
             self.user_auth_details.validate)
 
-    def test_validate_parent_user_id_enforces_all_lowercase_letters(self):
+    def test_validate_parent_user_id_enforces_all_lowercase_letters(
+        self) -> None:
         self.user_auth_details.parent_user_id = 'uid_%s%s' % ('a' * 31, 'A')
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
-    def test_validate_parent_user_id_enforces_length_to_be_at_least_36(self):
+    def test_validate_parent_user_id_enforces_length_to_be_at_least_36(
+        self) -> None:
         self.user_auth_details.parent_user_id = 'uid_%s' % ('a' * 31)
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
-    def test_validate_parent_user_id_enforces_uid_prefix(self):
+    def test_validate_parent_user_id_enforces_uid_prefix(
+        self) -> None:
         self.user_auth_details.parent_user_id = 'a' * 36
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
-    def test_validate_non_str_gae_id(self):
-        self.user_auth_details.gae_id = 123
-        self.assertRaisesRegexp(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_non_str_gae_id(self) -> None:
+        self.user_auth_details.gae_id = 123  # type: ignore[assignment]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'gae_id must be a string',
             self.user_auth_details.validate)
 
-    def test_validate_non_str_firebase_auth_id(self):
-        self.user_auth_details.firebase_auth_id = 123
-        self.assertRaisesRegexp(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_non_str_firebase_auth_id(self) -> None:
+        self.user_auth_details.firebase_auth_id = 123  # type: ignore[assignment]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'firebase_auth_id must be a string',
             self.user_auth_details.validate)
 
-    def test_parent_user_id_and_gae_id_together_raises_error(self):
+    def test_parent_user_id_and_gae_id_together_raises_error(self) -> None:
         self.user_auth_details.parent_user_id = (
             user_models.UserSettingsModel.get_new_id(''))
         self.user_auth_details.gae_id = self.auth_id
         self.user_auth_details.firebase_auth_id = None
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'parent_user_id must not be set for a full user',
             self.user_auth_details.validate)
 
-    def test_parent_user_id_and_firebase_auth_id_together_raises_error(self):
+    def test_parent_user_id_and_firebase_auth_id_together_raises_error(
+        self
+    ) -> None:
         self.user_auth_details.parent_user_id = (
             user_models.UserSettingsModel.get_new_id(''))
         self.user_auth_details.gae_id = None
         self.user_auth_details.firebase_auth_id = self.auth_id
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'parent_user_id must not be set for a full user',
             self.user_auth_details.validate)
 
-    def test_both_parent_user_id_and_auth_id_none_raises_error(self):
+    def test_both_parent_user_id_and_auth_id_none_raises_error(self) -> None:
         self.user_auth_details.parent_user_id = None
         self.user_auth_details.gae_id = None
         self.user_auth_details.firebase_auth_id = None
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'parent_user_id must be set for a profile user',
             self.user_auth_details.validate)

@@ -24,6 +24,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -38,6 +39,7 @@ describe('About Page', () => {
   let windowRef: MockWindowRef;
   let component: AboutPageComponent;
   let siteAnalyticsService: SiteAnalyticsService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(async() => {
     windowRef = new MockWindowRef();
@@ -57,7 +59,11 @@ describe('About Page', () => {
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     component = aboutPageComponent.componentInstance;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
   beforeEach(angular.mock.module('oppia'));
 

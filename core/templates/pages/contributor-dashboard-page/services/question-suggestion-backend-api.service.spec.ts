@@ -18,10 +18,14 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { QuestionSuggestionBackendApiService } from './question-suggestion-backend-api.service';
 
 const fakeImage = (): File => {
@@ -32,6 +36,7 @@ const fakeImage = (): File => {
 describe('Question Suggestion Backend Api Service', () => {
   let qsbas: QuestionSuggestionBackendApiService;
   let httpTestingController: HttpTestingController;
+  let imageLocalStorageService: ImageLocalStorageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -47,28 +52,45 @@ describe('Question Suggestion Backend Api Service', () => {
   beforeEach(() => {
     qsbas = TestBed.inject(QuestionSuggestionBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
   });
 
   it('should suggest questions', fakeAsync(() => {
+    spyOn(
+      imageLocalStorageService,
+      'getFilenameToBase64MappingAsync').and.returnValue(
+      Promise.resolve({}));
     let question = {
       toBackendDict: (isNewQuestion: boolean) => {
         return {};
       }
     };
+
+    const conceptCard = new ConceptCard(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION),
+      [],
+      RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
+        }
+      })
+    );
+
     let associatedSkill = new Skill(
       'test_skill', 'description', [], [],
-      null, 'en', 1, null, 'test_id', false, []);
+      conceptCard, 'en', 1, 0, 'test_id', false, []);
 
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let skillDifficulty = new SkillDifficulty('test_id', 'test_description', 1);
     qsbas.submitSuggestionAsync(
-      question as unknown as Question, associatedSkill, skillDifficulty, [{
+      question as Question, associatedSkill, 1, [{
         filename: 'image',
         imageBlob: fakeImage()
       }])
       .then(successHandler, failHandler);
+    tick();
 
     let req = httpTestingController.expectOne('/suggestionhandler/');
     expect(req.request.method).toEqual('POST');

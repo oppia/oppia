@@ -28,7 +28,7 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseStoryEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -439,9 +439,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id))
         self.assertEqual(self.story_id, json_response['story']['id'])
         self.assertEqual('Name', json_response['topic_name'])
-        self.assertEqual(len(json_response['skill_summaries']), 1)
-        self.assertEqual(
-            json_response['skill_summaries'][0]['description'], 'Description 3')
+        self.assertEqual(len(json_response['skill_summaries']), 0)
         self.logout()
 
     def test_editable_story_handler_put(self):
@@ -578,3 +576,27 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.assertEqual(
             json_response['error'],
             'Expected description to be a string, received 0')
+
+        self.logout()
+
+    def test_check_url_fragment_exists_or_not(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        new_story_id = story_services.get_new_story_id()
+        story = self.save_new_story(new_story_id, self.admin_id, self.topic_id)
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.STORY_URL_FRAGMENT_HANDLER, story.url_fragment))
+
+        url_fragment_exists = json_response['story_url_fragment_exists']
+        self.assertEqual(url_fragment_exists, True)
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.STORY_URL_FRAGMENT_HANDLER, 'non-existent-url-fragment'))
+
+        url_fragment_exists = json_response['story_url_fragment_exists']
+        self.assertEqual(url_fragment_exists, False)
+
+        self.logout()

@@ -28,7 +28,7 @@ import { AppConstants } from 'app.constants';
 
 export interface Warning {
   type: string;
-  message: string
+  message: string;
 }
 
 @Injectable({

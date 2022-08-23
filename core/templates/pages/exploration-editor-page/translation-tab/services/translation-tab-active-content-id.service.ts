@@ -29,6 +29,7 @@ import { StateRecordedVoiceoversService } from 'components/state-editor/state-ed
 export class TranslationTabActiveContentIdService {
   constructor(
     private _stateRecordedVoiceoversService: StateRecordedVoiceoversService) {}
+
   // 'activeContentId' and 'activeDataFormat' will be 'null' if active content
   // has not been set.
   activeContentId: string | null = null;
@@ -44,8 +45,9 @@ export class TranslationTabActiveContentIdService {
   }
 
   setActiveContent(contentId: string, dataFormat: string): void {
-    var allContentIds = (
-      this._stateRecordedVoiceoversService.displayed.getAllContentIds());
+    const displayStateRecordedVoiceovers = (
+      this._stateRecordedVoiceoversService.displayed);
+    let allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
     if (allContentIds.indexOf(contentId) === -1) {
       throw new Error('Invalid active content id: ' + contentId);
     }

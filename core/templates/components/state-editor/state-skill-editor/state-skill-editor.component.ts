@@ -17,51 +17,75 @@
 */
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { SkillSummary, SkillSummaryBackendDict } from 'core/templates/domain/skill/skill-summary.model';
+import { SkillSummaryBackendDict } from 'core/templates/domain/skill/skill-summary.model';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { DeleteStateSkillModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, CategorizedAndUntriagedSkillsData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { AlertsService } from 'services/alerts.service';
-import {WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { StateLinkedSkillIdService } from '../state-editor-properties-services/state-skill.service';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { UserService } from 'services/user.service';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 @Component({
   selector: 'state-skill-editor',
   templateUrl: './state-skill-editor.component.html'
 })
 export class StateSkillEditorComponent implements OnInit {
-  @Output() onSaveLinkedSkillId: EventEmitter<string> = (
-    new EventEmitter<string>());
+  @Output() onSaveLinkedSkillId: EventEmitter<string | null> = (
+    new EventEmitter<string | null>());
+
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
-  categorizedSkills: SkillsCategorizedByTopics = null;
-  untriagedSkillSummaries: SkillSummary[] = null;
+
+  categorizedSkills!: SkillsCategorizedByTopics;
+  untriagedSkillSummaries!: ShortSkillSummary[];
+  skillName!: string;
   skillEditorIsShown: boolean = true;
+  userCanEditSkills: boolean = false;
 
   constructor(
-    private topicsAndSkillsDashboardBackendApiService: (
-      TopicsAndSkillsDashboardBackendApiService),
+    private topicsAndSkillsDashboardBackendApiService:
+      TopicsAndSkillsDashboardBackendApiService,
     private storyEditorStateService: StoryEditorStateService,
     private alertsService: AlertsService,
     private windowDimensionsService: WindowDimensionsService,
     private stateLinkedSkillIdService: StateLinkedSkillIdService,
     private urlInterpolationService: UrlInterpolationService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private skillBackendApiService: SkillBackendApiService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
     this.skillEditorIsShown = (!this.windowDimensionsService.isWindowNarrow());
-    this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-      .then((response: TopicsAndSkillDashboardData) => {
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchCategorizedAndUntriagedSkillsDataAsync()
+      .then((response: CategorizedAndUntriagedSkillsData) => {
         this.categorizedSkills = response.categorizedSkillsDict;
         this.untriagedSkillSummaries = response.untriagedSkillSummaries;
+      });
+    this.userService.canUserAccessTopicsAndSkillsDashboard()
+      .then((canUserAccessTopicsAndSkillsDashboard) => {
+        this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
+      });
+    this.stateLinkedSkillIdService.onStateLinkedSkillIdInitialized.subscribe(
+      () => {
+        if (this.stateLinkedSkillIdService.displayed) {
+          this.skillBackendApiService.fetchSkillAsync(
+            this.stateLinkedSkillIdService.displayed
+          ).then((skill) => {
+            this.skillName = skill.skill.getDescription();
+          });
+        }
       });
   }
 
@@ -86,6 +110,7 @@ export class StateSkillEditorComponent implements OnInit {
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
     modalRef.result.then((result) => {
+      this.skillName = result.description;
       this.stateLinkedSkillIdService.displayed = result.id;
       this.stateLinkedSkillIdService.saveDisplayedValue();
       this.onSaveLinkedSkillId.emit(result.id);
@@ -119,6 +144,7 @@ export class StateSkillEditorComponent implements OnInit {
           skill_id: this.stateLinkedSkillIdService.displayed
         });
     }
+    throw new Error('Expected a skill id to be displayed');
   }
 
   toggleSkillEditor(): void {

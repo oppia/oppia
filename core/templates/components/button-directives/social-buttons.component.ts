@@ -19,14 +19,15 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import './social-buttons.component.css';
+
+
 @Component({
   selector: 'oppia-social-buttons',
   templateUrl: './social-buttons.component.html',
   styleUrls: []
 })
-export class SocialButtonsComponent {
-  constructor() {}
-}
+export class SocialButtonsComponent {}
 
 angular.module('oppia').directive('oppiaSocialButtons',
   downgradeComponent({

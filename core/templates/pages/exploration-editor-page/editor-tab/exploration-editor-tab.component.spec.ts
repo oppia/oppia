@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick, flush } from '@angular/core/testing';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerGroupObjectFactory } from
@@ -46,6 +46,7 @@ import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -64,7 +65,7 @@ describe('Exploration editor tab component', function() {
   var $q = null;
   var $scope = null;
   var $rootScope = null;
-  var $uibModal = null;
+  var ngbModal: NgbModal;
   var $timeout = null;
   var answerGroupObjectFactory = null;
   var editabilityService = null;
@@ -83,6 +84,16 @@ describe('Exploration editor tab component', function() {
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
 
@@ -147,7 +158,7 @@ describe('Exploration editor tab component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $timeout = $injector.get('$timeout');
     stateEditorService = $injector.get('StateEditorService');
     stateCardIsCheckpointService = $injector.get(
@@ -189,6 +200,7 @@ describe('Exploration editor tab component', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -200,6 +212,7 @@ describe('Exploration editor tab component', function() {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -275,6 +288,7 @@ describe('Exploration editor tab component', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -286,6 +300,7 @@ describe('Exploration editor tab component', function() {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -378,7 +393,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should add state in exploration states', function() {
-    spyOn(explorationStatesService, 'addState');
+    spyOn(explorationStatesService, 'addState').and.callThrough();
 
     ctrl.addState('Fourth State');
 
@@ -460,6 +475,7 @@ describe('Exploration editor tab component', function() {
         rule_specs: [],
         outcome: {
           dest: 'unused',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: ''
@@ -474,6 +490,7 @@ describe('Exploration editor tab component', function() {
       rule_specs: [],
       outcome: {
         dest: 'Second State',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'feedback_1',
           html: ''
@@ -498,6 +515,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
       outcomeObjectFactory.createFromBackendDict({
         dest: 'default',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: ''
@@ -509,6 +527,7 @@ describe('Exploration editor tab component', function() {
 
     var displayedValue = outcomeObjectFactory.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'default_outcome_changed',
         html: 'This is the default outcome changed'
@@ -620,39 +639,43 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.cardIsCheckpoint).toBe(true);
   });
 
-  it('should mark all audio as needing update when closing modal', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
-    stateEditorService.setActiveStateName('First State');
+  it('should mark all audio as needing update when closing modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve()
+      } as NgbModalRef);
+      stateEditorService.setActiveStateName('First State');
 
-    expect(
-      explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-      false);
-    expect(
-      explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-      .toBe(false);
+      expect(
+        explorationStatesService.getState('First State')
+          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+        false);
+      expect(
+        explorationStatesService.getState('First State')
+          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+        .toBe(false);
 
-    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
-    $scope.$apply();
+      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
+      tick();
+      $scope.$apply();
 
-    expect(
-      explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-      true);
-    expect(
-      explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-      .toBe(true);
-  });
+      expect(
+        explorationStatesService.getState('First State')
+          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+        true);
+      expect(
+        explorationStatesService.getState('First State')
+          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+        .toBe(true);
+
+      flush();
+    }));
 
   it('should not mark all audio as needing update when dismissing modal',
     function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
       stateEditorService.setActiveStateName('First State');
 
       expect(
@@ -728,6 +751,11 @@ describe('Exploration editor tab component', function() {
     ctrl.initStateEditor();
     $scope.$apply();
     expect(ctrl.startTutorial).toHaveBeenCalled();
+  });
+
+  it('should check if exploration is editable', () => {
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+    expect(ctrl.isEditable()).toBe(true);
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {

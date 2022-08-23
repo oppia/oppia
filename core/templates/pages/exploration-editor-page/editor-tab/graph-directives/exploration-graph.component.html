@@ -26,9 +26,20 @@
       </span>
     </div>
     <md-card class="oppia-state-graph-card">
-      <div class="oppia-state-graph-container protractor-test-exploration-graph">
-        <div state-graph-visualization graph-data="$ctrl.getGraphData()" current-state-id="$ctrl.getActiveStateName()" on-click-function="$ctrl.onClickStateInMinimap" on-delete-function="$ctrl.deleteState" on-maximize-function="$ctrl.openStateGraphModal" allow-panning="true" center-at-current-state="true" class="h-100" is-editable="$ctrl.isEditable()" show-warning-sign="true">
-        </div>
+      <div class="oppia-state-graph-container e2e-test-exploration-graph">
+        <state-graph-visualization [current-state-id]="$ctrl.getActiveStateName()"
+                                   (on-click-function)="$ctrl.onClickStateInMinimap($event)"
+                                   (on-delete-function)="$ctrl.deleteState($event)"
+                                   (on-maximize-function)="$ctrl.openStateGraphModal()"
+                                   [version-graph-data]="null"
+                                   [maximize]="true"
+                                   [allow-panning]="true"
+                                   [center-at-current-state]="true"
+                                   class="h-100"
+                                   [is-editable]="$ctrl.isEditable()"
+                                   [graph-data]="$ctrl.getGraphData()"
+                                   [show-warning-sign]="true">
+        </state-graph-visualization>
       </div>
     </md-card>
   </div>
@@ -45,7 +56,7 @@
     font-size: 16px;
   }
   exploration-graph .oppia-state-graph-card {
-    background-color: #FFF;
+    background-color: #fff;
     margin: 20px 0;
     padding: 8px;
   }
@@ -54,7 +65,7 @@
       display: none;
     }
     exploration-graph .oppia-exp-graph-modal-icon-container {
-      background-color: #FFF;
+      background-color: #fff;
       border: 2px solid #707070;
       display: block;
       padding: 6px;
@@ -70,6 +81,6 @@
     cursor: pointer;
   }
   exploration-graph span.checkpoint-count-error {
-    color: #C55F45;
+    color: #c55f45;
   }
 </style>

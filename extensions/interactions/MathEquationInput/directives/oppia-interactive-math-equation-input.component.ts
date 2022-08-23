@@ -23,13 +23,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { MathEquationInputRulesService } from './math-equation-input-rules.service';
+import { TranslateService } from '@ngx-translate/core';
 import constants from 'assets/constants';
 
 @Component({
@@ -37,12 +38,15 @@ import constants from 'assets/constants';
   templateUrl: './math-equation-input-interaction.component.html'
 })
 export class InteractiveMathEquationInput implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() savedSolution!: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue!: string;
+  @Input() allowedVariablesWithValue!: string;
   value: string = '';
   hasBeenTouched: boolean = false;
   warningText: string = '';
-  @Input() savedSolution: InteractionAnswer;
-  @Input() useFractionForDivisionWithValue;
-  @Input() customOskLettersWithValue;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -51,7 +55,8 @@ export class InteractiveMathEquationInput implements OnInit {
     private deviceInfoService: DeviceInfoService,
     private htmlEscaperService: HtmlEscaperService,
     private mathEquationInputRulesService: MathEquationInputRulesService,
-    private mathInteractionsService: MathInteractionsService
+    private mathInteractionsService: MathInteractionsService,
+    private translateService: TranslateService,
   ) {}
 
   isCurrentAnswerValid(): boolean {
@@ -63,7 +68,7 @@ export class InteractiveMathEquationInput implements OnInit {
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
         this.value);
       let answerIsValid = this.mathInteractionsService.validateEquation(
-        this.value, this.guppyInitializationService.getCustomOskLetters());
+        this.value, this.guppyInitializationService.getAllowedVariables());
       this.warningText = this.mathInteractionsService.getWarningText();
       return answerIsValid;
     }
@@ -76,8 +81,7 @@ export class InteractiveMathEquationInput implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.value,
-      this.mathEquationInputRulesService as unknown as InteractionRulesService);
+      this.value, this.mathEquationInputRulesService);
   }
 
   showOSK(): void {
@@ -90,15 +94,17 @@ export class InteractiveMathEquationInput implements OnInit {
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
       JSON.parse(this.useFractionForDivisionWithValue || 'false'));
+    let translatedPlaceholder = this.translateService.instant(
+      constants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
     this.guppyInitializationService.init(
       'guppy-div-learner',
-      constants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,
+      translatedPlaceholder,
       (this.savedSolution as string) !==
       undefined ? this.savedSolution as string : ''
     );
-    this.guppyInitializationService.setCustomOskLetters(
+    this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.customOskLettersWithValue) as unknown as string[]);
+        this.allowedVariablesWithValue) as unknown as string[]);
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

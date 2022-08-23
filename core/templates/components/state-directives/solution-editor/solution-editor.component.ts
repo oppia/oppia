@@ -16,69 +16,78 @@
  * @fileoverview Component for the solution editor.
  */
 
-require(
-  'components/state-directives/solution-editor/' +
-  'solution-explanation-editor.component.ts');
-require('directives/angular-html-bind.directive.ts');
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'solution-verification.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/editability.service.ts');
-require('services/exploration-html-formatter.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solution.service');
+interface ExplanationFormSchema {
+  type: string;
+  ui_config: object;
+}
 
-angular.module('oppia').component('solutionEditor', {
-  bindings: {
-    getInteractionId: '&interactionId',
-    onSaveSolution: '=',
-    correctAnswerEditorHtml: '=',
-    onOpenSolutionEditor: '&',
-    showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-  },
-  template: require(
-    'components/state-directives/solution-editor/' +
-    'solution-editor.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    'EditabilityService', 'ExplorationHtmlFormatterService',
-    'StateCustomizationArgsService', 'StateInteractionIdService',
-    'StateSolutionService',
-    function(
-        EditabilityService, ExplorationHtmlFormatterService,
-        StateCustomizationArgsService, StateInteractionIdService,
-        StateSolutionService) {
-      var ctrl = this;
-      ctrl.getAnswerHtml = function() {
-        return ExplorationHtmlFormatterService.getAnswerHtml(
-          StateSolutionService.savedMemento.correctAnswer,
-          StateInteractionIdService.savedMemento,
-          StateCustomizationArgsService.savedMemento);
-      };
-      ctrl.$onInit = function() {
-        ctrl.StateSolutionService = StateSolutionService;
-        ctrl.isEditable = EditabilityService.isEditable();
+@Component({
+  selector: 'oppia-solution-editor',
+  templateUrl: './solution-editor.component.html'
+})
+export class SolutionEditor implements OnInit {
+  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+    EventEmitter<string[]> = new EventEmitter();
 
-        ctrl.EXPLANATION_FORM_SCHEMA = {
-          type: 'html',
-          ui_config: {}
-        };
-      };
+  @Output() openSolutionEditorModal: EventEmitter<void> = new EventEmitter();
+
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  EXPLANATION_FORM_SCHEMA!: ExplanationFormSchema;
+  isEditable: boolean = false;
+
+  constructor(
+    private editabilityService: EditabilityService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private stateCustomizationArgsService: StateCustomizationArgsService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateSolutionService: StateSolutionService,
+  ) {}
+
+  getAnswerHtml(): string {
+    if (this.stateSolutionService.savedMemento === null) {
+      throw new Error('Expected solution to be defined');
     }
-  ]
-});
+    return this.explorationHtmlFormatterService.getAnswerHtml(
+      this.stateSolutionService.savedMemento.correctAnswer,
+      this.stateInteractionIdService.savedMemento,
+      this.stateCustomizationArgsService.savedMemento);
+  }
+
+  updateNewSolution(value: Solution): void {
+    this.saveSolution.emit(value);
+  }
+
+  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
+  }
+
+  openEditorModal(): void {
+    this.openSolutionEditorModal.emit();
+  }
+
+  ngOnInit(): void {
+    this.isEditable = this.editabilityService.isEditable();
+
+    this.EXPLANATION_FORM_SCHEMA = {
+      type: 'html',
+      ui_config: {}
+    };
+  }
+}
+
+angular.module('oppia').directive('oppiaSolutionEditor',
+  downgradeComponent({
+    component: SolutionEditor
+  }) as angular.IDirectiveFactory);

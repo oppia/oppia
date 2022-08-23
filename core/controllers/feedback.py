@@ -22,6 +22,29 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import suggestion_services
+from core.domain import user_services
+
+
+def replace_user_id_with_username_in_dict(thread_dicts, user_keys):
+    """Replace user id with the corresponding username in the given dictionary.
+
+    Args:
+        thread_dicts: list(dict). The dictionary that will be updated.
+        user_keys: list(tuple). A list that contains tuples of keys. The first
+            item in the tuple is a key of the user ID and the second item is a
+            key of a newly added username.
+
+    Returns:
+        list(dict). The updated dictionary.
+    """
+    for thread_dict in thread_dicts:
+        for user_id_key, username_key in user_keys:
+            thread_dict[username_key] = (
+                user_services.get_username(thread_dict[user_id_key])
+                if thread_dict[user_id_key] else None
+            )
+            thread_dict.pop(user_id_key)
+    return thread_dicts
 
 
 class ThreadListHandler(base.BaseHandler):
@@ -57,13 +80,22 @@ class ThreadListHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
+
+        feedback_thread_dicts = [
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+               feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False
+            )
+        ]
         self.values.update({
-            'feedback_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
-            'suggestion_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
+            'feedback_thread_dicts': replace_user_id_with_username_in_dict(
+                feedback_thread_dicts, [
+                    ('original_author_id', 'original_author_username'),
+                    (
+                        'last_nonempty_message_author_id',
+                        'last_nonempty_message_author'
+                    )
+                ]
+            )
         })
         self.render_json(self.values)
 
@@ -99,11 +131,18 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
+
+        suggestion_thread_dicts = [
+            thread.to_dict() for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_TOPIC, topic_id, True
+            )
+        ]
         self.values.update({
-            'suggestion_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_TOPIC, topic_id, True)])
-            })
+            'suggestion_thread_dicts': replace_user_id_with_username_in_dict(
+                suggestion_thread_dicts,
+                [('original_author_id', 'original_author_username')]
+            )
+        })
         self.render_json(self.values)
 
 
@@ -148,23 +187,34 @@ class ThreadHandler(base.BaseHandler):
     @acl_decorators.can_view_feedback_thread
     def get(self, thread_id):
         suggestion_id = thread_id
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
 
-        messages = [m.to_dict() for m in feedback_services.get_messages(
-            thread_id)]
-        message_ids = [message['message_id'] for message in messages]
+        message_dicts = [
+            message.to_dict() for message in feedback_services.get_messages(
+                thread_id
+            )
+        ]
+        message_ids = [message['message_id'] for message in message_dicts]
         if self.user_id:
             feedback_services.update_messages_read_by_the_user(
                 self.user_id, thread_id, message_ids)
+
         self.values.update({
-            'messages': messages,
+            'messages': replace_user_id_with_username_in_dict(
+                message_dicts,
+                [('author_id', 'author_username')]
+            ),
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
 
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            thread_id, strict=False
+        )
         text = self.normalized_payload.get('text')
         updated_status = self.normalized_payload.get('updated_status')
         updated_subject = self.normalized_payload.get('updated_subject')
@@ -182,8 +232,13 @@ class ThreadHandler(base.BaseHandler):
         # messages after adding new message model to the datastore because of an
         # unknown reason.
         messages.append(new_message)
+        message_dict = [message.to_dict() for message in messages]
+
         self.render_json({
-            'messages': [message.to_dict() for message in messages]
+            'messages': replace_user_id_with_username_in_dict(
+                message_dict,
+                [('author_id', 'author_username')]
+            )
         })
 
 
@@ -215,8 +270,13 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
             feedback_services.get_next_page_of_all_feedback_messages(
                 urlsafe_start_cursor=urlsafe_start_cursor))
 
+        message_dict = [message.to_dict() for message in all_feedback_messages]
+
         self.render_json({
-            'results': [m.to_dict() for m in all_feedback_messages],
+            'results': replace_user_id_with_username_in_dict(
+                message_dict,
+                [('author_id', 'author_username')]
+            ),
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })

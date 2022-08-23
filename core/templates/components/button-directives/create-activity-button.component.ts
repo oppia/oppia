@@ -55,6 +55,14 @@ export class CreateActivityButtonComponent implements OnInit {
     return false;
   }
 
+  createNewExploration(): void {
+    this.explorationCreationService.createNewExploration();
+  }
+
+  checkTabletView(): boolean {
+    return (this.windowRef.nativeWindow.innerWidth < 768);
+  }
+
   initCreationProcess(): void {
     // Without this, the modal keeps reopening when the window is
     // resized.

@@ -33,17 +33,40 @@ require('services/page-title.service.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('practiceSessionPage', {
   template: require('./practice-session-page.component.html'),
   controller: [
-    '$http', 'PageTitleService', 'UrlInterpolationService', 'UrlService',
-    'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL',
-    'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
+    '$http', '$translate', 'I18nLanguageCodeService', 'LoaderService',
+    'PageTitleService', 'UrlInterpolationService', 'UrlService',
+    'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL', 'TOPIC_VIEWER_PAGE',
+    'TOTAL_QUESTIONS',
     function(
-        $http, PageTitleService, UrlInterpolationService, UrlService,
-        PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL,
-        TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
+        $http, $translate, I18nLanguageCodeService, LoaderService,
+        PageTitleService, UrlInterpolationService, UrlService,
+        PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL, TOPIC_VIEWER_PAGE,
+        TOTAL_QUESTIONS) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
+      ctrl.setPageTitle = function() {
+        $translate.use(I18nLanguageCodeService.getCurrentI18nLanguageCode())
+          .then(() => {
+            const translatedTitle = $translate.instant(
+              'I18N_PRACTICE_SESSION_PAGE_TITLE', {
+                topicName: ctrl.topicName
+              }
+            );
+            PageTitleService.setDocumentTitle(translatedTitle);
+          });
+      };
+      ctrl.subscribeToOnLanguageCodeChange = function() {
+        ctrl.directiveSubscriptions.add(
+          I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+            ctrl.setPageTitle();
+          })
+        );
+      };
       var _fetchSkillDetails = function() {
         var topicUrlFragment = (
           UrlService.getTopicUrlFragmentFromLearnerUrl());
@@ -83,15 +106,15 @@ angular.module('oppia').component('practiceSessionPage', {
                 i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
               },
               {
+                type: 'DASHBOARD',
+                i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+                url: topicViewerUrl
+              },
+              {
                 type: 'RETRY_SESSION',
                 i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
                 url: practiceSessionsUrl
               },
-              {
-                type: 'DASHBOARD',
-                i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-                url: topicViewerUrl
-              }
             ],
             skillList: skillList,
             skillDescriptions: skillDescriptions,
@@ -100,8 +123,9 @@ angular.module('oppia').component('practiceSessionPage', {
           };
           ctrl.questionPlayerConfig = questionPlayerConfig;
           ctrl.topicName = result.data.topic_name;
-          PageTitleService.setDocumentTitle(
-            'Practice Session: ' + ctrl.topicName + ' - Oppia');
+          ctrl.setPageTitle();
+          ctrl.subscribeToOnLanguageCodeChange();
+          LoaderService.hideLoadingScreen();
         });
       };
       ctrl.$onInit = function() {
@@ -109,6 +133,9 @@ angular.module('oppia').component('practiceSessionPage', {
         ctrl.stringifiedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

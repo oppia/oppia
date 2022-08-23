@@ -1,6 +1,6 @@
-<div class="oppia-attribution-guide">
-  <div [ngStyle]="isLanguageRTL() ? {'left': '25px'} : {'right': '25px'}" class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
-    <div class="oppia-neutral-element protractor-test-neutral-element"></div>
+<div class="oppia-attribution-guide" *ngIf="!checkMobileView()">
+  <div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
+    <div class="oppia-neutral-element e2e-test-neutral-element"></div>
 
     <a class="oppia-attribution-image-link" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
       <img alt="Creative Commons License" class="oppia-creative-commons-image" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
@@ -36,7 +36,7 @@
     <div>
       <div class="attribution-mask" (click)="hideAttributionModal()"></div>
       <div class="attribution-modal">
-        <button (click)="hideAttributionModal()" type="button" class="close p-1" aria-label="Close">
+        <button (click)="hideAttributionModal()" type="button" class="close my-2 mx-1" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
         <div class="container pt-4">
@@ -90,120 +90,3 @@
     </div>
   </div>
 </div>
-<style>
-  .oppia-cc-icon a.oppia-attribution-image-link {
-    text-decoration: none;
-  }
-  .oppia-cc-icon a.oppia-attribution-image-link:focus > img {
-    outline: 1px dotted #212121;
-    outline: auto 5px -webkit-focus-ring-color;
-  }
-  .oppia-cc-icon a.oppia-attribution-link:hover,
-  .oppia-cc-icon a.oppia-attribution-link:focus {
-    text-decoration: underline;
-  }
-  .oppia-attribution-guide .oppia-cc-icon {
-    bottom: 50px;
-    position: fixed;
-  }
-
-  .oppia-attribution-guide .oppia-cc-icon:hover {
-    text-decoration: none;
-  }
-
-  .oppia-attribution-guide .oppia-neutral-element {
-    height: 3px;
-    width: 3px;
-  }
-
-  .oppia-attribution-guide .oppia-creative-commons-image {
-    border-width: 0;
-    height: 31px;
-  }
-
-  .oppia-attribution-guide .oppia-attribution-guide-text {
-    color: #008080;
-    font-size: 10px;
-    text-decoration: underline;
-  }
-
-  .oppia-attribution-guide .attribution-modal {
-    background-color: #FFF;
-    -moz-box-shadow: 0 3px 5px 1px #ccc;
-    -webkit-box-shadow: 0 3px 5px 1px #ccc;
-    box-shadow: 0 3px 5px 1px #ccc;
-    margin: 0 10px 120px 10px;
-    max-height: 600px;
-    overflow: auto;
-    position: relative;
-    top: 68px;
-    z-index: 1200;
-  }
-
-  .oppia-attribution-guide .oppia-attribution-guide-link,
-  .oppia-attribution-guide .oppia-attribution-licence-link {
-    color: #000;
-    font-size: 0.8rem;
-    text-decoration: underline;
-  }
-
-  .oppia-attribution-guide .oppia-attribution-guide-description {
-    font-size: 0.8rem;
-  }
-
-  .oppia-attribution-guide .oppia-open-new-tab-icon {
-    color: #000;
-    font-size: 1rem;
-  }
-
-  .oppia-attribution-guide .attribution-mask {
-    height: 100%;
-    position: fixed;
-    width: 100%;
-    z-index: 1100;
-  }
-
-  .oppia-attribution-guide .attribution-modal-container {
-    bottom: 0;
-    display: grid;
-    grid-template-columns: 1fr minmax(auto, 320px);
-    height: 100%;
-    overflow: auto;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-  }
-
-  .oppia-attribution-guide .attribution-html-section {
-    padding-top: 1rem;
-  }
-
-  .oppia-attribution-guide .attribution-print-section {
-    padding-top: 2.7rem;
-  }
-
-  .oppia-attribution-guide .attribute-instructions {
-    font-size: 0.8rem;
-    padding-inline-start: 1rem;
-  }
-
-  .oppia-attribution-guide .attribution-copy-button {
-    background: #0D48A1;
-    border: none;
-    border-radius: 3px;
-    color: #fff;
-    min-width: 55px;
-  }
-
-  .oppia-attribution-guide .attribution-copy-button:hover {
-    background-color: #115fd4;
-  }
-
-  .oppia-attribution-guide .sharing-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding-bottom: 1rem;
-    padding-top: 2rem;
-    width: 100%;
-  }
-</style>

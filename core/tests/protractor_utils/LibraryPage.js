@@ -24,40 +24,41 @@ var waitFor = require('./waitFor.js');
 var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
   var allCollectionSummaryTile = element.all(
-    by.css('.protractor-test-collection-summary-tile'));
+    by.css('.e2e-test-collection-summary-tile'));
   var allExplorationSummaryTile = element.all(
-    by.css('.protractor-test-exp-summary-tile'));
+    by.css('.e2e-test-exp-summary-tile'));
   var expSummaryTileTitleLocator = by.css(
-    '.protractor-test-exp-summary-tile-title');
+    '.e2e-test-exp-summary-tile-title');
   var allCollectionsTitled = function(collectionName) {
     return element.all(by.cssContainingText(
-      '.protractor-test-collection-summary-tile-title', collectionName));
+      '.e2e-test-collection-summary-tile-title', collectionName));
   };
   var allExplorationsTitled = function(explorationName) {
     return element.all(by.cssContainingText(
-      '.protractor-test-exp-summary-tile-title', explorationName));
+      '.e2e-test-exp-summary-tile-title', explorationName));
   };
 
   var categorySelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-category-selector')));
+    element(by.css('.e2e-test-search-bar-category-selector')));
   var explorationObjective = element(
-    by.css('.protractor-test-exp-summary-tile-objective'));
+    by.css('.e2e-test-exp-summary-tile-objective'));
   var createActivityButton = element(
-    by.css('.protractor-test-create-activity')
+    by.css('.e2e-test-create-activity')
   );
   var languageSelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-language-selector')));
+    element(by.css('.e2e-test-search-bar-language-selector')));
   var searchInputs = element.all(
-    by.css('.protractor-test-search-input'));
-  var mainHeader = element(by.css('.protractor-test-library-main-header'));
-  var searchButton = element(by.css('.protractor-test-search-button'));
+    by.css('.e2e-test-search-input'));
+  var mainHeader = element(by.css('.e2e-test-library-main-header'));
+  var searchButton = element(by.css('.e2e-test-search-button'));
   var addToPlayLaterListButton = element(
-    by.css('.protractor-test-add-to-playlist-btn'));
-  var expHoverElement = element(by.css('.protractor-test-exp-hover'));
+    by.css('.e2e-test-add-to-playlist-btn'));
+  var expHoverElement = element(
+    by.css('.e2e-test-exploration-dashboard-card'));
   var expSummaryTileObjectiveLocator = by.css(
-    '.protractor-test-exp-summary-tile-objective');
+    '.e2e-test-exp-summary-tile-objective');
   var expSummaryTileRatingLocator = by.css(
-    '.protractor-test-exp-summary-tile-rating');
+    '.e2e-test-exp-summary-tile-rating');
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {

@@ -27,8 +27,7 @@ from __future__ import annotations
 
 import argparse
 import subprocess
-
-from core import python_utils
+from typing import Optional, Sequence
 
 from . import run_backend_tests
 from . import run_frontend_tests
@@ -46,29 +45,28 @@ This script runs all the tests, in this order:
 """)
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Run all the tests."""
     unused_parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])
+    setup.main(args=[])  # type: ignore[no-untyped-call]
     setup_gae.main(args=[])
 
     # Run frontend unit tests.
-    python_utils.PRINT('Running frontend unit tests')
+    print('Running frontend unit tests')
     run_frontend_tests.main(args=[])
-    python_utils.PRINT('Frontend tests passed.')
+    print('Frontend tests passed.')
 
     # Run backend tests.
-    python_utils.PRINT('Running backend tests')
-    run_backend_tests.main(args=[])
-    python_utils.PRINT('Backend tests passed.')
+    print('Running backend tests')
+    run_backend_tests.main(args=[])  # type: ignore[no-untyped-call]
+    print('Backend tests passed.')
 
     # Run end-to-end tests.
-    python_utils.PRINT('Running end-to-end tests')
+    print('Running end-to-end tests')
     subprocess.Popen('bash scripts/run_e2e_tests.sh', shell=True)
 
-    python_utils.PRINT(
-        'SUCCESS    All frontend, backend and end-to-end tests passed!')
+    print('SUCCESS    All frontend, backend and end-to-end tests passed!')
 
 
 if __name__ == '__main__':

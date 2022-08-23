@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the Custom Form components.
+ * @fileoverview Module for the shared pipes.
  */
 
 import 'core-js/es7/reflect';
@@ -21,22 +21,34 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TruncateAtFirstLinePipe } from './string-utility-filters/truncate-at-first-line.pipe';
+
 import { LimitToPipe } from './limit-to.pipe';
+import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
+import { ParameterizeRuleDescriptionPipe } from './parameterize-rule-description.pipe';
+import { ConvertToPlainTextPipe } from './string-utility-filters/convert-to-plain-text.pipe';
+import { ReplaceInputsWithEllipsesPipe } from './string-utility-filters/replace-inputs-with-ellipses.pipe';
+import { TruncatePipe } from './string-utility-filters/truncate.pipe';
+import { WrapTextWithEllipsisPipe } from './string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    StringUtilityPipesModule
+  ],
+  providers: [
+    ReplaceInputsWithEllipsesPipe,
+    ParameterizeRuleDescriptionPipe,
+    ConvertToPlainTextPipe,
+    TruncatePipe,
+    WrapTextWithEllipsisPipe,
   ],
   declarations: [
-    LimitToPipe,
-    TruncateAtFirstLinePipe
+    LimitToPipe
   ],
-  entryComponents: [],
   exports: [
     LimitToPipe,
-    TruncateAtFirstLinePipe
+    StringUtilityPipesModule
   ],
 })
 

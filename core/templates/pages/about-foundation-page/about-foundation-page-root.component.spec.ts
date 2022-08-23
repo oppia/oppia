@@ -56,6 +56,7 @@ describe('About foundation Page Root', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     component.ngOnInit();
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.META);
   });
 });

@@ -22,10 +22,16 @@ import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorNavbarBreadcrumbComponent } from './story-editor-navbar-breadcrumb.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StorySavePendingChangesModalComponent } from '../modal-templates/story-save-pending-changes-modal.component';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+class MockNgbModalRef {
+  componentInstance!: {
+    body: 'xyz';
+  };
+}
 
 describe('StoryEditorNavbarBreadcrumbComponent', () => {
   let component: StoryEditorNavbarBreadcrumbComponent;
@@ -132,6 +138,7 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   ' with unsaved changes', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
+        componentInstance: MockNgbModalRef,
         result: Promise.resolve()
       } as NgbModalRef
     );
@@ -140,12 +147,13 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
     component.returnToTopicEditorPage();
 
     expect(ngbModal.open).toHaveBeenCalledWith(
-      StorySavePendingChangesModalComponent, { backdrop: true });
+      SavePendingChangesModalComponent, { backdrop: true });
   });
 
   it('should close save pending changes modal when user clicks cancel', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
+        componentInstance: MockNgbModalRef,
         result: Promise.reject()
       } as NgbModalRef
     );
@@ -154,6 +162,6 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
     component.returnToTopicEditorPage();
 
     expect(ngbModal.open).toHaveBeenCalledWith(
-      StorySavePendingChangesModalComponent, { backdrop: true });
+      SavePendingChangesModalComponent, { backdrop: true });
   });
 });

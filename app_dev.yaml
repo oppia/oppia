@@ -50,18 +50,16 @@ handlers:
 - url: /assets
   static_dir: assets
   secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
   expiration: "0"
-# Serve js scripts and css files under core/templates.
-# This regex allows us to recursively serve js scripts.
+# Serve CSS files under core/templates.
+# This regex allows us to recursively serve CSS files.
 # "\1" inserts text captured by the capture group in the URL pattern.
 - url: /templates/(.*\.(css))$
   static_files: core/templates/\1
   upload: core/templates/(.*\.(css))$
-  secure: always
-  expiration: "0"
-- url: /templates/(.*\.(js))$
-  static_files: local_compiled_js/core/templates/\1
-  upload: local_compiled_js/core/templates/(.*\.(js))$
   secure: always
   expiration: "0"
 - url: /templates/(.*\.(html))$
@@ -72,15 +70,13 @@ handlers:
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
+  http_headers:
+    # This is replaced by a specific origin when doing a deployment.
+    Access-Control-Allow-Origin: "*"
   expiration: "0"
 - url: /extensions/interactions/(.*)/static/(.*\.(css|png))
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*\.(css|png))
-  secure: always
-  expiration: "0"
-- url: /extensions/interactions/(.*)/static/(.js)
-  static_files: extensions/interactions/\1/static/\2
-  upload: local_compiled_js/extensions/interactions/(.*)/static/(.js)
   secure: always
   expiration: "0"
 - url: /extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
@@ -88,10 +84,10 @@ handlers:
   upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
   expiration: "0"
-# Serve js scripts for gadgets, interactions, rich_text_components, custom ckeditor plugins
-# and objects under extensions in dev mode. This regex allows us to recursively serve js
-# scripts under the three specified directories. "\1" and "\2" insert capture
-# groups from the url pattern.
+# Serve PNG images for interactions, rich_text_components, objects, classifiers,
+# and custom ckeditor plugins under extensions in dev mode. This regex allows
+# us to recursively serve PNG images scripts under the five specified
+# directories. "\1" and "\2" insert capture groups from the url pattern.
 - url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
   static_files: extensions/\1/\2
   upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$

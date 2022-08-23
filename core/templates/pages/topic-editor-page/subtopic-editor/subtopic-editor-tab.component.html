@@ -27,7 +27,7 @@
               <strong>Title*</strong>
             </p>
             <form class="form-horizontal" role="form">
-              <input class="form-control protractor-test-subtopic-title-field"
+              <input class="form-control e2e-test-subtopic-title-field"
                      type="text"
                      ng-blur="$ctrl.updateSubtopicTitle($ctrl.editableTitle)"
                      ng-model="$ctrl.editableTitle"
@@ -51,7 +51,7 @@
               <strong>Url Fragment*</strong>
             </p>
             <form class="form-horizontal" role="form">
-              <input class="form-control protractor-test-subtopic-url-fragment-field"
+              <input class="form-control e2e-test-subtopic-url-fragment-field"
                      ng-class="{'is-invalid': $ctrl.subtopicUrlFragmentExists || !$ctrl.subtopicUrlFragmentIsValid}"
                      type="text"
                      ng-blur="$ctrl.updateSubtopicUrlFragment($ctrl.editableUrlFragment)"
@@ -70,7 +70,7 @@
             </div>
           </div>
           <div class="subtopic-html">
-            <div  ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
+            <div  ng-click="$ctrl.showSchemaEditor()" class="e2e-test-edit-html-content">
               <p>
                 <strong>Explanation of the subtopic*</strong>
                 <i class="fa fa-pen edit-icon" ng-if="!$ctrl.schemaEditorIsShown"></i>
@@ -82,25 +82,26 @@
               </em>
             </span>
             <div ng-if="$ctrl.schemaEditorIsShown">
-              <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
-                                   class="protractor-test-edit-subtopic-page-contents"
-                                   local-value="$ctrl.htmlData">
+              <schema-based-editor [schema]="$ctrl.SUBTOPIC_PAGE_SCHEMA"
+                                   class="e2e-test-edit-subtopic-page-contents"
+                                   [(local-value)]="$ctrl.htmlData">
               </schema-based-editor>
               <div class="text-right pt-3">
                 <button class="btn btn-outline-dark" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
-                <button class="btn btn-success protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
+                <button class="btn btn-success e2e-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
               </div>
             </div>
-            <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="subtopic-html-content protractor-test-edit-html-content">
-              <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">
+            <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="subtopic-html-content e2e-test-edit-html-content">
+              <angular-html-bind html-data="$ctrl.htmlData" class="e2e-test-subtopic-html-content">
               </angular-html-bind>
             </div>
           </div>
-          <div class="subtopic-thumbnail protractor-test-subtopic-thumbnail">
+          <div class="subtopic-thumbnail e2e-test-subtopic-thumbnail">
             <p>
               <strong>Thumbnail Image*</strong>
             </p>
             <oppia-thumbnail-uploader [filename]="$ctrl.subtopic.getThumbnailFilename()"
+                                      [useLocalStorage]="false"
                                       (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
                                       [bg-color]="$ctrl.subtopic.getThumbnailBgColor()"
                                       (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
@@ -292,7 +293,7 @@
   }
   .subtopic-content .add-skill-btn {
     background-color: #008098;
-    color: #FFF;
+    color: #fff;
     font-weight: bold;
     margin: 15px 0;
   }
@@ -318,7 +319,7 @@
   }
   .subtopic-content .entity-count {
     align-items: center;
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid #aaaac1;
     border-radius: 6px;
     display: flex;
@@ -371,6 +372,7 @@
     padding: 6px 12px;
   }
   .subtopic-content .subtopic-skill-card {
+    margin-bottom: 30px;
     margin-top: 64px;
   }
   .subtopic-content .subtopic-card-heading {
@@ -420,6 +422,7 @@
     }
     .subtopic-content .subtopic-skill-card {
       display: block;
+      margin-bottom: 0;
       margin-top: 40px;
       padding: 0;
     }

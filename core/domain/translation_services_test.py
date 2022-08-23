@@ -23,6 +23,12 @@ from core.domain import translation_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import translate_services
+    from mypy_imports import translation_models
+
+
 translate_services = models.Registry.import_translate_services()
 
 (translation_models,) = models.Registry.import_models([
@@ -31,13 +37,14 @@ translate_services = models.Registry.import_translate_services()
 
 class TranslationServiceTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(TranslationServiceTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         translation_models.MachineTranslationModel.create(
             'en', 'es', 'text to translate', 'texto para traducir')
 
     def test_get_machine_translation_with_same_source_and_target_language_code(
-            self):
+        self
+    ) -> None:
         translated_text = (
             translation_services.get_and_cache_machine_translation(
                 'en', 'en', 'text to translate')
@@ -48,7 +55,8 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         self.assertIsNone(translation)
 
     def test_machine_translation_with_non_allowlisted_language_returns_none(
-            self):
+        self
+    ) -> None:
         translated_text = (
             translation_services.get_and_cache_machine_translation(
                 'en', 'hi', 'text to translate')
@@ -72,7 +80,7 @@ class TranslationServiceTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_get_machine_translation_checks_datastore_first(self):
+    def test_get_machine_translation_checks_datastore_first(self) -> None:
         with self.swap_to_always_raise(
             translate_services.CLIENT, 'translate', error=AssertionError
         ):
@@ -83,7 +91,8 @@ class TranslationServiceTests(test_utils.GenericTestBase):
             )
 
     def test_get_machine_translation_with_new_translation_saves_translation(
-            self):
+        self
+    ) -> None:
         translated_text = (
             translation_services.get_and_cache_machine_translation(
                 'en', 'fr', 'hello world')
@@ -92,4 +101,6 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         translation = translation_fetchers.get_machine_translation(
             'en', 'fr', 'hello world')
         self.assertIsNotNone(translation)
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation is not None
         self.assertEqual(translation.translated_text, 'Bonjour le monde')

@@ -21,13 +21,21 @@ from __future__ import annotations
 import re
 
 from core import feconf
+from core.constants import constants
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.subtopic])
@@ -44,9 +52,16 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     skill_id_1 = 'skill_1'
     skill_id_2 = 'skill_2'
 
-    def setUp(self):
-        super(SubtopicPageServicesUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email( # type: ignore[no-untyped-call]
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
+
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
@@ -55,21 +70,44 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         self.subtopic_page_id = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 self.TOPIC_ID, 1))
 
-    def test_get_subtopic_page_from_model(self):
+        self.TOPIC_ID_1 = topic_fetchers.get_new_topic_id()
+        # Set up topic and subtopic.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'Place Values', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Naming Numbers', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-url'),
+            topic_domain.Subtopic(
+                2, 'Subtopic Name', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'other-subtopic-url')]
+        topic.next_subtopic_id = 3
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
+
+        # Publish the topic and its stories.
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id) # type: ignore[no-untyped-call]
+
+    def test_get_subtopic_page_from_model(self) -> None:
         subtopic_page_model = subtopic_models.SubtopicPageModel.get(
             self.subtopic_page_id)
         subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
             subtopic_page_model)
         self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
 
-    def test_get_subtopic_page_by_id(self):
+    def test_get_subtopic_page_by_id(self) -> None:
         subtopic_page_1 = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, self.subtopic_id)
         self.assertEqual(
@@ -80,10 +118,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             'topic_id', 1, strict=False)
         self.assertEqual(subtopic_page_2, None)
 
-    def test_get_subtopic_pages_with_ids(self):
+    def test_get_subtopic_pages_with_ids(self) -> None:
         subtopic_ids = [self.subtopic_id]
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
+        # Ruling out the possibility of None for mypy type checking.
+        assert subtopic_pages[0] is not None
         self.assertEqual(
             subtopic_pages[0].to_dict(), self.subtopic_page.to_dict())
         subtopic_ids = [2]
@@ -94,6 +134,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
         expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
+        # Ruling out the possibility of None for mypy type checking.
+        assert subtopic_pages[0] is not None
         self.assertEqual(
             [subtopic_pages[0].to_dict(), subtopic_pages[1]],
             expected_subtopic_pages)
@@ -106,10 +148,10 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, subtopic_ids)
         self.assertEqual(subtopic_pages, [None, None])
 
-    def test_get_subtopic_page_contents_by_id(self):
+    def test_get_subtopic_page_contents_by_id(self) -> None:
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 1)
-        recorded_voiceovers = {
+        recorded_voiceovers: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
                     'en': {
@@ -153,12 +195,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         self.assertEqual(
             subtopic_page_contents.to_dict(), expected_page_contents_dict)
-        subtopic_page_contents = (
+        subtopic_page_content = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
                 self.TOPIC_ID, 2, strict=False))
-        self.assertEqual(subtopic_page_contents, None)
+        self.assertEqual(subtopic_page_content, None)
 
-    def test_save_subtopic_page(self):
+    def test_save_subtopic_page(self) -> None:
         subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, 'topic_id_1'))
@@ -167,9 +209,10 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment-one'
             })])
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Unexpected error: received an invalid change list *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', [])
@@ -180,50 +223,54 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_id_1)
         subtopic_page_1.version = 2
         subtopic_page_model_1.version = 3
-        with self.assertRaisesRegexp(Exception, 'Trying to update version *'):
+        with self.assertRaisesRegex(Exception, 'Trying to update version *'):  # type: ignore[no-untyped-call]
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
                 [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
-                    'title': 'Sample'
+                    'title': 'Sample',
+                    'url_fragment': 'fragment'
                 })])
         subtopic_page_1.version = 3
         subtopic_page_model_1.version = 2
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Unexpected error: trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
                 [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
-                    'title': 'Sample'
+                    'title': 'Sample',
+                    'url_fragment': 'sample-frag'
                 })])
 
-    def test_commit_log_entry(self):
+    def test_commit_log_entry(self) -> None:
         subtopic_page_commit_log_entry = (
             subtopic_models.SubtopicPageCommitLogEntryModel.get_commit(
                 self.subtopic_page_id, 1)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert subtopic_page_commit_log_entry is not None
         self.assertEqual(subtopic_page_commit_log_entry.commit_type, 'create')
         self.assertEqual(
             subtopic_page_commit_log_entry.subtopic_page_id,
             self.subtopic_page_id)
         self.assertEqual(subtopic_page_commit_log_entry.user_id, self.user_id)
 
-    def test_delete_subtopic_page(self):
+    def test_delete_subtopic_page(self) -> None:
         subtopic_page_id = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 self.TOPIC_ID, 1))
         subtopic_page_services.delete_subtopic_page(
             self.user_id, self.TOPIC_ID, 1)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
                 'Entity for class SubtopicPageModel with id %s not found' % (
                     subtopic_page_id))):
             subtopic_models.SubtopicPageModel.get(subtopic_page_id)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
                 'Entity for class SubtopicPageModel with id %s not found' % (
@@ -231,7 +278,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
 
-    def test_migrate_page_contents_from_v1_to_v2_schema(self):
+    def test_migrate_page_contents_from_v1_to_v2_schema(self) -> None:
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
         html_content = (
@@ -343,7 +390,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 
-    def test_migrate_page_contents_from_v2_to_v3_schema(self):
+    def test_migrate_page_contents_from_v2_to_v3_schema(self) -> None:
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 3)
         html_content = (
@@ -458,7 +505,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 
-    def test_migrate_page_contents_from_v3_to_v4_schema(self):
+    def test_migrate_page_contents_from_v3_to_v4_schema(self) -> None:
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 4)
         expected_html_content = (
@@ -569,10 +616,11 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 
     def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
-            self):
+        self
+    ) -> None:
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v2 page schemas at present.')
 
@@ -585,3 +633,49 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             assert_raises_regexp_context_manager):
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)
+
+    def test_get_topic_ids_from_subtopic_page_ids(self) -> None:
+        topic_ids = (
+            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
+                ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
+            )
+        )
+
+        self.assertEqual(topic_ids, ['topic1', 'topic2'])
+
+    def test_get_multi_users_subtopic_pages_progress(self) -> None:
+        degree_of_mastery = 0.5
+        student_id_1 = 'student_1'
+        student_id_2 = 'student_2'
+
+        # Add some subtopic progress for the student.
+        skill_services.create_user_skill_mastery( # type: ignore[no-untyped-call]
+            student_id_1, 'skill_id_1', degree_of_mastery
+        )
+
+        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        progress = (
+            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+                [student_id_1, student_id_2], [subtopic_page_id]
+            )
+        )
+
+        student_1_progress = progress[student_id_1]
+        student_2_progress = progress[student_id_2]
+
+        self.assertEqual(len(student_1_progress), 1)
+        self.assertEqual(len(student_2_progress), 1)
+        self.assertEqual(student_1_progress[0]['subtopic_id'], 1)
+        self.assertEqual(
+            student_1_progress[0]['subtopic_title'], 'Naming Numbers'
+        )
+        self.assertEqual(
+            student_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
+        )
+        self.assertEqual(
+            student_1_progress[0]['parent_topic_name'], 'Place Values'
+        )
+        self.assertEqual(
+            student_1_progress[0]['subtopic_mastery'], degree_of_mastery
+        )
+        self.assertIsNone(student_2_progress[0]['subtopic_mastery'])

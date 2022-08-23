@@ -1,33 +1,33 @@
-<mat-card class="blog-dashboard-tile protractor-test-blog-dashboard-tile" *ngIf="activeView === 'gridView'">
+<mat-card class="blog-dashboard-tile e2e-test-blog-dashboard-tile" *ngIf="activeView === 'gridView'">
   <div class="blog-dashboard-tile-content">
     <mat-card-content>
       <div class="blog-dashboard-tile-header">
-        <mat-card-title class="blog-dashboard-tile-title protractor-test-blog-post-title" *ngIf="blogPostSummary.title === ''">
+        <mat-card-title class="blog-dashboard-tile-title e2e-test-blog-post-title" *ngIf="blogPostSummary.title === ''">
           {{ 'I18N_BLOG_POST_UNTITLED_HEADING' | translate }}
         </mat-card-title>
-        <mat-card-title class="blog-dashboard-tile-title protractor-test-blog-post-title" *ngIf="blogPostSummary.title !== ''">
+        <mat-card-title class="blog-dashboard-tile-title e2e-test-blog-post-title" *ngIf="blogPostSummary.title !== ''">
           {{ blogPostSummary.title }}
         </mat-card-title>
         <button mat-icon-button
-                class="drop-down-button protractor-test-blog-post-edit-box"
+                class="drop-down-button e2e-test-blog-post-edit-box"
                 [matMenuTriggerFor]="blogCardOptions">
           <mat-icon class="align-text-bottom">more_vert</mat-icon>
         </button>
         <mat-menu #blogCardOptions="matMenu">
           <button mat-menu-item
                   (click)="editBlogPost()"
-                  class="protractor-test-edit-blog-post-button">
+                  class="e2e-test-edit-blog-post-button">
             <span>Edit</span>
           </button>
           <button mat-menu-item
                   *ngIf="blogPostIsPublished"
                   (click)="unpublishBlogPost()"
-                  class="protractor-test-unpublish-blog-post-button">
+                  class="e2e-test-unpublish-blog-post-button">
             <span>Unpublish</span>
           </button>
           <button mat-menu-item
                   (click)="deleteBlogPost()"
-                  class="protractor-test-delete-blog-post-button">
+                  class="e2e-test-delete-blog-post-button">
             <span>Delete</span>
           </button>
         </mat-menu>
@@ -35,22 +35,22 @@
       <mat-card-subtitle class="blog-dashboard-tile-subtitle">
         {{ lastUpdatedDateString }}
       </mat-card-subtitle>
-      <angular-html-bind-wrapper [htmlData]="this.blogPostSummary.summary"
-                                 class="blog-post-summary d-block">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display [rteString]="this.blogPostSummary.summary"
+                                class="blog-post-summary d-block">
+      </oppia-rte-output-display>
     </mat-card-content>
   </div>
 </mat-card>
 <div class="d-flex flex-row flex-grow-1 justify-content-between align-items-baseline" (click)="editBlogPost()" *ngIf="activeView === 'listView'">
-  <span class="blog-dashboard-tile-title protractor-test-blog-post-title px-0 py-0 col-sm-5" *ngIf="blogPostSummary.title !== ''">
+  <span class="blog-dashboard-tile-title e2e-test-blog-post-title px-0 py-0 col-sm-5" *ngIf="blogPostSummary.title !== ''">
     {{ blogPostSummary.title }}
   </span>
-  <span class="blog-dashboard-tile-title protractor-test-blog-post-title px-0 py-0 col-sm-5" *ngIf="blogPostSummary.title === ''">
+  <span class="blog-dashboard-tile-title e2e-test-blog-post-title px-0 py-0 col-sm-5" *ngIf="blogPostSummary.title === ''">
     {{ 'I18N_BLOG_POST_UNTITLED_HEADING' | translate }}
   </span>
-  <angular-html-bind-wrapper [htmlData]="this.blogPostSummary.summary"
-                             class="blog-post-summary truncated-text col-sm-6">
-  </angular-html-bind-wrapper>
+  <oppia-rte-output-display [rteString]="this.blogPostSummary.summary"
+                            class="blog-post-summary truncated-text col-sm-6">
+  </oppia-rte-output-display>
   <span class="blog-dashboard-tile-subtitle d-contents col-sm-2 px-0 py-0">
     {{ lastUpdatedDateString }}
   </span>
@@ -58,7 +58,7 @@
 </div>
 <style>
   .blog-dashboard-tile {
-    border: 1px solid #CCC;
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 3px 3px #00000029;
     height: 230px;
@@ -101,7 +101,7 @@
   }
 
   .mat-menu-item {
-    background: #FFF 0% 0% no-repeat padding-box;
+    background: #fff 0% 0% no-repeat padding-box;
     border: 1px solid #707070;
     height: 24px;
     line-height: unset;

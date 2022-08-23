@@ -19,7 +19,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
@@ -40,7 +40,8 @@ describe('Topic creation backend api service', () => {
     description: 'Description',
     thumbnailBgColor: thumbnailBgColor,
     filename: 'image.svg',
-    url_fragment: 'url-fragment'
+    url_fragment: 'url-fragment',
+    page_title_fragment: 'page_title_fragment'
   };
 
   beforeEach(() => {
@@ -57,6 +58,7 @@ describe('Topic creation backend api service', () => {
     topic.name = 'topic-name';
     topic.description = 'Description';
     topic.urlFragment = 'url-fragment';
+    topic.pageTitleFragment = 'page_title_fragment';
     let imageBlob = new Blob(
       ['data:image/png;base64,xyz']);
     imagesData = [{
@@ -93,7 +95,7 @@ describe('Topic creation backend api service', () => {
 
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       let sampleFormData = new FormData();
-      sampleFormData.append('image', imagesData[0].imageBlob);
+      sampleFormData.append('image', imagesData[0].imageBlob as Blob);
       expect(
         req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       req.flush(postData);
@@ -120,11 +122,25 @@ describe('Topic creation backend api service', () => {
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       let sampleFormData = new FormData();
-      sampleFormData.append('image', imagesData[0].imageBlob);
+      sampleFormData.append('image', imagesData[0].imageBlob as Blob);
       expect(
         req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       flushMicrotasks();
       expect(failHandler).toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();
     }));
+
+  it('should throw an error if image blob is null', fakeAsync(() => {
+    imagesData = [{
+      filename: 'image.svg',
+      imageBlob: null
+    }];
+    let successHandler = jasmine.createSpy('success');
+    expect(function() {
+      topicCreationBackendApiService.createTopicAsync(
+        topic, imagesData, thumbnailBgColor).then(
+        successHandler);
+      tick();
+    }).toThrowError();
+  }));
 });

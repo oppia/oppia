@@ -78,7 +78,9 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             story_reference_schema_version=(
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=1,
-            language_code='en'
+            language_code='en',
+            page_title_fragment_for_web='fragm',
+            skill_ids_for_diagnostic_test=[]
         )
         # We check that topic has not been saved before calling commit().
         self.assertIsNone(topic_models.TopicModel.get_by_name(self.TOPIC_NAME))
@@ -101,8 +103,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_by_name(self) -> None:
-        topic = topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]
-            self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description')
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description', 'fragm')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
         topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
         # Ruling out the possibility of None for mypy type checking.
@@ -111,8 +113,9 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_model.id, self.TOPIC_ID)
 
     def test_get_by_url_fragment(self) -> None:
-        topic = topic_domain.Topic.create_default_topic( # type: ignore[no-untyped-call]
-            self.TOPIC_ID, self.TOPIC_NAME, 'name-two', 'description')
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, self.TOPIC_NAME, 'name-two', 'description',
+            'fragm')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
         topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
         # Ruling out the possibility of None for mypy type checking.
@@ -226,7 +229,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     USER_ID_2 = 'user_id_2'
 
     def setUp(self) -> None:
-        super(TopicRightsModelUnitTests, self).setUp()
+        super().setUp()
         topic_models.TopicRightsModel(
             id=self.TOPIC_4_ID,
             manager_ids=[self.USER_ID_2],

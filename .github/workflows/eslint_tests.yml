@@ -15,7 +15,7 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-22.04]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -38,3 +38,9 @@ jobs:
       - name: Run ESLint Tests
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_custom_eslint_tests
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "ESLint checks failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

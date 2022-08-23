@@ -19,13 +19,12 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -88,9 +87,9 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             if topic_rights.topic_is_published:
                 raise self.InvalidInputException(
                     'The topic is already published.')
-            else:
-                raise self.InvalidInputException(
-                    'The topic exists but is not published.')
+
+            raise self.InvalidInputException(
+                'The topic exists but is not published.')
         exp_id = '26'
         user_id = feconf.SYSTEM_COMMITTER_ID
         # Generate new Structure id for topic, story, skill and question.
@@ -110,35 +109,36 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         # Create and update topic to validate before publishing.
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'Android test', 'test-topic-one', 'description')
+            topic_id, 'Android test', 'test-topic-one', 'description',
+            'fragm')
         topic.update_url_fragment('test-topic')
         topic.update_meta_tag_content('tag')
         topic.update_page_title_fragment_for_web('page title for topic')
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_TOPIC, topic_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         fs.commit(
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
         # Update thumbnail properties.
-        topic.update_thumbnail_filename('test_svg.svg')
+        topic_services.update_thumbnail_filename(topic, 'test_svg.svg')
         topic.update_thumbnail_bg_color('#C6DCDA')
 
         # Add other structures to the topic.
         topic.add_canonical_story(story_id)
         topic.add_uncategorized_skill_id(skill_id)
-        topic.add_subtopic(1, 'Test Subtopic Title')
+        topic.add_subtopic(1, 'Test Subtopic Title', 'testsubtop')
 
         # Update and validate subtopic.
-        topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
+        topic_services.update_subtopic_thumbnail_filename(
+            topic, 1, 'test_svg.svg')
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
         topic.update_subtopic_url_fragment(1, 'suburl')
         topic.move_skill_id_to_subtopic(None, 1, skill_id)
+        topic.update_skill_ids_for_diagnostic_test([skill_id])
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, topic_id))
@@ -174,13 +174,11 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         )
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_STORY, story_id))
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
         fs.commit(
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
@@ -207,7 +205,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Dummy Subtopic Title'
+                'title': 'Dummy Subtopic Title',
+                'url_fragment': 'dummy-fragment'
             })]
         )
 
@@ -230,7 +229,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         AssetDevHandler.
         """
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             image_content = f.read()
@@ -291,7 +290,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, state_domain.SubtitledHtml(
+                None, None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )

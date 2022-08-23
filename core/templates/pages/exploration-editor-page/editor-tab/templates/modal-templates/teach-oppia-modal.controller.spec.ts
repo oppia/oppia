@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
@@ -40,6 +40,9 @@ import { AngularNameService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { TrainingDataService } from '../../training-panel/training-data.service';
+import { TrainingModalService } from '../../training-panel/training-modal.service';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 
 describe('Teach Oppia Modal Controller', function() {
   importAllAngularServices();
@@ -47,6 +50,7 @@ describe('Teach Oppia Modal Controller', function() {
   var $httpBackend = null;
   var $log = null;
   var $scope = null;
+  let ctrl = null;
   var $uibModalInstance = null;
   var alertsService = null;
   var angularNameService = null;
@@ -63,6 +67,7 @@ describe('Teach Oppia Modal Controller', function() {
   var mockExternalSaveEventEmitter = null;
   var explorationId = 'exp1';
   var stateName = 'Introduction';
+  let mockEmitter = new EventEmitter();
   var state = {
     classifier_model_id: null,
     content: {
@@ -89,6 +94,7 @@ describe('Teach Oppia Modal Controller', function() {
         }],
         outcome: {
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content_5',
             html: ''
@@ -102,6 +108,7 @@ describe('Teach Oppia Modal Controller', function() {
       }],
       default_outcome: {
         dest: 'Introduction',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: 'This is a html feedback'
@@ -132,11 +139,38 @@ describe('Teach Oppia Modal Controller', function() {
     });
   });
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      isConfirmedUnclassifiedAnswer: () => {
+        return true;
+      },
+      associateWithDefaultResponse: () => {},
+      associateWithAnswerGroup: () => {},
+    });
+
+    $provide.value('TrainingDataService', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+
+    $provide.value('TrainingModalService', {
+      openTrainUnresolvedAnswerModal: () => {
+        return true;
+      },
+      onFinishTrainingCallback: mockEmitter
+    });
+  }));
+
   beforeEach(function() {
     angularNameService = TestBed.get(AngularNameService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
+    trainingDataService = TestBed.get(TrainingDataService);
+    trainingModalService = TestBed.get(TrainingModalService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -149,8 +183,20 @@ describe('Teach Oppia Modal Controller', function() {
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value(
+      'DEFAULT_OUTCOME_CLASSIFICATION',
+      ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
+    $provide.value(
+      'EXPLICIT_CLASSIFICATION',
+      ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION);
+    $provide.value(
+      'TRAINING_DATA_CLASSIFICATION',
+      ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION);
+
+    $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
+    $provide.value('TrainingDataService', trainingDataService);
+    $provide.value('TrainingModalService', trainingModalService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
@@ -162,6 +208,8 @@ describe('Teach Oppia Modal Controller', function() {
   }));
 
   describe('when successfully fetching top unresolved answers', function() {
+    let onchange = new EventEmitter();
+
     beforeEach(angular.mock.inject(function($injector, $controller) {
       alertsService = $injector.get('AlertsService');
       $httpBackend = $injector.get('$httpBackend');
@@ -210,21 +258,40 @@ describe('Teach Oppia Modal Controller', function() {
       });
 
       $scope = $rootScope.$new();
-      $controller('TeachOppiaModalController', {
+      ctrl = $controller('TeachOppiaModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance
       });
       $httpBackend.flush();
+
+      spyOnProperty(trainingModalService, 'onFinishTrainingCallback')
+        .and.returnValue(onchange);
+      ctrl.$onInit();
+      $rootScope.$apply();
     }));
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should initialize unresolved answer properties after controller is' +
-      ' initialized', function() {
-      var unresolvedAnswers = $scope.unresolvedAnswers[0];
+      ' initialized', fakeAsync(() => {
+      let unresolvedAnswers = $scope.unresolvedAnswers[0];
+
+      let finishTrainingResult = {
+        answerIndex: 0,
+        answer: 'answer Data for truncateInputBasedOnInteractionAnswerType'
+      };
+      $scope.interactionId = 'TextInput';
+
+      onchange.emit(finishTrainingResult);
+      $scope.$apply();
+      tick();
 
       expect(unresolvedAnswers.answer).toBe('Answer Text');
       expect(unresolvedAnswers.answerTemplate).toBe('');
       expect(unresolvedAnswers.feedbackHtml).toBe('This is a html feedback');
-    });
+    }));
 
     it('should confirm answer assignment when its type is default_outcome',
       function() {
@@ -264,15 +331,13 @@ describe('Teach Oppia Modal Controller', function() {
 
     it('should open train unresolved answer modal', function() {
       spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
-        .callFake(function(answer, callback) {
-          callback();
+        .callFake(function(InteractionAnswer, interactionId, answerIndex) {
         });
-      spyOn(alertsService, 'addSuccessMessage');
 
       $scope.openTrainUnresolvedAnswerModal(0);
 
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'The response for Answer Text has been fixed.', 2000);
+      expect(trainingModalService.openTrainUnresolvedAnswerModal)
+        .toHaveBeenCalled();
     });
   });
 

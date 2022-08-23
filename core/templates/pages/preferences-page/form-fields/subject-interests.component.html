@@ -1,5 +1,7 @@
 <mat-form-field class="subject-interests-chip-list" appearance="fill">
-  <mat-label>Subject Interests</mat-label>
+  <mat-label class="text-capitalize">
+    {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
+  </mat-label>
   <mat-chip-list #chipList aria-label="Subject Interests">
     <mat-chip *ngFor="let subjectInterest of subjectInterests"
               [selectable]="selectable"
@@ -8,8 +10,8 @@
       {{ subjectInterest }}
       <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
     </mat-chip>
-    <input placeholder="New Subject Interest"
-           class="protractor-test-subject-interests-input"
+    <input placeholder="{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_LABEL' | translate }}"
+           class="e2e-test-subject-interests-input"
            #subjectInterestInput
            [formControl]="formCtrl"
            [matAutocomplete]="auto"
@@ -22,7 +24,9 @@
       {{ subjectInterest }}
     </mat-option>
   </mat-autocomplete>
-  <mat-error>Subject interests must be unique and in lowercase.</mat-error>
+  <mat-error>
+    {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_ERROR_TEXT' | translate }}
+  </mat-error>
 </mat-form-field>
 
 <style>

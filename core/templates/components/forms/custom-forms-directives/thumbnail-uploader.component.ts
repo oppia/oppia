@@ -34,37 +34,47 @@ import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
   templateUrl: './thumbnail-uploader.component.html'
 })
 export class ThumbnailUploaderComponent implements OnInit, OnChanges {
-  @Input() disabled: boolean;
-  @Input() useLocalStorage: boolean;
-  @Input() allowedBgColors: string[];
-  @Input() aspectRatio: string;
-  @Input() bgColor: string;
-  @Input() filename: string;
-  @Input() previewDescription: string;
-  @Input() previewDescriptionBgColor: string;
-  @Input() previewFooter: string;
-  @Input() previewTitle: string;
-  @Output() updateBgColor: EventEmitter<string> = new EventEmitter() ;
+  @Output() updateBgColor: EventEmitter<string> = new EventEmitter();
   @Output() updateFilename: EventEmitter<string> = new EventEmitter();
   @Output() imageSave: EventEmitter<void> = new EventEmitter();
-  openInUploadMode: boolean;
-  tempBgColor: string;
-  tempImageName: string;
-  uploadedImage: string;
-  uploadedImageMimeType: string;
-  dimensions: { height: number; width: number; };
-  resampledFile: Blob;
-  newThumbnailDataUrl: string;
-  localStorageBgcolor: string;
-  imageUploadUrlTemplate: string;
-  hidePlaceholder = true;
-  placeholderImageUrl = (
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() disabled!: boolean;
+  @Input() useLocalStorage!: boolean;
+  @Input() allowedBgColors!: string[];
+  @Input() aspectRatio!: string;
+  @Input() bgColor!: string;
+  @Input() filename!: string;
+  @Input() previewDescription!: string;
+  @Input() previewDescriptionBgColor!: string;
+  @Input() previewFooter!: string;
+  @Input() previewTitle!: string;
+  tempBgColor!: string;
+  tempImageName!: string;
+  uploadedImage!: string;
+  uploadedImageMimeType!: string;
+  dimensions!: { height: number; width: number };
+  // Set resampled file returned to null when blob is not of type
+  // 'image', blob size is zero or dataURI is null.
+  resampledFile!: Blob | null;
+  newThumbnailDataUrl!: string;
+  localStorageBgcolor!: string;
+  imageUploadUrlTemplate!: string;
+  editableThumbnailDataUrl!: string;
+  transformedData!: string;
+  encodedImageURI!: string;
+  openInUploadMode: boolean = false;
+  hidePlaceholder: boolean = true;
+  thumbnailIsLoading: boolean = true;
+  placeholderImageUrl: string = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
-  editableThumbnailDataUrl: string;
-  transformedData: string;
-  parsedResponse;
-  encodedImageURI: string;
+
+  placeholderImageDataUrl: string = (
+    this.urlInterpolationService.getStaticImageUrl(
+      '/icons/story-image-icon.png'));
+
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -75,22 +85,23 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
-  placeholderImageDataUrl = (
-    this.urlInterpolationService.getStaticImageUrl(
-      '/icons/story-image-icon.png'));
-  thumbnailIsLoading = true;
 
   ngOnInit(): void {
     if (this.filename !== null &&
         this.filename !== undefined &&
         this.filename !== '') {
       this.hidePlaceholder = false;
+      let entityType = this.contextService.getEntityType();
+      if (entityType === undefined) {
+        throw new Error('No image present for preview');
+      }
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
           this.filename,
-          this.contextService.getEntityType(),
+          entityType,
           this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
+      this.thumbnailIsLoading = false;
     }
   }
 
@@ -107,6 +118,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     if (
       changes.filename &&
       changes.filename.currentValue !== changes.filename.previousValue) {
+      this.thumbnailIsLoading = true;
       const newValue = changes.filename.currentValue;
       const previousValue = changes.filename.previousValue;
       this.filenameChanges(newValue, previousValue);
@@ -115,20 +127,25 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
 
   filenameChanges(newFilename: string, prevFilename: string): void {
     if (newFilename) {
+      let entityType = this.contextService.getEntityType();
+      if (entityType === undefined) {
+        throw new Error('No image present for preview');
+      }
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService
           .getTrustedResourceUrlForThumbnailFilename(
             newFilename,
-            this.contextService.getEntityType(),
+            entityType,
             this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
     }
-    this.thumbnailIsLoading = true;
+    this.thumbnailIsLoading = false;
     this.hidePlaceholder = false;
   }
 
   saveThumbnailBgColor(newBgColor: string): void {
     if (newBgColor !== this.bgColor) {
+      this.bgColor = newBgColor;
       this.updateBgColor.emit(newBgColor);
     }
   }
@@ -148,15 +165,21 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
 
   postImageToServer(resampledFile: Blob, callback: () => void): void {
     let entityType = this.contextService.getEntityType();
+    if (entityType === undefined) {
+      throw new Error('No image present for preview');
+    }
     let entityId = this.contextService.getEntityId();
     const result = this.assetsBackendApiService.postThumbnailFile(
       resampledFile, this.tempImageName, entityType, entityId).toPromise();
     result.then((data) => {
-      this.editableThumbnailDataUrl = (
-        this.imageUploadHelperService
-          .getTrustedResourceUrlForThumbnailFilename(
-            data.filename, this.contextService.getEntityType(),
-            this.contextService.getEntityId()));
+      let entityType = this.contextService.getEntityType();
+      if (entityType) {
+        this.editableThumbnailDataUrl = (
+          this.imageUploadHelperService
+            .getTrustedResourceUrlForThumbnailFilename(
+              data.filename, entityType,
+              this.contextService.getEntityId()));
+      }
       callback();
     });
   }
@@ -165,7 +188,9 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     if (this.disabled) {
       return;
     }
-    this.openInUploadMode = true;
+    if (!this.uploadedImage) {
+      this.openInUploadMode = true;
+    }
     // This refers to the temporary thumbnail background
     // color used for preview.
     this.tempBgColor = (
@@ -212,6 +237,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
             this.uploadedImage = data.newThumbnailDataUrl;
             this.updateFilename.emit(this.tempImageName);
             this.saveThumbnailBgColor(data.newBgColor);
+            this.thumbnailIsLoading = false;
           });
         } else {
           this.saveThumbnailBgColor(data.newBgColor);

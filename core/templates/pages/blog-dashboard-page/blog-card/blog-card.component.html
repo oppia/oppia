@@ -13,8 +13,8 @@
       <img mat-card-avatar
            [src]="authorProfilePictureUrl"
            alt="Profile image of the author of the blog post"
-           class="protractor-test-profile-current-user-photo">
-      <mat-card-subtitle class="protractor-test-username-visible">
+           class="e2e-test-profile-current-user-photo">
+      <mat-card-subtitle class="e2e-test-username-visible">
         {{ blogPostSummary.authorUsername }}
       </mat-card-subtitle>
       <mat-card-subtitle class="font-weight-light mobile-published-date">
@@ -30,7 +30,7 @@
 </mat-card>
 <style>
   .blog-card {
-    border: 1px solid #CCC;
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 3px 3px #00000029;
     height: 384px;
@@ -48,7 +48,7 @@
   }
 
   .blog-card-thumbnail-container {
-    background-color: #AAA9;
+    background-color: #aaa9;
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
     height: 144px;

@@ -88,7 +88,7 @@ class BeamJobRunHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def delete(self) -> None:
-        job_id = self.request.get('job_id')
+        job_id = self.normalized_payload.get('job_id')
         beam_job_run = beam_job_services.cancel_beam_job(job_id)
         self.render_json(beam_job_run.to_dict())
 
@@ -114,6 +114,6 @@ class BeamJobRunResultHandler(base.BaseHandler):
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
-        job_id = self.request.get('job_id')
+        job_id = self.normalized_request.get('job_id')
         beam_job_run_result = beam_job_services.get_beam_job_run_result(job_id)
         self.render_json(beam_job_run_result.to_dict())

@@ -34,7 +34,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class ResponseInteractiveMapComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   mapOptions!: MapOptions;
@@ -45,6 +45,7 @@ export class ResponseInteractiveMapComponent implements OnInit {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
+
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private urlInterpolationService: UrlInterpolationService

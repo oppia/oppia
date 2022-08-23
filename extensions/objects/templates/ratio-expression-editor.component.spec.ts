@@ -18,13 +18,14 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { RatioExpressionEditorComponent } from './ratio-expression-editor.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('RatioExpression', () => {
   let component: RatioExpressionEditorComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [RatioExpressionEditorComponent],
+      declarations: [MockTranslatePipe, RatioExpressionEditorComponent],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -48,42 +49,40 @@ describe('RatioExpression', () => {
 
   it('should initialize warningText with non-integer ratio', () => {
     component.isValidRatio('1:1:2.3');
-    expect(component.warningText)
-      .toBe(
-        'For this question, each element in your ratio should be a ' +
-        'whole number (not a fraction or a decimal).');
+    // For this and other warning texts, the correct translated text is fetched
+    // in HTML and so, the key itself is passed around in the ts files.
+    expect(component.warningTextI18nKey)
+      .toBe('I18N_INTERACTIONS_RATIO_NON_INTEGER_ELEMENTS');
   });
 
   it('should initialize warningText with invalid ratio', () => {
     component.isValidRatio('1:2:3:');
-    expect(component.warningText)
-      .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
+    expect(component.warningTextI18nKey)
+      .toBe('I18N_INTERACTIONS_RATIO_INVALID_FORMAT');
   });
 
   it('should initialize warningText with invalid character', () => {
     component.isValidRatio('abc');
-    expect(component.warningText)
-      .toBe(
-        'Please write a ratio that consists of digits separated by colons' +
-        '(e.g. 1:2 or 1:2:3).');
+    expect(component.warningTextI18nKey)
+      .toBe('I18N_INTERACTIONS_RATIO_INVALID_CHARS');
   });
 
   it('should initialize warningText with empty ratio', () => {
     component.isValidRatio('');
-    expect(component.warningText)
-      .toBe('Please enter a valid ratio (e.g. 1:2 or 1:2:3).');
+    expect(component.warningTextI18nKey)
+      .toBe('I18N_INTERACTIONS_RATIO_EMPTY_STRING');
   });
 
   it('should initialize warningText with invalid colons', () => {
     component.isValidRatio('1:2::3');
-    expect(component.warningText)
-      .toBe('Your answer has multiple colons (:) next to each other.');
+    expect(component.warningTextI18nKey)
+      .toBe('I18N_INTERACTIONS_RATIO_INVALID_COLONS');
   });
 
   it('should initialize warningText with invalid zero ratio', () => {
     component.isValidRatio('1:0');
-    expect(component.warningText)
-      .toBe('Ratios cannot have 0 as a element.');
+    expect(component.warningTextI18nKey)
+      .toBe('I18N_INTERACTIONS_RATIO_INCLUDES_ZERO');
   });
 
   it('should return true with a valid value of ratio', () => {

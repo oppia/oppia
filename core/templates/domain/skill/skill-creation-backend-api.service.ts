@@ -20,21 +20,26 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+
 export interface RubricBackendDict {
   difficulty: string;
   explanations: string[];
 }
 
 export interface SkillCreationBackendDict {
-  'description': string,
-  'explanation_dict': string,
-  'linked_topic_ids': string[],
-  'rubrics': RubricBackendDict
+  'description': string;
+  'explanation_dict': string;
+  'linked_topic_ids': string[];
+  'rubrics': RubricBackendDict;
+  files: Record<string, string>;
 }
 
 export interface ImageData {
-  filename: string,
-  imageBlob: Blob
+  filename: string;
+  // 'imageBlob' will be null when filenames
+  // are not present in localStorage.
+  imageBlob: Blob | null;
 }
 
 interface SkillCreationBackendResponse {
@@ -45,7 +50,10 @@ interface SkillCreationBackendResponse {
   providedIn: 'root'
 })
 export class SkillCreationBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private imageLocalStorageService: ImageLocalStorageService
+  ) {}
 
   /**
    * Sends POST request to create skill.
@@ -67,20 +75,16 @@ export class SkillCreationBackendApiService {
       successCallback: (value: SkillCreationBackendResponse) => void,
       errorCallback: (reason: string) => void,
       description: string, rubrics: RubricBackendDict, explanation: string,
-      linkedTopicIds: string[], imagesData: ImageData[]): void {
+      linkedTopicIds: string[], files: Record<string, string>): void {
     let postData: SkillCreationBackendDict = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
-      rubrics: rubrics
+      rubrics: rubrics,
+      files: files
     };
     let body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    let filenames = imagesData.map(obj => obj.filename);
-    let imageBlobs = imagesData.map(obj => obj.imageBlob);
-    for (let idx in imageBlobs) {
-      body.append(filenames[idx], imageBlobs[idx]);
-    }
 
     this.http.post<SkillCreationBackendResponse>(
       '/skill_editor_handler/create_new', body).toPromise()
@@ -101,10 +105,12 @@ export class SkillCreationBackendApiService {
       description: string, rubrics: RubricBackendDict,
       explanation: string, linkedTopicIds: string[], imagesData: ImageData[]
   ): Promise<SkillCreationBackendResponse> {
+    const files = await this.imageLocalStorageService
+      .getFilenameToBase64MappingAsync(imagesData);
     return new Promise((resolve, reject) => {
       this._createSkill(
         resolve, reject, description, rubrics, explanation, linkedTopicIds,
-        imagesData);
+        files);
     });
   }
 }

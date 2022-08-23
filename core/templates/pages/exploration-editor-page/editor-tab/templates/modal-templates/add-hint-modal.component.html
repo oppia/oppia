@@ -1,0 +1,49 @@
+<div class="modal-header e2e-test-hint-modal">
+  <h3>Add Hint</h3>
+  <i class="fa fa-times" (click)="cancel()"></i>
+</div>
+
+<div class="modal-body">
+  <form class="form-inline">
+    <div class="oppia-rule-details-header">
+      <strong>Hint #{{ hintIndex }} is...</strong>
+      <schema-based-editor class="e2e-test-hint-text"
+                           [schema]="getSchema()"
+                           [localValue]="this.tmpHint"
+                           (localValueChange)="this.updateLocalHint($event)">
+      </schema-based-editor>
+    </div>
+  </form>
+  <div *ngIf="isHintLengthExceeded(tmpHint)" class="oppia-length-validation-error">
+    The hint length is too long. Please use at most 500 characters.
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-cancel-hint" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-save-hint" (click)="saveHint()" [disabled]="!this.tmpHint || this.isHintLengthExceeded(this.tmpHint)">Save Hint</button>
+</div>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .add-hint-modal .modal-dialog,
+    .add-hint-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+    }
+    .add-hint-modal .modal-content {
+      height: 100vh;
+    }
+    .add-hint-modal .modal-header {
+      background-color: #00609c;
+    }
+    .add-hint-modal .modal-header i {
+      color: #fff;
+      font-size: 20px;
+    }
+    .add-hint-modal .modal-header h3 {
+      color: #fff;
+    }
+  }
+</style>

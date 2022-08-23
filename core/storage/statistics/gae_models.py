@@ -608,7 +608,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             client_time_spent_in_secs: float,
             params: Dict[str, str],
             play_type: str
-    ) -> None:
+    ) -> str:
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -622,6 +622,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
+
+        Returns:
+            str. New unique ID for this entity instance.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -641,6 +644,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.update_timestamps()
         leave_event_entity.put()
+        return entity_id
 
     @staticmethod
     def get_model_association_to_user(
@@ -849,7 +853,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id: str. ID of the user.
 
         Returns:
-            str. New unique ID for this entity class.
+            str. New unique ID for this entity instance.
         """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
@@ -864,7 +868,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             user_id: str,
             rating: int,
             old_rating: Optional[int]
-    ) -> None:
+    ) -> str:
         """Creates a new rate exploration event and then writes it to the
         datastore.
 
@@ -874,6 +878,9 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             rating: int. Value of rating assigned to exploration.
             old_rating: int or None. Will be None if the user rates an
                 exploration for the first time.
+
+        Returns:
+            str. New unique ID for this entity instance.
         """
         entity_id = cls.get_new_event_entity_id(
             exp_id, user_id)
@@ -885,6 +892,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             old_rating=old_rating,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
+        return entity_id
 
     @staticmethod
     def get_model_association_to_user(
@@ -1438,14 +1446,12 @@ class ExplorationIssuesModel(base_models.BaseModel):
         instance_id = cls.get_entity_id(exp_id, exp_version)
         return cls.get(instance_id, strict=False)
 
-    # TODO(#13523): Change 'unresolved_issues' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
             cls,
             exp_id: str,
             exp_version: int,
-            unresolved_issues: List[Dict[str, Any]]
+            unresolved_issues: List[stats_domain.ExplorationIssueDict]
     ) -> str:
         """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
@@ -1554,7 +1560,7 @@ class PlaythroughModel(base_models.BaseModel):
             'The id generator for PlaythroughModel is producing too many '
             'collisions.')
 
-    # TODO(#13523): Change 'issue_customization_args' and 'actions' to
+    # TODO(#13523): Change 'issue_customization_args' to
     # TypedDict/Domain Object to remove Any used below.
     @classmethod
     def create(
@@ -1563,7 +1569,7 @@ class PlaythroughModel(base_models.BaseModel):
             exp_version: int,
             issue_type: str,
             issue_customization_args: Dict[str, Any],
-            actions: List[Dict[str, Any]]
+            actions: List[stats_domain.LearnerActionDict]
     ) -> str:
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
@@ -1732,7 +1738,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             state_reference=state_reference,
             interaction_id=interaction_id,
             learner_answer_info_list=[
-                learner_answer_info.to_dict() # type: ignore[no-untyped-call]
+                learner_answer_info.to_dict()
                 for learner_answer_info in learner_answer_info_list
             ],
             learner_answer_info_schema_version=(

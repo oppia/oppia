@@ -20,11 +20,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 interface ConfigSchema {
-  type: string,
+  type: string;
   items?: {
-      type: string,
-  },
-  validators?: {}[],
+      type: string;
+  };
+  validators?: {}[];
 }
 
 interface UserRolesBackendResponse {
@@ -37,15 +37,15 @@ interface RoleToActionsBackendResponse {
 
 export interface ConfigPropertiesBackendResponse {
   [property: string]: {
-    description: string,
-    value: string[] | number,
+    description: string;
+    value: string[] | number;
     schema: ConfigSchema;
-  }
+  };
 }
 
 export interface ConfigPropertyValues {
-  'max_number_of_tags_assigned_to_blog_post': number,
-  'list_of_default_tags_for_blog_post': string[]
+  'max_number_of_tags_assigned_to_blog_post': number;
+  'list_of_default_tags_for_blog_post': string[];
 }
 
 export interface BlogAdminPageDataBackendDict {

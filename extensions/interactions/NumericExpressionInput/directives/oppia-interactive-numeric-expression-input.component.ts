@@ -25,7 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { NumericExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
@@ -38,9 +38,12 @@ import { NumericExpressionInputRulesService } from './numeric-expression-input-r
   styleUrls: []
 })
 export class InteractiveNumericExpressionInput implements OnInit {
-  @Input() placeholderWithValue: string;
-  @Input() savedSolution: InteractionAnswer;
-  @Input() useFractionForDivisionWithValue: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() placeholderWithValue!: string;
+  @Input() savedSolution!: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue!: string;
 
   value: string = '';
   hasBeenTouched: boolean = false;
@@ -92,9 +95,8 @@ export class InteractiveNumericExpressionInput implements OnInit {
     if (!this.isCurrentAnswerValid()) {
       return;
     }
-    this.currentInteractionService.onSubmit(this.value, (
-      this.numericExpressionInputRulesService
-    ) as unknown as InteractionRulesService);
+    this.currentInteractionService.onSubmit(
+      this.value, this.numericExpressionInputRulesService);
   }
 
   showOSK(): void {

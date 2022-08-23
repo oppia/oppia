@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
@@ -23,8 +24,8 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { AlertsService } from 'services/alerts.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { SuggestionThreadObjectFactory } from
-  'domain/suggestion/SuggestionThreadObjectFactory';
+import { SuggestionThread } from
+  'domain/suggestion/suggestion-thread-object.model';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -34,13 +35,14 @@ import { UserService } from 'services/user.service';
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EventEmitter } from '@angular/core';
 // ^^^ This block is to be removed.
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var $uibModal = null;
   var $rootScope = null;
   var alertsService = null;
   let changeListService: ChangeListService = null;
@@ -48,9 +50,9 @@ describe('Feedback Tab Component', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var suggestionModalForExplorationEditorService = null;
-  var suggestionThreadObjectFactory = null;
   var threadDataBackendApiService = null;
   var userService = null;
+  let ngbModal: NgbModal = null;
 
   importAllAngularServices();
 
@@ -67,7 +69,6 @@ describe('Feedback Tab Component', function() {
     alertsService = TestBed.get(AlertsService);
     changeListService = TestBed.inject(ChangeListService);
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
-    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -81,12 +82,24 @@ describe('Feedback Tab Component', function() {
       TestBed.get(ReadOnlyExplorationBackendApiService));
     $provide.value(
       'UserService', TestBed.get(UserService));
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve(
+            {
+              newThreadSubject: 'New subject',
+              newThreadText: 'New text'
+            }
+          )
+        };
+      }
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     editabilityService = $injector.get('EditabilityService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     suggestionModalForExplorationEditorService = $injector.get(
@@ -98,8 +111,9 @@ describe('Feedback Tab Component', function() {
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));
-    spyOn(threadDataBackendApiService, 'getThreadsAsync').and.returnValue(
-      $q.resolve({}));
+    spyOn(
+      threadDataBackendApiService,
+      'getFeedbackThreadsAsync').and.returnValue($q.resolve({}));
 
     $scope = $rootScope.$new();
     ctrl = $componentController('feedbackTab', {
@@ -110,6 +124,32 @@ describe('Feedback Tab Component', function() {
     $scope.$apply();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should unsubscribe subscriptions on destroy', () => {
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+    ctrl.$onDestroy();
+    expect(ctrl.directiveSubscriptions.unsubscribe)
+      .toHaveBeenCalled();
+  });
+
+  it('should get threads after feedback threads are available', () => {
+    let onFeedbackThreadsInitializedEmitter = new EventEmitter();
+    spyOnProperty(
+      threadDataBackendApiService, 'onFeedbackThreadsInitialized')
+      .and.returnValue(onFeedbackThreadsInitializedEmitter);
+    spyOn(ctrl, 'fetchUpdatedThreads');
+
+    ctrl.$onInit();
+
+    onFeedbackThreadsInitializedEmitter.emit();
+    $scope.$apply();
+
+    expect(ctrl.fetchUpdatedThreads).toHaveBeenCalled();
+  });
+
   it('should throw an error when trying to active a non-existent thread',
     function() {
       expect(function() {
@@ -118,7 +158,7 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should set active thread when it exists', function() {
-    var thread = suggestionThreadObjectFactory.createFromBackendDicts({
+    var thread = SuggestionThread.createFromBackendDicts({
       status: 'review',
       subject: '',
       summary: '',
@@ -126,6 +166,9 @@ describe('Feedback Tab Component', function() {
       last_updated_msecs: 0,
       message_count: 1,
       thread_id: '1',
+      state_name: '',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: ''
     }, {
       suggestion_type: 'edit_exploration_state_content',
       suggestion_id: '1',
@@ -135,8 +178,9 @@ describe('Feedback Tab Component', function() {
       author_name: '',
       change: {
         state_name: '',
-        new_value: '',
-        old_value: '',
+        new_value: {html: ''},
+        old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -179,7 +223,7 @@ describe('Feedback Tab Component', function() {
   it('should add new message to a thread and then go back to feedback' +
     ' threads list', function() {
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
+      SuggestionThread.createFromBackendDicts({
         status: 'Open',
         subject: '',
         summary: '',
@@ -187,6 +231,9 @@ describe('Feedback Tab Component', function() {
         last_updated_msecs: 0,
         message_count: 1,
         thread_id: '1',
+        state_name: '',
+        last_nonempty_message_author: '',
+        last_nonempty_message_text: ''
       }, {
         suggestion_type: 'edit_exploration_state_content',
         suggestion_id: '1',
@@ -196,8 +243,9 @@ describe('Feedback Tab Component', function() {
         author_name: '',
         change: {
           state_name: '',
-          new_value: '',
-          old_value: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
@@ -227,7 +275,7 @@ describe('Feedback Tab Component', function() {
   it('should use reject handler when trying to add a message in a thread fails',
     function() {
       spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
-        suggestionThreadObjectFactory.createFromBackendDicts({
+        SuggestionThread.createFromBackendDicts({
           status: 'Open',
           subject: '',
           summary: '',
@@ -235,6 +283,9 @@ describe('Feedback Tab Component', function() {
           last_updated_msecs: 0,
           message_count: 1,
           thread_id: '1',
+          state_name: '',
+          last_nonempty_message_author: '',
+          last_nonempty_message_text: ''
         }, {
           suggestion_type: 'edit_exploration_state_content',
           suggestion_id: '1',
@@ -244,8 +295,9 @@ describe('Feedback Tab Component', function() {
           author_name: '',
           change: {
             state_name: '',
-            new_value: '',
-            old_value: '',
+            new_value: {html: ''},
+            old_value: {html: ''},
+            skill_id: '',
           },
           last_updated_msecs: 0
         }));
@@ -266,7 +318,7 @@ describe('Feedback Tab Component', function() {
 
   it('should evaluate suggestion button type to be default when a feedback' +
     ' thread is selected', function() {
-    var thread = suggestionThreadObjectFactory.createFromBackendDicts({
+    var thread = SuggestionThread.createFromBackendDicts({
       status: 'open',
       subject: '',
       summary: '',
@@ -274,6 +326,9 @@ describe('Feedback Tab Component', function() {
       last_updated_msecs: 0,
       message_count: 1,
       thread_id: '1',
+      state_name: '',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: ''
     }, {
       suggestion_type: 'edit_exploration_state_content',
       suggestion_id: '1',
@@ -283,8 +338,9 @@ describe('Feedback Tab Component', function() {
       author_name: '',
       change: {
         state_name: '',
-        new_value: '',
-        old_value: '',
+        new_value: {html: ''},
+        old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -300,7 +356,7 @@ describe('Feedback Tab Component', function() {
 
   it('should evaluate suggestion button type to be primary when a feedback' +
     ' thread is selected', function() {
-    var thread = suggestionThreadObjectFactory.createFromBackendDicts({
+    var thread = SuggestionThread.createFromBackendDicts({
       status: 'review',
       subject: '',
       summary: '',
@@ -308,6 +364,9 @@ describe('Feedback Tab Component', function() {
       last_updated_msecs: 0,
       message_count: 1,
       thread_id: '1',
+      state_name: '',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: ''
     }, {
       suggestion_type: 'edit_exploration_state_content',
       suggestion_id: '1',
@@ -317,8 +376,9 @@ describe('Feedback Tab Component', function() {
       author_name: '',
       change: {
         state_name: '',
-        new_value: '',
-        old_value: '',
+        new_value: {html: ''},
+        old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -345,7 +405,7 @@ describe('Feedback Tab Component', function() {
   it('should open show suggestion modal when active thread exists', function() {
     var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
     getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
+      SuggestionThread.createFromBackendDicts({
         status: 'Open',
         subject: '',
         summary: '',
@@ -354,7 +414,8 @@ describe('Feedback Tab Component', function() {
         message_count: 1,
         thread_id: '1',
         last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
+        last_nonempty_message_text: 'Message 2',
+        state_name: ''
       }, {
         suggestion_type: 'edit_exploration_state_content',
         suggestion_id: '1',
@@ -364,8 +425,9 @@ describe('Feedback Tab Component', function() {
         author_name: '',
         change: {
           state_name: '',
-          new_value: '',
-          old_value: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
@@ -380,7 +442,7 @@ describe('Feedback Tab Component', function() {
       });
 
     getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
+      SuggestionThread.createFromBackendDicts({
         status: 'Review',
         subject: '',
         summary: '',
@@ -389,7 +451,8 @@ describe('Feedback Tab Component', function() {
         message_count: 1,
         thread_id: '2',
         last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
+        last_nonempty_message_text: 'Message 2',
+        state_name: ''
       }, {
         suggestion_type: 'edit_exploration_state_content',
         suggestion_id: '2',
@@ -399,8 +462,9 @@ describe('Feedback Tab Component', function() {
         author_name: '',
         change: {
           state_name: '',
-          new_value: '',
-          old_value: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
@@ -415,19 +479,13 @@ describe('Feedback Tab Component', function() {
   });
 
   it('should create a new thread when closing create new thread modal',
-    function() {
+    fakeAsync(() => {
       spyOn(alertsService, 'addSuccessMessage').and.callThrough();
       spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.
-        returnValue($q.resolve());
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          newThreadSubject: 'New subject',
-          newThreadText: 'New text'
-        })
-      });
+        returnValue(Promise.resolve());
       ctrl.showCreateThreadModal();
-      $scope.$apply();
-      $scope.$apply();
+      tick();
+      tick();
 
       expect(threadDataBackendApiService.createNewThreadAsync)
         .toHaveBeenCalledWith('New subject', 'New text');
@@ -435,13 +493,15 @@ describe('Feedback Tab Component', function() {
         'Feedback thread created.');
       expect(ctrl.tmpMessage.status).toBe(null);
       expect(ctrl.tmpMessage.text).toBe('');
-    });
+    }));
 
   it('should not create a new thread when dismissing create new thread modal',
     function() {
       spyOn(threadDataBackendApiService, 'createNewThreadAsync');
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          result: Promise.reject()
+        } as NgbModalRef);
       });
       ctrl.showCreateThreadModal();
       $scope.$apply();

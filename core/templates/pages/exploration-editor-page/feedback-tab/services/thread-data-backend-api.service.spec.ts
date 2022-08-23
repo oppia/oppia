@@ -21,10 +21,10 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.model';
 
-import { FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
-import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
-import { SuggestionAndFeedbackThreads, ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
+import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
@@ -33,7 +33,6 @@ describe('retrieving threads service', () => {
   let contextService: ContextService;
   let csrfTokenService: CsrfTokenService;
   let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
-  let suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
   let threadDataBackendApiService: ThreadDataBackendApiService;
 
   let mockFeedbackThreads: FeedbackThreadBackendDict[];
@@ -97,6 +96,7 @@ describe('retrieving threads service', () => {
       {
         author_name: 'author_1',
         change: {
+          skill_id: 'skill_id',
           new_value: {
             html: 'new content html'
           },
@@ -141,8 +141,6 @@ describe('retrieving threads service', () => {
     contextService = TestBed.inject(ContextService);
     csrfTokenService = TestBed.inject(CsrfTokenService);
     feedbackThreadObjectFactory = TestBed.inject(FeedbackThreadObjectFactory);
-    suggestionThreadObjectFactory = (
-      TestBed.inject(SuggestionThreadObjectFactory));
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
@@ -150,36 +148,26 @@ describe('retrieving threads service', () => {
       .and.returnValue(Promise.resolve('sample-csrf-token'));
   });
 
-  it('should retrieve feedback threads and suggestion thread', fakeAsync(() => {
-    threadDataBackendApiService.getThreadsAsync().then(
+  it('should retrieve feedback threads', fakeAsync(() => {
+    threadDataBackendApiService.getFeedbackThreadsAsync().then(
       threadData => {
         for (let mockFeedbackThread of mockFeedbackThreads) {
           expect(threadDataBackendApiService.getThread(
             mockFeedbackThread.thread_id)).not.toBeNull();
         }
-        for (let mockSuggestionThread of mockSuggestionThreads) {
-          expect(threadDataBackendApiService.getThread(
-            mockSuggestionThread.thread_id)).not.toBeNull();
-        }
       });
 
     let req = httpTestingController.expectOne('/threadlisthandler/exp1');
     expect(req.request.method).toEqual('GET');
     req.flush({
-      feedback_thread_dicts: mockFeedbackThreads,
-      suggestion_thread_dicts: mockSuggestionThreads
+      feedback_thread_dicts: mockFeedbackThreads
     });
-
-    req = httpTestingController.expectOne(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({ suggestions: mockSuggestions });
 
     flushMicrotasks();
   }));
 
-  it('should call reject handler if any thread is null', fakeAsync(() => {
-    threadDataBackendApiService.getThreadsAsync().then(
+  it('should call reject handler if feedback thread is null', fakeAsync(() => {
+    threadDataBackendApiService.getFeedbackThreadsAsync().then(
       Promise.reject,
       error => {
         expect(error).toMatch('Missing input backend dict');
@@ -189,85 +177,27 @@ describe('retrieving threads service', () => {
     let req = httpTestingController.expectOne('/threadlisthandler/exp1');
     expect(req.request.method).toEqual('GET');
     req.flush({
-      feedback_thread_dicts: [null],
-      suggestion_thread_dicts: []
+      feedback_thread_dicts: [null]
     });
-
-    req = httpTestingController.expectOne(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({ suggestions: [] });
-
-    flushMicrotasks();
-
-    threadDataBackendApiService.getThreadsAsync().then(
-      Promise.reject,
-      error => {
-        expect(error).toMatch('Missing input backend dict');
-        Promise.resolve();
-      });
-
-    req = httpTestingController.expectOne('/threadlisthandler/exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      feedback_thread_dicts: [],
-      suggestion_thread_dicts: [null]
-    });
-
-    req = httpTestingController.expectOne(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({ suggestions: mockSuggestions });
-
-    flushMicrotasks();
-  }));
-
-  it('should call reject handler if suggestions are missing', fakeAsync(() => {
-    threadDataBackendApiService.getThreadsAsync().then(
-      Promise.reject,
-      error => {
-        expect(error).toMatch('Missing input backend dict');
-        Promise.resolve();
-      });
-
-    let req = httpTestingController.expectOne('/threadlisthandler/exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      feedback_thread_dicts: [],
-      suggestion_thread_dicts: mockSuggestionThreads
-    });
-
-    req = httpTestingController.expectOne(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({ suggestions: [] });
 
     flushMicrotasks();
   }));
 
   it(
-    'should use reject handler whenever fetching feedback threads or ' +
-    'suggestion threads fails', fakeAsync(() => {
-      threadDataBackendApiService.getThreadsAsync().then(
-        Promise.reject,
-        error => {
-          expect(error).toEqual('Error on retrieving feedback threads.');
-          Promise.resolve();
-        });
+    'should set open feedbacks to 0 when fetching feedback threads ' +
+    'fails', fakeAsync(async() => {
+      expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
 
-      let req = httpTestingController.expectOne(
-        '/suggestionlisthandler?target_type=exploration&target_id=exp1');
-      expect(req.request.method).toEqual('GET');
-      req.flush({ suggestions: mockSuggestions });
-
-      req = httpTestingController.expectOne('/threadlisthandler/exp1');
+      threadDataBackendApiService.getFeedbackThreadsAsync();
+      let req = httpTestingController.expectOne('/threadlisthandler/exp1');
       expect(req.request.method).toEqual('GET');
       req.flush('Error on retrieving feedback threads.', {
         status: 500,
         statusText: 'Error on retrieving feedback threads.'
       });
-
       flushMicrotasks();
+
+      expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
     }));
 
   it('should successfully fetch the messages of a thread', fakeAsync(() => {
@@ -333,36 +263,32 @@ describe('retrieving threads service', () => {
     }));
 
   it('should successfully fetch feedback stats', fakeAsync(() => {
-    threadDataBackendApiService.getOpenThreadsCountAsync().then(
+    threadDataBackendApiService.getFeedbackThreadsAsync().then(
       () => {
-        expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(10);
+        expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(2);
         Promise.resolve();
       },
       Promise.reject);
 
-    let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
+    let req = httpTestingController.expectOne('/threadlisthandler/exp1');
     expect(req.request.method).toEqual('GET');
-    req.flush({ num_open_threads: 10 });
+    req.flush({
+      feedback_thread_dicts: [
+        mockFeedbackThreads[0],
+        mockFeedbackThreads[0]],
+    });
 
     flushMicrotasks();
   }));
 
-  it(
-    'should use reject handler when fetching feedback stats fails',
-    fakeAsync(() => {
-      threadDataBackendApiService.getOpenThreadsCountAsync().then(
-        Promise.reject,
-        () => {
-          expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
-          Promise.resolve();
-        });
+  it('should get cached feedback threads', fakeAsync(() => {
+    threadDataBackendApiService.feedbackThreads = [];
 
-      let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Error on fetch feedback stats', {status: 500, statusText: ''});
+    threadDataBackendApiService.getFeedbackThreadsAsync();
 
-      flushMicrotasks();
-    }));
+    httpTestingController.expectNone('/threadlisthandler/exp1');
+    expect(threadDataBackendApiService.feedbackThreads).toEqual([]);
+  }));
 
   it('should successfully create a new thread', fakeAsync(() => {
     let subject = 'New Subject';
@@ -379,9 +305,9 @@ describe('retrieving threads service', () => {
     expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
     threadDataBackendApiService.createNewThreadAsync(subject, 'Text').then(
       threadData => {
-        const data = threadData as SuggestionAndFeedbackThreads;
-        expect(data.feedbackThreads.length).toEqual(1);
-        expect(data.feedbackThreads[0].threadId)
+        const data = threadData as FeedbackThread[];
+        expect(data.length).toEqual(1);
+        expect(data[0].threadId)
           .toEqual('exploration.exp1.jkl1');
         expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
         Promise.resolve();
@@ -397,14 +323,8 @@ describe('retrieving threads service', () => {
     req = httpTestingController.expectOne('/threadlisthandler/exp1');
     expect(req.request.method).toEqual('GET');
     req.flush({
-      feedback_thread_dicts: [mockCreatedFeedbackThread],
-      suggestion_thread_dicts: []
+      feedback_thread_dicts: [mockCreatedFeedbackThread]
     });
-
-    req = httpTestingController.expectOne(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({ suggestions: [] });
 
     flushMicrotasks();
   }));
@@ -485,11 +405,11 @@ describe('retrieving threads service', () => {
         mockThread);
 
       // Fetch feedback stats.
-      threadDataBackendApiService.getOpenThreadsCountAsync();
+      threadDataBackendApiService.getFeedbackThreadsAsync();
 
-      let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
+      let req = httpTestingController.expectOne('/threadlisthandler/exp1');
       expect(req.request.method).toEqual('GET');
-      req.flush({ num_open_threads: 1 });
+      req.flush({ feedback_thread_dicts: [mockFeedbackThreads[0]] });
       flushMicrotasks();
       expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
 
@@ -517,17 +437,17 @@ describe('retrieving threads service', () => {
         mockThread);
 
       // Fetch feedback stats.
-      threadDataBackendApiService.getOpenThreadsCountAsync();
+      threadDataBackendApiService.getFeedbackThreadsAsync();
 
-      let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
+      let req = httpTestingController.expectOne('/threadlisthandler/exp1');
       expect(req.request.method).toEqual('GET');
-      req.flush({ num_open_threads: 1 });
+      req.flush({ feedback_thread_dicts: [mockFeedbackThreads[0]] });
       flushMicrotasks();
-      expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
+      expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
 
       threadDataBackendApiService.addNewMessageAsync(
         thread, 'Message', 'open').then(() => {
-        expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(2);
+        expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
         Promise.resolve();
       },
       Promise.reject);
@@ -548,11 +468,11 @@ describe('retrieving threads service', () => {
         mockThread);
 
       // Fetch feedback stats.
-      threadDataBackendApiService.getOpenThreadsCountAsync();
+      threadDataBackendApiService.getFeedbackThreadsAsync();
 
-      let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
+      let req = httpTestingController.expectOne('/threadlisthandler/exp1');
       expect(req.request.method).toEqual('GET');
-      req.flush({ num_open_threads: 1 });
+      req.flush({ feedback_thread_dicts: [mockFeedbackThreads[0]] });
       flushMicrotasks();
       expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
 
@@ -572,31 +492,8 @@ describe('retrieving threads service', () => {
     }));
 
   it('should successfully resolve a suggestion', fakeAsync(() => {
-    let thread = suggestionThreadObjectFactory.createFromBackendDicts(
+    let thread = SuggestionThread.createFromBackendDicts(
       mockSuggestionThreads[0], mockSuggestions[0]);
-
-    threadDataBackendApiService.getThreadsAsync();
-
-    let req = httpTestingController.expectOne('/threadlisthandler/exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      feedback_thread_dicts: [],
-      suggestion_thread_dicts: mockSuggestionThreads
-    });
-
-    req = httpTestingController.expectOne(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({ suggestions: mockSuggestions });
-    flushMicrotasks();
-
-    threadDataBackendApiService.getOpenThreadsCountAsync();
-
-    req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
-    expect(req.request.method).toEqual('GET');
-    req.flush({num_open_threads: 1});
-    flushMicrotasks();
-    expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
 
     threadDataBackendApiService.resolveSuggestionAsync(
       thread, 'Message', 'status', 'a')
@@ -606,7 +503,7 @@ describe('retrieving threads service', () => {
       },
       Promise.reject);
 
-    req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       '/suggestionactionhandler/exploration/exp1/exploration.exp1.ghi3');
     expect(req.request.method).toEqual('PUT');
     req.flush(null, { status: 200, statusText: '' });

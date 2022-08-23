@@ -2,7 +2,7 @@
 
 <div align="center"
      *ngIf="statusMessage"
-     class="oppia-status-message-container protractor-test-status-message">
+     class="oppia-status-message-container e2e-test-status-message">
   {{ statusMessage }}
 </div>
 <br>
@@ -17,6 +17,13 @@
       <div class="oppia-action-buttons-container">
         <button mat-raised-button color="primary" (click)="flushMemoryCache()">Flush Cache</button>
         <button mat-raised-button color="primary" (click)="getMemoryCacheProfile()">Get Memory Cache Profile</button>
+      </div>
+      <div class="oppia-release-coordinator-page-cache-note">
+        <i>
+          When cache is flushed and then the memory cache profile is fetched there
+          will be some keys already as the cache profile requests adds some stuff
+          into the cache.
+        </i>
       </div>
       <div class="mt-4" *ngIf="memoryCacheDataFetched">
         <table class="table text-center view-results-table">
@@ -86,6 +93,11 @@
   }
   .oppia-release-coordinator-page-card.oppia-long-text p {
     margin: 0 0 1em 0;
+  }
+
+  .oppia-release-coordinator-page-cache-note {
+    margin-top: 20px;
+    text-align: justify;
   }
   .oppia-action-buttons-container {
     display: flex;

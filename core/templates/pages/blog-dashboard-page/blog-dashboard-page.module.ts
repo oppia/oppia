@@ -27,6 +27,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
@@ -42,6 +44,8 @@ import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-t
 import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
 import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -52,6 +56,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     MatTabsModule,
     MatMenuModule,
     MatButtonToggleModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     BrowserAnimationsModule
   ],
   declarations: [
@@ -93,6 +101,11 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ],
 })

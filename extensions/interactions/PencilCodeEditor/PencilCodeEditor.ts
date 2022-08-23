@@ -24,10 +24,10 @@ require(
   'pencil-code-editor-validation.service.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-interactive-pencil-code-editor.directive.ts');
+  'oppia-interactive-pencil-code-editor.component.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-response-pencil-code-editor.directive.ts');
+  'oppia-response-pencil-code-editor.component.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-short-response-pencil-code-editor.directive.ts');
+  'oppia-short-response-pencil-code-editor.component.ts');

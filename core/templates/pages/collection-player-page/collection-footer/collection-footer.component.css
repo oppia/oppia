@@ -1,0 +1,75 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.oppia-collection-footer-sharing-links {
+  left: -5px;
+  position: relative;
+  top: 7px;
+}
+
+.oppia-collection-footer {
+  background-color: #094142;
+  color: #fff;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 13px;
+  height: 42px;
+  line-height: 0;
+  margin-top: 30px;
+  width: 100%;
+}
+
+.oppia-collection-footer .float-right {
+  float: right !important;
+}
+
+.oppia-collection-footer .collection-footer-img {
+  height: 60px;
+  margin: -25px 0 0 10px;
+  width: 60px;
+}
+
+.oppia-collection-footer ul {
+  color: #fff;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.oppia-collection-footer li {
+  float: left;
+}
+
+.oppia-collection-footer .oppia-share-collection-footer {
+  line-height: 0.6;
+  padding-right: 20px;
+  padding-top: 16px;
+  text-transform: uppercase;
+}
+
+.oppia-collection-footer .oppia-collection-footer-container {
+  max-width: 800px;
+}
+
+.oppia-collection-footer .oppia-collection-footer-sharing-links ul {
+  display: block;
+  float: right;
+  margin: -8px;
+  padding-right: 20px;
+}
+
+.oppia-collection-footer .oppia-collection-footer-sharing-links li {
+  float: left;
+}
+
+@media (max-width: 475px) {
+  .oppia-collection-footer-sharing-links {
+    display: none;
+  }
+}
+
+@media (max-width: 658px) {
+  .oppia-share-collection-footer {
+    display: none;
+  }
+}

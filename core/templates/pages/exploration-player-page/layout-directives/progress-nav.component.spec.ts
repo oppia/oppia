@@ -33,6 +33,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { ProgressNavComponent } from './progress-nav.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -45,9 +46,9 @@ describe('Progress nav component', () => {
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
   let windowDimensionsService: WindowDimensionsService;
-  let explorationEngineService: ExplorationEngineService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
+  let contentTranslationManagerService: ContentTranslationManagerService;
   let mockDisplayedCard = new StateCard(
     '', '', '', null, [], null, null, '', null);
 
@@ -86,9 +87,10 @@ describe('Progress nav component', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    explorationEngineService = TestBed.inject(ExplorationEngineService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
+    contentTranslationManagerService = TestBed.inject(
+      ContentTranslationManagerService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -100,17 +102,12 @@ describe('Progress nav component', () => {
 
   it('should initialize', fakeAsync(() => {
     let isIframed = true;
-    let mockDisplayedCardIndexChangedEventEmitter = new EventEmitter<void>();
     let mockOnHelpCardAvailableEventEmitter = (
       new EventEmitter<HelpCardEventResponse>());
     let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
-    spyOn(componentInstance, 'updateDisplayedCardInfo');
     spyOn(componentInstance.submit, 'emit');
-    spyOnProperty(
-      playerPositionService, 'displayedCardIndexChangedEventEmitter')
-      .and.returnValue(mockDisplayedCardIndexChangedEventEmitter);
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockOnHelpCardAvailableEventEmitter);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
@@ -118,7 +115,6 @@ describe('Progress nav component', () => {
       .and.returnValue(mockSchemaFormSubmittedEventEmitter);
 
     componentInstance.ngOnInit();
-    mockDisplayedCardIndexChangedEventEmitter.emit();
     mockOnHelpCardAvailableEventEmitter.emit({
       hasContinueButton: true
     } as HelpCardEventResponse);
@@ -126,7 +122,6 @@ describe('Progress nav component', () => {
     tick();
 
     expect(componentInstance.isIframed).toEqual(isIframed);
-    expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
     expect(componentInstance.helpCardHasContinueButton).toBeTrue();
     expect(componentInstance.submit.emit).toHaveBeenCalled();
   }));
@@ -160,6 +155,22 @@ describe('Progress nav component', () => {
       mockDisplayedCard.getInteractionCustomizationArgs());
   }));
 
+  it('should respond to state card content updates', fakeAsync(() => {
+    let mockOnStateCardContentUpdate = new EventEmitter<void>();
+    spyOn(componentInstance, 'updateDisplayedCardInfo');
+    spyOnProperty(contentTranslationManagerService, 'onStateCardContentUpdate')
+      .and.returnValue(mockOnStateCardContentUpdate);
+
+    componentInstance.ngOnInit();
+    tick();
+    expect(componentInstance.updateDisplayedCardInfo).not.toHaveBeenCalled();
+
+    mockOnStateCardContentUpdate.emit();
+    tick();
+
+    expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
+  }));
+
   it('should return true if interaction has special case for mobile', () => {
     spyOn(browserCheckerService, 'isMobileDevice')
       .and.returnValue(true);
@@ -178,10 +189,6 @@ describe('Progress nav component', () => {
         .toBeFalse();
       expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
     });
-
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
-  });
 
   it('should not resolve special case for interaction if in desktop mode',
     () => {
@@ -228,24 +235,14 @@ describe('Progress nav component', () => {
 
   it('should change card', () => {
     componentInstance.transcriptLength = 5;
-    spyOn(playerPositionService, 'recordNavigationButtonClick');
-    spyOn(playerPositionService, 'setDisplayedCardIndex');
-    spyOn(explorationEngineService.onUpdateActiveStateIfInEditor, 'emit');
-    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('');
-    spyOn(playerPositionService, 'changeCurrentQuestion');
+    spyOn(componentInstance.changeCard, 'emit');
 
-    componentInstance.changeCard(0);
+    componentInstance.validateIndexAndChangeCard(0);
 
-    expect(playerPositionService.recordNavigationButtonClick)
-      .toHaveBeenCalled();
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalled();
-    expect(explorationEngineService.onUpdateActiveStateIfInEditor.emit)
-      .toHaveBeenCalled();
-    expect(playerPositionService.getCurrentStateName).toHaveBeenCalled();
-    expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalled();
+    expect(componentInstance.changeCard.emit).toHaveBeenCalled();
 
     expect(() => {
-      componentInstance.changeCard(-1);
+      componentInstance.validateIndexAndChangeCard(-1);
     }).toThrowError('Target card index out of bounds.');
   });
 

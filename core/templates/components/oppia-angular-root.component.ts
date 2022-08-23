@@ -123,8 +123,7 @@ const componentMap = {
   templateUrl: './oppia-angular-root.component.html'
 })
 export class OppiaAngularRootComponent implements AfterViewInit {
-  @Output()
-    public initialized: EventEmitter<void> = new EventEmitter();
+  @Output() public initialized: EventEmitter<void> = new EventEmitter();
   direction: string = 'ltr';
 
   static classroomBackendApiService: ClassroomBackendApiService;
@@ -166,7 +165,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         componentMap[rteKey].component_class,
         {injector: this.injector});
       customElements.define(
-        'oppia-noninteractive-' +
+        'oppia-noninteractive-ckeditor-' +
         ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
         rteElement
       );
@@ -244,10 +243,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     ]);
 
     // Initialize translations.
-    this.i18nService.initialize();
     this.i18nService.directionChangeEventEmitter.subscribe((direction) => {
       this.direction = direction;
     });
+    this.i18nService.initialize();
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

@@ -23,23 +23,32 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
+import { BackendChangeObject, Change, DomainObject } from 'domain/editor/undo_redo/change.model';
 import cloneDeep from 'lodash/cloneDeep';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { Story } from 'domain/story/StoryObjectFactory';
-import { StoryContents } from 'domain/story/StoryContentsObjectFactory';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
+type ChangeBackendDict = (
+  backendChangeObject: BackendChangeObject,
+  domainObject: DomainObject
+) => void;
 
 interface Params {
   'node_id'?: string;
   'title'?: string;
-  'old_value'?: string | string[] | boolean | number;
+  // For properties like initialNodeId, thumbnailBackdroundColor
+  // old value can be null.
+  'old_value'?: string | string[] | boolean | number | null;
   'new_value'?: string | string[] | boolean | number;
   'property_name'?: string;
   'cmd'?: string;
@@ -54,8 +63,10 @@ export class StoryUpdateService {
   constructor(
     private _undoRedoService: UndoRedoService,
     private _alertsService: AlertsService,
-    private _storyEditorStateService: StoryEditorStateService
+    private _storyEditorStateService: StoryEditorStateService,
+    private _localStorageService: LocalStorageService
   ) {}
+
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // story.
@@ -64,23 +75,50 @@ export class StoryUpdateService {
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     let changeDict = cloneDeep(params) as BackendChangeObject;
     changeDict.cmd = command;
-    let changeObj = new Change(changeDict, apply, reverse);
+    let changeObj = new Change(
+      changeDict, apply as ChangeBackendDict, reverse as ChangeBackendDict);
     try {
       this._undoRedoService.applyChange(changeObj, story);
-    } catch (err) {
-      this._alertsService.addWarning(err.message);
+      this._updateStoryEditorBrowserTabsUnsavedChangesStatus(story);
+    // The catch parameter type can only be any or unknown. The type 'unknown'
+    // is safer than type 'any' because it reminds us that we need to perform
+    // some sorts of type-checks before operating on our values.
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this._alertsService.addWarning(err.message);
+      }
       throw err;
+    }
+  }
+
+  private _updateStoryEditorBrowserTabsUnsavedChangesStatus(story: Story) {
+    var storyEditorBrowserTabsInfo:
+      EntityEditorBrowserTabsInfo | null = (
+        this._localStorageService.getEntityEditorBrowserTabsInfo(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+    if (
+      this._undoRedoService.getChangeCount() > 0 &&
+      storyEditorBrowserTabsInfo &&
+      !storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ) {
+      storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      this._localStorageService.updateEntityEditorBrowserTabsInfo(
+        storyEditorBrowserTabsInfo,
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_STORY_EDITOR_BROWSER_TABS);
     }
   }
 
   _getParameterFromChangeDict(
       changeDict: BackendChangeObject, paramName: string): string {
-    return changeDict[paramName];
+    return changeDict[paramName as keyof BackendChangeObject];
   }
 
   _getNodeIdFromChangeDict(changeDict: BackendChangeObject): string {
     return this._getParameterFromChangeDict(changeDict, 'node_id');
   }
+
   _getStoryNode(storyContents: StoryContents, nodeId: string): StoryNode {
     let storyNodeIndex = storyContents.getNodeIndex(nodeId);
     if (storyNodeIndex === -1) {
@@ -93,7 +131,7 @@ export class StoryUpdateService {
   // for details on the other behavior of this function.
   _applyStoryPropertyChange(
       story: Story, propertyName: string,
-      oldValue: string, newValue: string,
+      oldValue: string | null, newValue: string,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(story, StoryDomainConstants.CMD_UPDATE_STORY_PROPERTY, {
       property_name: propertyName,
@@ -104,7 +142,7 @@ export class StoryUpdateService {
 
   _applyStoryContentsPropertyChange(
       story: Story, propertyName: string,
-      oldValue: string | number, newValue: string | number,
+      oldValue: string | number | null, newValue: string | number,
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_CONTENTS_PROPERTY, {
@@ -116,7 +154,7 @@ export class StoryUpdateService {
 
   _applyStoryNodePropertyChange(
       story: Story, propertyName: string,
-      nodeId: string, oldValue: string | string[],
+      nodeId: string, oldValue: string | string[] | null,
       newValue: string | string[],
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
@@ -577,6 +615,7 @@ export class StoryUpdateService {
         this._storyEditorStateService.setExpIdsChanged();
       });
   }
+
   /**
    * Removes a node of a story and records the change in the
    * undo/redo service.

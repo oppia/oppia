@@ -21,7 +21,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 interface CollectionCreationBackendDict {
-  'collection_id': string
+  'collection_id': string;
 }
 
 interface CollectionCreationResponse {

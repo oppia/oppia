@@ -138,7 +138,7 @@ interface SkillMisconceptionNameChange {
   'property_name': 'name';
   'new_value': string;
   'old_value': string;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillMisconceptionMustBeAddressedChange {
@@ -146,7 +146,7 @@ interface SkillMisconceptionMustBeAddressedChange {
   'property_name': 'must_be_addressed';
   'new_value': boolean;
   'old_value': boolean;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillMisconceptionsNotesChange {
@@ -154,7 +154,7 @@ interface SkillMisconceptionsNotesChange {
   'property_name': 'notes';
   'new_value': string;
   'old_value': string;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillMisconceptionsFeedbackChange {
@@ -162,7 +162,7 @@ interface SkillMisconceptionsFeedbackChange {
   'property_name': 'feedback';
   'new_value': string;
   'old_value': string;
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 type SkillMisconceptionPropertyChange = (
@@ -202,7 +202,7 @@ interface SkillAddMisconceptionChange {
 
 interface SkillDeleteMisconceptionChange {
   'cmd': 'delete_skill_misconception';
-  'misconception_id': string;
+  'misconception_id': number;
 }
 
 interface SkillAddPrerequisiteChange {
@@ -473,8 +473,8 @@ interface TopicLanguageCodeChange {
 }
 
 interface TopicPageTitleFragmentForWebChange {
-  'cmd': 'update_topic_property',
-  'property_name': 'page_title_fragment_for_web',
+  'cmd': 'update_topic_property';
+  'property_name': 'page_title_fragment_for_web';
   'new_value': string;
   'old_value': string;
 }
@@ -553,11 +553,12 @@ interface TopicAddSubtopicChange {
   'cmd': 'add_subtopic';
   'subtopic_id': number;
   'title': string;
+  'url_fragment': string;
 }
 
 interface TopicAddUncategorizedSkillId {
-  'cmd': 'add_uncategorized_skill_id',
-  'new_uncategorized_skill_id': string
+  'cmd': 'add_uncategorized_skill_id';
+  'new_uncategorized_skill_id': string;
 }
 
 interface TopicDeleteSubtopicChange {
@@ -648,6 +649,7 @@ export class Change {
   _applyChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;
+
   _reverseChangeToObject: (
     backendChangeObject: BackendChangeObject,
     domainObject: DomainObject) => void;

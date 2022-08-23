@@ -40,6 +40,7 @@ export class ExtensionTagAssemblerService {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
+
   _convertCustomizationArgsToBackendDict(
       customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
@@ -81,15 +82,14 @@ export class ExtensionTagAssemblerService {
   }
 
   formatCustomizationArgAttrs(
-      element: JQuery,
-      customizationArgs: InteractionCustomizationArgs
-  ): JQuery {
+      element: HTMLElement, customizationArgs: InteractionCustomizationArgs
+  ): HTMLElement {
     const caBackendDict = (
       this._convertCustomizationArgsToBackendDict(customizationArgs)
     ) as Record<string, Record<string, Object>>;
     for (const caName in customizationArgs) {
       const caBackendDictValue = caBackendDict[caName].value;
-      element.attr(
+      element.setAttribute(
         this.camelCaseToHyphens.transform(caName) + '-with-value',
         this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
     }

@@ -16,28 +16,16 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, async, fakeAsync, tick } from
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from
   '@angular/core/testing';
 
 import { PlaybookPageComponent } from './playbook.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-
-class MockI18nLanguageCodeService {
-  codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
-    return 'en';
-  }
-
-  get onI18nLanguageCodeChange() {
-    return this.codeChangeEventEmiiter;
-  }
-}
 
 // Mocking window object here because changing location.href causes the
 // full page to reload. Page reloads raise an error in karma.
@@ -58,6 +46,7 @@ class MockWindowRef {
     },
     gtag: () => {}
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -69,22 +58,17 @@ class MockSiteAnalyticsService {
   }
 }
 
-let component: PlaybookPageComponent;
-let fixture: ComponentFixture<PlaybookPageComponent>;
-
 describe('Playbook Page', () => {
+  let component: PlaybookPageComponent;
+  let fixture: ComponentFixture<PlaybookPageComponent>;
   let windowRef: MockWindowRef;
   let siteAnalyticsService: SiteAnalyticsService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [PlaybookPageComponent, MockTranslatePipe],
       providers: [
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        },
         {
           provide: SiteAnalyticsService,
           useClass: MockSiteAnalyticsService
@@ -97,7 +81,7 @@ describe('Playbook Page', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   }));
 
   beforeEach(() => {

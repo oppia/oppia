@@ -16,8 +16,6 @@
  * @fileoverview Requires for MultipleChoiceInput interaction.
  */
 
-require('interactions/MultipleChoiceInput/static/multiple_choice_input.css');
-
 require(
   'interactions/MultipleChoiceInput/directives/' +
   'multiple-choice-input-rules.service.ts');

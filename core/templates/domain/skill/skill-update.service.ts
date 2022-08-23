@@ -17,47 +17,90 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
+import { EventEmitter, Injectable } from '@angular/core';
 import {
   BackendChangeObject,
   Change,
+  DomainObject,
+  SkillChange,
 } from 'domain/editor/undo_redo/change.model';
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { WorkedExample, WorkedExampleBackendDict } from 'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
+import { LocalStorageService } from 'services/local-storage.service';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import { Params } from '@angular/router';
+
+type SkillUpdateApply = (
+  skillChange: SkillChange, skill: Skill) => void;
+type SkillUpdateReverse = (
+  skillChange: SkillChange, skill: Skill) => void;
+type ChangeBackendDict = (
+  backendChangeObject: BackendChangeObject,
+  domainObject: DomainObject
+) => void;
 
 @Injectable({
   providedIn: 'root',
 })
 export class SkillUpdateService {
-  constructor(private undoRedoService: UndoRedoService) {}
+  private _prerequisiteSkillChanged = new EventEmitter();
+
+  constructor(
+    private undoRedoService: UndoRedoService,
+    private localStorageService: LocalStorageService
+  ) {}
 
   private _applyChange = (
-      skill,
+      skill: Skill,
       command: string,
-      params,
-      apply,
-      reverse
+      params: Params | BackendChangeObject,
+      apply: SkillUpdateApply,
+      reverse: SkillUpdateReverse
   ) => {
     const changeDict = cloneDeep(params);
     changeDict.cmd = command;
-    const changeObj = new Change(changeDict, apply, reverse);
+    const changeObj = new Change(
+      changeDict as BackendChangeObject,
+      apply as ChangeBackendDict,
+      reverse as ChangeBackendDict);
     this.undoRedoService.applyChange(changeObj, skill);
+    this._updateSkillEditorBrowserTabsUnsavedChangesStatus(skill);
   };
 
+  private _updateSkillEditorBrowserTabsUnsavedChangesStatus(skill: Skill) {
+    // EntityEditorBrowserTabsInfo if the data is found on the local
+    // storage. Otherwise, returns null.
+    const skillEditorBrowserTabsInfo:
+      EntityEditorBrowserTabsInfo | null = (
+        this.localStorageService.getEntityEditorBrowserTabsInfo(
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+    if (
+      this.undoRedoService.getChangeCount() > 0 &&
+      skillEditorBrowserTabsInfo &&
+      !skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+    ) {
+      skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      this.localStorageService.updateEntityEditorBrowserTabsInfo(
+        skillEditorBrowserTabsInfo,
+        EntityEditorBrowserTabsInfoDomainConstants
+          .OPENED_SKILL_EDITOR_BROWSER_TABS);
+    }
+  }
+
   private _applyPropertyChange = (
-      skill,
+      skill: Skill,
       propertyName: string,
       newValue: string,
       oldValue: string,
-      apply,
-      reverse
+      apply: SkillUpdateApply,
+      reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -73,13 +116,13 @@ export class SkillUpdateService {
   };
 
   private _applyMisconceptionPropertyChange = (
-      skill,
-      misconceptionId: string,
+      skill: Skill,
+      misconceptionId: number,
       propertyName: string,
       newValue: string | boolean,
       oldValue: string | boolean,
-      apply,
-      reverse
+      apply: SkillUpdateApply,
+      reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -96,11 +139,11 @@ export class SkillUpdateService {
   };
 
   private _applyRubricPropertyChange = (
-      skill,
+      skill: Skill,
       difficulty: string,
       explanations: string[],
-      apply,
-      reverse
+      apply: SkillUpdateApply,
+      reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -115,12 +158,12 @@ export class SkillUpdateService {
   };
 
   private _applySkillContentsPropertyChange = (
-      skill,
+      skill: Skill,
       propertyName: string,
-      newValue,
-      oldValue,
-      apply,
-      reverse
+      newValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
+      oldValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
+      apply: SkillUpdateApply,
+      reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -138,7 +181,7 @@ export class SkillUpdateService {
   private _getParameterFromChangeDict = (
       changeDict: BackendChangeObject,
       paramName: string
-  ) => changeDict[paramName];
+  ) => changeDict[paramName as keyof BackendChangeObject];
 
   private _getNewPropertyValueFromChangeDict = (
       changeDict: BackendChangeObject
@@ -280,7 +323,7 @@ export class SkillUpdateService {
     );
   }
 
-  deleteMisconception(skill: Skill, misconceptionId: string): void {
+  deleteMisconception(skill: Skill, misconceptionId: number): void {
     const params = {
       misconception_id: misconceptionId,
     };
@@ -313,6 +356,7 @@ export class SkillUpdateService {
         skill.deletePrerequisiteSkill(skillId);
       }
     );
+    this._prerequisiteSkillChanged.emit();
   }
 
   deletePrerequisiteSkill(skill: Skill, skillId: string): void {
@@ -330,11 +374,16 @@ export class SkillUpdateService {
         skill.addPrerequisiteSkill(skillId);
       }
     );
+    this._prerequisiteSkillChanged.emit();
+  }
+
+  get onPrerequisiteSkillChange(): EventEmitter<unknown> {
+    return this._prerequisiteSkillChanged;
   }
 
   updateMisconceptionName(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldName: string,
       newName: string
   ): void {
@@ -358,7 +407,7 @@ export class SkillUpdateService {
 
   updateMisconceptionMustBeAddressed(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldValue: boolean,
       newValue: boolean
   ): void {
@@ -382,7 +431,7 @@ export class SkillUpdateService {
 
   updateMisconceptionNotes(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldNotes: string,
       newNotes: string
   ): void {
@@ -406,7 +455,7 @@ export class SkillUpdateService {
 
   updateMisconceptionFeedback(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldFeedback: string,
       newFeedback: string
   ): void {

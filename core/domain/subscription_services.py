@@ -20,12 +20,16 @@ from __future__ import annotations
 
 from core.platform import models
 
-(user_models,) = models.Registry.import_models([
-    models.NAMES.user
-])
+from typing import List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-def subscribe_to_thread(user_id, feedback_thread_id):
+def subscribe_to_thread(user_id: str, feedback_thread_id: str) -> None:
     """Subscribes a user to a feedback thread.
 
     WARNING: Callers of this function should ensure that the user_id and
@@ -38,7 +42,7 @@ def subscribe_to_thread(user_id, feedback_thread_id):
     subscribe_to_threads(user_id, [feedback_thread_id])
 
 
-def subscribe_to_threads(user_id, feedback_thread_ids):
+def subscribe_to_threads(user_id: str, feedback_thread_ids: List[str]) -> None:
     """Subscribes a user to feedback threads.
 
     WARNING: Callers of this function should ensure that the user_id and
@@ -68,7 +72,7 @@ def subscribe_to_threads(user_id, feedback_thread_ids):
     subscriptions_model.put()
 
 
-def subscribe_to_exploration(user_id, exploration_id):
+def subscribe_to_exploration(user_id: str, exploration_id: str) -> None:
     """Subscribes a user to an exploration (and, therefore, indirectly to all
     feedback threads for that exploration).
 
@@ -90,7 +94,7 @@ def subscribe_to_exploration(user_id, exploration_id):
         subscriptions_model.put()
 
 
-def subscribe_to_creator(user_id, creator_id):
+def subscribe_to_creator(user_id: str, creator_id: str) -> None:
     """Subscribes a user (learner) to a creator.
 
     WARNING: Callers of this function should ensure that the user_id and
@@ -99,6 +103,10 @@ def subscribe_to_creator(user_id, creator_id):
     Args:
         user_id: str. The user ID of the new subscriber.
         creator_id: str. The user ID of the creator.
+
+    Raises:
+        Exception. The user ID of the new subscriber is same as the
+            user ID of the creator.
     """
     if user_id == creator_id:
         raise Exception('User %s is not allowed to self subscribe.' % user_id)
@@ -124,7 +132,7 @@ def subscribe_to_creator(user_id, creator_id):
         subscriptions_model_user.put()
 
 
-def unsubscribe_from_creator(user_id, creator_id):
+def unsubscribe_from_creator(user_id: str, creator_id: str) -> None:
     """Unsubscribe a user from a creator.
 
     WARNING: Callers of this function should ensure that the user_id and
@@ -135,9 +143,9 @@ def unsubscribe_from_creator(user_id, creator_id):
         creator_id: str. The user ID of the creator.
     """
     subscribers_model_creator = user_models.UserSubscribersModel.get(
-        creator_id, strict=False)
+        creator_id)
     subscriptions_model_user = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False)
+        user_id)
 
     if user_id in subscribers_model_creator.subscriber_ids:
         subscribers_model_creator.subscriber_ids.remove(user_id)
@@ -148,7 +156,7 @@ def unsubscribe_from_creator(user_id, creator_id):
         subscriptions_model_user.put()
 
 
-def get_all_threads_subscribed_to(user_id):
+def get_all_threads_subscribed_to(user_id: str) -> List[str]:
     """Returns a list with ids of all the feedback and suggestion threads to
     which the user is subscribed.
 
@@ -163,13 +171,19 @@ def get_all_threads_subscribed_to(user_id):
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
+    # TODO(#15621): The explicit declaration of type for ndb properties should
+    # be removed. Currently, these ndb properties are annotated with Any return
+    # type. Once we have proper return type we can remove this.
+    if subscriptions_model:
+        feedback_thread_ids: List[str] = (
+            subscriptions_model.general_feedback_thread_ids
+        )
+        return feedback_thread_ids
+    else:
+        return []
 
-    return (
-        subscriptions_model.general_feedback_thread_ids
-        if subscriptions_model else [])
 
-
-def get_all_creators_subscribed_to(user_id):
+def get_all_creators_subscribed_to(user_id: str) -> List[str]:
     """Returns a list with ids of all the creators to which this learner has
     subscribed.
 
@@ -184,12 +198,17 @@ def get_all_creators_subscribed_to(user_id):
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
-    return (
-        subscriptions_model.creator_ids
-        if subscriptions_model else [])
+    # TODO(#15621): The explicit declaration of type for ndb properties should
+    # be removed. Currently, these ndb properties are annotated with Any return
+    # type. Once we have proper return type we can remove this.
+    if subscriptions_model:
+        creator_ids: List[str] = subscriptions_model.creator_ids
+        return creator_ids
+    else:
+        return []
 
 
-def get_all_subscribers_of_creator(user_id):
+def get_all_subscribers_of_creator(user_id: str) -> List[str]:
     """Returns a list with ids of all users who have subscribed to this
     creator.
 
@@ -203,12 +222,17 @@ def get_all_subscribers_of_creator(user_id):
     """
     subscribers_model = user_models.UserSubscribersModel.get(
         user_id, strict=False)
-    return (
-        subscribers_model.subscriber_ids
-        if subscribers_model else [])
+    # TODO(#15621): The explicit declaration of type for ndb properties should
+    # be removed. Currently, these ndb properties are annotated with Any return
+    # type. Once we have proper return type we can remove this.
+    if subscribers_model:
+        subscriber_ids: List[str] = subscribers_model.subscriber_ids
+        return subscriber_ids
+    else:
+        return []
 
 
-def get_exploration_ids_subscribed_to(user_id):
+def get_exploration_ids_subscribed_to(user_id: str) -> List[str]:
     """Returns a list with ids of all explorations that the given user
     subscribes to.
 
@@ -223,12 +247,17 @@ def get_exploration_ids_subscribed_to(user_id):
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
-    return (
-        subscriptions_model.exploration_ids
-        if subscriptions_model else [])
+    # TODO(#15621): The explicit declaration of type for ndb properties should
+    # be removed. Currently, these ndb properties are annotated with Any return
+    # type. Once we have proper return type we can remove this.
+    if subscriptions_model:
+        exploration_ids: List[str] = subscriptions_model.exploration_ids
+        return exploration_ids
+    else:
+        return []
 
 
-def subscribe_to_collection(user_id, collection_id):
+def subscribe_to_collection(user_id: str, collection_id: str) -> None:
     """Subscribes a user to a collection.
 
     WARNING: Callers of this function should ensure that the user_id and
@@ -249,7 +278,7 @@ def subscribe_to_collection(user_id, collection_id):
         subscriptions_model.put()
 
 
-def get_collection_ids_subscribed_to(user_id):
+def get_collection_ids_subscribed_to(user_id: str) -> List[str]:
     """Returns a list with ids of all collections that the given user
     subscribes to.
 
@@ -264,6 +293,11 @@ def get_collection_ids_subscribed_to(user_id):
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
-    return (
-        subscriptions_model.collection_ids
-        if subscriptions_model else [])
+    # TODO(#15621): The explicit declaration of type for ndb properties should
+    # be removed. Currently, these ndb properties are annotated with Any return
+    # type. Once we have proper return type we can remove this.
+    if subscriptions_model:
+        collection_ids: List[str] = subscriptions_model.collection_ids
+        return collection_ids
+    else:
+        return []

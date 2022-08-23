@@ -33,144 +33,141 @@ var ExplorationEditorMainTab = function() {
    * Interactive elements
    */
   var addResponseDetails = element(
-    by.css('.protractor-test-add-response-details'));
+    by.css('.e2e-test-add-response-details'));
   var addResponseHeader = element(
-    by.css('.protractor-test-add-response-modal-header'));
-  var multipleChoiceAnswerOptions = function(optionNum) {
-    return element(
-      by.cssContainingText(
-        '.protractor-test-html-multiple-select-option', optionNum));
-  };
+    by.css('.e2e-test-add-response-modal-header'));
   var itemSelectionAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText(
-        '.protractor-test-html-item-select-option', optionNum));
+        '.e2e-test-html-item-select-option', optionNum));
   };
   var defaultResponseTab = element(
-    by.css('.protractor-test-default-response-tab'));
-  var editorWelcomeModal = element(by.css('.protractor-test-welcome-modal'));
-  var editOutcomeDestBubble = element(by.css('.protractor-test-dest-bubble'));
+    by.css('.e2e-test-default-response-tab'));
+  var editorWelcomeModal = element(by.css('.e2e-test-welcome-modal'));
+  var editOutcomeDestBubble = element(by.css('.e2e-test-dest-bubble'));
   var editOutcomeDestStateInput = editOutcomeDestBubble.element(
-    by.css('.protractor-test-add-state-input'));
+    by.css('.e2e-test-add-state-input'));
   var editOutcomeDestAddExplorationId = element(
-    by.css('.protractor-test-add-refresher-exploration-id'));
+    by.css('.e2e-test-add-refresher-exploration-id'));
   var editOutcomeDestDropdownOptions = function(targetOption) {
-    return element.all(by.cssContainingText('option', targetOption)).first();
+    return element.all(by.cssContainingText(
+      '.e2e-test-afterward-dest-selector', targetOption)).first();
   };
-  var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
-  var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
-  var fadeIn = element(by.css('.protractor-test-editor-cards-container'));
-  var interaction = element(by.css('.protractor-test-interaction'));
+  var feedbackBubble = element(by.css('.e2e-test-feedback-bubble'));
+  var feedbackEditor = element(by.css('.e2e-test-open-feedback-editor'));
+  var interaction = element(by.css('.e2e-test-interaction'));
   var interactionEditor = element(
-    by.css('.protractor-test-interaction-editor'));
-  var explorationGraph = element(by.css('.protractor-test-exploration-graph'));
-  var stateNodes = explorationGraph.all(by.css('.protractor-test-node'));
-  var nodeLabelLocator = by.css('.protractor-test-node-label');
+    by.css('.e2e-test-interaction-editor'));
+  var explorationGraph = element(by.css('.e2e-test-exploration-graph'));
+  var stateNodes = explorationGraph.all(by.css('.e2e-test-node'));
+  var nodeLabelLocator = by.css('.e2e-test-node-label');
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(nodeLabelLocator);
   };
   var interactionTab = function(tabId) {
-    return element(by.css('.protractor-test-interaction-tab-' + tabId));
+    return element(by.css('.e2e-test-interaction-tab-' + tabId));
   };
   var interactionTile = function(interactionId) {
     return element(by.css(
-      '.protractor-test-interaction-tile-' + interactionId));
+      '.e2e-test-interaction-tile-' + interactionId));
   };
   var openOutcomeDestEditor = element(
-    by.css('.protractor-test-open-outcome-dest-editor'));
+    by.css('.e2e-test-open-outcome-dest-editor'));
   var openOutcomeFeedBackEditor = element(
-    by.css('.protractor-test-open-outcome-feedback-editor'));
+    by.css('.e2e-test-open-outcome-feedback-editor'));
   var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
   var responseBody = function(responseNum) {
-    return element(by.css('.protractor-test-response-body-' + responseNum));
+    return element(by.css('.e2e-test-response-body-' + responseNum));
   };
-  var responseTab = element.all(by.css('.protractor-test-response-tab'));
+  var responseTab = element.all(by.css('.e2e-test-response-tab'));
   var stateContentDisplay = element(
-    by.css('.protractor-test-state-content-display'));
+    by.css('.e2e-test-state-content-display'));
   var stateEditButton = element(
-    by.css('.protractor-test-edit-content-pencil-button'));
+    by.css('.e2e-test-edit-content-pencil-button'));
   var stateNameContainer = element(
-    by.css('.protractor-test-state-name-container'));
+    by.css('.e2e-test-state-name-container'));
   var stateNameInput = element(
-    by.css('.protractor-test-state-name-input'));
-  var ruleDetails = element(by.css('.protractor-test-rule-details'));
-  var stateContentEditorLocator = by.css(
-    '.protractor-test-state-content-editor');
+    by.css('.e2e-test-state-name-input'));
+  var ruleDetails = element(by.css('.e2e-test-rule-details'));
   var addOrUpdateSolutionModal = element(
-    by.css('.protractor-test-add-or-update-solution-modal'));
+    by.css('.e2e-test-add-or-update-solution-modal'));
   var answerDescriptionFragment = element.all(
-    by.css('.protractor-test-answer-description-fragment'));
+    by.css('.e2e-test-answer-description-fragment'));
   var answerDescription = element(
-    by.css('.protractor-test-answer-description'));
-  var deleteNodeLocator = by.css('.protractor-test-delete-node');
+    by.css('.e2e-test-answer-description'));
+  var deleteNodeLocator = by.css('.e2e-test-delete-node');
   var titleElement = element(by.css('.ng-joyride-title'));
-  var ckEditorElement = element(by.css('.protractor-test-ck-editor'));
+  var ckEditorElement = element(by.css('.e2e-test-ck-editor'));
   var interactionHtmlElement = element(
-    by.css('.protractor-test-interaction-html'));
-  var answerTab = element(by.css('.protractor-test-answer-tab'));
-  var hintTextElement = element(by.css('.protractor-test-hint-text'));
+    by.css('.e2e-test-interaction-html'));
+  var answerTab = element(by.css('.e2e-test-answer-tab'));
+  var hintTextElement = element(by.css('.e2e-test-hint-text'));
   var explanationTextAreaElement = element(
-    by.css('.protractor-test-explanation-textarea'));
+    by.css('.e2e-test-explanation-textarea'));
+  var stateEditorTag = element(
+    by.css('.e2e-test-state-content-editor'));
+  var parameterElementButton = element(
+    by.css('.e2e-test-main-html-select-selector'));
 
   /*
    * Buttons
    */
-  var addAnswerButton = element(by.css('.protractor-test-add-answer'));
-  var addHintButton = element(by.css('.protractor-test-oppia-add-hint-button'));
+  var addAnswerButton = element(by.css('.e2e-test-add-answer'));
+  var addHintButton = element(by.css('.e2e-test-oppia-add-hint-button'));
   var addNewResponseButton = element(
-    by.css('.protractor-test-add-new-response'));
+    by.css('.e2e-test-add-new-response'));
   var addResponseButton = element(
-    by.css('.protractor-test-open-add-response-modal'));
+    by.css('.e2e-test-open-add-response-modal'));
   var addSolutionButton = element(
-    by.css('.protractor-test-oppia-add-solution-button'));
+    by.css('.e2e-test-oppia-add-solution-button'));
   var addInteractionButton = element(
-    by.css('.protractor-test-open-add-interaction-modal'));
+    by.css('.e2e-test-open-add-interaction-modal'));
   var cancelOutcomeDestButton = element(
-    by.css('.protractor-test-cancel-outcome-dest'));
+    by.css('.e2e-test-cancel-outcome-dest'));
   var closeAddResponseButton = element(
-    by.css('.protractor-test-close-add-response-modal'));
+    by.css('.e2e-test-close-add-response-modal'));
   var confirmDeleteInteractionButton = element(
-    by.css('.protractor-test-confirm-delete-interaction'));
+    by.css('.e2e-test-confirm-delete-interaction'));
   var confirmDeleteResponseButton = element(
-    by.css('.protractor-test-confirm-delete-response'));
+    by.css('.e2e-test-confirm-delete-response'));
   var confirmDeleteStateButton = element(
-    by.css('.protractor-test-confirm-delete-state'));
+    by.css('.e2e-test-confirm-delete-state'));
   var deleteAnswerButton = element(
-    by.css('.protractor-test-delete-answer'));
+    by.css('.e2e-test-delete-answer'));
   var deleteInteractionButton = element(
-    by.css('.protractor-test-delete-interaction'));
+    by.css('.e2e-test-delete-interaction'));
   var deleteResponseButton = element(
-    by.css('.protractor-test-delete-response'));
+    by.css('.e2e-test-delete-response'));
   var dismissWelcomeModalButton = element(
-    by.css('.protractor-test-dismiss-welcome-modal'));
+    by.css('.e2e-test-dismiss-welcome-modal'));
   var saveAnswerButton = element(
-    by.css('.protractor-test-save-answer'));
-  var saveHintButton = element(by.css('.protractor-test-save-hint'));
+    by.css('.e2e-test-save-answer'));
+  var saveHintButton = element(by.css('.e2e-test-save-hint'));
   var saveInteractionButton = element(
-    by.css('.protractor-test-save-interaction'));
+    by.css('.e2e-test-save-interaction'));
   var saveOutcomeDestButton = element(
-    by.css('.protractor-test-save-outcome-dest'));
+    by.css('.e2e-test-save-outcome-dest'));
   var saveOutcomeFeedbackButton = element(
-    by.css('.protractor-test-save-outcome-feedback'));
+    by.css('.e2e-test-save-outcome-feedback'));
   var saveStateContentButton = element(
-    by.css('.protractor-test-save-state-content'));
+    by.css('.e2e-test-save-state-content'));
   var stateNameSubmitButton = stateNameContainer.element(
-    by.css('.protractor-test-state-name-submit'));
+    by.css('.e2e-test-state-name-submit'));
   var answerCorrectnessToggle = element(
-    by.css('.protractor-test-editor-correctness-toggle'));
+    by.css('.e2e-test-editor-correctness-toggle'));
   var skipButtons = element.all(by.css('.ng-joyride .skipBtn'));
   var nextTutorialStageButtons = element.all(
     by.css('.ng-joyride .nextBtn'));
   var startTutorialButton = element(
-    by.css('.protractor-test-start-tutorial'));
+    by.css('.e2e-test-start-tutorial'));
   var submitSolutionButton = element(
-    by.css('.protractor-test-submit-solution-button'));
+    by.css('.e2e-test-submit-solution-button'));
 
   /*
    * Symbols
    */
   var correctAnswerTickMark = element(
-    by.css('.protractor-test-correct-tick-mark'));
+    by.css('.e2e-test-correct-tick-mark'));
 
   /*
    * Actions
@@ -324,7 +321,7 @@ var ExplorationEditorMainTab = function() {
 
       var isVisible = await responseBody(responseNum).isPresent();
       if (!isVisible) {
-        await action.click('Response Editor Header', headerElem);
+        await action.click('Response Editor Header', headerElem, true);
       }
     } else {
       headerElem = addResponseHeader;
@@ -506,18 +503,16 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
-      await waitFor.fadeInToComplete(
-        fadeIn, 'Editor taking long to fade in');
+      // We use browser.sleep() here because waiting for the fade-in to complete
+      // doesn't work for some reason. Also, since the fade-in is a client-side
+      // animation, it should always happen in the same amount of time.
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.sleep(5000);
     }
     await action.click('stateEditButton', stateEditButton);
-    var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.element(stateContentEditorLocator);
-    await waitFor.visibilityOf(
-      stateContentEditor,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    var richTextEditor = await forms.RichTextEditor(stateEditorTag);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);
@@ -548,7 +543,7 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await action.click('Add Hint', addHintButton);
     var addHintModal = element(
-      by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
+      by.cssContainingText('.e2e-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
     var hintTextButton = hintTextElement.all(by.tagName('p')).last();
@@ -776,14 +771,15 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        var parameterElementButton = parameterElement.element(
-          by.tagName('button'));
-        await action.click('Parameter Element Button', parameterElementButton);
-        var multipleChoiceAnswerOption =
-          multipleChoiceAnswerOptions(parameterValues[i]);
+        await action.click(
+          'Parameter Element Button', parameterElementButton, true);
+
+        var multipleChoiceAnswerOption = element.all(by.cssContainingText(
+          '.e2e-test-html-select-selector', parameterValues[i])).first();
+
         await action.click(
           'Multiple Choice Answer Option: ' + i,
-          multipleChoiceAnswerOption);
+          multipleChoiceAnswerOption, true);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var j = 0; j < answerArray.length; j++) {
@@ -842,8 +838,10 @@ var ExplorationEditorMainTab = function() {
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     await action.click('Answer Description', answerDescription);
+
     var ruleDropdownElement = element.all(by.cssContainingText(
-      '.select2-results__option', ruleDescriptionInDropdown)).first();
+      '.e2e-test-rule-type-selector',
+      ruleDescriptionInDropdown)).first();
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 
@@ -853,7 +851,7 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await general.scrollToTop();
     var nodeElement = await explorationGraph.all(
-      by.cssContainingText('.protractor-test-node', stateName)).first();
+      by.cssContainingText('.e2e-test-node', stateName)).first();
     await waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');

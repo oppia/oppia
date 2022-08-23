@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Numeric Expression Input
- * interaction
+ * interaction in protractor.
  */
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
@@ -43,7 +43,7 @@ var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.element(by.tagName(
     'oppia-interactive-numeric-expression-input'))).setValue(answer);
-  await element(by.css('.protractor-test-submit-answer-button')).click();
+  await element(by.css('.e2e-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'NumericExpression';
@@ -52,8 +52,8 @@ var testSuite = [{
   interactionArguments: ['Type an expression here, using only numbers.'],
   ruleArguments: ['MatchesExactlyWith', '6-(-4)'],
   expectedInteractionDetails: ['Type an expression here, using only numbers.'],
-  wrongAnswers: ['10', '3*2-(-4)'],
-  correctAnswers: ['6-(-4)', '-(-4)+6', '6+4']
+  wrongAnswers: ['10', '3*2-(-4)', '-(-4)+6', '6+4'],
+  correctAnswers: ['6-(-4)']
 }, {
   interactionArguments: [
     'Type an expression here, using numbers and the addition sign.'],
@@ -62,27 +62,6 @@ var testSuite = [{
     'Type an expression here, using numbers and the addition sign.'],
   wrongAnswers: ['3*10^5', '2*10^(-5)', '5*10^(-3)'],
   correctAnswers: ['3*10^(-5)', '0.00003']
-}, {
-  interactionArguments: [
-    'Type an expression here, using numbers and arithmetic signs.'],
-  ruleArguments: ['ContainsSomeOf', '1000 + 200 + 30 + 4 + 0.5 + 0.06'],
-  expectedInteractionDetails: [
-    'Type an expression here, using numbers and arithmetic signs.'],
-  wrongAnswers: ['1234.56', '123456/100'],
-  correctAnswers: [
-    '1000 + 200 + 30 + 4 + 0.5 + 0.06',
-    '1000 + 200 + 4 + 0.5',
-    '1000 + 234.56',
-    '0.06']
-}, {
-  interactionArguments: ['Type an expression here, using only numbers.'],
-  ruleArguments: ['OmitsSomeOf', '1000 + 200 + 30 + 4 + 0.5 + 0.06'],
-  expectedInteractionDetails: ['Type an expression here, using only numbers.'],
-  wrongAnswers: [
-    '1000 + 200 + 30 + 4 + 0.5 + 0.06',
-    '1000 + 200 + 30 + 4 + 0.5 + 0.06 + 0.07',
-    '0.06 + 0.5 + 4 + 30 + 200 + 1000'],
-  correctAnswers: ['1000 + 200 + 30 + 4 + 0.56', '1000 + 200 + 30 + 0.5 + 0.06']
 }];
 
 exports.customizeInteraction = customizeInteraction;

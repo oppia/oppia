@@ -26,10 +26,6 @@ from scripts import scripts_test_utils
 
 from . import css_linter
 
-PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-CONFIG_PATH = os.path.join(
-    PARENT_DIR, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
-
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
@@ -41,18 +37,17 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
     def test_all_filepaths_with_success(self):
         filepaths = [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH]
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, filepaths)
+            filepaths)
         returned_filepaths = third_party_linter.all_filepaths
         self.assertEqual(returned_filepaths, filepaths)
 
     def test_perform_all_lint_checks_with_invalid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [INVALID_CSS_FILEPATH])
+            [INVALID_CSS_FILEPATH])
         lint_task_report = third_party_linter.lint_css_files()
-        self.assert_same_list_elements([
-            '19:16',
-            'Unexpected whitespace before \":\"   declaration-colon-space-'
-            'before'], lint_task_report.get_report())
+        self.assert_same_list_elements(
+            ['19:16', 'Unexpected whitespace before ":"'],
+            lint_task_report.get_report())
         self.assertEqual('Stylelint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -63,10 +58,10 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         join_swap = self.swap(os.path, 'join', mock_join)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [INVALID_CSS_FILEPATH])
-        with self.print_swap, join_swap, self.assertRaisesRegexp(
+            [INVALID_CSS_FILEPATH])
+        with self.print_swap, join_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR    Please run start.sh first to install node-eslint or '
+            'ERROR    Please run start.py first to install node-eslint or '
             'node-stylelint and its dependencies.'):
             third_party_linter.perform_all_lint_checks()
 
@@ -77,15 +72,14 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         popen_swap = self.swap_with_checks(subprocess, 'Popen', mock_popen)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [VALID_CSS_FILEPATH])
-        with self.print_swap, popen_swap, self.assertRaisesRegexp(
+            [VALID_CSS_FILEPATH])
+        with self.print_swap, popen_swap, self.assertRaisesRegex(
             Exception, 'True'
         ):
             third_party_linter.perform_all_lint_checks()
 
     def test_perform_all_lint_checks_with_no_files(self):
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [])
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager([])
         lint_task_report = third_party_linter.perform_all_lint_checks()
         self.assertEqual(
             'There are no HTML or CSS files to lint.',
@@ -95,13 +89,13 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_perform_all_lint_checks_with_valid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [VALID_CSS_FILEPATH])
+            [VALID_CSS_FILEPATH])
         lint_task_report = third_party_linter.perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
     def test_get_linters(self):
         custom_linter, third_party_linter = css_linter.get_linters(
-            CONFIG_PATH, [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH])
+            [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH])
         self.assertEqual(custom_linter, None)
         self.assertTrue(
             isinstance(

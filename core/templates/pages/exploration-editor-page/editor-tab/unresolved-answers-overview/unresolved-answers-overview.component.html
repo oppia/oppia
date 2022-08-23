@@ -13,7 +13,7 @@
     font-size: 16px;
   }
   unresolved-answers-overview .oppia-unresolved-answers-card {
-    background-color: #FFF;
+    background-color: #fff;
     margin: 20px 0;
     padding: 8px;
   }
@@ -41,7 +41,7 @@
 
   <md-card class="oppia-unresolved-answers" ng-if="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isCurrentInteractionTrainable()">
     <div ng-if="isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
-      <button type="button" class="btn btn-secondary btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
+      <button type="button" class="btn btn-secondary btn-lg oppia-add-response-button e2e-test-open-teach-modal" ng-click="openTeachOppiaModal()">
         Train Oppia
       </button>
     </div>

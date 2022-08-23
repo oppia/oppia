@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -34,6 +34,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -42,10 +43,10 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('State Translation Editor Component', function() {
   var ctrl = null;
-  var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
+  let $q = null;
+  var ngbModal: NgbModal;
   var editabilityService = null;
   var explorationStatesService = null;
   var stateEditorService = null;
@@ -71,6 +72,7 @@ describe('State Translation Editor Component', function() {
       answer_groups: [{
         outcome: {
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content2',
             html: ''
@@ -84,6 +86,7 @@ describe('State Translation Editor Component', function() {
       }, {
         outcome: {
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content3',
             html: ''
@@ -130,7 +133,15 @@ describe('State Translation Editor Component', function() {
   var stateObj = null;
   var ctrl = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
 
   importAllAngularServices();
 
@@ -161,9 +172,9 @@ describe('State Translation Editor Component', function() {
 
   describe('when has written translation', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
+      $q = $injector.get('$q');
+      ngbModal = $injector.get('NgbModal');
       editabilityService = $injector.get('EditabilityService');
       explorationStatesService = $injector.get('ExplorationStatesService');
       translationLanguageService = $injector.get('TranslationLanguageService');
@@ -244,16 +255,18 @@ describe('State Translation Editor Component', function() {
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('es');
-      spyOn($uibModal, 'open');
+      spyOn(ngbModal, 'open');
 
       mockExternalSaveEventEmitter.emit();
 
-      expect($uibModal.open).not.toHaveBeenCalled();
+      expect(ngbModal.open).not.toHaveBeenCalled();
     });
 
     it('should update state\'s recorded voiceovers after broadcasting' +
-      ' externalSave event when closing modal', function() {
+      ' externalSave event when closing modal', fakeAsync(() => {
       $scope.openTranslationEditor();
+      tick();
+
       expect($scope.translationEditorIsOpen).toBe(true);
       stateWrittenTranslationsService.displayed = {
         hasWrittenTranslation: () => true,
@@ -269,21 +282,21 @@ describe('State Translation Editor Component', function() {
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('en');
-      spyOn($uibModal, 'open').and.returnValue({
+      spyOn(ngbModal, 'open').and.returnValue({
         result: $q.resolve()
-      });
-
+      } as NgbModalRef);
       expect(
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
           .en.needsUpdate).toBe(false);
 
       mockExternalSaveEventEmitter.emit();
+      tick();
       $scope.$apply();
 
       expect(
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
           .en.needsUpdate).toBe(true);
-    });
+    }));
 
     it('should update state\'s recorded voiceovers after broadcasting' +
     ' externalSave event when dismissing modal', function() {
@@ -303,9 +316,9 @@ describe('State Translation Editor Component', function() {
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('en');
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
 
       expect(
         stateObj.recordedVoiceovers.getBindableVoiceovers('content_1')
@@ -376,9 +389,8 @@ describe('State Translation Editor Component', function() {
 
   describe('when hasn\'t written translation', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
+      ngbModal = $injector.get('NgbModal');
       editabilityService = $injector.get('EditabilityService');
       explorationStatesService = $injector.get('ExplorationStatesService');
       translationTabActiveContentIdService = $injector.get(

@@ -39,6 +39,7 @@ export class FocusManagerService {
       private idGenerationService: IdGenerationService,
       private windowRef: WindowRef = new WindowRef(),
   ) {}
+
   clearFocus(): void {
     this.setFocus(AppConstants.LABEL_FOR_CLEARING_FOCUS);
   }

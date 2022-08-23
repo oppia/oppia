@@ -23,10 +23,12 @@ from core.domain import user_services
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+
 from typing import Iterable
 
 MYPY = False
@@ -92,23 +94,13 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
 
         new_user_stats_job_result = (
             new_user_stats_models
-            | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for new models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for new models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS NEW %s' % x)
-            )
+            | 'Create new job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult('NEW MODELS'))
         )
         old_user_stats_job_result = (
             old_user_stats_models
-            | 'Count all old models' >> beam.combiners.Count.Globally()
-            | 'Only create result for old models when > 0' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Create result for old models' >> beam.Map(
-                lambda x: job_run_result.JobRunResult(
-                    stdout='SUCCESS OLD %s' % x)
-            )
+            | 'Create old job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult('OLD MODELS'))
         )
 
         return (
@@ -117,6 +109,10 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
         )
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
     """DoFn to create empty user stats model."""
 
@@ -139,6 +135,10 @@ class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
         yield user_stats_model
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
     """DoFn to update weekly dashboard stats in the user stats model."""
 
@@ -159,10 +159,10 @@ class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
         schema_version = model.schema_version
 
         if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
-            user_services.migrate_dashboard_stats_to_latest_schema(model) # type: ignore[no-untyped-call]
+            user_services.migrate_dashboard_stats_to_latest_schema(model)
 
         weekly_creator_stats = {
-            user_services.get_current_date_as_string(): { # type: ignore[no-untyped-call]
+            user_services.get_current_date_as_string(): {
                 'num_ratings': model.num_ratings or 0,
                 'average_ratings': model.average_ratings,
                 'total_plays': model.total_plays or 0

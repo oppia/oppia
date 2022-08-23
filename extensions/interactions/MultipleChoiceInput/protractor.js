@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Multiple Choice
- * interaction.
+ * interaction in protractor.
  */
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
@@ -37,13 +37,13 @@ var customizeInteraction = async function(elem, richTextInstructionsArray) {
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = elem.all(
-    by.css('.protractor-test-multiple-choice-option-container'));
+    by.css('.e2e-test-multiple-choice-option-container'));
   var optionsCount = await optionElements.count();
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   var promises = [];
   for (var i = 0; i < optionsCount; i++) {
     promises.push(await (await optionElements.get(i)).element(by.css(
-      '.protractor-test-multiple-choice-option')).getText());
+      '.e2e-test-multiple-choice-option')).getText());
   }
   var rteInstructionArrayCopy = [...richTextInstructionsArray];
   rteInstructionArrayCopy.sort();

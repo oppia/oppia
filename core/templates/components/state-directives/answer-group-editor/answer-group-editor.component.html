@@ -1,18 +1,92 @@
+<div class="h-100">
+  <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
+  <div *ngIf="rules">
+    <strong class="oppia-answer-group-heading">
+      If the learner's answer...
+    </strong>
+    <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+      <li *ngFor="let rule of rules;  let index = index;let last = last;" [ngClass]="{'active': activeRuleIndex === index, 'oppia-answer-rule-block': last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block e2e-test-rule-block">
+        <a (click)="openRuleEditor(index)" [hidden]="activeRuleIndex === index" class="oppia-rule-tab e2e-test-answer-tab" [ngClass]="{'oppia-rule-tab-disabled': !isEditable}">
+          <div class="oppia-rule-header">
+            <span *ngIf="index > 0">or</span>
+            <span *ngIf="getCurrentInteractionId() !== 'MultipleChoiceInput' && index !== activeRuleIndex">
+              {{rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices}}...
+            </span>
+            <span *ngIf="getCurrentInteractionId() === 'MultipleChoiceInput'">
+              <oppia-rte-output-display class="oppia-multiple-choice-rule" [rteString]="rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices">
+              </oppia-rte-output-display>...
+            </span>
+          </div>
+        </a>
+        <span *ngIf="isEditable && rules.length > 1"
+              class="oppia-delete-rule-button oppia-transition-200 e2e-test-delete-answer"
+              (click)="deleteRule(index)">
+          <i class="material-icons md-18">&#xE5CD;</i>
+        </span>
+
+        <div *ngIf="activeRuleIndex === index">
+          <div class="oppia-editor-card-section">
+            <div class="oppia-rule-body-container">
+              <oppia-rule-editor [(rule)]="rule" [isEditable]="isEditable" [isEditingRuleInline]="true" (onCancelRuleEdit)="cancelActiveRuleEdit()" (onSaveRule)="saveRules()" class="e2e-test-answer-body">
+              </oppia-rule-editor>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <button type="button" *ngIf="isEditable" class="btn btn-secondary btn-lg oppia-add-rule-button e2e-test-add-answer" (click)="addNewRule()">
+      + Add Another Possible Answer
+    </button>
+
+    <div *ngIf="isEditable && isMLEnabled() && !isInQuestionMode()">
+      <div *ngIf="isCurrentInteractionTrainable()">
+        <button type="button" class="btn btn-secondary btn-lg oppia-modify-training-data-button" (click)="openTrainingDataEditor()">
+          <i class="material-icons md-24">playlist_add</i> Modify Training Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <br *ngIf="rules">
+
+  <oppia-outcome-editor [isEditable]="isEditable"
+                        [displayFeedback]="displayFeedback"
+                        (saveDest)="sendOnSaveAnswerGroupDest($event)"
+                        (saveFeedback)="sendOnSaveAnswerGroupFeedback($event)"
+                        (saveCorrectnessLabel)="sendOnSaveAnswerGroupCorrectnessLabel($event)"
+                        [outcome]="outcome"
+                        [addState]="addState"
+                        [areWarningsSuppressed]="suppressWarnings"
+                        (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+  </oppia-outcome-editor>
+
+  <oppia-question-misconception-editor [isEditable]="isEditable"
+                                       *ngIf="isInQuestionMode()"
+                                       (saveTaggedMisconception)="sendOnSaveTaggedMisconception($event)"
+                                       (saveAnswerGroupFeedback)="sendOnSaveAnswerGroupFeedback($event)"
+                                       [outcome]="outcome"
+                                       [rules]="rules"
+                                       [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
+  </oppia-question-misconception-editor>
+</div>
+
 <style>
-  answer-group-editor .oppia-rule-header {
+  .oppia-rule-header {
     color: rgb(120, 120, 120);
-    overflow: hidden;
     padding-left: 0;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
-  answer-group-editor .oppia-multiple-choice-rule p {
+
+  .oppia-multiple-choice-rule p {
     display: inline;
   }
-  answer-group-editor .oppia-multiple-choice-rule p::before {
+
+  .oppia-multiple-choice-rule p::before {
     content: ' ';
   }
-  answer-group-editor .oppia-add-rule-button {
+
+  .oppia-add-rule-button {
     background-color: rgba(165,165,165,0.9);
     border: 0;
     border-radius: 0;
@@ -22,17 +96,18 @@
     width: 100%;
   }
 
-  answer-group-editor .oppia-add-rule-button:active,
-  answer-group-editor .oppia-add-rule-button:focus,
-  answer-group-editor .oppia-add-rule-button:hover,
-  answer-group-editor .oppia-modify-training-data-button:active,
-  answer-group-editor .oppia-modify-training-data-button:focus,
-  answer-group-editor .oppia-modify-training-data-button:hover {
+  .oppia-add-rule-button:active,
+  .oppia-add-rule-button:focus,
+  .oppia-add-rule-button:hover,
+  .oppia-modify-training-data-button:active,
+  .oppia-modify-training-data-button:focus,
+  .oppia-modify-training-data-button:hover {
     background-color: rgba(165,165,165,1);
     color: white;
     opacity: 1;
   }
-  answer-group-editor .oppia-delete-rule-button {
+
+  .oppia-delete-rule-button {
     cursor: pointer;
     opacity: 0.5;
     position: absolute;
@@ -40,11 +115,12 @@
     top: 8px;
     width: 20px;
   }
-  answer-group-editor .oppia-delete-rule-button:hover {
+
+  .oppia-delete-rule-button:hover {
     opacity: 1;
   }
 
-  answer-group-editor .oppia-modify-training-data-button {
+  .oppia-modify-training-data-button {
     background-color: rgba(165,165,165,0.9);
     border: 0;
     border-radius: 0;
@@ -54,77 +130,21 @@
     padding: 7px;
     width: 100%;
   }
-  answer-group-editor .oppia-answer-rule-block {
+
+  .oppia-answer-rule-block {
     border-bottom: 1px solid #ccc;
   }
+
+  @media screen and (max-width: 700px) {
+  .oppia-editor-card-section {
+      padding: 20px 10px;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .oppia-answer-group-heading {
+      font-size: 18px;
+    }
+  }
+
 </style>
-
-<div class="h-100">
-  <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
-  <div ng-if="$ctrl.rules">
-    <strong>
-      If the learner's answer...
-    </strong>
-    <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ng-model="$ctrl.rules">
-      <li ng-repeat="rule in $ctrl.rules" ng-class="{'active': $ctrl.activeRuleIndex === $index, 'oppia-answer-rule-block': $last}" class="mt-0 oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block">
-        <a ng-click="$ctrl.openRuleEditor($index)" ng-hide="$ctrl.activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !$ctrl.isEditable}">
-          <div class="oppia-rule-header">
-            <span ng-if="$index > 0">or</span>
-            <span ng-if="$ctrl.getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== $ctrl.activeRuleIndex">
-              <[rule | parameterizeRuleDescription:$ctrl.getCurrentInteractionId():$ctrl.answerChoices]>...
-            </span>
-            <span ng-if="$ctrl.getCurrentInteractionId() === 'MultipleChoiceInput'">
-              <angular-html-bind class="oppia-multiple-choice-rule" html-data="rule | parameterizeRuleDescription:$ctrl.getCurrentInteractionId():$ctrl.answerChoices">
-              </angular-html-bind>...
-            </span>
-          </div>
-        </a>
-        <span ng-if="$ctrl.isEditable && $ctrl.rules.length > 1"
-              class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer"
-              ng-click="$ctrl.deleteRule($index)">
-          <i class="material-icons md-18">&#xE5CD;</i>
-        </span>
-
-        <div ng-if="$ctrl.activeRuleIndex === $index">
-          <div class="oppia-editor-card-section">
-            <div class="oppia-rule-body-container">
-              <rule-editor rule="rule" is-editable="$ctrl.isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="$ctrl.cancelActiveRuleEdit()" on-save-rule="$ctrl.saveRules()" class="protractor-test-answer-body">
-              </rule-editor>
-            </div>
-          </div>
-        </div>
-      </li>
-    </ul>
-
-    <button type="button" ng-if="$ctrl.isEditable" class="btn btn-secondary btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="$ctrl.addNewRule()">
-      + Add Another Possible Answer
-    </button>
-
-    <div ng-if="$ctrl.isEditable && $ctrl.isCurrentInteractionTrainable() && $ctrl.isMLEnabled() && !$ctrl.isInQuestionMode()">
-      <button type="button" class="btn btn-secondary btn-lg oppia-modify-training-data-button" ng-click="$ctrl.openTrainingDataEditor()">
-        <i class="material-icons md-24">playlist_add</i> Modify Training Data
-      </button>
-    </div>
-  </div>
-
-  <br ng-if="rules">
-
-  <outcome-editor is-editable="$ctrl.isEditable"
-                  display-feedback="$ctrl.displayFeedback"
-                  on-save-dest="$ctrl.getOnSaveAnswerGroupDestFn()"
-                  on-save-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
-                  on-save-correctness-label="$ctrl.getOnSaveAnswerGroupCorrectnessLabelFn()"
-                  outcome="$ctrl.outcome"
-                  add-state="$ctrl.addState"
-                  warnings-are-suppressed="$ctrl.suppressWarnings()"
-                  show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-  </outcome-editor>
-  <question-misconception-editor is-editable="$ctrl.isEditable"
-                                 ng-if="$ctrl.isInQuestionMode()"
-                                 on-save-tagged-misconception="$ctrl.onSaveTaggedMisconception"
-                                 on-save-answer-group-feedback="$ctrl.getOnSaveAnswerGroupFeedbackFn()"
-                                 outcome="$ctrl.outcome"
-                                 rules="$ctrl.rules"
-                                 tagged-skill-misconception-id="$ctrl.taggedSkillMisconceptionId">
-  </question-misconception-editor>
-</div>

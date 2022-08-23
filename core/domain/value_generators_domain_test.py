@@ -42,7 +42,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
     def test_generate_value_of_base_value_generator_raises_error(self) -> None:
         base_generator = value_generators_domain.BaseValueGenerator()
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             NotImplementedError,
             re.escape(
                 'generate_value() method has not yet been implemented')):
@@ -54,8 +54,7 @@ class ValueGeneratorNameTests(test_utils.GenericTestBase):
     def test_value_generator_names(self) -> None:
         """This function checks for duplicate value generators."""
 
-        all_python_files = (
-            self.get_all_python_files()) # type: ignore[no-untyped-call]
+        all_python_files = self.get_all_python_files()
         all_value_generators = []
 
         for file_name in all_python_files:

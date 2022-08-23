@@ -1,8 +1,8 @@
-<div class="image-with-regions-editor">
+<div class="image-with-regions-editor" *ngIf="value">
   <div *ngIf="value.imagePath === ''">
     <schema-based-editor [localValue]="value.imagePath"
                          (localValueChange)="imageValueChanged($event)"
-                         [schema]="getSchema.bind(this)">
+                         [schema]="getSchema()">
     </schema-based-editor>
   </div>
   <div class="position-relative" *ngIf="value.imagePath !== ''">
@@ -84,5 +84,9 @@
 
   .image-with-regions-editor .oppia-error-text {
     margin-bottom: 4px;
+  }
+
+  .oppia-image-with-regions-editor-svg {
+    user-select: none;
   }
 </style>

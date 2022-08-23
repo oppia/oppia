@@ -1,5 +1,5 @@
 <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
-<div [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
+<div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
      class="oppia-learner-dashboard-container position-relative">
   <div class="row oppia-row"
        [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
@@ -7,29 +7,34 @@
     <div class="col-md-3 oppia-learner-dashboard-side-content"
          *ngIf="!windowIsNarrow">
       <mat-card class="oppia-learner-dashboard-main-menu">
-        <h4 class="oppia-learner-dashboard-menu protractor-test-home-section"
+        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-home-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
-            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"
+            (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu protractor-test-goals-section"
+        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-goals-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
-            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)"
+            (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu protractor-test-progress-section"
+        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-progress-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
-            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)"
+            (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)" >
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu protractor-test-community-lessons-section"
+        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-community-lessons-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
-            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)"
+            (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu protractor-test-feedback-section"
+        <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-feedback-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK}"
-            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK)">
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK)"
+            (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK | translate"></span>
           <span *ngIf="numberOfUnreadThreads !== 0">({{ numberOfUnreadThreads }})</span>
         </h4>
@@ -72,11 +77,6 @@
     <div class="col-md-8 oppia-learner-dashboard-main-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
       <div>
-        <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
-          <span [innerHTML]="activeSection | translate">
-          </span>
-        </span>
-
         <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-sort-options"
               *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK && threadSummaries.length !== 0 && !feedbackThreadActive"
               [ngClass]="{'oppia-learner-dashboard-sort-mobile': windowIsNarrow}">
@@ -99,6 +99,7 @@
            [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
+                          [goalTopics]="allTopics"
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
                           [untrackedTopics]="untrackedTopics"
                           [username]="username"
@@ -141,16 +142,22 @@
         </div>
 
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK"
-             class="oppia-learner-dashboard-feedback-section" [ngStyle]="threadSummaries.length !== 0 && {'cursor': 'pointer'}">
+             class="oppia-learner-dashboard-feedback-section oppia-feedback-section-top-margin w-100"
+             [ngStyle]="threadSummaries.length !== 0 && {'cursor': 'pointer'}">
           <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
-                   *ngIf="threadSummaries.length === 0">
+                    *ngIf="threadSummaries.length === 0">
             <div>
+              <span class="oppia-learner-dashboard-main-content-title"
+                    *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
+                <span [innerHTML]="activeSection | translate">
+                </span>
+              </span>
               <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate" class="empty-feedback-threads"></p>
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
                  href="/learn/math"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE">
+                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE">
               </a>
             </div>
           </mat-card>
@@ -158,7 +165,7 @@
           <table class="table" *ngIf="!feedbackThreadActive">
             <tr *ngFor="let thread of threadSummaries | sortBy: isCurrentFeedbackSortDescending: getValueOfFeedbackThreadSortKey()"
                 (click)="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
-                class="oppia-feedback-tab-row protractor-test-feedback-thread">
+                class="oppia-feedback-tab-row e2e-test-feedback-thread">
               <td width="10%">
                 <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status) }}</span>
               </td>
@@ -189,7 +196,7 @@
               </td>
               <td width="50%">
                 <span *ngIf="thread.totalMessageCount > 1 && thread.secondLastMessageIsRead && thread.lastMessageIsRead">{{ thread.explorationTitle }} -</span>
-                <span class="protractor-test-feedback-exploration" *ngIf="thread.totalMessageCount === 1 && thread.lastMessageIsRead">{{ thread.explorationTitle }} -</span>
+                <span class="e2e-test-feedback-exploration" *ngIf="thread.totalMessageCount === 1 && thread.lastMessageIsRead">{{ thread.explorationTitle }} -</span>
                 <span *ngIf="thread.totalMessageCount === 1 && !thread.lastMessageIsRead">
                   <strong>{{ thread.explorationTitle }} -</strong>
                 </span>
@@ -275,7 +282,7 @@
                     <div class="col-sm-2 feedback-message-spacing oppia-feedback-message-spacing"></div>
                     <div class="col-sm-10 feedback-thread-message-body">
                       <div>
-                        <span class="protractor-test-feedback-message" *ngIf="message.text">{{ message.text }}</span>
+                        <span class="e2e-test-feedback-message" *ngIf="message.text">{{ message.text }}</span>
                         <button *ngIf="message.currentContentHtml"
                                 class="btn btn-primary oppia-dashboard-view-suggestion-button"
                                 (click)="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
@@ -313,7 +320,7 @@
                         <span *ngIf="messageSendingInProgress"
                               [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS' | translate">
                         </span>
-                        <span class="protractor-test-feedback-send-message"
+                        <span class="e2e-test-feedback-send-message"
                               *ngIf="!messageSendingInProgress"
                               [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE' | translate">
                         </span>
@@ -329,6 +336,17 @@
             <i class="material-icons">&#xE88F;</i>
             <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
           </div>
+          <div class="oppia-learnerdashboard-pagination-container" *ngIf="paginatedThreadsList.length > 0">
+            <button class="oppia-pagination-button" type="button" (click)="fetchFeedbackUpdates()">
+              <span *ngIf="!loadingIndicatorIsShown">Show more</span>
+              <span *ngIf="loadingIndicatorIsShown">
+                <mat-progress-spinner [diameter]="25"
+                                      [mode]="indeterminate"
+                                      class="oppia-diagram-spinning-button">
+                </mat-progress-spinner>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -338,382 +356,3 @@
     </div>
   </div>
 </div>
-<style>
-  body {
-    overflow-x: visible;
-  }
-
-  .oppia-learner-dashboard-container {
-    margin: 0 auto 30px auto;
-    max-width: 1400px;
-  }
-
-  .oppia-learner-dashboard-button-menu {
-    padding: 8px;
-
-  }
-  .oppia-learner-dashboard-title {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 3em;
-    margin-bottom: 33px;
-    margin-top: 0;
-    padding-top: 65.5px;
-    text-align: center;
-  }
-
-  .oppia-learner-dashboard-section-not-active-button {
-    filter: invert(31%) sepia(3%) saturate(11%) hue-rotate(341deg) brightness(101%) contrast(90%);
-  }
-
-  .oppia-learner-dashboard-section-active-button {
-    filter: invert(12%) sepia(99%) saturate(4263%) hue-rotate(171deg) brightness(94%) contrast(101%);
-  }
-
-  .oppia-learner-dashboard-progress-button-menu {
-    background: #e8e7e3;
-    border-bottom: 2px solid #d4d4d4;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 0.1px;
-  }
-
-  .home-button,
-  .goals-button {
-    left: 10px;
-    position: relative;
-  }
-
-  .oppia-learner-dashboard-buttons {
-    background: #FFF 0% 0% no-repeat padding-box;
-    bottom: 0;
-    box-shadow: 0 -3px 5px #3333331A;
-    height: 2.5rem;
-    position: absolute;
-    width: 100%;
-    z-index: 20;
-  }
-
-  .oppia-learner-dashboard-progress-button-menu-options {
-    color: #00645C;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 19px;
-    font-weight: 500;
-    margin: 0 16px;
-    padding: 23px 5px;
-    text-align: center;
-  }
-
-  .empty-feedback-threads {
-    color: #333;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 18px;
-  }
-
-  .oppia-buttons {
-    cursor: pointer;
-    display: inline-block;
-  }
-
-  .oppia-svg-image {
-    display: block;
-    height: 48px;
-    width: 64px;
-  }
-
-  .oppia-learner-dashboard-menu {
-    cursor: pointer;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 18px;
-    margin: 0;
-    padding: 17px 20px 17px 20px;
-  }
-
-  .oppia-learner-dashboard-section-active {
-    background-color: #00645C1A;
-    color: #00645C;
-  }
-
-  .oppia-learner-dashboard-side-content {
-    min-width: 241px;
-    padding-left: 100px;
-    width: 20%;
-  }
-
-  .oppia-learner-dashboard-main-content {
-    padding: 0;
-    width: 60%;
-  }
-
-  .oppia-learner-dashboard-main-content .remove-icon {
-    color: white;
-    float: right;
-    font-size: 20px;
-    left: -7px;
-    margin-left: -26px;
-    margin-top: 10px;
-    position: relative;
-    width: 18px;
-    z-index: 20;
-  }
-
-  .oppia-learner-dashboard-main-menu {
-    background-color: white;
-    height: 480px;
-    margin: 64px 0 0 0;
-    padding: 0;
-  }
-
-  .oppia-learner-dashboard-mobile-mode {
-    margin: auto;
-    width: 100%;
-  }
-
-  .oppia-learner-dashboard-main-content-title {
-    color: #076962;
-    display: inline-block;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 24px;
-    margin: 64px 0 0 0;
-    padding: 16px;
-    padding-bottom: 8px;
-  }
-
-  .oppia-learner-dashboard-sort {
-    float: right;
-    padding-right: 7.5px;
-    padding-top: 8px;
-  }
-
-  .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
-    background: rgb(255,255,255);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    margin: 0 17px 0 4px;
-    padding: 30px 55px 30px 30px;
-  }
-
-  .oppia-learner-dashboard-sort-mobile {
-    float: none;
-    padding: 0 7.5px;
-  }
-
-  .oppia-learner-dashboard-feedback-section {
-    margin: 0 23px 0 0;
-  }
-
-  .oppia-learner-dashboard-feedback-section .table {
-    background-color: white;
-    margin-bottom: 10px;
-    margin-left: 6px;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-message-count {
-    color: #757575;
-    font-size: 100.25%;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-message-spacing {
-    left: 3px;
-    padding: 0;
-    text-align: center;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-message-header {
-    display: inline-block;
-    text-align: center;
-    width: 8%;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
-    margin-right: 10px;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
-    margin: 6px 0 0 14px;
-  }
-
-  .oppia-row {
-    display: flex;
-  }
-  .oppia-sort-options {
-    width: auto;
-  }
-  .oppia-learner-dashboard-intro-button-link {
-    margin-top: 13px;
-    width: 230px;
-  }
-  .oppia-btn-secondary {
-    padding: 0 3px;
-  }
-  .oppia-exploration-title {
-    font-size: 105%;
-    margin-left: 7px;
-  }
-  .oppia-message-summaries {
-    padding: 13px 8px 7px 8px;
-  }
-  .oppia-profile-picture {
-    margin-top: 4px;
-    min-width: 32px;
-  }
-  .oppia-updated-status {
-    float: right;
-    margin-right: 15px;
-  }
-  .oppia-feedback-message-spacing {
-    width: 8%;
-  }
-
-  @media (max-width: 768px) {
-    .oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
-      margin-left: 14px;
-    }
-
-    .oppia-learner-dashboard-feedback-section .feedback-message-author-name {
-      margin-left: 10px;
-    }
-
-    .oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
-      margin: 6px 0 0 28px;
-    }
-
-    .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
-      margin-top: 9px;
-    }
-
-    .oppia-learner-dashboard-feedback-section .feedback-thread-message-body {
-      margin-left: 43px;
-    }
-
-    .oppia-learner-dashboard-container {
-      margin-bottom: 0;
-    }
-  }
-
-  @media screen and (min-width: 768px) and (max-width: 1000px) {
-    .oppia-learner-dashboard-buttons {
-      height: 0.1rem;
-    }
-    .oppia-buttons {
-      margin-left: 135px;
-    }
-    .oppia-learner-dashboard-progress-button-menu-options {
-      margin: 0 70px;
-    }
-  }
-
-  @media(max-width:450px) {
-    .oppia-learner-dashboard-progress-button-menu-options {
-      font-size: 16px;
-    }
-  }
-
-  @media screen and (min-width: 1001px) and (max-width: 1200px) {
-    .oppia-buttons {
-      margin-left: 205px;
-    }
-    .oppia-learner-dashboard-progress-button-menu-options {
-      margin: 0 110px;
-    }
-  }
-
-  .oppia-learner-dashboard-feedback-section .col-sm-11 {
-    padding: 0 20px 0 0;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
-    font-size: 1em;
-    height: 70px;
-    margin-left: 14px;
-    resize: vertical;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-warning {
-    color: #0277BD;
-    margin-left: 4px;
-  }
-
-  .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
-    margin-left: 26px;
-    margin-top: 4px;
-    min-width: 32px;
-  }
-
-  @media (max-width: 810px) {
-    .sort-explorations-select.oppia-learner-dashboard-sort {
-      padding: 0 0 6px 7.5px;
-      width: 100%;
-    }
-
-    .oppia-learner-dashboard-main-content-container {
-      margin-bottom: 10vh;
-    }
-  }
-
-  @media (max-width: 500px) {
-    .oppia-learner-dashboard-main-content-container {
-      padding: 7px;
-    }
-
-    .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
-      margin: 0 2px 0 4px;
-    }
-
-    .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
-      font-size: 1em;
-      height: 70px;
-      margin-left: 14px;
-      resize: vertical;
-    }
-
-    .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
-      margin-left: 15px;
-    }
-  }
-
-  @media screen and (max-width: 470px) {
-    .oppia-learner-dashboard-main-content,
-    .oppia-learner-dashboard-side-content {
-      width: 100%;
-    }
-  }
-
-  .oppia-dashboard-tooltip:hover + .oppia-dashboard-tooltip-text {
-    visibility: visible;
-  }
-
-  .oppia-learner-dashboard-page-portfolio {
-    font-weight: bold;
-    margin-right: 14px;
-    margin-top: 8px;
-    text-align: right;
-  }
-
-  /* The css below helps in using headroom.js for footer. */
-  .oppia-learner-dashboard-buttons.headroom {
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-  .oppia-learner-dashboard-buttons.headroom--top {
-    margin-bottom: 70px;
-  }
-
-  .oppia-learner-dashboard-buttons.headroom--unfixed {
-    position: relative;
-    transform: translateY(0);
-  }
-  .oppia-learner-dashboard-buttons.headroom--scrolled {
-    transition: transform 200ms ease-in-out;
-  }
-  .oppia-learner-dashboard-buttons.headroom--unpinned {
-    bottom: -30px;
-  }
-  .oppia-learner-dashboard-buttons.headroom--pinned {
-    margin-bottom: 50px;
-    position: fixed;
-    transform: translateY(-100%);
-  }
-</style>

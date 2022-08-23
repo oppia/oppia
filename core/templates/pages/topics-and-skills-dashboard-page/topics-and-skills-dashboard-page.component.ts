@@ -16,7 +16,7 @@
  * @fileoverview Component for the topics and skills dashboard.
  */
 
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
@@ -37,7 +37,6 @@ import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboa
 })
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();
-  TOPIC_CLASSROOM_UNASSIGNED: string = 'UNASSIGNED';
   totalTopicSummaries: CreatorTopicSummary[] = [];
   topicSummaries: CreatorTopicSummary[] = [];
   totalEntityCountToDisplay: number;
@@ -286,6 +285,11 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   toggleFilterBox(): void {
     this.filterBoxIsShown = !this.filterBoxIsShown;
+  }
+
+  @HostListener('window:resize')
+  filterBoxOnResize(): void {
+    this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
   }
 
   getUpperLimitValueForPagination(): number {

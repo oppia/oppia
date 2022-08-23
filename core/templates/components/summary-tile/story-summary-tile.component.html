@@ -1,5 +1,6 @@
-<div class="story-summary-tile protractor-test-story-summary-title">
-  <div class="story-progress-bar">
+<div class="e2e-test-story-summary-title"
+  [ngClass]="checkTabletView() ? 'story-summary-tile-mobile': 'story-summary-tile-desktop'">
+  <div class="story-progress-bar" *ngIf="!checkTabletView()">
     <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
       <circle class="story-progress-circle total-circle"
               cx="25"
@@ -26,17 +27,23 @@
       </text>
     </svg>
   </div>
-  <!-- Left-to-right is enforced here due to the formatting of the HTML with the title on the left and chapter count on the right. -->
-  <div class="oppia-story-title" dir="ltr">
+  <div class="oppia-story-title" dir="auto" *ngIf="!checkTabletView()">
     <strong class="title-text">
-      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
+      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">
+        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitle }}
+        </span>
+        <span *ngIf="isHackyStoryTitleTranslationDisplayed()">
+          {{ storyTitleTranslationKey | translate }}
+        </span>
+      </a>
     </strong>
     <span dir="auto" class="oppia-chapters-count">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>
     </span>
   </div>
   <div class="story-details">
-    <div class="story-thumbnail protractor-test-story-thumbnail"
+    <div class="story-thumbnail e2e-test-story-thumbnail"
          [ngStyle]="{background: thumbnailBgColor}">
       <a [href]="storyLink">
         <img *ngIf="thumbnailUrl !== null"
@@ -46,7 +53,74 @@
              [ngStyle]="{background: thumbnailBgColor}">
       </a>
     </div>
-    <div class="chapter-details">
+    <div class="story-details-box bottom-edge-shadow" *ngIf="checkTabletView()">
+      <div class="story-progress-bar">
+        <svg class="story-progress-svg" width="50" height="50" *ngIf="nodeCount">
+          <circle class="story-progress-circle total-circle"
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  [attr.stroke-dasharray]="strokeDashArrayValues"
+                  stroke-dashoffset="-2.5"
+                  stroke-linecap="round"/>
+          <circle class="story-progress-circle completed-circle"
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  [attr.stroke-dasharray]="completedStrokeDashArrayValues"
+                  stroke-dashoffset="-2.5"
+                  [attr.stroke-linecap]="completedStoriesCount ? 'round' : 'butt'"/>
+          <text x="25"
+                y="-20"
+                text-anchor="middle"
+                stroke="#4e4d4d9e"
+                stroke-width="0.3"
+                font-size="0.9em"
+                transform="rotate(90)">
+            {{ storyProgress }}%
+          </text>
+        </svg>
+        <p class="story-status-element">{{storyStatus}}</p>
+      </div>
+      <div class="oppia-story-title" dir="ltr" *ngIf="checkTabletView()">
+        <strong class="title-text">
+          <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
+        </strong>
+        <span dir="auto" class="oppia-chapters-count">
+          <p class="oppia-chapters-count-text" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></p>
+        </span>
+      </div>
+      <div (click)="showAllChapters()"
+           *ngIf="showButton && (chaptersDisplayed < nodeCount)"
+           class="view-button">
+        <span class="material-icons"> arrow_drop_down </span>
+      </div>
+      <div (click)="hideExtraChapters()"
+           *ngIf="showButton && (chaptersDisplayed === nodeCount)"
+           class="view-button">
+        <span class="material-icons"> arrow_drop_up </span>
+      </div>
+    </div>
+    <div class="chapters-container-box chapter-container" *ngIf="checkTabletView()">
+      <div *ngFor="let title of nodeTitles;let idx = index">
+        <div class="story-details-box chapter-specific-box" *ngIf="idx < chaptersDisplayed">
+          <div class="chapter-icon">
+            <span class="chapter-icon-number">{{ idx + 1 }}</span>
+          </div>
+          <div class="chapter-text">
+            <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
+              <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ title }}
+              </span>
+              <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+                {{ nodeTitlesTranslationKeys[idx] | translate }}
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-details" *ngIf="!checkTabletView()">
       <div class="chapter-title"
            *ngFor="let title of nodeTitles;let idx = index">
         <div *ngIf="storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
@@ -54,11 +128,12 @@
         </div>
         <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(title) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(title), 'complete-chapter': storySummary.isNodeCompleted(title)}"
              *ngIf="idx < chaptersDisplayed">
-          <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
+          <a [href]="getChapterUrl(title)" rel="noopener">
             <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-            </span>&nbsp;
-            <span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;
-            <span dir="auto">{{ title }}</span>
+            </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ title }}</span>
+            <span dir="auto" *ngIf="isHackyNodeTitleTranslationDisplayed(idx)">
+              {{ nodeTitlesTranslationKeys[idx] | translate }}
+            </span>
           </a>
         </div>
       </div>
@@ -76,197 +151,4 @@
       </div>
     </div>
   </div>
-
 </div>
-<style>
-  .chapter-identifier {
-    color: #00645C;
-    font-weight: 500;
-  }
-
-  .story-progress-bar {
-    float: left;
-  }
-
-  .story-progress-svg {
-    transform: rotate(-90deg);
-  }
-
-  .story-progress-circle {
-    fill-opacity: 0;
-    stroke-width: 3;
-  }
-
-  .total-circle {
-    stroke: #adadad;
-  }
-
-  .completed-circle {
-    stroke: #be563c;
-  }
-
-  .oppia-story-title {
-    display: inline-block;
-    font-size: 1.4em;
-    padding-bottom: 15px;
-    padding-left: 20px;
-    padding-top: 7px;
-  }
-
-  .completed-icon {
-    color: #00645C;
-    float: left;
-    margin-right: 6px;
-  }
-
-  .view-button {
-    color: #00645C;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 1.5vh;
-    text-align: center;
-    width: 100%;
-  }
-
-  .view-button:focus {
-    outline: 0;
-  }
-
-  .chapter-title {
-    display: block;
-    font-size: 1.1em;
-    margin-bottom: 0.7vh;
-  }
-
-  .incomplete-chapter {
-    margin-left: 30px;
-  }
-
-  .complete-chapter {
-    display: inline-block;
-    width: 84%;
-  }
-
-  .chapter-details {
-    border: 1px solid #7B7B7B;
-    border-radius: 0.25rem;
-    display: inline-block;
-    margin-left: 0.8vw;
-    margin-right: 0.8vw;
-    padding: 1.5vh 1.75vw 1vh 1vw;
-    width: 65%;
-  }
-
-  .story-details {
-    display: flex;
-  }
-
-  .story-summary-tile {
-    margin-left: 3vw;
-    padding-bottom: 7vh;
-  }
-
-  .title-text {
-    border-right: 1px solid #7B7B7B;
-    font-weight: 500;
-    padding-right: 10px;
-  }
-
-  .disabled-link,
-  .disabled-link:hover,
-  .disabled-link:active {
-    color: #000;
-    cursor: default;
-  }
-
-  .img-thumbnail {
-    border: none;
-    max-height: 100%;
-    max-width: 100%;
-  }
-
-  .story-thumbnail {
-    border-radius: 0.4em;
-    display: table-cell;
-    float: left;
-    height: 150px;
-    text-align: center;
-    vertical-align: middle;
-    width: 225px;
-  }
-
-  a {
-    color: #000;
-    cursor: pointer;
-  }
-
-  a:hover {
-    text-decoration: none;
-  }
-
-  .title-text a:hover,
-  .pending-chapter a:hover,
-  .incomplete-chapter a:hover,
-  .complete-chapter a:hover {
-    text-decoration: underline;
-  }
-
-  .oppia-chapters-count {
-    color: #404040;
-    font-size: 0.75em;
-    padding-left: 10px;
-  }
-
-  @media (max-width: 800px) {
-    .oppia-story-title {
-      padding-top: 0;
-      width: 75%;
-    }
-
-    .title-text,
-    .pending-chapter,
-    .incomplete-chapter,
-    .complete-chapter {
-      text-decoration: underline;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .story-details {
-      border-radius: 0.4em;
-      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
-      display: inherit;
-      width: 225px;
-    }
-
-    .story-thumbnail {
-      border: none;
-      border-radius: 0.4em 0.4em 0 0;
-    }
-
-    .chapter-details {
-      border: none;
-      margin-left: 0;
-      padding: 2vh 3vw 2vh 4vw;
-      width: 225px;
-    }
-  }
-
-  @media (max-width: 360px) {
-    .story-details {
-      border-radius: 0.4em;
-      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
-      display: inherit;
-      width: 225px;
-    }
-
-    .story-thumbnail {
-      height: 150px;
-      width: 225px;
-    }
-  }
-
-  .oppia-topic-viewer-container .background-banner-position {
-    position: inherit;
-  }
-</style>

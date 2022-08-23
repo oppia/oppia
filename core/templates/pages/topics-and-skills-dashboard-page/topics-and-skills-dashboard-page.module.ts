@@ -25,6 +25,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
@@ -36,20 +38,26 @@ import { TopicsListComponent } from './topics-list/topics-list.component';
 import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     DynamicContentModule,
     FormsModule,
@@ -98,6 +106,11 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })

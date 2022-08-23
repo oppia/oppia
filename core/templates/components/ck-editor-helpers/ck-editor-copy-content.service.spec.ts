@@ -27,7 +27,8 @@ import { LoggerService } from 'services/contextual/logger.service';
  */
 const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
-  container.innerHTML = `<angular-html-bind>${html.trim()}</angular-html-bind>`;
+  container.innerHTML = (
+    `<angular-html-bind>${html.trim()}</angular-html-bind>`);
   // Return element inside <angular-html-bind />
   if (container.content.firstChild === null ||
     container.content.firstChild.firstChild === null) {
@@ -112,10 +113,10 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
     const imageWidgetElement = generateContent(
-      '<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" capt' +
-      'ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;' +
-      'quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
-      '"></oppia-noninteractive-image>');
+      '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
+      '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
+      ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
+      'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>');
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(imageWidgetElement);
@@ -127,7 +128,8 @@ describe('Ck editor copy content service', () => {
         startupData: {
           alt: '',
           caption: 'Banana',
-          filepath: 'img_20200630_114637_c2ek92uvb8_height_326_width_490.png'
+          filepath: 'img_20200630_114637_c2ek92uvb8_height_326_width_490.png',
+          isCopied: true
         }
       }
     );
@@ -179,7 +181,8 @@ describe('Ck editor copy content service', () => {
         startupData: {
           math_content: {
             raw_latex: '\\frac{x}{y}', svg_filename: ''
-          }
+          },
+          isCopied: true
         }
       }
     );
@@ -205,7 +208,8 @@ describe('Ck editor copy content service', () => {
         startupData: {
           math_content: {
             raw_latex: '\\frac{x}{y}', svg_filename: ''
-          }
+          },
+          isCopied: true
         }
       }
     );

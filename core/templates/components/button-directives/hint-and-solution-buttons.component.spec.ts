@@ -97,6 +97,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           {
             outcome: {
               dest: 'State',
+              dest_if_really_stuck: null,
               feedback: {
                 html: '',
                 content_id: 'This is a new feedback text',
@@ -113,6 +114,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         ],
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: '',
             html: '',
@@ -129,7 +131,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           },
           placeholder: {
             value: 1,
-          },
+          }
         },
         hints: [],
         solution: {
@@ -184,7 +186,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   }));
 
   it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toEqual(true);
+    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should reset local hints array if active card is' +

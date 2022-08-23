@@ -1,14 +1,20 @@
-<form autocomplete="off" ng-disabled="$ctrl.NumberWithUnitsForm.$invalid" ng-submit="$ctrl.submitAnswer($ctrl.answer)" role="form" class="form-horizontal">
+<form autocomplete="off" [attr.disabled]="!isValid" role="form" class="form-horizontal" (submit)="submitAnswer()">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
-  <ng-form name="$ctrl.NumberWithUnitsForm" class="input">
-    <input type="text" name="answer" ng-model="$ctrl.answer" class="form-control">
-  </ng-form>
+  <input type="text"
+         name="answer"
+         [(ngModel)]="answer"
+         (ngModelChange)="answerValueChanged()"
+         class="form-control"
+         [oppiaFocusOn]="labelForFocusTarget">
 
   <div class="oppia-form-error oppia-units-input-error">
-    <[$ctrl.getWarningText()]>
+    {{ errorMessageI18nKey | translate }}
   </div>
 </form>
-<button class="btn btn-secondary" ng-click="$ctrl.showHelp()" translate="I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS"></button>
+<button class="btn btn-secondary"
+        (click)="showHelp()"
+        [innerHTML]="'I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS' | translate">
+</button>
 
 <style>
   .oppia-units-input-error {

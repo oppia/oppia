@@ -16,7 +16,7 @@
  * @fileoverview Utility service for saving data locally on the client machine.
  */
 
-// Service for saving exploration draft changes to local storage.
+// Includes methods for saving exploration draft changes to local storage.
 //
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
@@ -28,12 +28,16 @@ import {
   ExplorationChange,
   ExplorationDraft
 } from 'domain/exploration/exploration-draft.model';
+import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDict } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
-  constructor() {}
+  constructor(
+    private windowRef: WindowRef
+  ) {}
 
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
@@ -53,6 +57,8 @@ export class LocalStorageService {
 
   LAST_SELECTED_TRANSLATION_TOPIC_NAME = ('last_selected_translation_topic');
 
+  HIDE_SIGN_UP_SECTION_PREFERENCE = ('hide_sign_up_section');
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -69,6 +75,7 @@ export class LocalStorageService {
   isStorageAvailable(): boolean {
     return Boolean(this.storage);
   }
+
   /**
    * Save the given changeList to localStorage along with its
    * draftChangeListId
@@ -92,6 +99,7 @@ export class LocalStorageService {
         JSON.stringify(draftDict));
     }
   }
+
   /**
    * Retrieve the local save of the changeList associated with the given
    * exploration id.
@@ -115,6 +123,7 @@ export class LocalStorageService {
     }
     return null;
   }
+
   /**
    * Remove the local save of the changeList associated with the given
    * exploration id.
@@ -144,6 +153,7 @@ export class LocalStorageService {
         this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
     }
   }
+
   /**
    * Retrieve the local save of the last selected language for translation.
    * @returns {String} The local save of the last selected language for
@@ -190,6 +200,174 @@ export class LocalStorageService {
           this.LAST_SELECTED_TRANSLATION_TOPIC_NAME));
     }
     return null;
+  }
+
+  updateUniqueProgressIdOfLoggedOutLearner(uniqueProgressUrlId: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        'unique_progress_id', uniqueProgressUrlId);
+    }
+  }
+
+  getUniqueProgressIdOfLoggedOutLearner(): string | null {
+    if (this.isStorageAvailable()) {
+      return (this.storage as Storage).getItem('unique_progress_id');
+    }
+    return null;
+  }
+
+  removeUniqueProgressIdOfLoggedOutLearner(): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).removeItem('unique_progress_id');
+    }
+  }
+
+  /**
+   * Save the given sign up section hidden preference to localStorage.
+   * @param isSectionHidden
+   */
+  updateEndChapterSignUpSectionHiddenPreference(isSectionHidden: string): void {
+    if (this.isStorageAvailable()) {
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).setItem(
+        this.HIDE_SIGN_UP_SECTION_PREFERENCE, isSectionHidden);
+    }
+  }
+
+  /**
+   * Retrieve the local save of the sign up section preference.
+   * @returns {String} The local save of the preference for
+   *   hiding the end chapter sign up section.
+   */
+  getEndChapterSignUpSectionHiddenPreference(): string | null {
+    if (this.isStorageAvailable()) {
+      return (
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (this.storage as Storage).getItem(
+          this.HIDE_SIGN_UP_SECTION_PREFERENCE));
+    }
+    return null;
+  }
+
+  /**
+   * Retrieves the entity editor browser tabs info stored in the local storage
+   * for opened tabs of a particular entity type depending upon the
+   * browser tabs info constant.
+   * @param entityEditorBrowserTabsInfoConstant The key of the data stored on
+   * the local storage. It determines the type of the entity
+   * (topic, story, exploration, skill) for which we are retrieving data.
+   * @param entityId The id of the entity.
+   * @returns EntityEditorBrowserTabsInfo if the data is found on the local
+   * storage. Otherwise, returns null.
+   */
+  getEntityEditorBrowserTabsInfo(
+      entityEditorBrowserTabsInfoConstant: string, entityId: string
+  ): EntityEditorBrowserTabsInfo | null {
+    if (this.isStorageAvailable()) {
+      let allEntityEditorBrowserTabsInfoDicts:
+        EntityEditorBrowserTabsInfoDict = {};
+
+      const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
+        .getItem(entityEditorBrowserTabsInfoConstant);
+      if (stringifiedEntityEditorBrowserTabsInfo) {
+        allEntityEditorBrowserTabsInfoDicts = JSON.parse(
+          stringifiedEntityEditorBrowserTabsInfo);
+      }
+
+      const requiredEntityEditorBrowserTabsInfoDict = (
+        allEntityEditorBrowserTabsInfoDicts[entityId]);
+
+      if (requiredEntityEditorBrowserTabsInfoDict) {
+        return EntityEditorBrowserTabsInfo.fromLocalStorageDict(
+          requiredEntityEditorBrowserTabsInfoDict, entityId);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Updates the entity editor browser tabs info stored on the local storage.
+   * @param entityEditorBrowserTabsInfo The updated entity editor browser
+   * tabs info.
+   * @param entityEditorBrowserTabsInfoConstant The key of the data stored on
+   * the local storage.
+   */
+  updateEntityEditorBrowserTabsInfo(
+      entityEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo,
+      entityEditorBrowserTabsInfoConstant: string
+  ): void {
+    if (this.isStorageAvailable()) {
+      const updatedEntityEditorBrowserTabsInfoDict = (
+        entityEditorBrowserTabsInfo.toLocalStorageDict()
+      );
+      const entityId = entityEditorBrowserTabsInfo.getId();
+
+      let allEntityEditorBrowserTabsInfoDicts:
+        EntityEditorBrowserTabsInfoDict = {};
+
+      const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
+        .getItem(entityEditorBrowserTabsInfoConstant);
+      if (stringifiedEntityEditorBrowserTabsInfo) {
+        allEntityEditorBrowserTabsInfoDicts = JSON.parse(
+          stringifiedEntityEditorBrowserTabsInfo);
+      }
+
+      if (allEntityEditorBrowserTabsInfoDicts[entityId]) {
+        if (entityEditorBrowserTabsInfo.getNumberOfOpenedTabs() === 0) {
+          // If number of opened tabs for a particular entity editor becomes
+          // 0, then we should free the local storage by removing its info.
+          delete allEntityEditorBrowserTabsInfoDicts[entityId];
+          // If all the editor tabs of a particular entity are closed, then
+          // remove the whole list from the local storage since its length
+          // has become zero.
+          if (Object.keys(allEntityEditorBrowserTabsInfoDicts).length === 0) {
+            this.removeOpenedEntityEditorBrowserTabsInfo(
+              entityEditorBrowserTabsInfoConstant);
+          }
+        } else {
+          // If none of the above mentioned edge cases are present, then just
+          // update the local storage with the updated info.
+          allEntityEditorBrowserTabsInfoDicts[entityId] = (
+            updatedEntityEditorBrowserTabsInfoDict);
+        }
+      } else {
+        allEntityEditorBrowserTabsInfoDicts[entityId] = (
+          updatedEntityEditorBrowserTabsInfoDict);
+      }
+
+      (this.storage as Storage).setItem(
+        entityEditorBrowserTabsInfoConstant,
+        JSON.stringify(allEntityEditorBrowserTabsInfoDicts));
+    }
+  }
+
+  /**
+   * Removes the entity editor browser tabs info for a particular type of
+   * entity.
+   * @param entityEditorBrowserTabsInfoConstant The key of the data stored on
+   * the local storage.
+   */
+  removeOpenedEntityEditorBrowserTabsInfo(
+      entityEditorBrowserTabsInfoConstant: string
+  ): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).removeItem(entityEditorBrowserTabsInfoConstant);
+    }
+  }
+
+  /**
+   * Registers a new callback for 'storage' event.
+   * @param callbackFn The callback function to be called when the 'storage'
+   * event is triggered.
+   */
+  registerNewStorageEventListener(callbackFn: Function): void {
+    this.windowRef.nativeWindow.addEventListener('storage', (event) => {
+      callbackFn(event);
+    });
   }
 }
 

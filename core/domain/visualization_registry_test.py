@@ -29,31 +29,31 @@ from core.tests import test_utils
 class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the visualization registry."""
 
-    def test_visualization_registry(self):
+    def test_visualization_registry(self) -> None:
         """Sanity checks on the visualization registry."""
         self.assertGreater(
             len(visualization_registry.Registry.get_all_visualization_ids()),
             0)
 
-    def test_get_visualization_class_with_invalid_id_raises_error(self):
-        with self.assertRaisesRegexp(
+    def test_get_visualization_class_with_invalid_id_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             TypeError, 'is not a valid visualization id.'):
             visualization_registry.Registry.get_visualization_class(
                 'invalid_visualization_id')
 
-    def test_visualization_class_with_invalid_option_names(self):
+    def test_visualization_class_with_invalid_option_names(self) -> None:
         sorted_tiles = visualization_registry.Registry.get_visualization_class(
             'SortedTiles')
         sorted_tiles_instance = sorted_tiles('AnswerFrequencies', {}, True)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             re.escape(
                 'For visualization SortedTiles, expected option names '
                 '[\'header\', \'use_percentages\']; received names []')):
-            sorted_tiles_instance.validate()
+            sorted_tiles_instance.validate()  # type: ignore[no-untyped-call]
 
-    def test_visualization_class_with_invalid_option_value(self):
+    def test_visualization_class_with_invalid_option_value(self) -> None:
         sorted_tiles = visualization_registry.Registry.get_visualization_class(
             'SortedTiles')
         option_names = {
@@ -63,12 +63,13 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         sorted_tiles_instance = sorted_tiles(
             'AnswerFrequencies', option_names, True)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected bool, received invalid_value'):
-            sorted_tiles_instance.validate()
+            sorted_tiles_instance.validate()  # type: ignore[no-untyped-call]
 
     def test_visualization_class_with_invalid_addressed_info_is_supported_value(
-            self):
+        self
+    ) -> None:
         sorted_tiles = visualization_registry.Registry.get_visualization_class(
             'SortedTiles')
         option_names = {
@@ -78,13 +79,13 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         sorted_tiles_instance = sorted_tiles(
             'AnswerFrequencies', option_names, 'invalid_value')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'For visualization SortedTiles, expected a bool value for '
             'addressed_info_is_supported; received invalid_value'):
-            sorted_tiles_instance.validate()
+            sorted_tiles_instance.validate()  # type: ignore[no-untyped-call]
 
-    def test_get_all_visualization_ids(self):
+    def test_get_all_visualization_ids(self) -> None:
         visualization_ids = (
             visualization_registry.Registry.get_all_visualization_ids())
         expected_visualizations = ['FrequencyTable', 'ClickHexbins',
@@ -96,7 +97,7 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
 
 class VisualizationsNameTests(test_utils.GenericTestBase):
 
-    def test_visualization_names(self):
+    def test_visualization_names(self) -> None:
         """This function checks for duplicate visualizations."""
 
         all_python_files = self.get_all_python_files()

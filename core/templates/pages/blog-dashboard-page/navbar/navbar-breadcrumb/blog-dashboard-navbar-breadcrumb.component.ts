@@ -27,12 +27,16 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
 })
 export class BlogDashboardNavbarBreadcrumbComponent
 implements OnInit, OnDestroy {
-  activeTab: string;
-  title: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeTab!: string;
+  title!: string;
   directiveSubscriptions = new Subscription();
   constructor(
     private blogDashboardPageService: BlogDashboardPageService,
   ) {}
+
   ngOnInit(): void {
     this.activeTab = this.blogDashboardPageService.activeTab;
     this.directiveSubscriptions.add(

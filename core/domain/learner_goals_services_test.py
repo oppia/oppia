@@ -27,26 +27,29 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-MAX_CURRENT_GOALS_COUNT = (
-    feconf.MAX_CURRENT_GOALS_COUNT)
+MAX_CURRENT_GOALS_COUNT: Final = feconf.MAX_CURRENT_GOALS_COUNT
 
 
 class LearnerGoalsTests(test_utils.GenericTestBase):
     """Test the services related to learner goals services."""
 
-    OWNER_EMAIL = 'owner@example.com'
-    OWNER_USERNAME = 'owner'
-
-    TOPIC_ID_1 = 'Topic_id_1'
-    TOPIC_NAME_1 = 'Topic name 1'
-    TOPIC_ID_2 = 'Topic_id_2'
-    TOPIC_NAME_2 = 'Topic name 2'
-    TOPIC_ID_3 = 'Topic_id_3'
-    TOPIC_NAME_3 = 'Topic name 3'
-    TOPIC_ID_4 = 'Topic_id_4'
-    TOPIC_NAME_4 = 'Topic name 4'
+    TOPIC_ID_1: Final = 'Topic_id_1'
+    TOPIC_NAME_1: Final = 'Topic name 1'
+    TOPIC_ID_2: Final = 'Topic_id_2'
+    TOPIC_NAME_2: Final = 'Topic name 2'
+    TOPIC_ID_3: Final = 'Topic_id_3'
+    TOPIC_NAME_3: Final = 'Topic name 3'
+    TOPIC_ID_4: Final = 'Topic_id_4'
+    TOPIC_NAME_4: Final = 'Topic name 4'
 
     subtopic_1 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
@@ -69,112 +72,116 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         'dummy-subtopic-zero'
     )
 
-    def setUp(self):
-        super(LearnerGoalsTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.curriculum_admin_id = self.get_user_id_from_email(
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.curriculum_admin_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
             self.CURRICULUM_ADMIN_EMAIL)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
         # Save the topics.
-        self.save_new_topic(
+        self.save_new_topic(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_1], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_1, self.curriculum_admin_id)
-        self.save_new_topic(
+        topic_services.publish_topic(self.TOPIC_ID_1, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
+        self.save_new_topic(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_2, self.owner_id, name=self.TOPIC_NAME_2,
             url_fragment='topic-two',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_2], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_2, self.curriculum_admin_id)
-        self.save_new_topic(
+        topic_services.publish_topic(self.TOPIC_ID_2, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
+        self.save_new_topic(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_3, self.owner_id, name=self.TOPIC_NAME_3,
             url_fragment='topic-three',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_3], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_3, self.curriculum_admin_id)
-        self.save_new_topic(
+        topic_services.publish_topic(self.TOPIC_ID_3, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
+        self.save_new_topic(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_4, self.owner_id, name=self.TOPIC_NAME_4,
             url_fragment='topic-four',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_4], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_4, self.curriculum_admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_4, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
 
-    def _get_all_topic_ids_to_learn(self, user_id):
+    def _get_all_topic_ids_to_learn(self, user_id: str) -> List[str]:
         """Returns the list of all the topic ids to learn
         corresponding to the given user id.
         """
         learner_goals_model = user_models.LearnerGoalsModel.get(
             user_id, strict=False)
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if learner_goals_model:
+            topic_ids: List[str] = learner_goals_model.topic_ids_to_learn
+            return topic_ids
+        else:
+            return []
 
-        return (
-            learner_goals_model.topic_ids_to_learn if
-            learner_goals_model else [])
-
-    def test_single_topic_is_added_correctly_to_learn(self):
+    def test_single_topic_is_added_correctly_to_learn(self) -> None:
         # Test adding a single topic_id to learn.
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), [])
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-    def test_multiple_topics_are_added_correctly_to_learn(self):
+    def test_multiple_topics_are_added_correctly_to_learn(self) -> None:
         # Test adding two topics to the learn.
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [])
 
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
-    def test_adding_exisiting_topic_is_not_added_again(self):
+    def test_adding_exisiting_topic_is_not_added_again(self) -> None:
         # Test adding the topic_id if it is already in
         # learner_goals.topic_id.
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
             self.viewer_id, self.TOPIC_ID_1)
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'The topic id Topic_id_1 is already present in the learner goals'):
-            learner_progress_services.validate_and_add_topic_to_learn_goal(
+            learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
                 self.viewer_id, self.TOPIC_ID_1)
 
-    def test_completed_topic_is_not_added_to_learner_goals(self):
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
+    def test_completed_topic_is_not_added_to_learner_goals(self) -> None:
+        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-        learner_progress_services.mark_topic_as_learnt(
+        learner_progress_services.mark_topic_as_learnt(  # type: ignore[no-untyped-call]
             self.viewer_id, self.TOPIC_ID_2)
 
         # Test that the topic added to the in the learnt list doesn't get
@@ -183,12 +190,12 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-    def test_number_of_topics_cannot_exceed_max(self):
+    def test_number_of_topics_cannot_exceed_max(self) -> None:
         # Add MAX_CURRENT_GOALS_COUNT topics.
         topic_ids = ['SAMPLE_TOPIC_ID_%s' % index for index in (
             range(0, MAX_CURRENT_GOALS_COUNT))]
         for topic_id in topic_ids:
-            learner_progress_services.validate_and_add_topic_to_learn_goal(
+            learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
                 self.viewer_id, topic_id)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), topic_ids)
@@ -201,7 +208,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), topic_ids)
 
-    def test_remove_topic_from_learner_goals(self):
+    def test_remove_topic_from_learner_goals(self) -> None:
         self.assertEqual(self._get_all_topic_ids_to_learn(
             self.viewer_id), [])
 
@@ -220,7 +227,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self.viewer_id), [self.TOPIC_ID_2])
 
         # Removing the same topic raises error.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'The topic id Topic_id_1 is not present in LearnerGoalsModel'):
             learner_goals_services.remove_topics_from_learn_goal(
@@ -232,21 +239,21 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_topic_ids_to_learn(
             self.viewer_id), [])
 
-    def test_get_all_topic_ids_in_learn(self):
+    def test_get_all_topic_ids_in_learn(self) -> None:
         self.assertEqual(
-            self._get_all_topic_ids_to_learn(
+            learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [])
 
         # Add an topic to the learner goals.
         learner_goals_services.mark_topic_to_learn(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
-            self._get_all_topic_ids_to_learn(
+            learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
         # Add another topic.
         learner_goals_services.mark_topic_to_learn(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
-            self._get_all_topic_ids_to_learn(
+            learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])

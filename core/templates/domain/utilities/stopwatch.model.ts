@@ -36,11 +36,11 @@ export class Stopwatch {
     this.startTime = this._getCurrentTime();
   }
 
-  getTimeInSecs(): number | null {
+  getTimeInSecs(): number {
     if (this.startTime === null) {
       this.log.error(
         'Tried to retrieve the elapsed time, but no start time was set.');
-      return null;
+      return 0;
     }
     return (this._getCurrentTime() - this.startTime) / 1000;
   }

@@ -61,10 +61,12 @@ export class FractionInputValidationService {
         'integer.')
     };
   }
+
   getCustomizationArgsWarnings(
       customizationArgs: FractionInputCustomizationArgs): Warning[] {
     return [];
   }
+
   getAllWarnings(
       stateName: string, customizationArgs: FractionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome

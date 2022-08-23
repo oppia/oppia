@@ -40,6 +40,7 @@ export class EmailDashboardResultComponent {
     body: false,
     maxRecipients: false
   };
+
   emailSubject: string = '';
   maxRecipients!: number;
   emailOption: string = 'all';
@@ -49,6 +50,7 @@ export class EmailDashboardResultComponent {
     'bulk_email_create_exploration',
     'bulk_email_creator_reengagement',
     'bulk_email_learner_reengagement'];
+
   emailIntent = this.POSSIBLE_EMAIL_INTENTS[0];
   emailSubmitted: boolean = false;
   errorHasOccurred: boolean = false;

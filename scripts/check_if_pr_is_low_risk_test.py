@@ -16,21 +16,16 @@
 
 from __future__ import annotations
 
-from core import python_utils
+import builtins
+import io
+
+from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
 
-# We import StringIO directly instead of using python_utils.string_io
-# because we need to inherit from StringIO, so we need the StringIO
-# class. python_utils.string_io returns a StringIO object.
-try:
-    from StringIO import StringIO  # pylint: disable=import-only-modules
-except ImportError:
-    from io import StringIO  # pylint: disable=import-only-modules
 
-
-class MockResponse(StringIO):
+class MockResponse(io.StringIO):
     """Mock for the objects returned by urllib2.url_open."""
 
     def __init__(self, data='', code=200):
@@ -41,7 +36,7 @@ class MockResponse(StringIO):
             data: str. Response data.
             code: int. HTTP response code.
         """
-        StringIO.__init__(self, data)
+        super().__init__(data)
         self.code = code
 
     def getcode(self):
@@ -74,7 +69,7 @@ class ParsePrUrlTests(test_utils.GenericTestBase):
 class LoadDiffTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LoadDiffTests, self).setUp()
+        super().setUp()
         self.url = (
             'https://patch-diff.githubusercontent.com'
             '/raw/oppia/oppia/pull/1'
@@ -98,7 +93,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/modified\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '-    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             if tokens[-1] == 'old':
                 return (
@@ -108,7 +103,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ /dev/null\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '-    print(s)\n'
-                    '-    python_utils.PRINT(s)\n'
+                    '-    print(s)\n'
                 )
             if tokens[-1] == 'new':
                 return (
@@ -118,7 +113,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/new\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '+    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             if tokens[-1] == 'added':
                 return (
@@ -128,7 +123,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     '+++ b/added\n'
                     '@@ -32,6 +32,7 @@ def hello():\n'
                     '+    print(s)\n'
-                    '+    python_utils.PRINT(s)\n'
+                    '+    print(s)\n'
                 )
             raise AssertionError(
                 'Unknown args to mock_run_cmd: %s' % tokens)
@@ -170,19 +165,19 @@ class LoadDiffTests(test_utils.GenericTestBase):
         expected_file_diffs = {
             'modified': [
                 '-    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
             'old': [
                 '-    print(s)',
-                '-    python_utils.PRINT(s)',
+                '-    print(s)',
             ],
             'new': [
                 '+    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
             'added': [
                 '+    print(s)',
-                '+    python_utils.PRINT(s)',
+                '+    print(s)',
             ],
         }
         self.assertListEqual(diff_files, expected_diff_files)
@@ -206,7 +201,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     'upstream/develop'],),
             ])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 ('Failed to parse diff --name-status line "A B C D"',),
             ])
@@ -247,7 +242,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
                     'modified'],),
             ])
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
+            builtins, 'print', mock_print,
             expected_args=[
                 ('Failed to find end of header in "modified" diff',),
             ])
@@ -267,7 +262,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
 class LookupPrTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LookupPrTests, self).setUp()
+        super().setUp()
         self.url = (
             'https://api.github.com/repos/oppia/oppia/pulls/1')
         self.headers = {
@@ -281,7 +276,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             return MockResponse(data=data)
 
         url_open_swap = self.swap(
-            python_utils, 'url_open', mock_url_open)
+            utils, 'url_open', mock_url_open)
 
         with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
@@ -299,7 +294,7 @@ class LookupPrTests(test_utils.GenericTestBase):
             return MockResponse(code=404)
 
         url_open_swap = self.swap(
-            python_utils, 'url_open', mock_url_open)
+            utils, 'url_open', mock_url_open)
 
         with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
@@ -637,7 +632,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type changelog '
                     'because: Source branch does not indicate a '
@@ -730,7 +725,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '
@@ -823,7 +818,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Invalid change foo',
@@ -920,7 +915,7 @@ class MainTests(test_utils.GenericTestBase):
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
             mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', python_utils.PRINT, expected_args=[
+            builtins, 'print', print, expected_args=[
                 (
                     'PR is not a low-risk PR of type translatewiki '
                     'because: Source branch does not indicate a '
@@ -962,7 +957,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
 
         with parse_url_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
                 'Failed to parse PR URL %s' % url,
             ):
@@ -989,7 +984,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
 
         with parse_url_swap, lookup_pr_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
                 'Failed to load PR',
             ):
@@ -1040,7 +1035,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap, load_diff_swap:
             with run_cmd_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     RuntimeError,
                     'Failed to load PR diff',
                 ):

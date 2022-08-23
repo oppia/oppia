@@ -18,16 +18,20 @@
 
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
+import { CheckRevertExplorationModalComponent } from './modal-templates/check-revert-exploration-modal.component';
+import { RevertExplorationModalComponent } from './modal-templates/revert-exploration-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationMetadataDiffModalComponent } from '../modal-templates/exploration-metadata-diff-modal.component';
 
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.component.ts');
-require(
-  'pages/exploration-editor-page/history-tab/modal-templates/' +
-  'revert-exploration-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/history-tab/services/' +
+  'check-revert.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
@@ -40,19 +44,23 @@ require(
   'pages/exploration-editor-page/services/' +
   'history-tab-backend-api.service.ts'
 );
+require('services/contextual/url.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
+    '$log', '$rootScope', 'CheckRevertService', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'HistoryTabBackendApiService', 'LoaderService', 'RouterService',
-    'VersionTreeService', 'WindowRef',
+    'HistoryTabBackendApiService', 'LoaderService', 'NgbModal',
+    'RouterService', 'UrlInterpolationService', 'VersionTreeService',
+    'WindowRef',
     function(
-        $log, $rootScope, $uibModal, CompareVersionsService,
+        $log, $rootScope, CheckRevertService, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        HistoryTabBackendApiService, LoaderService, RouterService,
-        VersionTreeService, WindowRef) {
+        HistoryTabBackendApiService, LoaderService, NgbModal,
+        RouterService, UrlInterpolationService, VersionTreeService,
+        WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       // Variable explorationSnapshots is a list of all snapshots for the
@@ -232,17 +240,34 @@ angular.module('oppia').component('historyTab', {
           '&output_format=zip');
       };
 
-      ctrl.showRevertExplorationModal = function(version) {
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/history-tab/modal-templates/' +
-            'revert-exploration-modal.template.html'),
+      ctrl.showCheckRevertExplorationModal = function(version) {
+        const modalRef = NgbModal.open(CheckRevertExplorationModalComponent, {
           backdrop: true,
-          resolve: {
-            version: () => version
-          },
-          controller: 'RevertExplorationModalController'
-        }).result.then(function(version) {
+        });
+        modalRef.componentInstance.version = version;
+        const url = UrlInterpolationService.interpolateUrl(
+          ctrl.checkRevertExplorationValidUrl, {
+            exploration_id: ctrl.explorationId,
+            version: String(version)
+          }
+        );
+        HistoryTabBackendApiService.getCheckRevertValidData(url).then(
+          (revertData) => {
+            if (revertData.valid) {
+              modalRef.close();
+              ctrl.showRevertExplorationModal(version);
+            } else {
+              CheckRevertService.detailsEventEmitter.emit(revertData.details);
+            }
+          });
+      };
+
+      ctrl.showRevertExplorationModal = function(version) {
+        const modalRef = NgbModal.open(RevertExplorationModalComponent, {
+          backdrop: true,
+        });
+        modalRef.componentInstance.version = version;
+        modalRef.result.then(function(version) {
           var data = {
             revertExplorationUrl: ctrl.revertExplorationUrl,
             currentVersion: ExplorationDataService.data.version,
@@ -292,6 +317,24 @@ angular.module('oppia').component('historyTab', {
         ctrl.explorationVersionMetadata.reverse();
       };
 
+      ctrl.showExplorationMetadataDiffModal = function() {
+        let modalRef: NgbModalRef = NgbModal.open(
+          ExplorationMetadataDiffModalComponent, {
+            backdrop: true,
+            windowClass: 'exploration-metadata-diff-modal',
+            size: 'xl'
+          });
+
+        modalRef.componentInstance.oldMetadata = ctrl.diffData.v1Metadata;
+        modalRef.componentInstance.newMetadata = ctrl.diffData.v2Metadata;
+        modalRef.componentInstance.headers = {
+          leftPane: ctrl.earlierVersionHeader,
+          rightPane: ctrl.laterVersionHeader
+        };
+
+        modalRef.result.then(function() {}, function() {});
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshVersionHistory.subscribe((data) => {
@@ -306,6 +349,8 @@ angular.module('oppia').component('historyTab', {
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.explorationAllSnapshotsUrl =
             '/createhandler/snapshots/' + ctrl.explorationId;
+        ctrl.checkRevertExplorationValidUrl =
+          '/createhandler/check_revert_valid/<exploration_id>/<version>';
         ctrl.revertExplorationUrl =
           '/createhandler/revert/' + ctrl.explorationId;
         ctrl.explorationDownloadUrl =

@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import itertools
 import random
 import string
 
@@ -26,7 +27,8 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
+from typing_extensions import Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -90,6 +92,10 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = datastore_services.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+    # Language preference when submitting text translations in the
+    # contributor dashboard.
+    preferred_translation_language_code = datastore_services.StringProperty(
+        default=None)
 
     # Attributes used for full users only.
 
@@ -131,6 +137,10 @@ class UserSettingsModel(base_models.BaseModel):
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
+    # Flag to check whether the user has viewed lesson info modal once which
+    # shows the progress of the user through exploration checkpoints.
+    has_viewed_lesson_info_modal_once = datastore_services.BooleanProperty(
+        indexed=True, default=False)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -181,6 +191,8 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'preferred_audio_language_code':
                 base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_translation_language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
             'username': base_models.EXPORT_POLICY.EXPORTED,
             'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
             'last_started_state_editor_tutorial':
@@ -195,6 +207,8 @@ class UserSettingsModel(base_models.BaseModel):
             'creator_dashboard_display_pref':
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'has_viewed_lesson_info_modal_once':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -238,8 +252,6 @@ class UserSettingsModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSettingsModel.
         """
         user = UserSettingsModel.get(user_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert user is not None
         return {
             'email': user.email,
             'roles': user.roles,
@@ -288,7 +300,11 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
+            'preferred_translation_language_code': (
+                user.preferred_translation_language_code),
             'display_alias': user.display_alias,
+            'has_viewed_lesson_info_modal_once': (
+                user.has_viewed_lesson_info_modal_once)
         }
 
     @classmethod
@@ -1475,6 +1491,18 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = datastore_services.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+    # The state name of the furthest reached checkpoint.
+    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
+    # The exploration version of the furthest reached checkpoint.
+    furthest_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+    # The state name of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_state_name = (
+        datastore_services.StringProperty(default=None))
+    # The exploration version of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1530,6 +1558,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
             'mute_suggestion_notifications':
                 base_models.EXPORT_POLICY.EXPORTED,
             'mute_feedback_notifications':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'most_recently_reached_checkpoint_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1661,7 +1697,15 @@ class ExplorationUserDataModel(base_models.BaseModel):
                 'mute_suggestion_notifications': (
                     user_model.mute_suggestion_notifications),
                 'mute_feedback_notifications': (
-                    user_model.mute_feedback_notifications)
+                    user_model.mute_feedback_notifications),
+                'furthest_reached_checkpoint_exp_version': (
+                    user_model.furthest_reached_checkpoint_exp_version),
+                'furthest_reached_checkpoint_state_name': (
+                    user_model.furthest_reached_checkpoint_state_name),
+                'most_recently_reached_checkpoint_exp_version': (
+                    user_model.most_recently_reached_checkpoint_exp_version),
+                'most_recently_reached_checkpoint_state_name': (
+                    user_model.most_recently_reached_checkpoint_state_name)
             }
 
         return user_data
@@ -1960,6 +2004,30 @@ class StoryProgressModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, story_id=story_id)
 
+    @overload  # type: ignore[override]
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str
+    ) -> StoryProgressModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: Literal[True]
+    ) -> StoryProgressModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: Literal[False]
+    ) -> Optional[StoryProgressModel]: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, user_id: str, story_id: str, strict: bool = False
+    ) -> Optional[StoryProgressModel]: ...
+
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
@@ -1987,21 +2055,24 @@ class StoryProgressModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-        cls, user_id: str, story_ids: List[str]
+        cls, user_ids: List[str], story_ids: List[str]
     ) -> List[Optional[StoryProgressModel]]:
-        """Gets the StoryProgressModels for the given user and story
+        """Gets the StoryProgressModels for the given user ids and story
         ids.
 
         Args:
-            user_id: str. The id of the user.
+            user_ids: list(str). The ids of the users.
             story_ids: list(str). The ids of the stories.
 
         Returns:
             list(StoryProgressModel|None). The list of StoryProgressModel
-            instances which matches the given user_id and story_ids.
+            instances which matches the given user_ids and story_ids.
         """
-        instance_ids = [cls._generate_id(user_id, story_id)
-                        for story_id in story_ids]
+        all_posssible_combinations = itertools.product(user_ids, story_ids)
+        instance_ids = [
+            cls._generate_id(user_id, story_id)
+            for (user_id, story_id) in all_posssible_combinations
+        ]
 
         return super(StoryProgressModel, cls).get_multi(
             instance_ids)
@@ -2226,10 +2297,8 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: id field, but it isn't
-        deleted because it is needed for auditing purposes.
-        """
-        return base_models.DELETION_POLICY.KEEP
+        """Model contains data corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -2242,6 +2311,15 @@ class UserBulkEmailsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instance of UserBulkEmailsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @staticmethod
     def get_model_association_to_user(
@@ -2945,3 +3023,153 @@ class DeletedUsernameModel(base_models.BaseModel):
         """
         empty_dict: Dict[str, base_models.EXPORT_POLICY] = {}
         return dict(super(cls, cls).get_export_policy(), **empty_dict)
+
+
+class LearnerGroupUserDetailsDict(TypedDict):
+    """Dictionary for user details of a particular learner group to export."""
+
+    group_id: str
+    progress_sharing_is_turned_on: bool
+
+
+class LearnerGroupsUserDataDict(TypedDict):
+    """Dictionary for user data to export."""
+
+    invited_to_learner_groups_ids: List[str]
+    learner_groups_user_details: List[LearnerGroupUserDetailsDict]
+
+
+class LearnerGroupsUserModel(base_models.BaseModel):
+    """Model for storing user's learner groups related data.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # List of learner group ids which the student has been invited to join.
+    invited_to_learner_groups_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
+    # group and has details of the user correspoding to that group.
+    learner_groups_user_details = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
+    # Version of learner group details blob schema.
+    learner_groups_user_details_schema_version = (
+        datastore_services.IntegerProperty(
+            required=True, default=0, indexed=True))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether LearnerGroupsUserModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of LearnerGroupsUserModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.export_data().
+    @classmethod
+    def export_data(cls, user_id: str) -> LearnerGroupsUserDataDict: # type: ignore[override]
+        """(Takeout) Exports the data from LearnerGroupsUserModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from LearnerGroupsUserModel.
+        """
+        learner_grp_user_model = cls.get_by_id(user_id)
+
+        if learner_grp_user_model is None:
+            return {}
+
+        return {
+            'invited_to_learner_groups_ids': (
+                learner_grp_user_model.invited_to_learner_groups_ids),
+            'learner_groups_user_details': (
+                learner_grp_user_model.learner_groups_user_details)
+        }
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'invited_to_learner_groups_ids':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'learner_groups_user_details':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'learner_groups_user_details_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def delete_learner_group_references(
+        cls, group_id: str, user_ids: List[str]
+    ) -> None:
+        """Delete all references of given learner group stored in learner
+        groups user model.
+
+        Args:
+            group_id: str. The group_id denotes which group's reference to
+                delete.
+            user_ids: list(str). The user_ids denotes ids of users that were
+                referenced in the given group.
+        """
+        found_models = cls.get_multi(user_ids)
+
+        learner_groups_user_models_to_put = []
+
+        for learner_grp_usr_model in found_models:
+            if learner_grp_usr_model is None:
+                continue
+
+            # If the user has been invited to join the group as student, delete
+            # the group id from the invited_to_learner_groups_ids list.
+            if (
+                group_id in learner_grp_usr_model.invited_to_learner_groups_ids
+            ):
+                learner_grp_usr_model.invited_to_learner_groups_ids.remove(
+                    group_id)
+
+            # If the user is a student of the group, delete the corresponding
+            # learner group details of the student stored in
+            # learner_groups_user_details field.
+            updated_details = []
+
+            for learner_group_details in (
+                learner_grp_usr_model.learner_groups_user_details
+            ):
+                if learner_group_details['group_id'] != group_id:
+                    updated_details.append(learner_group_details)
+
+            learner_grp_usr_model.learner_groups_user_details = (
+                updated_details)
+
+            learner_groups_user_models_to_put.append(learner_grp_usr_model)
+
+        cls.update_timestamps_multi(learner_groups_user_models_to_put)
+        cls.put_multi(learner_groups_user_models_to_put)

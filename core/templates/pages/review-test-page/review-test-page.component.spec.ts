@@ -17,38 +17,46 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { PageTitleService } from 'services/page-title.service';
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { QuestionPlayerConstants } from 'components/question-directives/question-player/question-player.constants';
 
 describe('Review test page component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var pageTitleService = null;
-  var reviewTestBackendApiService = null;
-  var reviewTestEngineService = null;
+  var pageTitleService: PageTitleService = null;
+  var reviewTestBackendApiService: ReviewTestBackendApiService = null;
+  var reviewTestEngineService: ReviewTestEngineService = null;
   var urlService = null;
+  var $translate = null;
+  var I18nLanguageCodeService = null;
 
   importAllAngularServices();
 
-  beforeEach(function() {
-    pageTitleService = TestBed.get(PageTitleService);
-    reviewTestBackendApiService = TestBed.get(ReviewTestBackendApiService);
-    reviewTestEngineService = TestBed.get(ReviewTestEngineService);
+  beforeEach(() => {
+    pageTitleService = TestBed.inject(PageTitleService);
+    reviewTestBackendApiService = TestBed.inject(ReviewTestBackendApiService);
+    reviewTestEngineService = TestBed.inject(ReviewTestEngineService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ReviewTestBackendApiService', reviewTestBackendApiService);
+    $provide.value(
+      'QUESTION_PLAYER_MODE', QuestionPlayerConstants.QUESTION_PLAYER_MODE);
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     urlService = $injector.get('UrlService');
+    $translate = $injector.get('$translate');
+    I18nLanguageCodeService = $injector.get('I18nLanguageCodeService');
 
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic_1');
@@ -82,13 +90,17 @@ describe('Review test page component', function() {
         storyName: '',
         skillDescriptions: ['skill_1', 'skill_2']
       }));
-
-    ctrl.$onInit();
-    $scope.$apply();
+    spyOn($translate, 'use').and.returnValue($q.resolve());
   }));
 
   it('should initialize correctly controller properties after its' +
   ' initialization and get skill details from backend', function() {
+    spyOn(ctrl, 'subscribeToOnLanguageCodeChange');
+
+    ctrl.$onInit();
+    $scope.$apply();
+
+    expect(ctrl.subscribeToOnLanguageCodeChange).toHaveBeenCalled();
     expect(ctrl.questionPlayerConfig).toEqual({
       resultActionButtons: [{
         type: 'REVIEW_LOWEST_SCORED_SKILL',
@@ -111,5 +123,49 @@ describe('Review test page component', function() {
       },
       questionsSortedByDifficulty: true
     });
+  });
+
+  it('should subscribe to onLanguageCodeChange', () => {
+    spyOn(ctrl.directiveSubscriptions, 'add');
+    spyOn(I18nLanguageCodeService.onI18nLanguageCodeChange, 'subscribe');
+
+    ctrl.subscribeToOnLanguageCodeChange();
+
+    expect(ctrl.directiveSubscriptions.add).toHaveBeenCalled();
+    expect(I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe)
+      .toHaveBeenCalled();
+  });
+
+  it('should update title whenever the language changes', () => {
+    ctrl.subscribeToOnLanguageCodeChange();
+    spyOn(ctrl, 'setPageTitle');
+
+    I18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+
+    expect(ctrl.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should obtain translated title and set it', () => {
+    spyOn($translate, 'instant').and.returnValue('translated_title');
+    spyOn(pageTitleService, 'setDocumentTitle');
+    ctrl.storyName = 'dummy_story_name';
+
+    ctrl.setPageTitle();
+    $scope.$apply();
+
+    expect($translate.instant).toHaveBeenCalledWith(
+      'I18N_REVIEW_TEST_PAGE_TITLE', {
+        storyName: 'dummy_story_name'
+      });
+    expect(pageTitleService.setDocumentTitle)
+      .toHaveBeenCalledWith('translated_title');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
+    ctrl.$onDestroy();
+
+    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });

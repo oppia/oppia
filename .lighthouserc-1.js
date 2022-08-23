@@ -38,7 +38,7 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/blog-dashboard$',
-          'assertions': baseConfig['baseAccessibilityAssertions']
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/about$',
@@ -77,12 +77,15 @@ module.exports = {
           'assertions': {
             // The YouTube embed on donate page loads images in jpg format, thus
             // we need to allow one image.
-            'uses-webp-images': [
+            'modern-image-formats': [
               'error', {'maxLength': 1, 'strategy': 'pessimistic'}
             ],
             // The YouTube embed on donate page uses passive listeners.
             'uses-passive-event-listeners': ['error', {'minScore': 0}],
-            'deprecations': ['error', {'minScore': 1}]
+            'uses-rel-preload': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}],
+            'redirects': ['error', {'minScore': 1}],
+            'uses-responsive-images': ['error', {'minScore': 0.8}]
           }
         },
         {

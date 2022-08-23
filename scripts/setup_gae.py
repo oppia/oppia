@@ -21,9 +21,8 @@ import os
 import subprocess
 import sys
 import tarfile
-import urllib.request as urlrequest
 
-from core import python_utils
+from typing import Optional, Sequence
 
 from . import common
 
@@ -35,13 +34,12 @@ Python execution environment setup for scripts that require GAE.
 GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the script to setup GAE."""
     unused_parsed_args = _PARSER.parse_args(args=args)
 
     sys.path.append('.')
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.35'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
@@ -50,29 +48,28 @@ def main(args=None):
                 filepath = os.path.join(directory, file_name)
                 os.remove(filepath)
 
-    python_utils.PRINT(
+    print(
         'Checking whether google-cloud-sdk is installed in %s'
         % common.GOOGLE_CLOUD_SDK_HOME)
     if not os.path.exists(common.GOOGLE_CLOUD_SDK_HOME):
-        python_utils.PRINT(
-            'Downloading Google Cloud SDK (this may take a little while)...')
+        print('Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
             # If the google cloud version is updated here, the corresponding
             # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
             # should also be updated.
-            urlrequest.urlretrieve(
+            common.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
-                filename='gcloud-sdk.tar.gz')
-        except Exception:
-            python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
-            raise Exception('Error downloading Google Cloud SDK.')
-        python_utils.PRINT('Download complete. Installing Google Cloud SDK...')
+                'google-cloud-sdk-364.0.0-linux-x86_64.tar.gz',
+                'gcloud-sdk.tar.gz')
+        except Exception as e:
+            print('Error downloading Google Cloud SDK. Exiting.')
+            raise Exception('Error downloading Google Cloud SDK.') from e
+        print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-364.0.0/'))
         tar.close()
 
         os.remove('gcloud-sdk.tar.gz')

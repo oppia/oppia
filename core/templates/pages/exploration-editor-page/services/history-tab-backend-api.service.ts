@@ -20,18 +20,19 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-interface HistoryTabBackendDict {
-  'summaries': string[];
-}
-
-interface HistoryTabResposne {
+interface HistoryTabDict {
   summaries: string[];
 }
 
-interface HistoryTabPostData{
-  revertExplorationUrl: string,
-  currentVersion: number,
-  revertToVersion: number
+interface HistoryTabCheckRevertValidDict {
+  valid: boolean;
+  details: string | null;
+}
+
+interface HistoryTabData{
+  revertExplorationUrl: string;
+  currentVersion: number;
+  revertToVersion: number;
 }
 
 @Injectable({
@@ -42,14 +43,21 @@ export class HistoryTabBackendApiService {
         private http: HttpClient
   ) {}
 
-  getData(explorationAllSnapshotsUrl: string): Promise<HistoryTabResposne> {
-    return this.http.get<HistoryTabBackendDict>(
+  getData(explorationAllSnapshotsUrl: string): Promise<HistoryTabDict> {
+    return this.http.get<HistoryTabDict>(
       explorationAllSnapshotsUrl
     ).toPromise();
   }
 
-  postData(data: HistoryTabPostData): Promise<HistoryTabResposne> {
-    return this.http.post<HistoryTabBackendDict>(
+  getCheckRevertValidData(
+      revertExplorationUrl: string
+  ): Promise<HistoryTabCheckRevertValidDict> {
+    return this.http.get<HistoryTabCheckRevertValidDict>(
+      revertExplorationUrl).toPromise();
+  }
+
+  postData(data: HistoryTabData): Promise<HistoryTabDict> {
+    return this.http.post<HistoryTabDict>(
       data.revertExplorationUrl,
       {
         current_version: data.currentVersion,

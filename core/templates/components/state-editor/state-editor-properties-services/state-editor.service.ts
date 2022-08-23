@@ -59,19 +59,23 @@ export class StateEditorService {
   private _stateEditorInitializedEventEmitter = new EventEmitter<State>();
   private _stateEditorDirectiveInitializedEventEmitter =
     new EventEmitter<void>();
+
   private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
-  private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
+  private _updateAnswerChoicesEventEmitter =
+    new EventEmitter<AnswerChoice[]>();
+
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
+
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string | null = null;
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   // Currently, the only place where this is used in the state editor
   // is in solution verification. So, once the interaction is set in this

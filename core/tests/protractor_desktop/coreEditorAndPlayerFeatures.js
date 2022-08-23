@@ -34,7 +34,6 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-
 describe('Enable correctness feedback and set correctness', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -49,11 +48,6 @@ describe('Enable correctness feedback and set correctness', function() {
     ['TextInput', 'One'],
     ['NumericInput', 3]
   ];
-
-  var enableCorrectnessFeedbackSetting = async function() {
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.enableCorrectnessFeedback();
-  };
 
   var testEnableCorrectnessInPlayerPage = async function() {
     await libraryPage.get();
@@ -96,7 +90,7 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     // Create interaction first.
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
@@ -113,8 +107,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
-    // Turn on correctness feedback.
-    await enableCorrectnessFeedbackSetting();
 
     // Go back to mark the solution as correct.
     await explorationEditorPage.navigateToMainTab();
@@ -137,14 +129,11 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.navigateToMainTab();
 
-    // Turn on correctness feedback first.
-    await enableCorrectnessFeedbackSetting();
-
     // Go to main tab to create interactions.
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     // Create interaction without closing the add response modal. Set
     // correctness in the modal.
@@ -178,8 +167,6 @@ describe('Enable correctness feedback and set correctness', function() {
       await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
       await explorationEditorSettingsTab.setLanguage('English');
       await explorationEditorPage.navigateToMainTab();
-      // Turn on correctness feedback first.
-      await enableCorrectnessFeedbackSetting();
 
       // Go back to main tab to create interactions.
       await explorationEditorPage.navigateToMainTab();
@@ -211,9 +198,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorPage.navigateToMainTab();
-
-    // Turn on correctness feedback first.
-    await enableCorrectnessFeedbackSetting();
 
     // Go to main tab to create interactions.
     await explorationEditorPage.navigateToMainTab();
@@ -302,7 +286,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await general.checkForConsoleErrors([]);
   });
 });
-
 
 describe('Core exploration functionality', function() {
   var explorationPlayerPage = null;
@@ -457,10 +440,10 @@ describe('Core exploration functionality', function() {
     // this interaction does not have any customization options. To dismiss
     // this modal, user clicks 'Okay' implying that he/she has got the message.
     await explorationEditorMainTab.setInteraction('NumberWithUnits');
-    var testInteractionButton = element(by.css('.protractor-test-interaction'));
+    var testInteractionButton = element(by.css('.e2e-test-interaction'));
     await action.click('Test Interaction Button', testInteractionButton);
     var okayBtn = element(
-      by.css('.protractor-test-close-no-customization-modal'));
+      by.css('.e2e-test-close-no-customization-modal'));
     await action.click('Close \'No customization modal\' button', okayBtn);
 
     // Continue input has customization options. Therefore, on re-clicking, a
@@ -471,7 +454,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setInteraction('Continue');
     await action.click('Test interaction button', testInteractionButton);
     var saveInteractionBtn = element(
-      by.css('.protractor-test-save-interaction'));
+      by.css('.e2e-test-save-interaction'));
     await action.click('Save interaction button', saveInteractionBtn);
   });
 
@@ -589,7 +572,7 @@ describe('Core exploration functionality', function() {
   it('should change the first card of the exploration', async function() {
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 1'));
+      await forms.toRichText('this is card 1'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');

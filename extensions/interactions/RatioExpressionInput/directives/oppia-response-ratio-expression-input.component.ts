@@ -20,20 +20,36 @@
  * followed by the name of the arg.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 import { Ratio } from 'domain/objects/ratio.model';
+import { RatioInputAnswer } from 'interactions/answer-defs';
 
-require('services/html-escaper.service.ts');
+@Component({
+  selector: 'oppia-response-ratio-expression-input',
+  templateUrl: './ratio-expression-input-response.component.html',
+  styleUrls: []
+})
+export class ResponseRatioExpressionInputComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  responses!: string;
 
-angular.module('oppia').component('oppiaResponseRatioExpressionInput', {
-  template: require('./ratio-expression-input-response.component.html'),
-  controller: [
-    '$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.answer = Ratio.fromList(answer).toAnswerString();
-      };
-    }
-  ]
-});
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    const answer: RatioInputAnswer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as RatioInputAnswer;
+
+    this.responses = Ratio.fromList(answer).toAnswerString();
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaResponseRatioExpressionInput', downgradeComponent({
+    component: ResponseRatioExpressionInputComponent
+  }) as angular.IDirectiveFactory);

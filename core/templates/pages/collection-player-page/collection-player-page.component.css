@@ -1,0 +1,123 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.glow-button:hover {
+  -webkit-filter: drop-shadow(0 0 6px #045a47);
+  filter: drop-shadow(0 0 6px #045a47);
+}
+
+/* Styles for the collections learner view */
+
+.oppia-collection-player-tiles-container {
+  height: 100%;
+  margin: 0 auto;
+  max-width: 975px;
+  min-height: 500px;
+  padding-bottom: 25px;
+  padding-top: 30px;
+  position: relative;
+}
+
+.oppia-page-heading {
+  margin-bottom: 5px;
+}
+.oppia-collection-player-tiles-container .oppia-page-heading {
+  color: #005048;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-collection-player-tile-section {
+  margin-bottom: 24px;
+}
+
+.oppia-collection-player-small-text {
+  color: #005048;
+  font-size: 1em;
+  font-style: italic;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+.oppia-collection-player-title-font {
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 45px;
+}
+
+.oppia-collection-node-small-screen {
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  transform: translate(-50%, 195px);
+  z-index: 1;
+}
+.oppia-collection-node-small-screen::before {
+  color: #3f7a68;
+  content: attr(title-data);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  left: -60px;
+  position: absolute;
+  text-align: center;
+  top: -30px;
+  width: 220px;
+}
+.oppia-collection-exploration {
+  position: relative;
+  top: 20px
+}
+.oppia-exploration-summary-tile-container {
+  left: 0;
+  position: fixed;
+  top: 0;
+  z-index: 100;
+}
+.oppia-exploration-summary-tile {
+  position: absolute;
+  z-index: 10;
+}
+.oppia-exploration-preview-summary-tile {
+  left: 85px;
+  position: absolute;
+  top: 30px;
+  z-index: 10;
+}
+.title-section {
+  z-index: 1;
+}
+
+.no-exploration-created .oppia-collection-path-section {
+  color: red;
+  font-size: 20px;
+  left: 15em;
+  padding: 70px 40px 90px 40px;
+  top: 228px;
+}
+
+.oppia-card-preview-panel {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+  left: 50%;
+  padding: 30px 85px 70px 85px;
+  pointer-events: none;
+  position: fixed;
+  text-align: left;
+  top: 244px;
+  transform: translateX(29%);
+}
+
+@media screen and (max-width: 942px) {
+  .oppia-collection-path-section, .oppia-card-preview-panel {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 943px) {
+  .oppia-collection-table {
+    display: none;
+  }
+}

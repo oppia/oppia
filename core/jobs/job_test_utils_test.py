@@ -39,14 +39,14 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
     def test_assert_pcoll_empty_raises_immediately(self) -> None:
         # NOTE: Arbitrary operations that produce a non-empty PCollection.
         output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
-        with self.assertRaisesRegexp(AssertionError, 'failed'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(AssertionError, 'failed'): # type: ignore[no-untyped-call]
             self.assert_pcoll_empty(output)
 
     def test_assert_pcoll_equal_raises_immediately(self) -> None:
         # NOTE: Arbitrary operations that produce an empty PCollection.
         output = self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
 
-        with self.assertRaisesRegexp(AssertionError, 'failed'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(AssertionError, 'failed'): # type: ignore[no-untyped-call]
             self.assert_pcoll_equal(output, [123])
 
     def test_assert_pcoll_empty_raises_runtime_error_when_called_twice(
@@ -57,7 +57,7 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_empty(output)
 
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             RuntimeError, 'must be run in the pipeline context',
             lambda: self.assert_pcoll_empty(output))
 
@@ -69,7 +69,7 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [123])
 
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex( # type: ignore[no-untyped-call]
             RuntimeError, 'must be run in the pipeline context',
             lambda: self.assert_pcoll_equal(output, [123]))
 
@@ -86,12 +86,22 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
 
     def tearDown(self) -> None:
         self.JOB_CLASS.reset_mock()
-        super(JobTestBaseTests, self).tearDown()
+        super().tearDown()
 
     def test_run_job(self) -> None:
         self.run_job()
 
         self.job.run.assert_called() # type: ignore[attr-defined]
+
+    def test_put_multi(self) -> None:
+        model_list = [
+            self.create_model(base_models.BaseModel) for _ in range(3)]
+        self.put_multi(model_list)
+
+        model_ids = [model.id for model in model_list]
+        for model_id in model_ids:
+            model = base_models.BaseModel.get_by_id(model_id)
+            self.assertIsNotNone(model)
 
     def test_job_output_is(self) -> None:
         self.job.run.return_value = ( # type: ignore[attr-defined]
@@ -202,6 +212,6 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
         self.assert_error_is_decorated(actual_msg, actual_msg)
 
     def test_does_not_decorate_message_with_non_beam_type(self) -> None:
-        with self.assertRaisesRegexp(Exception, 'Error coming through!'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Error coming through!'): # type: ignore[no-untyped-call]
             with job_test_utils.decorate_beam_errors():
                 raise Exception('Error coming through!')

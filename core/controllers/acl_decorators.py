@@ -63,8 +63,8 @@ def _redirect_based_on_return_type(
     """
     if expected_return_type == feconf.HANDLER_TYPE_JSON:
         raise handler.PageNotFoundException
-    else:
-        handler.redirect(redirection_url)
+
+    handler.redirect(redirection_url)
 
 
 def open_access(handler):
@@ -117,13 +117,14 @@ def is_source_mailchimp(handler):
         """
         if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
             raise self.PageNotFoundException
-        elif secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+
+        if secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
             logging.error(
                 'Invalid Mailchimp webhook request received with secret: %s'
                 % secret)
             raise self.PageNotFoundException
-        else:
-            return handler(self, secret, **kwargs)
+
+        return handler(self, secret, **kwargs)
     test_is_source_mailchimp.__wrapped__ = True
 
     return test_is_source_mailchimp
@@ -149,6 +150,10 @@ def does_classroom_exist(handler):
 
         Returns:
             handler. function. The newly decorated function.
+
+        Raises:
+            Exception. This decorator is not expected to be used with other
+                handler types.
         """
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
@@ -160,12 +165,12 @@ def does_classroom_exist(handler):
             # the access validation handler endpoint.
             if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
                 raise self.PageNotFoundException
-            else:
-                # As this decorator is not expected to be used with other
-                # handler types, raising an error here.
-                raise Exception(
-                    'does_classroom_exist decorator is only expected to '
-                    'be used with json return type handlers.')
+
+            # As this decorator is not expected to be used with other
+            # handler types, raising an error here.
+            raise Exception(
+                'does_classroom_exist decorator is only expected to '
+                'be used with json return type handlers.')
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
@@ -227,12 +232,11 @@ def can_view_skills(handler):
         can view multiple given skills.
     """
 
-    def test_can_view(self, comma_separated_skill_ids, **kwargs):
+    def test_can_view(self, selected_skill_ids, **kwargs):
         """Checks if the user can view the skills.
 
         Args:
-            comma_separated_skill_ids: str. The skill ids
-                separated by commas.
+            selected_skill_ids: list(str). List of skill ids.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -244,20 +248,19 @@ def can_view_skills(handler):
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
-        skill_ids = comma_separated_skill_ids.split(',')
 
         try:
-            for skill_id in skill_ids:
+            for skill_id in selected_skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.InvalidInputException
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         try:
-            skill_fetchers.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        return handler(self, comma_separated_skill_ids, **kwargs)
+        return handler(self, selected_skill_ids, **kwargs)
     test_can_view.__wrapped__ = True
 
     return test_can_view
@@ -1600,19 +1603,77 @@ def can_voiceover_exploration(handler):
     return test_can_voiceover
 
 
-def can_manage_voice_artist(handler):
-    """Decorator to check whether the user can manage voice artist.
+def can_add_voice_artist(handler):
+    """Decorator to check whether the user can add voice artist to
+    the given activity.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if a user
-        has permission to manage voice artist.
+        has permission to add voice artist.
     """
 
-    def test_can_manage_voice_artist(self, entity_type, entity_id, **kwargs):
-        """Checks if the user can manage a voice artist for the given entity.
+    def test_can_add_voice_artist(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can add a voice artist for the given entity.
+
+        Args:
+            entity_type: str. The type of entity.
+            entity_id: str. The Id of the entity.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            InvalidInputException. The given entity type is not supported.
+            PageNotFoundException. The page is not found.
+            InvalidInputException. The given exploration is private.
+            UnauthorizedUserException. The user does not have the credentials
+                to manage voice artist.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            raise self.InvalidInputException(
+                'Unsupported entity_type: %s' % entity_type)
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            entity_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if exploration_rights.is_private():
+            raise base.UserFacingExceptions.InvalidInputException(
+                'Could not assign voice artist to private activity.')
+        if rights_manager.check_can_manage_voice_artist_in_activity(
+                self.user, exploration_rights):
+            return handler(self, entity_type, entity_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to manage voice artists.')
+    test_can_add_voice_artist.__wrapped__ = True
+
+    return test_can_add_voice_artist
+
+
+def can_remove_voice_artist(handler):
+    """Decorator to check whether the user can remove voice artist
+    from the given activity.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a user
+        has permission to remove voice artist.
+    """
+
+    def test_can_remove_voice_artist(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can remove a voice artist for the given entity.
 
         Args:
             entity_type: str. The type of entity.
@@ -1647,9 +1708,9 @@ def can_manage_voice_artist(handler):
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to manage voice artists.')
-    test_can_manage_voice_artist.__wrapped__ = True
+    test_can_remove_voice_artist.__wrapped__ = True
 
-    return test_can_manage_voice_artist
+    return test_can_remove_voice_artist
 
 
 def can_save_exploration(handler):
@@ -1832,8 +1893,10 @@ def can_resubmit_suggestion(handler):
             UnauthorizedUserException. The user does not have credentials to
                 edit this suggestion.
         """
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if not suggestion:
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
+        if suggestion is None:
             raise self.InvalidInputException(
                 'No suggestion found with given suggestion id')
 
@@ -2054,8 +2117,8 @@ def can_perform_tasks_in_taskqueue(handler):
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
-        else:
-            return handler(self, **kwargs)
+
+        return handler(self, **kwargs)
     test_can_perform.__wrapped__ = True
 
     return test_can_perform
@@ -2124,11 +2187,55 @@ def can_access_learner_dashboard(handler):
 
         Raises:
             NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
         """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
         if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
-            raise self.NotLoggedInException
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_access_learner_groups(handler):
+    """Decorator to check access to learner groups.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        one can access the learner groups.
+    """
+
+    def test_can_access(self, **kwargs):
+        """Checks if the user can access the learner groups.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_LEARNER_GROUPS in self.user.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
     test_can_access.__wrapped__ = True
 
     return test_can_access
@@ -2564,6 +2671,45 @@ def can_edit_skill(handler):
 
     test_can_edit_skill.__wrapped__ = True
     return test_can_edit_skill
+
+
+def can_submit_images_to_questions(handler):
+    """Decorator to check whether the user can submit images to questions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        the user has permission to submit a question.
+    """
+    def test_can_submit_images_to_questions(self, skill_id, **kwargs):
+        """Test to see if user can submit images to questions.
+
+        Args:
+            skill_id: str. The skill ID.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            PageNotFoundException. The given page cannot be found.
+            UnauthorizedUserException. The user does not have the
+                credentials to edit the given skill.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+            return handler(self, skill_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to submit images to questions.')
+
+    test_can_submit_images_to_questions.__wrapped__ = True
+    return test_can_submit_images_to_questions
 
 
 def can_delete_skill(handler):
@@ -3301,7 +3447,9 @@ def get_decorator_for_accepting_suggestion(decorator):
                     'Invalid format for suggestion_id.'
                     ' It must contain 3 parts separated by \'.\'')
 
-            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            suggestion = suggestion_services.get_suggestion_by_id(
+                suggestion_id, strict=False
+            )
 
             if suggestion is None:
                 raise self.PageNotFoundException
@@ -3407,22 +3555,32 @@ def can_edit_entity(handler):
         # for the corresponding decorators.
         reduced_handler = functools.partial(
             arg_swapped_handler, entity_type)
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            return can_edit_exploration(reduced_handler)(
-                self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
-            return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_SKILL:
-            return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_STORY:
-            return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_BLOG_POST:
-            return (
-                can_edit_blog_post(reduced_handler)(self, entity_id, **kwargs))
-        else:
+        functions = {
+            feconf.ENTITY_TYPE_EXPLORATION: lambda entity_id: (
+                can_edit_exploration(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_QUESTION: lambda entity_id: (
+                can_edit_question(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_TOPIC: lambda entity_id: (
+                can_edit_topic(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_SKILL: lambda entity_id: (
+                can_edit_skill(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS: lambda entity_id: (
+                can_submit_images_to_questions(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_STORY: lambda entity_id: (
+                can_edit_story(reduced_handler)(
+                    self, entity_id, **kwargs)),
+            feconf.ENTITY_TYPE_BLOG_POST: lambda entity_id: (
+                can_edit_blog_post(reduced_handler)(
+                    self, entity_id, **kwargs))
+        }
+        if entity_type not in dict.keys(functions):
             raise self.PageNotFoundException
+        return functions[entity_type](entity_id)
 
     test_can_edit_entity.__wrapped__ = True
 
@@ -3564,7 +3722,9 @@ def can_update_suggestion(handler):
                 'Invalid format for suggestion_id.' +
                 ' It must contain 3 parts separated by \'.\'')
 
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
 
         if suggestion is None:
             raise self.PageNotFoundException

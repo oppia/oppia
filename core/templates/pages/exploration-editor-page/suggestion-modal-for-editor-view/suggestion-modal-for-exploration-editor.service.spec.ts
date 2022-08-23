@@ -58,6 +58,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
       answer_groups: [{
         outcome: {
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: ''
@@ -79,6 +80,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
       }, {
         outcome: {
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: ''
@@ -116,6 +118,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
       }],
       default_outcome: {
         dest: 'default',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: ''
@@ -139,7 +142,15 @@ describe('Suggestion Modal For Exploration Editor', () => {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {

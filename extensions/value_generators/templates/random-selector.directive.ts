@@ -19,7 +19,7 @@
 interface RandomSelectorCustomScope extends ng.IScope {
   $ctrl?: {
     generatorId?: string;
-  }
+  };
   getTemplateUrl?: (() => string);
 }
 

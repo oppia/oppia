@@ -27,7 +27,7 @@ require(
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.component.ts');
@@ -59,15 +59,12 @@ require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.component.ts');
-require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'conversation-skin.directive.ts');
+  'conversation-skin.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.component.ts');
@@ -137,7 +134,6 @@ require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/page-title.service.ts');
-require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-top-answers-stats-backend-api.service.ts');
 require('services/state-top-answers-stats.service.ts');
@@ -156,11 +152,12 @@ require('services/ngb-modal.service.ts');
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
 import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
+import { HelpModalComponent } from './modal-templates/help-modal.component';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+    '$location', '$q', '$rootScope', '$scope', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -185,7 +182,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'UserService', 'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $uibModal, AlertsService,
+        $location, $q, $rootScope, $scope, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -214,6 +211,16 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
+      ctrl.explorationEditorPageHasInitialized = false;
+
+      // When the URL path changes, reroute to the appropriate tab in the
+      // Exploration editor page if back and forward button pressed in browser.
+      $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
+        if (newPath !== '') {
+          RouterService._changeTab(newPath);
+          $rootScope.$applyAsync();
+        }
+      });
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -240,6 +247,7 @@ angular.module('oppia').component('explorationEditorPage', {
       // Initializes the exploration page using data from the backend.
       // Called on page load.
       ctrl.initExplorationPage = () => {
+        EditabilityService.lockExploration(true);
         return $q.all([
           ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
@@ -250,10 +258,10 @@ angular.module('oppia').component('explorationEditorPage', {
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
-          ThreadDataBackendApiService.getOpenThreadsCountAsync(),
+          ThreadDataBackendApiService.getFeedbackThreadsAsync(),
           UserService.getUserInfoAsync()
         ]).then(async(
-            [explorationData, featuresData, openThreadsCount, userInfo]) => {
+            [explorationData, featuresData, _, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
@@ -283,6 +291,9 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
+          if (explorationData.edits_allowed) {
+            EditabilityService.lockExploration(false);
+          }
 
 
           ctrl.explorationTitleService = ExplorationTitleService;
@@ -337,7 +348,7 @@ angular.module('oppia').component('explorationEditorPage', {
           if (!RouterService.isLocationSetToNonStateEditorTab() &&
               !explorationData.states.hasOwnProperty(
                 RouterService.getCurrentStateFromLocationPath('gui'))) {
-            if (openThreadsCount > 0) {
+            if (ThreadDataBackendApiService.getOpenThreadsCount() > 0) {
               RouterService.navigateToFeedbackTab();
             } else {
               RouterService.navigateToMainTab();
@@ -389,6 +400,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
+          ctrl.explorationEditorPageHasInitialized = true;
           $scope.$applyAsync();
         });
       };
@@ -478,12 +490,8 @@ angular.module('oppia').component('explorationEditorPage', {
         SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/modal-templates/' +
-              'help-modal.template.html'),
+        NgbModal.open(HelpModalComponent, {
           backdrop: true,
-          controller: 'HelpModalController',
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
@@ -491,6 +499,7 @@ angular.module('oppia').component('explorationEditorPage', {
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
             StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
+          $rootScope.$applyAsync();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -566,6 +575,11 @@ angular.module('oppia').component('explorationEditorPage', {
             })
         );
         ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshTranslationTab.subscribe(() => {
+            $scope.$applyAsync();
+          })
+        );
+        ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
             () => {
               ctrl.startTranslationTutorial();
@@ -583,6 +597,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ctrl.explorationUrl = '/create/' + ctrl.explorationId;
         ctrl.explorationDownloadUrl = (
           '/createhandler/download/' + ctrl.explorationId);
+        ctrl.checkRevertExplorationValidUrl = (
+          '/createhandler/check_revert_valid/' + ctrl.explorationId);
         ctrl.revertExplorationUrl = (
           '/createhandler/revert/' + ctrl.explorationId);
         ctrl.areExplorationWarningsVisible = false;

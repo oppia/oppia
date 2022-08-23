@@ -6,7 +6,7 @@
          uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
          tooltip-placement="bottom"
          ng-class="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
-      <button type="button" class="btn btn-light oppia-editor-publish-button protractor-test-publish-exploration"
+      <button type="button" class="btn btn-light oppia-editor-publish-button e2e-test-publish-exploration"
               ng-class="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
               ng-click="showPublishExplorationModal()"
               ng-disabled="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
@@ -33,18 +33,18 @@
 
   <li class="nav-item d-none d-sm-block" ng-if="isEditableOutsideTutorialMode()">
     <div uib-dropdown class="btn-group oppia-publish-button-container"
-         title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !connectedToInternet || !isExplorationSaveable()}">
+         title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()}">
       <button id="tutorialSaveButton"
-              class="btn btn-light oppia-save-draft-button protractor-test-save-changes"
-              ng-class="{'btn-success': connectedToInternet && isExplorationSaveable()}"
-              ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable()">
+              class="btn btn-light oppia-save-draft-button e2e-test-save-changes"
+              ng-class="{'btn-success': connectedToInternet && isExplorationSaveable() && !isLockedByAdmin()}"
+              ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()">
         <span ng-if="!saveIsInProcess">
           <span class="oppia-draft-label-container" ng-if="isPrivate()">
             <i class="material-icons md-18 oppia-save-publish-button-icon"
                alt="Save Draft">
               &#xE161;
             </i>
-            <span class="oppia-save-draft-button-label oppia-save-publish-button-label protractor-test-save-draft-message">Save Draft</span>
+            <span class="oppia-save-draft-button-label oppia-save-publish-button-label e2e-test-save-draft-message">Save Draft</span>
             <span class="d-none d-md-block oppia-num-changes-text" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
           <span class="oppia-publish-label-container" ng-if="!isPrivate()" title="Publish Changes">
@@ -52,7 +52,7 @@
                alt="Publish Changes">
               &#xE2C3;
             </i>
-            <span class="oppia-save-publish-button-label protractor-test-publish-changes-message">Publish Changes</span>
+            <span class="oppia-save-publish-button-label e2e-test-publish-changes-message">Publish Changes</span>
             <span class="d-none d-md-block oppia-num-changes-count-text" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
         </span>
@@ -66,11 +66,11 @@
           <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
         </span>
       </button>
-      <button type="button" class="btn btn-light uib-dropdown-toggle oppia-discard-button protractor-test-save-discard-toggle dropdown-toggle"
+      <button type="button" class="btn btn-light uib-dropdown-toggle oppia-discard-button e2e-test-save-discard-toggle dropdown-toggle"
               ng-disabled="!connectedToInternet || !getChangeListLength()" uib-dropdown-toggle aria-label="Discard Draft">
       </button>
       <ul uib-dropdown-menu ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength()}" class="dropdown-item nav-item protractor-test-discard-changes">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength()}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></li>
       </ul>
     </div>
   </li>

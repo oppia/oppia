@@ -1,0 +1,341 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-exploration-footer {
+  background-color: #094142;
+  color: #fff;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 13px;
+  height: 42px;
+  line-height: 0;
+  margin-top: 30px;
+  width: 100%;
+}
+
+.oppia-exploration-footer .exploration-footer-img {
+  height: 60px;
+  margin: -31px 5px 0 10px;
+  width: 60px;
+}
+
+.oppia-exploration-footer .author-profile {
+  color: #fff;
+  display: flex;
+  list-style-type: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.oppia-exploration-footer .author-profile-dropdown-menu li > a {
+  color: #094142;
+  padding: 3px 6px;
+}
+
+.oppia-exploration-footer .author-profile a:hover {
+  text-decoration: none;
+}
+
+.oppia-exploration-footer .author-profile li {
+  float: left;
+}
+
+.oppia-exploration-footer .author-profile .hover-link {
+  background-color: #094142;
+  width: 190px;
+}
+
+.oppia-exploration-footer .author-profile.hovered-text h4 {
+  color: #094142;
+}
+
+.oppia-exploration-footer .author-profile .hover-link:hover,
+.oppia-exploration-footer .author-profile .hover-link:focus {
+  background-color: #fff;
+  color: #094142;
+}
+
+.oppia-exploration-footer .author-profile-dropdown-menu {
+  border: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
+  float: left;
+  list-style-type: none;
+  /** ngbDropdownMenu adds inline styles which conflicts with our own.
+  *  The usage of !important is unavoidable here to override inline styles.
+  */
+  top: auto !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+.oppia-exploration-footer .author-profile-dropdown-menu li {
+  background: #fff;
+  color: #094142;
+  float: none;
+  padding: 15px 0;
+  text-align: left;
+  text-overflow: clip;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
+  background-color: #eee;
+  color: #888;
+}
+
+.oppia-exploration-footer .author-profile-text {
+  cursor: default;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 12px 0 17px 0;
+  padding-left: 6px;
+  text-align: left;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.oppia-exploration-footer .author-profile-text.not-hovered {
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.oppia-exploration-footer .author-profile-text.hovered-text,
+.oppia-exploration-footer .author-profile .hover-link:focus .author-profile-text {
+  color: #094142;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.oppia-exploration-footer .oppia-share-exploration-footer {
+  line-height: 0.6;
+  padding-right: 20px;
+  text-transform: uppercase;
+}
+
+.oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
+  display: block;
+  float: right;
+  margin: -8px;
+  padding-right: 20px;
+}
+
+.oppia-exploration-footer .close-tooltip {
+  background-color: black;
+  height: 100vh;
+  left: 0;
+  opacity: 0.4;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+}
+
+.oppia-exploration-footer .lesson-info-tooltip-add-ons {
+  left: 5px;
+}
+
+.oppia-exploration-footer .lesson-info-tooltip-add-ons::after {
+  margin-right: 163px;
+}
+
+.oppia-exploration-footer .lesson-info-tooltip-add-ons::before {
+  margin-right: 161px;
+}
+
+.oppia-exploration-footer .lesson-info-tooltip {
+  -webkit-animation: bounce 4s infinite;
+  animation: bounce 4s infinite;
+  background-color: #f5701b;
+  border: none;
+  border-radius: 5px;
+  bottom: 65px;
+  color: white;
+  display: flex;
+  font-size: 15px;
+  height: auto;
+  line-height: 1.2;
+  max-width: 340px;
+  min-width: 200px;
+  padding: 10px;
+  position: absolute;
+  z-index: 2;
+}
+
+.oppia-exploration-footer .lesson-info-tooltip::after,
+.oppia-exploration-footer .lesson-info-tooltip::before {
+  border: solid transparent;
+  content: " ";
+  left: 49.5%;
+  position: absolute;
+  top: 100%;
+}
+
+.oppia-exploration-footer .lesson-info-tooltip::after {
+  border-left: 2px solid transparent;
+  border-right: 15px solid transparent;
+}
+
+.oppia-exploration-footer .lesson-info-tooltip::before {
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 20px solid #f5701b;
+}
+
+@keyframes bounce {
+  0% {
+    -webkit-transform: translateY(0);
+  }
+  8% {
+    -webkit-transform: translateY(-75px);
+  }
+  10% {
+    -webkit-transform: translateY(0);
+  }
+  15% {
+    -webkit-transform: translateY(-13px);
+  }
+  20% {
+    -webkit-transform: translateY(0);
+  }
+  25% {
+    -webkit-transform: translateY(-5px);
+  }
+  30% {
+    -webkit-transform: translateY(0);
+  }
+  35% {
+    -webkit-transform: translateY(-2px);
+  }
+  40% {
+    -webkit-transform: translateY(0);
+  }
+}
+
+@media (max-width: 650px) {
+  .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
+    margin: 0 -8px;
+  }
+}
+
+.oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
+  float: left;
+}
+
+.oppia-exploration-footer .oppia-exploration-footer-container {
+  max-width: 800px;
+}
+
+.oppia-exploration-footer .oppia-navbar-footer-info-icon {
+  height: 56px;
+  padding: 12px;
+}
+
+.oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
+  background: #fff;
+  color: #009688;
+  height: 56px;
+  padding: 12px;
+}
+
+.oppia-footer-info-icon {
+  background-color: #fff;
+  border-radius: 50%;
+  color: #094142;
+  font-size: 20px;
+  margin-left: 7px;
+}
+
+.oppia-lesson-info {
+  background: none;
+  border: none;
+  display: flex;
+  list-style-type: none;
+  padding-left: 0;
+  padding-top: 10px;
+}
+
+.oppia-lesson-info-header {
+  color: #fff;
+  cursor: pointer;
+  display: block;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 17px;
+  font-weight: normal;
+}
+
+.oppia-lesson-info-card {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  padding: 0 0 6px 0;
+  text-align: left;
+}
+
+.oppia-lesson-info-card .oppia-lesson-exploration-progress-info {
+  padding: 0 20px 20px 20px;
+}
+
+.oppia-lesson-info-card .oppia-story-title {
+  color: #3b3b3b;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 13px;
+  margin-bottom: -10px;
+  padding: 20px 20px 0;
+  text-align: left;
+}
+
+.oppia-lesson-info-card .oppia-lesson-info-content {
+  padding-bottom: 0;
+}
+
+.oppia-lesson-info-card .oppia-exploration-description {
+  color: #333;
+  font-size: 15px;
+  font-weight: normal;
+  padding-bottom: 10px;
+}
+
+.oppia-lesson-info .oppia-exploration-info-icon {
+  cursor: pointer;
+}
+
+.oppia-exploration-footer .oppia-close-popover-button {
+  outline: none;
+  padding: 0;
+  right: 0;
+  top: 0;
+}
+
+@media (max-width: 475px) {
+  .oppia-exploration-footer-sharing-links {
+    display: none;
+  }
+
+  .oppia-exploration-footer .lesson-info-tooltip {
+    font-size: 14px;
+    height: auto;
+    margin-right: 10px;
+    padding: 16px 8px 16px 8px;
+  }
+}
+
+@media (max-width: 658px) {
+  .oppia-exploration-footer .oppia-share-exploration-footer {
+    display: none;
+  }
+  .oppia-exploration-footer .oppia-navbar-footer-info-icon {
+    margin-top: -3px;
+  }
+  .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
+    margin-top: -3px;
+  }
+}
+
+@media (min-width: 768px) {
+  .oppia-exploration-footer .oppia-exploration-footer-info-icon {
+    display: none;
+  }
+}

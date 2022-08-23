@@ -27,10 +27,14 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SearchService, SelectionDetails } from 'services/search.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslateService } from '@ngx-translate/core';
+
+import './search-bar.component.css';
+
 
 interface SearchDropDownCategories {
   id: string;
@@ -48,7 +52,7 @@ interface LanguageIdAndText {
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   searchBarPlaceholder!: string;
   categoryButtonText!: string;
@@ -61,6 +65,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
   classroomPageIsActive: boolean = false;
+  searchButtonIsActive: boolean = false;
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
@@ -70,6 +75,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
+    private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private urlService: UrlService,
     private navigationService: NavigationService,
@@ -80,6 +86,17 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   ) {
     this.classroomPageIsActive = (
       this.urlService.getPathname().startsWith('/learn'));
+    this.isSearchButtonActive();
+  }
+
+  isMobileViewActive(): boolean {
+    return this.windowDimensionsService.getWidth() <= 766;
+  }
+
+  isSearchButtonActive(): boolean {
+    this.searchButtonIsActive = this.classroomPageIsActive ||
+      this.isMobileViewActive();
+    return this.searchButtonIsActive;
   }
 
   isSearchInProgress(): boolean {
@@ -87,7 +104,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (!this.classroomPageIsActive) {
+    if (!this.searchButtonIsActive) {
       this.searchQueryChanged.next(e.target.value);
     }
   }
@@ -143,9 +160,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       'I18N_LIBRARY_N_' + itemsName.toUpperCase());
     this.translationData[itemsName + 'Count'] = totalCount;
 
-    // TODO(milit): When the language changes, the translations won't
-    // change until the user changes the selection and this function is
-    // re-executed.
     if (selectedItems.length > 0) {
       let translatedItems = [];
       for (let i = 0; i < selectedItems.length; i++) {
@@ -169,12 +183,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
+    this.refreshSearchBarLabels();
   }
 
   onSearchQueryChangeExec(): void {
@@ -208,9 +224,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.selectionDetails.categories.selections = {};
     this.selectionDetails.languageCodes.selections = {};
 
-    this.updateSelectionDetails('categories');
-    this.updateSelectionDetails('languageCodes');
-
     let newQuery = (
       this.searchService.updateSearchFieldsBasedOnUrlQuery(
         this.windowRef.nativeWindow.location.search, this.selectionDetails));
@@ -219,6 +232,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.searchQuery = newQuery;
       this.onSearchQueryChangeExec();
     }
+
+    this.updateSelectionDetails('categories');
+    this.updateSelectionDetails('languageCodes');
+    this.refreshSearchBarLabels();
   }
 
   refreshSearchBarLabels(): void {
@@ -283,6 +300,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     for (let itemsType in this.selectionDetails) {
       this.updateSelectionDetails(itemsType);
     }
+
+    this.refreshSearchBarLabels();
 
     this.searchQueryChanged
       .pipe(debounceTime(1000), distinctUntilChanged())

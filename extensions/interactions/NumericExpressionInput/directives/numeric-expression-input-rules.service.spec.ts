@@ -32,9 +32,10 @@ describe('Numeric expression input rules service', () => {
     inputString = '6-(-4)';
 
     expect(neirs.MatchesExactlyWith('6-(-4)', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith('-(-4)+6', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith('6+4', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesExactlyWith('6 - (-4)', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith('-(-4)+6', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesExactlyWith('6+4', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('10', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('3*2-(-4)', {x: inputString})).toBeFalse();
 
@@ -42,10 +43,10 @@ describe('Numeric expression input rules service', () => {
     inputString = '3*10^(-5)';
 
     expect(neirs.MatchesExactlyWith('3*10^(-5)', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith('3/10^5', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith(
-      '(10^(-5))*3', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith('3/10^5', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesExactlyWith(
+      '(10^(-5))*3', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith(
       '30*10^(-6)', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('0.00003', {x: inputString})).toBeFalse();
@@ -57,9 +58,9 @@ describe('Numeric expression input rules service', () => {
 
     expect(neirs.MatchesExactlyWith(
       '1000 + 200 + 30 + 4 + 0.5 + 0.06', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith(
-      '0.06 + 0.5 + 4 + 30 + 200 + 1000', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith(
+      '0.06 + 0.5 + 4 + 30 + 200 + 1000', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('1234.56', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith(
       '1234 + 56/10', {x: inputString})).toBeFalse();
@@ -69,16 +70,81 @@ describe('Numeric expression input rules service', () => {
 
     inputString = '2*2*3*3';
 
-    expect(neirs.MatchesExactlyWith(
-      '2*2*3*3', {x: inputString})).toBeTrue();
-    expect(neirs.MatchesExactlyWith(
-      '2*3*2*3', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesExactlyWith('2*2*3*3', {x: inputString})).toBeTrue();
 
+    expect(neirs.MatchesExactlyWith('2*3*2*3', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('2*2*3*2*1', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('2*2*9', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('4*3^2', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('8/2 * 3*3', {x: inputString})).toBeFalse();
     expect(neirs.MatchesExactlyWith('36', {x: inputString})).toBeFalse();
+  });
+
+  it('should have a correct MatchesUpToTrivialManipulations rule', () => {
+    inputString = '6-(-4)';
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '6-(-4)', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '-(-4)+6', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '6+4', {x: inputString})).toBeTrue();
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '10', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '3*2-(-4)', {x: inputString})).toBeFalse();
+
+
+    inputString = '3*10^(-5)';
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '3*10^(-5)', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '(10^(-5))*3', {x: inputString})).toBeTrue();
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '30*10^(-6)', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '0.00003', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '3*10^(-1)*10^(-4)', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '3/10^5', {x: inputString})).toBeFalse();
+
+
+    inputString = '1000 + 200 + 30 + 4 + 0.5 + 0.06';
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '1000 + 200 + 30 + 4 + 0.5 + 0.06', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '0.06 + 0.5 + 4 + 30 + 200 + 1000', {x: inputString})).toBeTrue();
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '1234.56', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '1234 + 56/10', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '1230 + 4.56', {x: inputString})).toBeFalse();
+
+
+    inputString = '2*2*3*3';
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '2*2*3*3', {x: inputString})).toBeTrue();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '2*3*2*3', {x: inputString})).toBeTrue();
+
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '2*2*3*2*1', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '2*2*9', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '4*3^2', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '8/2 * 3*3', {x: inputString})).toBeFalse();
+    expect(neirs.MatchesUpToTrivialManipulations(
+      '36', {x: inputString})).toBeFalse();
   });
 
   it('should have a correct IsEquivalentTo rule', () => {
@@ -135,97 +201,5 @@ describe('Numeric expression input rules service', () => {
 
     expect(neirs.IsEquivalentTo('2*2*3', {x: inputString})).toBeFalse();
     expect(neirs.IsEquivalentTo('2*3*3*3', {x: inputString})).toBeFalse();
-  });
-
-  it('should have a correct ContainsSomeOf rule', () => {
-    inputString = '6-(-4)';
-
-    expect(neirs.ContainsSomeOf('6+4', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('4', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('6-(-4)', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('-4', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('-4+(-6)', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('10', {x: inputString})).toBeFalse();
-
-
-    inputString = '3*10^(-5)';
-
-    expect(neirs.ContainsSomeOf('3*10^(-5)', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('3/10^5', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('3*10^5', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('3', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('10^(-5)', {x: inputString})).toBeFalse();
-
-
-    inputString = '1000 + 200 + 30 + 4 + 0.5 + 0.06';
-
-    expect(neirs.ContainsSomeOf(
-      '1000 + 200 + 30 + 4 + 0.5 + 0.06', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf(
-      '1000 + 200 + 4 + 0.5', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('1000 + 234.56', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('0.06', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('1234.56', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('123456/100', {x: inputString})).toBeFalse();
-
-
-    inputString = '2*2*3*3';
-
-    expect(neirs.ContainsSomeOf('2*2*3*3', {x: inputString})).toBeTrue();
-    expect(neirs.ContainsSomeOf('2*3*3*2', {x: inputString})).toBeTrue();
-
-    expect(neirs.ContainsSomeOf('2*2*3', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('36', {x: inputString})).toBeFalse();
-    expect(neirs.ContainsSomeOf('72/2', {x: inputString})).toBeFalse();
-  });
-
-  it('should have a correct OmitsSomeOf rule', () => {
-    inputString = '6-(-4)';
-
-    expect(neirs.OmitsSomeOf('6', {x: inputString})).toBeTrue();
-    expect(neirs.OmitsSomeOf('6-4', {x: inputString})).toBeTrue();
-    expect(neirs.OmitsSomeOf('4', {x: inputString})).toBeTrue();
-
-    expect(neirs.OmitsSomeOf('6-(-4)', {x: inputString})).toBeFalse();
-    expect(neirs.OmitsSomeOf('4+6', {x: inputString})).toBeFalse();
-
-
-    inputString = '3*10^(-5)';
-
-    expect(neirs.OmitsSomeOf('3*10^5', {x: inputString})).toBeTrue();
-    expect(neirs.OmitsSomeOf('3', {x: inputString})).toBeTrue();
-    expect(neirs.OmitsSomeOf('10^(-5)', {x: inputString})).toBeTrue();
-
-    expect(neirs.OmitsSomeOf('3*10^(-5)', {x: inputString})).toBeFalse();
-    expect(neirs.OmitsSomeOf('3/10^5', {x: inputString})).toBeFalse();
-
-
-    inputString = '1000 + 200 + 30 + 4 + 0.5 + 0.06';
-
-    expect(neirs.OmitsSomeOf(
-      '1000 + 200 + 30 + 4 + 0.56', {x: inputString})).toBeTrue();
-    expect(neirs.OmitsSomeOf(
-      '1000 + 200 + 30 + 0.5 + 0.06', {x: inputString})).toBeTrue();
-
-    expect(neirs.OmitsSomeOf(
-      '1000 + 200 + 30 + 4 + 0.5 + 0.06', {x: inputString})).toBeFalse();
-    expect(neirs.OmitsSomeOf(
-      '0.06 + 0.5 + 4 + 30 + 200 + 1000', {x: inputString})).toBeFalse();
-    expect(neirs.OmitsSomeOf(
-      '1000 + 200 + 30 + 4 + 0.5 + 0.06 + 0.07', {x: inputString})).toBeFalse();
-
-
-    inputString = '2*2*3*3';
-
-    expect(neirs.OmitsSomeOf('2*2*3', {x: inputString})).toBeTrue();
-    expect(neirs.OmitsSomeOf('36', {x: inputString})).toBeTrue();
-    expect(neirs.OmitsSomeOf('72/2', {x: inputString})).toBeTrue();
-
-    expect(neirs.OmitsSomeOf('2*2*3*3', {x: inputString})).toBeFalse();
-    expect(neirs.OmitsSomeOf('2*3*3*2', {x: inputString})).toBeFalse();
-    expect(neirs.OmitsSomeOf('2*3*3*2 + 2', {x: inputString})).toBeFalse();
   });
 });

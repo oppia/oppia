@@ -32,7 +32,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 class MockRemoveActivityNgbModalRef {
-  componentInstance: {
+  componentInstance = {
     sectionNameI18nId: null,
     subsectionName: null,
     activityId: null,
@@ -568,7 +568,6 @@ describe('Community lessons tab Component', () => {
         .toBeUndefined;
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')
@@ -619,7 +618,6 @@ describe('Community lessons tab Component', () => {
         .toBeUndefined;
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')
@@ -662,7 +660,6 @@ describe('Community lessons tab Component', () => {
         .toBeUndefined;
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')
@@ -713,7 +710,6 @@ describe('Community lessons tab Component', () => {
         .toBeUndefined;
 
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockRemoveActivityNgbModalRef,
             result: Promise.resolve('success')

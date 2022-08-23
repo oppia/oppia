@@ -3,20 +3,20 @@
      #dropArea>
   <div class="image-uploader-text" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
   <span *ngIf="errorMessage"
-        class="image-uploader-error-message protractor-test-upload-error">
+        class="image-uploader-error-message e2e-test-upload-error">
     <i class="material-icons">&#xE002;</i>
     {{ errorMessage }}
   </span>
   <span class="image-uploader-license-warning" *ngIf="!isBlogPostThumbnailUploader">
     Before uploading images, please ensure that they are<br>
-    compatible with the <a href="/license" [routerLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site.<br>
+    compatible with the <a href="/license" [smartRouterLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site.<br>
     Please do not upload watermarked images.
   </span>
   <label for="image-file-input" class="image-uploader-upload-label-button" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
   <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
   <input type="file" id="image-file-input" (click)="this.value = null"
          (change)="handleFile()"
-         class="image-uploader-file-input protractor-test-photo-upload-input"
+         class="image-uploader-file-input e2e-test-photo-upload-input"
          [ngClass]="fileInputClassName" #imageInput>
   <label *ngIf="isBlogPostThumbnailUploader"
          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
@@ -78,12 +78,12 @@
 
   label.image-uploader-upload-label-button {
     background: grey;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #F2F2F2), color-stop(1, #BFBFBF));
-    background-image: -o-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
-    background-image: -moz-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
-    background-image: -webkit-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
-    background-image: -ms-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
-    background-image: linear-gradient(to bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f2f2f2), color-stop(1, #bfbfbf));
+    background-image: -o-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: -moz-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: -webkit-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: -ms-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
+    background-image: linear-gradient(to bottom, #f2f2f2 0%, #bfbfbf 100%);
     border: solid #707070 1px;
     border-radius: 2px;
     bottom: 6px;
@@ -98,23 +98,23 @@
   }
 
   label.image-uploader-upload-label-button:hover {
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #EAF6FD), color-stop(1, #A7D8F5));
-    background-image: -o-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
-    background-image: -moz-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
-    background-image: -webkit-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
-    background-image: -ms-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
-    background-image: linear-gradient(to bottom, #EAF6FD 0%, #A7D8F5 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eaf6fd), color-stop(1, #a7d8f5));
+    background-image: -o-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: -moz-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: -webkit-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: -ms-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
+    background-image: linear-gradient(to bottom, #eaf6fd 0%, #a7d8f5 100%);
     border: #3c7fb1 solid 1px;
     cursor: pointer;
   }
 
   label.image-uploader-upload-label-button:active {
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #E5F4FC), color-stop(0.5, #C4E5F6), color-stop(0.51, #98D0EF), color-stop(1, #68B3DB));
-    background-image: -o-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
-    background-image: -moz-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
-    background-image: -webkit-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
-    background-image: -ms-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
-    background-image: linear-gradient(to bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e5f4fc), color-stop(0.5, #c4e5f6), color-stop(0.51, #98d0ef), color-stop(1, #68b3db));
+    background-image: -o-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: -moz-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: -webkit-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: -ms-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
+    background-image: linear-gradient(to bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
     border: solid #2c628b 1px;
     padding: 4px 8px;
   }
@@ -163,12 +163,22 @@
       font-weight: 300 !important;
     }
 
+    .image-uploader-license-warning {
+      bottom: 50px;
+    }
+
     .blog-post-narrow-thumbnail-uploader {
       height: 40px;
     }
 
-    .narrow-image-uploader-area {
-      width: 66.667vw
+    .image-uploader-drop-area {
+      padding-top: 8px;
+      text-align: left;
+    }
+
+    label.image-uploader-upload-label-button {
+      left: 8px;
+      right: auto;
     }
 
     .blog-post-thumbnail-uploader.image-uploader-is-narrow,

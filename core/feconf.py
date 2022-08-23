@@ -20,11 +20,13 @@ from __future__ import annotations
 
 import copy
 import datetime
+import enum
 import os
 
 from core.constants import constants
 
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, Union
+from typing_extensions import Final, TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -37,6 +39,31 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 # The values which a post_commit_status can have: public, private.
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
+
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
+
+class RteTypeTextAngularDict(TypedDict):
+    """Dict representing RTE_TYPE_TEXTANGULAR Dictionary."""
+
+    ALLOWED_PARENT_LIST: Dict[str, List[str]]
+    ALLOWED_TAG_LIST: List[str]
+
+
+# Supported object types for ParamSpec.
+SUPPORTED_OBJ_TYPES = {
+    'UnicodeString',
+}
+
 
 # Whether to unconditionally log info messages.
 DEBUG = False
@@ -69,8 +96,6 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
-INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
-    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs_by_state_version'))
 INTERACTIONS_SPECS_FILE_PATH = (
     os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
@@ -105,13 +130,61 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
 LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
     'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
 
+
+# Valid model names.
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
+    """Enum for valid model names."""
+
+    activity = 'activity' # pylint: disable=invalid-name
+    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
+    audit = 'audit' # pylint: disable=invalid-name
+    base_model = 'base_model' # pylint: disable=invalid-name
+    beam_job = 'beam_job' # pylint: disable=invalid-name
+    blog = 'blog' # pylint: disable=invalid-name
+    classifier = 'classifier' # pylint: disable=invalid-name
+    classroom = 'classroom' # pylint: disable=invalid-name
+    collection = 'collection' # pylint: disable=invalid-name
+    config = 'config' # pylint: disable=invalid-name
+    email = 'email' # pylint: disable=invalid-name
+    exploration = 'exploration' # pylint: disable=invalid-name
+    feedback = 'feedback' # pylint: disable=invalid-name
+    improvements = 'improvements' # pylint: disable=invalid-name
+    job = 'job' # pylint: disable=invalid-name
+    learner_group = 'learner_group' # pylint: disable=invalid-name
+    opportunity = 'opportunity' # pylint: disable=invalid-name
+    question = 'question' # pylint: disable=invalid-name
+    recommendations = 'recommendations' # pylint: disable=invalid-name
+    skill = 'skill' # pylint: disable=invalid-name
+    statistics = 'statistics' # pylint: disable=invalid-name
+    auth = 'auth' # pylint: disable=invalid-name
+    story = 'story' # pylint: disable=invalid-name
+    subtopic = 'subtopic' # pylint: disable=invalid-name
+    suggestion = 'suggestion' # pylint: disable=invalid-name
+    topic = 'topic' # pylint: disable=invalid-name
+    translation = 'translation' # pylint: disable=invalid-name
+    user = 'user' # pylint: disable=invalid-name
+
+
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
 # However, we do have the necessary storage infrastructure to support multiple
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.
-INTERACTION_CLASSIFIER_MAPPING = {
+
+
+class ClassifierDict(TypedDict):
+    """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
+
+    algorithm_id: str
+    algorithm_version: int
+
+
+INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierDict] = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
         'algorithm_version': 1
@@ -125,7 +198,7 @@ TRAINING_JOB_STATUS_FAILED = 'FAILED'
 TRAINING_JOB_STATUS_NEW = 'NEW'
 TRAINING_JOB_STATUS_PENDING = 'PENDING'
 
-ALLOWED_TRAINING_JOB_STATUSES = [
+ALLOWED_TRAINING_JOB_STATUSES: List[str] = [
     TRAINING_JOB_STATUS_COMPLETE,
     TRAINING_JOB_STATUS_FAILED,
     TRAINING_JOB_STATUS_NEW,
@@ -149,7 +222,7 @@ ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
-ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+ALLOWED_TRAINING_JOB_STATUS_CHANGES: Dict[str, List[str]] = {
     TRAINING_JOB_STATUS_COMPLETE: [],
     TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
     TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
@@ -209,7 +282,7 @@ DEFAULT_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
 # for suggestions.
-DEFAULT_SUGGESTION_QUERY_LIMIT = 100
+DEFAULT_SUGGESTION_QUERY_LIMIT = 1000
 
 # The maximum number of results to retrieve in a datastore query
 # for top rated published explorations in /library page.
@@ -261,7 +334,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 49
+CURRENT_STATE_SCHEMA_VERSION = 52
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -359,7 +432,10 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
-DEFAULT_AUTO_TTS_ENABLED = True
+DEFAULT_AUTO_TTS_ENABLED = False
+# Whether new explorations should have correctness-feedback enabled
+# by default.
+DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -500,7 +576,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.1.4'
+OPPIA_VERSION = '3.2.7'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -612,13 +688,16 @@ MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-DEFAULT_SALUTATION_HTML_FN = (
+DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
-DEFAULT_SIGNOFF_HTML_FN = (
+DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
     lambda sender_username: (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
-VALID_MODERATOR_ACTIONS = {
+VALID_MODERATOR_ACTIONS: Dict[
+    str,
+    Dict[str, Union[str, Callable[[str], str]]]
+] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (
@@ -849,6 +928,7 @@ CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
+EXPLORATION_IMAGE_UPLOAD_PREFIX = '/createhandler/imageupload'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_LEARNER_ANSWER_DETAILS = (
@@ -878,6 +958,8 @@ LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
     '/learnerdashboardtopicsandstoriesprogresshandler/data')
+LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
+    '/learnercompletedchapterscounthandler/data')
 LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
@@ -898,6 +980,7 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
+METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -922,6 +1005,7 @@ EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
+REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -934,6 +1018,7 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
+STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -974,6 +1059,12 @@ USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
+FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
+FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
+CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
+CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
+CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+CLASSROOM_HANDLER_URL = '/classroom'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1143,7 +1234,7 @@ RTE_FORMAT_TEXTANGULAR = 'text-angular'
 RTE_FORMAT_CKEDITOR = 'ck-editor'
 
 # RTE content specifications according to the type of the editor.
-RTE_CONTENT_SPEC = {
+RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
         'ALLOWED_PARENT_LIST': {
@@ -1303,49 +1394,62 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
     'optional_attribute_names': [],
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
-        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES}
+        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES
+    },
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_ROLE,
     'required_attribute_names': ['removed_user_id', 'old_role'],
     'optional_attribute_names': [],
     'user_id_attribute_names': ['removed_user_id'],
-    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES}
+    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
     'required_attribute_names': [
         'old_viewable_if_private', 'new_viewable_if_private'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_RELEASE_OWNERSHIP,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
     'required_attribute_names': [
         'old_first_published_msec', 'new_first_published_msec'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = copy.deepcopy(
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1356,7 +1460,8 @@ COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
-    }
+    },
+    'deprecated_values': {}
 })
 
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
@@ -1388,11 +1493,13 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
@@ -1400,27 +1507,36 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
         'new_role': ALLOWED_TOPIC_ROLES, 'old_role': ALLOWED_TOPIC_ROLES
-    }
+    },
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_MANAGER_ROLE,
     'required_attribute_names': ['removed_user_id'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': ['removed_user_id']
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_PUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UNPUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
 USER_ID_RANDOM_PART_LENGTH = 32
@@ -1452,9 +1568,9 @@ CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
 }
 
 # Constants defining various suggestion types.
-SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
-SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
-SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+SUGGESTION_TYPE_EDIT_STATE_CONTENT: Final = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT: Final = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION: Final = 'add_question'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
@@ -1488,3 +1604,39 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 # '/access_validation_handler/<handler_name>'
 # example '/access_validation_handler/validate_access_to_splash_page'.
 ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'
+
+# The possible commit types.
+COMMIT_TYPE_CREATE = 'create'
+COMMIT_TYPE_REVERT = 'revert'
+COMMIT_TYPE_EDIT = 'edit'
+COMMIT_TYPE_DELETE = 'delete'
+
+# Interaction IDs of math related interactions.
+MATH_INTERACTION_IDS = [
+    'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput']
+
+# The task entry ID template used by the task entry model.
+TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
+
+# The composite entity ID template used by the task entry model.
+COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
+
+# The data type for the translated or translatable content in any
+# BaseTranslatableObject.
+ContentValueType = Union[str, List[str]]
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content_value: ContentValueType
+    needs_update: bool

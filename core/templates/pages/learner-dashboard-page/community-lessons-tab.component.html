@@ -1,18 +1,18 @@
 <div class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
-  <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
+  <p class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
   </p>
   <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
     <span class="view-text" [ngStyle]="displayInCommunityLessons.length !== 0 && {'right': '100px'}">
-      View
+      <span>{{ 'I18N_LEARNER_DASHBOARD_VIEW' | translate }}</span>
     </span>
     <button (click)="toggleDropdown()" class="dropbtn">
       {{selectedSection}}
       <i class="fa fa-caret-down dropdown-icon"></i>
     </button>
     <div class="dropdown-content" *ngIf="dropdownEnabled">
-      <p (click)="changeSection(all)">All</p>
-      <p (click)="changeSection(completed)">Completed</p>
-      <p (click)="changeSection(incomplete)">Incomplete</p>
+      <p (click)="changeSection(all)"><span>{{ 'I18N_LEARNER_DASHBOARD_ALL' | translate }}</span></p>
+      <p (click)="changeSection(completed)"><span>{{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }}</span></p>
+      <p (click)="changeSection(incomplete)"><span>{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE' | translate }}</span></p>
     </div>
     <div class="pagination" *ngIf="displayInCommunityLessons.length !== 0">
       <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page" (click)="changePageByOne(moveToPrevPage, 'communityLessons')"></i>
@@ -25,17 +25,17 @@
     </div>
   </div>
   <div *ngIf="noCommunityLessonActivity">
-    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></p>
+    <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></p>
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
-       [routerLink]="communityLibraryUrl"
+       [smartRouterLink]="communityLibraryUrl"
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div class="incomplete-section protractor-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
+  <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
-      <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
+      <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
       </p>
       <div class="summary-container">
         <div *ngFor="let summaryTile of displayIncompleteLessonsList"
@@ -86,20 +86,20 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="!showMoreInSection['incomplete']">
-                  Show More
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="showMoreInSection['incomplete']">
-                  Show Less
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div class="completed-section protractor-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
+  <div class="completed-section e2e-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalCompletedLessonsList.length !== 0">
-      <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
+      <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
       </p>
       <div class="summary-container">
         <span class="oppia-learner-dashboard-nonexistent-exploration" *ngIf="completedToIncompleteCollections.length !== 0">
@@ -156,12 +156,12 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="!showMoreInSection['completed']">
-                  Show More
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="showMoreInSection['completed']">
-                  Show Less
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
@@ -170,7 +170,8 @@
   <div class="community-lessons-mobile-view" *ngIf="windowIsNarrow">
     <span class="oppia-learner-dashboard-nonexistent-exploration"
           *ngIf="completedToIncompleteCollections.length !== 0">
-      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
+      <span>
+        {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length} }}
       </span>
       <span>
         <ul>
@@ -249,15 +250,15 @@
     </div>
   </div>
 </div>
-<div class="playlist-section protractor-test-play-later-section">
-  <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
+<div class="playlist-section e2e-test-play-later-section">
+  <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
   </p>
   <div *ngIf="noPlaylistActivity">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></p>
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
-       [routerLink]="communityLibraryUrl">
+       [smartRouterLink]="communityLibraryUrl">
     </a>
   </div>
   <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
@@ -340,19 +341,19 @@
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="!showMoreInSection['playlist']">
-                Show More
+          <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
         </button>
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="showMoreInSection['playlist']">
-                Show Less
+          <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
         </button>
       </div>
     </div>
   </div>
 </div>
-<div class="subscriptions-section protractor-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
-  <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
+<div class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
+  <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"
       *ngFor="let subscription of subscriptionsList">
@@ -361,7 +362,7 @@
              class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary text-dark">
           <div class="oppia-subscription-name">
-            <strong class="protractor-test-subscription-name"
+            <strong class="e2e-test-subscription-name"
                     container="body"
                     triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
               {{ subscription.username| truncate:10 }}
@@ -378,319 +379,13 @@
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="!showMoreInSection['subscription'] && !windowIsNarrow">
-              Show More
+        <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
       </button>
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="showMoreInSection['subscription'] && !windowIsNarrow">
-              Show Less
+        <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
       </button>
     </div>
   </div>
 </div>
-<style>
-  .community-lessons-section,
-  .playlist-section,
-  .subscriptions-section {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px #0000001a;
-    margin-bottom: 25px;
-    min-height: 215px;
-    opacity: 1;
-    padding: 0 0 30px 0;
-    width: 726px;
-  }
-  .community-lessons-section .summary-container,
-  .playlist-section .summary-container,
-  .subscriptions-section .summary-container {
-    margin: auto;
-    width: 656px;
-  }
-  .community-lessons-section .oppia-dashboard-intro-button,
-  .playlist-section .oppia-dashboard-intro-button,
-  .subscriptions-section .oppia-dashboard-intro-button {
-    left: 40px;
-    position: relative;
-  }
-  .community-lessons-section .pagination,
-  .playlist-section .pagination {
-    bottom: 10px;
-    display: block;
-    list-style: none;
-    padding-left: 0;
-    position: relative;
-    text-align: end;
-    width: 250px;
-  }
-  .community-lessons-section .pagination-bottom,
-  .playlist-section .pagination-bottom {
-    bottom: 10px;
-    display: block;
-    list-style: none;
-    padding-top: 25px;
-    position: relative;
-    right: 41px;
-    text-align: end;
-  }
-  .community-lessons-section .pagination-dot,
-  .playlist-section .pagination-dot {
-    background-color: rgba(65, 152, 137, 0.15);
-    border-radius: 50%;
-    bottom: 4px;
-    display: inline-block;
-    height: 25px;
-    margin: 0 10px;
-    position: relative;
-    width: 25px;
-  }
-  .community-lessons-section .pagination-number,
-  .playlist-section .pagination-number {
-    color: black;
-    font-size: 15px;
-    margin: 0 7px;
-    opacity: 1;
-    position: relative;
-    right: 1px;
-  }
-  .community-lessons-section .pagination-arrow,
-  .playlist-section .pagination-arrow {
-    color: #CCC;
-    font-size: 25px;
-  }
-  .community-lessons-section .dropbtn {
-    background-color: #fff;
-    border: 1px solid;
-    bottom: 23px;
-    font-size: 14px;
-    height: 24px;
-    margin-bottom: 20px;
-    position: relative;
-    right: -163px;
-    width: 104px;
-  }
-  .community-lessons-section .dropdown-icon {
-    float: right;
-    position: relative;
-    right: 5px;
-    top: 2px;
-  }
-  .community-lessons-section .dropdown {
-    display: inline-block;
-    height: 0;
-    position: relative;
-  }
-  .community-lessons-section .view-text {
-    bottom: 22px;
-    float: right;
-    font-size: 16px;
-    font-weight: 500;
-    position: relative;
-  }
-  .community-lessons-section .dropdown-content {
-    background-color: #fff;
-    box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-    display: none;
-    max-width: 104px;
-    z-index: 1;
-  }
-  .community-lessons-section .dropdown-content a {
-    color: black;
-    display: block;
-    padding: 12px 16px;
-    text-decoration: none;
-  }
-  .community-lessons-section .dropdown-content a:hover {
-    background-color: #ddd;
-  }
-  .community-lessons-section .dropdown:hover .dropdown-content {
-    bottom: 43px;
-    display: block;
-    left: 164px;
-    margin-right: 0;
-    padding: 10px;
-    position: relative;
-  }
-  .community-lessons-section .lessons-title,
-  .playlist-section .lessons-title,
-  .subscriptions-section .lessons-title {
-    color: #00645C;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 24px;
-    letter-spacing: 0;
-    margin-bottom: 0;
-    opacity: 1;
-    padding: 34px 40px;
-    text-align: left;
-  }
-  .community-lessons-section .oppia-summary-tile-container,
-  .playlist-section .oppia-summary-tile-container {
-    display: inline-block;
-    padding: 0 10px 30px 0;
-  }
-  .community-lessons-section .empty-section,
-  .playlist-section .empty-section,
-  .subscriptions-section .empty-section {
-    padding: 0 113px 0 40px;
-  }
-  .community-lessons-section .remove-icon,
-  .playlist-section .remove-icon {
-    color: white;
-    float: right;
-    font-size: 20px;
-    left: -7px;
-    margin-left: -26px;
-    margin-top: 10px;
-    position: relative;
-    width: 18px;
-    z-index: 20;
-  }
-  .subscriptions-section .oppia-impact-text {
-    font-size: 14.5px;
-  }
-  .subscriptions-section .oppia-subscription-card {
-    background-color: #fff;
-    display: inline-block;
-    height: 90px;
-    margin: 8px 4px;
-    padding: 0;
-    width: 191px;
-  }
-  .community-lessons-section .oppia-learner-dashboard-nonexistent-exploration,
-  .playlist-section .oppia-learner-dashboard-nonexistent-exploration {
-    display: block;
-    padding: 5px 7.5px;
-  }
-  .community-lessons-section .oppia-mobile-view-icon {
-    margin-right: 16px;
-  }
-  .subscriptions-section .oppia-subscription-container-list {
-    margin: 0 8px 0 4px;
-    padding: 0 10px 30px 0;
-    width: 197px;
-  }
-  .subscriptions-section .oppia-subscriptions-container {
-    margin: auto;
-    width: 656px;
-  }
-  .subscriptions-section .oppia-subscription-name {
-    font-size: 17.5px;
-    margin-bottom: 5px;
-  }
-  .community-lessons-section .oppia-toggle-button-section,
-  .playlist-section .oppia-toggle-button-section,
-  .subscriptions-section .oppia-toggle-button-section {
-    margin: auto;
-    padding: 0 98px;
-    width: 50%;
-  }
-  .community-lessons-section .oppia-toggle-btn,
-  .playlist-section .oppia-toggle-btn,
-  .subscriptions-section .oppia-toggle-btn {
-    color: #00645C;
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: 0;
-    opacity: 1;
-    text-align: center;
-    text-transform: uppercase;
-  }
-  .community-lessons-section .sub-section-title {
-    color: #333;
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: 0;
-    margin-bottom: 0;
-    opacity: 1;
-    padding: 0 0 12px 40px;
-    text-align: left;
-  }
-  @media screen and (max-width: 767px) {
-    .community-lessons-section,
-    .playlist-section,
-    .subscriptions-section {
-      margin: auto;
-      margin-bottom: 20px;
-      width: 296px;
-    }
-    .community-lessons-section {
-      margin-top: 35px;
-    }
-    .community-lessons-section .summary-container,
-    .playlist-section .summary-container,
-    .subscriptions-section .summary-container {
-      width: 256px;
-    }
-    .community-lessons-section .oppia-summary-tile-container,
-    .playlist-section .oppia-summary-tile-container {
-      width: 272px;
-    }
-    .community-lessons-section .oppia-mobile-summary-tile-container {
-      padding: 13px;
-      width: 310px;
-    }
-    .community-lessons-section .empty-section,
-    .playlist-section .empty-section,
-    .subscriptions-section .empty-section {
-      padding: 0 40px;
-    }
-    .community-lessons-section .lessons-title,
-    .playlist-section .lessons-title,
-    .subscriptions-section .lessons-title {
-      font-size: 17px;
-      padding: 34px 24px;
-    }
-    .subscriptions-section .oppia-subscriptions-container {
-      width: 205px;
-    }
-    .community-lessons-section .remove-icon,
-    .playlist-section .remove-icon {
-      left: -40px;
-      top: 2px;
-    }
-    .community-lessons-section .oppia-learner-dashboard-icon {
-      right: 44px;
-      top: 12px;
-    }
-  }
-  @media screen and (min-width: 768px) and (max-width: 800px) {
-    .community-lessons-section,
-    .playlist-section,
-    .subscriptions-section {
-      right: 117px;
-      width: 726px;
-    }
-  }
-  @media screen and (min-width: 768px) and (max-width: 1200px) {
-    .community-lessons-section,
-    .playlist-section,
-    .subscriptions-section {
-      width: 726px;
-    }
-    .community-lessons-section {
-      margin-top: 35px;
-    }
-    .community-lessons-mobile-view {
-      display: flex;
-      margin: auto;
-      width: 650px;
-    }
-    .community-lessons-section .pagination-bottom,
-    .playlist-section .pagination-bottom {
-      display: none;
-    }
-    .community-lessons-section .oppia-mobile-summary-tile-container {
-      padding: 0 5px;
-    }
-    .community-lessons-section .pagination,
-    .playlist-section .pagination {
-      width: 670px;
-    }
-    .community-lessons-section .dropbtn {
-      left: 595px;
-    }
-    .community-lessons-section .dropdown:hover .dropdown-content {
-      left: 595px;
-    }
-  }
-</style>

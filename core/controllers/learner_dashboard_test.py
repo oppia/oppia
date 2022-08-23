@@ -26,6 +26,8 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import state_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
@@ -97,8 +99,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(
-            LearnerDashboardTopicsAndStoriesProgressHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -452,6 +453,127 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         self.logout()
 
 
+class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+
+    EXP_ID_1 = 'EXP_ID_1'
+    EXP_TITLE_1 = 'Exploration title 1'
+    EXP_ID_2 = 'EXP_ID_2'
+    EXP_TITLE_2 = 'Exploration title 2'
+    EXP_ID_3 = 'EXP_ID_3'
+    EXP_TITLE_3 = 'Exploration title 3'
+
+    COL_ID_1 = 'COL_ID_1'
+    COL_TITLE_1 = 'Collection title 1'
+    COL_ID_2 = 'COL_ID_2'
+    COL_TITLE_2 = 'Collection title 2'
+    COL_ID_3 = 'COL_ID_3'
+    COL_TITLE_3 = 'Collection title 3'
+
+    STORY_ID_1 = 'STORY_1'
+    STORY_TITLE_1 = 'Story title 1'
+    STORY_ID_2 = 'STORY_2'
+    STORY_TITLE_2 = 'Story title 2'
+    STORY_ID_3 = 'STORY_3'
+    STORY_TITLE_3 = 'Story title 3'
+
+    TOPIC_ID_1 = 'TOPIC_1'
+    TOPIC_NAME_1 = 'Topic title 1'
+    TOPIC_ID_2 = 'TOPIC_2'
+    TOPIC_NAME_2 = 'Topic title 2'
+    TOPIC_ID_3 = 'TOPIC_3'
+    TOPIC_NAME_3 = 'Topic title 3'
+
+    subtopic_0 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+        'dummy-subtopic-zero')
+
+    subtopic_1 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+        'dummy-subtopic-zero')
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_can_get_completed_chapters_count(self):
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, 'Title 1')
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+        changelist = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_1',
+            'title': 'Title 1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': 'node_1',
+            'old_value': None,
+            'new_value': self.EXP_ID_1
+        })]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_1, changelist,
+            'Added first node.')
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.TOPIC_ID_1],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+
+        self.assertEqual(
+            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
+                ['completed_chapters_count'], 0)
+
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID_1, 'node_1')
+
+        self.assertEqual(
+            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
+                ['completed_chapters_count'], 1)
+        self.logout()
+
+
 class LearnerDashboardCollectionsProgressHandlerTests(
     test_utils.GenericTestBase):
 
@@ -497,7 +619,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardCollectionsProgressHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -617,7 +739,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardExplorationsProgressHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -708,15 +830,19 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE_1 = 'Exploration title 1'
 
     def setUp(self):
-        super(LearnerDashboardFeedbackUpdatesHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json(
-            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'paginated_threads_list': []},
+            csrf_token=csrf_token,
+            expected_status_int=200)
         thread_summaries = response['thread_summaries']
         self.assertEqual(thread_summaries, [])
 
@@ -726,12 +852,16 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, self.owner_id, 'a subject',
             'some text')
 
-        response = self.get_json(
-            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL)
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'paginated_threads_list': []},
+            csrf_token=csrf_token,
+            expected_status_int=200)
         thread_summaries = response['thread_summaries']
         thread_id = thread_summaries[0]['thread_id']
         thread = feedback_services.get_thread(thread_id)
 
+        self.assertEqual(len(response['paginated_threads_list']), 0)
         self.assertEqual(len(thread_summaries), 1)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
         self.assertEqual(
@@ -744,13 +874,72 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
 
+    def test_get_more_threads_on_request(self):
+        self.login(self.OWNER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        for i in range(190):
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, self.owner_id, 'a subject %s' % i,
+                'some text %s' % i)
+
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'paginated_threads_list': []},
+            csrf_token=csrf_token,
+            expected_status_int=200)
+        thread_summaries = response['thread_summaries']
+        thread_id = thread_summaries[0]['thread_id']
+        thread = feedback_services.get_thread(thread_id)
+        paginated_threads_list = response['paginated_threads_list']
+
+        self.assertEqual(len(paginated_threads_list), 1)
+        self.assertEqual(len(paginated_threads_list[0]), 90)
+        self.assertEqual(len(thread_summaries), 100)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
+        self.assertEqual(
+            thread_summaries[0]['last_message_text'], 'some text 0')
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(thread.subject, 'a subject 0')
+        self.assertEqual(thread.entity_type, 'exploration')
+
+        response = self.post_json(
+            feconf.LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL,
+            {'paginated_threads_list': paginated_threads_list},
+            csrf_token=csrf_token,
+            expected_status_int=200)
+        thread_summaries = response['thread_summaries']
+        thread_id = thread_summaries[0]['thread_id']
+        thread = feedback_services.get_thread(thread_id)
+        paginated_threads_list = response['paginated_threads_list']
+
+        self.assertEqual(len(response['paginated_threads_list']), 0)
+        self.assertEqual(len(thread_summaries), 90)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
+        self.assertEqual(
+            thread_summaries[0]['last_message_text'], 'some text 100')
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(thread.subject, 'a subject 100')
+        self.assertEqual(thread.entity_type, 'exploration')
+        self.logout()
+
 
 class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = '0'
 
     def setUp(self):
-        super(LearnerDashboardFeedbackThreadHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         # Load exploration 0.

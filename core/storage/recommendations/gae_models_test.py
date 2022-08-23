@@ -41,6 +41,25 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            recommendations_models.ExplorationRecommendationsModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'recommended_exploration_ids': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+        }
+        self.assertEqual(
+            recommendations_models.ExplorationRecommendationsModel
+            .get_export_policy(),
+            expected_export_policy_dict)
+
 
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSimilaritiesModel class."""
@@ -49,3 +68,20 @@ class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            recommendations_models.TopicSimilaritiesModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            recommendations_models.TopicSimilaritiesModel.get_export_policy(),
+            expected_export_policy_dict)

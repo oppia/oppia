@@ -25,27 +25,11 @@ import { map } from 'rxjs/operators';
 import { BeamJobRunResult, BeamJobRunResultBackendDict } from 'domain/jobs/beam-job-run-result.model';
 import { BeamJobRun, BeamJobRunBackendDict } from 'domain/jobs/beam-job-run.model';
 import { BeamJob, BeamJobBackendDict } from 'domain/jobs/beam-job.model';
-import { JobStatusSummary, JobStatusSummaryBackendDict } from 'domain/admin/job-status-summary.model';
-import { Job, JobDataBackendDict } from 'domain/admin/job.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-
-interface JobOutputBackendResponse {
-  output: string[];
-}
-
-export interface JobsDataBackendDict {
-  'one_off_job_status_summaries': JobStatusSummaryBackendDict[];
-  'human_readable_current_time': string;
-  'audit_job_status_summaries': JobStatusSummaryBackendDict[];
-  'unfinished_job_data': JobDataBackendDict[];
-  'recent_job_data': JobDataBackendDict[];
-}
 
 interface MemoryCacheProfileResponse {
-  'peak_allocation': string,
-  'total_allocation': string,
-  'total_keys_stored': string
+  'peak_allocation': string;
+  'total_allocation': string;
+  'total_keys_stored': string;
 }
 
 interface BeamJobsResponse {
@@ -56,80 +40,11 @@ interface BeamJobRunsResponse {
   'runs': BeamJobRunBackendDict[];
 }
 
-export interface JobsData {
-  oneOffJobStatusSummaries: JobStatusSummary[];
-  humanReadableCurrentTime: string;
-  auditJobStatusSummaries: JobStatusSummary[];
-  unfinishedJobData: Job[];
-  recentJobData: Job[];
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class ReleaseCoordinatorBackendApiService {
-  constructor(
-    private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
-
-  async getJobsDataAsync(): Promise<JobsData> {
-    return new Promise((resolve, reject) => {
-      this.http.get<JobsDataBackendDict>(
-        '/jobshandler').toPromise().then(response => {
-        resolve({
-          oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
-            JobStatusSummary.createFromBackendDict),
-          humanReadableCurrentTime: response.human_readable_current_time,
-          auditJobStatusSummaries: response.audit_job_status_summaries.map(
-            JobStatusSummary.createFromBackendDict),
-          unfinishedJobData: response.unfinished_job_data.map(
-            Job.createFromBackendDict),
-          recentJobData: response.recent_job_data.map(
-            Job.createFromBackendDict),
-        });
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  private async _postRequestAsync(
-      payload?: Object, action?: string): Promise<void> {
-    return this.http.post<void>(
-      '/jobshandler', { action, ...payload }).toPromise();
-  }
-
-  async startNewJobAsync(jobType: string): Promise<void> {
-    let action = 'start_new_job';
-    let payload = {
-      job_type: jobType
-    };
-    return this._postRequestAsync(payload, action);
-  }
-
-  async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
-    let action = 'cancel_job';
-    let payload = {
-      job_id: jobId,
-      job_type: jobType
-    };
-    return this._postRequestAsync(payload, action);
-  }
-
-  async fetchJobOutputAsync(jobId: string): Promise<string[]> {
-    let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
-      '/joboutputhandler?job_id=<jobId>', {
-        jobId: jobId
-      });
-    return new Promise((resolve, reject) => {
-      this.http.get<JobOutputBackendResponse>(
-        adminJobOutputUrl).toPromise().then(response => {
-        resolve(Array.isArray(response.output) ? response.output.sort() : []);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
+  constructor(private http: HttpClient) {}
 
   async getMemoryCacheProfileAsync(): Promise<MemoryCacheProfileResponse> {
     return new Promise((resolve, reject) => {

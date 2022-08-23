@@ -19,18 +19,18 @@
 import { TranslatableItem, TranslatableItemBackendDict } from './translatable-content.model';
 
 export interface ContentIdToContentBackendDictMapping {
-  [contentId: string]: TranslatableItemBackendDict
+  [contentId: string]: TranslatableItemBackendDict;
 }
 
 export interface StateNamesToContentIdBackendDictMapping {
-  [state: string]: ContentIdToContentBackendDictMapping
+  [state: string]: ContentIdToContentBackendDictMapping;
 }
 export interface ContentIdToContentMapping {
-  [contentId: string]: TranslatableItem
+  [contentId: string]: TranslatableItem;
 }
 
 export interface StateNamesToContentIdMapping {
-  [state: string]: ContentIdToContentMapping
+  [state: string]: ContentIdToContentMapping;
 }
 
 export interface TranslatableTextsBackendDict {

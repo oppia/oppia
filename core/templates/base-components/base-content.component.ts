@@ -30,6 +30,10 @@ import { PageTitleService } from 'services/page-title.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { NavigationEnd, Router } from '@angular/router';
+
+import './base-content.component.css';
+
 
 @Component({
   selector: 'oppia-base-content',
@@ -55,10 +59,20 @@ export class BaseContentComponent {
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
     private cookieService: CookieService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    /**
+     * Scroll to the top of the page while navigating
+     * through the static pages.
+     */
+    this.router.events.subscribe((evt) => {
+      if (evt instanceof NavigationEnd) {
+        window.scrollTo(0, 0);
+      }
+    });
     /**
      * Redirect any developers using the old appspot URL to the
      * test server (see issue #7867 for details).

@@ -23,8 +23,10 @@ import logging
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import role_services
@@ -38,6 +40,8 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
+
+from typing import Optional
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -87,7 +91,8 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         subtopics=[subtopic.to_dict() for subtopic in topic.subtopics],
         meta_tag_content=topic.meta_tag_content,
         practice_tab_is_displayed=topic.practice_tab_is_displayed,
-        page_title_fragment_for_web=topic.page_title_fragment_for_web
+        page_title_fragment_for_web=topic.page_title_fragment_for_web,
+        skill_ids_for_diagnostic_test=topic.skill_ids_for_diagnostic_test
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -198,7 +203,11 @@ def apply_change_list(topic_id, change_list):
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
-                topic.add_subtopic(change.subtopic_id, change.title)
+                topic.add_subtopic(
+                    change.subtopic_id,
+                    change.title,
+                    change.url_fragment
+                )
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))
@@ -267,7 +276,7 @@ def apply_change_list(topic_id, change_list):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                    topic.update_thumbnail_filename(change.new_value)
+                    update_thumbnail_filename(topic, change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)
@@ -280,6 +289,10 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB):
                     topic.update_page_title_fragment_for_web(change.new_value)
+                elif (change.property_name ==
+                      topic_domain
+                      .TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST):
+                    topic.update_skill_ids_for_diagnostic_test(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
@@ -315,8 +328,8 @@ def apply_change_list(topic_id, change_list):
                         change.subtopic_id, change.new_value)
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                    topic.update_subtopic_thumbnail_filename(
-                        change.subtopic_id, change.new_value)
+                    update_subtopic_thumbnail_filename(
+                        topic, change.subtopic_id, change.new_value)
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_subtopic_thumbnail_bg_color(
@@ -380,7 +393,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
             'Unexpected error: trying to update version %s of topic '
             'from version %s. Please reload the page and try again.'
             % (topic_model.version, topic.version))
-    elif topic.version < topic_model.version:
+    if topic.version < topic_model.version:
         raise Exception(
             'Trying to update version %s of topic from version %s, '
             'which is too old. Please reload the page and try again.'
@@ -410,6 +423,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.meta_tag_content = topic.meta_tag_content
     topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
     topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
+    topic_model.skill_ids_for_diagnostic_test = (
+        topic.skill_ids_for_diagnostic_test)
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -1044,7 +1059,11 @@ def deassign_user_from_all_topics(committer, user_id):
         })]
         save_topic_rights(
             topic_rights, committer.user_id,
-            'Removed all assigned topics from %s' % (user_id), commit_cmds)
+            'Removed all assigned topics from %s' % (
+                user_services.get_username(user_id)
+            ),
+            commit_cmds
+        )
 
 
 def deassign_manager_role_from_topic(committer, user_id, topic_id):
@@ -1069,8 +1088,13 @@ def deassign_manager_role_from_topic(committer, user_id, topic_id):
         'removed_user_id': user_id
     })]
     save_topic_rights(
-        topic_rights, committer.user_id,
-        'Removed all assigned topics from %s' % (user_id), commit_cmds)
+        topic_rights,
+        committer.user_id,
+        'Removed all assigned topics from %s' % (
+            user_services.get_username(user_id)
+        ),
+        commit_cmds
+    )
 
 
 def assign_role(committer, assignee, new_role, topic_id):
@@ -1149,3 +1173,62 @@ def get_story_titles_in_topic(topic):
     stories = story_fetchers.get_stories_by_ids(story_ids)
     story_titles = [story.title for story in stories if story is not None]
     return story_titles
+
+
+def update_thumbnail_filename(
+    topic: topic_domain.Topic, new_thumbnail_filename: Optional[str]
+) -> None:
+    """Updates the thumbnail filename and file size in a topic object.
+
+    Args:
+        topic: topic_domain.Topic. The topic domain object whose thumbnail
+            is to be updated.
+        new_thumbnail_filename: str|None. The updated thumbnail filename
+            for the topic.
+
+    Raises:
+        Exception. The thumbnail does not exist for expected topic in
+            the filesystem.
+    """
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
+    filepath = '%s/%s' % (
+        constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+    if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        thumbnail_size_in_bytes = len(fs.get(filepath))
+        topic.update_thumbnail_filename_and_size(
+            new_thumbnail_filename, thumbnail_size_in_bytes)
+    else:
+        raise Exception(
+            'The thumbnail %s for topic with id %s does not exist'
+            ' in the filesystem.' % (new_thumbnail_filename, topic.id))
+
+
+def update_subtopic_thumbnail_filename(
+    topic: topic_domain.Topic,
+    subtopic_id: int,
+    new_thumbnail_filename: str
+) -> None:
+    """Updates the thumbnail filename and file size in a subtopic.
+
+    Args:
+        topic: topic_domain.Topic. The topic domain object containing
+            the subtopic whose thumbnail is to be updated.
+        subtopic_id: int. The id of the subtopic to edit.
+        new_thumbnail_filename: str. The new thumbnail filename for the
+            subtopic.
+
+    Raises:
+        Exception. The thumbnail does not exist for expected topic in
+            the filesystem.
+    """
+    fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
+    filepath = '%s/%s' % (
+        constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+    if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+        thumbnail_size_in_bytes = len(fs.get(filepath))
+        topic.update_subtopic_thumbnail_filename_and_size(
+            subtopic_id, new_thumbnail_filename, thumbnail_size_in_bytes)
+    else:
+        raise Exception(
+            'The thumbnail %s for subtopic with topic_id %s does not exist'
+            ' in the filesystem.' % (new_thumbnail_filename, topic.id))

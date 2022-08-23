@@ -93,7 +93,7 @@ export class StoryNode {
     return this._explorationId;
   }
 
-  setExplorationId(explorationId: string): void {
+  setExplorationId(explorationId: string | null): void {
     this._explorationId = explorationId;
   }
 
@@ -129,7 +129,7 @@ export class StoryNode {
     return this._thumbnailFilename;
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename(thumbnailFilename: string | null): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -137,7 +137,7 @@ export class StoryNode {
     return this._thumbnailBgColor;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  setThumbnailBgColor(thumbnailBgColor: string | null): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 

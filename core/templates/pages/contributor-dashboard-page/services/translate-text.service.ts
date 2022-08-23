@@ -29,14 +29,14 @@ import {
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 export interface TranslatableItem {
-  translation: string | string[],
-  status: Status,
-  text: string | string[],
-  more: boolean
-  dataFormat: string,
-  contentType: string,
-  interactionId?: string,
-  ruleType?: string
+  translation: string | string[];
+  status: Status;
+  text: string | string[];
+  more: boolean;
+  dataFormat: string;
+  contentType: string;
+  interactionId?: string;
+  ruleType?: string;
 }
 
 export type Status = 'pending' | 'submitted';
@@ -132,10 +132,10 @@ export class TranslateTextService {
       interactionId,
       ruleType
     }: {
-      dataFormat?: string,
-      contentType?: string,
-      interactionId?: string,
-      ruleType?: string
+      dataFormat?: string;
+      contentType?: string;
+      interactionId?: string;
+      ruleType?: string;
     } = this.stateAndContent[this.activeIndex] || {};
     return {
       text: text,

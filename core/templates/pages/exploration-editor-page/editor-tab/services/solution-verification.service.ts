@@ -42,6 +42,9 @@ export class SolutionVerificationService {
       stateName: string,
       interaction: Interaction,
       correctAnswer: InteractionAnswer): boolean {
+    if (interaction.id === null) {
+      throw new Error('Interaction ID must not be null');
+    }
     let rulesService = this.interactionRulesRegistryService.
       getRulesServiceByInteractionId(interaction.id);
     let result =

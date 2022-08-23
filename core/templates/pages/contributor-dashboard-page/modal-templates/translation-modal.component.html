@@ -28,12 +28,12 @@
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <!-- textToTranslate contains the html content of an exploration state -->
-      <angular-html-bind-wrapper *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
-                                 [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                 (click)="onContentClick($event)"
-                                 [htmlData]="textToTranslate"
-                                 class="oppia-rte-editor">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
+                                [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                (click)="onContentClick($event)"
+                                [rteString]="textToTranslate"
+                                class="oppia-rte-editor">
+      </oppia-rte-output-display>
       <div *ngIf="isSetOfStringDataFormat()">
         <strong>{{ activeRuleDescription }}</strong>
         <ul class="oppia-option-list oppia-translate-rule-list" role="tablist">
@@ -44,31 +44,28 @@
       </div>
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
-      <div class="protractor-test-state-translation-editor">
+      <div class="e2e-test-state-translation-editor">
         <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
         <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
-                             [schema]="getHtmlSchema.bind(this)"
+                             [schema]="HTML_SCHEMA"
                              [localValue]="activeWrittenTranslation"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
         <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
-                             [schema]="getUnicodeSchema.bind(this)"
+                             [schema]="UNICODE_SCHEMA"
                              [localValue]="activeWrittenTranslation"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
-        <div *ngIf="editorIsShown && isSetOfStringDataFormat() && isActiveLanguageReviewer" class="oppia-rules-to-translate-container">
+        <div *ngIf="editorIsShown && isSetOfStringDataFormat()" class="oppia-rules-to-translate-container">
           <strong>Please add a translation per answer choice.</strong>
           <p class="oppia-rules-translation-tip">
             Because these answer choices will be matched against a learner's input, we want to be extra careful with the translations so as to not block a learner's progress in a lesson.
           </p>
-          <schema-based-editor [schema]="getSetOfStringsSchema.bind(this)"
+          <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
                                [localValue]="activeWrittenTranslation"
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>
         </div>
-        <strong *ngIf="editorIsShown && isSetOfStringDataFormat() && !isActiveLanguageReviewer">
-          Sorry! Currently, only translation reviewers are allowed to submit translations for rules.
-        </strong>
       </div>
     </div>
     <div class="oppia-translation-error-section">
@@ -87,9 +84,9 @@
     </div>
     <strong *ngIf="isSubmitted()">Submitted translation:</strong>
     <div *ngIf="isSubmitted()" class="oppia-text-to-translate-container">
-      <angular-html-bind-wrapper [htmlData]="activeWrittenTranslation"
-                                 class="oppia-rte-editor">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display [rteString]="activeWrittenTranslation"
+                                class="oppia-rte-editor">
+      </oppia-rte-output-display>
     </div>
     <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>
@@ -106,7 +103,7 @@
           (click)="returnToPreviousTranslation()">Go Back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
-          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted() || (isSetOfStringDataFormat() && !isActiveLanguageReviewer)"
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
           (click)="suggestTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
     <span [hidden]="uploadingTranslation || moreAvailable">Save and close</span>
@@ -171,8 +168,8 @@
     padding: 20px;
   }
   .oppia-translation-tips-container {
-    background-color: #EEE;
-    border: 1px solid #EEE;
+    background-color: #eee;
+    border: 1px solid #eee;
     margin: 15px 0;
     padding: 20px;
   }
@@ -181,6 +178,7 @@
     margin-left: 5%;
   }
   .oppia-close-button-position {
+    font-size: 2.5rem;
     position: absolute;
     right: 20px;
     top: 12px;

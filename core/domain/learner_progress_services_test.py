@@ -71,7 +71,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     USER_USERNAME = 'user'
 
     def setUp(self):
-        super(LearnerProgressTests, self).setUp()
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -139,7 +139,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Save new topics and stories.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -148,6 +148,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, self.TOPIC_ID_0))
@@ -156,7 +157,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -182,7 +184,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -191,6 +193,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, self.TOPIC_ID_1))
@@ -199,7 +202,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -226,7 +230,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.STORY_ID_1, changelist, 'Added Node 1.')
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_2, 'topic 2', 'abbrev-two', 'description 2')
+            self.TOPIC_ID_2, 'topic 2', 'abbrev-two', 'description 2', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -235,6 +239,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, self.TOPIC_ID_2))
@@ -243,7 +248,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -252,7 +258,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_3, 'topic 3', 'abbrev-three', 'description 3')
+            self.TOPIC_ID_3, 'topic 3', 'abbrev-three', 'description 3',
+            'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -261,6 +268,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, self.TOPIC_ID_3))
@@ -269,7 +277,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)

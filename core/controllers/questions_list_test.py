@@ -31,7 +31,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseQuestionsListControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
@@ -55,7 +55,8 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'dummy-fragment'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
@@ -143,6 +144,11 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             self.assertEqual(len(question_summary_dicts_4), 1)
             self.assertFalse(more)
         self.logout()
+
+    def test_get_fails_when_offset_not_valid(self):
+        self.get_json('%s/%s?offset=a' % (
+            feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id),
+                      expected_status_int=400)
 
     def test_get_fails_when_skill_id_not_valid(self):
         self.get_json('%s/%s?offset=0' % (

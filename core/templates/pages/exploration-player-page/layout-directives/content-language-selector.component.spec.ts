@@ -48,6 +48,7 @@ class MockContentTranslationLanguageService {
   getCurrentContentLanguageCode() {
     return this.currentLanguageCode;
   }
+
   getLanguageOptionsForDropdown() {
     return [
       {value: 'fr', displayed: 'français (French)'},
@@ -55,6 +56,7 @@ class MockContentTranslationLanguageService {
       {value: 'en', displayed: 'English'}
     ];
   }
+
   setCurrentContentLanguageCode(languageCode: string) {
     this.currentLanguageCode = languageCode;
   }

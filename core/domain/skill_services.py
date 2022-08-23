@@ -17,10 +17,10 @@
 from __future__ import annotations
 
 import collections
+import itertools
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import config_domain
@@ -37,6 +37,12 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+
+from typing import Dict, List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import skill_models
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
@@ -447,6 +453,9 @@ def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):
         user_id: str. The unique user ID of the user.
         old_skill_id: str. The old skill id.
         new_skill_id: str. The new skill id.
+
+    Raises:
+        Exception. The new skill already present.
     """
     all_topics = topic_fetchers.get_all_topics()
     for topic in all_topics:
@@ -543,7 +552,7 @@ def get_skill_summary_by_id(skill_id, strict=True):
         return None
 
 
-def get_new_skill_id():
+def get_new_skill_id() -> str:
     """Returns a new skill id.
 
     Returns:
@@ -632,6 +641,11 @@ def apply_change_list(skill_id, change_list, committer_id):
 
     Returns:
         Skill. The resulting skill domain object.
+
+    Raises:
+        Exception. The user does not have enough rights to edit the
+            skill description.
+        Exception. Invalid change dict.
     """
     skill = skill_fetchers.get_skill_by_id(skill_id)
     user = user_services.get_user_actions_info(committer_id)
@@ -705,12 +719,11 @@ def apply_change_list(skill_id, change_list, committer_id):
                         change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
-            elif (change.cmd ==
-                  skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
-                  or change.cmd ==
-                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION # pylint: disable=line-too-long
-                  or change.cmd ==
-                  skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd in (
+                    skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+                    skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION
+            )):
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -725,6 +738,41 @@ def apply_change_list(skill_id, change_list, committer_id):
                 e.__class__.__name__, e, skill_id, change_list)
         )
         raise e
+
+
+def populate_skill_model_fields(
+    skill_model: skill_models.SkillModel, skill: skill_domain.Skill
+) -> skill_models.SkillModel:
+    """Populate skill model with the data from skill object.
+
+    Args:
+        skill_model: SkillModel. The model to populate.
+        skill: Skill. The skill domain object which should be used to
+            populate the model.
+
+    Returns:
+        SkillModel. Populated model.
+    """
+    skill_model.description = skill.description
+    skill_model.language_code = skill.language_code
+    skill_model.superseding_skill_id = skill.superseding_skill_id
+    skill_model.all_questions_merged = skill.all_questions_merged
+    skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
+    skill_model.misconceptions_schema_version = (
+        skill.misconceptions_schema_version)
+    skill_model.rubric_schema_version = (
+        skill.rubric_schema_version)
+    skill_model.skill_contents_schema_version = (
+        skill.skill_contents_schema_version)
+    skill_model.skill_contents = skill.skill_contents.to_dict()
+    skill_model.misconceptions = [
+        misconception.to_dict() for misconception in skill.misconceptions
+    ]
+    skill_model.rubrics = [
+        rubric.to_dict() for rubric in skill.rubrics
+    ]
+    skill_model.next_misconception_id = skill.next_misconception_id
+    return skill_model
 
 
 def _save_skill(committer_id, skill, commit_message, change_list):
@@ -759,31 +807,14 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'Unexpected error: trying to update version %s of skill '
             'from version %s. Please reload the page and try again.'
             % (skill_model.version, skill.version))
-    elif skill.version < skill_model.version:
+
+    if skill.version < skill_model.version:
         raise Exception(
             'Trying to update version %s of skill from version %s, '
             'which is too old. Please reload the page and try again.'
             % (skill_model.version, skill.version))
 
-    skill_model.description = skill.description
-    skill_model.language_code = skill.language_code
-    skill_model.superseding_skill_id = skill.superseding_skill_id
-    skill_model.all_questions_merged = skill.all_questions_merged
-    skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
-    skill_model.misconceptions_schema_version = (
-        skill.misconceptions_schema_version)
-    skill_model.rubric_schema_version = (
-        skill.rubric_schema_version)
-    skill_model.skill_contents_schema_version = (
-        skill.skill_contents_schema_version)
-    skill_model.skill_contents = skill.skill_contents.to_dict()
-    skill_model.misconceptions = [
-        misconception.to_dict() for misconception in skill.misconceptions
-    ]
-    skill_model.rubrics = [
-        rubric.to_dict() for rubric in skill.rubrics
-    ]
-    skill_model.next_misconception_id = skill.next_misconception_id
+    skill_model = populate_skill_model_fields(skill_model, skill)
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -873,7 +904,9 @@ def delete_skill_summary(skill_id):
         skill_summary_model.delete()
 
 
-def compute_summary_of_skill(skill):
+def compute_summary_of_skill(
+    skill: skill_domain.Skill
+) -> skill_domain.SkillSummary:
     """Create a SkillSummary domain object for a given Skill domain
     object and return it.
 
@@ -908,6 +941,39 @@ def create_skill_summary(skill_id):
     save_skill_summary(skill_summary)
 
 
+def populate_skill_summary_model_fields(
+    skill_summary_model: skill_models.SkillSummaryModel,
+    skill_summary: skill_domain.SkillSummary
+) -> skill_models.SkillSummaryModel:
+    """Populate skill summary model with the data from skill summary object.
+
+    Args:
+        skill_summary_model: SkillSummaryModel. The model to populate.
+        skill_summary: SkillSummary. The skill summary domain object which
+            should be used to populate the model.
+
+    Returns:
+        SkillSummaryModel. Populated model.
+    """
+    skill_summary_dict = {
+        'description': skill_summary.description,
+        'language_code': skill_summary.language_code,
+        'version': skill_summary.version,
+        'misconception_count': skill_summary.misconception_count,
+        'worked_examples_count': skill_summary.worked_examples_count,
+        'skill_model_last_updated': skill_summary.skill_model_last_updated,
+        'skill_model_created_on': skill_summary.skill_model_created_on
+    }
+    if skill_summary_model is not None:
+        skill_summary_model.populate(**skill_summary_dict)
+    else:
+        skill_summary_dict['id'] = skill_summary.id
+        skill_summary_model = skill_models.SkillSummaryModel(
+            **skill_summary_dict)
+
+    return skill_summary_model
+
+
 def save_skill_summary(skill_summary):
     """Save a skill summary domain object as a SkillSummaryModel
     entity in the datastore.
@@ -916,29 +982,13 @@ def save_skill_summary(skill_summary):
         skill_summary: SkillSummaryModel. The skill summary object to be saved
             in the datastore.
     """
-    skill_summary_dict = {
-        'description': skill_summary.description,
-        'language_code': skill_summary.language_code,
-        'version': skill_summary.version,
-        'misconception_count': skill_summary.misconception_count,
-        'worked_examples_count': skill_summary.worked_examples_count,
-        'skill_model_last_updated': (
-            skill_summary.skill_model_last_updated),
-        'skill_model_created_on': (
-            skill_summary.skill_model_created_on)
-    }
-
-    skill_summary_model = (
+    existing_skill_summary_model = (
         skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
-    if skill_summary_model is not None:
-        skill_summary_model.populate(**skill_summary_dict)
-        skill_summary_model.update_timestamps()
-        skill_summary_model.put()
-    else:
-        skill_summary_dict['id'] = skill_summary.id
-        model = skill_models.SkillSummaryModel(**skill_summary_dict)
-        model.update_timestamps()
-        model.put()
+    skill_summary_model = populate_skill_summary_model_fields(
+        existing_skill_summary_model, skill_summary
+    )
+    skill_summary_model.update_timestamps()
+    skill_summary_model.put()
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
@@ -1039,14 +1089,53 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_id, skill_mastery_model in python_utils.ZIP(
-            skill_ids, skill_mastery_models):
+    for skill_id, skill_mastery_model in zip(skill_ids, skill_mastery_models):
         if skill_mastery_model is None:
             degrees_of_mastery[skill_id] = None
         else:
             degrees_of_mastery[skill_id] = skill_mastery_model.degree_of_mastery
 
     return degrees_of_mastery
+
+
+def get_multi_users_skills_mastery(
+    user_ids: List[str], skill_ids: List[str]
+) -> Dict[str, Dict[str, Optional[float]]]:
+    """Fetches the mastery of user in multiple skills.
+
+    Args:
+        user_ids: list(str). The user IDs of the users.
+        skill_ids: list(str). Skill IDs of the skill for which mastery degree is
+            requested.
+
+    Returns:
+        dict(str, dict(str, float|None)). The keys are the user IDs and values
+        are dictionaries with keys as requested skill IDs and values
+        as the corresponding mastery degree of the user or None if
+        UserSkillMasteryModel does not exist for the skill.
+    """
+    # We need to convert the resultant object of itertools product to a list
+    # to be able to use it multiple times as it otherwise gets exhausted after
+    # being iterated over once.
+    all_combinations = list(itertools.product(user_ids, skill_ids))
+    model_ids = []
+    for (user_id, skill_id) in all_combinations:
+        model_ids.append(user_models.UserSkillMasteryModel.construct_model_id(
+            user_id, skill_id))
+
+    skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
+        model_ids)
+    degrees_of_masteries = {user_id: {} for user_id in user_ids}
+    for i, (user_id, skill_id) in enumerate(all_combinations):
+        skill_mastery_model = skill_mastery_models[i]
+        if skill_mastery_model is None:
+            degrees_of_masteries[user_id][skill_id] = None
+        else:
+            degrees_of_masteries[user_id][skill_id] = (
+                skill_mastery_model.degree_of_mastery
+            )
+
+    return degrees_of_masteries
 
 
 def skill_has_associated_questions(skill_id):
@@ -1112,3 +1201,70 @@ def filter_skills_by_mastery(user_id, skill_ids):
         if skill_id in filtered_skill_ids:
             arranged_filtered_skill_ids.append(skill_id)
     return arranged_filtered_skill_ids
+
+
+def get_untriaged_skill_summaries(
+    skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids):
+    """Returns a list of skill summaries for all skills that are untriaged.
+
+    Args:
+        skill_summaries: list(SkillSummary). The list of all skill summary
+            domain objects.
+        skill_ids_assigned_to_some_topic: set(str). The set of skill ids which
+            are assigned to some topic.
+        merged_skill_ids: list(str). List of skill IDs of merged skills.
+
+    Returns:
+        list(SkillSummary). A list of skill summaries for all skills that
+        are untriaged.
+    """
+    untriaged_skill_summaries = []
+
+    for skill_summary in skill_summaries:
+        skill_id = skill_summary.id
+        if (skill_id not in skill_ids_assigned_to_some_topic) and (
+                skill_id not in merged_skill_ids):
+            untriaged_skill_summaries.append(skill_summary)
+
+    return untriaged_skill_summaries
+
+
+def get_categorized_skill_ids_and_descriptions():
+    """Returns a CategorizedSkills domain object for all the skills that are
+    categorized.
+
+    Returns:
+        CategorizedSkills. An instance of the CategorizedSkills domain object
+        for all the skills that are categorized.
+    """
+    topics = topic_fetchers.get_all_topics()
+
+    categorized_skills = skill_domain.CategorizedSkills()
+
+    skill_ids = []
+
+    for topic in topics:
+        subtopics = topic.subtopics
+        subtopic_titles = [subtopic.title for subtopic in subtopics]
+        categorized_skills.add_topic(topic.name, subtopic_titles)
+        for skill_id in topic.uncategorized_skill_ids:
+            skill_ids.append(skill_id)
+        for subtopic in subtopics:
+            for skill_id in subtopic.skill_ids:
+                skill_ids.append(skill_id)
+
+    skill_descriptions = get_descriptions_of_skills(skill_ids)[0]
+
+    for topic in topics:
+        subtopics = topic.subtopics
+        for skill_id in topic.uncategorized_skill_ids:
+            categorized_skills.add_uncategorized_skill(
+                topic.name, skill_id,
+                skill_descriptions[skill_id])
+        for subtopic in subtopics:
+            for skill_id in subtopic.skill_ids:
+                categorized_skills.add_subtopic_skill(
+                    topic.name, subtopic.title,
+                    skill_id, skill_descriptions[skill_id])
+
+    return categorized_skills

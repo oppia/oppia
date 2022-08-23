@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ScoreRingComponent } from './score-ring.component';
 
@@ -48,26 +48,38 @@ describe('Score Ring Component', () => {
 
   it('should set component properties on initialization', () => {
     component.score = 35;
-    spyOn(document, 'querySelector').and.returnValue({
-      // This throws "Argument of type '{ r: { baseVal: { value: number; };
-      // }; style: { strokeDasharray: string; strokeDashoffset: string; }; }'
-      // is not assignable to parameter of type 'Element'.". We need to
-      // suppress this error because we need these values for testing the file.
-      // @ts-expect-error
-      r: {
-        baseVal: {
-          value: 125
+    component.scoreRingElement = {
+      nativeElement: {
+        r: {
+          // This throws "Type '{ value: number; }' is missing the following
+          // properties from type 'SVGLength': unitType, valueAsString,
+          // valueInSpecifiedUnits, convertToSpecifiedUnits, and 12 more.".
+          // We need to suppress this error because only this value is
+          // needed for testing and providing a value for every single property
+          // is unnecessary.
+          // @ts-expect-error
+          baseVal: {
+            value: 125,
+          },
+        },
+        // This throws "Type
+        // '{ strokeDasharray: string; strokeDashoffset: string; }' is missing
+        // the following properties from type 'CSSStyleDeclaration':
+        // accentColor, alignContent, alignItems, alignSelf, and 447 more.".
+        // We need to suppress this error because only these values are
+        // needed for testing and providing a value for every single property is
+        // unnecessary.
+        // @ts-expect-error
+        style: {
+          strokeDasharray: '',
+          strokeDashoffset: ''
         }
-      },
-      style: {
-        strokeDasharray: '',
-        strokeDashoffset: ''
       }
-    });
+    };
 
-    component.ngOnInit();
+    component.ngAfterViewInit();
 
-    expect(document.querySelector).toHaveBeenCalledWith('.score-ring-circle');
+    expect(component.circle.r.baseVal.value).toBe(125);
   });
 
   it('should get score ring color', () => {
@@ -96,7 +108,7 @@ describe('Score Ring Component', () => {
       .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER);
   });
 
-  it('should set the new score if it changes', () => {
+  it('should set the new score if it changes', fakeAsync(() => {
     let changes: SimpleChanges = {
       score: {
         currentValue: 75,
@@ -105,11 +117,42 @@ describe('Score Ring Component', () => {
         isFirstChange: () => true
       }
     };
+    component.scoreRingElement = {
+      nativeElement: {
+        r: {
+          // This throws "Type '{ value: number; }' is missing the following
+          // properties from type 'SVGLength': unitType, valueAsString,
+          // valueInSpecifiedUnits, convertToSpecifiedUnits, and 12 more.".
+          // We need to suppress this error because only this value is
+          // needed for testing and providing a value for every single property
+          // is unnecessary.
+          // @ts-expect-error
+          baseVal: {
+            value: 125,
+          },
+        },
+        // This throws "Type
+        // '{ strokeDasharray: string; strokeDashoffset: string; }' is missing
+        // the following properties from type 'CSSStyleDeclaration':
+        // accentColor, alignContent, alignItems, alignSelf, and 447 more.".
+        // We need to suppress this error because only these values are
+        // needed for testing and providing a value for every single property is
+        // unnecessary.
+        // @ts-expect-error
+        style: {
+          strokeDasharray: '',
+          strokeDashoffset: ''
+        }
+      }
+    };
+
     expect(component.score).toEqual(35);
 
-    component.ngOnInit();
+    component.ngAfterViewInit();
     component.ngOnChanges(changes);
+    tick(2000);
 
-    expect(component.circle.style.strokeDashoffset).toEqual('196.35');
-  });
+    expect(Math.round(parseFloat(component.circle.style.strokeDashoffset)))
+      .toEqual(196);
+  }));
 });

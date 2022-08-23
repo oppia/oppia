@@ -56,6 +56,7 @@ import os
 import random
 import re
 import socket
+import string
 import subprocess
 import sys
 import threading
@@ -63,20 +64,14 @@ import time
 
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
+# libraries that use the builtins python module (e.g. build, utils).
 install_third_party_libs.main()
 
-from core import python_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-COVERAGE_DIR = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION)
-COVERAGE_MODULE_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
 COVERAGE_EXCLUSION_LIST_PATH = os.path.join(
     os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt')
 
@@ -175,11 +170,11 @@ class TestingTaskSpec:
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                sys.executable, COVERAGE_MODULE_PATH, 'run',
-                TEST_RUNNER_PATH, test_target_flag
+                sys.executable, '-m', 'coverage', 'run',
+                '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
-            rand = random.Random(os.urandom(8)).randint(0, 999999)
-            data_file = '.coverage.%s.%s.%06d' % (
+            rand = ''.join(random.choices(string.ascii_lowercase, k=16))
+            data_file = '.coverage.%s.%s.%s' % (
                 socket.gethostname(), os.getpid(), rand)
             env['COVERAGE_FILE'] = data_file
             concurrent_task_utils.log('Coverage data for %s is in %s' % (
@@ -187,7 +182,19 @@ class TestingTaskSpec:
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        result = run_shell_cmd(exc_list, env=env)
+        try:
+            result = run_shell_cmd(exc_list, env=env)
+        except Exception as e:
+            # Occasionally, tests fail spuriously because of an issue in grpc
+            # (see e.g. https://github.com/oppia/oppia/runs/7462764522) that
+            # causes a random polling error to be surfaced. Since this doesn't
+            # represent a 'real' test failure, we do a single extra run if we
+            # see that.
+            if 'ev_epollex_linux.cc' in str(e):
+                result = run_shell_cmd(exc_list, env=env)
+            else:
+                raise e
+
         messages = [result]
 
         if self.generate_coverage_report:
@@ -248,7 +255,7 @@ def _get_all_test_targets_from_shard(shard_name):
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
-    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     return shards_spec[shard_name]
 
@@ -262,8 +269,11 @@ def _check_shards_match_tests(include_load_tests=True):
     Returns:
         str. A description of any problems found, or an empty string if
         the shards match the tests.
+
+    Raises:
+        Exception. Failed to find duplicated module in shards.
     """
-    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     shard_modules = sorted([
         module for shard in shards_spec.values() for module in shard])
@@ -285,12 +295,16 @@ def _check_shards_match_tests(include_load_tests=True):
     shard_modules_set = set(shard_modules)
     shard_extra = shard_modules_set - test_modules_set
     if shard_extra:
-        return 'Modules {} in shards not found. See {}.'.format(
-            shard_extra, SHARDS_WIKI_LINK)
+        return (
+            'Modules {} are in the backend test shards but missing from the '
+            'filesystem. See {}.'
+        ).format(shard_extra, SHARDS_WIKI_LINK)
     test_extra = test_modules_set - shard_modules_set
     assert test_extra
-    return 'Modules {} not in shards. See {}.'.format(
-        test_extra, SHARDS_WIKI_LINK)
+    return (
+        'Modules {} are present on the filesystem but are not listed in the '
+        'backend test shards. See {}.'
+    ).format(test_extra, SHARDS_WIKI_LINK)
 
 
 def _load_coverage_exclusion_list(path):
@@ -329,20 +343,6 @@ def main(args=None):
 
     common.fix_third_party_imports()
 
-    if parsed_args.generate_coverage_report:
-        python_utils.PRINT(
-            'Checking whether coverage is installed in %s'
-            % common.OPPIA_TOOLS_DIR
-        )
-        if not os.path.exists(
-                os.path.join(
-                    common.OPPIA_TOOLS_DIR,
-                    'coverage-%s' % common.COVERAGE_VERSION
-                )
-        ):
-            raise Exception(
-                'Coverage is not installed, please run the start script.')
-
     test_specs_provided = sum([
         1 if argument else 0
         for argument in (
@@ -362,23 +362,21 @@ def main(args=None):
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     with contextlib.ExitStack() as stack:
-        stack.enter_context(servers.managed_cloud_datastore_emulator())
+        stack.enter_context(
+            servers.managed_cloud_datastore_emulator(clear_datastore=True))
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:
             if '_test' in parsed_args.test_target:
                 all_test_targets = [parsed_args.test_target]
             else:
-                python_utils.PRINT('')
-                python_utils.PRINT(
-                    '---------------------------------------------------------')
-                python_utils.PRINT(
+                print('')
+                print('------------------------------------------------------')
+                print(
                     'WARNING : test_target flag should point to the test file.')
-                python_utils.PRINT(
-                    '---------------------------------------------------------')
-                python_utils.PRINT('')
+                print('------------------------------------------------------')
+                print('')
                 time.sleep(3)
-                python_utils.PRINT(
-                    'Redirecting to its corresponding test file...')
+                print('Redirecting to its corresponding test file...')
                 all_test_targets = [parsed_args.test_target + '_test']
         elif parsed_args.test_shard:
             validation_error = _check_shards_match_tests(
@@ -416,11 +414,11 @@ def main(args=None):
         except Exception:
             task_execution_failed = True
 
-    python_utils.PRINT('')
-    python_utils.PRINT('+------------------+')
-    python_utils.PRINT('| SUMMARY OF TESTS |')
-    python_utils.PRINT('+------------------+')
-    python_utils.PRINT('')
+    print('')
+    print('+------------------+')
+    print('| SUMMARY OF TESTS |')
+    print('+------------------+')
+    print('')
 
     coverage_exclusions = _load_coverage_exclusion_list(
         COVERAGE_EXCLUSION_LIST_PATH)
@@ -434,20 +432,18 @@ def main(args=None):
         spec = task_to_taskspec[task]
 
         if not task.finished:
-            python_utils.PRINT('CANCELED  %s' % spec.test_target)
+            print('CANCELED  %s' % spec.test_target)
             test_count = 0
         elif task.exception and isinstance(
                 task.exception, subprocess.CalledProcessError):
-            python_utils.PRINT(
-                'ERROR     %s: Error raised by subprocess.')
+            print('ERROR     %s: Error raised by subprocess.')
             raise task.exception
         elif task.exception and 'No tests were run' in task.exception.args[0]:
-            python_utils.PRINT(
-                'ERROR     %s: No tests found.' % spec.test_target)
+            print('ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
             exc_str = task.exception.args[0]
-            python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
+            print(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
@@ -461,24 +457,20 @@ def main(args=None):
                 failures = int(tests_failed_regex_match.group(3))
                 total_errors += errors
                 total_failures += failures
-                python_utils.PRINT('FAILED    %s: %s errors, %s failures' % (
+                print('FAILED    %s: %s errors, %s failures' % (
                     spec.test_target, errors, failures))
-            except AttributeError:
+            except AttributeError as e:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
                 total_errors += 1
-                python_utils.PRINT('')
-                python_utils.PRINT(
-                    '------------------------------------------------------')
-                python_utils.PRINT(
-                    '    WARNING: FAILED TO RUN %s' % spec.test_target)
-                python_utils.PRINT('')
-                python_utils.PRINT(
-                    '    This is most likely due to an import error.')
-                python_utils.PRINT(
-                    '------------------------------------------------------')
-                raise task.exception
+                print('')
+                print('------------------------------------------------------')
+                print('    WARNING: FAILED TO RUN %s' % spec.test_target)
+                print('')
+                print('    This is most likely due to an import error.')
+                print('------------------------------------------------------')
+                raise task.exception from e
         else:
             try:
                 tests_run_regex_match = re.search(
@@ -486,60 +478,61 @@ def main(args=None):
                     task.task_results[0].get_report()[0])
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                python_utils.PRINT(
+                print(
                     'SUCCESS   %s: %d tests (%.1f secs)' %
                     (spec.test_target, test_count, test_time))
             except Exception:
-                python_utils.PRINT(
+                print(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
             if parsed_args.generate_coverage_report:
                 coverage = task.task_results[0].get_report()[-2]
-                if spec.test_target in coverage_exclusions:
-                    continue
-                if coverage != 100:
-                    python_utils.PRINT('INCOMPLETE COVERAGE (%s%%): %s' % (
+                if (
+                        spec.test_target not in coverage_exclusions
+                        and coverage != 100):
+                    print('INCOMPLETE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
                     incomplete_coverage += 1
-                    python_utils.PRINT(task.task_results[0].get_report()[-3])
+                    print(task.task_results[0].get_report()[-3])
 
         total_count += test_count
 
-    python_utils.PRINT('')
+    print('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
 
-    python_utils.PRINT('Ran %s test%s in %s test module%s.' % (
+    print('Ran %s test%s in %s test class%s.' % (
         total_count, '' if total_count == 1 else 's',
         len(tasks), '' if len(tasks) == 1 else 's'))
 
     if total_errors or total_failures:
-        python_utils.PRINT(
-            '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+        print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
     else:
-        python_utils.PRINT('All tests passed.')
+        print('All tests passed.')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
-    elif total_errors or total_failures:
+
+    if total_errors or total_failures:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
-    elif incomplete_coverage:
+
+    if incomplete_coverage:
         raise Exception(
             '%s tests incompletely cover associated code files.' %
             incomplete_coverage)
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
+        subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = _check_coverage(True)
-        python_utils.PRINT(report_stdout)
+        print(report_stdout)
 
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
 
-    python_utils.PRINT('')
-    python_utils.PRINT('Done!')
+    print('')
+    print('Done!')
 
 
 def _check_coverage(
@@ -557,10 +550,13 @@ def _check_coverage(
     Returns:
         str, float. Tuple of the coverage report and the coverage
         percentage.
+
+    Raises:
+        RuntimeError. Subprocess failure.
     """
     if combine:
         combine_process = subprocess.run(
-            [sys.executable, COVERAGE_MODULE_PATH, 'combine'],
+            [sys.executable, '-m', 'coverage', 'combine'],
             capture_output=True, encoding='utf-8', check=False)
         no_combine = combine_process.stdout.strip() == 'No data to combine'
         if (combine_process.returncode and not no_combine):
@@ -569,7 +565,7 @@ def _check_coverage(
                 '\n%s' % combine_process)
 
     cmd = [
-        sys.executable, COVERAGE_MODULE_PATH, 'report',
+        sys.executable, '-m', 'coverage', 'report',
          '--omit="%s*","third_party/*","/usr/share/*"'
          % common.OPPIA_TOOLS_DIR, '--show-missing']
     if include:
@@ -593,7 +589,7 @@ def _check_coverage(
         )
     else:
         coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
             process.stdout)
         coverage = float(coverage_result.group('total'))
 

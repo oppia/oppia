@@ -37,9 +37,9 @@ var DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
 };
 
 interface ParamChangeCustomizationArgs {
-  'parse_with_jinja'?: boolean,
-  'value'?: string,
-  'list_of_values'?: string[]
+  'parse_with_jinja'?: boolean;
+  'value'?: string;
+  'list_of_values'?: string[];
 }
 
 export interface ParamChangeBackendDict {
@@ -68,6 +68,7 @@ export class ParamChange {
       name: this.name
     };
   }
+
   resetCustomizationArgs(): void {
     this.customizationArgs = cloneDeep(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
@@ -85,12 +86,14 @@ export class ParamChangeObjectFactory {
       paramChangeBackendDict.generator_id,
       paramChangeBackendDict.name);
   }
+
   createEmpty(paramName: string): ParamChange {
     return new ParamChange({
       parse_with_jinja: true,
       value: ''
     }, 'Copier', paramName);
   }
+
   createDefault(paramName: string): ParamChange {
     return new ParamChange(
       cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);

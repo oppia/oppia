@@ -14,7 +14,7 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-22.04]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -43,9 +43,12 @@ jobs:
       - name: Install ffmpeg
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
+      - name: Build Webpack
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.build --prod_env
       - name: Run e2e Collections Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="collections" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run e2e Accessibility Test
@@ -74,6 +77,33 @@ jobs:
         with:
           name: protractor-video
           path: /home/runner/work/oppia/protractor-video
-      - name: Checking Memory Usage
-        if: ${{ always() }}
-        run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
+      - name: Uploading webdriverio-video as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webdriverio-video
+          path: /home/runner/work/oppia/webdriverio-video
+      - name: Uploading protractor screenshots as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: protractor-screenshots
+          path: /home/runner/work/oppia/protractor-screenshots
+      - name: Uploading webdriverio screenshots as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webdriverio-screenshots
+          path: /home/runner/work/oppia/webdriverio-screenshots
+      - name: Uploading webpack bundles as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webpack-bundles
+          path: /home/runner/work/oppia/oppia/build
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "An E2E test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

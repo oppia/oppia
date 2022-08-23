@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 // This makes the UrlParamsType like a dict whose keys and values both are
 // string.
 export interface UrlParamsType {
-  [param: string]: string
+  [param: string]: string;
 }
 
 @Injectable({
@@ -401,6 +401,15 @@ export class UrlService {
         version = version.substring(0, version.indexOf('#'));
       }
       return Number(version);
+    }
+    return null;
+  }
+
+  getPidFromUrl(): string | null {
+    let urlParams: UrlParamsType = this.getUrlParams();
+    if (urlParams.hasOwnProperty('pid')) {
+      let pid = urlParams.pid;
+      return String(pid);
     }
     return null;
   }

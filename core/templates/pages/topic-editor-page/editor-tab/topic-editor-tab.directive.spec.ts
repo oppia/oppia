@@ -18,8 +18,10 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { StoryReference } from 'domain/topic/story-reference-object.model';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -36,6 +38,7 @@ describe('Topic editor tab directive', function() {
   var $rootScope = null;
   var topic = null;
   var $q = null;
+  let ngbModal: NgbModal = null;
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
@@ -46,7 +49,6 @@ describe('Topic editor tab directive', function() {
   var EntityCreationService = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
-  var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
@@ -63,12 +65,24 @@ describe('Topic editor tab directive', function() {
     }
   };
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve('1')
+        };
+      }
+    });
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $uibModalInstance = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     $q = $injector.get('$q');
+    ngbModal = $injector.get('NgbModal');
     directive = $injector.get('topicEditorTabDirective')[0];
+    ngbModal = $injector.get('NgbModal');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     var MockContextSerivce = {
@@ -85,7 +99,6 @@ describe('Topic editor tab directive', function() {
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
     EntityCreationService = $injector.get('EntityCreationService');
-    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     mockTasdReinitializedEventEmitter = new EventEmitter();
 
@@ -125,8 +138,8 @@ describe('Topic editor tab directive', function() {
     subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
-    story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
-    story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    story1 = StoryReference.createFromStoryId('storyId1');
+    story2 = StoryReference.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');
@@ -218,10 +231,20 @@ describe('Topic editor tab directive', function() {
 
   it('should open save changes warning modal before creating skill',
     function() {
+      class MockNgbModalRef {
+        componentInstance: {
+          body: 'xyz';
+        };
+      }
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-      var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve()
+        }) as NgbModalRef;
+      });
       $scope.createSkill();
-      expect(uibModalSpy).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
     });
 
   it('should call TopicEditorStateService to load topic when ' +
@@ -278,6 +301,21 @@ describe('Topic editor tab directive', function() {
       expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
     });
 
+  it('should not call the getTopicWithUrlFragmentExists if url fragment' +
+     'is not correct', function() {
+    var topicUrlFragmentSpy = spyOn(
+      TopicUpdateService, 'setTopicUrlFragment');
+    var topicUrlFragmentExists = spyOn(
+      TopicEditorStateService, 'getTopicWithUrlFragmentExists');
+    spyOn(
+      TopicEditorStateService,
+      'updateExistenceOfTopicUrlFragment').and.callFake(
+      (newUrlFragment, successCallback, errorCallback) => errorCallback());
+    $scope.updateTopicUrlFragment('topic-url fragment');
+    expect(topicUrlFragmentSpy).toHaveBeenCalled();
+    expect(topicUrlFragmentExists).not.toHaveBeenCalled();
+  });
+
   it('should call the TopicUpdateService if url fragment is updated',
     function() {
       var topicUrlFragmentSpy = spyOn(
@@ -285,7 +323,7 @@ describe('Topic editor tab directive', function() {
       spyOn(
         TopicEditorStateService,
         'updateExistenceOfTopicUrlFragment').and.callFake(
-        (newUrlFragment, successCallback) => successCallback());
+        (newUrlFragment, successCallback, errorCallback) => successCallback());
       $scope.updateTopicUrlFragment('topic');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
     });
@@ -368,21 +406,16 @@ describe('Topic editor tab directive', function() {
       expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
     });
 
-  it('should call the TopicUpdateService if practice tab is displayed ' +
-    'property is updated', function() {
+  it('should set the practice tab as displayed if there are the defined ' +
+      'minimum number of practice questions in the topic', function() {
     var topicPracticeTabSpy = (
       spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
-    $scope.updatePracticeTabIsDisplayed(true);
-    expect(topicPracticeTabSpy).toHaveBeenCalled();
-  });
-
-  it('should not call the TopicUpdateService if practice tab is displayed ' +
-   'property is same', function() {
-    $scope.updatePracticeTabIsDisplayed(true);
-    var topicPracticeTabSpy = (
-      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
+    $scope.skillQuestionCountDict = {skill1: 3, skill2: 6};
     $scope.updatePracticeTabIsDisplayed(true);
     expect(topicPracticeTabSpy).not.toHaveBeenCalled();
+    $scope.skillQuestionCountDict = {skill1: 3, skill2: 7};
+    $scope.updatePracticeTabIsDisplayed(true);
+    expect(topicPracticeTabSpy).toHaveBeenCalled();
   });
 
   it('should call the TopicUpdateService if skill is deleted from topic',
@@ -441,10 +474,20 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should open save pending changes modal if changes are made', function() {
+    class MockNgbModalRef {
+      componentInstance: {
+        body: 'xyz';
+      };
+    }
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
-    var uibModalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve()
+      }) as NgbModalRef;
+    });
     $scope.createCanonicalStory();
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should call TopicRoutingService to navigate to subtopic', function() {
@@ -505,17 +548,40 @@ describe('Topic editor tab directive', function() {
 
   it('should open ChangeSubtopicAssignment modal when change ' +
       'subtopic assignment is called', function() {
-    var modalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+    class MockNgbModalRef {
+      componentInstance: {
+        subtopics: null;
+      };
+    }
+    var deferred = $q.defer();
+    deferred.resolve(1);
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return (
+        {
+          componentInstance: MockNgbModalRef,
+          result: deferred.promise
+        } as NgbModalRef);
+    });
     $scope.changeSubtopicAssignment(1, skillSummary);
     expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should open ChangeSubtopicAssignment modal and call TopicUpdateService',
     function() {
+      class MockNgbModalRef {
+        componentInstance: {
+          subtopics: null;
+        };
+      }
       var deferred = $q.defer();
       deferred.resolve(1);
-      spyOn($uibModalInstance, 'open').and.returnValue(
-        {result: deferred.promise});
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: MockNgbModalRef,
+          result: deferred.promise
+        } as NgbModalRef
+      );
       var moveSkillUpdateSpy = spyOn(
         TopicUpdateService, 'moveSkillToSubtopic');
       $scope.changeSubtopicAssignment(null, skillSummary);
@@ -525,10 +591,19 @@ describe('Topic editor tab directive', function() {
 
   it('should not call the TopicUpdateService if subtopicIds are same',
     function() {
+      class MockNgbModalRef {
+        componentInstance: {
+          subtopics: null;
+        };
+      }
       var deferred = $q.defer();
       deferred.resolve(1);
-      spyOn($uibModalInstance, 'open').and.returnValue(
-        {result: deferred.promise});
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: MockNgbModalRef,
+          result: deferred.promise
+        } as NgbModalRef
+      );
       var moveSkillSpy = (
         spyOn(TopicUpdateService, 'moveSkillToSubtopic'));
       $scope.changeSubtopicAssignment(1, skillSummary);

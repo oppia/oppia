@@ -47,11 +47,12 @@ import { InteractionCustomizationArgs } from 'interactions/customization-args-de
 })
 export class ContentTranslationManagerService {
   // This is initialized using the class initialization method.
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationLanguageCode!: string;
   private onStateCardContentUpdateEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
   private originalTranscript: StateCard[] = [];
@@ -86,7 +87,9 @@ export class ContentTranslationManagerService {
     const cards = this.playerTranscriptService.transcript;
 
     if (languageCode === this.explorationLanguageCode) {
-      this.playerTranscriptService.restoreImmutably(this.originalTranscript);
+      this.playerTranscriptService.restoreImmutably(
+        cloneDeep(this.originalTranscript)
+      );
     } else {
       cards.forEach(
         card => this._displayTranslationsForCard(card, languageCode));
@@ -246,10 +249,15 @@ export class ContentTranslationManagerService {
       }
     }
 
-    const element = $(card.getInteractionHtml());
+    // DOMParser().parseFromString() creates a HTML document from
+    // the HTML string and it's body contains our required element
+    // as a childnode.
+    const element = new DOMParser().parseFromString(
+      card.getInteractionHtml(), 'text/html'
+    ).body.childNodes[0] as HTMLElement;
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
-    card.setInteractionHtml(element.get(0).outerHTML);
+    card.setInteractionHtml(element.outerHTML);
   }
 
   _swapContentInRules(card: StateCard, languageCode: string): void {

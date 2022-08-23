@@ -20,7 +20,8 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subscription } from 'rxjs';
-
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterService } from '../services/router.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
@@ -28,8 +29,13 @@ import { WindowDimensionsService } from
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
+import { HelpModalComponent } from '../modal-templates/help-modal.component';
 
 require('services/ngb-modal.service.ts');
+
+class MockNgbModalRef {
+  componentInstance = {};
+}
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -37,7 +43,6 @@ describe('Editor Navigation Component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
   var $verifyNoPendingTasks = null;
   var contextService = null;
   var explorationFeaturesService = null;
@@ -46,8 +51,11 @@ describe('Editor Navigation Component', function() {
   var stateTutorialFirstTimeService = null;
   var threadDataBackendApiService = null;
   var userService = null;
+  let routerService = null;
   var windowDimensionsService = null;
   var internetConnectivityService = null;
+
+  let ngbModal: NgbModal;
 
   var mockOpenPostTutorialHelpPopover = new EventEmitter();
   var mockConnectionServiceEmitter = new EventEmitter<boolean>();
@@ -70,9 +78,16 @@ describe('Editor Navigation Component', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        NgbModule
+      ],
+      declarations: [
+        HelpModalComponent,
+      ],
       providers: [
-        ChangeListService
+        ChangeListService,
+        RouterService
       ]
     });
   });
@@ -83,6 +98,8 @@ describe('Editor Navigation Component', function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     userService = TestBed.get(UserService);
     changeListService = TestBed.inject(ChangeListService);
+    ngbModal = TestBed.inject(NgbModal);
+    routerService = TestBed.inject(RouterService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -100,7 +117,6 @@ describe('Editor Navigation Component', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationRightsService = $injector.get('ExplorationRightsService');
@@ -148,6 +164,7 @@ describe('Editor Navigation Component', function() {
         mockOpenPostTutorialHelpPopover);
       $scope = $rootScope.$new();
       ctrl = $componentController('editorNavigation', {
+        NgbModal: ngbModal,
         $scope: $scope,
         WindowDimensionsService: windowDimensionsService,
         InternetConnectivityService: internetConnectivityService,
@@ -210,9 +227,13 @@ describe('Editor Navigation Component', function() {
 
     it('should open editor tutorial after closing user help modal with mode' +
       'editor', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('editor')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: $q.resolve('editor')
+        } as NgbModalRef
+      );
+
       $scope.showUserHelpModal();
       $scope.$apply();
 
@@ -221,9 +242,13 @@ describe('Editor Navigation Component', function() {
 
     it('should open editor tutorial after closing user help modal with mode' +
       'translation', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('translation')
-      });
+      spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: new MockNgbModalRef(),
+            result: $q.resolve('translation')
+          } as NgbModalRef
+      );
+
       $scope.showUserHelpModal();
       $scope.$apply();
 
@@ -262,7 +287,7 @@ describe('Editor Navigation Component', function() {
       deferred.resolve();
       var explorationSpy = spyOn(
         explorationSaveService,
-        'saveChanges').and.returnValue(deferred.promise);
+        'saveChangesAsync').and.returnValue(deferred.promise);
       $scope.saveChanges();
       $rootScope.$apply();
       expect(explorationSpy).toHaveBeenCalled();
@@ -308,38 +333,57 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should navigate to main tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('main');
+
       $scope.selectMainTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('main');
     });
 
     it('should navigate to translation tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('translation');
+
       $scope.selectTranslationTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('translation');
     });
 
     it('should navigate to preview tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('preview');
+
       $scope.selectPreviewTab();
       $rootScope.$apply();
       $flushPendingTasks();
       $verifyNoPendingTasks('timeout');
+
       expect($scope.getActiveTabName()).toBe('preview');
     });
 
     it('should navigate to settings tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('settings');
+
       $scope.selectSettingsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('settings');
     });
 
     it('should navigate to stats tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('stats');
+
       $scope.selectStatsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('stats');
     });
 
     it('should navigate to improvements tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('improvements');
+
       spyOn(explorationFeaturesService, 'isInitialized').and.returnValue(true);
       isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
       $scope.selectImprovementsTab();
@@ -348,12 +392,18 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should navigate to history tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('history');
+
       $scope.selectHistoryTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('history');
     });
 
     it('should navigate to feedback tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('feedback');
+
       $scope.selectFeedbackTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('feedback');
@@ -399,7 +449,6 @@ describe('Editor Navigation Component', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');

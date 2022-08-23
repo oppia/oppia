@@ -30,8 +30,8 @@ class InteractiveMap(base.BaseInteraction):
     is_trainable = False
     _dependency_ids = ['ui_leaflet']
     answer_type = 'CoordTwoDim'
-    instructions = 'Click on the map'
-    narrow_instructions = 'View map'
+    instructions = 'I18N_INTERACTIONS_MAP_INSTRUCTION'
+    narrow_instructions = 'I18N_INTERACTIONS_MAP_NARROW_INSTRUCTION'
     needs_summary = True
     # There needs to be a way to pass marker location so that an answer can be
     # conveyed meaningfully to the learner. Once this issue is fixed,

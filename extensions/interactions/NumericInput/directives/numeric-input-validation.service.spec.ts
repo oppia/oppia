@@ -36,7 +36,6 @@ import { Warning } from 'interactions/base-interaction-validation.service';
 describe('NumericInputValidationService', () => {
   let validatorService: NumericInputValidationService;
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
-
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome,
     customizationArgs: NumericInputCustomizationArgs;
@@ -72,6 +71,7 @@ describe('NumericInputValidationService', () => {
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: '',
         html: ''
@@ -335,24 +335,57 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
+  it('should generate errors for string representation of the input', ()=>{
+    expect(validatorService.validateNumericString('12.', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL'
+    );
+    expect(validatorService.validateNumericString('12.22.1', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL'
+    );
+    expect(validatorService.validateNumericString('12-', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING'
+    );
+    expect(validatorService.validateNumericString('--12', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS'
+    );
+    expect(validatorService.validateNumericString('12e12e', '.')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT'
+    );
+  });
+
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(1200000000E-27, false)).toEqual(
-      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(999999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(-999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
+    expect(
+      validatorService.validateNumber(1200000000e+27, false)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT');
+    expect(
+      validatorService.validateNumber(1200000000e-27, false, ',')).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_COMMA');
+    expect(
+      validatorService.validateNumber(999999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(99.9999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(99.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(-9.9999999999999, false)).toEqual(
+    expect(
+      validatorService.validateNumber(-9.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(-2.2, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(34.56, false)).toEqual(undefined);
-    expect(validatorService.getErrorString(99999999999999, true)).toEqual(
+    expect(
+      validatorService.validateNumber(2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(-2.2, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(34.56, false)).toEqual(undefined);
+    expect(
+      validatorService.validateNumber(99999999999999, true)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(9999999999999999, true)).toEqual(
-      'The answer should be greater than or equal to zero and can contain' +
-      ' at most 15 digits (0-9) or symbols(.).');
+    expect(
+      validatorService.validateNumber(-99999999999999, true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO');
+    expect(
+      validatorService.validateNumber(Number('wqw'), true)).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
   });
 });

@@ -1,8 +1,8 @@
-<div class="learner-story-summary-tile" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
+<div class="learner-story-summary-tile">
   <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
     {{nextIncompleteNodeTitle}}
   </div>
-  <mat-card class="oppia-story-dashboard-card">
+  <mat-card class="oppia-story-dashboard-card" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
     <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
       <div class="story-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
@@ -15,10 +15,10 @@
           </div>
         </div>
         <div class="oppia-summary-section">
-          <span class="oppia-story-title protractor-test-story-name-in-learner-story-summary-tile">
+          <span class="oppia-story-title e2e-test-story-name-in-learner-story-summary-tile">
             {{storyTitle}}
           </span>
-          <span class="oppia-topic-title protractor-test-topic-name-in-learner-story-summary-tile">
+          <span class="oppia-topic-title e2e-test-topic-name-in-learner-story-summary-tile">
             {{topicName}}
           </span>
         </div>
@@ -50,9 +50,9 @@
     text-align: left;
   }
   .learner-story-summary-tile .continue-button {
-    background: #00645C 0% 0% no-repeat padding-box;
+    background: #00645c 0% 0% no-repeat padding-box;
     border-radius: 4px;
-    bottom: 110px;
+    bottom: 217px;
     box-shadow: 0 2px 2px #0000003d;
     display: none;
     height: 28px;
@@ -61,7 +61,7 @@
     width: 112px;
   }
   .learner-story-summary-tile .continue-button-text {
-    color: #FFF;
+    color: #fff;
     font-size: 14px;
     left: 1px;
     letter-spacing: 0;
@@ -71,7 +71,7 @@
     top: 6px;
   }
   .learner-story-summary-tile .oppia-story-completion {
-    background: #000C 0% 0% no-repeat padding-box;
+    background: #000c 0% 0% no-repeat padding-box;
     border-radius: 2px;
     bottom: 23px;
     float: right;
@@ -95,8 +95,12 @@
   .learner-story-summary-tile .oppia-story-link {
     text-decoration: none;
   }
+  .learner-story-summary-tile .story-card {
+    height: 100%;
+  }
   .learner-story-summary-tile .oppia-summary-section {
     position: absolute;
+    width: 100%;
   }
   .learner-story-summary-tile .oppia-topic-title {
     color: #333;
@@ -109,11 +113,11 @@
     padding-bottom: 12px;
     text-align: left;
     text-transform: uppercase;
-    width: 100%;
+    width: 188px;
   }
   .learner-story-summary-tile .oppia-story-completed-percent {
     bottom: 24px;
-    color: #FFF;
+    color: #fff;
     font-size: 10px;
     left: 11px;
     letter-spacing: 0;
@@ -123,7 +127,7 @@
     width: 100%;
   }
   .learner-story-summary-tile .oppia-percent-story-completed {
-    color: #FFF;
+    color: #fff;
     font-size: 10px;
     letter-spacing: 0;
     margin: 2px;
@@ -134,7 +138,7 @@
     border-radius: 4px;
     box-shadow: 0 3px 6px #00000029;
     display: inline-block;
-    height: 250px;
+    height: 270px;
     margin: 0 2px 30px 6px;
     padding: 0;
     position: relative;
@@ -155,7 +159,7 @@
     display: block;
     float: left;
   }
-  .learner-story-summary-tile .oppia-story-dashboard-card .story-card:hover + .continue-button {
+  .learner-story-summary-tile .oppia-story-dashboard-card:hover .continue-button {
     display: block;
     float: left;
   }

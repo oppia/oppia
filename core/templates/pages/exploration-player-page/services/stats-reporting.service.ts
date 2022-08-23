@@ -49,29 +49,32 @@ export class StatsReportingService {
     this.refreshAggregatedStats();
   }
 
-  explorationId: string = null;
-  explorationTitle: string = null;
-  explorationVersion: number = null;
-  sessionId: string = null;
-  stateStopwatch: Stopwatch = null;
-  optionalCollectionId: string = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationId!: string;
+  explorationTitle!: string;
+  explorationVersion!: number;
+  sessionId!: string;
+  stateStopwatch!: Stopwatch;
+  optionalCollectionId!: string;
+  currentStateName!: string;
+  nextExpId!: string;
+  previousStateName!: string;
+  nextStateName!: string;
+  topicName!: string;
+  private editorPreviewMode: boolean = false;
+  private questionPlayerMode: boolean = false;
   statesVisited: Set<string> = new Set();
   explorationStarted: boolean = false;
   explorationActuallyStarted: boolean = false;
   explorationIsComplete: boolean = false;
-  currentStateName: string = null;
-  nextExpId: string = null;
-  previousStateName: string = null;
-  nextStateName: string = null;
-  topicName: string = null;
-  private editorPreviewMode: boolean = null;
-  private questionPlayerMode: boolean = null;
   private MINIMUM_NUMBER_OF_VISITED_STATES = 3;
 
   // The following dict will contain all stats data accumulated over the
   // interval time and will be reset when the dict is sent to backend for
   // recording.
-  aggregatedStats: AggregatedStats = null;
+  aggregatedStats!: AggregatedStats;
 
   private refreshAggregatedStats(): void {
     this.aggregatedStats = {

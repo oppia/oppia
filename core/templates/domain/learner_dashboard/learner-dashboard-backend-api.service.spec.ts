@@ -51,7 +51,7 @@ describe('Learner Dashboard Backend API Service', () => {
     url_fragment: 'subtopic-name'
   };
 
-  let sampleTopicsAndStoriesDataResults = {
+  const sampleTopicsAndStoriesDataResults = {
     completed_stories_list: [{
       id: 'sample_story_id',
       title: 'Story title',
@@ -281,7 +281,7 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
 
-  let sampleCollectionsDataResults = {
+  const sampleCollectionsDataResults = {
     completed_collections_list: [{
       status: 'public',
       thumbnail_bg_color: '#d68453',
@@ -335,7 +335,7 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
 
-  let sampleFeedbackUpdatesDataResults = {
+  const sampleFeedbackUpdatesDataResults = {
     number_of_unread_threads: 0,
     thread_summaries: [
       {
@@ -356,7 +356,7 @@ describe('Learner Dashboard Backend API Service', () => {
     ]
   };
 
-  let sampleExplorationDataResults = {
+  const sampleExplorationDataResults = {
     incomplete_explorations_list: [{
       category: 'Arithmetic',
       created_on_msec: 1515553584276.8,
@@ -449,21 +449,27 @@ describe('Learner Dashboard Backend API Service', () => {
     user_email: 'user@example.com'
   };
 
-  let sampleSubtopicMastery = {
+  const sampleCompletedChaptersCountDataResults = {
+    completed_chapters_count: 5,
+  };
+
+  const sampleSubtopicMastery = {
     topic_id: {
       1: 0
     }
   };
 
-  let LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
+  const LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
     '/learnerdashboardtopicsandstoriesprogresshandler/data');
-  let LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
+  const LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data');
-  let LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
+  const LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
     '/learnerdashboardexplorationsprogresshandler/data');
-  let LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
+  const LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL = (
     '/learnerdashboardfeedbackupdateshandler/data');
-  let ERROR_STATUS_CODE = 400;
+  const LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
+    '/learnercompletedchapterscounthandler/data');
+  const ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -554,7 +560,7 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let req = httpTestingController.expectOne(
       LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
-    expect(req.request.method).toEqual('GET');
+    expect(req.request.method).toEqual('POST');
     req.flush(sampleFeedbackUpdatesDataResults);
 
     flushMicrotasks();
@@ -564,17 +570,39 @@ describe('Learner Dashboard Backend API Service', () => {
   }
   ));
 
+  it('should successfully fetch learner\'s completed chapters count data',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerCompletedChaptersCountDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleCompletedChaptersCountDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
   it('should successfully fetch subtopic mastery data from the' +
     ' backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    var topicIds = 'topic_id';
+    var topicIds = ['topic_id1', 'topic_id2'];
 
     learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+      '/subtopic_mastery_handler/data?' +
+      'selected_topic_ids=' + encodeURI(JSON.stringify(topicIds)));
     expect(req.request.method).toEqual('GET');
     req.flush(sampleSubtopicMastery);
 
@@ -589,13 +617,14 @@ describe('Learner Dashboard Backend API Service', () => {
     ' backend request failed', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    var topicIds = 'topic_id';
+    var topicIds = ['topic_id1', 'topic_id2'];
 
     learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
+      '/subtopic_mastery_handler/data?' +
+      'selected_topic_ids=' + encodeURI(JSON.stringify(topicIds)));
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 400
@@ -696,6 +725,31 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let req = httpTestingController.expectOne(
       LEARNER_DASHBOARD_FEEDBACK_UPDATES_DATA_URL);
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      error: 'Error loading dashboard data.'
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
+  }
+  ));
+
+  it('should use rejection handler if learner completed chapters count ' +
+    'data backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    learnerDashboardBackendApiService
+      .fetchLearnerCompletedChaptersCountDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL);
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 'Error loading dashboard data.'

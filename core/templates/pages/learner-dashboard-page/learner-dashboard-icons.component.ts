@@ -16,7 +16,7 @@
  * @fileoverview Component for showing learner dashboard icons.
  */
 
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -26,14 +26,16 @@ import { LearnerDashboardActivityBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
 })
-export class LearnerDashboardIconsComponent implements OnInit {
+export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activityType!: string;
   @Input() activityId!: string;
@@ -47,6 +49,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
   get activityActive(): boolean {
     return this.activityIsCurrentlyHoveredOver;
   }
+
   set activityActive(hoverState: boolean) {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }
@@ -55,7 +58,8 @@ export class LearnerDashboardIconsComponent implements OnInit {
     private learnerDashboardIdsBackendApiService:
       LearnerDashboardIdsBackendApiService,
     private learnerDashboardActivityBackendApiService:
-      LearnerDashboardActivityBackendApiService
+      LearnerDashboardActivityBackendApiService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -65,6 +69,12 @@ export class LearnerDashboardIconsComponent implements OnInit {
           this.learnerDashboardActivityIds = learnerDashboardActivityIds;
         }
       );
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.activityActive !== undefined) {
+      this.setHoverState(changes.activityActive.currentValue);
+    }
   }
 
   enablePlaylistTooltip(): void {
@@ -171,12 +181,37 @@ export class LearnerDashboardIconsComponent implements OnInit {
     }
   }
 
+  // This function will open a modal to remove an exploration
+  // from the 'Play Later' list in the Library Page.
   removeFromLearnerPlaylist(
       activityId: string, activityTitle: string, activityType: string): void {
-    this.learnerDashboardActivityBackendApiService
-      .removeFromLearnerPlaylistModal(
-        activityId, activityTitle, activityType,
-        this.learnerDashboardActivityIds);
+    // This following logic of showing a modal for confirmation previously
+    // resided in learnerDashboardActivityBackendApiService. However, in
+    // issue #14225, we noticed some errors with dynamic component creation.
+    // The componentFactoryResolver in the service was from AppModule and not
+    // the page specific module. This makes sense as the we provide all
+    // services in root (As specified by the providedIn: 'root'). So the
+    // injector used is the root injector and not the page module injector.
+    // The entry components specified in page module won't be available when
+    // we use the root injector.
+    // TODO(14290): Find a better way to refactor code that opens modals
+    // into new services that use the page specific injector rather than
+    // the root injector.
+    const modelRef = this.ngbModal.open(
+      LearnerPlaylistModalComponent, {backdrop: true});
+    modelRef.componentInstance.activityId = activityId;
+    modelRef.componentInstance.activityTitle = activityTitle;
+    modelRef.componentInstance.activityType = activityType;
+    modelRef.result.then((playlistUrl) => {
+      this.learnerDashboardActivityBackendApiService
+        .removeFromLearnerPlaylist(
+          activityId, activityType,
+          this.learnerDashboardActivityIds, playlistUrl);
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 }
 

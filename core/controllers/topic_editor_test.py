@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import skill_services
@@ -36,7 +36,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -70,12 +70,19 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'dummy-subtopic'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,
             'new_subtopic_id': 1,
             'skill_id': self.skill_id
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+            'old_value': [],
+            'new_value': [self.skill_id]
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
@@ -175,7 +182,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.logout()
 
-    def test_story_creation(self):
+    def test_story_creation_with_valid_description(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -186,7 +193,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-one'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:
@@ -203,6 +210,39 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
 
+    def test_story_creation_with_invalid_description(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description' * 60,
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-one'
+        }
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        invalid_description = 'Story Description' * 60
+        self.assertEqual(
+            json_response['error'],
+            'Schema validation for \'description\' failed: '
+            'Validation failed: has_length_at_most '
+            f'({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
+            f'for object {invalid_description}')
+
+        self.logout()
+
     def test_story_creation_fails_with_invalid_image(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -214,7 +254,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-two'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
             encoding=None
         ) as f:
@@ -249,7 +289,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             url_fragment='original'
         )
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None
         ) as f:
@@ -382,7 +422,7 @@ class TopicEditorTests(
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(
             '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_topic_id'),
+                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_id'),
             expected_status_int=404)
         self.logout()
 
@@ -465,9 +505,10 @@ class TopicEditorTests(
         self.logout()
 
     def test_editable_topic_handler_put_fails_with_long_commit_message(self):
+        commit_msg = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
         change_cmd = {
             'version': 2,
-            'commit_message': 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            'commit_message': commit_msg,
             'topic_and_subtopic_page_change_dicts': [{
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
@@ -482,10 +523,12 @@ class TopicEditorTests(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
-
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 375 characters long.')
+            'Schema validation for \'commit_message\' failed: '
+            'Validation failed: has_length_at_most '
+            f'({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
+            f'for object {commit_msg}')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {
@@ -539,7 +582,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-fragment-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
@@ -679,11 +723,21 @@ class TopicEditorTests(
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-            {'version': None}, csrf_token=csrf_token,
+            {
+                'version': None,
+                'commit_message': 'Some changes and added a subtopic.',
+                'topic_and_subtopic_page_change_dicts': [{
+                    'cmd': 'update_topic_property',
+                    'property_name': 'name',
+                    'old_value': '',
+                    'new_value': 'A new name'
+                }]
+            }, csrf_token=csrf_token,
             expected_status_int=400)
+
         self.assertEqual(
             json_response['error'],
-            'Invalid POST request: a version must be specified.')
+            'Missing key in handler args: version.')
 
         self.logout()
 
@@ -703,7 +757,16 @@ class TopicEditorTests(
         json_response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, topic_id_1),
-            {'version': '3'}, csrf_token=csrf_token,
+            {
+                'version': 3,
+                'commit_message': 'Some changes and added a subtopic.',
+                'topic_and_subtopic_page_change_dicts': [{
+                    'cmd': 'update_topic_property',
+                    'property_name': 'name',
+                    'old_value': '',
+                    'new_value': 'A new name'
+                }]
+            }, csrf_token=csrf_token,
             expected_status_int=400)
 
         self.assertEqual(
@@ -743,7 +806,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-frag-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
@@ -813,7 +877,7 @@ class TopicEditorTests(
         self.delete_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                'invalid_topic_id'), expected_status_int=404)
+                'invalid_id'), expected_status_int=404)
         self.logout()
 
     def test_editable_topic_handler_delete(self):
@@ -906,16 +970,17 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_get_can_not_access_handler_with_invalid_publish_status(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-
+        invalid = 'invalid_status'
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
-            {'publish_status': 'invalid_status'}, csrf_token=csrf_token,
+            {'publish_status': invalid}, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Publish status should only be true or false.')
+            'Schema validation for \'publish_status\' failed: '
+            f'Expected bool, received {invalid}')
 
         self.logout()
 
@@ -1018,7 +1083,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
             subtopics=[], next_subtopic_id=1)
 
         # Unique topic url fragment does not exist.
-        topic_url_fragment = 'fragment_2'
+        topic_url_fragment = 'topic-fragment'
 
         json_response = self.get_json(
             '%s/%s' % (

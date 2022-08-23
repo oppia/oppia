@@ -14,6 +14,26 @@
 
 /**
  * @fileoverview Directive for CK Editor.
+ * NOTE: The way we show rich text components in CKEditor is by using Web
+ * components. We don't create an angular view inside ckeditor. In our case,
+ * the web components can't have the same selector as the angular component even
+ * though they are literally the same component and use the same class. This is
+ * because using the same selector is causing issues in the angular view as
+ * angular creates a component instance and adds it to the view. When adding to
+ * the view, it will also create a node with the selector we have specified.
+ * Usually, this has no effect as there is no element in the web-browser
+ * registered by the selector. But in our case, we did it to show rte components
+ * in the ck-editor view.
+ *
+ * In order to overcome this situation, ck-editor uses the same component but we
+ * register it with a different selector. The selector prefix is now
+ * oppia-noninteractive-ckeditor-* instead of oppia-noninteractive we have for
+ * the angular counterpart. This just an internal representation and the value
+ * emitted to the parent component doesn't have oppia-noninteractive-ckeditor-*
+ * tags, They have the normal oppia-noninteractive tags in them. Similarly, for
+ * the value that's passed in, we don't expect oppia-noninteractive-ckeditor-*
+ * tags. We expect the normal angular version of our tags and that is converted
+ * on the fly.
  */
 
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, OnInit } from '@angular/core';
@@ -59,6 +79,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
   );
+
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
@@ -82,6 +103,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           }
         }));
   }
+
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
@@ -99,6 +121,25 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
+
+    // Angular lifecycle methods on NgModel write null to the value property.
+    // Initializing this properly won't work as Angular will overwrite the
+    // value after it has been initialized.
+    // Since string methods are used on value variable, so it can't be null or
+    // undefined. When we move to reactive forms, this won't be a problem.
+    // TODO(#15458): Change the ternary statement to "let value = this.value".
+    let value = this.value ? this.value : '';
+    // Refer to the note at the top of the file for the reason behind replace.
+    value = value.replace(
+      /<oppia-noninteractive-/g,
+      '<oppia-noninteractive-ckeditor-'
+    );
+    // Refer to the note at the top of the file for the reason behind replace.
+    value = value.replace(
+      /<\/oppia-noninteractive-/g,
+      '</oppia-noninteractive-ckeditor-'
+    );
+    this.value = value;
     if (this.ck && this.ck.status === 'ready' && changes.value) {
       this.ck.setData(this.wrapComponents(this.value));
     }
@@ -202,7 +243,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       return html;
     }
     return html.replace(this.componentRe, (match, p1, p2, p3) => {
-      if (this.rteHelperService.isInlineComponent(p3)) {
+      // Here we remove the 'ckeditor' part of the string p3 to get the name
+      // of the RTE Component.
+      let rteComponentName = p3.split('-')[1];
+
+      if (this.rteHelperService.isInlineComponent(rteComponentName)) {
         return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
       } else {
         return (
@@ -261,7 +306,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
        */
     // Whitelist the component tags with any attributes and classes.
     var componentRule = names.map((name) => {
-      return 'oppia-noninteractive-' + name;
+      return 'oppia-noninteractive-ckeditor-' + name;
     }).join(' ') + '(*)[*];';
       // Whitelist the inline component wrapper, which is a
       // span with a "type" attribute.
@@ -437,9 +482,20 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           break;
         }
       }
-      this.valueChange.emit(elt.html());
-      this.value = elt.html();
-      this.currentValue = this.value;
+      let html = elt.html();
+      this.value = html;
+      // Refer to the note at the top of the file for the reason behind replace.
+      html = html.replace(
+        /<oppia-noninteractive-ckeditor-/g,
+        '<oppia-noninteractive-'
+      );
+      // Refer to the note at the top of the file for the reason behind replace.
+      html = html.replace(
+        /<\/oppia-noninteractive-ckeditor-/g,
+        '</oppia-noninteractive-'
+      );
+      this.valueChange.emit(html);
+      this.currentValue = html;
     });
     ck.setData(this.value);
     this.ck = ck;
@@ -457,6 +513,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       }
     });
   }
+
   enableRTEicons(): void {
     this.componentsThatRequireInternet.forEach((name) => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(

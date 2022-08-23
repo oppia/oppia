@@ -45,6 +45,7 @@ export default {
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
+  "LIBRARY_MOBILE_TILE_WIDTH_PX": 350,
   "DASHBOARD_TYPE_CREATOR": "creator",
   "DASHBOARD_TYPE_LEARNER": "learner",
   "DEFAULT_COLOR": "#a33f40",
@@ -59,6 +60,7 @@ export default {
     "ASSIGNED": "Assigned",
     "UNASSIGNED": "Unassigned"
   },
+  "TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE": 10,
   "TOPIC_SKILL_DASHBOARD_SORT_OPTIONS": {
     "IncreasingCreatedOn": "Newly Created",
     "DecreasingCreatedOn": "Oldest Created",
@@ -72,10 +74,207 @@ export default {
     "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
     "Reading", "Statistics"],
 
+  // These classrooms are shown in the add learner group syllabus filters.
+  "SEARCH_DROPDOWN_CLASSROOMS": ["math"],
+
+  // These types are shown in the add learner group syllabus filters.
+  "SEARCH_DROPDOWN_TYPES": ["Skill", "Story"],
+
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
-  "RTL_LANGUAGE_CODES": ["ar"],
+  // Hacky translation keys for classroom, topic, skill, exploration
+  // and subtopic names and descriptions. Needs to be updated whenever
+  // any new class, topic, skill, exploration or subtopic is added or a
+  // previous one is deleted.
+  // TODO(#14645): Remove these keys once translation service is extended.
+  "HACKY_TRANSLATION_KEYS": [
+    "I18N_CLASSROOM_MATH_TITLE",
+    "I18N_TOPIC_iX9kYCjnouWN_TITLE",
+    "I18N_TOPIC_sWBXKH4PZcK6_TITLE",
+    "I18N_TOPIC_C4fqwrvqWpRm_TITLE",
+    "I18N_TOPIC_qW12maD4hiA8_TITLE",
+    "I18N_TOPIC_dLmjjMDbCcrf_TITLE",
+    "I18N_TOPIC_0abdeaJhmfPm_TITLE",
+    "I18N_TOPIC_5g0nxGUmx5J5_TITLE",
+    "I18N_TOPIC_iX9kYCjnouWN_DESCRIPTION",
+    "I18N_TOPIC_sWBXKH4PZcK6_DESCRIPTION",
+    "I18N_TOPIC_C4fqwrvqWpRm_DESCRIPTION",
+    "I18N_TOPIC_qW12maD4hiA8_DESCRIPTION",
+    "I18N_TOPIC_dLmjjMDbCcrf_DESCRIPTION",
+    "I18N_TOPIC_0abdeaJhmfPm_DESCRIPTION",
+    "I18N_TOPIC_5g0nxGUmx5J5_DESCRIPTION",
+    "I18N_EXPLORATION_K645IfRNzpKy_TITLE",
+    "I18N_EXPLORATION_K645IfRNzpKy_DESCRIPTION",
+    "I18N_EXPLORATION_Knvx24p24qPO_TITLE",
+    "I18N_EXPLORATION_Knvx24p24qPO_DESCRIPTION",
+    "I18N_EXPLORATION_aAkDKVDR53cG_TITLE",
+    "I18N_EXPLORATION_aAkDKVDR53cG_DESCRIPTION",
+    "I18N_EXPLORATION_avwshGklKLJE_TITLE",
+    "I18N_EXPLORATION_avwshGklKLJE_DESCRIPTION",
+    "I18N_EXPLORATION_OKxYhsWONHZV_TITLE",
+    "I18N_EXPLORATION_OKxYhsWONHZV_DESCRIPTION",
+    "I18N_EXPLORATION_BJd7yHIxpqkq_TITLE",
+    "I18N_EXPLORATION_BJd7yHIxpqkq_DESCRIPTION",
+    "I18N_EXPLORATION_W0xq3jW5GzDF_TITLE",
+    "I18N_EXPLORATION_W0xq3jW5GzDF_DESCRIPTION",
+    "I18N_EXPLORATION_53Ka3mQ6ra5A_TITLE",
+    "I18N_EXPLORATION_53Ka3mQ6ra5A_DESCRIPTION",
+    "I18N_EXPLORATION_VKXd8qHsxLml_TITLE",
+    "I18N_EXPLORATION_VKXd8qHsxLml_DESCRIPTION",
+    "I18N_EXPLORATION_PsfDKdhd6Esz_TITLE",
+    "I18N_EXPLORATION_PsfDKdhd6Esz_DESCRIPTION",
+    "I18N_EXPLORATION_9DITEN8BUEHw_TITLE",
+    "I18N_EXPLORATION_9DITEN8BUEHw_DESCRIPTION",
+    "I18N_EXPLORATION_R7WpsSfmDQPV_TITLE",
+    "I18N_EXPLORATION_R7WpsSfmDQPV_DESCRIPTION",
+    "I18N_EXPLORATION_zIBYaqfDJrJC_TITLE",
+    "I18N_EXPLORATION_zIBYaqfDJrJC_DESCRIPTION",
+    "I18N_EXPLORATION_1904tpP0CYwY_TITLE",
+    "I18N_EXPLORATION_1904tpP0CYwY_DESCRIPTION",
+    "I18N_EXPLORATION_cQDibOXQbpi7_TITLE",
+    "I18N_EXPLORATION_cQDibOXQbpi7_DESCRIPTION",
+    "I18N_EXPLORATION_MRJeVrKafW6G_TITLE",
+    "I18N_EXPLORATION_MRJeVrKafW6G_DESCRIPTION",
+    "I18N_EXPLORATION_hNOP3TwRJhsz_TITLE",
+    "I18N_EXPLORATION_hNOP3TwRJhsz_DESCRIPTION",
+    "I18N_EXPLORATION_zTg2hzTz37jP_TITLE",
+    "I18N_EXPLORATION_zTg2hzTz37jP_DESCRIPTION",
+    "I18N_EXPLORATION_8HTzQQUPiK5i_TITLE",
+    "I18N_EXPLORATION_8HTzQQUPiK5i_DESCRIPTION",
+    "I18N_EXPLORATION_40a3vjmZ7Fwu_TITLE",
+    "I18N_EXPLORATION_40a3vjmZ7Fwu_DESCRIPTION",
+    "I18N_EXPLORATION_WulCxGAmGE61_TITLE",
+    "I18N_EXPLORATION_WulCxGAmGE61_DESCRIPTION",
+    "I18N_EXPLORATION_lOU0XPC2BnE9_TITLE",
+    "I18N_EXPLORATION_lOU0XPC2BnE9_DESCRIPTION",
+    "I18N_EXPLORATION_wE9pyaC5np3n_TITLE",
+    "I18N_EXPLORATION_wE9pyaC5np3n_DESCRIPTION",
+    "I18N_EXPLORATION_umPkwp0L1M0-_TITLE",
+    "I18N_EXPLORATION_umPkwp0L1M0-_DESCRIPTION",
+    "I18N_EXPLORATION_MjZzEVOG47_1_TITLE",
+    "I18N_EXPLORATION_MjZzEVOG47_1_DESCRIPTION",
+    "I18N_EXPLORATION_9trAQhj6uUC2_TITLE",
+    "I18N_EXPLORATION_9trAQhj6uUC2_DESCRIPTION",
+    "I18N_EXPLORATION_rfX8jNkPnA-1_TITLE",
+    "I18N_EXPLORATION_rfX8jNkPnA-1_DESCRIPTION",
+    "I18N_EXPLORATION_0FBWxCE5egOw_TITLE",
+    "I18N_EXPLORATION_0FBWxCE5egOw_DESCRIPTION",
+    "I18N_EXPLORATION_670bU6d9JGBh_TITLE",
+    "I18N_EXPLORATION_670bU6d9JGBh_DESCRIPTION",
+    "I18N_EXPLORATION_aHikhPlxYgOH_TITLE",
+    "I18N_EXPLORATION_aHikhPlxYgOH_DESCRIPTION",
+    "I18N_EXPLORATION_-tMgcP1i_4au_TITLE",
+    "I18N_EXPLORATION_-tMgcP1i_4au_DESCRIPTION",
+    "I18N_EXPLORATION_zW39GLG_BdN2_TITLE",
+    "I18N_EXPLORATION_zW39GLG_BdN2_DESCRIPTION",
+    "I18N_EXPLORATION_Xa3B_io-2WI5_TITLE",
+    "I18N_EXPLORATION_Xa3B_io-2WI5_DESCRIPTION",
+    "I18N_EXPLORATION_6Q6IyIDkjpYC_TITLE",
+    "I18N_EXPLORATION_6Q6IyIDkjpYC_DESCRIPTION",
+    "I18N_EXPLORATION_osw1m5Q3jK41_TITLE",
+    "I18N_EXPLORATION_osw1m5Q3jK41_DESCRIPTION",
+    "I18N_EXPLORATION_2mzzFVDLuAj8_TITLE",
+    "I18N_EXPLORATION_2mzzFVDLuAj8_DESCRIPTION",
+    "I18N_EXPLORATION_5NWuolNcwH6e_TITLE",
+    "I18N_EXPLORATION_5NWuolNcwH6e_DESCRIPTION",
+    "I18N_EXPLORATION_k2bQ7z5XHNbK_TITLE",
+    "I18N_EXPLORATION_k2bQ7z5XHNbK_DESCRIPTION",
+    "I18N_EXPLORATION_tIoSb3HZFN6e_TITLE",
+    "I18N_EXPLORATION_tIoSb3HZFN6e_DESCRIPTION",
+    "I18N_EXPLORATION_nLmUS6lbmvnl_TITLE",
+    "I18N_EXPLORATION_nLmUS6lbmvnl_DESCRIPTION",
+    "I18N_EXPLORATION_Vgde5_ZVqrq5_TITLE",
+    "I18N_EXPLORATION_Vgde5_ZVqrq5_DESCRIPTION",
+    "I18N_EXPLORATION_RvopsvVdIb0J_TITLE",
+    "I18N_EXPLORATION_RvopsvVdIb0J_DESCRIPTION",
+    "I18N_EXPLORATION_zVbqxwck0KaC_TITLE",
+    "I18N_EXPLORATION_zVbqxwck0KaC_DESCRIPTION",
+    "I18N_EXPLORATION_rDJojPOc0KgJ_TITLE",
+    "I18N_EXPLORATION_rDJojPOc0KgJ_DESCRIPTION",
+    "I18N_EXPLORATION_kYSrbNDCv5sH_TITLE",
+    "I18N_EXPLORATION_kYSrbNDCv5sH_DESCRIPTION",
+    "I18N_EXPLORATION_K89Hgj2qRSzw_TITLE",
+    "I18N_EXPLORATION_K89Hgj2qRSzw_DESCRIPTION",
+    "I18N_EXPLORATION_lNpxiuqufPiw_TITLE",
+    "I18N_EXPLORATION_lNpxiuqufPiw_DESCRIPTION",
+    "I18N_EXPLORATION_Jbgc3MlRiY07_TITLE",
+    "I18N_EXPLORATION_Jbgc3MlRiY07_DESCRIPTION",
+    "I18N_EXPLORATION_rwN3YPG9XWZa_TITLE",
+    "I18N_EXPLORATION_rwN3YPG9XWZa_DESCRIPTION",
+    "I18N_EXPLORATION_nTMZwH7i0DdW_TITLE",
+    "I18N_EXPLORATION_nTMZwH7i0DdW_DESCRIPTION",
+    "I18N_EXPLORATION_IrbGLTicm0BI_TITLE",
+    "I18N_EXPLORATION_IrbGLTicm0BI_DESCRIPTION",
+    "I18N_EXPLORATION_v8fonNnX4Ub1_TITLE",
+    "I18N_EXPLORATION_v8fonNnX4Ub1_DESCRIPTION",
+    "I18N_EXPLORATION_ibeLZqbbjbKF_TITLE",
+    "I18N_EXPLORATION_ibeLZqbbjbKF_DESCRIPTION",
+    "I18N_EXPLORATION_BDIln52yGfeH_TITLE",
+    "I18N_EXPLORATION_BDIln52yGfeH_DESCRIPTION",
+    "I18N_EXPLORATION_SR1IKIdLxnm1_TITLE",
+    "I18N_EXPLORATION_SR1IKIdLxnm1_DESCRIPTION",
+    "I18N_EXPLORATION_m1nvGABWeUoh_TITLE",
+    "I18N_EXPLORATION_m1nvGABWeUoh_DESCRIPTION",
+    "I18N_EXPLORATION_zNb0Bh27QtJ4_TITLE",
+    "I18N_EXPLORATION_zNb0Bh27QtJ4_DESCRIPTION",
+    "I18N_EXPLORATION_5I4srORrwjt2_TITLE",
+    "I18N_EXPLORATION_5I4srORrwjt2_DESCRIPTION",
+    "I18N_EXPLORATION_aqJ07xrTFNLF_TITLE",
+    "I18N_EXPLORATION_aqJ07xrTFNLF_DESCRIPTION",
+    "I18N_EXPLORATION_0X0KC9DXWwra_TITLE",
+    "I18N_EXPLORATION_0X0KC9DXWwra_DESCRIPTION",
+    "I18N_STORY_RRVMHsZ5Mobh_TITLE",
+    "I18N_STORY_RRVMHsZ5Mobh_DESCRIPTION",
+    "I18N_STORY_Qu6THxP29tOy_TITLE",
+    "I18N_STORY_Qu6THxP29tOy_DESCRIPTION",
+    "I18N_STORY_vfJDB3JAdwIx_TITLE",
+    "I18N_STORY_vfJDB3JAdwIx_DESCRIPTION",
+    "I18N_STORY_rqnxwceQyFnv_TITLE",
+    "I18N_STORY_rqnxwceQyFnv_DESCRIPTION",
+    "I18N_STORY_3M5VBajMccXO_TITLE",
+    "I18N_STORY_3M5VBajMccXO_DESCRIPTION",
+    "I18N_STORY_JhiDkq01dqgC_TITLE",
+    "I18N_STORY_JhiDkq01dqgC_DESCRIPTION",
+    "I18N_STORY_ialKSV0VYV0B_TITLE",
+    "I18N_STORY_ialKSV0VYV0B_DESCRIPTION",
+    "I18N_SUBTOPIC_iX9kYCjnouWN_place-names-and-values_TITLE",
+    "I18N_SUBTOPIC_iX9kYCjnouWN_naming-numbers_TITLE",
+    "I18N_SUBTOPIC_iX9kYCjnouWN_comparing-numbers_TITLE",
+    "I18N_SUBTOPIC_iX9kYCjnouWN_rounding-numbers_TITLE",
+    "I18N_SUBTOPIC_sWBXKH4PZcK6_adding-numbers_TITLE",
+    "I18N_SUBTOPIC_sWBXKH4PZcK6_subtracting-numbers_TITLE",
+    "I18N_SUBTOPIC_sWBXKH4PZcK6_addition-subtraction_TITLE",
+    "I18N_SUBTOPIC_sWBXKH4PZcK6_estimation_TITLE",
+    "I18N_SUBTOPIC_sWBXKH4PZcK6_sequences _TITLE",
+    "I18N_SUBTOPIC_C4fqwrvqWpRm_basic-concepts_TITLE",
+    "I18N_SUBTOPIC_C4fqwrvqWpRm_memorizing-expressions_TITLE",
+    "I18N_SUBTOPIC_C4fqwrvqWpRm_multiplication-techniques_TITLE",
+    "I18N_SUBTOPIC_C4fqwrvqWpRm_rules-to-simplify_TITLE",
+    "I18N_SUBTOPIC_qW12maD4hiA8_basic-concepts_TITLE",
+    "I18N_SUBTOPIC_qW12maD4hiA8_techniques-of-division_TITLE",
+    "I18N_SUBTOPIC_qW12maD4hiA8_problem-solving_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_order-of-operations_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_variables_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_modelling-scenarios_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_problem-solving_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_algebraic-expressions_TITLE",
+    "I18N_SUBTOPIC_dLmjjMDbCcrf_solving-equations_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_what-is-a-fraction_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_fractions-of-a-group_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_equivalent-fractions_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_mixed-numbers_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_number-line_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_comparing-fractions_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_adding-fractions_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_subtracting-fractions_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_multiplying-fractions_TITLE",
+    "I18N_SUBTOPIC_0abdeaJhmfPm_dividing-fractions_TITLE",
+    "I18N_SUBTOPIC_5g0nxGUmx5J5_what-is-a-ratio_TITLE",
+    "I18N_SUBTOPIC_5g0nxGUmx5J5_equivalent-ratios_TITLE",
+    "I18N_SUBTOPIC_5g0nxGUmx5J5_calculations-with-ratios_TITLE",
+    "I18N_SUBTOPIC_5g0nxGUmx5J5_combining-ratios_TITLE"
+  ],
 
   "ALLOWED_THUMBNAIL_BG_COLORS": {
     "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
@@ -98,6 +297,11 @@ export default {
   "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
 
   "TASK_TARGET_TYPE_STATE": "state",
+
+  // Filters for adding new syllabus items to learner groups.
+  "DEFAULT_ADD_SYLLABUS_FILTER": "All",
+  "LEARNER_GROUP_ADD_STORY_FILTER": "Story",
+  "LEARNER_GROUP_ADD_SKILL_FILTER": "Skill",
 
   // Roles in exploration.
   "ROLE_OWNER": "owner",
@@ -4748,283 +4952,381 @@ export default {
   },
 
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
-  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "link", "math", "skillreview"],
+  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
   // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
     "code": "en",
-    "description": "English"
+    "description": "English",
+    "decimal_separator": "."
   }],
 
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
     "description": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "ar",
     "description": "العربية (Arabic)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "sq",
     "description": "shqip (Albanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
+  }, {
+    "code": "az",
+    "description": "Azeri (Azerbaijani)",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "bg",
     "description": "български (Bulgarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "bn",
     "description": "বাংলা (Bangla)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "ca",
     "description": "català (Catalan)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "zh",
     "description": "中文 (Chinese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hr",
     "description": "hrvatski (Croatian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "cs",
     "description": "čeština (Czech)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "da",
     "description": "dansk (Danish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "nl",
     "description": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fat",
     "description": "Fanti",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "fi",
     "description": "suomi (Finnish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fr",
     "description": "français (French)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "lg",
     "description": "Luganda (Ganda)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "de",
     "description": "Deutsch (German)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "el",
     "description": "ελληνικά (Greek)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
+  }, {
+    "code": "ha",
+    "description": "Halshen Hausa (Hausa)",
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "he",
     "description": "עברית (Hebrew)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": "."
   }, {
     "code": "hi",
     "description": "हिन्दी (Hindi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hi-en",
     "description": "Hinglish",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "hu",
     "description": "magyar (Hungarian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
+  }, {
+    "code": "ig",
+    "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "it",
     "description": "italiano (Italian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "kab",
     "description": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ko",
     "description": "한국어 (Korean)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "lv",
     "description": "latviešu (Latvian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "lt",
     "description": "lietuvių (Lithuanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "mr",
     "description": "मराठी (Marathi)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "fa",
     "description": "فارسی (Persian)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
+  }, {
+    "code": "pcm",
+    "description": "Naijá (Nigerian Pidgin)",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "pl",
     "description": "polszczyzna (Polish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "prs",
     "description": "دری (Dari)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ro",
     "description": "română (Romanian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ru",
     "description": "pусский (Russian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sr",
     "description": "cрпски (Serbian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sk",
     "description": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sl",
     "description": "slovenščina (Slovenian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "es",
     "description": "español (Spanish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "sw",
     "description": "kiswahili (Swahili)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "sv",
     "description": "svenska (Swedish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ta",
     "description": "தமிழ் (Tamil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "code": "tr",
     "description": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "uk",
     "description": "yкраїнська (Ukrainian)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "code": "ur",
     "description": "اُردُو (Urdu)",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
+  }, {
+    "code": "yo",
+    "description": "Èdè Yoùbá (Yoruba)",
+    "direction": "ltr",
+    "decimal_separator": "."
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
   // languages are roughly in order of how much support we have for them in
   // terms of lesson content translations.
   // List of supported site languages in which the platform is offered.
+  // The decimal separators were derived from https://en.wikipedia.org/w/index.php?title=Decimal_separator&section=9#Usage_worldwide.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "en",
     "text": "English",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "ar",
     "text": "العربية",
-    "direction": "rtl"
+    "direction": "rtl",
+    "decimal_separator": ","
   }, {
     "id": "hi",
     "text": "हिन्दी",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "es",
     "text": "Español",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "bn",
     "text": "বাংলা",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "fr",
-    "text": "français (French)",
-    "direction": "ltr"
+    "text": "français",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "id",
     "text": "Bahasa Indonesia",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
+  }, {
+    "id": "pcm",
+    "text": "Naijá (Nigerian Pidgin)",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "uk",
-    "text": "украї́нська мо́ва (Ukrainian)",
-    "direction": "ltr"
+    "text": "украї́нська мо́ва",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "sk",
-    "text": "slovenčina (Slovak)",
-    "direction": "ltr"
+    "text": "slovenčina",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "nl",
-    "text": "Nederlands (Dutch)",
-    "direction": "ltr"
+    "text": "Nederlands",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "kab",
     "text": "Taqbaylit (Kabyle)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "vi",
     "text": "Tiếng Việt",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "tr",
-    "text": "Türkçe (Turkish)",
-    "direction": "ltr"
+    "text": "Türkçe",
+    "direction": "ltr",
+    "decimal_separator": ","
   }, {
     "id": "zh-hans",
     "text": "中文(简体)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }, {
     "id": "zh-hant",
     "text": "中文(繁體)",
-    "direction": "ltr"
+    "direction": "ltr",
+    "decimal_separator": "."
   }],
 
   // List of supported audio languages in which we have audio and translations
@@ -5038,122 +5340,132 @@ export default {
     "direction": "ltr"
   }, {
     "id": "ak",
-    "description": "Akan",
+    "description": "Ákán (Akan)",
     "relatedLanguages": ["ak"],
     "direction": "ltr"
   }, {
     "id": "sq",
-    "description": "Albanian",
+    "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
     "direction": "ltr"
   }, {
     "id": "ar",
-    "description": "Arabic",
+    "description": "العربية (Arabic)",
     "relatedLanguages": ["ar"],
     "direction": "rtl"
   }, {
+    "id": "az",
+    "description": "Azeri (Azerbaijani)",
+    "relatedLanguages": ["az"],
+    "direction": "ltr"
+  }, {
     "id": "bg",
-    "description": "Bulgarian",
+    "description": "български (Bulgarian)",
     "relatedLanguages": ["bg"],
     "direction": "ltr"
   }, {
     "id": "bn",
-    "description": "Bangla",
+    "description": "বাংলা (Bangla)",
     "relatedLanguages": ["bn"],
     "direction": "ltr"
   }, {
     "id": "ms",
-    "description": "Bahasa Melayu",
+    "description": "بهاس ملايو(Bahasa Melayu)",
     "relatedLanguages": ["ms"],
     "direction": "ltr"
   }, {
     "id": "ca",
-    "description": "Catalan",
+    "description": "català (Catalan)",
     "relatedLanguages": ["ca"],
     "direction": "ltr"
   }, {
     "id": "zh",
-    "description": "Chinese",
+    "description": "中文 (Chinese)",
     "relatedLanguages": ["zh"],
     "direction": "ltr"
   }, {
     "id": "hr",
-    "description": "Croatian",
+    "description": "hrvatski (Croatian)",
     "relatedLanguages": ["hr"],
     "direction": "ltr"
   }, {
     "id": "cs",
-    "description": "Czech",
+    "description": "čeština (Czech)",
     "relatedLanguages": ["cs"],
     "direction": "ltr"
   }, {
     "id": "da",
-    "description": "Danish",
+    "description": "dansk (Danish)",
     "relatedLanguages": ["da"],
     "direction": "ltr"
   }, {
     "id": "prs",
-    "description": "Dari",
+    "description": "دری (Dari)",
     "relatedLanguages": ["prs"],
     "direction": "rtl"
   }, {
     "id": "nl",
-    "description": "Dutch",
+    "description": "Nederlands (Dutch)",
     "relatedLanguages": ["nl"],
     "direction": "ltr"
   }, {
     "id": "ee",
-    "description": "Ewe",
+    "description": "Eʋegbe (Ewe)",
     "relatedLanguages": ["ee"],
     "direction": "ltr"
   }, {
     "id": "fat",
-    "description": "Fanti",
+    "description": "Fante (Fanti)",
     "relatedLanguages": ["ak", "fat"],
     "direction": "ltr"
   }, {
     "id": "tl",
-    "description": "Filipino",
+    "description": "Filipino (Filipino)",
     "relatedLanguages": ["tl"],
     "direction": "ltr"
   }, {
     "id": "fi",
-    "description": "Finnish",
+    "description": "suomi (Finnish)",
     "relatedLanguages": ["fi"],
     "direction": "ltr"
   }, {
     "id": "fr",
-    "description": "French",
+    "description": "français (French)",
     "relatedLanguages": ["fr"],
     "direction": "ltr"
   }, {
     "id": "lg",
-    "description": "Ganda",
+    "description": "Luganda (Ganda)",
     "relatedLanguages": ["lg"],
     "direction": "ltr"
   }, {
     "id": "de",
-    "description": "German",
+    "description": "Deutsch (German)",
     "relatedLanguages": ["de"],
     "direction": "ltr"
   }, {
     "id": "el",
-    "description": "Greek",
+    "description": "ελληνικά (Greek)",
     "relatedLanguages": ["el"],
     "direction": "ltr"
   }, {
     "id": "gaa",
-    "description": "Ga",
+    "description": "Gã (Ga)",
     "relatedLanguages": ["gaa"],
     "direction": "ltr"
   }, {
+    "id": "ha",
+    "description": "Halshen Hausa (Hausa)",
+    "relatedLanguages": ["ha"],
+    "direction": "ltr"
+  }, {
     "id": "he",
-    "description": "Hebrew",
+    "description": "עברית (Hebrew)",
     "relatedLanguages": ["he"],
     "direction": "rtl"
   }, {
     "id": "hi",
-    "description": "Hindi",
+    "description": "हिन्दी (Hindi)",
     "relatedLanguages": ["hi"],
     "direction": "ltr"
   }, {
@@ -5163,148 +5475,163 @@ export default {
     "direction": "ltr"
   }, {
     "id": "hu",
-    "description": "Hungarian",
+    "description": "magyar (Hungarian)",
     "relatedLanguages": ["hu"],
     "direction": "ltr"
   }, {
     "id": "id",
-    "description": "Indonesian",
+    "description": "Bahasa Indonesia (Indonesian)",
     "relatedLanguages": ["id"],
     "direction": "ltr"
   }, {
+    "id": "ig",
+    "description": "Ásụ̀sụ́ Ìgbò (Igbo)",
+    "relatedLanguages": ["igbo"],
+    "direction": "ltr"
+  }, {
     "id": "it",
-    "description": "Italian",
+    "description": "italiano (Italian)",
     "relatedLanguages": ["it"],
     "direction": "ltr"
   }, {
     "id": "ja",
-    "description": "Japanese",
+    "description": "日本語 (Japanese)",
     "relatedLanguages": ["ja"],
     "direction": "ltr"
   }, {
     "id": "kab",
-    "description": "Kabyle",
+    "description": "Taqbaylit (Kabyle)",
     "relatedLanguages": ["kab"],
     "direction": "ltr"
   }, {
     "id": "ko",
-    "description": "Korean",
+    "description": "한국어 (Korean)",
     "relatedLanguages": ["ko"],
     "direction": "ltr"
   }, {
     "id": "lv",
-    "description": "Latvian",
+    "description": "latviešu (Latvian)",
     "relatedLanguages": ["lv"],
     "direction": "ltr"
   }, {
     "id": "lt",
-    "description": "Lithuanian",
+    "description": "lietuvių (Lithuanian)",
     "relatedLanguages": ["lt"],
     "direction": "ltr"
   }, {
     "id": "mr",
-    "description": "Marathi",
+    "description": "मराठी (Marathi)",
     "relatedLanguages": ["mr"],
     "direction": "ltr"
   }, {
     "id": "no",
-    "description": "Norwegian",
+    "description": "Norsk (Norwegian)",
     "relatedLanguages": ["no"],
     "direction": "ltr"
   }, {
     "id": "fa",
-    "description": "Persian",
+    "description": "فارسی (Persian)",
     "relatedLanguages": ["fa"],
     "direction": "rtl"
   }, {
+    "id": "pcm",
+    "description": "Naijá (Nigerian Pidgin)",
+    "relatedLanguages": ["pcm"],
+    "direction": "ltr"
+  }, {
     "id": "pl",
-    "description": "Polish",
+    "description": "polszczyzna (Polish)",
     "relatedLanguages": ["pl"],
     "direction": "ltr"
   }, {
     "id": "pt",
-    "description": "Portuguese",
+    "description": "português (Portuguese)",
     "relatedLanguages": ["pt"],
     "direction": "ltr"
   }, {
     "id": "ps",
-    "description": "Pashto",
+    "description": "پښتو (Pashto)",
     "relatedLanguages": ["ps"],
     "direction": "rtl"
   }, {
     "id": "ro",
-    "description": "Romanian",
+    "description": "română (Romanian)",
     "relatedLanguages": ["ro"],
     "direction": "ltr"
   }, {
     "id": "ru",
-    "description": "Russian",
+    "description": "pусский (Russian)",
     "relatedLanguages": ["ru"],
     "direction": "ltr"
   }, {
     "id": "sr",
-    "description": "Serbian",
+    "description": "cрпски (Serbian)",
     "relatedLanguages": ["sr"],
     "direction": "ltr"
   }, {
     "id": "sk",
-    "description": "Slovak",
+    "description": "slovenčina (Slovak)",
     "relatedLanguages": ["sk"],
     "direction": "ltr"
   }, {
     "id": "sl",
-    "description": "Slovenian",
+    "description": "slovenščina (Slovenian)",
     "relatedLanguages": ["sl"],
     "direction": "ltr"
   }, {
     "id": "es",
-    "description": "Spanish",
+    "description": "español (Spanish)",
     "relatedLanguages": ["es"],
     "direction": "ltr"
   }, {
     "id": "sw",
-    "description": "Swahili",
+    "description": "kiswahili (Swahili)",
     "relatedLanguages": ["sw"],
     "direction": "ltr"
   }, {
     "id": "sv",
-    "description": "Swedish",
+    "description": "svenska (Swedish)",
     "relatedLanguages": ["sv"],
     "direction": "ltr"
   }, {
     "id": "ta",
-    "description": "Tamil",
+    "description": "தமிழ் (Tamil)",
     "relatedLanguages": ["ta"],
     "direction": "ltr"
   }, {
     "id": "te",
-    "description": "Telugu",
+    "description": "తెలుగు (Telugu)",
     "relatedLanguages": ["te"],
     "direction": "ltr"
   }, {
     "id": "th",
-    "description": "Thai",
+    "description": "ภาษาไทย (Thai)",
     "relatedLanguages": ["th"],
     "direction": "ltr"
   }, {
     "id": "tr",
-    "description": "Turkish",
+    "description": "Türkçe (Turkish)",
     "relatedLanguages": ["tr"],
     "direction": "ltr"
   }, {
     "id": "uk",
-    "description": "Ukrainian",
+    "description": "yкраїнська (Ukrainian)",
     "relatedLanguages": ["uk"],
     "direction": "ltr"
   }, {
     "id": "ur",
-    "description": "Urdu",
+    "description": "اُردُو (Urdu)",
     "relatedLanguages": ["ur"],
     "direction": "rtl"
   }, {
     "id": "vi",
-    "description": "Vietnamese",
+    "description": "Tiếng Việt (Vietnamese)",
     "relatedLanguages": ["vi"],
+    "direction": "ltr"
+  }, {
+    "id": "yo",
+    "description": "Èdè Yoùbá (Yoruba)",
+    "relatedLanguages": ["yo"],
     "direction": "ltr"
   }],
 
@@ -5569,7 +5896,7 @@ export default {
 
   "MAX_SKILLS_PER_QUESTION": 3,
 
-  "MAX_QUESTIONS_PER_SKILL": 50,
+  "MAX_QUESTIONS_PER_SKILL": 10,
 
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
@@ -5580,6 +5907,15 @@ export default {
   // The default number of opportunities to show on the contributor dashboard
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
+
+  // The breakpoint for mobile view for contributor dashboard in px.
+  // This value must be the same as the one specified in
+  // opportunities-list-item.component.html.
+  "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
+
+  // Represents the string value indicating "All topics" in the Contributor
+  // Dashboard topic selector.
+  "TOPIC_SENTINEL_NAME_ALL": "All",
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
@@ -5622,6 +5958,7 @@ export default {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 5,
   "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {
@@ -5637,6 +5974,7 @@ export default {
       "answer_groups": [],
       "default_outcome": {
         "dest": "Introduction",
+        "dest_if_really_stuck": null,
         "feedback": {
           "content_id": "default_outcome",
           "html": ""
@@ -5706,6 +6044,9 @@ export default {
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
 
+  // A regular expression for allowed learner group IDs.
+  "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
+
   // A regular expression for allowed characters in Title field for Blog Post.
   "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
 
@@ -5774,8 +6115,8 @@ export default {
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
 
-  // Allowed letters in the OSK.
-  "VALID_CUSTOM_OSK_LETTERS": [
+  // Valid allowed letters for math lessons.
+  "VALID_ALLOWED_VARIABLES": [
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
     "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
@@ -5818,9 +6159,10 @@ export default {
 
   // Placeholder texts for the math interactions.
   "MATH_INTERACTION_PLACEHOLDERS": {
-    "AlgebraicExpressionInput": "Type an expression here.",
-    "NumericExpressionInput": "Type an expression here, using only numbers.",
-    "MathEquationInput": "Type an equation here."
+    "AlgebraicExpressionInput": "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION",
+    "MathEquationInput": "I18N_INTERACTIONS_MATH_EQ_INSTRUCTION",
+    // The following is user editable and hence, is not translated.
+    "NumericExpressionInput": "Type an expression here, using only numbers."
   },
 
   // Unfinished features.
@@ -5840,12 +6182,6 @@ export default {
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
-  // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": true,
-
-  // Used to disable account data export until it is fully implemented.
-  "ENABLE_ACCOUNT_EXPORT": true,
-
   // Link to open when the Oppia avatar is clicked on any page.
   "OPPIA_AVATAR_LINK_URL": null,
 
@@ -5854,6 +6190,9 @@ export default {
 
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
+
+  // Maximum allowed length of unique progress url ID.
+  "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
@@ -5974,7 +6313,7 @@ export default {
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "ABOUT": {
       "ROUTE": "about",
-      "TITLE": "About | Oppia",
+      "TITLE": "I18N_ABOUT_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -5992,34 +6331,12 @@ export default {
     },
     "ABOUT_FOUNDATION": {
       "ROUTE": "about-foundation",
-      "TITLE": "About foundation | Oppia",
+      "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
-    },
-    "CLASSROOM": {
-      "ROUTE": "learn/:classroom_url_fragment",
-      "TITLE": "Oppia",
-      // Some routes contain url fragments, as syntax for url fragments are
-      // different for angular router and backend. They have to be registered
-      // manually in the backend. Please use angular router syntax here.
-      "MANUALLY_REGISTERED_WITH_BACKEND": true,
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
-        }
-      ]
     },
     "CONTACT": {
       "ROUTE": "contact",
-      "TITLE": "Contact | Oppia",
+      "TITLE": "I18N_CONTACT_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6055,7 +6372,7 @@ export default {
     },
     "GET_STARTED": {
       "ROUTE": "get-started",
-      "TITLE": "Get Started | Oppia",
+      "TITLE": "I18N_GET_STARTED_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6071,7 +6388,7 @@ export default {
     },
     "LICENSE": {
       "ROUTE": "license",
-      "TITLE": "License Page | Oppia",
+      "TITLE": "I18N_LICENSE_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6087,12 +6404,12 @@ export default {
     },
     "LOGIN": {
       "ROUTE": "login",
-      "TITLE": "Sign in | Oppia",
+      "TITLE": "I18N_LOGIN_PAGE_TITLE",
       "META": []
     },
     "LOGOUT": {
       "ROUTE": "logout",
-      "TITLE": "Logout | Oppia",
+      "TITLE": "I18N_LOGOUT_PAGE_BROWSER_TAB_TITLE",
       "META": []
     },
     "PARTNERSHIPS": {
@@ -6102,7 +6419,7 @@ export default {
     },
     "PLAYBOOK": {
       "ROUTE": "creator-guidelines",
-      "TITLE": "Creator Guidelines | Oppia",
+      "TITLE": "I18N_PLAYBOOK_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6120,12 +6437,12 @@ export default {
     },
     "PRIVACY": {
       "ROUTE": "privacy-policy",
-      "TITLE": "Privacy Policy | Oppia",
+      "TITLE": "I18N_PRIVACY_POLICY_PAGE_TITLE",
       "META": []
     },
     "SIGNUP": {
       "ROUTE": "signup",
-      "TITLE": "Join the community - Oppia",
+      "TITLE": "I18N_SIGNUP_PAGE_TITLE",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
@@ -6142,7 +6459,7 @@ export default {
     },
     "TEACH": {
       "ROUTE": "teach",
-      "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
+      "TITLE": "I18N_TEACH_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6160,7 +6477,7 @@ export default {
     },
     "TERMS": {
       "ROUTE": "terms",
-      "TITLE": "Terms of Use | Oppia",
+      "TITLE": "I18N_TERMS_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6178,7 +6495,7 @@ export default {
     },
     "THANKS": {
       "ROUTE": "thanks",
-      "TITLE": "Thanks | Oppia",
+      "TITLE": "I18N_THANKS_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6194,7 +6511,7 @@ export default {
     },
     "DELETE_ACCOUNT": {
       "ROUTE": "delete-account",
-      "TITLE": "Delete Account | Oppia",
+      "TITLE": "I18N_DELETE_ACCOUNT_PAGE_TITLE",
       "META": []
     },
     "LIBRARY_INDEX": {
@@ -6271,12 +6588,12 @@ export default {
     },
     "PENDING_ACCOUNT_DELETION": {
       "ROUTE": "pending-account-deletion",
-      "TITLE": "Pending Account Deletion | Oppia",
+      "TITLE": "I18N_PENDING_ACCOUNT_DELETION_PAGE_TITLE",
       "META": []
     },
     "PREFERENCES": {
       "ROUTE": "preferences",
-      "TITLE": "Preferences | Oppia",
+      "TITLE": "I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6292,7 +6609,7 @@ export default {
     },
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
-      "TITLE": "Profile | Oppia",
+      "TITLE": "I18N_PROFILE_PAGE_TITLE",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -6301,25 +6618,7 @@ export default {
     },
     "RELEASE_COORDINATOR_PAGE": {
       "ROUTE": "release-coordinator",
-      "TITLE": "Oppia Release Coordinator Panel",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
-    },
-    "SPLASH": {
-      "ROUTE": "",
-      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "TITLE": "I18N_RELEASE_COORDINATOR_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6349,6 +6648,48 @@ export default {
       "ROUTE": "volunteer",
       "TITLE": "Volunteer | Oppia",
       "META": []
+    },
+    "CLASSROOM": {
+      "ROUTE": "learn/:classroom_url_fragment",
+      "TITLE": "Oppia",
+      "LIGHTWEIGHT": true,
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        }
+      ]
+    },
+    "SPLASH": {
+      "ROUTE": "",
+      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "LIGHTWEIGHT": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
     }
   },
 
@@ -6411,5 +6752,16 @@ export default {
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
-  "ASSET_TYPE_THUMBNAIL": "thumbnail"
+  "ASSET_TYPE_THUMBNAIL": "thumbnail",
+
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
+
+  "CAN_FETCH_VERSION_HISTORY_DATA": false,
+  "METADATA_PROPERTIES": [
+    "title", "category", "objective", "language_code", "tags", "blurb",
+    "author_notes", "states_schema_version", "init_state_name", "param_specs",
+    "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
+    "edits_allowed"
+  ],
+  "NON_METADATA_PROPERTIES": ["id", "states"]
 } as const;

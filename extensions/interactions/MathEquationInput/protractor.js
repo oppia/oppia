@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Math Equation Input
- * interaction
+ * interaction in protractor.
  */
 
 var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
@@ -24,7 +24,7 @@ var waitFor = require(
 
 var customizeInteraction = async function(elem, customLetters) {
   await waitFor.presenceOf(elem.element(by.css(
-    '.protractor-test-custom-letters-div')),
+    '.e2e-test-custom-letters-div')),
   'The custom letters div took too long to load.');
   for (let letter of customLetters) {
     if (letter.match(/[a-z]/)) {
@@ -51,7 +51,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.element(by.tagName(
     'oppia-interactive-math-equation-input'))).setValue(answer);
-  await element(by.css('.protractor-test-submit-answer-button')).click();
+  await element(by.css('.e2e-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'MathEquation';
@@ -75,13 +75,13 @@ var testSuite = [{
   ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on Left Hand Side'],
   expectedInteractionDetails: [],
   wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
-  correctAnswers: ['y=m*x+c', 'y=m*x^2+c', '2*y-y=m*x+c', 'y=0', 'y=m*x-c']
+  correctAnswers: ['y=m*x+c', 'y=m*x^2+c', 'y=0', 'y=m*x-c']
 }, {
   interactionArguments: [['y', 'm', 'x', 'c']],
   ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
-  correctAnswers: ['y=m*x+c', 'y=c+m*x']
+  wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c', 'y=c+m*x'],
+  correctAnswers: ['y=m*x+c']
 }];
 
 exports.customizeInteraction = customizeInteraction;

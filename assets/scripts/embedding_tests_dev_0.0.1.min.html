@@ -7,7 +7,7 @@
 </p>
 
 <style type="text/css">
-  .protractor-test-results {
+  .e2e-test-results {
     display: none;
   }
 </style>
@@ -16,37 +16,37 @@
 <script src="/assets/scripts/embedding_tests.js"></script>
 <script src="../../third_party/static/jquery-3.5.1/jquery.min.js"></script>
 
-<input class="protractor-test-exploration-id-input-field" type="text" placeholder="explorationId">
-<input class="protractor-test-exploration-id-submit-button" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
+<input class="e2e-test-exploration-id-input-field" type="text" placeholder="explorationId">
+<input class="e2e-test-exploration-id-submit-button" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
 
-<div class="protractor-test-results">
+<div class="e2e-test-results">
   <div>
     <h3>Iframe embedding</h3>
     <iframe src="/embed/exploration/idToBeReplaced" width="700" height="600">
     </iframe>
   </div>
 
-  <div class="protractor-test-standard">
+  <div class="e2e-test-standard">
     <h3>Standard embedding of the latest version</h3>
     <oppia oppia-id="idToBeReplaced"></oppia>
   </div>
 
-  <div class="protractor-test-old-version">
+  <div class="e2e-test-old-version">
     <h3>Standard embedding of version 2 of the exploration with deferred loading</h3>
     <oppia oppia-id="idToBeReplaced" autoload="false" exploration-version="2"></oppia>
   </div>
 
-  <div class="protractor-test-missing-id">
+  <div class="e2e-test-missing-id">
     <h3>ERROR: No oppia id specified</h3>
     <oppia></oppia>
   </div>
 
-  <div class="protractor-test-invalid-id">
+  <div class="e2e-test-invalid-id">
     <h3>ERROR: 404 error</h3>
     <oppia oppia-id="fake_id"></oppia>
   </div>
 
-  <div class="protractor-test-invalid-id-deferred">
+  <div class="e2e-test-invalid-id-deferred">
     <h3>ERROR: 404 error with deferred loading</h3>
     <oppia oppia-id="fake_id" autoload="false"></oppia>
   </div>
@@ -57,7 +57,7 @@
   var placeholderExplorationId = 'idToBeReplaced';
   var onChangeExpId = function() {
     var newExplorationId = $(
-      '.protractor-test-exploration-id-input-field').val();
+      '.e2e-test-exploration-id-input-field').val();
     $('div > iframe').each(function(index) {
       var src = $(this).attr('src');
       src = src.replace(placeholderExplorationId, newExplorationId);
@@ -71,6 +71,6 @@
     });
 
     // Show the contents.
-    $('.protractor-test-results').show();
+    $('.e2e-test-results').show();
   };
 </script>

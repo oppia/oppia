@@ -23,7 +23,6 @@ import os
 import re
 from unittest import mock
 
-from core import python_utils
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import param_domain
@@ -170,7 +169,7 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
     EMAIL = 'user@test.com'
 
     def setUp(self):
-        super(AuthServicesStubTests, self).setUp()
+        super().setUp()
         self.stub = test_utils.AuthServicesStub()
 
     def test_get_auth_claims_from_request(self):
@@ -249,7 +248,7 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
         self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
             'aid', 'uid'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'):
+        with self.assertRaisesRegex(Exception, 'already associated'):
             self.stub.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -269,7 +268,7 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
         self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
             'aid1', 'uid1'))
 
-        with self.assertRaisesRegexp(Exception, 'already associated'):
+        with self.assertRaisesRegex(Exception, 'already associated'):
             self.stub.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
@@ -330,7 +329,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             test_utils.FailingFunction.INFINITY)
 
         for i in range(20):
-            with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
+            with self.assertRaisesRegex(MockError, 'Dummy Exception'):
                 failing_func(i)
 
     def test_failing_function_raises_error_with_invalid_num_tries(self):
@@ -339,7 +338,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
 
         function = lambda x: x ** 2
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             'num_tries_before_success should either be an integer greater than '
             'or equal to 0, or FailingFunction.INFINITY'):
@@ -369,29 +368,29 @@ class TestUtilsTests(test_utils.GenericTestBase):
             'b': param_domain.ParamSpec('UnicodeString'),
         }
 
-        with self.assertRaisesRegexp(Exception, 'Parameter a not found'):
+        with self.assertRaisesRegex(Exception, 'Parameter a not found'):
             self.get_updated_param_dict(
                 {}, param_change_list, exp_param_specs)
 
     def test_cannot_save_new_linear_exp_with_no_state_name(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'must provide at least one state name'):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', [], ['interaction_id'])
 
     def test_cannot_save_new_linear_exp_with_no_interaction_id(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'must provide at least one interaction type'):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', ['state_name'], [])
 
     def test_cannot_perform_delete_json_with_non_dict_params(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected params to be a dict'):
             self.delete_json('random_url', params='invalid_params')
 
     def test_cannot_get_response_with_non_dict_params(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected params to be a dict'):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
@@ -401,9 +400,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.capture_logging() as logs:
             logging.info('1')
             logging.debug('2')
-            logging.warn('3')
+            logging.warning('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.info('6')
 
         self.assertEqual(logs, ['1', '2', '3', '4'])
@@ -413,9 +412,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.capture_logging(min_level=logging.WARN) as logs:
             logging.info('1')
             logging.debug('2')
-            logging.warn('3')
+            logging.warning('3')
             logging.error('4')
-            python_utils.PRINT('5')
+            print('5')
         logging.error('6')
 
         self.assertEqual(logs, ['3', '4'])
@@ -454,15 +453,15 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
     def test_swap_to_always_raise_with_error(self):
         obj = mock.Mock()
-        obj.func = lambda: python_utils.divide(1, 0)
+        obj.func = lambda: 1 // 0
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ZeroDivisionError, 'integer division or modulo by zero'
         ):
             obj.func()
 
         with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
-            with self.assertRaisesRegexp(ValueError, 'abc'):
+            with self.assertRaisesRegex(ValueError, 'abc'):
                 obj.func()
 
     def test_swap_with_check_on_method_called(self):
@@ -478,7 +477,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             return
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
-        with self.assertRaisesRegexp(AssertionError, r'os\.getcwd'):
+        with self.assertRaisesRegex(AssertionError, r'os\.getcwd'):
             with getcwd_swap:
                 SwapWithCheckTestClass.empty_function_without_args()
 
@@ -497,7 +496,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         getcwd_swap = self.swap_with_checks(
             os, 'getcwd', mock_getcwd)
-        with self.assertRaisesRegexp(AssertionError, r'os\.getcwd'):
+        with self.assertRaisesRegex(AssertionError, r'os\.getcwd'):
             with getcwd_swap:
                 SwapWithCheckTestClass.empty_function_without_args()
 
@@ -530,7 +529,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             mock_samefile,
             expected_args=[('first', 'second')]
         )
-        with self.assertRaisesRegexp(AssertionError, r'os\.getenv'):
+        with self.assertRaisesRegex(AssertionError, r'os\.getenv'):
             with getenv_swap, samefile_swap:
                 SwapWithCheckTestClass.functions_with_args()
 
@@ -544,7 +543,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         samefile_swap = self.swap_with_checks(
             os.path, 'samefile', mock_samefile, expected_args=[
                 ('first', 'second'), ('third', 'forth')])
-        with self.assertRaisesRegexp(AssertionError, r'samefile'):
+        with self.assertRaisesRegex(AssertionError, r'samefile'):
             with getenv_swap, samefile_swap:
                 SwapWithCheckTestClass.functions_with_args()
 
@@ -569,7 +568,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 {'key': '678', 'default': '900'},
             ])
 
-        with self.assertRaisesRegexp(AssertionError, r'os\.getenv'):
+        with self.assertRaisesRegex(AssertionError, r'os\.getenv'):
             with getenv_swap:
                 SwapWithCheckTestClass.functions_with_kwargs()
 
@@ -580,7 +579,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, re.escape('Exception raised from getcwd()')
         ):
             with getcwd_swap:
@@ -590,10 +589,10 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_exception_func():
             raise Exception()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.'
+            'self.assertRaisesRegex instead.'
         ):
             self.assertRaises(Exception, mock_exception_func)
 
@@ -601,15 +600,15 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_exception_func():
             raise Exception()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Please provide a sufficiently strong regexp string to '
             'validate that the correct error is being raised.'
         ):
-            self.assertRaisesRegexp(Exception, '', mock_exception_func)
+            self.assertRaisesRegex(Exception, '', mock_exception_func)
 
     def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
                 Exception, 'mocked_now must be datetime, got: 123'):
             with self.mock_datetime_utcnow(123):
                 pass

@@ -15,175 +15,238 @@
 /**
  * @fileoverview Unit tests for contributor dashboard page component.
  */
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ContributorDashboardPageComponent } from 'pages/contributor-dashboard-page/contributor-dashboard-page.component';
+import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { UserService } from 'services/user.service';
+import { LocalStorageService } from 'services/local-storage.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { UserInfo } from 'domain/user/user-info.model';
 
-require(
-  'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
-
-describe('Contributor dashboard page', function() {
-  var ctrl = null;
-  var $q = null;
-  var $rootScope = null;
-  var LocalStorageService = null;
-  var $timeout = null;
-  var UserService = null;
-  var TranslationLanguageService = null;
-  var TranslationTopicService = null;
-  var ContributionOpportunitiesService = null;
-  var userProfileImage = 'profile-data-url';
-  var userContributionRights = {
+describe('Contributor dashboard page', () => {
+  let component: ContributorDashboardPageComponent;
+  let fixture: ComponentFixture<ContributorDashboardPageComponent>;
+  let localStorageService: LocalStorageService;
+  let userService: UserService;
+  let translationLanguageService: TranslationLanguageService;
+  let translationTopicService: TranslationTopicService;
+  let contributionOpportunitiesService: ContributionOpportunitiesService;
+  let userProfileImage = 'profile-data-url';
+  let userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
-    can_review_questions: true
+    can_review_questions: true,
+    can_suggest_questions: true,
   };
-  var windowRef = new WindowRef();
-  var focusManagerService = null;
+  let focusManagerService: FocusManagerService;
+  let windowRef: WindowRef;
+  let getTranslatableTopicNamesAsyncSpy;
+  let getUserInfoAsyncSpy;
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRef);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        ContributorDashboardPageComponent
+      ],
+      providers: [
+        LocalStorageService,
+        UserService,
+        TranslationLanguageService,
+        TranslationTopicService,
+        ContributionOpportunitiesService,
+        WindowRef
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-    focusManagerService = TestBed.get(FocusManagerService);
-  });
+    fixture = TestBed.createComponent(ContributorDashboardPageComponent);
+    component = fixture.componentInstance;
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    ContributionOpportunitiesService =
-      $injector.get('ContributionOpportunitiesService');
-    LocalStorageService = $injector.get('LocalStorageService');
-    TranslationLanguageService = $injector.get('TranslationLanguageService');
-    TranslationTopicService = $injector.get('TranslationTopicService');
-    UserService = $injector.get('UserService');
-    $q = $injector.get('$q');
-    $timeout = $injector.get('$timeout');
-    $rootScope = $injector.get('$rootScope');
-    focusManagerService = $injector.get('FocusManagerService');
-    ctrl = $componentController('contributorDashboardPage');
+    contributionOpportunitiesService =
+      TestBed.inject(ContributionOpportunitiesService);
+    localStorageService = TestBed.inject(LocalStorageService);
+    windowRef = TestBed.inject(WindowRef);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
+    translationTopicService = TestBed.inject(TranslationTopicService);
+    userService = TestBed.inject(UserService);
+    focusManagerService = TestBed.inject(FocusManagerService);
 
-    spyOn(ContributionOpportunitiesService, 'getAllTopicNamesAsync')
-      .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
-    spyOn(LocalStorageService, 'getLastSelectedTranslationLanguageCode').and
+    getTranslatableTopicNamesAsyncSpy = spyOn(
+      contributionOpportunitiesService, 'getTranslatableTopicNamesAsync');
+    getTranslatableTopicNamesAsyncSpy.and.returnValue(
+      Promise.resolve(['Topic 1', 'Topic 2']));
+    spyOn(localStorageService, 'getLastSelectedTranslationLanguageCode').and
       .returnValue('');
-    spyOn(LocalStorageService, 'getLastSelectedTranslationTopicName').and
+    spyOn(localStorageService, 'getLastSelectedTranslationTopicName').and
       .returnValue('Topic 1');
-    spyOn(TranslationLanguageService, 'setActiveLanguageCode').and
+    spyOn(translationLanguageService, 'setActiveLanguageCode').and
       .callThrough();
-    spyOn(TranslationTopicService, 'setActiveTopicName').and.callThrough();
-  }));
+    spyOn(translationTopicService, 'setActiveTopicName').and.callThrough();
 
-  it('should set focus on select lang field', function() {
-    var focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
-    ctrl.onTabClick('translateTextTab');
-    $timeout.flush();
-    expect(focusSpy).toHaveBeenCalled();
-  });
-
-  describe('when user is logged in', function() {
-    var userInfo = {
+    let userInfo = {
       isLoggedIn: () => true,
       getUsername: () => 'username1'
     };
 
-    beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync')
-        .and.returnValue($q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsDataAsync')
-        .and.returnValue($q.resolve(userContributionRights));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve(userInfo));
-      ctrl.$onInit();
-      $rootScope.$apply();
+    spyOn(userService, 'getProfileImageDataUrlAsync')
+      .and.returnValue(Promise.resolve(userProfileImage));
+    spyOn(userService, 'getUserContributionRightsDataAsync')
+      .and.returnValue(Promise.resolve(userContributionRights));
+    getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
+    getUserInfoAsyncSpy.and.returnValue(
+      Promise.resolve(userInfo as UserInfo));
+
+    component.ngOnInit();
+  });
+
+  it('should set focus on select lang field', fakeAsync(() => {
+    let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+
+    component.onTabClick('translateTextTab');
+    tick();
+    flush();
+
+    expect(focusSpy).toHaveBeenCalled();
+  }));
+
+  it('should scroll properly', () => {
+    const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+    nativeWindowSpy.and.returnValue({
+      pageYOffset: 11
     });
 
-    it('should set specific properties after $onInit is called', function() {
-      expect(ctrl.topicName).toBe('Topic 1');
-      expect(TranslationTopicService.setActiveTopicName)
-        .toHaveBeenCalledWith('Topic 1');
-      expect(ctrl.activeTabName).toBe('myContributionTab');
-      expect(ctrl.OPPIA_AVATAR_IMAGE_URL).toBe(
-        '/assets/images/avatar/oppia_avatar_100px.svg');
+    component.scrollFunction();
+
+    expect(component.defaultHeaderVisible).toBeTrue();
+  });
+
+  it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
+    let userInfo = {
+      isLoggedIn: () => false,
+      getUsername: () => 'username1'
+    };
+
+    getUserInfoAsyncSpy.and.returnValue(
+      Promise.resolve(userInfo as UserInfo));
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.username).toEqual('');
+    expect(component.userIsLoggedIn).toBeFalse();
+  }));
+
+  describe('when user is logged in', () => {
+    it('should set specific properties after $onInit is called',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        expect(component.topicName).toBe('Topic 1');
+        expect(translationTopicService.setActiveTopicName)
+          .toHaveBeenCalled();
+        expect(component.activeTabName).toBe('myContributionTab');
+        expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
+          '/assets/images/avatar/oppia_avatar_100px.svg');
+      }));
+
+    it('should not set active topic name when no topics are returned',
+      fakeAsync(() => {
+        getTranslatableTopicNamesAsyncSpy.and.returnValue(
+          Promise.resolve([]));
+
+        component.ngOnInit();
+        tick();
+
+        expect(component.topicName).toBe(undefined);
+        expect(translationTopicService.setActiveTopicName)
+          .not.toHaveBeenCalled();
+      }));
+
+    it('should return language description in kebab case format', () => {
+      let languageDescription = 'Deutsch (German)';
+
+      expect(component.provideLanguageForProtractorClass(
+        languageDescription)).toEqual('deutsch-german');
     });
 
     it('should initialize $scope properties after controller is initialized' +
-      ' and get data from backend', function() {
-      expect(ctrl.userIsLoggedIn).toBe(true);
-      expect(ctrl.username).toBe('username1');
-      expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([
-        'English', 'Portuguese', 'Hindi']);
-      expect(ctrl.userCanReviewVoiceoverSuggestionsInLanguages).toEqual([
-        'English', 'Portuguese', 'Hindi']);
-      expect(ctrl.userCanReviewQuestions).toBe(true);
-      expect(ctrl.userIsReviewer).toBe(true);
-      expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
+      ' and get data from backend', () => {
+      expect(component.userIsLoggedIn).toBe(false);
+      expect(component.username).toBe('');
+      expect(component.userCanReviewQuestions).toBe(false);
+      expect(component.userIsReviewer).toBe(false);
+      expect(component.profilePictureDataUrl).toBe(null);
     });
 
     it('should change active tab name when clicking on translate text tab',
-      function() {
-        var changedTab = 'translateTextTab';
-        expect(ctrl.activeTabName).toBe('myContributionTab');
-        ctrl.onTabClick(changedTab);
-        expect(ctrl.activeTabName).toBe(changedTab);
+      () => {
+        let changedTab = 'translateTextTab';
+        expect(component.activeTabName).toBe('myContributionTab');
+        component.onTabClick(changedTab);
+        expect(component.activeTabName).toBe(changedTab);
       });
 
     it('should change active language when clicking on language selector',
-      function() {
-        spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
+      () => {
+        spyOn(localStorageService, 'updateLastSelectedTranslationLanguageCode')
           .and.callThrough();
 
-        ctrl.onChangeLanguage('hi');
+        component.onChangeLanguage('hi');
 
-        expect(TranslationLanguageService.setActiveLanguageCode)
+        expect(translationLanguageService.setActiveLanguageCode)
           .toHaveBeenCalledWith('hi');
-        expect(LocalStorageService.updateLastSelectedTranslationLanguageCode)
+        expect(localStorageService.updateLastSelectedTranslationLanguageCode)
           .toHaveBeenCalledWith('hi');
       });
 
-    it('should show language selector based on active tab', function() {
-      var changedTab = 'translateTextTab';
+    it('should show language selector based on active tab', () => {
+      let changedTab = 'translateTextTab';
 
-      expect(ctrl.activeTabName).toBe('myContributionTab');
-      expect(ctrl.showLanguageSelector()).toBe(false);
+      expect(component.activeTabName).toBe('myContributionTab');
+      expect(component.showLanguageSelector()).toBe(false);
 
-      ctrl.onTabClick(changedTab);
-      expect(ctrl.activeTabName).toBe(changedTab);
-      expect(ctrl.showLanguageSelector()).toBe(true);
+      component.onTabClick(changedTab);
+      expect(component.activeTabName).toBe(changedTab);
+      expect(component.showLanguageSelector()).toBe(true);
     });
 
     it('should change active topic when clicking on topic selector',
-      function() {
-        spyOn(LocalStorageService, 'updateLastSelectedTranslationTopicName')
+      () => {
+        spyOn(localStorageService, 'updateLastSelectedTranslationTopicName')
           .and.callThrough();
 
-        ctrl.onChangeTopic('Topic 2');
+        component.onChangeTopic('Topic 2');
 
-        expect(TranslationTopicService.setActiveTopicName)
+        expect(translationTopicService.setActiveTopicName)
           .toHaveBeenCalledWith('Topic 2');
-        expect(LocalStorageService.updateLastSelectedTranslationTopicName)
+        expect(localStorageService.updateLastSelectedTranslationTopicName)
           .toHaveBeenCalledWith('Topic 2');
       });
 
-    it('should show topic selector based on active tab', function() {
-      var changedTab = 'translateTextTab';
+    it('should show topic selector based on active tab', () => {
+      let changedTab = 'translateTextTab';
 
-      expect(ctrl.activeTabName).toBe('myContributionTab');
-      expect(ctrl.showLanguageSelector()).toBe(false);
+      expect(component.activeTabName).toBe('myContributionTab');
+      expect(component.showLanguageSelector()).toBe(false);
 
-      ctrl.onTabClick(changedTab);
-      expect(ctrl.activeTabName).toBe(changedTab);
-      expect(ctrl.showTopicSelector()).toBe(true);
+      component.onTabClick(changedTab);
+      expect(component.activeTabName).toBe(changedTab);
+      expect(component.showTopicSelector()).toBe(true);
     });
 
-    it('should call scrollFunction on scroll', function() {
-      var dummyScrollEvent = new Event('scroll');
-      var scrollSpy = spyOn(ctrl, 'scrollFunction');
+    it('should call scrollFunction on scroll', () => {
+      let dummyScrollEvent = new Event('scroll');
+      let scrollSpy = spyOn(component, 'scrollFunction');
 
       windowRef.nativeWindow.dispatchEvent(dummyScrollEvent);
 
@@ -191,49 +254,28 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should show default header if window pageYOffset is ' +
-      'less than 5', function() {
+      'less than 80', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 4
+        pageYOffset: 79
       });
 
-      ctrl.scrollFunction();
+      component.scrollFunction();
 
-      expect(ctrl.defaultHeaderVisible).toBe(true);
+      expect(component.defaultHeaderVisible).toBe(true);
     });
 
     it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 5', function() {
+      ' scrolled greater than 80', fakeAsync(() => {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 6
+        pageYOffset: 81
       });
 
-      ctrl.scrollFunction();
+      component.scrollFunction();
+      tick();
 
-      expect(ctrl.defaultHeaderVisible).toBe(false);
-    });
-  });
-
-  describe('when user is not logged in', function() {
-    var userInfo = {
-      isLoggedIn: () => false
-    };
-
-    beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync')
-        .and.returnValue($q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsDataAsync')
-        .and.returnValue($q.resolve(userContributionRights));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve(userInfo));
-      ctrl.$onInit();
-      $rootScope.$apply();
-    });
-
-    it('should have no user data in dashboard page', function() {
-      expect(ctrl.userIsLoggedIn).toBe(false);
-      expect(ctrl.username).toBe('');
-    });
+      expect(component.defaultHeaderVisible).toBe(false);
+    }));
   });
 });

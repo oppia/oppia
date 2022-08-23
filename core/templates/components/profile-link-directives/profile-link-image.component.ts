@@ -31,14 +31,15 @@ import { AppConstants } from 'app.constants';
 })
 export class ProfileLinkImageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
   profileImageUrl!: string;
   profilePicture!: string;
   profileUrl = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE +
-    '/' + this.username
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+      ':username_fragment', this.username
+    )
   );
 
   constructor(
@@ -59,6 +60,11 @@ export class ProfileLinkImageComponent implements OnInit {
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.webp'));
     this.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+    this.profileUrl = (
+      '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+        ':username_fragment', this.username
+      )
+    );
 
     // Returns a promise for the user profile picture, or the default
     // image if user is not logged in or has not uploaded a profile

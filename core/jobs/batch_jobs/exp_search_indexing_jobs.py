@@ -18,31 +18,35 @@
 
 from __future__ import annotations
 
+from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import search_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable, List, cast
+import result
+
+from typing import Iterable, List
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import search_services as platform_search_services
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
-datastore_services = models.Registry.import_datastore_services()
 platform_search_services = models.Registry.import_search_services()
 
 
 class IndexExplorationsInSearchJob(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
-    MAX_BATCH_SIZE = 1000
+    MAX_BATCH_SIZE: Final = 1000
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
@@ -57,35 +61,40 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
             | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(
                     exp_models.ExpSummaryModel.get_all(include_deleted=False)))
+            | 'Convert ExpSummaryModels to domain objects' >> beam.Map(
+                exp_fetchers.get_exploration_summary_from_model)
             | 'Split models into batches' >> beam.transforms.util.BatchElements(
                 max_batch_size=self.MAX_BATCH_SIZE)
             | 'Index batches of models' >> beam.ParDo(
                 IndexExplorationSummaries())
+            | 'Count the output' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
     """DoFn to index exploration summaries."""
 
     def process(
-        self, exp_summary_models: List[datastore_services.Model]
-    ) -> Iterable[job_run_result.JobRunResult]:
+        self, exp_summary: List[exp_domain.ExplorationSummary]
+    ) -> Iterable[result.Result[None, Exception]]:
         """Index exploration summaries and catch any errors.
 
         Args:
-            exp_summary_models: list(Model). Models to index.
+            exp_summary: list(ExplorationSummary). List of Exp Summary domain
+                objects to be indexed.
 
         Yields:
             JobRunResult. List containing one element, which is either SUCCESS,
             or FAILURE.
         """
         try:
-            search_services.index_exploration_summaries( # type: ignore[no-untyped-call]
-                cast(List[exp_models.ExpSummaryModel], exp_summary_models))
-            yield job_run_result.JobRunResult(
-                stdout='SUCCESS %s models indexed' % len(exp_summary_models)
-            )
-        except platform_search_services.SearchException:
-            yield job_run_result.JobRunResult(
-                stderr='FAILURE %s models not indexed' % len(exp_summary_models)
-            )
+            search_services.index_exploration_summaries(exp_summary)
+            for _ in exp_summary:
+                yield result.Ok()
+        except platform_search_services.SearchException as e:
+            yield result.Err(e)

@@ -24,7 +24,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 
-from core import python_utils
+from core import utils
 
 from . import pylint_extensions
 
@@ -32,13 +32,13 @@ import astroid  # isort:skip
 from pylint import interfaces  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint import lint  # isort:skip
-from pylint import utils  # isort:skip
+from pylint import utils as pylint_utils  # isort:skip
 
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(ExplicitKeywordArgsCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.ExplicitKeywordArgsChecker)
@@ -186,7 +186,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 class HangingIndentCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(HangingIndentCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.HangingIndentChecker)
@@ -198,7 +198,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
@@ -209,7 +209,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_break_after_hanging_indent.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_break_after_hanging_indent))
+           pylint_utils.tokenize_module(node_break_after_hanging_indent))
 
         message = testutils.Message(
             msg_id='no-break-after-hanging-indent', line=1)
@@ -223,7 +223,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
@@ -235,7 +235,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_break_after_hanging_indent.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_break_after_hanging_indent))
+           pylint_utils.tokenize_module(node_break_after_hanging_indent))
 
         message = testutils.Message(
             msg_id='no-break-after-hanging-indent', line=1)
@@ -250,21 +250,21 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""\"\"\"Some multiline
                 docstring.
                 \"\"\"
                 # Load JSON.
                 master_translation_dict = json.loads(
-                utils.get_file_contents(os.path.join(
+               pylint_utils.get_file_contents(os.path.join(
                 os.getcwd(), 'assets', 'i18n', 'en.json')))
                 """)
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_with_no_error_message))
+           pylint_utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -276,7 +276,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json(  # Random comment
                 '(',
@@ -285,7 +285,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_with_no_error_message.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_with_no_error_message))
+           pylint_utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -297,7 +297,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json(func(  # Random comment
                 '(',
@@ -306,7 +306,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_with_no_error_message.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_with_no_error_message))
+           pylint_utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -318,7 +318,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""self.post_json([  # Random comment
                 '(',
@@ -327,16 +327,47 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_with_no_error_message.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_with_no_error_message))
+           pylint_utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_hanging_indentation_with_a_if_statement_before(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                if 5 > 7:
+                    self.post_json([
+                    '(',
+                    '', '', ''])
+
+                def func(arg1,
+                    arg2, arg3):
+                    a = 2 / 2""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_no_error_message))
+
+        message = testutils.Message(
+            msg_id='no-break-after-hanging-indent',
+            line=7)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
 
 class DocstringParameterCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(DocstringParameterCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
@@ -349,7 +380,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -377,7 +408,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -407,7 +438,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -437,7 +468,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(
@@ -466,7 +497,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(
@@ -491,7 +522,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -515,7 +546,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -538,7 +569,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -564,7 +595,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     class ClassName(dummy_class):
@@ -1924,7 +1955,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
                 """'cde'\\\n"""             # pylint: disable=backslash-continuation
@@ -2002,7 +2033,7 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
 class RestrictedImportCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(RestrictedImportCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.RestrictedImportChecker)
@@ -2010,9 +2041,26 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # The spaces are included on purpose so that we properly test
         # the input sanitization.
         self.checker_test_object.checker.config.forbidden_imports = (
-            '  core.storage: core.domain  ',
-            'core.domain  : core.controllers',
-            'core.controllers: core.platform  |  core.storage '
+            (
+                '*core.controllers*:\n'
+                '    import core.platform*   |  \n'
+                '    import core.storage*\n'
+            ),
+            (
+                '*core.domain*:import core.controllers*'
+            ),
+            (
+                '   *core.storage*:import    core.domain*   '
+            ),
+            (
+                '*core.domain.*_domain:\n'
+                '    from core.domain    import    *_service*   |\n'
+                '    from   core.domain import *_cleaner|\n'
+                '      from core.domain import *_registry |\n'
+                '    from core.domain import *_fetchers  |\n'
+                '    from core.domain import *_manager |\n'
+                '       from core.platform import   models'
+            )
         )
         self.checker_test_object.checker.open()
 
@@ -2020,13 +2068,14 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_err_import = astroid.extract_node(
             """
             import core.domain.activity_domain #@
-        """)
+            """
+        )
         node_err_import.root().name = 'oppia.core.storage.topic'
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('domain', 'storage'),
+                args=('core.domain*', '*core.storage*'),
             ),
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2050,7 +2099,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_importfrom,
-                args=('domain', 'storage'),
+                args=('core.domain*', '*core.storage*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2076,7 +2125,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('controllers', 'domain'),
+                args=('core.controllers*', '*core.domain*'),
             ),
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2094,13 +2143,14 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_err_importfrom = astroid.extract_node(
             """
             from core.controllers import acl_decorators #@
-        """)
+            """
+        )
         node_err_importfrom.root().name = 'oppia.core.domain'
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_importfrom,
-                args=('controllers', 'domain'),
+                args=('core.controllers*', '*core.domain*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2116,6 +2166,60 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_importfrom(
                 node_no_err_importfrom)
 
+    def test_forbid_service_import_in_domain_file(self):
+        node_err_import = astroid.extract_node(
+            """
+            import core.domain.exp_services #@
+            """
+        )
+        node_err_import.root().name = 'oppia.core.domain.exp_domain'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import-from',
+                node=node_err_import,
+                args=('*_service*', 'core.domain', '*core.domain.*_domain'),
+            ),
+        ):
+            self.checker_test_object.checker.visit_import(node_err_import)
+
+    def test_allow_domain_file_import_in_domain_file(self):
+        node_no_err_import = astroid.extract_node(
+            """
+            import core.domain.collection_domain #@
+            """
+        )
+        node_no_err_import.root().name = 'oppia.core.domain.topic_domain'
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_import(node_no_err_import)
+
+    def test_forbid_cleaner_from_import_in_domain_file(self):
+        node_err_importfrom = astroid.extract_node(
+            """
+            from core.domain import html_cleaner #@
+            """
+        )
+        node_err_importfrom.root().name = 'oppia.core.domain.collection_domain'
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import-from',
+                node=node_err_importfrom,
+                args=('*_cleaner', 'core.domain', '*core.domain.*_domain'),
+            )
+        ):
+            self.checker_test_object.checker.visit_importfrom(
+                node_err_importfrom)
+
+    def test_allow_domain_file_from_import_in_domain_file(self):
+        node_no_err_importfrom = astroid.extract_node(
+            """
+            from core.domain import exp_domain #@
+            """
+        )
+        node_no_err_importfrom.root().name = 'oppia.core.domain.story_domain'
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(
+                node_no_err_importfrom)
+
     def test_forbid_platform_import_in_controllers_module(self):
         node_err_import = astroid.extract_node(
             """
@@ -2126,7 +2230,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('platform', 'controllers'),
+                args=('core.platform*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2141,7 +2245,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_err_import,
-                args=('storage', 'controllers'),
+                args=('core.storage*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_import(node_err_import)
@@ -2165,7 +2269,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_no_err_importfrom,
-                args=('platform', 'controllers'),
+                args=('core.platform*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2181,7 +2285,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
             testutils.Message(
                 msg_id='invalid-import',
                 node=node_no_err_importfrom,
-                args=('storage', 'controllers'),
+                args=('core.storage*', '*core.controllers*'),
             )
         ):
             self.checker_test_object.checker.visit_importfrom(
@@ -2211,7 +2315,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""c = 'something dummy'
                 """)
@@ -2234,7 +2338,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(u"""1""")
         node_single_char_file.file = filename
         node_single_char_file.path = filename
@@ -2255,7 +2359,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(u"""x = 'something dummy'""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
@@ -2266,48 +2370,10 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class DivisionOperatorCheckerTests(unittest.TestCase):
-
-    def setUp(self):
-        super(DivisionOperatorCheckerTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DivisionOperatorChecker)
-        self.checker_test_object.setup_method()
-
-    def test_division_operator_with_spaces(self):
-        node_division_operator_with_spaces = astroid.extract_node(
-            u"""
-            a / b #@
-            """)
-
-        message = testutils.Message(
-            msg_id='division-operator-used',
-            node=node_division_operator_with_spaces)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_binop(
-                node_division_operator_with_spaces)
-
-    def test_division_operator_without_spaces(self):
-        node_division_operator_without_spaces = astroid.extract_node(
-            u"""
-            a/b #@
-            """)
-
-        message = testutils.Message(
-            msg_id='division-operator-used',
-            node=node_division_operator_without_spaces)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_binop(
-                node_division_operator_without_spaces)
-
-
 class SingleLineCommentCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SingleLineCommentCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleLineCommentChecker)
@@ -2320,7 +2386,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# This is a multiline
                 # comment/
@@ -2331,7 +2397,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_invalid_punctuation.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_invalid_punctuation))
+           pylint_utils.tokenize_module(node_invalid_punctuation))
 
         message = testutils.Message(
             msg_id='invalid-punctuation-used',
@@ -2347,7 +2413,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""#Something.
                 """)
@@ -2355,7 +2421,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_no_space_at_beginning.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_no_space_at_beginning))
+           pylint_utils.tokenize_module(node_no_space_at_beginning))
 
         message = testutils.Message(
             msg_id='no-space-at-beginning',
@@ -2371,7 +2437,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2381,7 +2447,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_no_capital_letter_at_beginning.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_no_capital_letter_at_beginning))
+           pylint_utils.tokenize_module(node_no_capital_letter_at_beginning))
 
         message = testutils.Message(
             msg_id='no-capital-letter-at-beginning',
@@ -2397,7 +2463,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
                 # pylint: disable
@@ -2407,7 +2473,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_with_excluded_phrase.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_comment_with_excluded_phrase))
+           pylint_utils.tokenize_module(node_comment_with_excluded_phrase))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2419,7 +2485,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""a = 1 + 2  # type: ignore[some-rule]
                 """)
@@ -2428,7 +2494,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_allowed_pragma.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+           pylint_utils.tokenize_module(
+               node_inline_comment_with_allowed_pragma))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2440,7 +2507,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
                 """)
@@ -2449,7 +2516,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_allowed_pragma.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_inline_comment_with_allowed_pragma))
+           pylint_utils.tokenize_module(
+               node_inline_comment_with_allowed_pragma))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2461,7 +2529,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""a = 1 + 2  # not_a_valid_pragma
                 """)
@@ -2470,7 +2538,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_invalid_pragma.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_inline_comment_with_invalid_pragma))
+           pylint_utils.tokenize_module(
+               node_inline_comment_with_invalid_pragma))
 
         message = testutils.Message(
             msg_id='no-allowed-inline-pragma',
@@ -2486,7 +2555,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2496,7 +2565,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_variable_name_in_comment.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_variable_name_in_comment))
+           pylint_utils.tokenize_module(node_variable_name_in_comment))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2508,7 +2577,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2518,7 +2587,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_with_version_info.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_comment_with_version_info))
+           pylint_utils.tokenize_module(node_comment_with_version_info))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2530,7 +2599,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2540,7 +2609,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_data_type_in_comment.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_data_type_in_comment))
+           pylint_utils.tokenize_module(node_data_type_in_comment))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2552,7 +2621,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
                     \"\"\"# str. variable is type of str.\"\"\"
@@ -2563,7 +2632,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_inside_docstring.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_comment_inside_docstring))
+           pylint_utils.tokenize_module(node_comment_inside_docstring))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2575,7 +2644,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
 
@@ -2587,7 +2656,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_with_no_error_message.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_with_no_error_message))
+           pylint_utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2596,7 +2665,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
 class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(BlankLineBelowFileOverviewCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.BlankLineBelowFileOverviewChecker)
@@ -2609,7 +2678,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     \"\"\" this file does something \"\"\"
@@ -2637,7 +2706,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
 
@@ -2668,7 +2737,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     #this comment has a unicode character \u2713
@@ -2698,7 +2767,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     #this comment has a unicode character \u2713
@@ -2727,7 +2796,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     \"\"\" this file does something \"\"\"
@@ -2752,7 +2821,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     import something
@@ -2774,7 +2843,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     \"\"\" this file does something \"\"\"   """)
@@ -2796,7 +2865,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 class SingleLinePragmaCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SingleLinePragmaCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleLinePragmaChecker)
@@ -2809,7 +2878,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint: disable=invalid-name
@@ -2822,7 +2891,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_pragma_for_multiline.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_pragma_for_multiline))
+           pylint_utils.tokenize_module(node_pragma_for_multiline))
 
         message1 = testutils.Message(
             msg_id='single-line-pragma',
@@ -2842,7 +2911,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint: disable=single-line-pragma
@@ -2857,7 +2926,8 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_enable_single_line_pragma_for_multiline.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_enable_single_line_pragma_for_multiline))
+           pylint_utils.tokenize_module(
+               node_enable_single_line_pragma_for_multiline))
 
         message = testutils.Message(
             msg_id='single-line-pragma',
@@ -2872,7 +2942,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint: disable=invalid-name, single-line-pragma
@@ -2887,7 +2957,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_enable_single_line_pragma_with_invalid_name.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(
+           pylint_utils.tokenize_module(
                 node_enable_single_line_pragma_with_invalid_name))
 
         message = testutils.Message(
@@ -2903,7 +2973,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     def funcName():  # pylint: disable=single-line-pragma
@@ -2913,7 +2983,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_with_no_error_message.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_with_no_error_message))
+           pylint_utils.tokenize_module(node_with_no_error_message))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2924,7 +2994,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                     # pylint:disable=single-line-pragma
@@ -2939,7 +3009,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_no_and_extra_space_before_pylint.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_no_and_extra_space_before_pylint))
+           pylint_utils.tokenize_module(node_no_and_extra_space_before_pylint))
 
         message = testutils.Message(
             msg_id='single-line-pragma',
@@ -2952,7 +3022,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
 class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SingleSpaceAfterKeyWordCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleSpaceAfterKeyWordChecker)
@@ -2965,7 +3035,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                 if(False):
@@ -2981,7 +3051,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         node_no_space_after_keyword.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_no_space_after_keyword))
+           pylint_utils.tokenize_module(node_no_space_after_keyword))
 
         if_message = testutils.Message(
             msg_id='single-space-after-keyword', args=('if'), line=2)
@@ -3006,7 +3076,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                 if  False:
@@ -3022,7 +3092,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         node_multiple_spaces_after_keyword.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_multiple_spaces_after_keyword))
+           pylint_utils.tokenize_module(node_multiple_spaces_after_keyword))
 
         if_message = testutils.Message(
             msg_id='single-space-after-keyword', args=('if'), line=2)
@@ -3047,7 +3117,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
-        with python_utils.open_file(filename, 'w') as tmp:
+        with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
                 if False:
@@ -3063,7 +3133,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         node_single_space_after_keyword.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_single_space_after_keyword))
+           pylint_utils.tokenize_module(node_single_space_after_keyword))
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -3072,7 +3142,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 class InequalityWithNoneCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(InequalityWithNoneCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.InequalityWithNoneChecker)
@@ -3126,7 +3196,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
     """Unit tests for DisallowedFunctionsChecker"""
 
     def setUp(self):
-        super(DisallowedFunctionsCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowedFunctionsChecker)
@@ -3174,19 +3244,14 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             .checker.config.disallowed_functions_and_replacements_str) = [
                 'datetime.datetime.now=>datetime.datetime.utcnow',
                 'self.assertEquals=>self.assertEqual',
-                'b.next=>python_utils.NEXT',
             ]
         self.checker_test_object.checker.open()
 
-        (
-            call1, call2,
-            call3, call4
-            ) = astroid.extract_node(
-                """
-        datetime.datetime.now() #@
-        self.assertEquals() #@
-        b.next() #@
-        b.a.next() #@
+        call1, call2, call3 = astroid.extract_node(
+        """
+            datetime.datetime.now() #@
+            self.assertEquals() #@
+            b.a.next() #@
         """)
 
         message_replace_disallowed_datetime = testutils.Message(
@@ -3203,24 +3268,15 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             confidence=interfaces.UNDEFINED
         )
 
-        message_replace_disallowed_next = testutils.Message(
-            msg_id='replace-disallowed-function-calls',
-            node=call3,
-            args=('b.next', 'python_utils.NEXT'),
-            confidence=interfaces.UNDEFINED
-        )
-
         with self.checker_test_object.assertAddsMessages(
             message_replace_disallowed_datetime,
             message_replace_disallowed_assert_equals,
-            message_replace_disallowed_next
         ):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
-            self.checker_test_object.checker.visit_call(call3)
 
         with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_call(call4)
+            self.checker_test_object.checker.visit_call(call3)
 
     def test_disallowed_removals_regex(self):
         (
@@ -3318,7 +3374,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(NonTestFilesFunctionNameCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.NonTestFilesFunctionNameChecker)
@@ -3380,7 +3436,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
     def setUp(self):
-        super(DisallowHandlerWithoutSchemaTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowHandlerWithoutSchema)
@@ -3560,7 +3616,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 class DisallowedImportsCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(DisallowedImportsCheckerTests, self).setUp()
+        super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowedImportsChecker)

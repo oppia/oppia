@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
 
@@ -33,16 +34,57 @@ base_models, improvements_models = models.Registry.import_models(
 class TaskEntryModelTests(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            improvements_models.TaskEntryModel.
+                get_field_name_mapping_to_takeout_keys(),
+            {
+                'resolver_id': 'task_ids_resolved_by_user',
+                'issue_description': 'issue_descriptions',
+                'status': 'statuses',
+                'resolved_on': 'resolution_msecs'
+            }
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'task_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_description': base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
+            'resolved_on': base_models.EXPORT_POLICY.EXPORTED,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            improvements_models.TaskEntryModel.get_export_policy(),
+            expected_export_policy_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            improvements_models.TaskEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.
+                ONE_INSTANCE_SHARED_ACROSS_USERS
+        )
+
     def test_has_reference_to_user_id(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description',
-            improvements_models.TASK_STATUS_RESOLVED,
+            constants.TASK_STATUS_RESOLVED,
             'uid')
         self.assertTrue(
             improvements_models.TaskEntryModel.has_reference_to_user_id('uid'))
@@ -56,14 +98,14 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description',
-            status=improvements_models.TASK_STATUS_OPEN,
+            status=constants.TASK_STATUS_OPEN,
             resolver_id='uid')
         self.assertTrue(
             improvements_models.TaskEntryModel.has_reference_to_user_id('uid'))
@@ -84,24 +126,24 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_export_data_with_task(self) -> None:
         task_id_1 = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_1',
             1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description_1',
-            status=improvements_models.TASK_STATUS_RESOLVED,
+            status=constants.TASK_STATUS_RESOLVED,
             resolver_id='uid')
         task_id_2 = improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_2',
             1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description_2',
-            status=improvements_models.TASK_STATUS_RESOLVED,
+            status=constants.TASK_STATUS_RESOLVED,
             resolver_id='uid')
         self.assertEqual(
             improvements_models.TaskEntryModel.export_data('uid'),
@@ -116,85 +158,85 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
     def test_generate_new_task_id(self) -> None:
         self.assertEqual(
             improvements_models.TaskEntryModel.generate_task_id(
-                improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.TASK_ENTITY_TYPE_EXPLORATION,
                 'eid',
                 1,
-                improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-                improvements_models.TASK_TARGET_TYPE_STATE,
+                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.TASK_TARGET_TYPE_STATE,
                 'tid'),
             'exploration.eid.1.high_bounce_rate.state.tid')
 
     def test_can_create_task_with_unicode_identifiers(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_\U0001F4C8',
             1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             'tid_\U0001F4C8')
 
     def test_can_create_new_high_bounce_rate_task(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=improvements_models.TASK_STATUS_OPEN)
+            status=constants.TASK_STATUS_OPEN)
 
     def test_can_create_new_successive_incorrect_answers_task(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            improvements_models.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=improvements_models.TASK_STATUS_OPEN)
+            status=constants.TASK_STATUS_OPEN)
 
     def test_can_create_new_needs_guiding_responses_task(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            improvements_models.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=improvements_models.TASK_STATUS_OPEN)
+            status=constants.TASK_STATUS_OPEN)
 
     def test_can_create_new_ineffective_feedback_loop_task(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=improvements_models.TASK_STATUS_OPEN)
+            status=constants.TASK_STATUS_OPEN)
 
     def test_can_not_create_duplicate_tasks(self) -> None:
         improvements_models.TaskEntryModel.create(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=improvements_models.TASK_STATUS_OPEN)
+            status=constants.TASK_STATUS_OPEN)
 
-        with self.assertRaisesRegexp(Exception, 'Task id .* already exists'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Task id .* already exists'): # type: ignore[no-untyped-call]
             improvements_models.TaskEntryModel.create(
-                improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.TASK_ENTITY_TYPE_EXPLORATION,
                 'eid',
                 1,
-                improvements_models.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-                improvements_models.TASK_TARGET_TYPE_STATE,
+                constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+                constants.TASK_TARGET_TYPE_STATE,
                 'Introduction',
                 'issue_description',
-                status=improvements_models.TASK_STATUS_OPEN)
+                status=constants.TASK_STATUS_OPEN)

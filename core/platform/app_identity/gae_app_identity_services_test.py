@@ -33,7 +33,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def test_get_application_id_throws_error(self) -> None:
         with self.swap(os, 'getenv', lambda _: None):
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 ValueError, 'Value None for application id is invalid.'
             ):
                 gae_app_identity_services.get_application_id()

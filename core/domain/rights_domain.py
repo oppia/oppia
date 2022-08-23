@@ -17,14 +17,17 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import user_services
 
 from typing import List, Optional
 from typing_extensions import TypedDict
+
+from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
+
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 
 # IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
 # backward-compatibility with previous exploration snapshots in the datastore.
@@ -38,8 +41,8 @@ CMD_CHANGE_PRIVATE_VIEWABILITY = feconf.CMD_CHANGE_PRIVATE_VIEWABILITY
 CMD_RELEASE_OWNERSHIP = feconf.CMD_RELEASE_OWNERSHIP
 CMD_UPDATE_FIRST_PUBLISHED_MSEC = feconf.CMD_UPDATE_FIRST_PUBLISHED_MSEC
 
-ACTIVITY_STATUS_PRIVATE = constants.ACTIVITY_STATUS_PRIVATE
-ACTIVITY_STATUS_PUBLIC = constants.ACTIVITY_STATUS_PUBLIC
+ACTIVITY_STATUS_PRIVATE: str = constants.ACTIVITY_STATUS_PRIVATE
+ACTIVITY_STATUS_PUBLIC: str = constants.ACTIVITY_STATUS_PUBLIC
 
 ROLE_OWNER = feconf.ROLE_OWNER
 ROLE_EDITOR = feconf.ROLE_EDITOR
@@ -82,7 +85,7 @@ class ActivityRights:
         cloned_from: Optional[str] = None,
         status: str = ACTIVITY_STATUS_PRIVATE,
         viewable_if_private: bool = False,
-        first_published_msec: Optional[str] = None
+        first_published_msec: Optional[float] = None
     ) -> None:
         self.id = exploration_id
         self.owner_ids = owner_ids
@@ -176,13 +179,13 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'owner_names': user_services.get_human_readable_user_ids(
                     self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'editor_names': user_services.get_human_readable_user_ids(
                     self.editor_ids),
-                'voice_artist_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'voice_artist_names': user_services.get_human_readable_user_ids(
                     self.voice_artist_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'viewer_names': user_services.get_human_readable_user_ids(
                     self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
             }
@@ -237,7 +240,7 @@ class ActivityRights:
         Returns:
             bool. Whether activity is published.
         """
-        return bool(self.status == ACTIVITY_STATUS_PUBLIC)
+        return self.status == ACTIVITY_STATUS_PUBLIC
 
     def is_private(self) -> bool:
         """Checks whether activity is private.
@@ -245,7 +248,7 @@ class ActivityRights:
         Returns:
             bool. Whether activity is private.
         """
-        return bool(self.status == ACTIVITY_STATUS_PRIVATE)
+        return self.status == ACTIVITY_STATUS_PRIVATE
 
     def is_solely_owned_by_user(self, user_id: str) -> bool:
         """Checks whether the activity is solely owned by the user.
@@ -267,6 +270,9 @@ class ActivityRights:
 
         Returns:
             str. The previous role of the user.
+
+        Raises:
+            Exception. If previous role is assigned again.
         """
         old_role = ROLE_NONE
         if new_role == ROLE_VIEWER:
@@ -274,7 +280,7 @@ class ActivityRights:
                 raise Exception(
                     'Public explorations can be viewed by anyone.')
 
-        for role, user_ids in python_utils.ZIP(
+        for role, user_ids in zip(
                 [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
                 [self.owner_ids, self.editor_ids, self.viewer_ids,
                  self.voice_artist_ids]):
@@ -289,13 +295,16 @@ class ActivityRights:
             if old_role == ROLE_OWNER:
                 raise Exception(
                     'This user already owns this exploration.')
-            elif old_role == ROLE_EDITOR:
+
+            if old_role == ROLE_EDITOR:
                 raise Exception(
                     'This user already can edit this exploration.')
-            elif old_role == ROLE_VOICE_ARTIST:
+
+            if old_role == ROLE_VOICE_ARTIST:
                 raise Exception(
                     'This user already can voiceover this exploration.')
-            elif old_role == ROLE_VIEWER:
+
+            if old_role == ROLE_VIEWER:
                 raise Exception(
                     'This user already can view this exploration.')
 

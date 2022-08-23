@@ -21,8 +21,9 @@ import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFact
 import { ParamSpecBackendDict } from 'domain/exploration/ParamSpecObjectFactory';
 import { InteractionBackendDict } from 'domain/exploration/InteractionObjectFactory';
 import { WrittenTranslationsBackendDict } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { SubtitledHtmlBackendDict } from './subtitled-html.model';
-import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
+import { SubtitledHtmlBackendDict} from './subtitled-html.model';
+import { RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
+import { InteractionCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
 
 export type ExplorationChange = (
   ExplorationChangeAddState |
@@ -43,7 +44,7 @@ export interface ExplorationChangeAddState {
 }
 
 export interface ExplorationChangeRenameState {
-  'cmd': 'rename_state',
+  'cmd': 'rename_state';
   'new_state_name': string;
   'old_state_name': string;
 }
@@ -53,19 +54,23 @@ export interface ExplorationChangeDeleteState {
   'state_name': string;
 }
 
+// TODO(xxx): Add more discrimination and create multiple versions of this
+// interface, each with a different 'state_name'.
 export interface ExplorationChangeEditStateProperty {
-  'cmd': 'edit_state_property',
+  'cmd': 'edit_state_property';
   'new_value': SubtitledHtmlBackendDict |
     InteractionBackendDict |
     ParamChangeBackendDict[] |
     RecordedVoiceOverBackendDict |
     WrittenTranslationsBackendDict |
+    InteractionCustomizationArgsBackendDict |
     boolean | number | string;
   'old_value': SubtitledHtmlBackendDict |
     InteractionBackendDict |
     ParamChangeBackendDict[] |
     RecordedVoiceOverBackendDict |
     WrittenTranslationsBackendDict |
+    InteractionCustomizationArgsBackendDict |
     boolean | number | string;
   'state_name': string;
   'property_name': string;
@@ -73,8 +78,10 @@ export interface ExplorationChangeEditStateProperty {
 
 export interface ExplorationChangeEditExplorationProperty {
   'cmd': 'edit_exploration_property';
-  'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
-  'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string |
+   boolean;
+  'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string |
+   boolean;
   'property_name': string;
 }
 
@@ -120,7 +127,7 @@ export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
 
 export interface ExplorationDraftDict {
   draftChanges: ExplorationChange[];
-  draftChangeListId: number
+  draftChangeListId: number;
 }
 
 export class ExplorationDraft {
@@ -132,6 +139,7 @@ export class ExplorationDraft {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
   }
+
   /**
    * Checks whether the draft object has been overwritten by another
    * draft which has been committed to the back-end. If the supplied draft id

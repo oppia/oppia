@@ -20,9 +20,19 @@ from __future__ import annotations
 
 from core import schema_utils
 from core import utils
+from extensions import domain
+
+from typing import Any, Dict, List
 
 
-def get_full_customization_args(customization_args, ca_specs):
+# In argument 'customization_args', we used Any type because it accepts the
+# values of customization args and that values can be of type str, int, Dict,
+# bool, List and other types too. So to make it generalize for every type of
+# values, we used Any here.
+def get_full_customization_args(
+    customization_args: Dict[str, Dict[str, Any]],
+    ca_specs: List[domain.CustomizationArgSpec]
+) -> Dict[str, Dict[str, Any]]:
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
 
@@ -51,9 +61,17 @@ def get_full_customization_args(customization_args, ca_specs):
     return customization_args
 
 
+# In argument 'customization_args', we used Any type because it accepts the
+# values of customization args and that values can be of type str, int, Dict,
+# bool, List and other types too. So to make it generalize for every type of
+# values, we used Any here.
 def validate_customization_args_and_values(
-        item_name, item_type, customization_args,
-        ca_specs_to_validate_against, fail_on_validation_errors=False):
+    item_name: str,
+    item_type: str,
+    customization_args: Dict[str, Dict[str, Any]],
+    ca_specs_to_validate_against: List[domain.CustomizationArgSpec],
+    fail_on_validation_errors: bool = False
+) -> None:
     """Validates the given `customization_args` dict against the specs set
     out in 'ca_specs_to_validate_against'. 'item_name' and 'item_type' are
     used to populate any error messages that arise during validation.

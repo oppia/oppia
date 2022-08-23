@@ -16,9 +16,8 @@
  * @fileoverview Component for the exploration editor feedback tab.
  */
 
-require(
-  'pages/exploration-editor-page/feedback-tab/templates/' +
-  'create-feedback-thread-modal.controller.ts');
+import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
+import { Subscription } from 'rxjs';
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -41,24 +40,26 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').component('feedbackTab', {
   template: require('./feedback-tab.component.html'),
   controller: [
-    '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$q', '$rootScope', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
-    'FocusManagerService', 'LoaderService',
+    'FocusManagerService', 'LoaderService', 'NgbModal',
     'SuggestionModalForExplorationEditorService',
     'ThreadDataBackendApiService', 'ThreadStatusDisplayService',
     'UserService',
     function(
-        $q, $rootScope, $uibModal, AlertsService, ChangeListService,
+        $q, $rootScope, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
-        FocusManagerService, LoaderService,
+        FocusManagerService, LoaderService, NgbModal,
         SuggestionModalForExplorationEditorService,
         ThreadDataBackendApiService, ThreadStatusDisplayService,
         UserService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
 
       var _resetTmpMessageFields = function() {
         ctrl.tmpMessage.status =
@@ -75,16 +76,21 @@ angular.module('oppia').component('feedbackTab', {
       ctrl.fetchUpdatedThreads = function() {
         let activeThreadId =
           ctrl.activeThread && ctrl.activeThread.threadId;
-        return ThreadDataBackendApiService.getThreadsAsync().then(data => {
-          ctrl.threadData = data;
-          ctrl.threadIsStale = false;
-          if (activeThreadId !== null) {
-            // Fetching threads invalidates old thread domain objects, so we
-            // need to update our reference to the active thread afterwards.
-            ctrl.activeThread = ThreadDataBackendApiService.getThread(
-              activeThreadId);
-          }
-        });
+        return ThreadDataBackendApiService.getFeedbackThreadsAsync().then(
+          data => {
+            ctrl.threadData = data;
+            ctrl.threadIsStale = false;
+            if (activeThreadId !== null) {
+              // Fetching threads invalidates old thread domain objects, so we
+              // need to update our reference to the active thread afterwards.
+              ctrl.activeThread = ThreadDataBackendApiService.getThread(
+                activeThreadId);
+            }
+            LoaderService.hideLoadingScreen();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
+          });
       };
 
       ctrl.onBackButtonClicked = function() {
@@ -95,12 +101,8 @@ angular.module('oppia').component('feedbackTab', {
       };
 
       ctrl.showCreateThreadModal = function() {
-        return $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/feedback-tab/templates/' +
-            'create-feedback-thread-modal.template.html'),
-          backdrop: 'static',
-          controller: 'CreateFeedbackThreadModalController'
+        return NgbModal.open(CreateFeedbackThreadModalComponent, {
+          backdrop: 'static'
         }).result.then(
           result => ThreadDataBackendApiService.createNewThreadAsync(
             result.newThreadSubject, result.newThreadText)
@@ -231,11 +233,16 @@ angular.module('oppia').component('feedbackTab', {
           text: ''
         };
         ctrl.clearActiveThread();
+        ctrl.directiveSubscriptions.add(
+          ThreadDataBackendApiService.onFeedbackThreadsInitialized.subscribe(
+            () => {
+              ctrl.fetchUpdatedThreads();
+            }
+          ));
 
         return $q.all([
           UserService.getUserInfoAsync().then(
             userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
-          ctrl.fetchUpdatedThreads()
         ]).then(
           () => {
             LoaderService.hideLoadingScreen();
@@ -243,6 +250,10 @@ angular.module('oppia').component('feedbackTab', {
             // once the controller is migrated to angular.
             $rootScope.$applyAsync();
           });
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

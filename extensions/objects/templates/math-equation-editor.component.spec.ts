@@ -21,6 +21,13 @@ import { GuppyInitializationService, GuppyObject } from 'services/guppy-initiali
 import { MathEquationEditorComponent } from './math-equation-editor.component';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateService } from '@ngx-translate/core';
+
+class MockTranslateService {
+  instant(key: string): string {
+    return key;
+  }
+}
 
 describe('MathEquationEditor', () => {
   let component: MathEquationEditorComponent;
@@ -43,10 +50,12 @@ describe('MathEquationEditor', () => {
     asciimath() {
       return 'Dummy value';
     }
+
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
       handler({focused: MockGuppy.focused});
     }
+
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
     static 'add_global_symbol'(name: string, symbol: Object): void {}
@@ -55,7 +64,11 @@ describe('MathEquationEditor', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [MathEquationEditorComponent]
+      declarations: [MathEquationEditorComponent],
+      providers: [{
+        provide: TranslateService,
+        useClass: MockTranslateService
+      }]
     }).compileComponents();
   }));
   beforeEach(() => {
@@ -117,7 +130,7 @@ describe('MathEquationEditor', () => {
       component.warningText).toBe('Please enter an answer before submitting.');
 
     component.currentValue = 'x=y';
-    spyOn(guppyInitializationService, 'getCustomOskLetters').and.returnValue(
+    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue(
       ['x', 'y']);
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');

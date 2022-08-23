@@ -5,7 +5,7 @@
       This is the name of the skill as visible to learners and other creators.
     </div>
     <p ng-class="{'has-error': !tmpSkillDescription.length > 0}">
-      <input type="text" aria-label="Skill Description" class="form-control protractor-test-skill-description-field" ng-if="canEditSkillDescription()"
+      <input type="text" aria-label="Skill Description" class="form-control e2e-test-skill-description-field" ng-if="canEditSkillDescription()"
              ng-model="tmpSkillDescription" ng-change="resetErrorMsg()" ng-blur="saveSkillDescription(tmpSkillDescription)"
              maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>" ng-trim="false">
       <span class="oppia-input-box-subtitle">
@@ -31,7 +31,7 @@
   }
 
   skill-description-editor .skill-description-error-message {
-    color: #F00;
+    color: #f00;
     display: block;
     font-size: 0.8em;
   }

@@ -27,7 +27,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
 
     def setUp(self) -> None:
-        super(PendingDeletionRequestUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.user_id_a = self.get_user_id_from_email('a@example.com') # type: ignore[no-untyped-call]
@@ -53,7 +53,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         pending_deletion_request.pseudonymizable_entity_mappings = {
             'wrong_key': {}
         }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'pseudonymizable_entity_mappings contain wrong key'
         ):

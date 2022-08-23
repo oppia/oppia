@@ -59,7 +59,7 @@ export type PreferencesBackendDict = (
 );
 
 export interface UpdatePreferencesResponse {
-  'bulk_email_signup_message_should_be_shown': boolean
+  'bulk_email_signup_message_should_be_shown': boolean;
 }
 
 interface LoginUrlResponseDict {
@@ -70,6 +70,7 @@ export interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': string[];
   'can_review_voiceover_for_language_codes': string[];
   'can_review_questions': boolean;
+  'can_suggest_questions': boolean;
 }
 
 @Injectable({
@@ -84,6 +85,7 @@ export class UserBackendApiService {
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
+
   private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {

@@ -18,8 +18,10 @@
 
 from __future__ import annotations
 
+import urllib
+
 from core import feconf
-from core import python_utils
+from core import utils
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
 
@@ -32,7 +34,7 @@ class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     class Response:
-        """Class to mock python_utils.url_open responses."""
+        """Class to mock utils.url_open responses."""
 
         def __init__(
             self, url: MailgunQueryType, expected_url: MailgunQueryType
@@ -64,9 +66,9 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -93,9 +95,9 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -126,9 +128,9 @@ class EmailTests(test_utils.GenericTestBase):
             {'Authorization': 'Basic YXBpOmtleQ=='})
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -157,9 +159,9 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swapped_request = lambda *args: args
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
@@ -176,7 +178,7 @@ class EmailTests(test_utils.GenericTestBase):
         unset.
         """
         # Testing no mailgun api key.
-        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        mailgun_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Mailgun API key is not available.')
         with mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
@@ -188,7 +190,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         # Testing no mailgun domain name.
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        mailgun_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Mailgun domain name is not set.')
         with swap_api, mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
@@ -211,9 +213,9 @@ class EmailTests(test_utils.GenericTestBase):
         swapped_request = lambda *args: args
         swapped_urlopen = lambda x: self.Response(x, expected_query_url)
         swap_urlopen_context = self.swap(
-            python_utils, 'url_open', swapped_urlopen)
+            utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
-            python_utils, 'url_request', swapped_request)
+            urllib.request, 'Request', swapped_request)
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:

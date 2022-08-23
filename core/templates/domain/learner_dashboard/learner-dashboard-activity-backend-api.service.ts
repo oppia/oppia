@@ -25,24 +25,23 @@ import { HttpClient } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
 interface LearnerPlaylistResponseObject {
-  'belongs_to_completed_or_incomplete_list': boolean
-  'belongs_to_subscribed_activities': boolean
-  'is_super_admin': boolean
-  'playlist_limit_exceeded': boolean
-  'user_email': string
-  'username': string
+  'belongs_to_completed_or_incomplete_list': boolean;
+  'belongs_to_subscribed_activities': boolean;
+  'is_super_admin': boolean;
+  'playlist_limit_exceeded': boolean;
+  'user_email': string;
+  'username': string;
   }
 
 interface LearnerGoalsResponseObject {
-  'belongs_to_learnt_list': boolean
-  'is_super_admin': boolean
-  'goals_limit_exceeded': boolean
-  'user_email': string
-  'username': string
+  'belongs_to_learnt_list': boolean;
+  'is_super_admin': boolean;
+  'goals_limit_exceeded': boolean;
+  'user_email': string;
+  'username': string;
   }
 
 @Injectable({
@@ -50,7 +49,7 @@ interface LearnerGoalsResponseObject {
 })
 export class LearnerDashboardActivityBackendApiService {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   addToLearnerPlaylistUrl!: string;
   addToLearnerGoalsUrl!: string;
@@ -101,30 +100,18 @@ export class LearnerDashboardActivityBackendApiService {
     return this.successfullyAdded;
   }
 
-  // This function will open a modal to remove an exploration
-  // from the 'Play Later' list in the Library Page.
-  removeFromLearnerPlaylistModal(
-      activityId: string, activityTitle: string, activityType: string,
-      learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
-    const modelRef = this.ngbModal.open(
-      LearnerPlaylistModalComponent, {backdrop: true});
-    modelRef.componentInstance.activityId = activityId;
-    modelRef.componentInstance.activityTitle = activityTitle;
-    modelRef.componentInstance.activityType = activityType;
-    modelRef.result.then((playlistUrl) => {
-      this.http.delete<void>(playlistUrl).toPromise();
-      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
-        learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
-          activityId);
-      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
-        learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
-          activityId);
-      }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+  removeFromLearnerPlaylist(
+      activityId: string, activityType: string,
+      learnerDashboardActivityIds: LearnerDashboardActivityIds,
+      playlistUrl: string): void {
+    this.http.delete<void>(playlistUrl).toPromise();
+    if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
+      learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
+        activityId);
+    } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
+      learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
+        activityId);
+    }
   }
 
   async addToLearnerGoals(

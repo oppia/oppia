@@ -63,33 +63,34 @@ import subprocess
 import sys
 import threading
 
-from core import python_utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position
+
+from core import utils  # isort:skip
 
 # Install third party dependencies before proceeding.
-from . import codeowner_linter
-from . import css_linter
-from . import general_purpose_linter
-from . import html_linter
-from . import js_ts_linter
-from . import linter_utils
-from . import other_files_linter
-from . import python_linter
-from .. import common
-from .. import concurrent_task_utils
-from .. import install_third_party_libs
+from . import codeowner_linter  # isort:skip
+from . import css_linter  # isort:skip
+from . import general_purpose_linter  # isort:skip
+from . import html_linter  # isort:skip
+from . import js_ts_linter  # isort:skip
+from . import linter_utils  # isort:skip
+from . import other_files_linter  # isort:skip
+from . import python_linter  # isort:skip
+from .. import concurrent_task_utils  # isort:skip
+from .. import install_third_party_libs  # isort:skip
 
 OTHER_SHARD_NAME = 'other'
 
+# Shards are specified by a mapping from shard name to a list of the
+# paths in that shard. For exaple, `'1': ['core/domain/']` will create a
+# shard named `'1'` that contains all the files under core/domain/. A
+# shard name matching OTHER_SHARD_NAME includes all files not under
+# another shard.  Currently we are not sharding the lint checks, so the
+# only shard is the `other` shard that contains all files.
 SHARDS = {
-    '1': [
-        'core/templates/',
-        'extensions/',
-        'core/tests/',
-        'core/storage/',
-        'core/controllers/',
-        'core/platform',
-        'core/jobs/',
-    ],
     'other': None,
 }
 
@@ -119,35 +120,7 @@ _PARSER.add_argument(
     '--shard',
     help='Name of shard to run lint checks for')
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-_PATHS_TO_INSERT = [
-    os.getcwd(),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'setuptools-%s' % common.SETUPTOOLS_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'protobuf-%s' % common.PROTOBUF_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
-    common.THIRD_PARTY_PYTHON_LIBS_DIR
-]
-
-for path in _PATHS_TO_INSERT:
+for path in common.DIRS_TO_ADD_TO_SYS_PATH:
     sys.path.insert(0, path)
 
 
@@ -198,7 +171,7 @@ class FileCache:
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with python_utils.open_file(filepath, mode, newline='') as f:
+            with utils.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
@@ -219,7 +192,6 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
     """
     namespace.files = FileCache()
     file_cache = namespace.files
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     custom_linters = []
     third_party_linters = []
 
@@ -248,17 +220,13 @@ def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-        config_path_for_css_in_html = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-        custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_css_in_html, files['.html'])
+        custom_linter, third_party_linter = (
+            css_linter.get_linters(files['.html']))
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'css':
-        config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
-        custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_oppia_css, files['.css'])
+        custom_linter, third_party_linter = (
+            css_linter.get_linters(files['.css']))
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'py':
@@ -336,11 +304,11 @@ def _get_file_extensions(file_extensions_to_lint):
             'ts' in file_extensions_to_lint)
 
         if js_and_ts_is_present:
-            python_utils.PRINT(
+            print(
                 'Please use only one of "js" or "ts", as we do not have '
                 'separate linters for JS and TS files. If both these options '
                 'are used together, then the JS/TS linter will be run twice.')
-            python_utils.PRINT('Exiting...')
+            print('Exiting...')
             sys.exit(1)
 
         return set(file_extensions_to_lint)
@@ -366,15 +334,15 @@ def _get_filepaths_from_path(input_path, namespace=None):
     file_cache = namespace.files
     input_path = os.path.join(os.getcwd(), input_path)
     if not os.path.exists(input_path):
-        python_utils.PRINT(
-            'Could not locate file or directory %s. Exiting.' % input_path)
-        python_utils.PRINT('----------------------------------------')
+        print('Could not locate file or directory %s. Exiting.' % input_path)
+        print('----------------------------------------')
         sys.exit(1)
     if os.path.isfile(input_path):
         return [input_path]
     else:
         eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
-        excluded_glob_patterns = file_cache.readlines(eslintignore_path)
+        excluded_glob_patterns = [
+            line.strip() for line in file_cache.readlines(eslintignore_path)]
         return _get_all_files_in_directory(
             input_path, excluded_glob_patterns)
 
@@ -392,6 +360,10 @@ def _get_filepaths_from_non_other_shard(shard, namespace=None):
 
     Returns:
         list(str). Paths to lintable files.
+
+    Raises:
+        RuntimeError. Invalid shards because of a duplicate file.
+        AssertionError. A file duplicated across shards.
     """
     filepaths = []
     assert shard != OTHER_SHARD_NAME
@@ -462,7 +434,7 @@ def _get_all_filepaths(
             else:
                 invalid_filepaths.append(filename)
         if invalid_filepaths:
-            python_utils.PRINT(
+            print(
                 'The following file(s) do not exist: %s\n'
                 'Exiting.' % invalid_filepaths)
             sys.exit(1)
@@ -567,17 +539,17 @@ def _print_errors_stacktrace(errors_stacktrace):
         errors_stacktrace: list(str). List of error stacktrace of lint
             execution failure.
     """
-    python_utils.PRINT('')
-    python_utils.PRINT(
+    print('')
+    print(
         'Unable to run the complete lint test, please check '
         'the following stack trace and fix the errors:')
-    python_utils.PRINT('+--------------------------+')
+    print('+--------------------------+')
     for stacktrace in errors_stacktrace:
-        python_utils.PRINT(stacktrace)
-        python_utils.PRINT('--------------------------------------------------')
-        python_utils.PRINT('')
-    python_utils.PRINT('--------------------------------------------------')
-    python_utils.PRINT(
+        print(stacktrace)
+        print('--------------------------------------------------')
+        print('')
+    print('--------------------------------------------------')
+    print(
         'Some of the linting functions may not run until the'
         ' above errors gets fixed')
 
@@ -622,12 +594,12 @@ def main(args=None):
     install_third_party_libs.main()
     common.fix_third_party_imports()
 
-    python_utils.PRINT('Starting Linter....')
+    print('Starting Linter....')
 
     if len(all_filepaths) == 0:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('No files to check.')
-        python_utils.PRINT('---------------------------')
+        print('---------------------------')
+        print('No files to check.')
+        print('---------------------------')
         return
 
     read_files(all_filepaths, namespace=namespace)
@@ -710,13 +682,13 @@ def main(args=None):
         _print_summary_of_error_messages(lint_messages)
         linter_utils.print_failure_message('\n'.join([
             '---------------------------',
-            'Checks Not Passed.',
+            'Linter Checks Failed.',
             '---------------------------']))
         sys.exit(1)
     else:
         linter_utils.print_success_message('\n'.join([
             '---------------------------',
-            'All Checks Passed.',
+            'All Linter Checks Passed.',
             '---------------------------']))
 
 

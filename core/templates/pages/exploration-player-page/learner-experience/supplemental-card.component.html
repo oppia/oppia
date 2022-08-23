@@ -1,27 +1,24 @@
 <div class="conversation-skin-supplemental-card">
   <div *ngIf="helpCardHtml"
-       [ngClass]="{'left-align-card': isLanguageRTL()}"
-       class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
+       class="conversation-skin-help-card help-card-standard e2e-test-conversation-skin-help-card"
        [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
        #helpCard>
     <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
        [href]="OPPIA_AVATAR_LINK_URL"
        target="_blank"
        rel="noopener">
-      <img [ngStyle]="isLanguageRTL() ? {'right': '-15px'} : {'left': '-15px'}"
-           class="conversation-skin-oppia-avatar"
+      <img class="conversation-skin-oppia-avatar"
            [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
     </a>
-    <button type="button" class="conversation-skin-close-help-card-button protractor-test-close-help-card-button"
+    <button type="button" class="conversation-skin-close-help-card-button e2e-test-close-help-card-button"
             (click)="clearHelpCard()" *ngIf="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback"
-                                 [htmlData]="helpCardHtml"
-                                 [parentScope]="this"
-                                 [ngClass]="getFeedbackAudioHighlightClass()">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display class="oppia-rte-viewer conversation-skin-help-card-content e2e-test-conversation-feedback-latest"
+                                [rteString]="helpCardHtml"
+                                [ngClass]="getFeedbackAudioHighlightClass()">
+      </oppia-rte-output-display>
     </div>
     <br>
     <oppia-continue-button *ngIf="helpCardHasContinueButton"
@@ -36,74 +33,9 @@
   correctly. More details about the class can be found in extensions/interactions/
   DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
   <div class="conversation-skin-interaction-container" #interactionContainer>
-    <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
+    <oppia-interaction-display classStr="e2e-test-conversation-input"
                                [parentScope]="this"
                                [htmlData]="currentDisplayedCard.getInteractionHtml()">
-    </angular-html-bind-wrapper>
+    </oppia-interaction-display>
   </div>
 </div>
-
-<style>
-  /* The important tags are required since this is a conditional class for only
-     RTL languages. These styles are meant to override the corresponding styles
-     in the other non conditional classes for the same div.
-  */
-  .left-align-card {
-    left: 0;
-    right: auto !important;
-    text-align: right !important;
-  }
-
-  .conversation-skin-help-card {
-    background: #fff;
-    border-radius: 2px;
-    /* We move the help card lower so that it does not block
-       the terminal output in the CodeRepl interaction.
-    */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.12);
-    min-height: 50px;
-    opacity: 1;
-    padding: 12px;
-    right: 12px;
-    text-align: left;
-    transition: all 350ms;
-    /* The z-index value of leaflet map attribution is 1000, to make it go lower
-       in stack we have used 1001.
-    */
-    z-index: 1001;
-  }
-
-  .conversation-skin-help-card.ng-enter,
-  .conversation-skin-help-card.ng-leave-active {
-    opacity: 0;
-    transform: translateX(200px);
-  }
-
-  .help-card-standard {
-    /* Use margin-bottom to make sure the help card doesn't get hidden behind the footer. */
-    margin-bottom: 80px;
-    position: absolute;
-  }
-
-  .conversation-skin-help-card .conversation-skin-oppia-avatar {
-    top: 12px;
-  }
-
-  .conversation-skin-close-help-card-button {
-    background: none;
-    border: 0;
-    color: #000;
-    cursor: pointer;
-    height: 24px;
-    opacity: 0.5;
-    position: absolute;
-    right: 2px;
-    top: 2px;
-    width: 24px;
-    z-index: 200;
-  }
-
-  .conversation-skin-supplemental-card {
-    background-color: #fff;
-  }
-</style>

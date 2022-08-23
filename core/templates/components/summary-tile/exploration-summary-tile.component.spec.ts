@@ -35,6 +35,7 @@ import { RatingComputationService } from 'components/ratings/rating-computation/
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UserInfo } from 'domain/user/user-info.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
 class LearnerDashboardIconsComponentStub {
@@ -92,6 +93,7 @@ class MockWindowRef {
       this.location._hashChange = val;
     }
   };
+
   get nativeWindow() {
     return this._window;
   }
@@ -133,6 +135,7 @@ describe('Exploration Summary Tile Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
   let windowRef: MockWindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let userInfo = new UserInfo(
     ['USER_ROLE'], true, false, false, false, true,
@@ -190,6 +193,7 @@ describe('Exploration Summary Tile Component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ratingComputationService = TestBed.inject(RatingComputationService);
     urlService = TestBed.inject(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     component.collectionId = '1';
     component.explorationId = '1';
@@ -227,6 +231,10 @@ describe('Exploration Summary Tile Component', () => {
       windowDimensionsService, 'getResizeEvent').and.callThrough();
     const windowWidthSpy = spyOn(
       windowDimensionsService, 'getWidth').and.callThrough();
+    component.mobileCutoffPx = 536;
+    spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey')
+      .and.returnValues(
+        'I18N_EXPLORATION_123ab_TITLE', 'I18N_EXPLORATION_123ab_DESCRIPTION');
 
     component.ngOnInit();
     tick();
@@ -235,11 +243,44 @@ describe('Exploration Summary Tile Component', () => {
     expect(component.activityType).toBe('exploration');
     expect(component.isRefresherExploration).toBe(true);
     expect(component.isWindowLarge).toBe(true);
+    expect(component.expTitleTranslationKey).toBe(
+      'I18N_EXPLORATION_123ab_TITLE');
+    expect(component.expObjectiveTranslationKey).toBe(
+      'I18N_EXPLORATION_123ab_DESCRIPTION');
 
     expect(userServiceSpy).toHaveBeenCalled();
     expect(windowResizeSpy).toHaveBeenCalled();
     expect(windowWidthSpy).toHaveBeenCalled();
   }));
+
+  it('should check whether hacky translations are displayed or not'
+    , fakeAsync(() => {
+      const userServiceSpy = spyOn(
+        userService, 'getUserInfoAsync')
+        .and.returnValue(Promise.resolve(userInfo));
+      const windowResizeSpy = spyOn(
+        windowDimensionsService, 'getResizeEvent').and.callThrough();
+      const windowWidthSpy = spyOn(
+        windowDimensionsService, 'getWidth').and.callThrough();
+      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+        .and.returnValues(false, true);
+      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+        .and.returnValues(false, false);
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(userServiceSpy).toHaveBeenCalled();
+      expect(windowResizeSpy).toHaveBeenCalled();
+      expect(windowWidthSpy).toHaveBeenCalled();
+      let hackyTranslationIsDisplayed =
+        component.isHackyExpTitleTranslationDisplayed();
+      expect(hackyTranslationIsDisplayed).toBe(false);
+      hackyTranslationIsDisplayed =
+        component.isHackyExpObjectiveTranslationDisplayed();
+      expect(hackyTranslationIsDisplayed).toBe(true);
+    }));
 
   it('should intialize the component and set mobileCutoffPx to 0' +
     ' if it is undefined', fakeAsync(() => {
@@ -273,7 +314,25 @@ describe('Exploration Summary Tile Component', () => {
       tick();
       fixture.detectChanges();
       expect(component.resizeSubscription.closed).toBe(true);
-    }));
+    })
+  );
+
+  it('should check if mobile card is to be shown', () => {
+    const urlPathSpy = spyOn(urlService, 'getPathname')
+      .and.returnValue('/community-library');
+    component.isWindowLarge = false;
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(urlPathSpy).toHaveBeenCalled();
+    expect(component.mobileCardToBeShown).toBe(true);
+
+    urlPathSpy.and.returnValue('/not-community-library');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(false);
+  });
 
   it('should set the hover state to true', () => {
     component.setHoverState(true);
@@ -361,6 +420,30 @@ describe('Exploration Summary Tile Component', () => {
     fixture.detectChanges();
 
     expect(dateTime).toBeNull();
+  });
+
+  it('should get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
+      .and.returnValue('a few seconds ago');
+
+    component.lastUpdatedMsec = Date.now();
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBe('a few seconds ago');
+  });
+
+  it('should fail to get relative last updated Date & time', () => {
+    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow');
+
+    let relativeLastUpdatedDateTime =
+      component.getRelativeLastUpdatedDateTime();
+    fixture.detectChanges();
+
+    expect(dateTimeSpy).not.toHaveBeenCalled();
+    expect(relativeLastUpdatedDateTime).toBeNull();
   });
 
   it('should get the thumbnail url', () => {

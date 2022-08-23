@@ -63,7 +63,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(FeedbackThreadModelTest, self).setUp()
+        super().setUp()
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
@@ -104,7 +104,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_raise_exception_by_mocking_collision(self) -> None:
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
         # Test create method.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Feedback thread ID conflict on create.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
@@ -116,7 +116,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                     'exploration.exp_id.thread_id')
 
         # Test generate_new_thread_id method.
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'New thread id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -186,7 +186,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id('id_x'))
 
     def test_raise_exception_by_mocking_collision(self) -> None:
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             'exploration', '0', 'test_author', 'subject 1', 'text 1')
         # Simulating the _generate_id function in the
         # GeneralFeedbackMessageModel class.
@@ -196,23 +196,21 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             r'The following feedback message ID\(s\) conflicted on '
             'create: %s' % (instance_id)
         )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp): # type: ignore[no-untyped-call]
             feedback_models.GeneralFeedbackMessageModel.create(
-                feedback_domain.FullyQualifiedMessageIdentifier( # type: ignore[no-untyped-call]
-                    thread_id, '0')
+                feedback_domain.FullyQualifiedMessageIdentifier(
+                    thread_id, 0)
             )
 
     def test_get_all_messages(self) -> None:
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
-            'exploration', '0', None, 'subject 1', 'text 1')
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', 'test_author', 'subject 1', 'text 1')
 
-        feedback_services.create_message( # type: ignore[no-untyped-call]
-            thread_id, None, 'open', 'subject 2', 'text 2')
+        feedback_services.create_message(
+            thread_id, 'test_author', 'open', 'subject 2', 'text 2')
 
         model = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         self.assertEqual(model.entity_type, 'exploration')
 
         all_messages = (
@@ -234,16 +232,14 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertEqual(all_messages[0][1].updated_subject, 'subject 1')
 
     def test_get_most_recent_message(self) -> None:
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
-            'exploration', '0', None, 'subject 1', 'text 1')
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', 'test_author', 'subject 1', 'text 1')
 
-        feedback_services.create_message( # type: ignore[no-untyped-call]
-            thread_id, None, 'open', 'subject 2', 'text 2')
+        feedback_services.create_message(
+            thread_id, 'test_author', 'open', 'subject 2', 'text 2')
 
         model1 = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
-        # Ruling out the possibility of None for mypy type checking.
-        assert model1 is not None
         self.assertEqual(model1.entity_type, 'exploration')
 
         message = (
@@ -276,7 +272,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         test_export_author_id = (
             self.get_user_id_from_email('export_author_1@example.com')) # type: ignore[no-untyped-call]
 
-        thread_id = feedback_services.create_thread( # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             test_export_thread_type,
             test_export_thread_id,
             test_export_author_id,
@@ -284,7 +280,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             test_export_text
         )
 
-        feedback_services.create_message( # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             test_export_author_id,
             test_export_updated_status,
@@ -331,7 +327,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     MESSAGE_IDS_READ_IN_THREAD_C = [5, 6, 7, 8, 9]
 
     def setUp(self) -> None:
-        super(FeedbackThreadUserModelTest, self).setUp()
+        super().setUp()
         model = feedback_models.GeneralFeedbackThreadUserModel.create(
             self.USER_ID_A, self.THREAD_ID_A)
         model.message_ids_read_by_user = self.MESSAGE_IDS_READ_IN_THREAD_A
@@ -420,7 +416,6 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
                 'user_id', 'exploration.exp_id.thread_id'))
 
         # Ruling out the possibility of None for mypy type checking.
-        assert expected_model is not None
         assert actual_model is not None
         self.assertEqual(actual_model.id, expected_model.id)
         self.assertEqual(actual_model.user_id, expected_model.user_id)
@@ -508,19 +503,37 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class."""
 
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_ID_1 = 'id_1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             feedback_models.UnsentFeedbackEmailModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self) -> None:
-        feedback_models.UnsentFeedbackEmailModel(id='user_id').put()
         self.assertTrue(
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('user_id'))
         self.assertFalse(
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('id_x'))
+
+    def test_apply_deletion_policy_deletes_model_for_user(self) -> None:
+        feedback_models.UnsentFeedbackEmailModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertIsNone(
+            feedback_models.UnsentFeedbackEmailModel.get_by_id(self.USER_ID_1))
+
+    def test_apply_deletion_policy_raises_no_exception_for_nonexistent_user(
+        self
+    ) -> None:
+        feedback_models.UnsentFeedbackEmailModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_new_instances_stores_correct_data(self) -> None:
         user_id = 'A'

@@ -23,23 +23,14 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 
 from core.tests import test_utils
 
+import esprima
+
 from . import js_ts_linter
 from . import pre_commit_linter
-from .. import common
 
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-
-ESPRIMA_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
-
-sys.path.insert(1, ESPRIMA_PATH)
-
-import esprima  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
@@ -86,6 +77,24 @@ class JsTsLintTests(test_utils.LinterTestBase):
             else:
                 continue
 
+    def test_compile_all_ts_files_with_error(self):
+        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret:
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 1
+                def communicate(self):
+                    """Return some error."""
+                    return '', 'Some error'.encode('utf-8')
+            return Ret()
+
+        popen_error_swap = self.swap(
+            subprocess, 'Popen', mock_popen_error_call)
+        with popen_error_swap:
+            with self.assertRaisesRegex(Exception, 'Some error'):
+                js_ts_linter.compile_all_ts_files()
+
     def test_validate_and_parse_js_and_ts_files_with_exception(self):
         def mock_parse_script(unused_file_content, comment):  # pylint: disable=unused-argument
             raise Exception('Exception raised from parse_script()')
@@ -94,7 +103,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter, 'compile_all_ts_files', lambda: None)
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
-        with esprima_swap, compile_all_ts_files_swap, self.assertRaisesRegexp(
+        with esprima_swap, compile_all_ts_files_swap, self.assertRaisesRegex(
             Exception, re.escape('Exception raised from parse_script()')
         ):
             js_ts_linter.JsTsLintChecksManager(
@@ -175,7 +184,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         communicate_swap = self.swap(
             subprocess.Popen, 'communicate', mock_communicate)
         with popen_swap, communicate_swap:
-            with self.assertRaisesRegexp(Exception, 'Invalid'):
+            with self.assertRaisesRegex(Exception, 'Invalid'):
                 js_ts_linter.ThirdPartyJsTsLintChecksManager(
                     [INVALID_SORTED_DEPENDENCIES_FILEPATH]
                 ).perform_all_lint_checks()
@@ -186,9 +195,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with exists_swap, self.assertRaisesRegexp(
+        with exists_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR    Please run start.sh first to install node-eslint and '
+            'ERROR    Please run start.py first to install node-eslint and '
             'its dependencies.'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH]

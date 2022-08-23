@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -25,6 +24,7 @@ from core.controllers import base
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import learner_progress_services
+from core.domain import story_fetchers
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
@@ -129,6 +129,37 @@ class LearnerDashboardTopicsAndStoriesProgressHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class LearnerCompletedChaptersCountHandler(base.BaseHandler):
+    """Provides the number of chapters completed by the user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        """Handles GET requests."""
+        learner_progress_in_topics_and_stories = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id)[0])
+
+        all_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id,
+                learner_progress_in_topics_and_stories.all_topic_summaries))
+
+        completed_chapters_count = 0
+        for topic in all_topic_summary_dicts:
+            for story in topic['canonical_story_summary_dict']:
+                completed_chapters_count += (
+                    len(story_fetchers.get_completed_nodes_in_story(
+                        self.user_id, story['id'])))
+
+        self.render_json({
+            'completed_chapters_count': completed_chapters_count,
+        })
+
+
 class LearnerDashboardCollectionsProgressHandler(base.BaseHandler):
     """Provides data of the user's collections for the learner
     dashboard page."""
@@ -228,24 +259,50 @@ class LearnerDashboardFeedbackUpdatesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'paginated_threads_list': {
+                    'schema': {
+                        'type': 'list',
+                        'items': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'basestring'
+                            },
+                        },
+                    },
+                    'default_value': []
+                }
+            }
+        }
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self):
-        """Handles GET requests."""
-
-        full_thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
-        if len(full_thread_ids) > 0:
+    def post(self):
+        """Handles POST requests."""
+        if len(self.normalized_payload.get('paginated_threads_list')) == 0:
+            full_thread_ids = (
+                subscription_services.get_all_threads_subscribed_to(
+                    self.user_id))
+            paginated_threads_list = [
+                full_thread_ids[index: index + 100]
+                for index in range(0, len(full_thread_ids), 100)]
+        else:
+            paginated_threads_list = self.normalized_payload.get(
+                'paginated_threads_list')
+        if (
+            len(paginated_threads_list) > 0 and
+            len(paginated_threads_list[0]) > 0
+        ):
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_exp_thread_summaries(
-                    self.user_id, full_thread_ids))
+                    self.user_id, paginated_threads_list[0]))
         else:
             thread_summaries, number_of_unread_threads = [], 0
 
         self.values.update({
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
+            'paginated_threads_list': paginated_threads_list[1:]
         })
         self.render_json(self.values)
 
@@ -306,7 +363,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             self.user_id, thread_id, message_ids)
 
         message_summary_list = []
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            thread_id, strict=False
+        )
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
@@ -329,7 +388,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             messages.pop(0)
             authors_settings.pop(0)
 
-        for m, author_settings in python_utils.ZIP(messages, authors_settings):
+        for m, author_settings in zip(messages, authors_settings):
 
             if author_settings is None:
                 author_username = None

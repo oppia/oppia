@@ -16,23 +16,30 @@
  * @fileoverview Unit tests for the ExplorationTitleService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
-
-require(
-  'pages/exploration-editor-page/services/exploration-title.service.ts');
+import { TestBed } from '@angular/core/testing';
+import { ExplorationTitleService } from './exploration-title.service';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { ExplorationRightsService } from './exploration-rights.service';
+import { ValidatorsService } from 'services/validators.service';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Exploration Title Service', function() {
-  let ets = null;
+  let ets: ExplorationTitleService;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationRightsService,
+        ValidatorsService,
+        NormalizeWhitespacePipe,
+        ExplorationPropertyService
+      ]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ets = $injector.get('ExplorationTitleService');
-  }));
+    ets = TestBed.inject(ExplorationTitleService);
+  });
 
   it('should test the child object properties', function() {
     expect(ets.propertyName).toBe('title');

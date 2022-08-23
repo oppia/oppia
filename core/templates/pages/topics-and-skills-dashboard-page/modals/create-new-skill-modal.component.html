@@ -9,7 +9,7 @@
       <div class="skill-description-header">
         <strong>Skill Description</strong>
       </div>
-      <input type="text" class="form-control protractor-test-new-skill-description-field"
+      <input type="text" class="form-control e2e-test-new-skill-description-field"
              placeholder="eg: Adding Fractions" (change)="updateSkillDescriptionAndCheckIfExists()"
              [(ngModel)]="this.newSkillDescription" [ngModelOptions]="{standalone: true}"
              autofocus [attr.maxlength]="MAX_CHARS_IN_SKILL_DESCRIPTION"
@@ -26,7 +26,7 @@
       </span>
     </div>
     <div class="skill-review-material-box">
-      <div class="oppia-rule-details-header protractor-test-open-concept-card" (click)="openConceptCardExplanationEditor()">
+      <div class="oppia-rule-details-header e2e-test-open-concept-card" (click)="openConceptCardExplanationEditor()">
         <strong>Review Material</strong>
         <div class="oppia-input-box-subtitle">
           <i>
@@ -37,7 +37,7 @@
       </div>
 
       <div *ngIf="conceptCardExplanationEditorIsShown">
-        <schema-based-editor [schema]="getHtmlSchema.bind(this)" class="protractor-test-concept-card-text"
+        <schema-based-editor [schema]="getHtmlSchema()" class="e2e-test-concept-card-text"
                              [localValue]="bindableDict.displayedConceptCardExplanation"
                              (localValueChange)="updateExplanation($event)">
         </schema-based-editor>
@@ -47,7 +47,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-skill-creation-button"
+    <button class="btn btn-success e2e-test-confirm-skill-creation-button"
             type="submit"
             [disabled]="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || errorMsg !== ''">
             Save
@@ -94,14 +94,14 @@
     }
     .create-new-skill-modal .modal-header {
       align-items: center;
-      background-color: #00609C;
+      background-color: #00609c;
       display: flex;
     }
     .create-new-skill-modal .modal-header h3 {
-      color: #FFF;
+      color: #fff;
     }
     .create-new-skill-modal .modal-close-button {
-      color: #FFF;
+      color: #fff;
       display: block;
       font-size: 20px;
     }

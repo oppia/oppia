@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 import { Rubric } from 'domain/skill/rubric.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
@@ -38,6 +38,7 @@ export class CreateNewSkillModalComponent {
     Rubric.create(constants.SKILL_DIFFICULTIES[0], []),
     Rubric.create(constants.SKILL_DIFFICULTIES[1], ['']),
     Rubric.create(constants.SKILL_DIFFICULTIES[2], [])];
+
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
@@ -46,7 +47,11 @@ export class CreateNewSkillModalComponent {
   HTML_SCHEMA: {type: string} = { type: 'html' };
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     constants.MAX_CHARS_IN_SKILL_DESCRIPTION);
-  newExplanationObject = null;
+
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  newExplanationObject!: SubtitledHtmlBackendDict;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -96,6 +101,7 @@ export class CreateNewSkillModalComponent {
     this.skillDescriptionExists = skillDescriptionExists;
     this.setErrorMessageIfNeeded();
   }
+
   updateSkillDescriptionAndCheckIfExists(): void {
     this.resetErrorMsg();
 

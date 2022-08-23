@@ -40,7 +40,7 @@ export interface AggregatedStats {
   'num_completions': number;
   'num_actual_starts': number;
   'state_stats_mapping': {
-    [stateName: string]: SessionStateStats
+    [stateName: string]: SessionStateStats;
   };
 }
 

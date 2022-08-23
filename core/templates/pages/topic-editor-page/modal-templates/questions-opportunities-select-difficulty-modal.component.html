@@ -1,0 +1,70 @@
+<div class="oppia-outer"
+     *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; trackBy: index">
+  <div class="modal-header">
+    <h3 *ngIf="linkedSkillsWithDifficulty.length === 0">
+      Select skills you would like to link to the question.
+    </h3>
+    <h3 class="oppia-modal-header" *ngIf="linkedSkillsWithDifficulty.length > 0">
+      {{ skillWithDifficulty.getDescription() }}
+    </h3>
+    <button type="button"
+            class="close oppia-close-button-position"
+            (click)="cancel()"
+            aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body select-skill-modal">
+    <div *ngIf="linkedSkillsWithDifficulty.length === 0">
+      You can only set difficulty after selecting skills linked to the question. Please go back and link skill(s) to this question.
+    </div>
+    <div class="list-group">
+      <div class="list-group-item">
+        <label class="list-group-item-heading skill-description">
+          Select the difficulty per skill according to the specified rubrics
+        </label>
+        <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
+                                            [(skillWithDifficulty)]="skillWithDifficulty">
+        </oppia-question-difficulty-selector>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div *ngIf="linkedSkillsWithDifficulty.length > 0" class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()"> Cancel </button>
+    <button class="btn btn-success e2e-test-confirm-skill-difficulty-button"
+            [disabled]="linkedSkillsWithDifficulty.length === 0"
+            (click)="startQuestionCreation()"> Continue
+    </button>
+  </div>
+  <div *ngIf="linkedSkillsWithDifficulty.length === 0">
+    <button class="btn btn-secondary" (click)="goToSelectSkillView()"> Back </button>
+  </div>
+</div>
+<style>
+  .oppia-close-button-position {
+    top: 1px;
+  }
+  .select-skill-modal .skill-summary-container {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .select-skill-modal .skill-description {
+    display: block;
+    font-size: 1em;
+  }
+  @media screen and (max-width: 500px) {
+    .modal-header {
+      border-bottom: 0;
+      margin-bottom: -20px;
+    }
+    .oppia-modal-header {
+      font-size: 22px;
+    }
+    .select-skill-modal .skill-description {
+      font-size: 18px;
+    }
+  }
+</style>

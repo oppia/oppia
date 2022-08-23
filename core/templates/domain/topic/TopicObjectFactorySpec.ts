@@ -19,17 +19,15 @@
 import { TestBed } from '@angular/core/testing';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
-import { StoryReferenceObjectFactory } from './StoryReferenceObjectFactory';
+import { StoryReference } from './story-reference-object.model';
 import { Subtopic } from './subtopic.model';
 
 describe('Topic object factory', () => {
   let topicObjectFactory: TopicObjectFactory;
-  let storyReferenceObjectFactory: StoryReferenceObjectFactory;
   let _sampleTopic: Topic;
 
   beforeEach(() => {
     topicObjectFactory = TestBed.get(TopicObjectFactory);
-    storyReferenceObjectFactory = TestBed.get(StoryReferenceObjectFactory);
 
     let sampleTopicBackendObject = {
       id: 'sample_topic_id',
@@ -113,21 +111,21 @@ describe('Topic object factory', () => {
 
   it('should warn user if duplicate stories are present', () => {
     _sampleTopic._canonicalStoryReferences = [
-      storyReferenceObjectFactory.createFromBackendDict({
+      StoryReference.createFromBackendDict({
         story_id: 'story_1',
         story_is_published: true
       }),
-      storyReferenceObjectFactory.createFromBackendDict({
+      StoryReference.createFromBackendDict({
         story_id: 'story_1',
         story_is_published: true
       })];
 
     _sampleTopic._additionalStoryReferences = [
-      storyReferenceObjectFactory.createFromBackendDict({
+      StoryReference.createFromBackendDict({
         story_id: 'story_4',
         story_is_published: true
       }),
-      storyReferenceObjectFactory.createFromBackendDict({
+      StoryReference.createFromBackendDict({
         story_id: 'story_4',
         story_is_published: true
       })];
@@ -234,6 +232,16 @@ describe('Topic object factory', () => {
     let issue = _sampleTopic.prepublishValidate();
 
     expect(issue).toEqual(['Topic should have page title fragment.']);
+  });
+
+  it('should warn user when page title length is less than the' +
+  ' allowed limit', () => {
+    _sampleTopic._pageTitleFragmentForWeb = Array(3).join('a');
+    let issue = _sampleTopic.prepublishValidate();
+
+    expect(issue).toEqual(
+      ['Topic page title fragment should not be shorter than ' +
+      '5 characters.']);
   });
 
   it('should warn user when page title length is more than the' +

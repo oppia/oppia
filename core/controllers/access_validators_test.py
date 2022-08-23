@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.constants import constants
 from core.domain import config_services
 from core.tests import test_utils
 
@@ -27,7 +26,7 @@ ACCESS_VALIDATION_HANDLER_PREFIX = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
 class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ClassroomPageAccessValidationHandlerTests, self).setUp()
+        super().setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
@@ -64,7 +63,7 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
 
     def setUp(self) -> None:
         """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
-        super(ReleaseCoordinatorAccessValidationHandlerTests, self).setUp()
+        super().setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -92,31 +91,10 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
-class AccountDeletionIsEnabledValidationHandlerTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self) -> None:
-        super(AccountDeletionIsEnabledValidationHandlerTests, self).setUp()
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
-
-    def test_delete_account_validation_returns_true_if_enabled(self) -> None:
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            self.get_html_response( # type: ignore[no-untyped-call]
-                '%s/account_deletion_is_enabled' %
-                ACCESS_VALIDATION_HANDLER_PREFIX)
-
-    def test_delete_account_validation_returns_false_if_disabled(self) -> None:
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_json(
-                '%s/account_deletion_is_enabled' %
-                ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=404)
-
-
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ProfileExistsValidationHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -160,7 +138,7 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
     user_email = 'user@example.com'
 
     def setUp(self) -> None:
-        super(ManageOwnAccountValidationHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
         self.mark_user_banned(self.banned_user) # type: ignore[no-untyped-call]

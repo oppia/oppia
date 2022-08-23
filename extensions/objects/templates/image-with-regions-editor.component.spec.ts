@@ -18,17 +18,24 @@
 
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ImageWithRegionsEditorComponent } from './image-with-regions-editor.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ContextService } from 'services/context.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
+import { AppConstants } from 'app.constants';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('ImageWithRegionsEditorComponent', () => {
   let component: ImageWithRegionsEditorComponent;
   let ngbModal: NgbModal;
   let fixture: ComponentFixture<ImageWithRegionsEditorComponent>;
   let contextService: ContextService;
+  let imageLocalStorageService: ImageLocalStorageService;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let svgSanitizerService: SvgSanitizerService;
 
   class MockImageObject {
     source = null;
@@ -42,6 +49,7 @@ describe('ImageWithRegionsEditorComponent', () => {
         return 'Fake onload executed';
       };
     }
+
     set src(url: string) {
       this.onload();
     }
@@ -59,6 +67,9 @@ describe('ImageWithRegionsEditorComponent', () => {
   beforeEach(() => {
     ngbModal = TestBed.inject(NgbModal);
     contextService = TestBed.inject(ContextService);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     fixture = TestBed.createComponent(ImageWithRegionsEditorComponent);
     component = fixture.componentInstance;
 
@@ -105,13 +116,149 @@ describe('ImageWithRegionsEditorComponent', () => {
     // We have only defined the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new MockImageObject(490, 864));
-    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
   });
+
+  it(
+    'should initialize editor when ngOnChanges is run with a new value only',
+    fakeAsync(() => {
+      expect(component.editorIsInitialized).toBe(false);
+      component.ngOnChanges({});
+      expect(component.editorIsInitialized).toBe(false);
+      component.ngOnChanges({
+        value: new SimpleChange(
+          undefined, {labeledRegion: [], imagePath: ''}, true
+        ),
+      });
+      expect(component.editorIsInitialized).toBe(true);
+    })
+  );
+
+  it(
+    'should not re-initialize editor once initialized',
+    fakeAsync(() => {
+      expect(component.editorIsInitialized).toBe(false);
+      component.initializeEditor();
+      expect(component.editorIsInitialized).toBe(true);
+      component.initializeEditor();
+      expect(component.editorIsInitialized).toBe(true);
+    })
+  );
 
   it('should initialize component when interaction editor is opened.', () => {
     spyOn(component, 'initializeEditor').and.callThrough();
     spyOn(component, 'imageValueChanged').and.callThrough();
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     spyOn(component.valueChanged, 'emit');
+    spyOn(component, 'getPreviewUrl');
+
+    component.ngOnInit();
+
+    expect(component.alwaysEditable).toBe(true);
+    expect(component.SCHEMA).toEqual({
+      type: 'custom',
+      obj_type: 'Filepath'
+    });
+    // Testing values initialised in initializeEditor function.
+    expect(component.initializeEditor).toHaveBeenCalled();
+    expect(component.mouseX).toBe(0);
+    expect(component.mouseY).toBe(0);
+    expect(component.originalMouseX).toBe(0);
+    expect(component.originalMouseY).toBe(0);
+    expect(component.originalRectArea).toEqual({
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    });
+    expect(component.rectX).toBe(0);
+    expect(component.rectY).toBe(0);
+    expect(component.rectWidth).toBe(0);
+    expect(component.rectHeight).toBe(0);
+    expect(component.userIsCurrentlyDrawing).toBe(false);
+    expect(component.userIsCurrentlyDragging).toBe(false);
+    expect(component.userIsCurrentlyResizing).toBe(false);
+    expect(component.xDirection).toBe(0);
+    expect(component.yDirection).toBe(0);
+    expect(component.yDirectionToggled).toBe(false);
+    expect(component.xDirectionToggled).toBe(false);
+    expect(component.movedOutOfRegion).toBe(false);
+    expect(component.resizableBorderWidthPx).toBe(10);
+    expect(component.hoveredRegion).toBeNull();
+    expect(component.selectedRegion).toBeNull();
+    expect(component.errorText).toBe('');
+    // Testing values initalised in the imageValueChanged function.
+    expect(component.imageValueChanged).toHaveBeenCalled();
+    expect(component.originalImageWidth).toBe(490);
+    expect(component.originalImageHeight).toBe(864);
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
+  });
+
+  it('should initialize component when interaction editor is opened with a' +
+  ' custom entity context', () => {
+    spyOn(component, 'initializeEditor').and.callThrough();
+    spyOn(component, 'imageValueChanged').and.callThrough();
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS);
+    spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
+    spyOn(component.valueChanged, 'emit');
+
+    component.ngOnInit();
+
+    expect(component.alwaysEditable).toBe(true);
+    expect(component.SCHEMA).toEqual({
+      type: 'custom',
+      obj_type: 'Filepath'
+    });
+    // Testing values initialised in initializeEditor function.
+    expect(component.initializeEditor).toHaveBeenCalled();
+    expect(component.mouseX).toBe(0);
+    expect(component.mouseY).toBe(0);
+    expect(component.originalMouseX).toBe(0);
+    expect(component.originalMouseY).toBe(0);
+    expect(component.originalRectArea).toEqual({
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    });
+    expect(component.rectX).toBe(0);
+    expect(component.rectY).toBe(0);
+    expect(component.rectWidth).toBe(0);
+    expect(component.rectHeight).toBe(0);
+    expect(component.userIsCurrentlyDrawing).toBe(false);
+    expect(component.userIsCurrentlyDragging).toBe(false);
+    expect(component.userIsCurrentlyResizing).toBe(false);
+    expect(component.xDirection).toBe(0);
+    expect(component.yDirection).toBe(0);
+    expect(component.yDirectionToggled).toBe(false);
+    expect(component.xDirectionToggled).toBe(false);
+    expect(component.movedOutOfRegion).toBe(false);
+    expect(component.resizableBorderWidthPx).toBe(10);
+    expect(component.hoveredRegion).toBeNull();
+    expect(component.selectedRegion).toBeNull();
+    expect(component.errorText).toBe('');
+    // Testing values initalised in the imageValueChanged function.
+    expect(component.imageValueChanged).toHaveBeenCalled();
+    expect(component.originalImageWidth).toBe(490);
+    expect(component.originalImageHeight).toBe(864);
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
+  });
+
+  it('should initialize component when interaction editor is opened with a' +
+  ' the image destination set to local storage', () => {
+    spyOn(component, 'initializeEditor').and.callThrough();
+    spyOn(component, 'imageValueChanged').and.callThrough();
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS);
+    spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(component.valueChanged, 'emit');
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue('abc');
 
     component.ngOnInit();
 
@@ -629,6 +776,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.movedOutOfRegion = true;
     component.xDirection = 1;
     component.yDirection = 1;
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onSvgMouseUp();
 
@@ -1305,5 +1455,48 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.yDirectionToggled = false;
 
     expect(component.getCursorStyle()).toBe('e-resize');
+  });
+
+  it('should get the preview URL when the image save destination is ' +
+  'server', () => {
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    spyOn(assetsBackendApiService, 'getImageUrlForPreview');
+
+    component.getPreviewUrl('/path/to/image.png');
+
+    expect(assetsBackendApiService.getImageUrlForPreview).toHaveBeenCalled();
+  });
+
+  it('should get the preview URL when the image save destination is ' +
+  'local storage and image is non SVG', () => {
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      'data:image/png;dummy%20image');
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes');
+
+    component.getPreviewUrl('/path/to/image.png');
+
+    expect(
+      svgSanitizerService.removeAllInvalidTagsAndAttributes
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should get the preview URL when the image save destination is ' +
+  'local storage and image is an SVG', () => {
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      'data:image/svg+xml;dummy%20image');
+    spyOn(svgSanitizerService, 'removeAllInvalidTagsAndAttributes');
+
+    component.getPreviewUrl('/path/to/image.svg');
+
+    expect(
+      svgSanitizerService.removeAllInvalidTagsAndAttributes
+    ).toHaveBeenCalled();
   });
 });

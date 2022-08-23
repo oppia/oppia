@@ -6,6 +6,7 @@
 *.swo
 *.bak
 .*
+__pycache__/
 # Typescript files in core
 core/**.ts
 # Typescript output log file
@@ -17,6 +18,8 @@ core/tests/
 node_modules/
 scripts/
 third_party/python3_libs/
+third_party/python_libs/
+local_compiled_js_for_test/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
@@ -34,7 +37,8 @@ third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/
 third_party/static/bower-angular-translate-loader-partial-2.18.1/
 third_party/static/bower-angular-translate-loader-static-files-2.18.1/
 third_party/static/bower-angular-translate-storage-cookie-2.18.1/
-third_party/static/bower-material-1.1.19/
+third_party/static/bower-material-1.1.19/layouts/
+third_party/static/bower-material-1.1.19/modules/
 third_party/python_libs/google/appengine/
 third_party/python_libs/google/net/
 third_party/python_libs/google/pyglib/

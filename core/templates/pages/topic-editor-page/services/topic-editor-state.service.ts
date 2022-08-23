@@ -61,15 +61,18 @@ export class TopicEditorStateService {
     current: [],
     others: []
   };
+
   private _skillCreationIsAllowed: boolean = false;
   private _classroomUrlFragment: string = 'staging';
   private _storySummariesInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   private _subtopicPageLoadedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
   private _topicInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
+
   private _topicReinitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
@@ -94,8 +97,10 @@ export class TopicEditorStateService {
   }
 
   private _updateGroupedSkillSummaries(
-      groupedSkillSummaries: { [topicName: string]:
-        SkillSummaryBackendDict[] }): void {
+      groupedSkillSummaries: {
+        [topicName: string]: SkillSummaryBackendDict[];
+      }
+  ): void {
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
@@ -518,6 +523,7 @@ export class TopicEditorStateService {
   get onTopicReinitialized(): EventEmitter<void> {
     return this._topicReinitializedEventEmitter;
   }
+
   /**
    * Returns the classroom name for the topic.
    */
@@ -558,18 +564,33 @@ export class TopicEditorStateService {
    * has been successfully updated.
    */
   updateExistenceOfTopicUrlFragment(
-      topicUrlFragment: string, successCallback: () => void): void {
+      topicUrlFragment: string,
+      successCallback: () => void,
+      errorCallback: () => void
+  ): void {
     this.editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
       topicUrlFragment).then((topicUrlFragmentExists) => {
       this._setTopicWithUrlFragmentExists(topicUrlFragmentExists);
       if (successCallback) {
         successCallback();
       }
-    }, (error) => {
-      this.alertsService.addWarning(
-        error ||
-        'There was an error when checking if the topic url fragment ' +
-        'exists for another topic.');
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback();
+      }
+      /**
+       * This backend api service uses a HTTP link which is generated with
+       * the help of inputted url fragment. So, whenever a url fragment is
+       * entered against the specified reg-ex(or rules) wrong HTTP link is
+       * generated and causes server to respond with 400 error. Because
+       * server also checks for reg-ex match.
+       */
+      if (errorResponse.status !== 400) {
+        this.alertsService.addWarning(
+          errorResponse.message ||
+          'There was an error when checking if the topic url fragment ' +
+          'exists for another topic.');
+      }
     });
   }
 

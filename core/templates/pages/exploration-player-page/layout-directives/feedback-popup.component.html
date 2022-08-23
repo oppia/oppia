@@ -1,24 +1,21 @@
 <div class="oppia-feedback-popup-container">
   <div *ngIf="!feedbackSubmitted">
-    <button type="button" class="oppia-close-popover-button protractor-test-exploration-feedback-close-button" (click)="close()">
+    <button type="button" class="oppia-close-popover-button e2e-test-exploration-feedback-close-button" (click)="close()">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <br>
 
     <div>
-      <textarea [(ngModel)]="feedbackText" rows="5" class="protractor-test-exploration-feedback-textarea oppia-feedback-popover-textarea" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"
+      <textarea [(ngModel)]="feedbackText" rows="5" class="e2e-test-exploration-feedback-textarea oppia-feedback-popover-textarea" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"
                 placeholder="{{ 'I18N_PLAYER_LEAVE_FEEDBACK' | translate }}" [oppiaFocusOn]="feedbackPopoverId">
       </textarea>
       <span class="oppia-input-box-subtitle">
-        <em>
-          Feedback message should be at most
-          {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
-        </em>
+        <em [innerHTML]="'I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH }"></em>
       </span>
     </div>
 
     <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-    <button mat-button class="float-right oppia-exploration-feedback-submit-btn protractor-test-exploration-feedback-submit-btn"
+    <button mat-button class="float-right oppia-exploration-feedback-submit-btn e2e-test-exploration-feedback-submit-btn"
             [ngClass]="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}"
             (click)="saveFeedback()"
             [disabled]="!feedbackText || feedbackText.length > MAX_REVIEW_MESSAGE_LENGTH">
@@ -45,6 +42,9 @@
     padding: 4px;
     resize: none;
     width: 250px;
+  }
+  .oppia-close-popover-button {
+    position: absolute;
   }
   input {
     position: relative;

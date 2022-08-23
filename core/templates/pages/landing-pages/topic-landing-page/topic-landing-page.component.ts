@@ -18,8 +18,10 @@
 
 require('base-components/base-content.component.ts');
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -32,6 +34,12 @@ import { PageTitleService } from 'services/page-title.service';
 
 import constants from 'assets/constants';
 
+type TopicLandingPageDataKey = (
+  keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA);
+
+type TopicLandingPageMathDataKey = (
+    keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA.math);
+
 interface LessonsQuality {
   title: string;
   description: string;
@@ -41,10 +49,10 @@ interface LessonsQuality {
 }
 
 interface TopicData {
-  topicTitle: string,
-  topicTagline: string,
-  collectionId: string,
-  chapters: string[]
+  topicTitle: string;
+  topicTagline: string;
+  collectionId: string;
+  chapters: readonly string[];
 }
 
 @Component({
@@ -52,20 +60,26 @@ interface TopicData {
   templateUrl: './topic-landing-page.component.html',
   styleUrls: []
 })
-export class TopicLandingPageComponent implements OnInit {
-  backgroundBannerUrl: string = null;
-  lessonInDevicesPngImageSrc: string = null;
-  lessonInDevicesWebpImageSrc: string = null;
-  lessonsQualities: LessonsQuality[] = null;
-  topicData: TopicData = null;
-  topicTitle: string = null;
+export class TopicLandingPageComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  backgroundBannerUrl!: string;
+  lessonInDevicesPngImageSrc!: string;
+  lessonInDevicesWebpImageSrc!: string;
+  lessonsQualities!: LessonsQuality[];
+  topicData!: TopicData;
+  topicTitle!: string;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private urlService: UrlService) {}
+    private urlService: UrlService,
+    private translateService: TranslateService
+  ) {}
 
   getLessonQualities(): LessonsQuality[] {
     return [{
@@ -106,7 +120,9 @@ export class TopicLandingPageComponent implements OnInit {
     let topicName = pathArray[2];
 
     this.topicData =
-      TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA[subjectName][topicName];
+      TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA[
+        subjectName as TopicLandingPageDataKey][
+          topicName as TopicLandingPageMathDataKey];
     this.topicTitle = this.topicData.topicTitle;
 
     this.lessonsQualities = this.getLessonQualities();
@@ -131,14 +147,26 @@ export class TopicLandingPageComponent implements OnInit {
             topic: topicName,
             filename: 'lesson_in_devices.webp'
           })));
-    this.pageTitleService.setDocumentTitle(
-      [this.topicTitle, this.topicData.topicTagline, 'Oppia'].join(' | '));
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
   }
 
   getLessonQualityImageSrc(filename: string): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.urlInterpolationService.interpolateUrl(
         '/landing/<filename>', {filename: filename}));
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_TOPIC_LANDING_PAGE_TITLE', {
+        topicTitle: this.topicTitle,
+        topicTagline: this.topicData.topicTagline
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   onClickGetStartedButton(): void {
@@ -156,6 +184,10 @@ export class TopicLandingPageComponent implements OnInit {
       this.windowRef.nativeWindow.location.href = (
         `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
     }, 150);
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

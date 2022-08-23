@@ -66,8 +66,10 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
 require('services/site-analytics.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 
 angular.module('oppia').component('explorationEditorTab', {
   bindings: {
@@ -75,21 +77,21 @@ angular.module('oppia').component('explorationEditorTab', {
   },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
+    '$rootScope', '$scope', '$templateCache', '$timeout', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
-    'LoaderService',
+    'LoaderService', 'NgbModal',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $timeout, $uibModal, EditabilityService,
+        $rootScope, $scope, $templateCache, $timeout, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService, GraphDataService,
-        LoaderService,
+        LoaderService, NgbModal,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -105,6 +107,10 @@ angular.module('oppia').component('explorationEditorTab', {
         /\{\{/g, '<[').replace(/\}\}/g, ']>');
       $templateCache.put(
         'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
+
+      ctrl.isEditable = function() {
+        return EditabilityService.isEditable();
+      };
 
       ctrl.getStateContentPlaceholder = function() {
         if (
@@ -201,6 +207,8 @@ angular.module('oppia').component('explorationEditorTab', {
         // Show the interaction when the text content is saved, even if no
         // content is entered.
         ctrl.interactionIsShown = true;
+
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveLinkedSkillId = function(displayedValue) {
@@ -262,6 +270,7 @@ angular.module('oppia').component('explorationEditorTab', {
       };
 
       ctrl.saveHints = function(displayedValue) {
+        $rootScope.$applyAsync();
         ExplorationStatesService.saveHints(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
@@ -291,13 +300,10 @@ angular.module('oppia').component('explorationEditorTab', {
             writtenTranslations.hasUnflaggedWrittenTranslations(contentId));
         });
         if (shouldPrompt) {
-          $uibModal.open({
-            template: require(
-              'components/forms/forms-templates/mark-all-audio-and-' +
-              'translations-as-needing-update-modal.directive.html'),
-            backdrop: 'static',
-            controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {
+          NgbModal.open(
+            MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
+              backdrop: 'static',
+            }).result.then(function() {
             contentIds.forEach(contentId => {
               if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
                 recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
@@ -344,12 +350,12 @@ angular.module('oppia').component('explorationEditorTab', {
           })
         );
 
-        $scope.$watch(ExplorationStatesService.getStates, function() {
+        ExplorationStatesService.registerOnStatesChangedCallback(() => {
           if (ExplorationStatesService.getStates()) {
             StateEditorService.setStateNames(
               ExplorationStatesService.getStateNames());
           }
-        }, true);
+        });
         ctrl.interactionIsShown = false;
       };
       ctrl.$onDestroy = function() {

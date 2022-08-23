@@ -1,0 +1,54 @@
+name: End-to-End coverage and Typescript test
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  e2e_coverage_and_typescript_tests:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: ./.github/actions/install-oppia-dependencies
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
+      - name: Install chrome
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.install_chrome_for_ci
+      - name: Check that all e2e test files are captured in protractor.conf.js and wdio.conf.js
+        run: python -m scripts.check_e2e_tests_are_captured_in_ci
+      - name: Run typescript tests
+        run: python -m scripts.typescript_checks
+      - name: Run typescript tests in strict mode
+        run: python -m scripts.typescript_checks --strict_checks
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A typescript test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

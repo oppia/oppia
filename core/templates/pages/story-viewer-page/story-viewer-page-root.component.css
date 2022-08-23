@@ -1,0 +1,297 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.oppia-story-player-tiles-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 8px 6px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  margin-bottom: 120px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 880px;
+  min-height: 500px;
+  padding-top: 30px;
+  position: relative;
+  text-align: left;
+}
+
+.oppia-story-player-tiles-container .oppia-page-heading {
+  color: #005048;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-story-viewer-container {
+  position: relative;
+}
+
+.oppia-story-viewer-container .oppia-story-title {
+  color: #01645c;
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 3em;
+  margin-bottom: 25px;
+  margin-top: 0;
+  padding-top: 30px;
+  text-align: center;
+}
+
+.oppia-story-viewer-container .oppia-story-description {
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.oppia-story-viewer-inner-container {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 40px;
+}
+
+oppia-story-viewer-page-root .oppia-card-preview-panel {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+  left: 50%;
+  padding: 30px 85px 70px 85px;
+  pointer-events: none;
+  position: fixed;
+  text-align: left;
+  transform: translateX(29%);
+}
+oppia-story-viewer-page-root .story-mascot {
+  left: 40px;
+  position: absolute;
+  top: 40px;
+  width: 120px;
+}
+
+/* To avoid double shadows caused by overlaying preview card
+over the blank preview card */
+oppia-story-viewer-page-root .exploration-summary-tile md-card {
+  box-shadow: none;
+}
+
+oppia-story-viewer-page-root .mobile-path-segment {
+  margin: 0 auto;
+  width: 250px;
+}
+
+oppia-story-viewer-page-root .mobile-lesson-icon {
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 100px;
+}
+
+oppia-story-viewer-page-root .oppia-lesson-icon-completed {
+  background-color: #296e5f;
+  border-radius: 50%;
+  height: 40px;
+  left: 50%;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%) rotate(-120deg);
+  transform-origin: center;
+  width: 40px;
+}
+
+oppia-story-viewer-page-root .oppia-lesson-icon-uncompleted {
+  background-color: #fff;
+  border: #296e5f 3px solid;
+  border-radius: 50%;
+  height: 40px;
+  left: 50%;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 40px;
+}
+
+oppia-story-viewer-page-root .oppia-lesson-icon-unavailable {
+  border: #bdbdbd 3px solid;
+}
+
+.oppia-story-viewer-title {
+  color: #00645c;
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 2.4em;
+  font-weight: 500;
+  letter-spacing: 0.58px;
+  margin-bottom: 0;
+  margin-top: 20px;
+  padding-left: 60px;
+  padding-top: 30px;
+  text-align: left;
+}
+
+.oppia-story-viewer-description {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 1.2em;
+  padding-bottom: 4vh;
+  padding-left: 60px;
+  padding-right: 45px;
+  text-align: left;
+}
+
+.oppia-story-viewer-card {
+  color: rgb(51, 51, 51);
+  flex: 1;
+  font-family: Roboto, Arial, sans-serif;
+  margin-right: 60px;
+}
+
+.oppia-story-viewer-card-content {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.oppia-story-viewer-mobile-card-content {
+  border-radius: 4px;
+  box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);
+  margin-top: 16px;
+  overflow: hidden;
+  width: 185px;
+}
+
+.oppia-story-viewer-card-description-box {
+  border-radius: 4px;
+  box-shadow: 0 0 4px #00000029;
+  display: flex;
+  flex: 1;
+  max-height: 180px;
+  min-width: 120px;
+  padding: 20px;
+}
+
+.oppia-story-viewer-mobile-card-description-box {
+  max-height: 220px;
+  min-height: 120px;
+  padding: 15px;
+  width: 185px;
+}
+
+oppia-story-viewer-page-root .oppia-lesson-track {
+  display: flex;
+  flex: 1;
+  height: 360px;
+  justify-content: center;
+  max-width: 170px;
+  overflow: hidden;
+  position: relative;
+}
+
+oppia-story-viewer-page-root .oppia-chapter-title {
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.43px;
+  padding-top: 3px;
+}
+
+@media (max-width: 850px) {
+  oppia-story-viewer-page-root .oppia-chapter-title {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 640px) {
+  .oppia-story-viewer-title {
+    font-size: 2em;
+    margin-top: 20px;
+    padding-left: 40px;
+    padding-top: 0;
+  }
+
+  .oppia-story-viewer-description {
+    font-size: 1em;
+    padding-left: 40px;
+    padding-right: 40px;
+    text-align: justify;
+  }
+
+  oppia-story-viewer-page-root .oppia-lesson-track {
+    height: 530px;
+    max-width: 130px;
+  }
+
+  .oppia-story-viewer-card-content {
+    display: none;
+  }
+
+  .oppia-story-viewer-card {
+    margin-left: -10px;
+  }
+
+  oppia-story-viewer-page-root .oppia-chapter-title {
+    margin-left: 0;
+  }
+
+  oppia-story-viewer-page-root .oppia-lesson-icon-completed {
+    height: 55px;
+    width: 55px;
+  }
+
+  oppia-story-viewer-page-root .oppia-lesson-icon-uncompleted {
+    height: 55px;
+    width: 55px;
+  }
+
+  .oppia-story-viewer-inner-container {
+    padding-top: 80px;
+  }
+}
+
+@media (max-width: 500px) {
+  .oppia-story-viewer-card {
+    width: 40vw;
+  }
+}
+
+@media (min-width: 641px) {
+  .oppia-story-viewer-mobile-card-content {
+    display: none;
+  }
+
+  oppia-story-viewer-page-root  .oppia-story-description {
+    padding-bottom: 4vh;
+  }
+
+  .oppia-story-viewer-card-container {
+    margin-top: 30px;
+  }
+}
+
+@media only screen and (max-width: 998px) {
+  oppia-story-viewer-page-root .oppia-activity-summary-tile-mobile-background-mask {
+    align-items: center;
+    background: rgba(0,0,0,0.25);
+    display: flex;
+    height: 100vh;
+    justify-content: space-around;
+    width: 100vw;
+    z-index: -1;
+  }
+}
+@media (max-width: 768px) {
+  oppia-story-viewer-page-root .navbar-brand {
+    display: none;
+  }
+
+  oppia-story-viewer-page-root .oppia-navbar-brand-name.d-none {
+    /* !important is necessary otherwise d-none class of base components is not overwritten(!important
+    is being used there). */
+    display: flex !important;
+  }
+  oppia-story-viewer-page-root .float-left {
+    margin-left: 40%;
+  }
+}
+@media (max-width: 500px) {
+  oppia-story-viewer-page-root .float-left {
+    margin-left: 30%;
+  }
+}

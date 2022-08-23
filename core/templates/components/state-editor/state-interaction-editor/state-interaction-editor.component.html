@@ -1,0 +1,144 @@
+<mat-card class="oppia-editor-card-with-avatar"
+          id="tutorialStateInteraction">
+  <div>
+    <div class="oppia-exp-interaction-card-header-container oppia-mobile-collapsible-card-header"
+         (click)="toggleInteractionEditor()">
+      <h3 class="oppia-exp-interaction-card-header">
+        Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
+      </h3>
+      <i class="fa fa-caret-down"
+         *ngIf="!interactionEditorIsShown"
+         aria-hidden="true">
+      </i>
+      <i class="fa fa-caret-up"
+         *ngIf="interactionEditorIsShown"
+         aria-hidden="true">
+      </i>
+    </div>
+    <div class="oppia-add-interaction-button-container"
+         *ngIf="!interactionId">
+      <button type="button"
+              class="btn btn-secondary oppia-add-interaction-button e2e-test-open-add-interaction-modal"
+              (click)="openInteractionCustomizerModal()"
+              *ngIf="editabilityService.isEditable()">
+        + ADD INTERACTION
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="interactionId && interactionEditorIsShown"
+       class="oppia-exp-interaction-container">
+    <div class="oppia-state-interaction-content oppia-mobile-collapsible-card">
+      <div class="oppia-editor-card-body"
+           title="{{getCurrentInteractionName()}}">
+        <picture *ngIf="!windowIsNarrow">
+          <source type="image/webp"
+                  [srcset]="getStaticImageUrl('/avatar/user_blue_72px.webp')">
+          <source type="image/png"
+                  [srcset]="getStaticImageUrl('/avatar/user_blue_72px.png')">
+          <img [src]="getStaticImageUrl('/avatar/user_blue_72px.png')"
+               class="oppia-editor-card-avatar"
+               alt="">
+        </picture>
+        <div class="oppia-editor-card-section-container">
+          <div class="oppia-editor-card-section oppia-mobile-collapsible-card-content">
+            <div *ngIf="hasLoaded"
+                 class="e2e-test-interaction"
+                 [ngClass]="{'oppia-editable-section': editabilityService.isEditable() && !interactionIsDisabled}">
+              <div class="oppia-interaction-preview oppia-transition-200"
+                   (click)="openInteractionCustomizerModal()"
+                   *ngIf="editabilityService.isEditable()"
+                   aria-label="edit interaction">
+              </div>
+              <div>
+                <oppia-interaction-display [htmlData]="interactionPreviewHtml"
+                                           classStr="oppia-interaction-preview-container">
+                </oppia-interaction-display>
+              </div>
+            </div>
+            <button type="button"
+                    class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
+                    (click)="deleteInteraction()"
+                    *ngIf="editabilityService.isEditable()">
+              <i class="material-icons mat-18">&#xE5CD;</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-card>
+
+<style>
+  .oppia-editable-section {
+    width: -webkit-fill-available;
+  }
+
+  .oppia-editor-card-with-avatar {
+    margin-top: 40px;
+  }
+  .oppia-exp-interaction-card-header {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .oppia-exp-interaction-card-header-container {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+  }
+
+  .oppia-add-interaction-button-container {
+    padding: 20px 30px;
+  }
+
+  .oppia-exp-interaction-container {
+    border: 1.5px solid #d3d1d1;
+    border-radius: 4px;
+    margin: 15px auto 30px;
+    width: 87%;
+  }
+
+  .oppia-state-interaction-content {
+    margin-top: 0;
+  }
+
+  .oppia-interaction-preview-container {
+    padding: 5px;
+    pointer-events: none;
+  }
+
+  .oppia-editor-card-section {
+    display: flex;
+    min-height: 80px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .oppia-delete-interaction-button {
+      height: 25px;
+      padding: 0;
+      right: 0;
+      top: 2px;
+      width: 25px;
+    }
+
+    .oppia-exp-interaction-card-header {
+      padding: 0;
+    }
+
+    .oppia-exp-interaction-card-header-container i {
+      display: block;
+    }
+
+    .oppia-exp-interaction-card-header-container {
+      background-color: #fff;
+      padding: 0;
+    }
+
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
+    }
+  }
+</style>

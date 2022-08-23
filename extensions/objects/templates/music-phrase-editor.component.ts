@@ -32,8 +32,8 @@ interface MusicPhraseSchema {
     type: string;
     choices: string[];
   };
-  'ui_config': {'add_element_text': string;};
-  validators: { id: string; 'max_value': number; }[];
+  'ui_config': { 'add_element_text': string };
+  validators: { id: string; 'max_value': number }[];
 }
 
 @Component({
@@ -54,10 +54,12 @@ export class MusicPhraseEditorComponent implements OnInit {
   get localValue(): string[] {
     return this._proxy;
   }
+
   set localValue(val: string[]) {
     this._localValue = val;
     this._createProxy();
   }
+
   // The maximum number of notes allowed in a music phrase.
   _MAX_NOTES_IN_PHRASE = 8;
   schema: MusicPhraseSchema = {
@@ -77,6 +79,7 @@ export class MusicPhraseEditorComponent implements OnInit {
       max_value: this._MAX_NOTES_IN_PHRASE
     }]
   };
+
   constructor(private alertsService: AlertsService) {
     this._createProxy();
   }

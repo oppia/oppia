@@ -2,9 +2,6 @@
 #
 #   pylint core --rcfile=.pylintrc -i y
 
-[GENERAL]
-init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/google_appengine")'
-
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
 
@@ -65,18 +62,29 @@ indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
 forbidden-imports=
-    core.controllers:core.platform|core.storage,
-    core.domain:core.controllers,
-    core.storage:core.domain
+    *core.controllers*:
+        import core.platform*|
+        import core.storage*,
+    *core.domain*:
+        import core.controllers*,
+    *core.storage*:
+        import core.domain*,
+    *core.domain.*_domain:
+        from core.domain* import *_service*|
+        from core.domain* import *_cleaner|
+        from core.domain* import *_registry|
+        from core.domain* import *_fetchers|
+        from core.domain* import *_manager|
+        from core.platform import models
 
 disallowed-functions-and-replacements-str=
-  assertEquals=>self.assertEqual,
-  now=>datetime.datetime.utcnow,
-  beam.CombineValues=>beam.CombinePerKey
+    assertEquals=>self.assertEqual,
+    now=>datetime.datetime.utcnow,
+    beam.CombineValues=>beam.CombinePerKey
 
 disallowed-functions-and-replacements-regex=
-  \.put_async\(=>put,
-  \.put_multi_async\(=>put_multi
+    \.put_async\(=>put,
+    \.put_multi_async\(=>put_multi
 
 [SIMILARITIES]
 
@@ -85,6 +93,7 @@ ignore-imports=yes
 [MESSAGES CONTROL]
 
 disable=abstract-method,
+        ungrouped-imports,
         arguments-differ,
         broad-except,
         consider-using-ternary,
@@ -115,23 +124,18 @@ disable=abstract-method,
 # TODO(#12912): Remove these after the Python 3 migration.
         arg-name-for-non-keyword-arg,
         arguments-renamed,
-        consider-using-dict-items,
         consider-using-with,
-        cyclic-import,
-        deprecated-method,
         import-outside-toplevel,
-        missing-raises-doc,
-        no-else-break,
-        no-else-continue,
-        no-else-raise,
         non-explicit-keyword-args,
         not-an-iterable,
-        raise-missing-from,
-        super-with-arguments,
         unnecessary-pass,
-        useless-object-inheritance,
         consider-using-f-string,
-        consider-using-in
+# TODO(#14322): Reinstate this.
+        missing-type-doc,
+        # Pylint considers imports to be cyclic even when the cycle is
+        # broken by putting imports inside functions so they aren't
+        # executed upon module import.
+        cyclic-import,
 
 [REPORTS]
 

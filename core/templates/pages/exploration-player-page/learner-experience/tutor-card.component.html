@@ -1,9 +1,15 @@
+<oppia-end-chapter-confetti #confetti
+                            class="end-chapter-confetti">
+</oppia-end-chapter-confetti>
 <oppia-audio-bar *ngIf="showAudioBar()"></oppia-audio-bar>
-<div class="oppia-learner-view-card"
-     [ngClass]="{'animate-card-width': startCardChangeAnimation}"
-     [ngStyle]="{'text-align': isLanguageRTL() ? 'right' : 'left', 'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
-  <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
-       [ngClass]="{'animate-card-change': startCardChangeAnimation}">
+<div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard"
+     [ngStyle]="{'margin-top': isAudioBarExpandedOnMobileDevice() ? '60px' : '30px'}">
+  <oppia-end-chapter-check-mark #checkMark
+                                [ngClass]="{'check-mark-hidden': checkMarkHidden, 'check-mark-skipped': checkMarkSkipped}"
+                                class="end-chapter-check-mark">
+  </oppia-end-chapter-check-mark>
+  <div class="oppia-learner-view-card-content"
+       [ngClass]="{'learner-view-card-transition-class': isOnTerminalCard(), 'card-content-hidden': !checkMarkHidden}">
     <div class="oppia-learner-view-card-top-section">
       <oppia-content-language-selector></oppia-content-language-selector>
       <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
@@ -12,16 +18,15 @@
          rel="noopener">
         <img class="conversation-skin-oppia-avatar"
              [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
-             [ngStyle]="isLanguageRTL() ? {'right': '-87px'} : {'left': '-87px'}"
              *ngIf="avatarImageIsShown">
       </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            [ngClass]="getContentAudioHighlightClass()"
            [oppiaFocusOn]="getContentFocusLabel($index)">
         <div tabindex="1">
-          <angular-html-bind-wrapper classStr="protractor-test-conversation-content"
-                                     [htmlData]="displayedCard.getContentHtml()">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
+                                    class="e2e-test-conversation-content">
+          </oppia-rte-output-display>
         </div>
         <div *ngIf="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
@@ -43,8 +48,8 @@
       </h4>
     </div>
 
-    <div *ngIf="arePreviousResponsesShown && !conceptCardIsBeingShown"
-         class="conversation-skin-tutor-card-middle-section">
+    <div class="conversation-skin-tutor-card-middle-section"
+         *ngIf="(arePreviousResponsesShown && !conceptCardIsBeingShown)" [@expandInOut]>
       <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
         <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
           <oppia-input-response-pair [data]="responsePair"
@@ -60,6 +65,7 @@
     <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
     <div class="conversation-skin-tutor-card-bottom-section" *ngIf="isInteractionInline() && displayedCard.getInputResponsePairs().length > 0">
       <oppia-input-response-pair [data]="displayedCard.getInputResponsePairs()[displayedCard.getInputResponsePairs().length - 1]"
+                                 [bottomSection]="true"
                                  [profilePicture]="profilePicture"
                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
@@ -74,7 +80,7 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div *ngIf="isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div *ngIf="!displayedCardWasCompletedInPrevSession && isInteractionInline() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((displayedCard.getInteractionHtml() && !displayedCard.isCompleted()) || displayedCard.isCompleted()) &&
     (!isOnTerminalCard() || !isIframed || displayedCard.isCompleted())">
       <div class="conversation-skin-inline-interaction">
@@ -83,9 +89,9 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
+          <oppia-interaction-display classStr="e2e-test-conversation-input"
                                      [htmlData]="displayedCard.getInteractionHtml()">
-          </angular-html-bind-wrapper>
+          </oppia-interaction-display>
         </div>
       </div>
     </div>
@@ -93,177 +99,75 @@
     <div *ngIf="!isInteractionInline() && !conceptCardIsBeingShown"
          class="conversation-skin-inline-interaction">
       <div class="oppia-conversation-skin-instruction-container">
-        <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">{{ interactionInstructions }}</span>
+        <span [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}">
+          {{ interactionInstructions | translate }}
+        </span>
         <i *ngIf="canWindowShowTwoCards() && !isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
         <i *ngIf="canWindowShowTwoCards() && isLanguageRTL()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C4;</i>
         <i *ngIf="!canWindowShowTwoCards()" [ngClass]="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5DB;</i>
       </div>
+
+      <div *ngIf="!displayedCard.getInteractionId() && !isOnTerminalCard() && !conceptCardIsBeingShown">
+        <div class="conversation-skin-inline-interaction">
+          <span class="oppia-no-interaction-text">
+            <strong>Error</strong>: No interaction specified for '{{ displayedCard.getStateName() }}'.
+          </span>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage() && !setNextMilestoneAndCheckIfProgressBarIsShown()">
+      <div class="conversation-skin-milestone-message">
+        <div class="milestone-message-star-container">
+          <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
+          <p class="completed-chapter-count">{{ completedChaptersCount }}</p>
+        </div>
+        <span class="milestone-message-text">{{ generateMilestoneMessage() }}</span>
+      </div>
+    </div>
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && setNextMilestoneAndCheckIfProgressBarIsShown()">
+      <div class="conversation-skin-milestone-message milestone-progress-message">
+        <div class="milestone-message-progress-bar-container">
+          <div class="milestone-progress-bar-outer">
+            <div class="milestone-progress-bar-inner"
+                 [style.width.%]="(completedChaptersCount / nextMilestoneChapterCount) * 100">
+            </div>
+          </div>
+          <div class="milestone-message-star-container">
+            <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')"
+                 class="star-icon">
+            <p class="chapters-left-count">{{ nextMilestoneChapterCount }}</p>
+          </div>
+        </div>
+        <span class="milestone-message-text">
+          {{ 'I18N_END_CHAPTER_MILESTONE_PROGRESS_MESSAGE' | translate:{chaptersToGo: nextMilestoneChapterCount - completedChaptersCount, messageFormat: true} }}
+        </span>
+      </div>
     </div>
 
-    <div *ngIf="!displayedCard.getInteractionId() && !isOnTerminalCard() && !conceptCardIsBeingShown">
-      <div class="conversation-skin-inline-interaction">
-        <span class="oppia-no-interaction-text">
-          <strong>Error</strong>: No interaction specified for '{{ displayedCard.getStateName() }}'.
-        </span>
+    <oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                       [userIsLoggedIn]="userIsLoggedIn"
+                                       [explorationIsInPreviewMode]="explorationIsInPreviewMode"
+                                       [questionPlayerConfig]="questionPlayerConfig"
+                                       [collectionSummary]="collectionSummary"
+                                       [isRefresherExploration]="isRefresherExploration"
+                                       [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                                       [parentExplorationIds]="parentExplorationIds"
+                                       [nextLessonLink]="nextLessonLink">
+    </oppia-ratings-and-recommendations>
+
+    <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
+      <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
+        <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+           [href]="OPPIA_AVATAR_LINK_URL"
+           target="_blank"
+           rel="noopener">
+          <img class="conversation-skin-oppia-avatar rounded-circle"
+               [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+        </a>
+        <div class="conversation-skin-oppia-feedback-content">
+          {{ 'I18N_EXPLORATION_STATE_PREVIOUSLY_COMPLETED' | translate }}
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-<style>
-  .oppia-learner-view-card-content .oppia-learner-confirm-button {
-    margin-bottom: 10px;
-    margin-left: 10px;
-  }
-  .oppia-learner-view-card {
-    max-width: 100vw;
-    padding-bottom: 18px;
-  }
-
-  .conversation-skin-instruction-disabled {
-    color: gray;
-  }
-
-  .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
-    height: 100px;
-    top: -20px;
-    width: 100px;
-  }
-
-  .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
-  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
-    display: none;
-  }
-
-  .oppia-learner-view-card .instructions-button {
-    background: inherit;
-    border: none;
-    white-space: normal;
-  }
-
-  .oppia-learner-view-card.animate-card-width {
-    -webkit-transition: width 500ms;
-    transition: width 500ms;
-  }
-
-  .oppia-learner-view-card-top-content p:not(:last-child) {
-    line-height: 1.5;
-    margin-bottom: 18px;
-  }
-
-  /* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
-  .conversation-skin-audio-highlight {
-    border: 3px solid #f3d140;
-  }
-
-  .conversation-skin-future-tutor-card {
-    background: #fff;
-    border-radius: 2px;
-    margin-left: 87px;
-    padding-top: 20px;
-    text-align: left;
-  }
-
-  .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
-    background-color: rgba(236,239,241,0.4);
-  }
-
-  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
-    background-color: rgba(224,242,241,0.4);
-  }
-
-  .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
-  .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
-    display: none;
-  }
-
-  .oppia-learner-view-card.ng-hide {
-    opacity: 0;
-    transform: translateX(-1000px);
-  }
-
-  .conversation-skin-responses-dropdown-container {
-    border-bottom: 1px solid #ccc;
-    cursor: pointer;
-    line-height: 0.1em;
-    margin: 8px 20px 20px 20px;
-    text-align: center;
-  }
-
-  .conversation-skin-responses-dropdown-text {
-    background-color: #fff;
-    color: #888;
-    font-size: 0.8em;
-    padding: 0 10px;
-  }
-
-  .conversation-skin-responses-dropdown-icon {
-    font-size: 20px;
-    margin-bottom: -2px;
-    -moz-transition: all 0.2s;
-    -o-transition: all 0.2s;
-    -webkit-transition: all 0.2s;
-    transition: all 0.2s;
-  }
-
-  .conversation-skin-responses-dropdown-icon-rotated {
-    margin-bottom: -2px;
-    -moz-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    transform: rotate(90deg);
-    transition: transform 0.2s ease-in-out;
-  }
-
-  .conversation-skin-inline-interaction {
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
-    padding: 8px 20px 25px;
-    position: relative;
-  }
-
-  .conversation-skin-inline-interaction .conversation-skin-user-avatar {
-    left: -20px;
-    top: 14px;
-  }
-
-  .oppia-conversation-skin-inline-interaction {
-    opacity: 0.8;
-  }
-
-  .oppia-conversation-skin-instruction-container {
-    padding: 6px 12px;
-  }
-  .oppia-no-interaction-text {
-    color: #F00;
-  }
-
-  /* When the size of the browser is reduced, and the answer submitted is
-     correct, the continue button (in the tutor card) hides under the
-     Correctness footer and the page cannot be scrolled down further.
-     So this padding allows to scroll down the tutor card. */
-  @media(max-width: 770px) {
-    .oppia-learner-view-card {
-      padding-bottom: 30px;
-    }
-  }
-
-  @media screen and (max-width: 959px) {
-    .oppia-learner-view-card .instructions-button {
-      background-color: #0D48A1;
-      color: #fff;
-      padding: 6px 12px;
-      white-space: normal;
-    }
-
-    .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:focus,
-    .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
-      background-color: #115FD4;
-    }
-    @media screen and (max-width: 768px) {
-      .oppia-learner-view-card {
-        margin-top: 30px;
-      }
-    }
-  }
-</style>

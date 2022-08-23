@@ -27,7 +27,7 @@ import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface FetchStoryBackendResponse {
+export interface FetchStoryBackendResponse {
   'story': StoryBackendDict;
   'topic_name': string;
   'story_is_published': boolean;

@@ -45,7 +45,7 @@ export class CollectionCreationService {
   }
 
   CREATE_NEW_COLLECTION_URL_TEMPLATE = (
-      '/collection_editor/create/<collection_id>');
+    '/collection_editor/create/<collection_id>');
 
   createNewCollection(): void {
     if (CollectionCreationService.collectionCreationInProgress) {

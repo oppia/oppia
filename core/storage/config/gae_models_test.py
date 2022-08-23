@@ -22,8 +22,12 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List
+
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'platform_parameter_domain' only for type checking.
+    from core.domain import platform_parameter_domain
     from mypy_imports import base_models
     from mypy_imports import config_models
 
@@ -72,6 +76,25 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_model2.value, 'd')
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.ConfigPropertyModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            config_models.ConfigPropertyModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
 
@@ -107,7 +130,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[
+            platform_parameter_domain.PlatformParameterRuleDict
+        ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -125,10 +150,10 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
-        new_rules = [
+        new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    {'type': 'app_version', 'value': '>1.2.3'}
+                    {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
                 ],
                 'value_when_matched': True
             },
@@ -147,7 +172,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit_is_persistent_in_storage(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[
+            platform_parameter_domain.PlatformParameterRuleDict
+        ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -166,7 +193,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_commit_with_updated_rules(self) -> None:
         parameter_name = 'parameter_name'
-        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+        rule_dicts: List[
+            platform_parameter_domain.PlatformParameterRuleDict
+        ] = [{'filters': [], 'value_when_matched': False}]
 
         param_model = config_models.PlatformParameterModel.create(
             param_name=parameter_name,
@@ -176,10 +205,10 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         )
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
-        new_rules = [
+        new_rules: List[platform_parameter_domain.PlatformParameterRuleDict] = [
             {
                 'filters': [
-                    {'type': 'app_version', 'value': '>1.2.3'}
+                    {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
                 ],
                 'value_when_matched': True
             },
@@ -194,3 +223,23 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         assert retrieved_model is not None
 
         self.assertEqual(retrieved_model.rules, new_rules)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_model_association_to_user(), # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_export_policy(),
+            expected_export_policy_dict
+        )

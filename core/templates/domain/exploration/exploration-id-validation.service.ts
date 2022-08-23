@@ -21,21 +21,52 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationSummaryBackendApiService, ExplorationSummaryBackendDict } from
   'domain/summary/exploration-summary-backend-api.service';
+import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
+  './read-only-exploration-backend-api.service';
+import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExplorationIdValidationService {
   constructor(
-    private explorationSummartBackendApiService:
-      ExplorationSummaryBackendApiService) {}
+    private explorationSummaryBackendApiService:
+      ExplorationSummaryBackendApiService,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService) {}
 
   async isExpPublishedAsync(explorationId: string): Promise<boolean> {
-    return this.explorationSummartBackendApiService.
+    return this.explorationSummaryBackendApiService.
       loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {
           let summaries = response.summaries;
           return (summaries.length === 1 && summaries[0] !== null);
+        });
+  }
+
+  async isCorrectnessFeedbackEnabled(explorationId: string): Promise<boolean> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          return response.correctness_feedback_enabled;
+        });
+  }
+
+  async isDefaultCategoryAsync(explorationId: string): Promise<boolean> {
+    return this.explorationSummaryBackendApiService
+      .loadPublicExplorationSummariesAsync([explorationId]).then(
+        (response: ExplorationSummaryBackendDict) => {
+          let summaries = response.summaries;
+          let isCategoryPresent = false;
+          if (summaries.length === 1) {
+            let category = summaries[0].category;
+            for (let i of constants.ALL_CATEGORIES) {
+              if (i === category) {
+                isCategoryPresent = true;
+              }
+            }
+          }
+          return isCategoryPresent;
         });
   }
 }

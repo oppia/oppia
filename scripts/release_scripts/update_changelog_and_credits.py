@@ -24,18 +24,16 @@ import argparse
 import datetime
 import os
 import subprocess
-import sys
 
-from core import constants
-from core import python_utils
-from scripts import common
+import github
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
+from core import constants  # isort:skip  # pylint: disable=wrong-import-position
+from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
-import github  # isort:skip pylint: disable=wrong-import-position
 
 ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
     'core', 'templates', 'pages', 'about-page',
@@ -45,10 +43,12 @@ CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
 SETUP_PY_FILEPATH = os.path.join('', 'setup.py')
+FECONF_PY_FILEPATH = os.path.join('core', 'feconf.py')
 LIST_OF_FILEPATHS_TO_MODIFY = (
     CHANGELOG_FILEPATH,
     AUTHORS_FILEPATH,
     CONTRIBUTORS_FILEPATH,
+    FECONF_PY_FILEPATH,
     ABOUT_PAGE_CONSTANTS_FILEPATH,
     PACKAGE_JSON_FILEPATH
 )
@@ -90,7 +90,7 @@ def update_sorted_file(filepath, new_list):
             add to the file.
     """
     file_lines = []
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         file_lines = f.readlines()
 
     for line in file_lines:
@@ -105,7 +105,7 @@ def update_sorted_file(filepath, new_list):
     updated_list = list(set(new_list + file_lines[start_index:]))
     updated_list = sorted(updated_list, key=lambda s: s.lower())
     file_lines = file_lines[:start_index] + updated_list
-    with python_utils.open_file(filepath, 'w') as f:
+    with utils.open_file(filepath, 'w') as f:
         for line in file_lines:
             f.write(line)
 
@@ -129,14 +129,14 @@ def is_order_of_sections_valid(release_summary_lines):
     ]
     for section, next_section in EXPECTED_ORDERING_DICT.items():
         if section not in sections:
-            python_utils.PRINT(
+            print(
                 'Expected release_summary to have %s section to ensure '
                 'that automatic updates to changelog and credits are '
                 'correct.' % section.strip())
             return False
         index = sections.index(section)
         if index + 1 >= len(sections) or sections[index + 1] != next_section:
-            python_utils.PRINT(
+            print(
                 'Expected %s section to be followed by %s section in '
                 'release_summary to ensure that automatic updates to '
                 'changelog and credits are correct.' % (
@@ -212,7 +212,7 @@ def update_changelog(
             ../release_summary.md.
         current_release_version_number: str. The version of current release.
     """
-    python_utils.PRINT('Updating Changelog...')
+    print('Updating Changelog...')
     start_index = release_summary_lines.index(
         constants.release_constants.CHANGELOG_HEADER) + 1
     end_index = release_summary_lines.index(
@@ -222,7 +222,7 @@ def update_changelog(
         u'------------------------\n'] + release_summary_lines[
             start_index:end_index]
     changelog_lines = []
-    with python_utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
+    with utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
         changelog_lines = changelog_file.readlines()
 
     if constants.release_constants.BRANCH_TYPE_HOTFIX in branch_name:
@@ -247,10 +247,10 @@ def update_changelog(
                 changelog_lines)
 
     changelog_lines[2:2] = release_version_changelog
-    with python_utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:
+    with utils.open_file(CHANGELOG_FILEPATH, 'w') as changelog_file:
         for line in changelog_lines:
             changelog_file.write(line)
-    python_utils.PRINT('Updated Changelog!')
+    print('Updated Changelog!')
 
 
 def get_new_authors(release_summary_lines):
@@ -308,10 +308,10 @@ def update_authors(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating AUTHORS file...')
+    print('Updating AUTHORS file...')
     new_authors = get_new_authors(release_summary_lines)
     update_sorted_file(AUTHORS_FILEPATH, new_authors)
-    python_utils.PRINT('Updated AUTHORS file!')
+    print('Updated AUTHORS file!')
 
 
 def update_contributors(release_summary_lines):
@@ -321,10 +321,10 @@ def update_contributors(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating CONTRIBUTORS file...')
+    print('Updating CONTRIBUTORS file...')
     new_contributors = get_new_contributors(release_summary_lines)
     update_sorted_file(CONTRIBUTORS_FILEPATH, new_contributors)
-    python_utils.PRINT('Updated CONTRIBUTORS file!')
+    print('Updated CONTRIBUTORS file!')
 
 
 def update_developer_names(release_summary_lines):
@@ -334,11 +334,11 @@ def update_developer_names(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
     """
-    python_utils.PRINT('Updating about-page file...')
+    print('Updating about-page file...')
     new_developer_names = get_new_contributors(
         release_summary_lines, return_only_names=True)
 
-    with python_utils.open_file(
+    with utils.open_file(
         ABOUT_PAGE_CONSTANTS_FILEPATH, 'r') as about_page_file:
         about_page_lines = about_page_file.readlines()
         start_index = about_page_lines.index(CREDITS_START_LINE) + 1
@@ -350,11 +350,11 @@ def update_developer_names(release_summary_lines):
             list(set(all_developer_names)), key=lambda s: s.lower())
         about_page_lines[start_index:end_index] = all_developer_names
 
-    with python_utils.open_file(
+    with utils.open_file(
         ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as about_page_file:
         for line in about_page_lines:
             about_page_file.write(str(line))
-    python_utils.PRINT('Updated about-page file!')
+    print('Updated about-page file!')
 
 
 def remove_updates_and_delete_branch(repo_fork, target_branch):
@@ -365,6 +365,9 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
         repo_fork: github.Repository.Repository. The PyGithub object for the
             forked repo.
         target_branch: str. The name of the target branch.
+
+    Raises:
+        Exception. The target branch not deleted before re-run.
     """
 
     common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
@@ -374,10 +377,10 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
         repo_fork.get_git_ref('heads/%s' % target_branch).delete()
     except github.UnknownObjectException:
         pass
-    except Exception:
+    except Exception as e:
         raise Exception(
             'Please ensure that %s branch is deleted before '
-            're-running the script' % target_branch)
+            're-running the script' % target_branch) from e
 
 
 def create_branch(
@@ -395,16 +398,16 @@ def create_branch(
         github_username: str. The github username of the user.
         current_release_version_number: str. The version of current release.
     """
-    python_utils.PRINT(
+    print(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
-        'CHANGELOG, about-page, and package.json...')
+        'CHANGELOG, feconf.py, about-page, and package.json...')
     sb = repo.get_branch('develop')
     repo_fork.create_git_ref(
         ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
 
     for filepath in LIST_OF_FILEPATHS_TO_MODIFY:
         contents = repo_fork.get_contents(filepath, ref=target_branch)
-        with python_utils.open_file(filepath, 'r') as f:
+        with utils.open_file(filepath, 'r') as f:
             repo_fork.update_file(
                 contents.path, 'Update %s' % filepath, f.read(),
                 contents.sha, branch=target_branch)
@@ -413,7 +416,7 @@ def create_branch(
         'https://github.com/oppia/oppia/compare/develop...%s:%s?'
         'expand=1&title=Update authors and changelog for v%s' % (
             github_username, target_branch, current_release_version_number))
-    python_utils.PRINT(
+    print(
         'Pushed changes to Github. '
         'Please create a pull request from the %s branch\n\n'
         'Note: PR title should be exactly: '
@@ -439,8 +442,7 @@ def is_invalid_email_present(release_summary_lines):
     invalid_email_ids = [
         email_id for email_id in new_email_ids
         if constants.release_constants.INVALID_EMAIL_SUFFIX in email_id]
-    python_utils.PRINT(
-        'Following email ids are invalid: %s' % invalid_email_ids)
+    print('Following email ids are invalid: %s' % invalid_email_ids)
     return bool(invalid_email_ids)
 
 
@@ -456,7 +458,7 @@ def get_release_summary_lines():
     invalid_email_is_present = True
     ordering_is_invalid = True
     while invalid_email_is_present or ordering_is_invalid:
-        release_summary_file = python_utils.open_file(
+        release_summary_file = utils.open_file(
             constants.release_constants.RELEASE_SUMMARY_FILEPATH, 'r')
         release_summary_lines = release_summary_file.readlines()
         invalid_email_is_present = is_invalid_email_present(
@@ -502,6 +504,28 @@ def update_version_in_config_files():
     )
 
 
+def inform_server_errors_team(release_rota_url, server_error_playbook_url):
+    """Asks the release coordinator to inform the server errors team
+    that the release will be deployed to production.
+
+    Args:
+        release_rota_url: str. URL pointing to the page which lists the rota
+            to be followed for release coordinators.
+        server_error_playbook_url: str. URL pointing to the server error team
+            playbook.
+    """
+    common.open_new_tab_in_browser_if_possible(release_rota_url)
+    common.open_new_tab_in_browser_if_possible(server_error_playbook_url)
+    common.ask_user_to_confirm(
+        'Ping the Server errors team coordinator (you can find them here: %s) '
+        'that the release will be deployed on the production server and '
+        'send them the Playbook for the Server Errors Team: %s.'
+        'Wait for them to confirm they have done all the stuff that was needed '
+        'before doing the deployment. If there is no response in 24 hours '
+        'then go ahead with the deployment.' % (
+            release_rota_url, server_error_playbook_url))
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
@@ -539,7 +563,7 @@ def main():
     remove_updates_and_delete_branch(repo_fork, target_branch)
 
     # Opens Credit Form.
-    python_utils.PRINT(
+    print(
         'Note: Make following changes directly to %s and make sure to '
         'save the file after making these changes.' % (
             constants.release_constants.RELEASE_SUMMARY_FILEPATH))
@@ -552,12 +576,6 @@ def main():
         'the emails of the form: %s.' % (
             constants.release_constants.RELEASE_SUMMARY_FILEPATH,
             constants.release_constants.INVALID_EMAIL_SUFFIX))
-    common.open_new_tab_in_browser_if_possible(
-        constants.release_constants.CREDITS_FORM_URL)
-    common.ask_user_to_confirm(
-        'Check the credits form and add any additional contributors '
-        'to the contributor list in the file: %s.' % (
-            constants.release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
         'Categorize the PR titles in the Uncategorized section of the '
         'changelog in the file: %s, and arrange the changelog '
@@ -579,6 +597,10 @@ def main():
 
     release_summary_lines = get_release_summary_lines()
 
+    # Note to developers: If you edit any files apart from
+    # LIST_OF_FILEPATHS_TO_MODIFY in this script, please add it to this list
+    # so that it gets commited as part of the PR that is automatically
+    # generated.
     update_changelog(
         branch_name, release_summary_lines, current_release_version_number)
     update_authors(release_summary_lines)
@@ -599,6 +621,9 @@ def main():
     create_branch(
         repo, repo_fork, target_branch, github_username,
         current_release_version_number)
+    inform_server_errors_team(
+        constants.release_constants.RELEASE_ROTA_URL,
+        constants.release_constants.SERVER_ERROR_PLAYBOOK_URL)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

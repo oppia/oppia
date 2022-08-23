@@ -59,20 +59,20 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_collection_count(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
 
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
         self.assertEqual(num_collections, 1)
 
     def test_reconstitute(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
         collection_model = collection_models.CollectionModel.get_by_id('id')
         snapshot_dict = collection_model.compute_snapshot()
         snapshot_dict['nodes'] = ['node0', 'node1']
@@ -149,7 +149,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_6_NEW = 'id_6_new'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
@@ -253,8 +253,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 self.USER_ID_COMMITTER, 'Created new collection',
                 [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
-        # Ruling out the possibility of None for mypy type checking.
-        assert collection_model is not None
 
         self.assertEqual('id', collection_model.id)
         self.assertEqual(
@@ -341,8 +339,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         collection_rights_model = (
             collection_models.CollectionRightsModel.get('id')
             )
-        # Ruling out the possibility of None for mypy type checking.
-        assert collection_rights_model is not None
         snapshot_dict = collection_rights_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['tid1', 'tid2']
         snapshot_dict = collection_rights_model.convert_to_valid_dict(
@@ -368,7 +364,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_COMMITTER = 'id_4'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelRevertUnitTest, self).setUp()
+        super().setUp()
         self.collection_model = collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -408,7 +404,9 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             'name': feconf.CMD_REVERT_COMMIT,
             'required_attribute_names': [],
             'optional_attribute_names': [],
-            'user_id_attribute_names': []
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
         })
         self.allowed_commands_swap = self.swap(
             feconf,
@@ -531,7 +529,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_get_all_non_private_commits_with_invalid_max_age(self) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
             # TODO(#13528): Remove this test after the backend is fully
@@ -583,7 +581,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_3_NEW = 'id_3_new'
 
     def setUp(self) -> None:
-        super(CollectionSummaryModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',

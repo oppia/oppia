@@ -23,11 +23,10 @@ import re
 import subprocess
 import sys
 
-from core import python_utils
 from scripts import common
 
 
-def main():
+def main() -> None:
     """Run the tests."""
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     nyc_path = os.path.join('node_modules', 'nyc', 'bin', 'nyc.js')
@@ -44,22 +43,25 @@ def main():
     tests_stdout = encoded_tests_stdout.decode('utf-8')
     tests_stderr = encoded_tests_stderr.decode('utf-8')
     if tests_stderr:
-        python_utils.PRINT(tests_stderr)
+        print(tests_stderr)
         sys.exit(1)
-    python_utils.PRINT(tests_stdout)
+    print(tests_stdout)
     if 'failing' in tests_stdout:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('Tests not passed')
-        python_utils.PRINT('---------------------------')
+        print('---------------------------')
+        print('Tests not passed')
+        print('---------------------------')
         sys.exit(1)
     else:
-        python_utils.PRINT('---------------------------')
-        python_utils.PRINT('All tests passed')
-        python_utils.PRINT('---------------------------')
+        print('---------------------------')
+        print('All tests passed')
+        print('---------------------------')
 
-    coverage_result = re.search = re.search(
+    coverage_result = re.search(
         r'All files\s*\|\s*(?P<stmts>\S+)\s*\|\s*(?P<branch>\S+)\s*\|\s*'
         r'(?P<funcs>\S+)\s*\|\s*(?P<lines>\S+)\s*\|\s*', tests_stdout)
+    # Here coverage_result variable may contain None value which can give error
+    # while accessing methods from the variable. Hence added the below assert.
+    assert coverage_result is not None
     if (coverage_result.group('stmts') != '100' or
             coverage_result.group('branch') != '100' or
             coverage_result.group('funcs') != '100' or

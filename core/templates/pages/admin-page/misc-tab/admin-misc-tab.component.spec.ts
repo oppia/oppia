@@ -46,13 +46,14 @@ class MockWindowRef {
 
 class MockReaderObject {
   result = null;
-  onload = null;
+  onload: {(arg0: { target: { result: string}}): void; (): string};
   constructor() {
-    this.onload = ($evt) => {
+    this.onload = () => {
       return 'Fake onload executed';
     };
   }
-  readAsText(file) {
+
+  readAsText() {
     this.onload({target: {result: 'result'}});
     return 'The file is loaded';
   }
@@ -97,9 +98,9 @@ describe('Admin misc tab component ', () => {
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.returnValue(null);
-    spyOn(adminTaskManagerService, 'startTask').and.returnValue(null);
-    spyOn(adminTaskManagerService, 'finishTask').and.returnValue(null);
+      .and.returnValue();
+    spyOn(adminTaskManagerService, 'startTask').and.returnValue();
+    spyOn(adminTaskManagerService, 'finishTask').and.returnValue();
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
     // This throws "Argument of type 'mockReaderObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
@@ -114,7 +115,7 @@ describe('Admin misc tab component ', () => {
       confirmSpy.and.returnValue(true);
       let clearSearchIndexSpy = spyOn(
         adminBackendApiService, 'clearSearchIndexAsync')
-        .and.resolveTo(null);
+        .and.resolveTo();
 
       component.clearSearchIndex();
       tick();
@@ -228,6 +229,65 @@ describe('Admin misc tab component ', () => {
     }));
   });
 
+  describe('when clicking on rollback exploration button ', () => {
+    it('should rollback exploration successfully', fakeAsync(() => {
+      confirmSpy.and.returnValue(true);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState')
+        .and.returnValue(Promise.resolve(10));
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Exploration rolledback to version: 10');
+    }));
+
+    it('should not rollback exploration in case of backend ' +
+      'error', fakeAsync(() => {
+      confirmSpy.and.returnValue(true);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState')
+        .and.rejectWith('Internal Server Error.');
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+
+    it('should not request backend to rollback exploration if ' +
+      'a task is still running in the queue', fakeAsync(() => {
+      confirmSpy.and.returnValue(true);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState');
+
+      // Setting task is still running to be true.
+      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should not request backend to rollback exploration if ' +
+      'cancel button is clicked in the alert', fakeAsync(() => {
+      confirmSpy.and.returnValue(false);
+      let regenerateTopicSpy = spyOn(
+        adminBackendApiService, 'rollbackExplorationToSafeState');
+      // Setting cancel button clicked to be true.
+
+      component.rollbackExploration();
+      tick();
+
+      expect(regenerateTopicSpy).not.toHaveBeenCalled();
+    }));
+  });
+
   describe('when clicking on upload csv button ', () => {
     it('should upload csv file successfully', fakeAsync(() => {
       let uploadCsvSpy = spyOn(
@@ -256,6 +316,31 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith(
         'Server error: Internal Server Error.');
     }));
+
+    it('should throw error if no label is found for uploading files', () => {
+      spyOn(document, 'getElementById').and.returnValue(null);
+      expect(() => {
+        component.uploadTopicSimilaritiesFile();
+      }).toThrowError('No element with id topicSimilaritiesFile found.');
+    });
+
+    it('should throw error if no files are uploaded', () => {
+      // This throws "Argument of type '() => { files: { size: number;
+      // name: string; }[]; }' is not assignable to parameter of type
+      // '(elementId: string) => HTMLElement'.". This is because the
+      // actual 'getElementById' returns more properties than just "files".
+      // We need to suppress this error because we need only "files"
+      // property for testing.
+      // @ts-expect-error
+      spyOn(document, 'getElementById').and.callFake(() => {
+        return {
+          files: null
+        };
+      });
+      expect(() => {
+        component.uploadTopicSimilaritiesFile();
+      }).toThrowError('No files found.');
+    });
   });
 
   it('should download topic similarities csv file ' +
@@ -270,12 +355,12 @@ describe('Admin misc tab component ', () => {
     'on clicking submit query button', () => {
     let message = 'message';
     // Pre-checks.
-    expect(component.showDataExtractionQueryStatus).toBe(undefined);
-    expect(component.dataExtractionQueryStatusMessage).toBe(undefined);
+    expect(component.showDataExtractionQueryStatus).toBeFalse();
+    expect(component.dataExtractionQueryStatusMessage).toBeUndefined();
 
     component.setDataExtractionQueryStatusMessage(message);
 
-    expect(component.showDataExtractionQueryStatus).toBe(true);
+    expect(component.showDataExtractionQueryStatus).toBeTrue();
     expect(component.dataExtractionQueryStatusMessage).toBe(message);
   });
 

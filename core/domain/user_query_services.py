@@ -23,10 +23,18 @@ from core.domain import email_manager
 from core.domain import user_query_domain
 from core.platform import models
 
+from typing import Dict, List, Optional, Tuple
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-def _get_user_query_from_model(user_query_model):
+def _get_user_query_from_model(
+    user_query_model: user_models.UserQueryModel
+) -> user_query_domain.UserQuery:
     """Transform user query model to domain object.
 
     Args:
@@ -54,7 +62,9 @@ def _get_user_query_from_model(user_query_model):
     )
 
 
-def get_user_query(query_id, strict=False):
+def get_user_query(
+    query_id: str, strict: bool = False
+) -> Optional[user_query_domain.UserQuery]:
     """Gets the user query with some ID.
 
     Args:
@@ -62,7 +72,8 @@ def get_user_query(query_id, strict=False):
         strict: bool. Whether to raise an error if the user query doesn't exist.
 
     Returns:
-        UserQuery. The user query.
+        UserQuery|None. Returns the user query domain object. Can be None if
+        there is no user query model.
     """
     user_query_model = user_models.UserQueryModel.get(query_id, strict=strict)
     return (
@@ -71,7 +82,9 @@ def get_user_query(query_id, strict=False):
     )
 
 
-def get_recent_user_queries(num_queries_to_fetch, cursor):
+def get_recent_user_queries(
+    num_queries_to_fetch: int, cursor: Optional[str]
+) -> Tuple[List[user_query_domain.UserQuery], Optional[str]]:
     """Get recent user queries.
 
     Args:
@@ -93,7 +106,7 @@ def get_recent_user_queries(num_queries_to_fetch, cursor):
     )
 
 
-def _save_user_query(user_query):
+def _save_user_query(user_query: user_query_domain.UserQuery) -> str:
     """Save the user query into the datastore.
 
     Args:
@@ -127,7 +140,9 @@ def _save_user_query(user_query):
     return user_query_model.id
 
 
-def save_new_user_query(submitter_id, query_params):
+def save_new_user_query(
+    submitter_id: str, query_params: Dict[str, int]
+) -> str:
     """Saves a new user query.
 
     Args:
@@ -145,19 +160,26 @@ def save_new_user_query(submitter_id, query_params):
     return _save_user_query(user_query)
 
 
-def archive_user_query(user_query_id):
+def archive_user_query(user_query_id: str) -> None:
     """Delete the user query.
 
     Args:
         user_query_id: str. The ID of the user query to delete.
     """
     user_query = get_user_query(user_query_id, strict=True)
+    # Ruling out the possibility of None for mypy type checking.
+    assert user_query is not None
     user_query.archive()
     _save_user_query(user_query)
 
 
 def send_email_to_qualified_users(
-        query_id, email_subject, email_body, email_intent, max_recipients):
+    query_id: str,
+    email_subject: str,
+    email_body: str,
+    email_intent: str,
+    max_recipients: int
+) -> None:
     """Send email to maximum 'max_recipients' qualified users.
 
     Args:
@@ -168,6 +190,8 @@ def send_email_to_qualified_users(
         max_recipients: int. Maximum number of recipients send emails to.
     """
     user_query = get_user_query(query_id, strict=True)
+    # Ruling out the possibility of None for mypy type checking.
+    assert user_query is not None
     recipient_ids = user_query.user_ids
 
     if max_recipients:

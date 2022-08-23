@@ -31,12 +31,12 @@ import { Outcome } from
 import { AppConstants } from 'app.constants';
 
 interface Range {
-      answerGroupIndex: number,
-      ruleIndex: number,
-      lb: number,
-      ub: number,
-      lbi: boolean,
-      ubi: boolean,
+  answerGroupIndex: number;
+  ruleIndex: number;
+  lb: number;
+  ub: number;
+  lbi: boolean;
+  ubi: boolean;
 }
 
 @Injectable({
@@ -205,46 +205,87 @@ export class NumericInputValidationService {
 
     return warningsList;
   }
+
   // Returns 'undefined' when no error occurs.
-  getErrorString(
-      value: number, customizationArgs: boolean
+  validateNumericString(
+      value: string, decimalSeparator: string
   ): string | undefined {
+    value = value.toString().trim();
+    const trailingDot = /[\.|\,|\u066B]\d/g;
+    const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
+    const trailingMinus = /(^-)|(e-)/g;
+    const extraMinus = /-.*-/g;
+    const extraExponent = /e.*e/g;
+
+    if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL';
+    } else if (value.match(twoDecimals)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_DECIMAL';
+    } else if (value.includes('-') && !value.match(trailingMinus)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING';
+    } else if (value.includes('-') && value.match(extraMinus)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_MINUS';
+    } else if (value.includes('e') && value.match(extraExponent)) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_ATMOST_1_EXPONENT';
+    }
+  }
+
+  // Returns 'undefined' when no error occurs.
+  validateNumber(
+      // Null can also be passed in as a value, which is further validated.
+      value: number | null,
+      requireNonnegativeInput: boolean,
+      decimalSeparator: string = '.'
+  ): string | undefined {
+    if (requireNonnegativeInput && value && value < 0) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO';
+    }
+
     let stringValue = null;
+    // Value of sign is '-' if value of number is negative,
+    // '' if non-negative.
+    let sign: string = '';
+    if (value !== null) {
+      sign = value < 0 ? '-' : '';
+    }
+
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.
-    var data = String(value).split(/[eE]/);
-    if (data.length === 1) {
-      stringValue = data[0];
-    } else {
-      var z = '';
-      var sign = value < 0 ? '-' : '';
-      var str = data[0].replace('.', '');
-      var mag = Number(data[1]) + 1;
+    let numberParts = String(value).split(/[eE]/);
 
-      if (mag < 0) {
-        z = sign + '0.';
-        while (mag++) {
-          z += '0';
+    // If numberParts.length === 1, that means number is not in
+    // exponential form.
+    if (numberParts.length === 1) {
+      stringValue = numberParts[0];
+    } else {
+      let exponentialValueToString = '';
+      // Mantissa is the part of exponential number before the 'e' or 'E'.
+      let mantissa = numberParts[0].replace('.', '');
+      let numberOfZerosToAdd = Number(numberParts[1]) + 1;
+
+      if (numberOfZerosToAdd < 0) {
+        exponentialValueToString = sign + '0.';
+        while (numberOfZerosToAdd++) {
+          exponentialValueToString += '0';
         }
-        stringValue = z + str.replace(/^\-/, '');
+        stringValue = exponentialValueToString + mantissa.replace(/^\-/, '');
       } else {
-        mag -= str.length;
-        while (mag--) {
-          z += '0';
+        numberOfZerosToAdd -= mantissa.length;
+        while (numberOfZerosToAdd--) {
+          exponentialValueToString += '0';
         }
-        stringValue = str + z;
+        stringValue = mantissa + exponentialValueToString;
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-    if (
-      customizationArgs &&
-      (stringValueRegExp === null || stringValueRegExp.length > 15)
-    ) {
-      return 'The answer should be greater than or equal to zero and ' +
-      'can contain at most 15 digits (0-9) or symbols(.).';
-    } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
-      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
-        '(. or -).';
+    if (stringValueRegExp === null) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER';
+    } else if (stringValueRegExp.length > 15) {
+      if (decimalSeparator === ',') {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_COMMA';
+      } else {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_GREATER_THAN_15_DIGITS_DOT';
+      }
     }
   }
 }

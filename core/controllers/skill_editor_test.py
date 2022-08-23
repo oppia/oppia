@@ -36,7 +36,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseSkillEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -54,7 +54,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
             self.skill_id_2, self.admin_id, description='Description')
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic1')
+            1, 'Subtopic1', 'url-frag-one')
         subtopic.skill_ids = [self.skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
@@ -83,7 +83,7 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
     """Tests for SkillEditorPage."""
 
     def setUp(self):
-        super(SkillEditorTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id)
 
     def test_access_skill_editor_page(self):
@@ -113,7 +113,7 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillRightsHandler."""
 
     def setUp(self):
-        super(SkillRightsHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (feconf.SKILL_RIGHTS_URL_PREFIX, self.skill_id)
 
     def test_skill_rights_handler_succeeds(self):
@@ -136,7 +136,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     """Tests for EditableSkillDataHandler."""
 
     def setUp(self):
-        super(EditableSkillDataHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (
             feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id)
         self.put_payload = {
@@ -149,6 +149,11 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
                 'new_value': 'New Description'
             }]
         }
+
+    def test_cannot_get_skill_by_invalid_skill_id(self):
+        url_with_invalid_id = '%s/%s' % (
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, 'invalidSkillId')
+        self.get_json(url_with_invalid_id, expected_status_int=400)
 
     def test_guest_can_not_delete_skill(self):
         response = self.delete_json(self.url, expected_status_int=401)
@@ -222,7 +227,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             skill_id, self.admin_id, description='DescriptionSkill')
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Addition')
+            1, 'Addition', 'addition')
         subtopic.skill_ids = [skill_id]
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -233,7 +238,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             subtopics=[subtopic], next_subtopic_id=2)
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Chemistry')
+            1, 'Chemistry', 'chemistry')
         subtopic.skill_ids = [skill_id]
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -309,14 +314,16 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token,
             expected_status_int=400)
-        self.put_payload['version'] = -1
+        self.put_payload['version'] = 10
         self.put_json(
             self.url, self.put_payload, csrf_token=csrf_token,
             expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.put_payload['version'] = 1
         self.put_json(
-            self.url, {}, csrf_token=csrf_token, expected_status_int=404)
+            self.url, self.put_payload,
+            csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
     def test_editable_skill_handler_delete_succeeds(self):
@@ -372,7 +379,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillDataHandler."""
 
     def setUp(self):
-        super(SkillDataHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s,%s' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
         self.put_payload = {
@@ -409,7 +416,7 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for FetchSkillsHandler."""
 
     def setUp(self):
-        super(FetchSkillsHandlerTest, self).setUp()
+        super().setUp()
         self.url = feconf.FETCH_SKILLS_URL_PREFIX
 
     def test_skill_data_handler_get_multiple_skills(self):
@@ -425,7 +432,7 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillDescriptionHandler."""
 
     def setUp(self):
-        super(SkillDescriptionHandlerTest, self).setUp()
+        super().setUp()
         self.skill_description = 'Adding Fractions'
         self.url = '%s/%s' % (
             feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)

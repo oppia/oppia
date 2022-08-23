@@ -30,14 +30,20 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './upload-blog-post-thumbnail.component.html'
 })
 export class UploadBlogPostThumbnailComponent implements OnInit {
-  uploadedImage: SafeResourceUrl;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  croppedFilename!: string;
+  cropper!: Cropper;
+  @ViewChild('croppableImage') croppableImageRef!: ElementRef;
+  invalidTagsAndAttributes!: { tags: string[]; attrs: string[] };
+  // This property will be null when the SVG uploaded is not valid or when
+  // the image is not yet uploaded.
+  uploadedImage: SafeResourceUrl | null = null;
+  windowIsNarrow: boolean = false;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  croppedFilename: string;
-  windowIsNarrow: boolean;
-  cropper;
-  @ViewChild('croppableImage') croppableImageRef: ElementRef;
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
   constructor(
@@ -73,8 +79,17 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
-      this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (e.target as FileReader).result as string);
+      this.invalidTagsAndAttributes = {
+        tags: [],
+        attrs: []
+      };
+      let imageData = (e.target as FileReader).result as string;
+      if (this.svgSanitizerService.isBase64Svg(imageData)) {
+        this.invalidTagsAndAttributes = this.svgSanitizerService
+          .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
+        this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
+          imageData);
+      }
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
@@ -88,6 +103,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   reset(): void {
     this.uploadedImage = null;
     this.cropppedImageDataUrl = '';
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
   }
 
   onInvalidImageLoaded(): void {
@@ -109,11 +128,19 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   }
 
   cancel(): void {
-    this.uploadedImage = false;
+    this.uploadedImage = null;
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
     this.cancelThumbnailUpload.emit();
   }
 
   ngOnInit(): void {
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 
     this.windowDimensionService.getResizeEvent().subscribe(() => {

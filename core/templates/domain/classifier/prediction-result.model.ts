@@ -39,6 +39,7 @@ export class PredictionResult {
   getLabel(): number {
     return this.predictionLabel;
   }
+
   getConfidence(): number {
     return this.predictionConfidence;
   }

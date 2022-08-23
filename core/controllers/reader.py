@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import random
 
@@ -26,9 +25,11 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
+from core.controllers import editor
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -78,6 +79,42 @@ def _does_exploration_exist(exploration_id, version, collection_id):
 class ExplorationEmbedPage(base.BaseHandler):
     """Page describing a single embedded exploration."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'v': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                },
+                'default_value': None
+            },
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'iframed': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': False
+            },
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests.
@@ -85,19 +122,18 @@ class ExplorationEmbedPage(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version_str = self.request.get('v')
-        version = int(version_str) if version_str else None
+        version = self.normalized_request.get('v')
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
-        collection_id = self.request.get('collection_id')
+        collection_id = self.normalized_request.get('collection_id')
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
         # needed for backwards compatibility with older versions of the
         # embedding script.
         if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
-                self.request.get('iframed')):
+                self.normalized_request.get('iframed')):
             self.iframed = True
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
@@ -217,6 +253,16 @@ class ExplorationHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
+            },
+            'pid': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
+                    }]
+                },
+                'default_value': None
             }
         }
     }
@@ -229,6 +275,7 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.normalized_request.get('v')
+        unique_progress_url_id = self.normalized_request.get('pid')
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
@@ -237,22 +284,99 @@ class ExplorationHandler(base.BaseHandler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
-        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False
+        )
 
         preferred_audio_language_code = None
         preferred_language_codes = None
+        has_viewed_lesson_info_modal_once = None
 
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
             preferred_language_codes = (
                 user_settings.preferred_language_codes)
+            has_viewed_lesson_info_modal_once = (
+                user_settings.has_viewed_lesson_info_modal_once)
+
+        furthest_reached_checkpoint_exp_version = None
+        furthest_reached_checkpoint_state_name = None
+        most_recently_reached_checkpoint_exp_version = None
+        most_recently_reached_checkpoint_state_name = None
+
+        if not self.user_id and unique_progress_url_id is not None:
+            logged_out_user_data = (
+                exp_fetchers.get_logged_out_user_progress(
+                    unique_progress_url_id))
+
+            synced_exp_user_data = None
+            # If the latest exploration version is ahead of the most recently
+            # interacted exploration version.
+            if (
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+            ):
+                synced_exp_user_data = (
+                    exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                        logged_out_user_data.exploration_id, unique_progress_url_id)) # pylint: disable=line-too-long
+            else:
+                synced_exp_user_data = logged_out_user_data
+
+            furthest_reached_checkpoint_exp_version = (
+                synced_exp_user_data.furthest_reached_checkpoint_exp_version)
+            furthest_reached_checkpoint_state_name = (
+                synced_exp_user_data.furthest_reached_checkpoint_state_name)
+            most_recently_reached_checkpoint_exp_version = (
+                synced_exp_user_data
+                    .most_recently_reached_checkpoint_exp_version)
+            most_recently_reached_checkpoint_state_name = (
+                synced_exp_user_data
+                    .most_recently_reached_checkpoint_state_name)
+
+        elif self.user_id is not None:
+            exp_user_data = exp_fetchers.get_exploration_user_data(
+                self.user_id, exploration_id)
+
+            # If exp_user_data is None, it means the exploration is started
+            # for the first time and no checkpoint progress of the user
+            #  exists for the respective exploration.
+            # Exploration version 'v' passed as a parameter in GET request
+            # means a previous version of the exploration is being fetched.
+            # In that case, we want that exploration to start from the
+            # beginning and do not allow users to save their checkpoint
+            # progress in older exploration version.
+            if exp_user_data is not None and version is None:
+                synced_exp_user_data = None
+                # If the latest exploration version is ahead of the most
+                # recently interacted exploration version.
+                if (
+                    exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                    exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+                ):
+                    synced_exp_user_data = (
+                        user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                            self.user_id, exploration_id))
+                else:
+                    synced_exp_user_data = exp_user_data
+
+                furthest_reached_checkpoint_exp_version = (
+                    synced_exp_user_data.furthest_reached_checkpoint_exp_version) # pylint: disable=line-too-long
+                furthest_reached_checkpoint_state_name = (
+                    synced_exp_user_data.furthest_reached_checkpoint_state_name)
+                most_recently_reached_checkpoint_exp_version = (
+                    synced_exp_user_data
+                        .most_recently_reached_checkpoint_exp_version)
+                most_recently_reached_checkpoint_state_name = (
+                    synced_exp_user_data
+                        .most_recently_reached_checkpoint_state_name)
 
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
+            'exploration_metadata': exploration.get_metadata().to_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
@@ -264,6 +388,16 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value),
+            'has_viewed_lesson_info_modal_once': (
+                has_viewed_lesson_info_modal_once),
+            'furthest_reached_checkpoint_exp_version': (
+                furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                most_recently_reached_checkpoint_state_name)
         })
         self.render_json(self.values)
 
@@ -293,7 +427,7 @@ class PretestHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET request."""
-        story_url_fragment = self.request.get('story_url_fragment')
+        story_url_fragment = self.normalized_request.get('story_url_fragment')
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
         if story is None:
             raise self.InvalidInputException
@@ -358,8 +492,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         issue_schema_version = self.normalized_payload.get(
             'issue_schema_version')
 
-        playthrough_data = self.normalized_payload.get('playthrough_data')
-        playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
+        playthrough = self.normalized_payload.get('playthrough_data')
 
         exp_issues = stats_services.get_exp_issues(
             exploration_id, playthrough.exp_version)
@@ -421,6 +554,99 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
     """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'params': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict', 'list']
+                        }
+                    }
+                },
+                'default_value': {}
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'old_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'answer': {
+                'schema': {
+                    'type': 'weak_multiple',
+                    'options': ['int', 'basestring', 'dict', 'list']
+                }
+            },
+            'client_time_spent_in_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'answer_group_index': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'rule_spec_index': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'classification_categorization': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        exp_domain.EXPLICIT_CLASSIFICATION,
+                        exp_domain.TRAINING_DATA_CLASSIFICATION,
+                        exp_domain.STATISTICAL_CLASSIFICATION,
+                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+                    ]
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -429,24 +655,21 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        old_state_name = self.payload.get('old_state_name')
+        old_state_name = self.normalized_payload.get('old_state_name')
         # The reader's answer.
-        answer = self.payload.get('answer')
+        answer = self.normalized_payload.get('answer')
         # Parameters associated with the learner.
-        params = self.payload.get('params', {})
+        params = self.normalized_payload.get('params', {})
         # The version of the exploration.
-        version = self.payload.get('version')
-        if version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Answer Submit')
-        session_id = self.payload.get('session_id')
-        client_time_spent_in_secs = self.payload.get(
+        version = self.normalized_payload.get('version')
+        session_id = self.normalized_payload.get('session_id')
+        client_time_spent_in_secs = self.normalized_payload.get(
             'client_time_spent_in_secs')
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
-        answer_group_index = self.payload.get('answer_group_index')
-        rule_spec_index = self.payload.get('rule_spec_index')
-        classification_categorization = self.payload.get(
+        answer_group_index = self.normalized_payload.get('answer_group_index')
+        rule_spec_index = self.normalized_payload.get('rule_spec_index')
+        classification_categorization = self.normalized_payload.get(
             'classification_categorization')
 
         exploration = exp_fetchers.get_exploration_by_id(
@@ -542,6 +765,53 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'subject': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': 'Feedback from a learner'
+            },
+            'feedback': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': 10000
+                    }]
+                }
+            },
+            'include_author': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': True
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests.
@@ -549,9 +819,9 @@ class ReaderFeedbackHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        subject = self.payload.get('subject', 'Feedback from a learner')
-        feedback = self.payload.get('feedback')
-        include_author = self.payload.get('include_author')
+        subject = self.normalized_payload.get('subject')
+        feedback = self.normalized_payload.get('feedback')
+        include_author = self.normalized_payload.get('include_author')
 
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -566,6 +836,57 @@ class ExplorationStartEventHandler(base.BaseHandler):
     """Tracks a learner starting an exploration."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'params': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring']
+                        }
+                    }
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -574,14 +895,12 @@ class ExplorationStartEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        if self.payload.get('version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Exploration start')
         event_services.StartExplorationEventHandler.record(
-            exploration_id, self.payload.get('version'),
-            self.payload.get('state_name'),
-            self.payload.get('session_id'),
-            self.payload.get('params'),
+            exploration_id,
+            self.normalized_payload.get('version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
         self.render_json({})
 
@@ -592,34 +911,103 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exploration_version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Actual Start')
         event_services.ExplorationActualStartEventHandler.record(
-            exploration_id, self.payload.get('exploration_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'))
+            exploration_id,
+            self.normalized_payload.get('exploration_version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'))
         self.render_json({})
 
 
 class SolutionHitEventHandler(base.BaseHandler):
     """Tracks a learner clicking on the 'View Solution' button."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'exploration_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'time_spent_in_state_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            }
+        }
+    }
+
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if self.payload.get('exploration_version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Solution hit')
         event_services.SolutionHitEventHandler.record(
-            exploration_id, self.payload.get('exploration_version'),
-            self.payload.get('state_name'), self.payload.get('session_id'),
-            self.payload.get('time_spent_in_state_secs'))
+            exploration_id,
+            self.normalized_payload.get('exploration_version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -628,6 +1016,68 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
     The state name recorded should be a state with a terminal interaction.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'client_time_spent_in_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'params': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict', 'list']
+                        }
+                    }
+                }
+            },
+        }
+    }
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
@@ -641,19 +1091,16 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
 
         # This will be None if the exploration is not being played within the
         # context of a collection.
-        collection_id = self.payload.get('collection_id')
+        collection_id = self.normalized_payload.get('collection_id')
         user_id = self.user_id
 
-        if self.payload.get('version') is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Exploration complete')
         event_services.CompleteExplorationEventHandler.record(
             exploration_id,
-            self.payload.get('version'),
-            self.payload.get('state_name'),
-            self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'),
-            self.payload.get('params'),
+            self.normalized_payload.get('version'),
+            self.normalized_payload.get('state_name'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('client_time_spent_in_secs'),
+            self.normalized_payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
 
         if user_id:
@@ -683,6 +1130,68 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
     The state name recorded should be a state with a non-terminal interaction.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'session_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'client_time_spent_in_secs': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            },
+            'params': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'weak_multiple',
+                            'options': ['int', 'basestring', 'dict', 'list']
+                        }
+                    }
+                }
+            },
+        }
+    }
+
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_play_exploration
@@ -692,13 +1201,10 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version = self.payload.get('version')
-        if version is None:
-            raise self.InvalidInputException(
-                'NONE EXP VERSION: Maybe quit')
-        state_name = self.payload.get('state_name')
+        version = self.normalized_payload.get('version')
+        state_name = self.normalized_payload.get('state_name')
         user_id = self.user_id
-        collection_id = self.payload.get('collection_id')
+        collection_id = self.normalized_payload.get('collection_id')
         story_id = exp_services.get_story_id_linked_to_exploration(
             exploration_id)
 
@@ -729,9 +1235,9 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
             exploration_id,
             version,
             state_name,
-            self.payload.get('session_id'),
-            self.payload.get('client_time_spent_in_secs'),
-            self.payload.get('params'),
+            self.normalized_payload.get('session_id'),
+            self.normalized_payload.get('client_time_spent_in_secs'),
+            self.normalized_payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
         self.render_json(self.values)
 
@@ -863,18 +1369,72 @@ class RecommendationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'include_system_recommendations': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': True
+            },
+            'author_recommended_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            },
+            'story_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'current_node_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        collection_id = self.request.get('collection_id')
-
-        include_system_recommendations = self.request.get(
+        collection_id = self.normalized_request.get('collection_id')
+        include_system_recommendations = self.normalized_request.get(
             'include_system_recommendations')
-        try:
-            author_recommended_exp_ids = json.loads(self.request.get(
-                'stringified_author_recommended_ids'))
-        except Exception:
-            raise self.PageNotFoundException
+        author_recommended_exp_ids = self.normalized_request.get(
+            'author_recommended_ids')
 
         system_recommended_exp_ids = []
         next_exp_id = None
@@ -992,6 +1552,138 @@ class QuestionPlayerHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class TransientCheckpointUrlPage(base.BaseHandler):
+    """Responsible for redirecting the learner to the checkpoint
+    last reached on the exploration page as a logged out user."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'unique_progress_url_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
+                }]
+            },
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self, unique_progress_url_id):
+        """Handles GET requests. Fetches the logged-out learner's progress."""
+
+        logged_out_user_data = (
+            exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+
+        if logged_out_user_data is None:
+            raise self.PageNotFoundException()
+
+        redirect_url = '%s/%s?pid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            logged_out_user_data.exploration_id,
+            unique_progress_url_id)
+
+        self.redirect(redirect_url)
+
+
+class SaveTransientCheckpointProgressHandler(base.BaseHandler):
+    """Responsible for storing progress of a logged-out learner."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            }
+        },
+        'PUT': {
+            'unique_progress_url_id': {
+                'schema': {
+                    'type': 'basestring',
+                }
+            },
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            }
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests. Creates a new unique progress
+        url ID and a new corresponding TransientCheckpointUrl model.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        # Create a new unique_progress_url_id.
+        new_unique_progress_url_id = (
+            exp_fetchers.get_new_unique_progress_url_id())
+
+        # Create a new model corresponding to the new progress id.
+        exp_services.update_logged_out_user_progress(
+            exploration_id,
+            new_unique_progress_url_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
+        self.render_json({
+            'unique_progress_url_id': new_unique_progress_url_id
+        })
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
+        """"Handles the PUT requests. Saves the logged-out user's progress."""
+        unique_progress_url_id = (
+            self.normalized_payload.get('unique_progress_url_id'))
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        exp_services.update_logged_out_user_progress(
+            exploration_id,
+            unique_progress_url_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
+        self.render_json(self.values)
+
+
 class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
     """Handles the learner answer details submission."""
 
@@ -1030,3 +1722,299 @@ class LearnerAnswerDetailsSubmissionHandler(base.BaseHandler):
             entity_type, state_reference,
             interaction_id, answer, answer_details)
         self.render_json({})
+
+
+class CheckpointReachedEventHandler(base.BaseHandler):
+    """Tracks a learner reaching a checkpoint."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
+        """Handles PUT requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        user_services.update_learner_checkpoint_progress(
+            self.user_id,
+            exploration_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
+        self.render_json(self.values)
+
+
+class ExplorationRestartEventHandler(base.BaseHandler):
+    """Tracks a learner restarting an exploration."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                },
+                'default_value': None
+            },
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
+        """Handles PUT requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+
+        if most_recently_reached_checkpoint_state_name is None:
+            user_services.clear_learner_checkpoint_progress(
+                self.user_id, exploration_id)
+
+        self.render_json(self.values)
+
+
+class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
+    """Syncs logged out progress of a learner with the logged in progress."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'unique_progress_url_id': {
+                'schema': {
+                    'type': 'basestring',
+                }
+            },
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        unique_progress_url_id = self.normalized_payload.get(
+            'unique_progress_url_id')
+        if self.user_id is not None:
+            exp_services.sync_logged_out_learner_progress_with_logged_in_progress( # pylint: disable=line-too-long
+                self.user_id,
+                exploration_id,
+                unique_progress_url_id
+            )
+
+        self.render_json(self.values)
+
+
+class StateVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for a state at the given
+    version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'state_name': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_STATE_NAME_LENGTH
+                }]
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, state_name, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
+        state_version_history = (
+            version_history.state_version_history[state_name]
+        )
+        last_edited_version_number = (
+            state_version_history.previously_edited_in_version
+        )
+        state_name_in_previous_version = (
+            state_version_history.state_name_in_previous_version
+        )
+        state_in_previous_version = None
+        last_edited_committer_username = user_services.get_username(
+            state_version_history.committer_id
+        )
+
+        # If the state has not been updated after it was added for the
+        # first time, the value of last_edited_version_number will be None.
+        if last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=last_edited_version_number
+            )
+            state_in_previous_version = (
+                exploration.states[state_name_in_previous_version]
+            )
+
+        self.render_json({
+            'last_edited_version_number': last_edited_version_number,
+            'state_name_in_previous_version': state_name_in_previous_version,
+            'state_dict_in_previous_version': (
+                state_in_previous_version.to_dict()
+                if state_in_previous_version is not None else None
+            ),
+            'last_edited_committer_username': last_edited_committer_username
+        })
+
+
+class MetadataVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for the exploration metadata
+    at the given version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
+        metadata_version_history = version_history.metadata_version_history
+        metadata_in_previous_version = None
+
+        # If the metadata has not been updated after the exploration was
+        # created, the value of last_edited_version_number will be None.
+        if metadata_version_history.last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                version=metadata_version_history.last_edited_version_number
+            )
+            metadata_in_previous_version = exploration.get_metadata()
+
+        self.render_json({
+            'last_edited_version_number': (
+                metadata_version_history.last_edited_version_number
+            ),
+            'last_edited_committer_username': user_services.get_username(
+                metadata_version_history.last_edited_committer_id
+            ),
+            'metadata_dict_in_previous_version': (
+                metadata_in_previous_version.to_dict()
+                if metadata_in_previous_version is not None else None
+            )
+        })
+
+
+class CheckpointsFeatureStatusHandler(base.BaseHandler):
+    """The handler for checking whether the checkpoints feature is enabled."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        self.render_json({
+            'checkpoints_feature_is_enabled': (
+                config_domain.CHECKPOINTS_FEATURE_IS_ENABLED.value)
+        })

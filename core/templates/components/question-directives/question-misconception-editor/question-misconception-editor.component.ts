@@ -16,123 +16,153 @@
  * @fileoverview Component for the question misconception editor.
  */
 
-require('directives/angular-html-bind.directive.ts');
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import cloneDeep from 'lodash/cloneDeep';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { ExternalSaveService } from 'services/external-save.service';
+import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
+import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/question-directives/question-misconception-selector/' +
-  'question-misconception-selector.component.ts');
-require(
-  'components/question-directives/question-misconception-editor/' +
-  'tag-misconception-modal.controller.ts');
-require('services/external-save.service.ts');
+export interface MisconceptionUpdatedValues {
+  misconception: Misconception;
+  skillId: string;
+  feedbackIsUsed: boolean;
+}
 
-angular.module('oppia').component('questionMisconceptionEditor', {
-  bindings: {
-    getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
-    getOnSaveTaggedMisconception: '&onSaveTaggedMisconception',
-    getTaggedSkillMisconceptionId: '&taggedSkillMisconceptionId',
-    isEditable: '=',
-    outcome: '=',
-    rules: '=',
-  },
-  template: require('./question-misconception-editor.component.html'),
-  controller: [
-    '$uibModal', 'ExternalSaveService', 'StateEditorService',
-    function(
-        $uibModal, ExternalSaveService, StateEditorService) {
-      var ctrl = this;
+interface Outcome {
+  feedback: SubtitledHtmlBackendDict;
+}
 
-      ctrl.containsMisconceptions = function() {
-        var containsMisconceptions = false;
-        Object.keys(ctrl.misconceptionsBySkill).forEach(function(skillId) {
-          if (ctrl.misconceptionsBySkill[skillId].length > 0) {
-            containsMisconceptions = true;
+interface TaggedMisconception {
+  skillId: string;
+  misconceptionId: number;
+}
+
+@Component({
+  selector: 'oppia-question-misconception-editor',
+  templateUrl: './question-misconception-editor.component.html'
+})
+export class QuestionMisconceptionEditorComponent implements OnInit {
+  @Output() saveAnswerGroupFeedback:
+    EventEmitter<Outcome> = (new EventEmitter());
+
+  @Output() saveTaggedMisconception:
+    EventEmitter<TaggedMisconception> = (new EventEmitter());
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() outcome!: Outcome;
+  @Input() isEditable!: boolean;
+  @Input() rules!: Rule;
+  @Input() taggedSkillMisconceptionId!: string;
+  misconceptionName!: string;
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  selectedMisconception!: Misconception;
+  selectedMisconceptionSkillId!: string;
+  feedbackIsUsed: boolean = false;
+  misconceptionEditorIsOpen: boolean = false;
+
+  constructor(
+    private externalSaveService: ExternalSaveService,
+    private ngbModal: NgbModal,
+    private stateEditorService: StateEditorService
+  ) {}
+
+  ngOnInit(): void {
+    this.misconceptionsBySkill = (
+      this.stateEditorService.getMisconceptionsBySkill());
+    this.misconceptionEditorIsOpen = false;
+    let skillMisconceptionId = this.taggedSkillMisconceptionId;
+    if (skillMisconceptionId) {
+      if (typeof skillMisconceptionId === 'string' &&
+          skillMisconceptionId.split('-').length === 2) {
+        let skillId = skillMisconceptionId.split('-')[0];
+        let misconceptionId = skillMisconceptionId.split('-')[1];
+        let misconceptions = this.misconceptionsBySkill[skillId];
+
+        for (let i = 0; i < misconceptions.length; i++) {
+          if (misconceptions[i].getId().toString() ===
+            misconceptionId) {
+            this.misconceptionName = misconceptions[i].getName();
+            this.selectedMisconception = misconceptions[i];
+            this.selectedMisconceptionSkillId = skillId;
           }
-        });
-        return containsMisconceptions;
-      };
-
-      ctrl.tagAnswerGroupWithMisconception = function() {
-        var taggedSkillMisconceptionId = (
-          ctrl.getTaggedSkillMisconceptionId());
-        $uibModal.open({
-          template: require(
-            'pages/topic-editor-page/modal-templates/' +
-            'tag-misconception-modal.template.html'),
-          backdrop: 'static',
-          controller: 'TagMisconceptionModalController',
-          resolve: {
-            taggedSkillMisconceptionId: taggedSkillMisconceptionId
-          }
-        }).result.then(function(returnObject) {
-          var misconception = returnObject.misconception;
-          var misconceptionSkillId = returnObject.misconceptionSkillId;
-          var feedbackIsUsed = returnObject.feedbackIsUsed;
-          ctrl.selectedMisconception = misconception;
-          ctrl.selectedMisconceptionSkillId = misconceptionSkillId;
-          ctrl.feedbackIsUsed = feedbackIsUsed;
-          ctrl.updateMisconception();
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      ctrl.updateMisconception = function() {
-        var skillId = ctrl.selectedMisconceptionSkillId;
-        var misconceptionId = ctrl.selectedMisconception.getId();
-        ctrl.getOnSaveTaggedMisconception()(misconceptionId, skillId);
-        ctrl.misconceptionName = ctrl.selectedMisconception.getName();
-        var outcome = angular.copy(ctrl.outcome);
-        if (ctrl.feedbackIsUsed) {
-          outcome.feedback.html = (
-            ctrl.selectedMisconception.getFeedback());
-          ctrl.getOnSaveAnswerGroupFeedbackFn()(outcome);
-          ExternalSaveService.onExternalSave.emit();
         }
-        ctrl.misconceptionEditorIsOpen = false;
-      };
-
-      ctrl.editMisconception = function() {
-        ctrl.misconceptionEditorIsOpen = true;
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.misconceptionName = null;
-        ctrl.selectedMisconception = null;
-        ctrl.selectedMisconceptionSkillId = null;
-        ctrl.misconceptionsBySkill = (
-          StateEditorService.getMisconceptionsBySkill());
-        ctrl.misconceptionEditorIsOpen = null;
-        var skillMisconceptionId = ctrl.getTaggedSkillMisconceptionId();
-        if (skillMisconceptionId) {
-          if (typeof skillMisconceptionId === 'string' &&
-              skillMisconceptionId.split('-').length === 2) {
-            var skillId = skillMisconceptionId.split('-')[0];
-            var misconceptionId = skillMisconceptionId.split('-')[1];
-            var misconceptions = ctrl.misconceptionsBySkill[skillId];
-
-            for (var i = 0; i < misconceptions.length; i++) {
-              if (misconceptions[i].getId().toString() ===
-                misconceptionId) {
-                ctrl.misconceptionName = misconceptions[i].getName();
-                ctrl.selectedMisconception = misconceptions[i];
-                ctrl.selectedMisconceptionSkillId = skillId;
-              }
-            }
-          } else {
-            throw new Error(
-              'Expected skillMisconceptionId to be ' +
+      } else {
+        throw new Error(
+          'Expected skillMisconceptionId to be ' +
               '<skillId>-<misconceptionId>.');
-          }
-        }
-        ctrl.feedbackIsUsed = true;
-      };
+      }
     }
-  ]
-});
+    this.feedbackIsUsed = true;
+  }
+
+  containsMisconceptions(): boolean {
+    let containsMisconceptions = false;
+    Object.keys(this.misconceptionsBySkill).forEach((skillId) => {
+      if (this.misconceptionsBySkill[skillId].length > 0) {
+        containsMisconceptions = true;
+      }
+    });
+    return containsMisconceptions;
+  }
+
+  updateValues(newValues: MisconceptionUpdatedValues): void {
+    this.selectedMisconception = (
+      newValues.misconception);
+    this.selectedMisconceptionSkillId = (
+      newValues.skillId);
+    this.feedbackIsUsed = (
+      newValues.feedbackIsUsed);
+  }
+
+  tagAnswerGroupWithMisconception(): void {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      TagMisconceptionModalComponent, {
+        backdrop: 'static',
+        backdropClass: 'forced-modal-backdrop-stack-over',
+        windowClass: 'forced-modal-stack-over'
+      });
+    modalRef.componentInstance.taggedSkillMisconceptionId = (
+      this.taggedSkillMisconceptionId);
+    modalRef.result.then((returnObject) => {
+      this.selectedMisconception = returnObject.misconception;
+      this.selectedMisconceptionSkillId = returnObject.misconceptionSkillId;
+      this.feedbackIsUsed = returnObject.feedbackIsUsed;
+      this.updateMisconception();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  updateMisconception(): void {
+    let taggedMisconception = {
+      skillId: this.selectedMisconceptionSkillId,
+      misconceptionId: this.selectedMisconception.getId()
+    };
+    this.saveTaggedMisconception.emit(taggedMisconception);
+    this.misconceptionName = this.selectedMisconception.getName();
+    let outcome = cloneDeep(this.outcome);
+    if (this.feedbackIsUsed) {
+      outcome.feedback.html = (
+        this.selectedMisconception.getFeedback());
+      this.saveAnswerGroupFeedback.emit(outcome);
+      this.externalSaveService.onExternalSave.emit();
+    }
+    this.misconceptionEditorIsOpen = false;
+  }
+
+  editMisconception(): void {
+    this.misconceptionEditorIsOpen = true;
+  }
+}
+
+angular.module('oppia').directive('oppiaQuestionMisconceptionEditor',
+  downgradeComponent({component: QuestionMisconceptionEditorComponent}));

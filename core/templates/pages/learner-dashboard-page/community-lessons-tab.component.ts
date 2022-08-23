@@ -26,6 +26,14 @@ import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { AppConstants } from 'app.constants';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Subscription } from 'rxjs';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './community-lessons-tab.component.css';
+
+
+interface ShowMoreInSectionDict {
+  [section: string]: boolean;
+}
 
  @Component({
    selector: 'oppia-community-lessons-tab',
@@ -35,47 +43,61 @@ export class CommunityLessonsTabComponent {
   constructor(
     private learnerDashboardActivityBackendApiService: (
       LearnerDashboardActivityBackendApiService),
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService) {
   }
-  @Input() incompleteExplorationsList: LearnerExplorationSummary[];
-  @Input() incompleteCollectionsList: CollectionSummary[];
-  @Input() completedExplorationsList: LearnerExplorationSummary[];
-  @Input() completedCollectionsList: CollectionSummary[];
-  @Input() explorationPlaylist: LearnerExplorationSummary[];
-  @Input() collectionPlaylist: CollectionSummary[];
-  @Input() subscriptionsList: ProfileSummary[];
-  @Input() completedToIncompleteCollections: string[];
-  noCommunityLessonActivity: boolean;
-  noPlaylistActivity: boolean;
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() incompleteExplorationsList!: LearnerExplorationSummary[];
+  @Input() incompleteCollectionsList!: CollectionSummary[];
+  @Input() completedExplorationsList!: LearnerExplorationSummary[];
+  @Input() completedCollectionsList!: CollectionSummary[];
+  @Input() explorationPlaylist!: LearnerExplorationSummary[];
+  @Input() collectionPlaylist!: CollectionSummary[];
+  @Input() subscriptionsList!: ProfileSummary[];
+  @Input() completedToIncompleteCollections!: string[];
+  selectedSection!: string;
+  noCommunityLessonActivity: boolean = false;
+  noPlaylistActivity: boolean = false;
   totalIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   totalCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   totalLessonsInPlaylist: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   allCommunityLessons: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayIncompleteLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayCompletedLessonsList: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayLessonsInPlaylist: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
+
   displayInCommunityLessons: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
-  selectedSection: string;
+
   completed: string = 'Completed';
   incomplete: string = 'Incomplete';
   all: string = 'All';
   moveToPrevPage: string = 'MOVE_TO_PREV_PAGE';
   moveToNextPage: string = 'MOVE_TO_NEXT_PAGE';
-  dropdownEnabled: boolean;
-  showMoreInSection = {
+  dropdownEnabled: boolean = false;
+  showMoreInSection: ShowMoreInSectionDict = {
     incomplete: false,
     completed: false,
     playlist: false,
     subscriptions: false
   };
+
   pageNumberInCommunityLessons: number = 1;
   pageSize: number = 3;
   startIndexInCommunityLessons: number = 0;
@@ -85,10 +107,15 @@ export class CommunityLessonsTabComponent {
   endIndexInPlaylist: number = 3;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
+    var tempIncompleteLessonsList: (
+      LearnerExplorationSummary | CollectionSummary)[] = [];
+    var tempCompletedLessonsList: (
+    LearnerExplorationSummary | CollectionSummary)[] = [];
     this.noCommunityLessonActivity = (
       (this.incompleteExplorationsList.length === 0) &&
         (this.completedExplorationsList.length === 0) &&
@@ -97,10 +124,12 @@ export class CommunityLessonsTabComponent {
     this.noPlaylistActivity = (
       (this.explorationPlaylist.length === 0) &&
       (this.collectionPlaylist.length === 0));
-    this.totalIncompleteLessonsList.push(
+    tempIncompleteLessonsList.push(
       ...this.incompleteExplorationsList, ...this.incompleteCollectionsList);
-    this.totalCompletedLessonsList.push(
+    this.totalIncompleteLessonsList = tempIncompleteLessonsList.reverse();
+    tempCompletedLessonsList.push(
       ...this.completedExplorationsList, ...this.completedCollectionsList);
+    this.totalCompletedLessonsList = tempCompletedLessonsList.reverse();
     this.totalLessonsInPlaylist.push(
       ...this.explorationPlaylist, ...this.collectionPlaylist);
     this.allCommunityLessons.push(
@@ -158,10 +187,14 @@ export class CommunityLessonsTabComponent {
     this.endIndexInCommunityLessons = 3;
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   getLessonType(tile: LearnerExplorationSummary | CollectionSummary): string {
     if (this.totalIncompleteLessonsList.includes(tile)) {
       return this.incomplete;
-    } else if (this.totalCompletedLessonsList.includes(tile)) {
+    } else {
       return this.completed;
     }
   }

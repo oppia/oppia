@@ -71,7 +71,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for clazz in self._get_base_or_versioned_model_child_classes():
             if (clazz.get_deletion_policy() ==
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     NotImplementedError,
                     re.escape(
                         'The has_reference_to_user_id() method is missing from '

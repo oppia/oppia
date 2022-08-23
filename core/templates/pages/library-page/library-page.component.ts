@@ -17,10 +17,12 @@
  */
 
 import { Component } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -35,13 +37,22 @@ import { ActivityDict,
   LibraryPageBackendApiService,
   SummaryDict } from './services/library-page-backend-api.service';
 
+import './library-page.component.css';
+
+
+interface MobileLibraryGroupProperties {
+  inCollapsedState: boolean;
+  buttonText: string;
+}
+
 @Component({
   selector: 'oppia-library-page',
   templateUrl: './library-page.component.html'
 })
 export class LibraryPageComponent {
-  possibleBannerFilenames = [
+  possibleBannerFilenames: string[] = [
     'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+
   // If the value below is changed, the following CSS values in
   // oppia.css must be changed:
   // - .oppia-exp-summary-tiles-container: max-width
@@ -50,23 +61,31 @@ export class LibraryPageComponent {
   isAnyCarouselCurrentlyScrolling: boolean = false;
   CLASSROOM_PROMOS_ARE_ENABLED: boolean = false;
   tileDisplayCount: number = 0;
-  activeGroupIndex: number;
-  libraryGroups: SummaryDict[];
   leftmostCardIndices: number[] = [];
-  currentPath: string;
-  pageMode: string;
   LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
-  bannerImageFilename: string;
-  bannerImageFileUrl: string;
-  groupName: string;
-  activityList: ActivityDict[];
-  groupHeaderI18nId: string;
-  activitiesOwned = {
+  activitiesOwned: {[key: string]: {[key: string]: boolean}} = {
     explorations: {},
     collections: {}
   };
-  libraryWindowIsNarrow: boolean;
-  resizeSubscription: Subscription;
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  translateSubscription!: Subscription;
+  resizeSubscription!: Subscription;
+  // The following property will be assigned null when user
+  // has not selected any active group index.
+  activeGroupIndex!: number | null;
+  activityList!: ActivityDict[];
+  bannerImageFilename!: string;
+  bannerImageFileUrl!: string;
+  currentPath!: string;
+  groupName!: string;
+  groupHeaderI18nId!: string;
+  libraryGroups!: SummaryDict[];
+  libraryWindowIsNarrow!: boolean;
+  mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
+  pageMode!: string;
 
   constructor(
     private loggerService: LoggerService,
@@ -80,7 +99,8 @@ export class LibraryPageComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private classroomBackendApiService: ClassroomBackendApiService,
-    private pageTitleService: PageTitleService
+    private pageTitleService: PageTitleService,
+    private translateService: TranslateService
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -92,13 +112,21 @@ export class LibraryPageComponent {
   }
 
   initCarousels(): void {
+    if (this.libraryWindowIsNarrow) {
+      return;
+    }
+
     // This prevents unnecessary execution of this method immediately
     // after a window resize event is fired.
     if (!this.libraryGroups) {
       return;
     }
 
-    let windowWidth = $(window).width() * 0.85;
+    // The number 0 here is just to make sure that the type of width is number,
+    // it is never assigned as the width will never be undefined.
+    let width = $(window).width() || 0;
+
+    let windowWidth = width * 0.85;
     // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
     // compensate for padding and margins. 20 is just an arbitrary
     // number.
@@ -107,7 +135,8 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW);
 
     $('.oppia-library-carousel').css({
-      width: (this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
+      'max-width': (
+        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX) + 'px'
     });
 
     // The following determines whether to enable left scroll after
@@ -116,8 +145,10 @@ export class LibraryPageComponent {
       let carouselJQuerySelector = (
         '.oppia-library-carousel-tiles:eq(n)'.replace(
           'n', String(i)));
+      // The number 0 here is just to make sure that the type of width is
+      // number, it is never assigned as the selector will never be undefined.
       let carouselScrollPositionPx = $(
-        carouselJQuerySelector).scrollLeft();
+        carouselJQuerySelector).scrollLeft() || 0;
       let index = Math.ceil(
         carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX);
       this.leftmostCardIndices[i] = index;
@@ -132,8 +163,10 @@ export class LibraryPageComponent {
       '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind.toString()));
 
     let direction = isLeftScroll ? -1 : 1;
+    // The number 0 here is just to make sure that the type of width is
+    // number, it is never assigned as the selector will never be undefined.
     let carouselScrollPositionPx = $(
-      carouselJQuerySelector).scrollLeft();
+      carouselJQuerySelector).scrollLeft() || 0;
 
     // Prevent scrolling if there more carousel pixed widths than
     // there are tile widths.
@@ -197,7 +230,7 @@ export class LibraryPageComponent {
     if (fullResultsUrl) {
       this.windowRef.nativeWindow.location.href = fullResultsUrl;
     } else {
-      let selectedCategories = {};
+      let selectedCategories: Record<string, boolean> = {};
       for (let i = 0; i < categories.length; i++) {
         selectedCategories[categories[i]] = true;
       }
@@ -213,7 +246,36 @@ export class LibraryPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  toggleButtonText(idx: number): void {
+    if (this.mobileLibraryGroupsProperties[idx].buttonText === 'See More') {
+      this.mobileLibraryGroupsProperties[idx].buttonText = 'Collapse Section';
+    } else {
+      this.mobileLibraryGroupsProperties[idx].buttonText = 'See More';
+    }
+  }
+
+  toggleCardContainerHeightInMobileView(idx: number): void {
+    this.mobileLibraryGroupsProperties[idx].inCollapsedState =
+      !this.mobileLibraryGroupsProperties[idx].inCollapsedState;
+    this.toggleButtonText(idx);
+  }
+
+  setPageTitle(): void {
+    let titleKey = 'I18N_LIBRARY_PAGE_TITLE';
+    if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP ||
+      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH) {
+      titleKey = 'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE';
+    }
+
+    this.pageTitleService.setDocumentTitle(
+      this.translateService.instant(titleKey));
+  }
+
   ngOnInit(): void {
+    let libraryWindowCutoffPx = 536;
+    this.libraryWindowIsNarrow = (
+      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+
     this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
     this.bannerImageFilename = this.possibleBannerFilenames[
       Math.floor(Math.random() * this.possibleBannerFilenames.length)];
@@ -232,20 +294,23 @@ export class LibraryPageComponent {
       this.loggerService.error('INVALID URL PATH: ' + currentPath);
     }
 
-    this.pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[currentPath];
+    const libraryContants: Record<string, string> = (
+      LibraryPageConstants.LIBRARY_PATHS_TO_MODES);
+    this.pageMode = libraryContants[currentPath];
     this.LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
 
-    let title = 'Community Library Lessons | Oppia';
-    if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP ||
-      this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH) {
-      title = 'Find explorations to learn from - Oppia';
-    }
-
-    this.pageTitleService.setDocumentTitle(title);
+    this.translateSubscription = this.translateService.onLangChange.subscribe(
+      () => {
+        this.setPageTitle();
+      });
 
     // Keeps track of the index of the left-most visible card of each
     // group.
     this.leftmostCardIndices = [];
+
+    // Keeps track of the state of each library group when in mobile view
+    // i.e. if they are in a collapsed state or not.
+    this.mobileLibraryGroupsProperties = [];
 
     if (this.pageMode === LibraryPageConstants.LIBRARY_PAGE_MODES.GROUP) {
       let pathnameArray = (
@@ -329,11 +394,13 @@ export class LibraryPageComponent {
           setTimeout(() => {
             let actualWidth = $('oppia-exploration-summary-tile').width();
             if (actualWidth &&
-              actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX) {
+              (actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX &&
+               actualWidth !== AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX)) {
               this.loggerService.error(
-                'The actual width of tile is different than the ' +
-                'expected width. Actual size: ' + actualWidth +
-                ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX);
+                'The actual width of tile is different than either of the ' +
+                'expected widths. Actual size: ' + actualWidth +
+                ', Expected sizes: ' + AppConstants.LIBRARY_TILE_WIDTH_PX +
+                '/' + AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX);
             }
           }, 3000);
           // The following initializes the tracker to have all
@@ -343,12 +410,17 @@ export class LibraryPageComponent {
           for (let i = 0; i < this.libraryGroups.length; i++) {
             this.leftmostCardIndices.push(0);
           }
+          // The following initializes the array so that every group
+          // (in mobile view) loads in with a limit on the number of cards
+          // displayed, and with the button text being "See More".
+          for (let i = 0; i < this.libraryGroups.length; i++) {
+            this.mobileLibraryGroupsProperties.push({
+              inCollapsedState: true,
+              buttonText: 'See More'
+            });
+          }
         });
     }
-
-    let libraryWindowCutoffPx = 530;
-    this.libraryWindowIsNarrow = (
-      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
       .subscribe(evt => {
@@ -360,6 +432,9 @@ export class LibraryPageComponent {
   }
 
   ngOnDestroy(): void {
+    if (this.translateSubscription) {
+      this.translateSubscription.unsubscribe();
+    }
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for the Item Selection
- * interaction.
+ * interaction in protractor.
  */
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
@@ -33,8 +33,7 @@ var waitFor = require(
 var customizeInteraction = async function(
     elem, richTextInstructionsArray, maxSelectionAllowed) {
   await objects.IntEditor(
-    elem.all(by.repeater(
-      'customizationArgSpec in customizationArgSpecs track by $index'))
+    elem.all(by.css('.e2e-test-multiple-options'))
       .filter(async function(elem, index) {
         var text = await elem.getText();
         return text === 'Maximum number of selections permitted';
@@ -55,12 +54,12 @@ var customizeInteraction = async function(
 var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
   var optionElements = elem.all(
-    by.repeater('choice in $ctrl.choices track by $index'));
+    by.css('.e2e-test-item-selection-input-container'));
   var optionsCount = await optionElements.count();
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   for (var i = 0; i < optionsCount; i++) {
     await forms.expectRichText((await optionElements.get(i)).element(by.css(
-      '.protractor-test-item-selection-option'
+      '.e2e-test-item-selection-option'
     ))).toMatch(richTextInstructionsArray[i]);
   }
 };
@@ -76,13 +75,13 @@ var submitAnswer = async function(elem, answer) {
   for (var i = 0; i < answerArray.length; i++) {
     var desiredAnswer = answerArray[i];
     await elem.element(by.cssContainingText(
-      '.protractor-test-item-selection-input-item', desiredAnswer))
+      '.e2e-test-item-selection-input-item', desiredAnswer))
       .element(by.css(
-        '.protractor-test-item-selection-input-checkbox')).click();
+        '.e2e-test-item-selection-input-checkbox')).click();
   }
 
   var submitAnswerButton = element(by.css(
-    '.protractor-test-submit-answer-button'));
+    '.e2e-test-submit-answer-button'));
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');
   await submitAnswerButton.click();

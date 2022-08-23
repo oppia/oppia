@@ -12,399 +12,404 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
 /**
- * @fileoverview Unit tests for QuestionPlayerComponent.
+ * @fileoverview Unit tests for Question Player Component.
  */
 
-describe('QuestionPlayerComponent', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
-  let $location = null;
-  let $q = null;
-  let $uibModal = null;
 
-  let PlayerPositionService = null;
-  let ExplorationPlayerStateService = null;
-  let QuestionPlayerStateService = null;
-  let UserService = null;
-  let mockWindow = null;
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { UserService } from 'services/user.service';
+import { Answer, QuestionPlayerComponent, QuestionPlayerConfig } from './question-player.component';
+import { QuestionPlayerStateService } from './services/question-player-state.service';
+import { Location } from '@angular/common';
+import { UserInfo } from 'domain/user/user-info.model';
 
-  let userInfo = {
-    _isModerator: true,
-    _isAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
-  };
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    mockWindow = {
-      location: {
-        href: ''
-      }
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
     };
-    $provide.value('$window', mockWindow);
+  }
+}
+
+describe('Question Player Component', () => {
+  let component: QuestionPlayerComponent;
+  let fixture: ComponentFixture<QuestionPlayerComponent>;
+  let ngbModal: NgbModal;
+  let playerPositionService: PlayerPositionService;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let questionPlayerStateService: QuestionPlayerStateService;
+  let userService: UserService;
+  let windowRef: WindowRef;
+  let playerPositionServiceEmitter = new EventEmitter();
+  let explorationPlayerStateServiceEmitter = new EventEmitter();
+  let questionPlayerStateServiceEmitter = new EventEmitter();
+  let userInfo = new UserInfo(
+    null, true, false, false, false,
+    true, 'en', 'username1', 'tester@example.org', true);
+
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        href: '',
+        hash: null
+      },
+      addEventListener: () => {}
+    };
+  }
+
+  class MockPlayerPositionService {
+    onCurrentQuestionChange = playerPositionServiceEmitter;
+  }
+
+  class MockExplorationPlayerStateService {
+    onTotalQuestionsReceived = explorationPlayerStateServiceEmitter;
+  }
+
+  class MockQuestionPlayerStateService {
+    onQuestionSessionCompleted = questionPlayerStateServiceEmitter;
+    resultsPageIsLoadedEventEmitter = new EventEmitter();
+  }
+
+  class MockLocation {
+    onUrlChange(callback) {
+      callback();
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        QuestionPlayerComponent
+      ],
+      providers: [
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        {
+          provide: PlayerPositionService,
+          useClass: MockPlayerPositionService
+        },
+        {
+          provide: ExplorationPlayerStateService,
+          useClass: MockExplorationPlayerStateService
+        },
+        {
+          provide: QuestionPlayerStateService,
+          useClass: MockQuestionPlayerStateService
+        },
+        {
+          provide: Location,
+          useClass: MockLocation
+        },
+        PreventPageUnloadEventService,
+        UserService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(
-    function($injector, $componentController) {
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-      $location = $injector.get('$location');
-      $q = $injector.get('$q');
-      $uibModal = $injector.get('$uibModal');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(QuestionPlayerComponent);
+    component = fixture.componentInstance;
 
-      PlayerPositionService = $injector.get('PlayerPositionService');
-      ExplorationPlayerStateService = $injector.get(
-        'ExplorationPlayerStateService');
-      QuestionPlayerStateService = $injector.get('QuestionPlayerStateService');
-      UserService = $injector.get('UserService');
+    ngbModal = TestBed.inject(NgbModal);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    preventPageUnloadEventService = (
+      TestBed.inject(PreventPageUnloadEventService));
+    explorationPlayerStateService = (
+      TestBed.inject(ExplorationPlayerStateService));
+    questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
+    userService = TestBed.inject(UserService);
+    windowRef = TestBed.inject(WindowRef);
 
+    fixture.detectChanges();
 
-      ctrl = $componentController('questionPlayer', {
-        $scope: $scope
-      }, {
-        getQuestionPlayerConfig: () => {}
-      });
-    }));
+    spyOn(questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'emit');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo)
+    );
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
+    fixture.destroy();
   });
 
   it('should set component properties on initialization', () => {
-    expect(ctrl.currentQuestion).toBe(undefined);
-    expect(ctrl.totalQuestions).toBe(undefined);
-    expect(ctrl.currentProgress).toBe(undefined);
-    expect(ctrl.totalScore).toBe(undefined);
-    expect(ctrl.scorePerSkillMapping).toBe(undefined);
-    expect(ctrl.testIsPassed).toBe(undefined);
+    component.ngOnInit();
 
-    ctrl.$onInit();
-
-    expect(ctrl.currentQuestion).toBe(0);
-    expect(ctrl.totalQuestions).toBe(0);
-    expect(ctrl.currentProgress).toBe(0);
-    expect(ctrl.totalScore).toBe(0.0);
-    expect(ctrl.scorePerSkillMapping).toEqual({});
-    expect(ctrl.testIsPassed).toBe(true);
+    expect(component.currentQuestion).toBe(0);
+    expect(component.totalQuestions).toBe(0);
+    expect(component.currentProgress).toBe(0);
+    expect(component.totalScore).toBe(0.0);
+    expect(component.scorePerSkillMapping).toEqual({});
+    expect(component.testIsPassed).toBe(true);
+    expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
+      .toHaveBeenCalledWith(false);
   });
 
-  it('should add subscriptions on initialization', () => {
-    spyOn(PlayerPositionService.onCurrentQuestionChange, 'subscribe');
-    spyOn(ExplorationPlayerStateService.onTotalQuestionsReceived, 'subscribe');
-    spyOn(QuestionPlayerStateService.onQuestionSessionCompleted, 'subscribe');
+  it('should add subscriptions on initialization', fakeAsync(() => {
+    spyOn(playerPositionService.onCurrentQuestionChange, 'subscribe');
+    spyOn(explorationPlayerStateService.onTotalQuestionsReceived, 'subscribe');
+    spyOn(questionPlayerStateService.onQuestionSessionCompleted, 'subscribe');
 
-    ctrl.$onInit();
+    component.ngOnInit();
+    tick();
 
-    expect(PlayerPositionService.onCurrentQuestionChange.subscribe)
+    playerPositionServiceEmitter.emit(1);
+    explorationPlayerStateServiceEmitter.emit(10);
+    questionPlayerStateServiceEmitter.emit('result');
+    tick();
+
+    expect(playerPositionService.onCurrentQuestionChange.subscribe)
       .toHaveBeenCalled();
-    expect(ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe)
+    expect(explorationPlayerStateService.onTotalQuestionsReceived.subscribe)
       .toHaveBeenCalled();
-    expect(QuestionPlayerStateService.onQuestionSessionCompleted.subscribe)
+    expect(questionPlayerStateService.onQuestionSessionCompleted.subscribe)
       .toHaveBeenCalled();
-  });
+  }));
 
   it('should update current question when current question is changed', () => {
-    spyOnProperty(PlayerPositionService, 'onCurrentQuestionChange')
-      .and.returnValue(new EventEmitter());
+    component.ngOnInit();
+    component.totalQuestions = 5;
 
-    ctrl.$onInit();
-    ctrl.totalQuestions = 5;
+    expect(component.currentQuestion).toBe(0);
+    expect(component.currentProgress).toBe(0);
 
-    expect(ctrl.currentQuestion).toBe(0);
-    expect(ctrl.currentProgress).toBe(0);
+    playerPositionServiceEmitter.emit(3);
 
-    PlayerPositionService.onCurrentQuestionChange.emit(3);
-    $scope.$apply();
-
-    expect(ctrl.currentQuestion).toBe(4);
-    expect(ctrl.currentProgress).toBe(80);
+    expect(component.currentQuestion).toBe(4);
+    expect(component.currentProgress).toBe(80);
   });
 
-  it('should update total number of questions when count is received', () => {
-    spyOnProperty(ExplorationPlayerStateService, 'onTotalQuestionsReceived')
-      .and.returnValue(new EventEmitter());
+  it('should update total number of questions when count is received',
+    fakeAsync(() => {
+      component.ngOnInit();
 
-    ctrl.$onInit();
+      expect(component.totalQuestions).toBe(0);
 
-    expect(ctrl.totalQuestions).toBe(0);
+      explorationPlayerStateServiceEmitter.emit(3);
+      tick();
+      questionPlayerStateServiceEmitter.emit('new uri');
+      tick();
 
-    ExplorationPlayerStateService.onTotalQuestionsReceived.emit(3);
-    $scope.$apply();
+      expect(component.totalQuestions).toBe(3);
+    }));
 
-    expect(ctrl.totalQuestions).toBe(3);
-  });
 
-  it('should change location hash when question session is completed', () => {
-    spyOnProperty(QuestionPlayerStateService, 'onQuestionSessionCompleted')
-      .and.returnValue(new EventEmitter());
-    spyOn($location, 'hash').and.stub();
+  it('should get user info on initialization', fakeAsync(() => {
+    spyOn(component, 'calculateScores').and.stub();
+    spyOn(component, 'calculateMasteryDegrees').and.stub();
+    spyOn(component, 'hasUserPassedTest').and.returnValue(true);
 
-    ctrl.$onInit();
-    QuestionPlayerStateService.onQuestionSessionCompleted.emit('new uri');
-    $scope.$apply();
+    component.userIsLoggedIn = true;
+    let data = JSON.stringify({
+      state: {}
+    });
+    windowRef.nativeWindow.location.hash = 'question-player-result=' + data;
+    component.ngOnInit();
+    tick();
+    tick();
 
-    expect($location.hash).toHaveBeenCalledWith(
-      'question-player-result=%22new%20uri%22');
-  });
-
-  it('should get user info on initialization', () => {
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve(userInfo)
-    );
-
-    expect(ctrl.canCreateCollections).toBe(undefined);
-    expect(ctrl.isLoggedIn).toBe(undefined);
-
-    ctrl.$onInit();
-    $scope.$apply();
-
-    expect(ctrl.canCreateCollections).toBe(true);
-    expect(ctrl.userIsLoggedIn).toBe(true);
-  });
-
-  it('should calculate scores, mastery degree and check if user' +
-    ' has passed test', () => {
-    spyOnProperty(PlayerPositionService, 'onCurrentQuestionChange')
-      .and.returnValue(new EventEmitter());
-    spyOn($location, 'hash').and.returnValue(
-      'question-player-result=%22new%20uri%22');
-    spyOn(ctrl, 'calculateScores').and.stub();
-    spyOn(ctrl, 'calculateMasteryDegrees').and.stub();
-    spyOn(ctrl, 'hasUserPassedTest').and.returnValue(true);
-
-    expect(ctrl.testIsPassed).toBe(undefined);
-
-    ctrl.$onInit();
-    ctrl.userIsLoggedIn = true;
-
-    PlayerPositionService.onCurrentQuestionChange.emit(3);
-    $scope.$apply();
-
-    expect(ctrl.calculateScores).toHaveBeenCalled();
-    expect(ctrl.calculateMasteryDegrees).toHaveBeenCalled();
-    expect(ctrl.testIsPassed).toBe(true);
-  });
-
-  it('should get the outer class name for action button', () => {
-    expect(ctrl.getActionButtonOuterClass('REVIEW_LOWEST_SCORED_SKILL'))
-      .toBe('review-lowest-scored-skill-outer');
-    expect(ctrl.getActionButtonOuterClass('RETRY_SESSION'))
-      .toBe('new-session-outer');
-    expect(ctrl.getActionButtonOuterClass('DASHBOARD'))
-      .toBe('my-dashboard-outer');
-    expect(ctrl.getActionButtonOuterClass('INVALID_TYPE'))
-      .toBe('');
-  });
+    expect(component.testIsPassed).toBeTrue();
+    expect(component.calculateScores).toHaveBeenCalled();
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
 
   it('should get the inner class name for action button', () => {
-    expect(ctrl.getActionButtonInnerClass('REVIEW_LOWEST_SCORED_SKILL'))
+    expect(component.getActionButtonInnerClass('REVIEW_LOWEST_SCORED_SKILL'))
       .toBe('review-lowest-scored-skill-inner');
-    expect(ctrl.getActionButtonInnerClass('RETRY_SESSION'))
+    expect(component.getActionButtonInnerClass('RETRY_SESSION'))
       .toBe('new-session-inner');
-    expect(ctrl.getActionButtonInnerClass('DASHBOARD'))
+    expect(component.getActionButtonInnerClass('DASHBOARD'))
       .toBe('my-dashboard-inner');
-    expect(ctrl.getActionButtonInnerClass('INVALID_TYPE'))
+    expect(component.getActionButtonInnerClass('INVALID_TYPE'))
       .toBe('');
   });
 
   it('should get html for action button icon', () => {
-    expect(ctrl.getActionButtonIconHtml(
+    expect(component.getActionButtonIconHtml(
       'REVIEW_LOWEST_SCORED_SKILL').toString())
-      .toBe(
-        '&#10;          &#10;          &#10;          <img alt="" ' +
-        'class="action-button-icon" src="/assets/images/icons/' +
-        'rocket@2x.png">&#10;          '
-      );
-    expect(ctrl.getActionButtonIconHtml('RETRY_SESSION').toString())
-      .toBe('<i class="material-icons md-36 action-button-icon">&#58837;</i>');
-    expect(ctrl.getActionButtonIconHtml('DASHBOARD').toString())
-      .toBe('<i class="material-icons md-36 action-button-icon">&#59530;</i>');
-  });
-
-  it('should open review lowest scored skill modal when use clicks ' +
-    'on action button with type REVIEW_LOWEST_SCORED_SKILL', () => {
-    let skills, skillIds;
-    spyOn($uibModal, 'open').and.callFake((options) => {
-      skills = options.resolve.skills();
-      skillIds = options.resolve.skillIds();
-      return {
-        result: $q.resolve()
-      };
-    });
-    ctrl.scorePerSkillMapping = {
-      skill1: {
-        score: 5,
-        total: 8,
-        description: ''
-      },
-      skill2: {
-        score: 8,
-        total: 8,
-        description: ''
-      }
-    };
-
-    ctrl.performAction({
-      type: 'REVIEW_LOWEST_SCORED_SKILL'
-    });
-    $scope.$apply();
-
-    expect(skills).toEqual(['']);
-    expect(skillIds).toEqual(['skill1']);
+      .toBe('<i class="material-icons md-18 action-button-icon">&#59497;</i>');
+    expect(component.getActionButtonIconHtml('RETRY_SESSION').toString())
+      .toBe('<i class="material-icons md-18 action-button-icon">&#58837;</i>');
+    expect(component.getActionButtonIconHtml('DASHBOARD').toString())
+      .toBe('<i class="material-icons md-18 action-button-icon">&#59530;</i>');
   });
 
   it('should close review lowest scored skill modal', () => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    ctrl.scorePerSkillMapping = {
+    let mockEmitter = new EventEmitter();
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        skills: null,
+        skillIds: null,
+        masteryPerSkillMapping: null,
+        skillId: null,
+        userIsLoggedIn: null,
+        openConceptCardModal: mockEmitter
+      },
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.scorePerSkillMapping = {
       skill1: {
         score: 5,
-        total: 8
+        total: 8,
+        description: ''
       },
       skill2: {
         score: 8,
-        total: 8
+        total: 8,
+        description: ''
       }
     };
 
-    ctrl.performAction({
-      type: 'REVIEW_LOWEST_SCORED_SKILL'
+    component.performAction({
+      type: 'REVIEW_LOWEST_SCORED_SKILL',
+      url: ''
     });
-    $scope.$apply();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should redirect user if action button has a URL', () => {
-    expect(mockWindow.location.href).toBe('');
+    expect(windowRef.nativeWindow.location.href).toBe('');
 
-    ctrl.performAction({
-      url: '/url'
+    component.performAction({
+      url: '/url',
+      type: ''
     });
 
-    expect(mockWindow.location.href).toBe('/url');
+    expect(windowRef.nativeWindow.location.href).toBe('/url');
   });
 
   it('should check if action buttons footer is to be shown or not', () => {
-    ctrl.questionPlayerConfig = {
+    component.questionPlayerConfig = {
       resultActionButtons: ['first']
-    };
+    } as QuestionPlayerConfig;
 
-    expect(ctrl.showActionButtonsFooter()).toBe(true);
+    expect(component.showActionButtonsFooter()).toBe(true);
 
-    ctrl.questionPlayerConfig = {
+    component.questionPlayerConfig = {
       resultActionButtons: []
-    };
-    expect(ctrl.showActionButtonsFooter()).toBe(false);
+    } as QuestionPlayerConfig;
+    expect(component.showActionButtonsFooter()).toBe(false);
   });
 
   it('should check if the user has passed the test or not', () => {
-    ctrl.questionPlayerConfig = {
+    component.questionPlayerConfig = {
       questionPlayerMode: {
         modeType: 'PASS_FAIL',
         passCutoff: 1.5
       }
-    };
-    ctrl.scorePerSkillMapping = {
+    } as QuestionPlayerConfig;
+    component.scorePerSkillMapping = {
       skill1: {
         score: 5,
-        total: 8
+        total: 8,
+        description: ''
       },
       skill2: {
         score: 8,
-        total: 8
+        total: 8,
+        description: ''
       }
     };
 
-    expect(ctrl.hasUserPassedTest()).toBe(false);
+    expect(component.hasUserPassedTest()).toBe(false);
 
-    ctrl.questionPlayerConfig = {
+    component.questionPlayerConfig = {
       questionPlayerMode: {
         modeType: 'PASS_FAIL',
         passCutoff: 0.5
       }
-    };
+    } as QuestionPlayerConfig;
 
-    expect(ctrl.hasUserPassedTest()).toBe(true);
+    expect(component.hasUserPassedTest()).toBe(true);
   });
 
   it('should get score percentage to set score bar width', () => {
-    expect(ctrl.getScorePercentage({
+    expect(component.getScorePercentage({
       score: 5,
-      total: 10
+      total: 10,
+      description: ''
     })).toBe(50);
-    expect(ctrl.getScorePercentage({
+    expect(component.getScorePercentage({
       score: 3,
-      total: 10
+      total: 10,
+      description: ''
     })).toBe(30);
   });
 
   it('should calculate score based on question state data', () => {
     let questionStateData = {
       ques1: {
-        answers: ['1'],
+        answers: null,
         usedHints: [],
         viewedSolution: false,
-      },
-      ques2: {
-        answers: ['3', '4'],
-        usedHints: ['hint1'],
-        viewedSolution: true,
-        linkedSkillIds: ['skillId1', 'skillId2']
-      }
-    };
-    ctrl.questionPlayerConfig = {
-      skillList: ['skillId1'],
-      skillDescriptions: ['description1']
-    };
-    ctrl.totalScore = 0.0;
-
-    ctrl.calculateScores(questionStateData);
-
-    expect(ctrl.totalScore).toBe(50);
-  });
-
-  it('should calculate mastery degrees', () => {
-    ctrl.questionPlayerConfig = {
-      skillList: ['skillId1'],
-      skillDescriptions: ['description1']
-    };
-    let questionStateData = {
-      ques1: {
-        answers: [],
-        usedHints: ['hint1'],
-        viewedSolution: false,
+        linkedSkillIds: null
       },
       ques2: {
         answers: [{
           isCorrect: false,
           taggedSkillMisconceptionId: 'skillId1-misconception1'
-        }, {
+        } as Answer, {
           isCorrect: true,
-        }],
+        } as Answer
+        ],
+        usedHints: ['hint1'],
+        viewedSolution: true,
+        linkedSkillIds: ['skillId1', 'skillId2']
+      }
+    };
+    component.questionPlayerConfig = {
+      skillList: ['skillId1'],
+      skillDescriptions: ['description1']
+    } as QuestionPlayerConfig;
+    component.totalScore = 0.0;
+
+    component.calculateScores(questionStateData);
+
+    expect(component.totalScore).toBe(50);
+    expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
+      .toHaveBeenCalledWith(true);
+  });
+
+  it('should calculate mastery degrees', () => {
+    component.questionPlayerConfig = {
+      skillList: ['skillId1'],
+      skillDescriptions: ['description1']
+    } as QuestionPlayerConfig;
+    let questionStateData = {
+      ques1: {
+        answers: [],
+        usedHints: ['hint1'],
+        viewedSolution: false,
+        linkedSkillIds: null
+      },
+      ques2: {
+        answers: [{
+          isCorrect: false,
+          taggedSkillMisconceptionId: 'skillId1-misconception1'
+        } as Answer, {
+          isCorrect: true,
+        } as Answer
+        ],
         usedHints: ['hint1'],
         viewedSolution: true,
         linkedSkillIds: ['skillId1', 'skillId2']
@@ -413,7 +418,7 @@ describe('QuestionPlayerComponent', () => {
         answers: [{
           isCorrect: false,
           taggedSkillMisconceptionId: 'skillId1-misconception1'
-        }],
+        } as Answer],
         usedHints: ['hint1'],
         viewedSolution: false,
         linkedSkillIds: ['skillId1']
@@ -421,37 +426,37 @@ describe('QuestionPlayerComponent', () => {
       ques4: {
         answers: [{
           isCorrect: false,
-        }],
+        } as Answer],
         usedHints: ['hint1'],
         viewedSolution: false,
         linkedSkillIds: ['skillId1']
       }
     };
 
-    expect(ctrl.masteryPerSkillMapping).toEqual(undefined);
+    expect(component.masteryPerSkillMapping).toEqual(undefined);
 
-    ctrl.calculateMasteryDegrees(questionStateData);
+    component.calculateMasteryDegrees(questionStateData);
 
-    expect(ctrl.masteryPerSkillMapping).toEqual({
+    expect(component.masteryPerSkillMapping).toEqual({
       skillId1: -0.04000000000000001
     });
   });
 
   it('should open concept card modal when user clicks on review' +
     ' and retry', () => {
-    spyOn(ctrl, 'openConceptCardModal').and.stub();
-    ctrl.failedSkillIds = ['skillId1'];
+    spyOn(component, 'openConceptCardModal').and.stub();
+    component.failedSkillIds = ['skillId1'];
 
-    ctrl.reviewConceptCardAndRetryTest();
+    component.reviewConceptCardAndRetryTest();
 
-    expect(ctrl.openConceptCardModal).toHaveBeenCalled();
+    expect(component.openConceptCardModal).toHaveBeenCalled();
   });
 
   it('should throw error when user clicks on review and retry' +
     ' and there are no failed skills', () => {
-    ctrl.failedSkillIds = [];
+    component.failedSkillIds = [];
 
-    expect(() => ctrl.reviewConceptCardAndRetryTest()).toThrowError(
+    expect(() => component.reviewConceptCardAndRetryTest()).toThrowError(
       'No failed skills'
     );
   });
@@ -459,80 +464,184 @@ describe('QuestionPlayerComponent', () => {
   it('should get color for score based on score per skill', () => {
     let scorePerSkill = {
       score: 5,
-      total: 7
+      total: 7,
+      description: ''
     };
-    ctrl.questionPlayerConfig = {
+    component.questionPlayerConfig = {
       questionPlayerMode: {
         modeType: 'NOT_PASS_FAIL',
         passCutoff: 1.5
       }
-    };
+    } as QuestionPlayerConfig;
 
-    expect(ctrl.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
+    expect(component.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
 
-    ctrl.questionPlayerConfig = {
+    component.questionPlayerConfig = {
       questionPlayerMode: {
         modeType: 'PASS_FAIL',
         passCutoff: 1.5
       }
-    };
+    } as QuestionPlayerConfig;
 
-    expect(ctrl.getColorForScore(scorePerSkill)).toBe('rgb(217, 92, 12)');
+    expect(component.getColorForScore(scorePerSkill)).toBe('rgb(217, 92, 12)');
 
-    ctrl.questionPlayerConfig = {
+    component.questionPlayerConfig = {
       questionPlayerMode: {
         modeType: 'PASS_FAIL',
         passCutoff: 0.5
       }
-    };
+    } as QuestionPlayerConfig;
 
-    expect(ctrl.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
+    expect(component.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
   });
 
-  it('should open skill mastery modal when user clicks on skill', () => {
-    let masteryPerSkillMapping;
-    let skillId;
-    let openConceptCardModal;
-    let userIsLoggedIn;
-
-    ctrl.masteryPerSkillMapping = {
-      skillId1: -0.1
+  it('should get color for score bar based on score per skill', () => {
+    let scorePerSkill = {
+      score: 5,
+      total: 7,
+      description: ''
     };
-    ctrl.openConceptCardModal = false;
-    ctrl.userIsLoggedIn = true;
-    spyOn($uibModal, 'open').and.callFake((options) => {
-      masteryPerSkillMapping = options.resolve.masteryPerSkillMapping();
-      openConceptCardModal = options.resolve.openConceptCardModal();
-      skillId = options.resolve.skillId();
-      userIsLoggedIn = options.resolve.userIsLoggedIn();
-      return {
-        result: $q.resolve()
-      };
-    });
+    component.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'NOT_PASS_FAIL',
+        passCutoff: 1.5
+      }
+    } as QuestionPlayerConfig;
 
-    ctrl.openSkillMasteryModal('skillId1');
-    $scope.$apply();
+    expect(
+      component.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');
 
-    expect(masteryPerSkillMapping).toEqual({skillId1: -0.1});
-    expect(skillId).toBe('skillId1');
-    expect(openConceptCardModal).toBe(false);
-    expect(userIsLoggedIn).toBe(true);
+    component.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'PASS_FAIL',
+        passCutoff: 1.5
+      }
+    } as QuestionPlayerConfig;
+
+    expect(
+      component.getColorForScoreBar(scorePerSkill)).toBe('rgb(217, 92, 12)');
+
+    component.questionPlayerConfig = {
+      questionPlayerMode: {
+        modeType: 'PASS_FAIL',
+        passCutoff: 0.5
+      }
+    } as QuestionPlayerConfig;
+
+    expect(
+      component.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');
   });
 
-  it('should close skill master modal when user clicks cancel', () => {
-    ctrl.masteryPerSkillMapping = {
-      skillId1: -0.1
-    };
-
-    spyOn($uibModal, 'open').and.callFake((options) => {
-      return {
-        result: $q.reject()
+  it('should open skill mastery modal when user clicks on skill',
+    fakeAsync(() => {
+      let masteryPerSkillMapping = {
+        skillId1: -0.1
       };
-    });
+      let skillId;
+      component.scorePerSkillMapping = {
+        skill1: {
+          score: 5,
+          total: 8,
+          description: ''
+        },
+        skill2: {
+          score: 8,
+          total: 8,
+          description: ''
+        }
+      };
 
-    ctrl.openSkillMasteryModal('skillId1');
-    $scope.$apply();
+      let mockEmitter = new EventEmitter();
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          skills: null,
+          skillIds: skillId,
+          masteryPerSkillMapping: masteryPerSkillMapping,
+          skillId: 'skillId1',
+          userIsLoggedIn: true,
+          openConceptCardModal: mockEmitter
+        },
+        result: Promise.resolve()
+      } as NgbModalRef);
 
-    expect($uibModal.open).toHaveBeenCalled();
+      component.masteryPerSkillMapping = {
+        skillId1: -0.1
+      };
+      component.scorePerSkillMapping = {
+        skill1: {
+          score: 10,
+          total: 5,
+          description: ''
+        },
+        skill2: {
+          score: 5,
+          total: 10,
+          description: ''
+        }
+      };
+      tick();
+      component.openConceptCardModal(['skill1', 'skill2']);
+      tick();
+      component.userIsLoggedIn = true;
+      tick();
+
+      component.scorePerSkillMapping = {
+        skill1: {
+          score: 10,
+          total: 5,
+          description: ''
+        },
+        skill2: {
+          score: 5,
+          total: 10,
+          description: ''
+        }
+      };
+      component.openSkillMasteryModal('skillId1');
+      tick();
+
+      expect(masteryPerSkillMapping).toEqual({skillId1: -0.1});
+      expect(component.userIsLoggedIn).toBe(true);
+    }));
+
+  it('should close skill master modal when user clicks cancel',
+    fakeAsync(() => {
+      component.masteryPerSkillMapping = {
+        skillId1: -0.1
+      };
+
+      let mockEmitter = new EventEmitter();
+      spyOn(component, 'openConceptCardModal').and.stub();
+      spyOn(ngbModal, 'open').and.callFake((options) => {
+        return {
+          componentInstance: {
+            skills: null,
+            skillIds: null,
+            masteryPerSkillMapping: null,
+            skillId: null,
+            userIsLoggedIn: null,
+            openConceptCardModal: mockEmitter
+          },
+          result: Promise.reject()
+        } as NgbModalRef;
+      });
+
+      component.openSkillMasteryModal('skillId1');
+      mockEmitter.emit('skillId1');
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.openConceptCardModal).toHaveBeenCalled();
+    }));
+
+  it('should prevent page reload or exit in between' +
+  'practice session', () => {
+    spyOn(preventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    component.ngOnInit();
+
+    expect(preventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 });

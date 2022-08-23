@@ -17,12 +17,13 @@
 from __future__ import annotations
 
 import logging
+import os
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import collection_services
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
@@ -77,7 +78,7 @@ class HomePageTests(test_utils.GenericTestBase):
         """Test the logged-out version of the home page."""
         response = self.get_html_response('/')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('</oppia-root>', response)
+        self.assertIn('</lightweight-oppia-root>', response)
 
 
 class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
@@ -100,7 +101,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE_3 = 'Exploration title 3'
 
     def setUp(self):
-        super(CreatorDashboardHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
@@ -500,9 +501,15 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
 
 class CreationButtonsTests(test_utils.GenericTestBase):
+    with utils.open_file(
+        os.path.join(
+            feconf.SAMPLE_EXPLORATIONS_DIR, 'welcome', 'welcome.yaml'),
+        'rb', encoding=None
+    ) as f:
+        raw_yaml = f.read()
 
     def setUp(self):
-        super(CreationButtonsTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
@@ -542,14 +549,14 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             self.assertEqual(explorations_list, [])
             exp_a_id = self.post_json(
                 feconf.UPLOAD_EXPLORATION_URL,
-                {'yaml_file': self.SAMPLE_YAML_CONTENT},
-                csrf_token=csrf_token
+                {},
+                csrf_token=csrf_token,
+                upload_files=((
+                'yaml_file', 'unused_filename', self.raw_yaml),)
             )[creator_dashboard.EXPLORATION_ID_KEY]
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
-            exploration = exp_fetchers.get_exploration_by_id(exp_a_id)
             self.assertEqual(explorations_list[0]['id'], exp_a_id)
-            self.assertEqual(exploration.to_yaml(), self.SAMPLE_YAML_CONTENT)
             self.logout()
 
     def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(
@@ -559,9 +566,10 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.UPLOAD_EXPLORATION_URL,
-            {'yaml_file': self.SAMPLE_YAML_CONTENT},
+            {},
             csrf_token=csrf_token,
+            upload_files=((
+                'yaml_file', 'unused_filename', self.raw_yaml),),
             expected_status_int=400
         )
-
         self.logout()

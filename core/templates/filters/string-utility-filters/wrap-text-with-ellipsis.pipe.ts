@@ -27,6 +27,7 @@ export class WrapTextWithEllipsisPipe implements PipeTransform {
   constructor(
     private utilsService: UtilsService,
     private normalizeWhitespacePipe: NormalizeWhitespacePipe) {}
+
   transform(input: string, characterCount: number): string {
     if (this.utilsService.isString(input)) {
       input = this.normalizeWhitespacePipe.transform(input);

@@ -39,7 +39,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 export interface TabContent {
-  title: string,
+  title: string;
   content: string;
 }
 
@@ -50,7 +50,7 @@ export interface TabContent {
 })
 export class NoninteractiveTabs implements OnInit, OnChanges {
   // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() tabContentsWithValue!: string;
   tabContents: TabContent[] = [];

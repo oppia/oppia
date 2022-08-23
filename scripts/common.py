@@ -25,47 +25,42 @@ import platform
 import re
 import shutil
 import socket
+import ssl
 import subprocess
 import sys
 import time
+from urllib import error as urlerror
+from urllib import request as urlrequest
 
 from core import constants
-from core import python_utils
+
+from typing import Dict, Generator, List, Optional, Union
+
+# Add third_party to path. Some scripts access feconf even before
+# python_libs is added to path.
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from core import utils # pylint: disable=wrong-import-position
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
 
-# Versions of libraries used in devflow.
-COVERAGE_VERSION = '5.3'
-ESPRIMA_VERSION = '4.0.1'
-ISORT_VERSION = '5.8.0'
-PYCODESTYLE_VERSION = '2.6.0'
-PSUTIL_VERSION = '5.8.0'
-PYLINT_VERSION = '2.8.3'
-PYLINT_QUOTES_VERSION = '0.1.9'
-PYGITHUB_VERSION = '1.45'
-WEBTEST_VERSION = '2.0.35'
-PIP_TOOLS_VERSION = '6.0.1'
-GRPCIO_VERSION = '1.38.0'
-ENUM_VERSION = '1.1.10'
-PROTOBUF_VERSION = '3.13.0'
-SETUPTOOLS_VERSION = '36.6.0'
-
 # Node version.
-NODE_VERSION = '14.15.0'
+NODE_VERSION = '16.13.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.10'
+YARN_VERSION = '1.22.15'
 
 # Versions of libraries used in backend.
-PILLOW_VERSION = '6.2.2'
+PILLOW_VERSION = '9.0.1'
 
 # Buf version.
 BUF_VERSION = '0.29.0'
-# Protoc is the compiler for protobuf files and the version must be same as
-# the version of protobuf library being used.
-PROTOC_VERSION = PROTOBUF_VERSION
+
+# Must match the version of protobuf in requirements_dev.in.
+PROTOC_VERSION = '3.13.0'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
@@ -83,7 +78,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '7.10.1'
+ELASTICSEARCH_VERSION = '7.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -92,22 +87,16 @@ OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
-ISORT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'isort-%s' % ISORT_VERSION)
 WEBPACK_BIN_PATH = (
     os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
 DEV_APPSERVER_PATH = (
     os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
-PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
-PYCODESTYLE_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
-PYLINT_QUOTES_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
@@ -115,7 +104,6 @@ FIREBASE_PATH = os.path.join(
     NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
-PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
 REDIS_SERVER_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-server')
@@ -129,6 +117,12 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
 FIREBASE_EMULATOR_CACHE_DIR = (
     os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
 
+# By specifying this condition, we are importing the below module only while
+# type checking, not in runtime.
+MYPY = False
+if MYPY:  # pragma: no cover
+    import github
+
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
 ES_PATH_CONFIG_DIR = os.path.join(
@@ -140,10 +134,11 @@ RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
-USER_PREFERENCES = {'open_new_tab_in_browser': None}
+USER_PREFERENCES: Dict[str, Optional[str]] = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+APP_DEV_YAML_PATH = os.path.join('app_dev.yaml')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
@@ -182,39 +177,35 @@ PROTRACTOR_BIN_PATH = (
     os.path.join(NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'))
 PROTRACTOR_CONFIG_FILE_PATH = (
     os.path.join('core', 'tests', 'protractor.conf.js'))
+WEBDRIVERIO_CONFIG_FILE_PATH = (
+    os.path.join('core', 'tests', 'wdio.conf.js'))
+NODEMODULES_WDIO_BIN_PATH = (
+    os.path.join(NODE_MODULES_PATH, '.bin', 'wdio'))
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
-    PYLINT_PATH,
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
-    PSUTIL_DIR,
     os.path.join(CURR_DIR, 'proto_files'),
-    os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
 
 
-def is_windows_os():
+def is_windows_os() -> bool:
     """Check if the running system is Windows."""
     return OS_NAME == 'Windows'
 
 
-def is_mac_os():
+def is_mac_os() -> bool:
     """Check if the running system is MacOS."""
     return OS_NAME == 'Darwin'
 
 
-def is_linux_os():
+def is_linux_os() -> bool:
     """Check if the running system is Linux."""
     return OS_NAME == 'Linux'
 
 
-def is_x64_architecture():
+def is_x64_architecture() -> bool:
     """Check if the architecture is on X64."""
     # https://docs.python.org/2/library/platform.html#platform.architecture
     return sys.maxsize > 2**32
@@ -222,6 +213,8 @@ def is_x64_architecture():
 
 NODE_BIN_PATH = os.path.join(
     NODE_PATH, '' if is_windows_os() else 'bin', 'node')
+NPX_BIN_PATH = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
@@ -231,7 +224,7 @@ os.environ['PATH'] = os.pathsep.join([
 ])
 
 
-def run_cmd(cmd_tokens):
+def run_cmd(cmd_tokens: List[str]) -> str:
     """Runs the command and returns the output.
     Raises subprocess.CalledProcessError upon failure.
 
@@ -245,13 +238,13 @@ def run_cmd(cmd_tokens):
         cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
 
 
-def ensure_directory_exists(d):
+def ensure_directory_exists(d: str) -> None:
     """Creates the given directory if it does not already exist."""
     if not os.path.exists(d):
         os.makedirs(d)
 
 
-def require_cwd_to_be_oppia(allow_deploy_dir=False):
+def require_cwd_to_be_oppia(allow_deploy_dir: bool = False) -> None:
     """Ensures that the current working directory ends in 'oppia'.
 
     If allow_deploy_dir is True, this also allows the cwd to be a directory
@@ -270,55 +263,69 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
     raise Exception('Please run this script from the oppia/ directory.')
 
 
-def open_new_tab_in_browser_if_possible(url):
+def open_new_tab_in_browser_if_possible(url: str) -> None:
     """Opens the given URL in a new browser tab, if possible."""
     if USER_PREFERENCES['open_new_tab_in_browser'] is None:
-        python_utils.PRINT(
+        print(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
         USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
-        python_utils.PRINT(
-            'Please open the following link in browser: %s' % url)
+        print('Please open the following link in browser: %s' % url)
         return
     browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
-    for cmd in browser_cmds:
+    print(
+        'Please choose your default browser from the list using a number. '
+        'It will be given a preference over other available options.'
+    )
+    for index, browser in enumerate(browser_cmds):
+        print('%s). %s' % (index + 1, browser))
+
+    default_index = int(input().strip()) - 1
+    # Re-order the browsers by moving the user selected browser to the
+    # first position and copying over the browsers before and after
+    # the selected browser in the same order as they were present.
+    ordered_browser_cmds = (
+        [browser_cmds[default_index]] + browser_cmds[:default_index] +
+        browser_cmds[default_index + 1:])
+    for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
-    python_utils.PRINT(
-        '******************************************************************')
-    python_utils.PRINT(
+    print('******************************************************************')
+    print(
         'WARNING: Unable to open browser. Please manually open the following')
-    python_utils.PRINT('URL in a browser window, then press Enter to confirm.')
-    python_utils.PRINT('')
-    python_utils.PRINT('    %s' % url)
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'NOTE: To get rid of this message, open scripts/common.py and fix')
-    python_utils.PRINT(
-        'the function open_new_tab_in_browser_if_possible() to work on your')
-    python_utils.PRINT('system.')
+    print('URL in a browser window, then press Enter to confirm.')
+    print('')
+    print('    %s' % url)
+    print('')
+    print('NOTE: To get rid of this message, open scripts/common.py and fix')
+    print('the function open_new_tab_in_browser_if_possible() to work on your')
+    print('system.')
     input()
 
 
-def get_remote_alias(remote_url):
-    """Finds the correct alias for the given remote repository URL."""
+def get_remote_alias(remote_urls: List[str]) -> str:
+    """Finds the correct alias for the given remote repository URLs."""
     git_remote_output = subprocess.check_output(
         ['git', 'remote', '-v']).decode('utf-8').split('\n')
     remote_alias = None
-    for line in git_remote_output:
-        if remote_url in line:
-            remote_alias = line.split()[0]
+    remote_url = None
+    for remote_url in remote_urls:
+        for line in git_remote_output:
+            if remote_url in line:
+                remote_alias = line.split()[0]
+        if remote_alias:
+            break
     if remote_alias is None:
         raise Exception(
             'ERROR: There is no existing remote alias for the %s repo.'
-            % remote_url)
+            % ', '.join(remote_urls))
 
     return remote_alias
 
 
-def verify_local_repo_is_clean():
+def verify_local_repo_is_clean() -> None:
     """Checks that the local Git repo is clean."""
     git_status_output = subprocess.check_output(
         ['git', 'status']
@@ -333,7 +340,7 @@ def verify_local_repo_is_clean():
             'ERROR: This script should be run from a clean branch.')
 
 
-def get_current_branch_name():
+def get_current_branch_name() -> str:
     """Get the current branch name.
 
     Returns:
@@ -348,7 +355,13 @@ def get_current_branch_name():
     return git_status_first_line[len(branch_message_prefix):]
 
 
-def get_current_release_version_number(release_branch_name):
+def update_branch_with_upstream() -> None:
+    """Updates the current branch with upstream."""
+    current_branch_name = get_current_branch_name()
+    run_cmd(['git', 'pull', 'upstream', current_branch_name])
+
+
+def get_current_release_version_number(release_branch_name: str) -> str:
     """Gets the release version given a release branch name.
 
     Args:
@@ -356,6 +369,9 @@ def get_current_release_version_number(release_branch_name):
 
     Returns:
         str. The version of release.
+
+    Raises:
+        Exception. Invalid name of the release branch.
     """
     release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
@@ -372,7 +388,7 @@ def get_current_release_version_number(release_branch_name):
         raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
-def is_current_branch_a_hotfix_branch():
+def is_current_branch_a_hotfix_branch() -> bool:
     """Checks if the current branch is a hotfix branch.
 
     Returns:
@@ -383,7 +399,7 @@ def is_current_branch_a_hotfix_branch():
         re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
 
 
-def is_current_branch_a_release_branch():
+def is_current_branch_a_release_branch() -> bool:
     """Returns whether the current branch is a release branch.
 
     Returns:
@@ -398,7 +414,7 @@ def is_current_branch_a_release_branch():
     return release_match or release_maintenance_match or hotfix_match
 
 
-def is_current_branch_a_test_branch():
+def is_current_branch_a_test_branch() -> bool:
     """Returns whether the current branch is a test branch for deployment.
 
     Returns:
@@ -408,7 +424,7 @@ def is_current_branch_a_test_branch():
     return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
 
 
-def verify_current_branch_name(expected_branch_name):
+def verify_current_branch_name(expected_branch_name: str) -> None:
     """Checks that the user is on the expected branch."""
     if get_current_branch_name() != expected_branch_name:
         raise Exception(
@@ -416,7 +432,7 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
-def is_port_in_use(port):
+def is_port_in_use(port: int) -> bool:
     """Checks if a process is listening to the port.
 
     Args:
@@ -430,7 +446,7 @@ def is_port_in_use(port):
         return bool(not s.connect_ex(('localhost', port)))
 
 
-def recursive_chown(path, uid, gid):
+def recursive_chown(path: str, uid: int, gid: int) -> None:
     """Changes the owner and group id of all files in a path to the numeric
     uid and gid.
 
@@ -447,7 +463,7 @@ def recursive_chown(path, uid, gid):
             os.chown(os.path.join(root, filename), uid, gid)
 
 
-def recursive_chmod(path, mode):
+def recursive_chmod(path: str, mode: int) -> None:
     """Changes the mode of path to the passed numeric mode.
 
     Args:
@@ -462,17 +478,17 @@ def recursive_chmod(path, mode):
             os.chmod(os.path.join(root, filename), mode)
 
 
-def print_each_string_after_two_new_lines(strings):
+def print_each_string_after_two_new_lines(strings: List[str]) -> None:
     """Prints the given strings, separating adjacent strings with two newlines.
 
     Args:
         strings: list(str). The strings to print.
     """
     for string in strings:
-        python_utils.PRINT('%s\n' % string)
+        print('%s\n' % string)
 
 
-def install_npm_library(library_name, version, path):
+def install_npm_library(library_name: str, version: str, path: str) -> None:
     """Installs the npm library after ensuring its not already installed.
 
     Args:
@@ -480,15 +496,14 @@ def install_npm_library(library_name, version, path):
         version: str. The library version.
         path: str. The installation path for the library.
     """
-    python_utils.PRINT(
-        'Checking whether %s is installed in %s' % (library_name, path))
+    print('Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
-        python_utils.PRINT('Installing %s' % library_name)
+        print('Installing %s' % library_name)
         subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
 
 
-def ask_user_to_confirm(message):
+def ask_user_to_confirm(message: str) -> None:
     """Asks user to perform a task and confirm once they are done.
 
     Args:
@@ -496,16 +511,15 @@ def ask_user_to_confirm(message):
             to do.
     """
     while True:
-        python_utils.PRINT(
-            '******************************************************')
-        python_utils.PRINT(message)
-        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
+        print('******************************************************')
+        print(message)
+        print('Confirm once you are done by entering y/ye/yes.\n')
         answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
 
-def get_personal_access_token():
+def get_personal_access_token() -> str:
     """"Returns the personal access token for the GitHub id of user.
 
     Returns:
@@ -527,7 +541,9 @@ def get_personal_access_token():
     return personal_access_token
 
 
-def check_prs_for_current_release_are_released(repo):
+def check_prs_for_current_release_are_released(
+    repo: github.Repository.Repository
+) -> None:
     """Checks that all pull requests for current release have a
     'PR: released' label.
 
@@ -555,7 +571,7 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
-def convert_to_posixpath(file_path):
+def convert_to_posixpath(file_path: str) -> str:
     """Converts a Windows style filepath to posixpath format. If the operating
     system is not Windows, this function does nothing.
 
@@ -570,7 +586,7 @@ def convert_to_posixpath(file_path):
     return file_path.replace('\\', '/')
 
 
-def create_readme(dir_path, readme_content):
+def create_readme(dir_path: str, readme_content: str) -> None:
     """Creates a readme in a given dir path with the specified
     readme content.
 
@@ -579,16 +595,16 @@ def create_readme(dir_path, readme_content):
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+    with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
 
 def inplace_replace_file(
-    filename,
-    regex_pattern,
-    replacement_string,
-    expected_number_of_replacements=None
-):
+    filename: str,
+    regex_pattern: str,
+    replacement_string: str,
+    expected_number_of_replacements: Optional[int] = None
+) -> None:
     """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line.
 
@@ -602,6 +618,10 @@ def inplace_replace_file(
         replacement_string: str. The content to be replaced.
         expected_number_of_replacements: optional(int). The number of
             replacements that should be made. When None no check is done.
+
+    Raises:
+        ValueError. Wrong number of replacements.
+        Exception. The content failed to get replaced.
     """
     backup_filename = '%s.bak' % filename
     shutil.copyfile(filename, backup_filename)
@@ -609,14 +629,14 @@ def inplace_replace_file(
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with python_utils.open_file(backup_filename, 'r') as f:
+        with utils.open_file(backup_filename, 'r') as f:
             for line in f:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line)
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with python_utils.open_file(filename, 'w') as f:
+        with utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
 
@@ -641,7 +661,9 @@ def inplace_replace_file(
 
 
 @contextlib.contextmanager
-def inplace_replace_file_context(filename, regex_pattern, replacement_string):
+def inplace_replace_file_context(
+    filename: str, regex_pattern: str, replacement_string: str
+) -> Generator[None, None, None]:
     """Context manager in which the file's content is replaced according to the
     given regex pattern. This function should only be used with files that are
     processed line by line.
@@ -660,9 +682,9 @@ def inplace_replace_file_context(filename, regex_pattern, replacement_string):
     shutil.copyfile(filename, backup_filename)
 
     try:
-        with python_utils.open_file(backup_filename, 'r') as f:
+        with utils.open_file(backup_filename, 'r') as f:
             new_contents = [regex.sub(replacement_string, line) for line in f]
-        with python_utils.open_file(filename, 'w') as f:
+        with utils.open_file(filename, 'w') as f:
             f.write(''.join(new_contents))
         yield
     finally:
@@ -672,7 +694,7 @@ def inplace_replace_file_context(filename, regex_pattern, replacement_string):
             shutil.move(backup_filename, filename)
 
 
-def wait_for_port_to_be_in_use(port_number):
+def wait_for_port_to_be_in_use(port_number: int) -> None:
     """Wait until the port is in use and exit if port isn't open after
     MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
@@ -686,17 +708,15 @@ def wait_for_port_to_be_in_use(port_number):
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_in_use(port_number)):
-        python_utils.PRINT(
-            'Failed to start server on port %s, exiting ...' %
-            port_number)
-        python_utils.PRINT(
+        print('Failed to start server on port %s, exiting ...' % port_number)
+        print(
             'This may be because you do not have enough available '
             'memory. Please refer to '
             'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
         sys.exit(1)
 
 
-def wait_for_port_to_not_be_in_use(port_number):
+def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
 
@@ -741,7 +761,7 @@ def fix_third_party_imports() -> None:
     # correct.
     if 'google' in sys.modules:
         google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-        google_module = sys.modules['google']
+        google_module: dev_appserver = sys.modules['google']
         google_module.__path__ = [google_path]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
 
@@ -751,20 +771,21 @@ def fix_third_party_imports() -> None:
 class CD:
     """Context manager for changing the current working directory."""
 
-    def __init__(self, new_path):
+    def __init__(self, new_path: str) -> None:
         self.new_path = new_path
-        self.saved_path = None
+        self.saved_path: Optional[str] = None
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self.saved_path = os.getcwd()
         os.chdir(self.new_path)
 
-    def __exit__(self, etype, value, traceback):
+    def __exit__(self, etype: str, value: str, traceback: str) -> None:
+        assert self.saved_path is not None
         os.chdir(self.saved_path)
 
 
 @contextlib.contextmanager
-def swap_env(key, value):
+def swap_env(key: str, value: str) -> Generator[Optional[str], None, None]:
     """Context manager that temporarily changes the value of os.environ[key].
 
     Args:
@@ -786,13 +807,16 @@ def swap_env(key, value):
             os.environ[key] = old_value
 
 
-def write_stdout_safe(string):
+def write_stdout_safe(string: Union[str, bytes]) -> None:
     """Tries to write the input string to stdout in a non-blocking way.
 
     https://stackoverflow.com/a/44961052/4859885
 
     Args:
         string: str|bytes. The string to write to stdout.
+
+    Raises:
+        OSError. Failed to write the input string.
     """
     string_bytes = string.encode('utf-8') if isinstance(string, str) else string
 
@@ -811,5 +835,54 @@ def write_stdout_safe(string):
         except OSError as e:
             if e.errno == errno.EAGAIN:
                 continue
-            else:
-                raise
+
+            raise
+
+
+def url_retrieve(
+        url: str, output_path: str, max_attempts: int = 2,
+        enforce_https: bool = True
+) -> None:
+    """Retrieve a file from a URL and write the file to the file system.
+
+    Note that we use Python's recommended default settings for verifying SSL
+    connections, which are documented here:
+    https://docs.python.org/3/library/ssl.html#best-defaults.
+
+    Args:
+        url: str. The URL to retrieve the data from.
+        output_path: str. Path to the destination file where the data from the
+            URL will be written.
+        max_attempts: int. The maximum number of attempts that will be made to
+            download the data. For failures before the maximum number of
+            attempts, a message describing the error will be printed. Once the
+            maximum is hit, any errors will be raised.
+        enforce_https: bool. Whether to require that the provided URL starts
+            with 'https://' to ensure downloads are secure.
+
+    Raises:
+        Exception. Raised when the provided URL does not use HTTPS but
+            enforce_https is True.
+    """
+    failures = 0
+    success = False
+    if enforce_https and not url.startswith('https://'):
+        raise Exception(
+            'The URL %s should use HTTPS.' % url)
+    while not success and failures < max_attempts:
+        try:
+            with urlrequest.urlopen(
+                url, context=ssl.create_default_context()
+            ) as response:
+                with open(output_path, 'wb') as output_file:
+                    output_file.write(response.read())
+        except (urlerror.URLError, ssl.SSLError) as exception:
+            failures += 1
+            print('Attempt %d of %d failed when downloading %s.' % (
+                failures, max_attempts, url))
+            if failures >= max_attempts:
+                raise exception
+            print('Error: %s' % exception)
+            print('Retrying download.')
+        else:
+            success = True

@@ -1,17 +1,46 @@
-<div class="oppia-navbar-button-container btn-group">
+<div class="btn-group"
+     [ngClass]="checkTabletView() ? 'oppia-button-display' : 'float-right'">
   <!-- User must complete the registration process. -->
-  <button class="btn oppia-navbar-button nav-link oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-          (click)="onRedirectToLogin('/creator-dashboard?mode=create')" *ngIf="userIsLoggedIn === false">
+  <button type="button"
+          class="oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus"
+          (click)="onRedirectToLogin('/creator-dashboard?mode=create')"
+          *ngIf="userIsLoggedIn === false">
           <!-- "userIsLoggedIn === false" is needed because we want to show the button when we know that user is not logged in
                 when userIsLoggedIn is undefined or null we don't want to show the button thus we can't use ""userIsLoggedIn"!-->
-    <span class="oppia-navbar-tab-content" [innerHTML]="'I18N_CREATE_EXPLORATION_CREATE' | translate"></span>
+          + {{'I18N_CREATE_EXPLORATION' | translate}}
   </button>
-  <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-          (click)="initCreationProcess()" [disabled]="creationInProgress" *ngIf="userIsLoggedIn">
-    <span class="oppia-navbar-tab-content" [innerHTML]="'I18N_CREATE_EXPLORATION_CREATE' | translate"></span>
+  <button type="button"
+          class="oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus"
+          (click)="initCreationProcess()"
+          *ngIf="userIsLoggedIn">
+          + {{'I18N_CREATE_EXPLORATION' | translate}}
   </button>
   <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
-          (click)="showUploadExplorationModal()" [disabled]="creationInProgress" *ngIf="allowYamlFileUpload && userIsLoggedIn">
-    <span class="oppia-navbar-tab-content" [innerHTML]="'I18N_CREATE_EXPLORATION_UPLOAD' | translate"></span>
+          (click)="showUploadExplorationModal()"
+          [disabled]="creationInProgress"
+          *ngIf="allowYamlFileUpload && userIsLoggedIn">
+    <span class="oppia-navbar-tab-content"
+          [innerHTML]="'I18N_CREATE_EXPLORATION_UPLOAD' | translate">
+    </span>
   </button>
 </div>
+
+<style>
+  .oppia-creator-dashboard-intro-button {
+    background-color: #00645c;
+    border-radius: 6px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    text-transform: uppercase;
+    width: 200px;
+  }
+
+  .oppia-button-display {
+    display: block;
+  }
+</style>

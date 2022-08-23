@@ -29,6 +29,12 @@ import time
 from core import feconf
 from core.platform import models
 
+from typing import Dict, List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import audit_models
+
 (audit_models,) = models.Registry.import_models([models.NAMES.audit])
 
 # Actions that can be performed in the system.
@@ -97,6 +103,7 @@ ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY = 'UNPUBLISH_ANY_PUBLIC_ACTIVITY'
 ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE = 'VISIT_ANY_QUESTION_EDITOR_PAGE'
 ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE = 'VISIT_ANY_TOPIC_EDITOR_PAGE'
 ACTION_CAN_MANAGE_VOICE_ARTIST = 'CAN_MANAGE_VOICE_ARTIST'
+ACTION_ACCESS_LEARNER_GROUPS = 'ACCESS_LEARNER_GROUPS'
 
 # Users can be updated to the following list of role IDs via admin interface.
 #
@@ -186,6 +193,7 @@ _ROLE_ACTIONS = {
     feconf.ROLE_ID_FULL_USER: [
         ACTION_ACCESS_CREATOR_DASHBOARD,
         ACTION_ACCESS_LEARNER_DASHBOARD,
+        ACTION_ACCESS_LEARNER_GROUPS,
         ACTION_CREATE_EXPLORATION,
         ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
         ACTION_EDIT_OWNED_ACTIVITY,
@@ -255,7 +263,7 @@ _ROLE_ACTIONS = {
 }
 
 
-def get_all_actions(roles):
+def get_all_actions(roles: List[str]) -> List[str]:
     """Returns a list of all actions that can be performed by the given role.
 
     Args:
@@ -277,7 +285,7 @@ def get_all_actions(roles):
     return list(role_actions)
 
 
-def get_role_actions():
+def get_role_actions() -> Dict[str, List[str]]:
     """Returns the possible role to actions items in the application.
 
     Returns:
@@ -287,7 +295,12 @@ def get_role_actions():
     return copy.deepcopy(_ROLE_ACTIONS)
 
 
-def log_role_query(user_id, intent, role=None, username=None):
+def log_role_query(
+    user_id: str,
+    intent: str,
+    role: Optional[str] = None,
+    username: Optional[str] = None
+) -> None:
     """Stores the query to role structure in RoleQueryAuditModel."""
     model_id = '%s.%s.%s.%s' % (
         user_id, int(math.floor(time.time())), intent, random.randint(0, 1000)

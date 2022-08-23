@@ -25,33 +25,41 @@ from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = (
-    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT: Final = (
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT
+)
 
 
 class LearnerPlaylistTests(test_utils.GenericTestBase):
     """Test the services related to learner playlist services."""
 
-    EXP_ID_0 = '0_en_arch_bridges_in_england'
-    EXP_ID_1 = '1_fi_arch_sillat_suomi'
-    EXP_ID_2 = '2_en_welcome_introduce_oppia'
-    EXP_ID_3 = '3_welcome_oppia'
-    COL_ID_0 = '0_arch_bridges_in_england'
-    COL_ID_1 = '1_welcome_introduce_oppia'
-    COL_ID_2 = '2_welcome_introduce_oppia_interactions'
-    COL_ID_3 = '3_welcome_oppia_collection'
-    USER_EMAIL = 'user@example.com'
-    USER_USERNAME = 'user'
+    EXP_ID_0: Final = '0_en_arch_bridges_in_england'
+    EXP_ID_1: Final = '1_fi_arch_sillat_suomi'
+    EXP_ID_2: Final = '2_en_welcome_introduce_oppia'
+    EXP_ID_3: Final = '3_welcome_oppia'
+    COL_ID_0: Final = '0_arch_bridges_in_england'
+    COL_ID_1: Final = '1_welcome_introduce_oppia'
+    COL_ID_2: Final = '2_welcome_introduce_oppia_interactions'
+    COL_ID_3: Final = '3_welcome_oppia_collection'
+    USER_EMAIL: Final = 'user@example.com'
+    USER_USERNAME: Final = 'user'
 
-    def setUp(self):
-        super(LearnerPlaylistTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
 
         # Save a few explorations.
         self.save_new_valid_exploration(
@@ -81,29 +89,41 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self.COL_ID_3, self.owner_id, title='Welcome Oppia Collection',
             category='Welcome')
 
-    def _get_all_learner_playlist_exp_ids(self, user_id):
+    def _get_all_learner_playlist_exp_ids(self, user_id: str) -> List[str]:
         """Returns the list of all the exploration ids in the learner's playlist
         corresponding to the given user id.
         """
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 
-        return (
-            learner_playlist_model.exploration_ids if
-            learner_playlist_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if learner_playlist_model:
+            exp_ids: List[str] = learner_playlist_model.exploration_ids
+            return exp_ids
+        else:
+            return []
 
-    def _get_all_learner_playlist_collection_ids(self, user_id):
+    def _get_all_learner_playlist_collection_ids(
+        self, user_id: str
+    ) -> List[str]:
         """Returns the list of all the collection ids in the learner's playlist
         corresponding to the given user id.
         """
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 
-        return (
-            learner_playlist_model.collection_ids if
-            learner_playlist_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if learner_playlist_model:
+            collection_ids: List[str] = learner_playlist_model.collection_ids
+            return collection_ids
+        else:
+            return []
 
-    def test_subscribed_exploration_cannot_be_added_to_playlist(self):
+    def test_subscribed_exploration_cannot_be_added_to_playlist(self) -> None:
         # Subscribe to exploration.
         subscription_services.subscribe_to_exploration(
             self.user_id, self.EXP_ID_0)
@@ -111,16 +131,16 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
         # Now if we try to add the same exploration, it shouldn't be added.
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
 
-    def test_single_exploration_is_added_correctly_to_playlist(self):
+    def test_single_exploration_is_added_correctly_to_playlist(self) -> None:
         # Test adding a single exploration_id to learner playlist.
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
@@ -128,51 +148,57 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         # Test adding a single exploration_id to learner playlist at
         # a specific position.
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_1, position_to_be_inserted=0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
-    def test_multiple_explorations_are_added_correctly_to_playlist(self):
+    def test_multiple_explorations_are_added_correctly_to_playlist(
+        self
+    ) -> None:
         # Test adding two explorations to the learner playlist.
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [])
 
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0])
 
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-    def test_adding_exisiting_exploration_changes_order_of_explorations(self):
+    def test_adding_exisiting_exploration_changes_order_of_explorations(
+        self
+    ) -> None:
         # Test adding the exploration_id if it is already in
         # learner_playlist.exploration_ids.
         # Add the first exploration to the second position.
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_0)
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-        learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_0,
             position_to_be_inserted=1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
-    def test_incomplete_exploration_is_not_added_to_learner_playlist(self):
-        learner_progress_services.add_exp_to_learner_playlist(
+    def test_incomplete_exploration_is_not_added_to_learner_playlist(
+        self
+    ) -> None:
+        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
@@ -180,7 +206,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         state_name = 'state_name'
         version = 1
-        learner_progress_services.mark_exploration_as_incomplete(
+        learner_progress_services.mark_exploration_as_incomplete(  # type: ignore[no-untyped-call]
             self.user_id, self.EXP_ID_1, state_name, version)
 
         # Test that the exploration added to the in progress list doesn't get
@@ -189,12 +215,12 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0])
 
-    def test_nunmber_of_explorations_cannot_exceed_max(self):
+    def test_number_of_explorations_cannot_exceed_max(self) -> None:
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT explorations.
         exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
             0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for exp_id in exp_ids:
-            learner_progress_services.add_exp_to_learner_playlist(
+            learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
                 self.user_id, exp_id)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
@@ -216,7 +242,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
 
-    def test_subscribed_collection_cannot_be_added_to_playlist(self):
+    def test_subscribed_collection_cannot_be_added_to_playlist(self) -> None:
         # Subscribe to collection.
         subscription_services.subscribe_to_collection(
             self.user_id, self.COL_ID_0)
@@ -225,16 +251,16 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Now if we try to add the same collection, it shouldn't be added.
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
 
-    def test_single_collection_is_added_correctly_to_playlist(self):
+    def test_single_collection_is_added_correctly_to_playlist(self) -> None:
         # Test adding a single collection_id to learner playlist.
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
@@ -242,55 +268,57 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         # Test adding a single collection_id to learner playlist at
         # a specific position.
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_1, position_to_be_inserted=0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_1, self.COL_ID_0])
 
-    def test_multiple_collections_are_added_correctly_to_playlist(self):
+    def test_multiple_collections_are_added_correctly_to_playlist(self) -> None:
         # Test adding two explorations to the learner playlist.
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [])
 
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0])
 
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-    def test_adding_existing_collection_changes_order_of_collections(self):
+    def test_adding_existing_collection_changes_order_of_collections(
+        self
+    ) -> None:
         # Test adding the collection_id if it is already in
         # learner_playlist.collection_ids.
         # Add the first collection to the second position.
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_0)
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-        learner_progress_services.add_collection_to_learner_playlist(
+        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
             self.user_id, self.COL_ID_0,
             position_to_be_inserted=1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_1, self.COL_ID_0])
 
-    def test_number_of_collections_cannot_exceed_max(self):
+    def test_number_of_collections_cannot_exceed_max(self) -> None:
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT collections.
         col_ids = ['SAMPLE_COL_ID_%s' % index for index in range(
             0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for col_id in col_ids:
-            learner_progress_services.add_collection_to_learner_playlist(
+            learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
                 self.user_id, col_id)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
@@ -315,7 +343,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), col_ids)
 
-    def test_remove_exploration_from_learner_playlist(self):
+    def test_remove_exploration_from_learner_playlist(self) -> None:
         self.assertEqual(self._get_all_learner_playlist_exp_ids(
             self.user_id), [])
 
@@ -345,7 +373,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_learner_playlist_exp_ids(
             self.user_id), [])
 
-    def test_remove_collection_from_learner_playlist(self):
+    def test_remove_collection_from_learner_playlist(self) -> None:
         self.assertEqual(self._get_all_learner_playlist_collection_ids(
             self.user_id), [])
 
@@ -375,7 +403,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_learner_playlist_collection_ids(
             self.user_id), [])
 
-    def test_get_all_exp_ids_in_learner_playlist(self):
+    def test_get_all_exp_ids_in_learner_playlist(self) -> None:
         self.assertEqual(
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [])
@@ -394,7 +422,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_services.get_all_exp_ids_in_learner_playlist(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-    def test_get_all_learner_playlist_collection_ids(self):
+    def test_get_all_learner_playlist_collection_ids(self) -> None:
         self.assertEqual(
             learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
                 self.user_id), [])

@@ -53,6 +53,7 @@ export class SvgEditorComponent implements OnInit {
   @Input() value: string;
   @Output() valueChanged = new EventEmitter();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
+  @Output() discardImage = new EventEmitter();
   // These constants are used to identify the tool that is currently being
   // used so that other tools can be disabled accordingly.
   STATUS_EDITING = 'editing';
@@ -82,10 +83,12 @@ export class SvgEditorComponent implements OnInit {
     lineCounter: 0,
     shape: null
   };
+
   // These sizes are used in the strokeWidth options dropdown.
   sizes = [
     '1px', '2px', '3px', '5px', '9px', '10px', '12px',
     '14px', '18px', '24px', '30px', '36px'];
+
   // These fonts are used in the font family options dropdown.
   fontFamily = [
     'Arial',
@@ -102,6 +105,7 @@ export class SvgEditorComponent implements OnInit {
     'Plaster',
     'Engagement'
   ];
+
   // Dynamically assign a unique id to each lc editor to avoid clashes
   // when there are multiple RTEs in the same page.
   randomId = Math.floor(Math.random() * 100000).toString();
@@ -120,9 +124,10 @@ export class SvgEditorComponent implements OnInit {
   // The data variable is used to store the saved svg data
   // and the filename.
   data: {
-    savedSvgUrl?: SafeResourceUrl | string,
+    savedSvgUrl?: SafeResourceUrl | string;
     savedSvgFileName?: string;
   } = {};
+
   // The diagramStatus stores the mode of the tool that is being used.
   diagramStatus = this.STATUS_EDITING;
   displayFontStyles = false;
@@ -147,6 +152,7 @@ export class SvgEditorComponent implements OnInit {
     bold: false,
     italic: false
   };
+
   objectIsSelected = false;
   pieChartDataLimit = 10;
   groupCount = 0;
@@ -162,11 +168,13 @@ export class SvgEditorComponent implements OnInit {
     color: '#00ff00',
     angle: 0
   }];
+
   allowedImageFormats = ['svg'];
   uploadedSvgDataUrl: {
-    safeUrl: SafeResourceUrl,
-    unsafeUrl: string
+    safeUrl: SafeResourceUrl;
+    unsafeUrl: string;
   } = null;
+
   loadType = 'group';
   defaultTopCoordinate = 50;
   defaultLeftCoordinate = 50;
@@ -252,8 +260,8 @@ export class SvgEditorComponent implements OnInit {
   }
 
   private getTrustedResourceUrlForSvgFileName(
-      svgFileName: string): {
-        safeUrl: SafeResourceUrl | string, unsafeUrl: string} {
+      svgFileName: string
+  ): { safeUrl: SafeResourceUrl | string; unsafeUrl: string } {
     if (
       this.imageSaveDestination ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
@@ -293,13 +301,31 @@ export class SvgEditorComponent implements OnInit {
       };
       this.diagramWidth = dimensions.width;
       this.diagramHeight = dimensions.height;
-      this.svgFileFetcherBackendApiService.fetchSvg(
-        this.data.savedSvgUrl as string
-      ).subscribe(
-        response => {
-          this.savedSvgDiagram = response;
-        }
-      );
+      let svgDataUrl = this.imageLocalStorageService.getRawImageData(
+        this.data.savedSvgFileName);
+      if (
+        this.imageSaveDestination ===
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && svgDataUrl
+      ) {
+        this.uploadedSvgDataUrl = {
+          safeUrl: this.svgSanitizerService.getTrustedSvgResourceUrl(
+            svgDataUrl as string),
+          unsafeUrl: svgDataUrl as string
+        };
+        this.savedSvgDiagram = (
+          this.svgSanitizerService.convertBase64ToUnicodeString(
+            svgDataUrl.split(',')[1]
+          )
+        );
+      } else {
+        this.svgFileFetcherBackendApiService.fetchSvg(
+          this.data.savedSvgUrl as string
+        ).subscribe(
+          response => {
+            this.savedSvgDiagram = response;
+          }
+        );
+      }
     }
   }
 
@@ -313,27 +339,16 @@ export class SvgEditorComponent implements OnInit {
 
   saveImageToLocalStorage(
       dimensions: Dimensions,
-      resampledFile: Blob
+      svgDataURI: string
   ): void {
     const filename = this.imageUploadHelperService.generateImageFilename(
       dimensions.height, dimensions.width, 'svg');
-    const reader = new FileReader();
-    reader.onload = () => {
-      const imageData = reader.result as string;
-      this.imageLocalStorageService.saveImage(filename, imageData);
-      const img = new Image();
-      img.onload = () => {
-        this.setSavedSvgFilename(filename, false);
-        const dimensions = (
-          this.imagePreloaderService.getDimensionsOfImage(filename));
-        this.svgContainerStyle = {
-          height: dimensions.height + 'px',
-          width: dimensions.width + 'px'
-        };
-      };
-      img.src = this.getTrustedResourceUrlForSvgFileName(filename).unsafeUrl;
+    this.imageLocalStorageService.saveImage(filename, svgDataURI);
+    this.setSavedSvgFilename(filename, false);
+    this.svgContainerStyle = {
+      height: dimensions.height + 'px',
+      width: dimensions.width + 'px'
     };
-    reader.readAsDataURL(resampledFile);
   }
 
   getSvgString(): string {
@@ -380,6 +395,10 @@ export class SvgEditorComponent implements OnInit {
     return true;
   }
 
+  discardSvgFile(): void {
+    this.discardImage.emit();
+  }
+
   saveSvgFile(): void {
     this.alertsService.clearWarnings();
 
@@ -407,7 +426,7 @@ export class SvgEditorComponent implements OnInit {
         this.imageSaveDestination ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.saveImageToLocalStorage(dimensions, resampledFile);
+        this.saveImageToLocalStorage(dimensions, svgDataURI);
         this.validityChange.emit({ empty: true });
       } else {
         this.loadingIndicatorIsShown = true;
@@ -929,7 +948,7 @@ export class SvgEditorComponent implements OnInit {
   }
 
   getPieSlice(
-      center: {x: number, y: number},
+      center: { x: number; y: number },
       radius: number,
       startAngle: number,
       endAngle: number,
@@ -1109,7 +1128,11 @@ export class SvgEditorComponent implements OnInit {
     } else {
       this.drawMode = this.DRAW_MODE_NONE;
       if (this.uploadedSvgDataUrl !== null) {
-        var svgString = atob(this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
+        const svgString = (
+          this.svgSanitizerService.convertBase64ToUnicodeString(
+            this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]
+          )
+        );
         fabric.loadSVGFromString(svgString, (args) => this.loadSvgFile(args));
       }
       this.canvas.renderAll();
@@ -1498,7 +1521,8 @@ export class SvgEditorComponent implements OnInit {
       if (this.drawMode === this.DRAW_MODE_BEZIER) {
         var pt = e.target;
         var curve = this.getQuadraticBezierCurve() as unknown as {
-          path: number[][]};
+          path: number[][];
+        };
         if (e.target.name === 'p0') {
           curve.path[0][1] = pt.left;
           curve.path[0][2] = pt.top;

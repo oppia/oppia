@@ -24,6 +24,7 @@ import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
@@ -46,508 +47,621 @@ import { StatsReportingService } from './stats-reporting.service';
    providedIn: 'root'
  })
 export class ExplorationEngineService {
-   private _explorationId: string;
-   private _editorPreviewMode: boolean;
-   private _questionPlayerMode: boolean;
-   private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
-     (new EventEmitter());
+  private _explorationId: string;
+  private _editorPreviewMode: boolean;
+  private _questionPlayerMode: boolean;
+  private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> = (
+    new EventEmitter()
+  );
 
-   answerIsBeingProcessed: boolean = false;
-   alwaysAskLearnersForAnswerDetails: boolean = false;
-   exploration: Exploration;
+  answerIsBeingProcessed: boolean = false;
+  alwaysAskLearnersForAnswerDetails: boolean = false;
+  exploration: Exploration;
 
-   // This list may contain duplicates. A state name is added to it each time
-   // the learner moves to a new card.
-   visitedStateNames: string[] = [];
-   currentStateName: string;
-   nextStateName: string;
+  // This list may contain duplicates. A state name is added to it each time
+  // the learner moves to a new card.
+  visitedStateNames: string[] = [];
+  currentStateName: string;
+  nextStateName: string;
 
-   // Param changes to be used ONLY in editor preview mode.
-   manualParamChanges: ParamChange[];
-   initStateName: string;
-   version: number;
+  // Param changes to be used ONLY in editor preview mode.
+  manualParamChanges: ParamChange[];
+  initStateName: string;
+  version: number;
 
-   constructor(
-     private alertsService: AlertsService,
-     private answerClassificationService: AnswerClassificationService,
-     private audioPreloaderService: AudioPreloaderService,
-     private audioTranslationLanguageService: AudioTranslationLanguageService,
-     private contentTranslationLanguageService:
-       ContentTranslationLanguageService,
-     private contextService: ContextService,
-     private explorationFeaturesBackendApiService:
-       ExplorationFeaturesBackendApiService,
-     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-     private explorationObjectFactory: ExplorationObjectFactory,
-     private expressionInterpolationService: ExpressionInterpolationService,
-     private focusManagerService: FocusManagerService,
-     private imagePreloaderService: ImagePreloaderService,
-     private learnerParamsService: LearnerParamsService,
-     private playerTranscriptService: PlayerTranscriptService,
-     private readOnlyExplorationBackendApiService:
-       ReadOnlyExplorationBackendApiService,
-     private statsReportingService: StatsReportingService,
-     private urlService: UrlService
-   ) {
-     this.setExplorationProperties();
-   }
+  constructor(
+    private alertsService: AlertsService,
+    private answerClassificationService: AnswerClassificationService,
+    private audioPreloaderService: AudioPreloaderService,
+    private audioTranslationLanguageService: AudioTranslationLanguageService,
+    private contentTranslationLanguageService:
+      ContentTranslationLanguageService,
+    private contextService: ContextService,
+    private explorationFeaturesBackendApiService:
+      ExplorationFeaturesBackendApiService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private explorationObjectFactory: ExplorationObjectFactory,
+    private expressionInterpolationService: ExpressionInterpolationService,
+    private focusManagerService: FocusManagerService,
+    private imagePreloaderService: ImagePreloaderService,
+    private learnerParamsService: LearnerParamsService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private statsReportingService: StatsReportingService,
+    private urlService: UrlService
+  ) {
+    this.setExplorationProperties();
+  }
 
-   setExplorationProperties(): void {
-     let pathnameArray = this.urlService.getPathname().split('/');
-     let explorationContext = false;
+  setExplorationProperties(): void {
+    let pathnameArray = this.urlService.getPathname().split('/');
+    let explorationContext = false;
 
-     for (let i = 0; i < pathnameArray.length; i++) {
-       if (pathnameArray[i] === 'explore' ||
-             pathnameArray[i] === 'create' ||
-             pathnameArray[i] === 'skill_editor' ||
-             pathnameArray[i] === 'embed') {
-         explorationContext = true;
-         break;
-       }
-     }
+    for (let i = 0; i < pathnameArray.length; i++) {
+      if (
+        pathnameArray[i] === 'explore' ||
+        pathnameArray[i] === 'create' ||
+        pathnameArray[i] === 'skill_editor' ||
+        pathnameArray[i] === 'embed'
+      ) {
+        explorationContext = true;
+        break;
+      }
+    }
 
-     if (explorationContext) {
-       this._explorationId = this.contextService.getExplorationId();
-       this.version = this.urlService.getExplorationVersionFromUrl();
-       this._editorPreviewMode = this.contextService
-         .isInExplorationEditorPage();
-       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
-       if (!this._questionPlayerMode &&
-       !('skill_editor' === this.urlService.getPathname()
-         .split('/')[1].replace(/"/g, "'"))) {
-         this.readOnlyExplorationBackendApiService
-           .loadExplorationAsync(this._explorationId, this.version)
-           .then((exploration) => {
-             this.version = exploration.version;
-           });
-       }
-     } else {
-       this._explorationId = 'test_id';
-       this.version = 1;
-       this._editorPreviewMode = false;
-       this._questionPlayerMode = false;
-     }
-   }
+    if (explorationContext) {
+      this._explorationId = this.contextService.getExplorationId();
+      this.version = this.urlService.getExplorationVersionFromUrl();
+      this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+      this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+      if (
+        !this._questionPlayerMode &&
+        !(
+          'skill_editor' ===
+          this.urlService.getPathname().split('/')[1].replace(/"/g, "'")
+        )
+      ) {
+        this.readOnlyExplorationBackendApiService
+          .loadExplorationAsync(this._explorationId, this.version)
+          .then((exploration) => {
+            this.version = exploration.version;
+          });
+      }
+    } else {
+      this._explorationId = 'test_id';
+      this.version = 1;
+      this._editorPreviewMode = false;
+      this._questionPlayerMode = false;
+    }
+  }
 
-   randomFromArray<T>(arr: T[]): T {
-     return arr[Math.floor(Math.random() * arr.length)];
-   }
+  randomFromArray<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
 
-   // Evaluate feedback.
-   makeFeedback(
-       feedbackHtml: string, envs: Record<string, string>[]): string {
-     return this.expressionInterpolationService
-       .processHtml(feedbackHtml, envs);
-   }
+  // Evaluate feedback.
+  makeFeedback(
+      feedbackHtml: string, envs: Record<string, string>[]
+  ): string {
+    return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
+  }
 
-   private _getRandomSuffix(): string {
-     // This is a bit of a hack. When a refresh to a $scope variable
-     // happens,
-     // AngularJS compares the new value of the variable to its previous
-     // value. If they are the same, then the variable is not updated.
-     // Appending a random suffix makes the new value different from the
-     // previous one, and thus indirectly forces a refresh.
-     let randomSuffix = '';
-     let N = Math.round(Math.random() * 1000);
-     for (let i = 0; i < N; i++) {
-       randomSuffix += ' ';
-     }
-     return randomSuffix;
-   }
+  private _getRandomSuffix(): string {
+    // This is a bit of a hack. When a refresh to a $scope variable
+    // happens,
+    // AngularJS compares the new value of the variable to its previous
+    // value. If they are the same, then the variable is not updated.
+    // Appending a random suffix makes the new value different from the
+    // previous one, and thus indirectly forces a refresh.
+    let randomSuffix = '';
+    let N = Math.round(Math.random() * 1000);
+    for (let i = 0; i < N; i++) {
+      randomSuffix += ' ';
+    }
+    return randomSuffix;
+  }
 
-   // Evaluate parameters. Returns null if any evaluation fails.
-   makeParams(
-       oldParams: ExplorationParams, paramChanges: ParamChange[],
-       envs: Record<string, string>[]): ExplorationParams {
-     let newParams: ExplorationParams = { ...oldParams };
-     if (paramChanges.every((pc) => {
-       if (pc.generatorId === 'Copier') {
-         if (!pc.customizationArgs.parse_with_jinja) {
-           newParams[pc.name] = pc.customizationArgs.value;
-         } else {
-           let paramValue: string = this.expressionInterpolationService
-             .processUnicode(
-               pc.customizationArgs.value, [newParams].concat(envs));
-           if (paramValue === null) {
-             return false;
-           }
-           newParams[pc.name] = paramValue;
-         }
-       } else {
-         // RandomSelector.
-         newParams[pc.name] = this.randomFromArray(
-           pc.customizationArgs.list_of_values);
-       }
-       return true;
-     })) {
-       // All parameters were evaluated successfully.
-       return newParams;
-     }
-     // Evaluation of some parameter failed.
-     return null;
-   }
+  // Evaluate parameters. Returns null if any evaluation fails.
+  makeParams(
+      oldParams: ExplorationParams,
+      paramChanges: ParamChange[],
+      envs: Record<string, string>[]
+  ): ExplorationParams {
+    let newParams: ExplorationParams = { ...oldParams };
+    if (paramChanges.every((pc) => {
+      if (pc.generatorId === 'Copier') {
+        if (!pc.customizationArgs.parse_with_jinja) {
+          newParams[pc.name] = pc.customizationArgs.value;
+        } else {
+          let paramValue: string = (
+            this.expressionInterpolationService.processUnicode(
+              pc.customizationArgs.value, [newParams].concat(envs)));
+          if (paramValue === null) {
+            return false;
+          }
+          newParams[pc.name] = paramValue;
+        }
+      } else {
+        // RandomSelector.
+        newParams[pc.name] = this.randomFromArray(
+          pc.customizationArgs.list_of_values);
+      }
+      return true;
+    })) {
+      // All parameters were evaluated successfully.
+      return newParams;
+    }
+    // Evaluation of some parameter failed.
+    return null;
+  }
 
-   // Evaluate question string.
-   makeQuestion(newState: State, envs: Record<string, string>[]): string {
-     return this.expressionInterpolationService.processHtml(
-       newState.content.html, envs);
-   }
+  // Evaluate question string.
+  makeQuestion(newState: State, envs: Record<string, string>[]): string {
+    return this.expressionInterpolationService.processHtml(
+      newState.content.html, envs);
+  }
 
+  // This should only be called when 'exploration' is non-null.
+  _loadInitialState(
+      successCallback: (stateCard: StateCard, str: string) => void
+  ): void {
+    let initialState: State = this.exploration.getInitialState();
+    let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
+    let newParams: ExplorationParams = this.makeParams(
+      oldParams, initialState.paramChanges, [oldParams]);
+    if (newParams === null) {
+      this.alertsService.addWarning('Expression parsing error.');
+      return;
+    }
+    if (newParams) {
+      this.learnerParamsService.init(newParams);
+    }
+    this.currentStateName = this.exploration.initStateName;
+    this.nextStateName = this.exploration.initStateName;
 
-   // This should only be called when 'exploration' is non-null.
-   _loadInitialState(
-       successCallback: (stateCard: StateCard, str: string) => void): void {
-     let initialState: State = this.exploration.getInitialState();
-     let oldParams: ExplorationParams = this.learnerParamsService
-       .getAllParams();
-     let newParams: ExplorationParams = this.makeParams(
-       oldParams, initialState.paramChanges, [oldParams]);
-     if (newParams === null) {
-       this.alertsService.addWarning('Expression parsing error.');
-       return;
-     }
-     if (newParams) {
-       this.learnerParamsService.init(newParams);
-     }
-     this.currentStateName = this.exploration.initStateName;
-     this.nextStateName = this.exploration.initStateName;
+    let interaction: Interaction = this.exploration.getInteraction(
+      this.exploration.initStateName);
+    let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
 
-     let interaction: Interaction = this.exploration
-       .getInteraction(this.exploration.initStateName);
-     let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
+    let interactionId = interaction.id;
+    let interactionHtml = null;
 
-     let interactionId = interaction.id;
-     let interactionHtml = null;
+    if (interactionId) {
+      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
+        interactionId,
+        this.exploration.getInteractionCustomizationArgs(this.currentStateName),
+        true,
+        nextFocusLabel,
+        null
+      );
+    }
 
-     if (interactionId) {
-       interactionHtml = this.explorationHtmlFormatterService
-         .getInteractionHtml(
-           interactionId,
-           this.exploration.getInteractionCustomizationArgs(
-             this.currentStateName),
-           true, nextFocusLabel, null);
-     }
+    let questionHtml: string = this.makeQuestion(initialState, [newParams]);
+    if (questionHtml === null) {
+      this.alertsService.addWarning('Expression parsing error.');
+      return;
+    }
 
-     let questionHtml: string = this.makeQuestion(initialState, [newParams]);
-     if (questionHtml === null) {
-       this.alertsService.addWarning('Expression parsing error.');
-       return;
-     }
+    if (!this._editorPreviewMode) {
+      this.statsReportingService.recordExplorationStarted(
+        this.exploration.initStateName, newParams);
+    }
 
-     if (!this._editorPreviewMode) {
-       this.statsReportingService.recordExplorationStarted(
-         this.exploration.initStateName, newParams);
-     }
+    let initialCard = StateCard.createNewCard(
+      this.currentStateName, questionHtml, interactionHtml,
+      interaction, initialState.recordedVoiceovers,
+      initialState.writtenTranslations,
+      initialState.content.contentId, this.audioTranslationLanguageService);
+    successCallback(initialCard, nextFocusLabel);
+  }
 
-     let initialCard =
-       StateCard.createNewCard(
-         this.currentStateName, questionHtml, interactionHtml,
-         interaction, initialState.recordedVoiceovers,
-         initialState.writtenTranslations,
-         initialState.content.contentId, this.audioTranslationLanguageService);
-     successCallback(initialCard, nextFocusLabel);
-   }
+  // Initialize the parameters in the exploration as specified in the
+  // exploration-level initial parameter changes list, followed by any
+  // manual parameter changes (in editor preview mode).
+  initParams(manualParamChanges: ParamChange[]): void {
+    let baseParams = {};
+    this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
+      baseParams[paramName] = paramSpec.getType().createDefaultValue();
+    });
 
-   // Initialize the parameters in the exploration as specified in the
-   // exploration-level initial parameter changes list, followed by any
-   // manual parameter changes (in editor preview mode).
-   initParams(manualParamChanges: ParamChange[]): void {
-     let baseParams = {};
-     this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
-       baseParams[paramName] = paramSpec.getType().createDefaultValue();
-     });
+    let startingParams = this.makeParams(
+      baseParams,
+      this.exploration.paramChanges.concat(manualParamChanges),
+      [baseParams]);
 
-     let startingParams = this.makeParams(
-       baseParams,
-       this.exploration.paramChanges.concat(manualParamChanges),
-       [baseParams]);
+    this.learnerParamsService.init(startingParams);
+  }
 
-     this.learnerParamsService.init(startingParams);
-   }
+  private _getInteractionHtmlByStateName(
+      labelForFocusTarget: string, stateName: string
+  ): string {
+    let interactionId: string = this.exploration.getInteractionId(
+      stateName);
 
-   private _getNextInteractionHtml(labelForFocusTarget: string): string {
-     let interactionId: string = this.exploration
-       .getInteractionId(this.nextStateName);
+    return this.explorationHtmlFormatterService.getInteractionHtml(
+      interactionId,
+      this.exploration.getInteractionCustomizationArgs(stateName),
+      true,
+      labelForFocusTarget, null);
+  }
 
-     return this.explorationHtmlFormatterService.getInteractionHtml(
-       interactionId,
-       this.exploration.getInteractionCustomizationArgs(this.nextStateName),
-       true,
-       labelForFocusTarget, null);
-   }
+  checkAlwaysAskLearnersForAnswerDetails(): void {
+    this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
+      this._explorationId
+    ).then((featuresData) => {
+      this.alwaysAskLearnersForAnswerDetails = (
+        featuresData.alwaysAskLearnersForAnswerDetails);
+    });
+  }
 
-   checkAlwaysAskLearnersForAnswerDetails(): void {
-     this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
-       this._explorationId).then((featuresData) => {
-       this.alwaysAskLearnersForAnswerDetails = (
-         featuresData.alwaysAskLearnersForAnswerDetails);
-     });
-   }
+  // This should only be used in editor preview mode. It sets the
+  // exploration data from what's currently specified in the editor, and
+  // also initializes the parameters to empty strings.
+  initSettingsFromEditor(
+      activeStateNameFromPreviewTab: string,
+      manualParamChangesToInit: ParamChange[]
+  ): void {
+    if (this._editorPreviewMode) {
+      this.manualParamChanges = manualParamChangesToInit;
+      this.initStateName = activeStateNameFromPreviewTab;
+    } else {
+      throw new Error('Cannot populate exploration in learner mode.');
+    }
+  }
 
-   // This should only be used in editor preview mode. It sets the
-   // exploration data from what's currently specified in the editor, and
-   // also initializes the parameters to empty strings.
-   initSettingsFromEditor(
-       activeStateNameFromPreviewTab: string,
-       manualParamChangesToInit: ParamChange[]): void {
-     if (this._editorPreviewMode) {
-       this.manualParamChanges = manualParamChangesToInit;
-       this.initStateName = activeStateNameFromPreviewTab;
-     } else {
-       throw new Error('Cannot populate exploration in learner mode.');
-     }
-   }
+  /**
+  * Initializes an exploration, passing the data for the first state to
+  * successCallback.
+  *
+  * In editor preview mode, populateExploration() must be called before
+  * calling init().
+  *
+  * @param {function} successCallback - The function to execute after the
+  *   initial exploration data is successfully loaded. This function will
+  *   be passed two arguments:
+  *   - stateName {string}, the name of the first state
+  *   - initHtml {string}, an HTML string representing the content of the
+  *       first state.
+  */
+  init(
+      explorationDict: ExplorationBackendDict,
+      explorationVersion: number,
+      preferredAudioLanguage: string,
+      autoTtsEnabled: boolean,
+      preferredContentLanguageCodes: string[],
+      successCallback: (stateCard: StateCard, label: string) => void
+  ): void {
+    this.exploration = this.explorationObjectFactory.createFromBackendDict(
+      explorationDict);
+    this.answerIsBeingProcessed = false;
+    if (this._editorPreviewMode) {
+      this.exploration.setInitialStateName(this.initStateName);
+      this.visitedStateNames = [this.exploration.getInitialState().name];
+      this.initParams(this.manualParamChanges);
+      this.audioTranslationLanguageService.init(
+        this.exploration.getAllVoiceoverLanguageCodes(),
+        null,
+        this.exploration.getLanguageCode(),
+        explorationDict.auto_tts_enabled);
+      this.audioPreloaderService.init(this.exploration);
+      this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
+      this._loadInitialState(successCallback);
+    } else {
+      this.visitedStateNames.push(this.exploration.getInitialState().name);
+      this.version = explorationVersion;
+      this.initParams([]);
+      this.audioTranslationLanguageService.init(
+        this.exploration.getAllVoiceoverLanguageCodes(),
+        preferredAudioLanguage,
+        this.exploration.getLanguageCode(),
+        autoTtsEnabled);
+      this.audioPreloaderService.init(this.exploration);
+      this.audioPreloaderService.kickOffAudioPreloader(
+        this.exploration.getInitialState().name);
+      this.imagePreloaderService.init(this.exploration);
+      this.imagePreloaderService.kickOffImagePreloader(
+        this.exploration.getInitialState().name);
+      this.checkAlwaysAskLearnersForAnswerDetails();
+      this._loadInitialState(successCallback);
+    }
+    this.contentTranslationLanguageService.init(
+      this.exploration.getDisplayableWrittenTranslationLanguageCodes(),
+      preferredContentLanguageCodes,
+      this.exploration.getLanguageCode()
+    );
+  }
 
-   /**
-    * Initializes an exploration, passing the data for the first state to
-    * successCallback.
-    *
-    * In editor preview mode, populateExploration() must be called before
-    * calling init().
-    *
-    * @param {function} successCallback - The function to execute after the
-    *   initial exploration data is successfully loaded. This function will
-    *   be passed two arguments:
-    *   - stateName {string}, the name of the first state
-    *   - initHtml {string}, an HTML string representing the content of the
-    *       first state.
-    */
-   init(
-       explorationDict: ExplorationBackendDict,
-       explorationVersion: number, preferredAudioLanguage: string,
-       autoTtsEnabled: boolean, preferredContentLanguageCodes: string[],
-       successCallback: (stateCard: StateCard, label: string) => void): void {
-     this.exploration = this.explorationObjectFactory.createFromBackendDict(
-       explorationDict);
-     this.answerIsBeingProcessed = false;
-     if (this._editorPreviewMode) {
-       this.exploration.setInitialStateName(this.initStateName);
-       this.visitedStateNames = [this.exploration.getInitialState().name];
-       this.initParams(this.manualParamChanges);
-       this.audioTranslationLanguageService.init(
-         this.exploration.getAllVoiceoverLanguageCodes(),
-         null,
-         this.exploration.getLanguageCode(),
-         explorationDict.auto_tts_enabled);
-       this.audioPreloaderService.init(this.exploration);
-       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
-       this._loadInitialState(successCallback);
-     } else {
-       this.visitedStateNames.push(this.exploration.getInitialState().name);
-       this.version = explorationVersion;
-       this.initParams([]);
-       this.audioTranslationLanguageService.init(
-         this.exploration.getAllVoiceoverLanguageCodes(),
-         preferredAudioLanguage,
-         this.exploration.getLanguageCode(),
-         autoTtsEnabled);
-       this.audioPreloaderService.init(this.exploration);
-       this.audioPreloaderService.kickOffAudioPreloader(
-         this.exploration.getInitialState().name);
-       this.imagePreloaderService.init(this.exploration);
-       this.imagePreloaderService.kickOffImagePreloader(
-         this.exploration.getInitialState().name);
-       this.checkAlwaysAskLearnersForAnswerDetails();
-       this._loadInitialState(successCallback);
-     }
-     this.contentTranslationLanguageService.init(
-       this.exploration.getDisplayableWrittenTranslationLanguageCodes(),
-       preferredContentLanguageCodes,
-       this.exploration.getLanguageCode()
-     );
-   }
+  moveToExploration(successCallback: (StateCard, string) => void): void {
+    this._loadInitialState(successCallback);
+  }
 
-   moveToExploration(successCallback: (StateCard, string) => void): void {
-     this._loadInitialState(successCallback);
-   }
+  isCurrentStateInitial(): boolean {
+    return this.currentStateName === this.exploration.initStateName;
+  }
 
-   isCurrentStateInitial(): boolean {
-     return this.currentStateName === this.exploration.initStateName;
-   }
+  recordNewCardAdded(): void {
+    this.currentStateName = this.nextStateName;
+  }
 
-   recordNewCardAdded(): void {
-     this.currentStateName = this.nextStateName;
-   }
+  getState(): State {
+    let stateName: string = this.playerTranscriptService.getLastStateName();
+    return this.exploration.getState(stateName);
+  }
 
-   getState(): State {
-     let stateName: string = this.playerTranscriptService.getLastStateName();
-     return this.exploration.getState(stateName);
-   }
+  getStateFromStateName(stateName: string): State {
+    return this.exploration.getState(stateName);
+  }
 
-   getExplorationId(): string {
-     return this._explorationId;
-   }
+  getExplorationId(): string {
+    return this._explorationId;
+  }
 
-   getExplorationTitle(): string {
-     return this.exploration.title;
-   }
+  getExplorationTitle(): string {
+    return this.exploration.title;
+  }
 
-   getExplorationVersion(): number {
-     return this.version;
-   }
+  getExplorationVersion(): number {
+    return this.version;
+  }
 
-   getAuthorRecommendedExpIds(): string[] {
-     return this.exploration.getAuthorRecommendedExpIds(this.currentStateName);
-   }
+  getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {
+    return this.exploration.getAuthorRecommendedExpIds(stateName);
+  }
 
-   getLanguageCode(): string {
-     return this.exploration.getLanguageCode();
-   }
+  getLanguageCode(): string {
+    return this.exploration.getLanguageCode();
+  }
 
-   isInPreviewMode(): boolean {
-     return !!this._editorPreviewMode;
-   }
+  isInPreviewMode(): boolean {
+    return !!this._editorPreviewMode;
+  }
 
-   submitAnswer(
-       answer: string, interactionRulesService: InteractionRulesService,
-       successCallback: (
-         nextCard: StateCard,
-         refreshInteraction: boolean,
-         feedbackHtml: string,
-         feedbackAudioTranslations: BindableVoiceovers,
-         refresherExplorationId: string,
-         missingPrerequisiteSkillId: string,
-         remainOnCurrentCard: boolean,
-         taggedSkillMisconceptionId: string,
-         wasOldStateInitial: boolean,
-         isFirstHit: boolean,
-         isFinalQuestion: boolean,
-         focusLabel: string
-       ) => void): boolean {
-     if (this.answerIsBeingProcessed) {
-       return;
-     }
-     this.answerIsBeingProcessed = true;
-     let oldStateName: string = this.playerTranscriptService.getLastStateName();
-     let oldState: State = this.exploration.getState(oldStateName);
-     let recordedVoiceovers: RecordedVoiceovers = oldState.recordedVoiceovers;
-     let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
-     let classificationResult: AnswerClassificationResult = (
-       this.answerClassificationService.getMatchingClassificationResult(
-         oldStateName, oldStateCard.getInteraction(), answer,
-         interactionRulesService));
-     let answerIsCorrect: boolean = classificationResult.outcome
-       .labelledAsCorrect;
+  submitAnswer(
+      answer: string, interactionRulesService: InteractionRulesService,
+      successCallback: (
+        nextCard: StateCard,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        feedbackAudioTranslations: BindableVoiceovers,
+        refresherExplorationId: string,
+        missingPrerequisiteSkillId: string,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string,
+        wasOldStateInitial: boolean,
+        isFirstHit: boolean,
+        isFinalQuestion: boolean,
+        focusLabel: string
+      ) => void
+  ): boolean {
+    if (this.answerIsBeingProcessed) {
+      return;
+    }
+    this.answerIsBeingProcessed = true;
+    let oldStateName: string = this.playerTranscriptService.getLastStateName();
+    let oldState: State = this.exploration.getState(oldStateName);
+    let recordedVoiceovers: RecordedVoiceovers = oldState.recordedVoiceovers;
+    let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
+    let classificationResult: AnswerClassificationResult = (
+      this.answerClassificationService.getMatchingClassificationResult(
+        oldStateName, oldStateCard.getInteraction(), answer,
+        interactionRulesService));
+    let answerIsCorrect: boolean = (
+      classificationResult.outcome.labelledAsCorrect);
 
-     // Use {...} to clone the object
-     // since classificationResult.outcome points
-     // at oldState.interaction.default_outcome.
-     let outcome = {...classificationResult.outcome};
-     let newStateName: string = outcome.dest;
+    // Use {...} to clone the object
+    // since classificationResult.outcome points
+    // at oldState.interaction.default_outcome.
+    let outcome = {...classificationResult.outcome};
+    let newStateName: string = outcome.dest;
 
-     if (!this._editorPreviewMode) {
-       let feedbackIsUseful: boolean = (
-         this.answerClassificationService
-           .isClassifiedExplicitlyOrGoesToNewState(
-             oldStateName, oldState, answer,
-             interactionRulesService));
-       this.statsReportingService.recordAnswerSubmitted(
-         oldStateName,
-         this.learnerParamsService.getAllParams(),
-         answer,
-         classificationResult.answerGroupIndex,
-         classificationResult.ruleIndex,
-         classificationResult.classificationCategorization,
-         feedbackIsUseful);
+    if (!this._editorPreviewMode) {
+      let feedbackIsUseful: boolean = (
+        this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          oldStateName, oldState, answer, interactionRulesService));
+      this.statsReportingService.recordAnswerSubmitted(
+        oldStateName,
+        this.learnerParamsService.getAllParams(),
+        answer,
+        classificationResult.answerGroupIndex,
+        classificationResult.ruleIndex,
+        classificationResult.classificationCategorization,
+        feedbackIsUseful);
 
-       this.statsReportingService.recordAnswerSubmitAction(
-         oldStateName, newStateName, oldState.interaction.id, answer,
-         outcome.feedback.html);
-     }
+      this.statsReportingService.recordAnswerSubmitAction(
+        oldStateName, newStateName, oldState.interaction.id, answer,
+        outcome.feedback.html);
+    }
 
-     let refresherExplorationId = outcome.refresherExplorationId;
-     let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
-     let newState = this.exploration.getState(newStateName);
-     let isFirstHit = Boolean(this.visitedStateNames.indexOf(
-       newStateName) === -1);
-     if (oldStateName !== newStateName) {
-       this.visitedStateNames.push(newStateName);
-     }
-     // Compute the data for the next state.
-     let oldParams: ExplorationParams = this.learnerParamsService
-       .getAllParams();
-     oldParams.answer = answer;
-     let feedbackHtml: string =
-       this.makeFeedback(outcome.feedback.html, [oldParams]);
-     let feedbackContentId: string = outcome.feedback.contentId;
-     let feedbackAudioTranslations: BindableVoiceovers = (
-       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
-     if (feedbackHtml === null) {
-       this.answerIsBeingProcessed = false;
-       this.alertsService.addWarning('Feedback content should not be empty.');
-       return;
-     }
-     let newParams = (
-       newState ? this.makeParams(
-         oldParams, newState.paramChanges, [oldParams]) : oldParams);
-     if (newParams === null) {
-       this.answerIsBeingProcessed = false;
-       this.alertsService.addWarning('Parameters should not be empty.');
-       return;
-     }
+    let refresherExplorationId = outcome.refresherExplorationId;
+    let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
+    let newState = this.exploration.getState(newStateName);
+    let isFirstHit = Boolean(
+      this.visitedStateNames.indexOf(newStateName) === -1);
+    if (oldStateName !== newStateName) {
+      this.visitedStateNames.push(newStateName);
+    }
+    // Compute the data for the next state.
+    let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
+    oldParams.answer = answer;
+    let feedbackHtml: string = this.makeFeedback(
+      outcome.feedback.html, [oldParams]);
+    let feedbackContentId: string = outcome.feedback.contentId;
+    let feedbackAudioTranslations: BindableVoiceovers = (
+      recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
+    if (feedbackHtml === null) {
+      this.answerIsBeingProcessed = false;
+      this.alertsService.addWarning('Feedback content should not be empty.');
+      return;
+    }
+    let newParams = (
+      newState ? this.makeParams(
+        oldParams, newState.paramChanges, [oldParams]) : oldParams);
+    if (newParams === null) {
+      this.answerIsBeingProcessed = false;
+      this.alertsService.addWarning('Parameters should not be empty.');
+      return;
+    }
 
-     let questionHtml = this.makeQuestion(newState, [newParams, {
-       answer: 'answer'
-     }]);
-     if (questionHtml === null) {
-       this.answerIsBeingProcessed = false;
-       // TODO(#13133): Remove all question related naming conventions.
-       this.alertsService.addWarning('Question content should not be empty.');
-       return;
-     }
+    let questionHtml = this.makeQuestion(newState, [newParams, {
+      answer: 'answer'
+    }]);
+    if (questionHtml === null) {
+      this.answerIsBeingProcessed = false;
+      // TODO(#13133): Remove all question related naming conventions.
+      this.alertsService.addWarning('Question content should not be empty.');
+      return;
+    }
 
-     // TODO(sll): Remove the 'answer' key from newParams.
-     newParams.answer = answer;
+    // TODO(sll): Remove the 'answer' key from newParams.
+    newParams.answer = answer;
 
-     this.answerIsBeingProcessed = false;
+    this.answerIsBeingProcessed = false;
 
-     let refreshInteraction = (
-       oldStateName !== newStateName ||
-       this.exploration.isInteractionInline(oldStateName));
-     this.nextStateName = newStateName;
-     let onSameCard: boolean = (oldStateName === newStateName);
+    let refreshInteraction = (
+      oldStateName !== newStateName ||
+      this.exploration.isInteractionInline(oldStateName)
+    );
+    this.nextStateName = newStateName;
+    let onSameCard: boolean = (oldStateName === newStateName);
 
-     this._updateActiveStateIfInEditorEventEmitter.emit(newStateName);
+    this._updateActiveStateIfInEditorEventEmitter.emit(newStateName);
 
-     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-     let nextInteractionHtml = null;
-     if (this.exploration.getInteraction(this.nextStateName).id) {
-       nextInteractionHtml = this._getNextInteractionHtml(_nextFocusLabel);
-     }
-     if (newParams) {
-       this.learnerParamsService.init(newParams);
-     }
+    let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    let nextInteractionHtml = null;
+    if (this.exploration.getInteraction(this.nextStateName).id) {
+      nextInteractionHtml = (
+        this._getInteractionHtmlByStateName(_nextFocusLabel, this.nextStateName)
+      );
+    }
+    if (newParams) {
+      this.learnerParamsService.init(newParams);
+    }
 
-     questionHtml = questionHtml + this._getRandomSuffix();
-     nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
+    questionHtml = questionHtml + this._getRandomSuffix();
+    nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
 
-     let nextCard = StateCard.createNewCard(
-       this.nextStateName, questionHtml, nextInteractionHtml,
-       this.exploration.getInteraction(this.nextStateName),
-       this.exploration.getState(this.nextStateName).recordedVoiceovers,
-       this.exploration.getState(this.nextStateName).writtenTranslations,
-       this.exploration.getState(this.nextStateName).content.contentId,
-       this.audioTranslationLanguageService);
-     successCallback(
-       nextCard, refreshInteraction, feedbackHtml,
-       feedbackAudioTranslations, refresherExplorationId,
-       missingPrerequisiteSkillId, onSameCard, null,
-       (oldStateName === this.exploration.initStateName), isFirstHit, false,
-       _nextFocusLabel);
-     return answerIsCorrect;
-   }
+    let nextCard = StateCard.createNewCard(
+      this.nextStateName, questionHtml, nextInteractionHtml,
+      this.exploration.getInteraction(this.nextStateName),
+      this.exploration.getState(this.nextStateName).recordedVoiceovers,
+      this.exploration.getState(this.nextStateName).writtenTranslations,
+      this.exploration.getState(this.nextStateName).content.contentId,
+      this.audioTranslationLanguageService);
+    successCallback(
+      nextCard, refreshInteraction, feedbackHtml,
+      feedbackAudioTranslations, refresherExplorationId,
+      missingPrerequisiteSkillId, onSameCard, null,
+      (oldStateName === this.exploration.initStateName), isFirstHit, false,
+      _nextFocusLabel);
+    return answerIsCorrect;
+  }
 
-   isAnswerBeingProcessed(): boolean {
-     return this.answerIsBeingProcessed;
-   }
+  isAnswerBeingProcessed(): boolean {
+    return this.answerIsBeingProcessed;
+  }
 
-   getAlwaysAskLearnerForAnswerDetails(): boolean {
-     return this.alwaysAskLearnersForAnswerDetails;
-   }
+  getAlwaysAskLearnerForAnswerDetails(): boolean {
+    return this.alwaysAskLearnersForAnswerDetails;
+  }
 
-   get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
-     return this._updateActiveStateIfInEditorEventEmitter;
-   }
+  get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
+    return this._updateActiveStateIfInEditorEventEmitter;
+  }
+
+  getStateCardByName(stateName: string): StateCard {
+    const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    let interactionHtml = null;
+    if (this.exploration.getInteraction(stateName).id) {
+      interactionHtml = (
+        this._getInteractionHtmlByStateName(
+          _nextFocusLabel, stateName
+        )
+      );
+    }
+    let contentHtml = (
+      this.exploration.getState(stateName).content.html +
+      this._getRandomSuffix()
+    );
+    interactionHtml = interactionHtml + this._getRandomSuffix();
+
+    return StateCard.createNewCard(
+      stateName, contentHtml, interactionHtml,
+      this.exploration.getInteraction(stateName),
+      this.exploration.getState(stateName).recordedVoiceovers,
+      this.exploration.getState(stateName).writtenTranslations,
+      this.exploration.getState(stateName).content.contentId,
+      this.audioTranslationLanguageService);
+  }
+
+  getShortestPathToState(
+      allStates: StateObjectsBackendDict, destStateName: string
+  ): string[] {
+    let stateGraphLinks: { source: string; target: string }[] = [];
+
+    // Create a list of all possible links between states.
+    for (let stateName of Object.keys(allStates)) {
+      let interaction = this.exploration.getState(stateName).interaction;
+      if (interaction.id) {
+        let groups = interaction.answerGroups;
+        for (let h = 0; h < groups.length; h++) {
+          stateGraphLinks.push({
+            source: stateName,
+            target: groups[h].outcome.dest,
+          });
+        }
+
+        if (interaction.defaultOutcome) {
+          stateGraphLinks.push({
+            source: stateName,
+            target: interaction.defaultOutcome.dest,
+          });
+        }
+      }
+    }
+
+    let shortestPathToStateInReverse: string[] = [];
+    let pathsQueue: string[] = [];
+    let visitedNodes: Record<string, boolean> = {};
+    let nodeToParentMap: Record<string, string> = {};
+    visitedNodes[this.exploration.initStateName] = true;
+    pathsQueue.push(this.exploration.initStateName);
+    // 1st state does not have a parent
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    nodeToParentMap[this.exploration.initStateName] = null;
+    while (pathsQueue.length > 0) {
+      // '.shift()' here can return an undefined value, but we're already
+      // checking for pathsQueue.length > 0, so this is safe.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      let currStateName = pathsQueue.shift()!;
+
+      if (currStateName === destStateName) {
+        break;
+      }
+
+      for (let e = 0; e < stateGraphLinks.length; e++) {
+        let edge = stateGraphLinks[e];
+        let dest = edge.target;
+        if (edge.source === currStateName &&
+          !visitedNodes.hasOwnProperty(dest)) {
+          visitedNodes[dest] = true;
+          nodeToParentMap[dest] = currStateName;
+          pathsQueue.push(dest);
+        }
+      }
+    }
+
+    // Reconstruct the shortest path from node to parent map.
+    let currStateName = destStateName;
+    while (currStateName !== null) {
+      shortestPathToStateInReverse.push(currStateName);
+      currStateName = nodeToParentMap[currStateName];
+    }
+    // Actual shortest path in order is reverse of the path retrieved
+    // from parent map, hence we return the reversed path that goes
+    // from initStateName to destStateName.
+    return shortestPathToStateInReverse.reverse();
+  }
 }
 
 angular.module('oppia').factory('ExplorationEngineService',

@@ -18,29 +18,29 @@
 
 from __future__ import annotations
 
+import builtins
 import threading
 import time
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import concurrent_task_utils
 
 
 def test_function(unused_arg):
-    return python_utils.OBJECT
+    return object
 
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
     """Test for concurrent_task_utils.py flie."""
 
     def setUp(self):
-        super(ConcurrentTaskUtilsTests, self).setUp()
+        super().setUp()
         self.semaphore = threading.Semaphore(1)
         self.task_stdout = []
 
         def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
+            """Mock for print. Append the values to print to
             task_stdout list.
 
             Args:
@@ -48,7 +48,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                     in the same line of output.
             """
             self.task_stdout.append(' '.join(str(arg) for arg in args))
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
 
 class TaskResultTests(ConcurrentTaskUtilsTests):
@@ -130,7 +130,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        self.assertRegexpMatches(
+        self.assertRegex(
             self.task_stdout[0],
             r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
             'name check failed')

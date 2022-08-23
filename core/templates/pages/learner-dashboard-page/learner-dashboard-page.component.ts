@@ -17,16 +17,18 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { trigger, state, style, transition,
   animate, group } from '@angular/animations';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { FeedbackThreadSummary } from 'domain/feedback_thread/feedback-thread-summary.model';
+import { FeedbackThreadSummary, FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
@@ -41,9 +43,12 @@ import { UserService } from 'services/user.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PageTitleService } from 'services/page-title.service';
+
+import './learner-dashboard-page.component.css';
+
 
 @Component({
   selector: 'oppia-learner-dashboard-page',
@@ -84,15 +89,18 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
     ])
   ]
 })
-export class LearnerDashboardPageComponent implements OnInit {
+export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   threadIndex: number;
 
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+
   LEARNER_DASHBOARD_SECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
+
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+
   username: string = '';
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
@@ -115,19 +123,22 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   completedToIncompleteCollections: string[];
   learntToPartiallyLearntTopics: string[];
-  threadSummaries: FeedbackThreadSummary[];
+  threadSummaries: FeedbackThreadSummary[] = [];
   numberOfUnreadThreads: number;
   explorationPlaylist: LearnerExplorationSummary[];
   collectionPlaylist: CollectionSummary[];
   activeSection: string;
   activeSubsection: string;
   feedbackThreadActive: boolean;
+  paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
+  loadingIndicatorIsShown = false;
 
   messageSendingInProgress: boolean;
   profilePictureDataUrl: SafeResourceUrl;
   newMessage: {
-    'text': string
+    'text': string;
   };
+
   loadingFeedbacks: boolean;
   explorationTitle: string;
   threadStatus: string;
@@ -137,6 +148,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   threadSummary: FeedbackThreadSummary;
   communityLibraryUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
   progressImageUrl: string = '';
@@ -157,6 +169,8 @@ export class LearnerDashboardPageComponent implements OnInit {
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
+    private translateService: TranslateService,
+    private pageTitleService: PageTitleService
   ) {}
 
   ngOnInit(): void {
@@ -215,32 +229,11 @@ export class LearnerDashboardPageComponent implements OnInit {
       }
     );
 
-    let dashboardFeedbackUpdatesDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardFeedbackUpdatesDataAsync());
-    dashboardFeedbackUpdatesDataPromise.then(
-      responseData => {
-        this.isCurrentFeedbackSortDescending = true;
-        this.currentFeedbackThreadsSortType = (
-          LearnerDashboardPageConstants
-            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
-        this.threadSummaries = responseData.threadSummaries;
-        this.numberOfUnreadThreads =
-          responseData.numberOfUnreadThreads;
-        this.feedbackThreadActive = false;
-      }, errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard feedback updates data');
-        }
-      }
-    );
+    this.fetchFeedbackUpdates();
 
     Promise.all([
       userInfoPromise,
-      dashboardTopicAndStoriesDataPromise,
-      dashboardFeedbackUpdatesDataPromise
+      dashboardTopicAndStoriesDataPromise
     ]).then(() => {
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
@@ -262,14 +255,56 @@ export class LearnerDashboardPageComponent implements OnInit {
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  fetchFeedbackUpdates(): void {
+    this.loadingIndicatorIsShown = true;
+    let dashboardFeedbackUpdatesDataPromise = (
+      this.learnerDashboardBackendApiService
+        .fetchLearnerDashboardFeedbackUpdatesDataAsync(
+          this.paginatedThreadsList));
+    dashboardFeedbackUpdatesDataPromise.then(
+      responseData => {
+        this.isCurrentFeedbackSortDescending = true;
+        this.currentFeedbackThreadsSortType = (
+          LearnerDashboardPageConstants
+            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
+        this.threadSummaries = [
+          ... this.threadSummaries,
+          ... responseData.threadSummaries];
+        this.paginatedThreadsList = responseData.paginatedThreadsList;
+        this.numberOfUnreadThreads =
+          responseData.numberOfUnreadThreads;
+        this.feedbackThreadActive = false;
+        this.loadingIndicatorIsShown = false;
+      }, errorResponseStatus => {
+        this.loadingIndicatorIsShown = false;
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
+          this.alertsService.addWarning(
+            'Failed to get learner dashboard feedback updates data');
+        }
+      }
+    );
   }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   setActiveSection(newActiveSectionName: string): void {

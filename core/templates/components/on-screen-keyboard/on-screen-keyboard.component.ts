@@ -30,7 +30,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 })
 export class OnScreenKeyboardComponent {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   engine!: {
     'insert_string': (arg0: string) => void;
@@ -40,6 +40,7 @@ export class OnScreenKeyboardComponent {
     right: () => void;
     end: () => void;
   };
+
   guppyInstance!: Guppy;
   interactionType!: string;
   customLetters!: string[];
@@ -48,6 +49,7 @@ export class OnScreenKeyboardComponent {
   mainTab: string = constants.OSK_MAIN_TAB;
   greekSymbols: string[] = Object.values(
     constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
   greekLetters: string[] = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
   currentTab: string = this.mainTab;
   lettersInKeyboardLayout: string[] = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
@@ -128,7 +130,7 @@ export class OnScreenKeyboardComponent {
       this.engine = this.guppyInstance.engine;
       this.interactionType = GuppyInitializationService.interactionType;
       this.customLetters =
-        this.guppyInitializationService.getCustomOskLetters();
+        this.guppyInitializationService.getAllowedVariables();
       return true;
     }
     return false;

@@ -23,11 +23,11 @@ from core.tests import test_utils
 
 
 class HelperFunctionsUnitTests(test_utils.GenericTestBase):
-    """Test the 'contains_balanced_brackets' and 'is_algebraic' helper
-    functions.
+    """Test the 'contains_balanced_brackets' and
+    'contains_at_least_one_variable' helper functions.
     """
 
-    def test_contains_balanced_brackets(self):
+    def test_contains_balanced_brackets(self) -> None:
         """Tests for contains_balanced_brackets method."""
         self.assertTrue(expression_parser.contains_balanced_brackets(''))
         self.assertTrue(expression_parser.contains_balanced_brackets('a+2'))
@@ -53,34 +53,46 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(expression_parser.contains_balanced_brackets('4/{0/]'))
         self.assertFalse(expression_parser.contains_balanced_brackets('(a/2]'))
 
-    def test_is_algebraic(self):
-        """Tests for is_algebraic method."""
-        self.assertTrue(expression_parser.is_algebraic('a^2.3'))
-        self.assertTrue(expression_parser.is_algebraic('abs(alpha)'))
-        self.assertTrue(expression_parser.is_algebraic('alpha/gamma'))
-        self.assertTrue(expression_parser.is_algebraic('A + 2/3'))
+    def test_contains_at_least_one_variable(self) -> None:
+        """Tests for contains_at_least_one_variable method."""
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('a^2.3'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('abs(alpha)'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('alpha/gamma'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('A + 2/3'))
         # The following tests might seem as invalid but the individual letters
         # will be joined via '*' during tokenization which makes them valid.
-        self.assertTrue(expression_parser.is_algebraic('Alpha'))
-        self.assertTrue(expression_parser.is_algebraic('invalid + 2'))
-        self.assertTrue(expression_parser.is_algebraic('alpha + bet/22'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('Alpha'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('invalid + 2'))
+        self.assertTrue(
+            expression_parser.contains_at_least_one_variable('alpha + bet/22'))
 
-        self.assertFalse(expression_parser.is_algebraic('1 + 2'))
-        self.assertFalse(expression_parser.is_algebraic('1^2^3/4'))
-        self.assertFalse(expression_parser.is_algebraic('1'))
-        self.assertFalse(expression_parser.is_algebraic('sqrt(4/4)'))
-        self.assertFalse(expression_parser.is_algebraic('tan(30)'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('1 + 2'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('1^2^3/4'))
+        self.assertFalse(expression_parser.contains_at_least_one_variable('1'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('sqrt(4/4)'))
+        self.assertFalse(
+            expression_parser.contains_at_least_one_variable('tan(30)'))
 
-        with self.assertRaisesRegexp(Exception, 'Invalid bracket pairing.'):
-            expression_parser.is_algebraic('1 +2)')
-        with self.assertRaisesRegexp(Exception, 'Invalid character: ~.'):
-            expression_parser.is_algebraic('a~2')
-        with self.assertRaisesRegexp(Exception, 'Invalid character: !.'):
-            expression_parser.is_algebraic('4! 2')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
-            expression_parser.is_algebraic('alpha + bet/22.3.4')
+        with self.assertRaisesRegex(Exception, 'Invalid bracket pairing.'):  # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable('1 +2)')
+        with self.assertRaisesRegex(Exception, 'Invalid character: ~.'):  # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable('a~2')
+        with self.assertRaisesRegex(Exception, 'Invalid character: !.'):  # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable('4! 2')
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable(
+                'alpha + bet/22.3.4')
 
-    def test_tokenize(self):
+    def test_tokenize(self) -> None:
         """Tests for tokenize method."""
         expression = 'a+b'
         expected_output = ['a', '+', 'b']
@@ -233,66 +245,66 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
             expression_parser.tokenize('a.3')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
             expression_parser.tokenize('.3 -  2.4')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
             expression_parser.tokenize('1.2.3 + 4/2')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
             expression_parser.tokenize('a . . 3')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
             expression_parser.tokenize('3..4')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
             expression_parser.tokenize('..5')
 
-    def test_get_variables(self):
+    def test_get_variables(self) -> None:
         """Tests for get_variables method."""
-        self.assertItemsEqual(expression_parser.get_variables('a^2.3'), ['a'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(expression_parser.get_variables('a^2.3'), ['a'])  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('abs(alpha)'), ['alpha'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('alpha/gamma'), ['alpha', 'gamma'])
         self.assertEqual(expression_parser.get_variables('A + 2/3'), ['A'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('alphabetagamma'),
             ['alpha', 'beta', 'gamma'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('betalphaa'),
             ['a', 'p', 'beta', 'l', 'h'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('a+a*a/aa^a-a'), ['a'])
-        self.assertItemsEqual(expression_parser.get_variables(
+        self.assertItemsEqual(expression_parser.get_variables(  # type: ignore[no-untyped-call]
             'sqrt(3+x^y)/abs(gamma)'), ['y', 'x', 'gamma'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('a=3+4'), ['a'])
-        self.assertItemsEqual(expression_parser.get_variables(
+        self.assertItemsEqual(expression_parser.get_variables(  # type: ignore[no-untyped-call]
             '(a-2)^beta = alpha/gamma'), ['a', 'alpha', 'beta', 'gamma'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('4=abs(-4)'), [])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('a^pi + e/2'), ['a', 'pi', 'e'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('pi-3.14e'), ['pi', 'e'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             expression_parser.get_variables('epi'), ['pi', 'e'])
 
 
 class TokenUnitTests(test_utils.GenericTestBase):
     """Test the token module."""
 
-    def test_is_function(self):
+    def test_is_function(self) -> None:
         """Tests for is_function method."""
         self.assertEqual(expression_parser.Token('sqrt').category, 'function')
         self.assertEqual(expression_parser.Token('abs').category, 'function')
         self.assertEqual(expression_parser.Token('tan').category, 'function')
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: tan().'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: tan().'):  # type: ignore[no-untyped-call]
             expression_parser.Token('tan()')
-        with self.assertRaisesRegexp(Exception, 'Invalid token: Sqrt.'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: Sqrt.'):  # type: ignore[no-untyped-call]
             expression_parser.Token('Sqrt')
 
-    def test_is_identifier(self):
+    def test_is_identifier(self) -> None:
         """Tests for is_identifier method."""
         self.assertEqual(expression_parser.Token('a').category, 'identifier')
         self.assertEqual(expression_parser.Token('a').category, 'identifier')
@@ -300,12 +312,12 @@ class TokenUnitTests(test_utils.GenericTestBase):
             expression_parser.Token('alpha').category, 'identifier')
         self.assertEqual(expression_parser.Token('A').category, 'identifier')
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: al.'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: al.'):  # type: ignore[no-untyped-call]
             expression_parser.Token('al')
         self.assertNotEqual(
             expression_parser.Token('5').category, 'identifier')
 
-    def test_is_number(self):
+    def test_is_number(self) -> None:
         """Tests for is_number method."""
         self.assertEqual(expression_parser.Token('1').category, 'number')
         self.assertEqual(expression_parser.Token('123').category, 'number')
@@ -314,10 +326,10 @@ class TokenUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expression_parser.Token('pi').category, 'number')
         self.assertEqual(expression_parser.Token('e').category, 'number')
 
-        with self.assertRaisesRegexp(Exception, 'Invalid token: 8.4.3.'):
+        with self.assertRaisesRegex(Exception, 'Invalid token: 8.4.3.'):  # type: ignore[no-untyped-call]
             expression_parser.Token('8.4.3')
 
-    def test_is_operator(self):
+    def test_is_operator(self) -> None:
         """Tests for is_operator method."""
         self.assertEqual(expression_parser.Token('+').category, 'operator')
         self.assertEqual(expression_parser.Token('-').category, 'operator')
@@ -331,7 +343,7 @@ class TokenUnitTests(test_utils.GenericTestBase):
 class ParserUnitTests(test_utils.GenericTestBase):
     """Test the expression parser module."""
 
-    def test_parse(self):
+    def test_parse(self) -> None:
         """Tests to check whether the following production rule is implemented
         correctly:
         <expr> ::= <mul_expr> (('+' | '-') <mul_expr>)*
@@ -355,21 +367,21 @@ class ParserUnitTests(test_utils.GenericTestBase):
             left_child_1, expression_parser.AdditionOperatorNode)
         self.assertEqual(len(left_child_1.children), 2)
         # Right child 1 {2}.
-        self.assertIsInstance(right_child_1, expression_parser.NumberNode)
+        assert isinstance(right_child_1, expression_parser.NumberNode)
         self.assertEqual(right_child_1.token.text, '2')
         self.assertEqual(len(right_child_1.children), 0)
 
         left_child_2, right_child_2 = left_child_1.children
         # Left child 2 {a}.
-        self.assertIsInstance(left_child_2, expression_parser.IdentifierNode)
+        assert isinstance(left_child_2, expression_parser.IdentifierNode)
         self.assertEqual(left_child_2.token.text, 'a')
         self.assertEqual(len(left_child_2.children), 0)
         # Right child 2 {b}.
-        self.assertIsInstance(right_child_2, expression_parser.IdentifierNode)
+        assert isinstance(right_child_2, expression_parser.IdentifierNode)
         self.assertEqual(right_child_2.token.text, 'b')
         self.assertEqual(len(right_child_2.children), 0)
 
-    def test_parse_mul_expr(self):
+    def test_parse_mul_expr(self) -> None:
         """Tests to check whether the following production rule is implemented
         correctly:
         <mul_expr> ::= <pow_expr> (('*' | '/') <pow_expr>)*
@@ -383,31 +395,31 @@ class ParserUnitTests(test_utils.GenericTestBase):
         """
         root_node = expression_parser.Parser().parse('a / b * 2')
         # Root node {*}.
-        self.assertIsInstance(
+        assert isinstance(
             root_node, expression_parser.MultiplicationOperatorNode)
         self.assertEqual(len(root_node.children), 2)
 
         left_child_1, right_child_1 = root_node.children
         # Left child 1 {/}.
-        self.assertIsInstance(
+        assert isinstance(
             left_child_1, expression_parser.DivisionOperatorNode)
         self.assertEqual(len(left_child_1.children), 2)
         # Right child 1 {2}.
-        self.assertIsInstance(right_child_1, expression_parser.NumberNode)
+        assert isinstance(right_child_1, expression_parser.NumberNode)
         self.assertEqual(right_child_1.token.text, '2')
         self.assertEqual(len(right_child_1.children), 0)
 
         left_child_2, right_child_2 = left_child_1.children
         # Left child 2 {a}.
-        self.assertIsInstance(left_child_2, expression_parser.IdentifierNode)
+        assert isinstance(left_child_2, expression_parser.IdentifierNode)
         self.assertEqual(left_child_2.token.text, 'a')
         self.assertEqual(len(left_child_2.children), 0)
         # Right child 2 {b}.
-        self.assertIsInstance(right_child_2, expression_parser.IdentifierNode)
+        assert isinstance(right_child_2, expression_parser.IdentifierNode)
         self.assertEqual(right_child_2.token.text, 'b')
         self.assertEqual(len(right_child_2.children), 0)
 
-    def test_parse_pow_expr(self):
+    def test_parse_pow_expr(self) -> None:
         """Tests to check whether the following production rule is implemented
         correctly:
         <pow_expr> ::= '-' <pow_expr> | '+' <pow_expr> |
@@ -422,30 +434,30 @@ class ParserUnitTests(test_utils.GenericTestBase):
         """
         root_node = expression_parser.Parser().parse('a ^ b ^ 2')
         # Root node {^}.
-        self.assertIsInstance(root_node, expression_parser.PowerOperatorNode)
+        assert isinstance(root_node, expression_parser.PowerOperatorNode)
         self.assertEqual(len(root_node.children), 2)
 
         left_child_1, right_child_1 = root_node.children
         # Left child 1 {a}.
-        self.assertIsInstance(left_child_1, expression_parser.IdentifierNode)
+        assert isinstance(left_child_1, expression_parser.IdentifierNode)
         self.assertEqual(left_child_1.token.text, 'a')
         self.assertEqual(len(left_child_1.children), 0)
         # Right child 1 {^}.
-        self.assertIsInstance(
+        assert isinstance(
             right_child_1, expression_parser.PowerOperatorNode)
         self.assertEqual(len(right_child_1.children), 2)
 
         left_child_2, right_child_2 = right_child_1.children
         # Left child 2 {b}.
-        self.assertIsInstance(left_child_2, expression_parser.IdentifierNode)
+        assert isinstance(left_child_2, expression_parser.IdentifierNode)
         self.assertEqual(left_child_2.token.text, 'b')
         self.assertEqual(len(left_child_2.children), 0)
         # Right child 2 {2}.
-        self.assertIsInstance(right_child_2, expression_parser.NumberNode)
+        assert isinstance(right_child_2, expression_parser.NumberNode)
         self.assertEqual(right_child_2.token.text, '2')
         self.assertEqual(len(right_child_2.children), 0)
 
-    def test_parse_unit(self):
+    def test_parse_unit(self) -> None:
         """Tests to check whether the following production rule is implemented
         correctly:
         <unit> ::= <identifier> | <number> | '(' <expr> ')' |
@@ -460,26 +472,26 @@ class ParserUnitTests(test_utils.GenericTestBase):
         """
         root_node = expression_parser.Parser().parse('sqrt(a*2)')
         # Root node {sqrt}.
-        self.assertIsInstance(root_node, expression_parser.UnaryFunctionNode)
+        assert isinstance(root_node, expression_parser.UnaryFunctionNode)
         self.assertEqual(len(root_node.children), 1)
 
         child_1 = root_node.children[0]
         # Child 1 {*}.
-        self.assertIsInstance(
+        assert isinstance(
             child_1, expression_parser.MultiplicationOperatorNode)
         self.assertEqual(len(child_1.children), 2)
 
         left_child_2, right_child_2 = child_1.children
         # Left child 2 {a}.
-        self.assertIsInstance(left_child_2, expression_parser.IdentifierNode)
+        assert isinstance(left_child_2, expression_parser.IdentifierNode)
         self.assertEqual(left_child_2.token.text, 'a')
         self.assertEqual(len(left_child_2.children), 0)
         # Right child 2 {2}.
-        self.assertIsInstance(right_child_2, expression_parser.NumberNode)
+        assert isinstance(right_child_2, expression_parser.NumberNode)
         self.assertEqual(right_child_2.token.text, '2')
         self.assertEqual(len(right_child_2.children), 0)
 
-    def test_validates_math_expression(self):
+    def test_validates_math_expression(self) -> None:
         """Tests whether the parser can validate math expressions."""
         self.assertTrue(expression_parser.is_valid_expression('a+b'))
         self.assertTrue(expression_parser.is_valid_expression('a+(-b)'))

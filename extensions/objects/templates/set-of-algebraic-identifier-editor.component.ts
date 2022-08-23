@@ -27,14 +27,14 @@ import { AppConstants } from 'app.constants';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 
 interface SetOfAlgebraicIdentifierEditorSchema {
-  type: 'list',
+  type: 'list';
   items: {
-    type: 'unicode',
-    choices: string[]
-  },
+    type: 'unicode';
+    choices: string[];
+  };
   validators: [{
-    id: 'is_uniquified'
-  }]
+    id: 'is_uniquified';
+  }];
 }
 
 @Component({
@@ -44,7 +44,7 @@ interface SetOfAlgebraicIdentifierEditorSchema {
 })
 export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: string[];
@@ -61,11 +61,11 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    let customOskLetters = (
-      this.guppyInitializationService.getCustomOskLetters());
+    let allowedVariables = (
+      this.guppyInitializationService.getAllowedVariables());
 
     let choices = (
-      customOskLetters ? customOskLetters :
+      allowedVariables ? allowedVariables :
       AppConstants.VALID_ALGEBRAIC_IDENTIFIERS);
 
     this.SCHEMA = {

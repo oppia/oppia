@@ -16,18 +16,24 @@
 
 from __future__ import annotations
 
+import base64
 import imghdr
 
 from core import feconf
 from core import utils
 from core.domain import html_validation_service
 
+from typing import Union
 
-def validate_image_and_filename(raw_image, filename):
+
+def validate_image_and_filename(
+    raw_image: Union[str, bytes],
+    filename: str
+) -> str:
     """Validates the image data and its filename.
 
     Args:
-        raw_image: str. The image content.
+        raw_image: Union[str, bytes]. The image content.
         filename: str. The filename for the image.
 
     Returns:
@@ -41,11 +47,15 @@ def validate_image_and_filename(raw_image, filename):
 
     if not raw_image:
         raise utils.ValidationError('No image supplied')
+    if isinstance(raw_image, str) and utils.is_base64_encoded(raw_image):
+        raw_image = base64.decodebytes(raw_image.encode('utf-8'))
     if len(raw_image) > hundred_kb_in_bytes:
         raise utils.ValidationError(
             'Image exceeds file size limit of 100 KB.')
     allowed_formats = ', '.join(
         list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
+    # Ruling out the possibility of str for mypy type checking.
+    assert isinstance(raw_image, bytes)
     if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
         invalid_tags, invalid_attrs = (

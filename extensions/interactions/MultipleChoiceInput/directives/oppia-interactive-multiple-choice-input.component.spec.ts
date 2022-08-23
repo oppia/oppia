@@ -22,12 +22,20 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveMultipleChoiceInputComponent } from './oppia-interactive-multiple-choice-input.component';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
   let fixture: ComponentFixture<InteractiveMultipleChoiceInputComponent>;
   let currentInteractionService: CurrentInteractionService;
   let browserCheckerService: BrowserCheckerService;
+  let playerTranscriptService: PlayerTranscriptService;
+  let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(interactionId, attributes) {
@@ -46,6 +54,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     onSubmit(answer, rulesService) {
       expect(answer).toBe(1);
     }
+
     registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
       validateExpressionFn();
@@ -74,7 +83,17 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     browserCheckerService = TestBed.inject(BrowserCheckerService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveMultipleChoiceInputComponent);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     component = fixture.componentInstance;
+
+    let contentId: string = 'content_id';
+    let interaction = {} as Interaction;
+    let writtenTranslations = {} as WrittenTranslations;
+    let recordedVoiceovers = new RecordedVoiceovers({});
+    let audioTranslation = {} as AudioTranslationLanguageService;
+    displayedCard = new StateCard(
+      'test_name', 'content', 'interaction', interaction, [],
+      recordedVoiceovers, writtenTranslations, contentId, audioTranslation);
 
 
     component.choicesWithValue = '[' +
@@ -102,6 +121,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   'interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction')
       .and.callThrough();
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
     component.ngOnInit();
 
     expect(component.choices).toEqual([
@@ -132,7 +152,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   'interaction', () => {
     spyOn(currentInteractionService, 'registerCurrentInteraction')
       .and.callThrough();
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
     component.showChoicesInShuffledOrderWithValue = 'true';
+    spyOn(component, 'isQuestionOnceAnswered').and.returnValue(false);
 
     component.ngOnInit();
 
@@ -145,6 +167,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
   it('should update selected answer when user selects an option', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
+    let questionElement = document.createElement('div');
+    questionElement.className = (
+      'oppia-rte-viewer oppia-learner-view-card-top-content');
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
     spyOn(document, 'querySelector')
       .withArgs('button.multiple-choice-option.selected').and.returnValue({
@@ -163,7 +188,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
             return;
           }
         }
-      });
+      })
+      .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
+      .and.returnValue(questionElement);
     spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
       {
         classList: {
@@ -252,5 +279,38 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     component.submitAnswer();
 
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('should get previous order of choices if re-answered', () => {
+    // Create the question element to mock the question element needed
+    // for this test as this element exists outside the scope of the
+    // MCQ component and we will not be able to find this in the test
+    // of MCQ component otherwise.
+    let questionElement = document.createElement('div');
+    questionElement.className =
+      'oppia-rte-viewer oppia-learner-view-card-top-content';
+
+    spyOn(document, 'querySelector')
+      .withArgs('.oppia-rte-viewer.oppia-learner-view-card-top-content')
+      .and.returnValue(questionElement);
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+
+    let previousOrderOfChoices = [0, 2, 1, 3];
+    let encodedOrderOfChoices = JSON.stringify(previousOrderOfChoices);
+
+    spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
+    spyOn(questionElement, 'getAttribute')
+      .withArgs('oppia-mcq-choice-order').and.returnValues(
+        null, encodedOrderOfChoices, encodedOrderOfChoices);
+
+    let questionIsAnsweredOnce = component.isQuestionOnceAnswered();
+    expect(questionIsAnsweredOnce).toBe(false);
+    component.answer = 1;
+    component.submitAnswer();
+
+    component.ngOnInit();
+
+    expect(component.questionIsAnsweredOnce).toBe(true);
+    expect(component.orderOfChoices).toEqual(previousOrderOfChoices);
   });
 });

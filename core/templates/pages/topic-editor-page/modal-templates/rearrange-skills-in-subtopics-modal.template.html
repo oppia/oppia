@@ -8,7 +8,7 @@
     <div class="subtopics-container">
       <div class="empty-placeholder"></div>
       <div class="item-flex-container">
-        <md-card class="item-container uncategorized-skill-ids protractor-test-uncategorized-skills-container"
+        <md-card class="item-container uncategorized-skill-ids e2e-test-uncategorized-skills-container"
                  ng-class="{'skills-valid': !$ctrl.uncategorizedSkillSummaries.length, 'skills-invalid': $ctrl.uncategorizedSkillSummaries.length}"
                  dnd-list="$ctrl.uncategorizedSkillSummaries"
                  dnd-drop="$ctrl.onMoveSkillEnd(null)">
@@ -25,13 +25,13 @@
                      dnd-dragstart="$ctrl.onMoveSkillStart(null, skillSummary)">
               <div class="skill-card">
                 <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
-                   class="skill-name protractor-test-uncategorized-skill-card"
+                   class="skill-name e2e-test-uncategorized-skill-card"
                    ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
                    <[skillSummary.getDescription()]>
                 </a>
               </div>
             </md-card>
-            <p class="intro-card-message protractor-test-no-uncategorized-skills" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
+            <p class="intro-card-message e2e-test-no-uncategorized-skills" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
               There are no unassigned skills left in the topic.
             </p>
           </div>
@@ -41,7 +41,7 @@
            dnd-list="subtopic.getSkillSummaries()"
            dnd-drop="$ctrl.onMoveSkillEnd(subtopic.getId())"
            class="item-flex-container">
-        <md-card class="subtopic item-container protractor-test-subtopic-column">
+        <md-card class="subtopic item-container e2e-test-subtopic-column">
           <div class="subtopic-header" ng-click="$ctrl.editNameOfSubtopicWithId(subtopic.getId())">
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
@@ -62,7 +62,7 @@
                      dnd-dragstart="$ctrl.onMoveSkillStart(subtopic.getId(), skillSummary)"
                      dnd-effect-allowed="move">
               <div class="skill-card">
-                <a ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" class="skill-name protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
+                <a ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" class="skill-name e2e-test-subtopic-skill-description" target="_blank" rel="noopener">
                    <[skillSummary.getDescription()]>
                 </a>
               </div>
@@ -74,7 +74,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-save-rearrange-skills" ng-click="confirm()">Save</button>
+    <button class="btn btn-success e2e-test-save-rearrange-skills" ng-click="confirm()">Save</button>
   </div>
 </div>
 <style>
@@ -132,7 +132,7 @@
     min-height: 200px;
   }
   .rearrange-skills-modal .skill-id {
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: none;
@@ -150,12 +150,12 @@
     display: none;
   }
   .rearrange-skills-modal .skills-valid {
-    background-color: #009C8A33;
-    border: 2px solid #009C8A;
+    background-color: #009c8a33;
+    border: 2px solid #009c8a;
   }
   .rearrange-skills-modal .skills-invalid {
-    background-color: #C55F4533;
-    border: 2px solid #C55F45;
+    background-color: #c55f4533;
+    border: 2px solid #c55f45;
   }
   .rearrange-skills-modal .dndDragover .subtopic {
     box-shadow: 0 6px 12px rgba(0, 0, 0, .175);

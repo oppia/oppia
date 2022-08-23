@@ -1,6 +1,7 @@
 <div>
   <background-banner></background-banner>
-  <conversation-skin></conversation-skin>
+  <oppia-conversation-skin-embed *ngIf="pageIsIframed"></oppia-conversation-skin-embed>
+  <oppia-conversation-skin *ngIf="!pageIsIframed"></oppia-conversation-skin>
   <attribution-guide></attribution-guide>
   <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
 </div>

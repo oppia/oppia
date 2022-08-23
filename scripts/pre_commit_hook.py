@@ -29,17 +29,23 @@ but it will have no effect.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
 import sys
 
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
 sys.path.append(os.getcwd())
-from core import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
+from core import utils  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
+RELEASE_CONSTANTS_FILEPATH = os.path.join(
+    '.', 'assets', 'release_constants.json')
 KEYS_UPDATED_IN_FECONF = [
     b'INCOMING_EMAILS_DOMAIN_NAME', b'ADMIN_EMAIL_ADDRESS',
     b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS', b'CAN_SEND_EMAILS',
@@ -69,7 +75,7 @@ def install_hook():
     file_is_symlink = os.path.islink(pre_commit_file)
     file_exists = os.path.exists(pre_commit_file)
     if file_is_symlink and file_exists:
-        python_utils.PRINT('Symlink already exists')
+        print('Symlink already exists')
     else:
         # This is needed, because otherwise some systems symlink/copy the .pyc
         # file instead of the .py file.
@@ -77,21 +83,21 @@ def install_hook():
         # If its a broken symlink, delete it.
         if file_is_symlink and not file_exists:
             os.unlink(pre_commit_file)
-            python_utils.PRINT('Removing broken symlink')
+            print('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(this_file), pre_commit_file)
-            python_utils.PRINT('Created symlink in .git/hooks directory')
+            print('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
         except (OSError, AttributeError):
             shutil.copy(this_file, pre_commit_file)
-            python_utils.PRINT('Copied file to .git/hooks directory')
+            print('Copied file to .git/hooks directory')
 
-    python_utils.PRINT('Making pre-commit hook file executable ...')
+    print('Making pre-commit hook file executable ...')
     if not common.is_windows_os():
         _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
         if not err_chmod_cmd:
-            python_utils.PRINT('pre-commit hook file is now executable!')
+            print('pre-commit hook file is now executable!')
         else:
             raise ValueError(err_chmod_cmd)
 
@@ -179,6 +185,27 @@ def check_changes_in_config():
                 CONSTANTS_FILEPATH))
 
 
+def check_changes_in_gcloud_path():
+    """Checks that the gcloud path in common.py matches with the path in
+    release_constants.json.
+
+    Raises:
+        Exception. The gcloud path in common.py does not match with the path
+            in release_constants.json.
+    """
+    with utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
+        release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
+
+    if not (
+            os.path.exists(release_constants_gcloud_path) and
+            os.path.samefile(release_constants_gcloud_path, common.GCLOUD_PATH)
+    ):
+        raise Exception(
+            'The gcloud path in common.py: %s should match the path in '
+            'release_constants.json: %s. Please fix.' % (
+                common.GCLOUD_PATH, release_constants_gcloud_path))
+
+
 def main(args=None):
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -192,15 +219,17 @@ def main(args=None):
         install_hook()
         return
 
-    python_utils.PRINT('Running pre-commit check for feconf and constants ...')
+    print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
-    python_utils.PRINT('Running pre-commit check for package-lock.json ...')
+    print('Running pre-commit check for gcloud path changes...')
+    check_changes_in_gcloud_path()
+    print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
-        python_utils.PRINT('-----------COMMIT ABORTED-----------')
-        python_utils.PRINT(
+        print('-----------COMMIT ABORTED-----------')
+        print(
             'Oppia utilize Yarn to manage node packages. Please delete '
             'package-lock.json, revert the changes in package.json, and use '
             'yarn to add, update, or delete the packages. For more information '

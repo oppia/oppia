@@ -19,12 +19,16 @@
 
       <div *ngIf="uploadedImage">
         <span>{{ 'I18N_PREFERENCES_PROFILE_PICTURE_DRAG' | translate }}</span>
-        <div class="oppia-profile-picture-crop-area protractor-test-photo-crop">
+        <div class="oppia-profile-picture-crop-area e2e-test-photo-crop">
           <button class="btn btn-secondary oppia-profile-picture-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
           <img id="croppable-image" [src]="uploadedImage" #croppableImage>
         </div>
+        <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
+             class="oppia-unsupported-svg-tag-attribute-error"
+             [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }"
+        ></div>
       </div>
     </div>
   </div>
@@ -34,7 +38,7 @@
             (click)="cancel()">
             {{ 'I18N_PREFERENCES_CANCEL_BUTTON' | translate }}
     </button>
-    <button class="btn btn-success protractor-test-photo-upload-submit"
+    <button class="btn btn-success e2e-test-photo-upload-submit"
             (click)="confirm()"
             [disabled]="!uploadedImage">
             {{ 'I18N_PREFERENCES_PROFILE_PICTURE_ADD' | translate }}
@@ -43,7 +47,7 @@
 </div>
 <style>
   .oppia-profile-picture-container .oppia-profile-picture-crop-area {
-    background: #E4E4E4;
+    background: #e4e4e4;
     height: 350px;
     margin-top: 20px;
     max-width: 100%;
@@ -60,5 +64,12 @@
   }
   .oppia-profile-picture-container .oppia-form-error-text {
     margin-top: 15px;
+  }
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
   }
 </style>

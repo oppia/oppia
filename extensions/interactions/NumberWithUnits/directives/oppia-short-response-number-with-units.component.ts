@@ -13,24 +13,43 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the NumberWithUnits short response.
+ * @fileoverview Component for the NumberWithUnits short response.
  */
 
-require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
-angular.module('oppia').component('oppiaShortResponseNumberWithUnits', {
-  template: require('./number-with-units-short-response.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    '$attrs', 'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
-    function(
-        $attrs, HtmlEscaperService, NumberWithUnitsObjectFactory) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
-      };
-    }]
-});
+@Component({
+  selector: 'oppia-short-response-number-with-units',
+  templateUrl: './number-with-units-short-response.component.html',
+  styleUrls: []
+})
+export class ShortResponseNumberWithUnitsComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  responses!: string;
+
+  constructor(
+    private htmlEscaperService: HtmlEscaperService,
+    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory
+  ) {}
+
+  ngOnInit(): void {
+    const answer: NumberWithUnitsAnswer = (
+      this.htmlEscaperService.escapedJsonToObj(
+        this.answer
+      ) as NumberWithUnitsAnswer);
+    this.responses = this.numberWithUnitsObjectFactory.fromDict(
+      answer).toString();
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaShortResponseNumberWithUnits', downgradeComponent({
+    component: ShortResponseNumberWithUnitsComponent
+  }) as angular.IDirectiveFactory);

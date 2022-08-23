@@ -15,6 +15,7 @@
 """Tests for the handler that returns concept card for a skill."""
 
 from __future__ import annotations
+import json
 
 from core import feconf
 from core.domain import skill_domain
@@ -29,7 +30,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy skill."""
-        super(ConceptCardDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -86,10 +87,10 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
 
     def test_get_concept_cards(self):
         json_response = self.get_json(
-            '%s/%s,%s' % (
+            '%s/%s' % (
                 feconf.CONCEPT_CARD_DATA_URL_PREFIX,
-                self.skill_id, self.skill_id_1)
-            )
+                json.dumps([self.skill_id, self.skill_id_1])
+            ))
         self.assertEqual(2, len(json_response['concept_card_dicts']))
         self.assertEqual(
             '<p>Skill Explanation</p>',
@@ -128,5 +129,15 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
     def test_get_concept_cards_fails_when_skill_doesnt_exist(self):
         self.get_json(
             '%s/%s' % (
-                feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id_2),
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps([self.skill_id_2])),
             expected_status_int=404)
+
+    def test_invalid_skill_id(self):
+        skill_ids = [1, 2]
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+                json.dumps(skill_ids)), expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Skill id should be a string.')

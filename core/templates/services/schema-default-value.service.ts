@@ -86,7 +86,11 @@ interface DictSchemaDefaultValue {
   [property: string]: SchemaDefaultValue;
 }
 
-type SchemaDefaultValue = (
+// SchemaDefaultValue is a value that is used to represent the default value
+// of a property in a schema. It may be null as well when input is empty or not
+// provided.
+export type SchemaDefaultValue = (
+  null |
   string |
   number |
   boolean |

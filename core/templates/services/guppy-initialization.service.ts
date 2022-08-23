@@ -23,7 +23,7 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 
 export class GuppyObject {
   // These properties are initialized using constructor function
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   divId!: string;
   guppyInstance!: Guppy;
@@ -40,7 +40,7 @@ export class GuppyInitializationService {
   private guppyInstances: GuppyObject[] = [];
   private onScreenKeyboardShown = false;
   static interactionType: string;
-  private static customOskLetters: string[] = [];
+  private static allowedVariables: string[] = [];
 
   init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
       void {
@@ -99,12 +99,12 @@ export class GuppyInitializationService {
     this.onScreenKeyboardShown = value;
   }
 
-  getCustomOskLetters(): string[] {
-    return GuppyInitializationService.customOskLetters;
+  getAllowedVariables(): string[] {
+    return GuppyInitializationService.allowedVariables;
   }
 
-  setCustomOskLetters(customOskLetters: string[]): void {
-    GuppyInitializationService.customOskLetters = customOskLetters;
+  setAllowedVariables(allowedVariables: string[]): void {
+    GuppyInitializationService.allowedVariables = allowedVariables;
   }
 }
 

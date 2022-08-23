@@ -1,29 +1,37 @@
 <div class="h-100">
-  <div ng-if="!$ctrl.solutionEditorIsOpen"
+  <div *ngIf="!solutionEditorIsOpen"
        class="h-100"
-       ng-attr-title="Edit solution">
+       title="Edit solution">
     <div class="oppia-readonly-rule-tile"
-         ng-class="{'oppia-editable-section': $ctrl.isEditable}">
+         [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
-        <div ng-if="$ctrl.isEditable"
+        <div *ngIf="isEditable"
              class="oppia-click-to-start-editing"
-             ng-click="$ctrl.onOpenSolutionEditor()">
+             (click)="openEditorModal()">
           <i class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Solution">&#xE254;
           </i>
         </div>
         <strong>
-          <[$ctrl.StateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
+          {{stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One'}} solution is...
         </strong>
         <span>
-          <angular-html-bind html-data="$ctrl.getAnswerHtml()">
-          </angular-html-bind>
+          <oppia-interaction-display [htmlData]="getAnswerHtml()">
+          </oppia-interaction-display>
         </span>
       </div>
     </div>
   </div>
   <br>
-  <solution-explanation-editor on-save-solution="$ctrl.onSaveSolution"
-                               show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
-  </solution-explanation-editor>
+  <oppia-solution-explanation-editor (saveSolution)="updateNewSolution($event)"
+                                     (showMarkAllAudioAsNeedingUpdateModalIfRequired)="openMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+  </oppia-solution-explanation-editor>
 </div>
+
+<style>
+  @media screen and (max-width: 500px) {
+    .oppia-editor-edit-icon {
+      right: 3px;
+    }
+  }
+</style>

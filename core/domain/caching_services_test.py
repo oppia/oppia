@@ -33,6 +33,8 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Any, Dict
+
 memory_cache_services = models.Registry.import_cache_services()
 
 
@@ -41,20 +43,18 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     # A dictionary representation of an exploration that contains unicode
     # characters.
-    exploration_dict_with_unicode_characters = {
+    exploration_dict_with_unicode_characters: exp_domain.ExplorationDict = {
         'tags': [],
         'title': '',
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 45,
+        'states_schema_version': 51,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
-        'created_on': '08/17/2020, 17:30:48:283600',
         'category': '',
         'auto_tts_enabled': True,
-        'version': 3,
         'states': {
             'Introduction': {
                 'card_is_checkpoint': True,
@@ -112,6 +112,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         'param_changes': [],
                         'refresher_exploration_id': None,
                         'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
@@ -125,6 +126,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             'param_changes': [],
                             'refresher_exploration_id': None,
                             'dest': 'Introduction',
+                            'dest_if_really_stuck': None,
                             'missing_prerequisite_skill_id': None,
                             'feedback': {
                                 'content_id': 'feedback_2',
@@ -147,7 +149,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             }
         },
         'correctness_feedback_enabled': False,
-        'last_updated': '08/17/2020, 18:04:57:799687',
+        'edits_allowed': True,
         'language_code': 'en',
         'blurb': ''
     }
@@ -156,45 +158,46 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     # unicode characters that is set to the memory cache.
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, "tags"'
-        ': [], "states_schema_version": 45, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 51, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
         'ard_is_checkpoint": true, "interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'
         'nges": [], "feedback": {"content_id": "feedback_2", "html": "<p>This i'
-        's great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "refresher_expl'
-        'oration_id": null, "missing_prerequisite_skill_id": null, "labelled_as'
-        '_correct": false}, "training_data": [], "rule_specs": [{"rule_type": "'
-        'Contains", "inputs": {"x": {"normalizedStrSet": ["\\u00ae\\u00ae"], "c'
-        'ontentId": "rule_input_4"}}}]}], "default_outcome": {"param_changes": '
-        '[], "feedback": {"content_id": "default_outcome", "html": ""}, "dest"'
-        ': "Introduction", "refresher_exploration_id": null, "missing_prerequis'
-        'ite_skill_id": null, "labelled_as_correct": false}, "customization_arg'
-        's": {"rows": {"value": 1}, "placeholder": {"value": {"unicode_str": "'
-        '\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id'
-        '": "ca_placeholder_0"}}}, "confirmed_unclassified_answers": [], "id": '
-        '"TextInput", "hints": [{"hint_content": {"content_id": "hint_3", "html'
-        '": "<p>This is a copyright character \\u00a9.</p>"}}]}, "linked_skill_'
-        'id": null, "recorded_voiceovers": {"voiceovers_mapping": {"feedback_2"'
-        ': {}, "rule_input_4": {}, "content": {}, "hint_3": {}, "default_outcom'
-        'e": {}, "ca_placeholder_0": {}}}, "classifier_model_id": null, "conten'
-        't": {"content_id": "content", "html": "<p>Unicode Characters \\ud83d\\'
-        'ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, "written_transl'
-        'ations": {"translations_mapping": {"feedback_2": {}, "rule_input_4": {'
-        '}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder'
-        '_0": {}}}, "next_content_id_index": 5, "solicit_answer_details": false'
-        '}}, "version": 0, "correctness_feedback_enabled": false, "language_cod'
-        'e": "en", "objective": "", "init_state_name": "Introduction", "blurb":'
-        ' "", "author_notes": ""}'
+        's great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "dest_if_really'
+        '_stuck": null, "refresher_exploration_id": null, "missing_prerequisite'
+        '_skill_id": null, "labelled_as_correct": false}, "training_data": [], '
+        '"rule_specs": [{"rule_type": "Contains", "inputs": {"x": {"normalizedS'
+        'trSet": ["\\u00ae\\u00ae"], "contentId": "rule_input_4"}}}]}], "defaul'
+        't_outcome": {"param_changes": [], "feedback": {"content_id": "default_'
+        'outcome", "html": ""}, "dest": "Introduction", "dest_if_really_stuck":'
+        ' null, "refresher_exploration_id": null, "missing_prerequisite_skill_i'
+        'd": null, "labelled_as_correct": false}, "customization_args": {"rows"'
+        ': {"value": 1}, "placeholder": {"value": {"unicode_str": "\\ud83d\\ude'
+        '0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id": "ca_place'
+        'holder_0"}}}, "confirmed_unclassified_answers": [], "id": "TextInput",'
+        ' "hints": [{"hint_content": {"content_id": "hint_3", "html": "<p>This '
+        'is a copyright character \\u00a9.</p>"}}]}, "linked_skill_id": null, "'
+        'recorded_voiceovers": {"voiceovers_mapping": {"feedback_2": {}, "rule_'
+        'input_4": {}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_'
+        'placeholder_0": {}}}, "classifier_model_id": null, "content": {"conten'
+        't_id": "content", "html": "<p>Unicode Characters \\ud83d\\ude0d\\ud83d'
+        '\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, "written_translations": {"t'
+        'ranslations_mapping": {"feedback_2": {}, "rule_input_4": {}, "content"'
+        ': {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, "'
+        'next_content_id_index": 5, "solicit_answer_details": false}}, "version'
+        '": 0, "correctness_feedback_enabled": false, "edits_allowed": true, "l'
+        'anguage_code": "en", "objective": "", "init_state_name": "Introduction'
+        '", "blurb": "", "author_notes": ""}'
     )
 
-    def test_retrieved_memory_profile_contains_correct_elements(self):
+    def test_retrieved_memory_profile_contains_correct_elements(self) -> None:
         memory_profile = caching_services.get_memory_cache_stats()
         self.assertIsInstance(memory_profile, caching_domain.MemoryCacheStats)
         self.assertIsNotNone(memory_profile.total_allocated_in_bytes)
         self.assertIsNotNone(memory_profile.peak_memory_usage_in_bytes)
         self.assertIsNotNone(memory_profile.total_number_of_keys_stored)
 
-    def test_flush_cache_wipes_cache_clean(self):
+    def test_flush_cache_wipes_cache_clean(self) -> None:
         """Tests whether flushing the cache removes the elements in the
         cache.
         """
@@ -228,8 +231,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c']), {})
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                ['a', 'b', 'c']),
+            {})
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -237,7 +242,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-    def test_serialization_and_deserialization_returns_the_same_object(self):
+    def test_serialization_and_deserialization_returns_the_same_object(
+        self
+    ) -> None:
         deserialize = (
             caching_services.DESERIALIZATION_FUNCTIONS['exploration'])
         serialize = (
@@ -250,39 +257,29 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_exploration.to_dict(),
             deserialize(serialize(default_exploration)).to_dict())
 
-    def test_invalid_namespace_raises_error(self):
+    def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
-        with self.assertRaisesRegexp(
+        # get_multi has namespace argument, which can accept only keys of
+        # DESERIALIZATION_FUNCTIONS Dict and 'invalid' is not one of them.
+        # So, we don't have any overload function for 'invalid' key.
+        # that's why we added call-overload ignore statement here.
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
-            caching_services.set_multi(
-                invalid_namespace, None,
-                key_value_mapping)
-
-        with self.assertRaisesRegexp(
-            ValueError,
-            'Invalid namespace: %s.' % invalid_namespace):
-            caching_services.get_multi(
+            caching_services.get_multi( # type: ignore[call-overload]
                 invalid_namespace, None,
                 ['a', 'b', 'c'])
 
-        with self.assertRaisesRegexp(
-            ValueError,
-            'Invalid namespace: %s.' % invalid_namespace):
-            caching_services.delete_multi(
-                invalid_namespace, None, ['a', 'b', 'c'])
-
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             ValueError,
             'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace):
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT,
                 invalid_sub_namespace, ['a', 'b', 'c'])
 
-    def test_get_multi_correctly_retrieves_cache_elements(self):
+    def test_get_multi_correctly_retrieves_cache_elements(self) -> None:
         """Testing that querying the cache for elements where either all of the
         ids exist or don't exist in the cache returns reasonable output.
         """
@@ -299,8 +296,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c', 'd']), {})
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                ['a', 'b', 'c', 'd']),
+            {})
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -308,7 +307,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        caching_services.set_multi(
+        # set_mutli can accept str with literal(default), but here
+        # we passing object. Hence, ignore statement is used.
+        caching_services.set_multi( # type: ignore[call-overload]
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(
@@ -338,7 +339,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             default_exploration.to_dict(),
             exp_ids_to_explorations[exploration_id].to_dict())
 
-    def test_partial_fetches_returns_correct_elements(self):
+    def test_partial_fetches_returns_correct_elements(self) -> None:
         """Testing that querying the cache returns reasonable output for
         elements where only a subsection of the queried ids exist in the cache.
         """
@@ -358,12 +359,16 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
-                ['a', 'b', 'c']), {})
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                ['a', 'b', 'c']),
+            {})
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None, []),
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
+                []),
             {})
 
         caching_services.set_multi(
@@ -374,11 +379,14 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
         caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
+            caching_services.CACHE_NAMESPACE_DEFAULT,
+            None,
+            key_value_mapping)
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'b', 'c']),
             {'a': '1', 'c': '3'})
 
@@ -389,11 +397,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            result.get(exploration_id).to_dict())
+            result[exploration_id].to_dict())
 
         self.assertFalse(nonexistent_exploration_id in result)
 
-    def test_queries_to_wrong_namespace_returns_none(self):
+    def test_queries_to_wrong_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(
@@ -410,9 +418,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT,
                 '0',
-                [exploration_id]), {})
+                [exploration_id]),
+            {})
 
-    def test_queries_to_wrong_sub_namespace_returns_none(self):
+    def test_queries_to_wrong_sub_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(
@@ -435,11 +444,14 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_EXPLORATION,
             '1',
             [exploration_id])
+
         self.assertEqual(
-            existent_result.get(exploration_id).to_dict(),
+            existent_result[exploration_id].to_dict(),
             default_exploration.to_dict())
 
-    def test_set_multi_returns_true_for_successful_insert_into_cache(self):
+    def test_set_multi_returns_true_for_successful_insert_into_cache(
+        self
+    ) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         cache_strings_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
@@ -461,7 +473,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_DEFAULT, None, {})
         self.assertTrue(cache_empty_list_response)
 
-    def test_delete_multi_returns_true_when_all_ids_exist(self):
+    def test_delete_multi_returns_true_when_all_ids_exist(self) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
         self.assertFalse(
@@ -510,10 +522,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
-                '0', [exploration_id]),
+                '0',
+                [exploration_id]),
             {})
 
-    def test_delete_multi_returns_false_when_not_all_ids_exist(self):
+    def test_delete_multi_returns_false_when_not_all_ids_exist(self) -> None:
         """Tests that deleting keys that don't exist returns False."""
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
@@ -522,10 +535,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'e', 'f']))
 
-    def test_delete_multi_returns_false_when_namespace_incorrect(self):
+    def test_delete_multi_returns_false_when_namespace_incorrect(self) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
         caching_services.set_multi(
@@ -533,10 +547,13 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             caching_services.delete_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                None,
                 ['a', 'b', 'c']))
 
-    def test_delete_multi_returns_false_when_sub_namespace_incorrect(self):
+    def test_delete_multi_returns_false_when_sub_namespace_incorrect(
+        self
+    ) -> None:
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
         caching_services.set_multi(
@@ -547,7 +564,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 caching_services.CACHE_NAMESPACE_DEFAULT,
                 'invalid_sub_namespace', ['a', 'b', 'c']))
 
-    def test_all_namespace_strings_are_valid(self):
+    def test_all_namespace_strings_are_valid(self) -> None:
         """Tests SERIALIZATION_FUNCTIONS and DESERIALIZATION FUNCTIONS does not
         contain any keys with the MEMCACHE_KEY_DELIMITER and that the namespaces
         in both dictionaries are identical.
@@ -559,7 +576,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             self.assertNotIn(caching_services.MEMCACHE_KEY_DELIMITER, namespace)
 
     def test_config_properties_identically_cached_in_dev_and_test_environment(
-            self):
+        self
+    ) -> None:
         """Test to make sure that caching in the test environment is in sync
         with caching in the main development server. More specifically, when a
         config property is created with fields that contain unicode characters,
@@ -567,7 +585,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         server should be the same as the string that is set to the testing cache
         on the testing server.
         """
-        def mock_memory_cache_services_set_multi(id_value_mapping):
+        def mock_memory_cache_services_set_multi(
+            id_value_mapping: Dict[str, str]
+        ) -> None:
             # This mock asserts that for the same config domain attribute
             # containing unicode characters, the string that is set to the cache
             # in the testing environment is the same as the string set to the
@@ -625,7 +645,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_explorations_identically_cached_in_dev_and_test_environment(
-            self):
+        self
+    ) -> None:
         """Test to make sure that caching in the test environment is in sync
         with caching in the main development server. More specifically, when an
         exploration is created with fields that contain unicode characters, the
@@ -645,7 +666,12 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
-        def mock_memory_cache_services_set_multi(id_value_mapping):
+        # id_value_mapping is a Dict whose values can be any of the type from
+        # Exploration, Skill, Story, Topic, Collection, str. hence Any type
+        # has to be used here for the value type of id_value_mapping dictionary.
+        def mock_memory_cache_services_set_multi(
+            id_value_mapping: Dict[str, Any]
+        ) -> None:
             # The json encoded string is the string that is set to the cache
             # when an exploration is created in the development server. This
             # mock asserts that for the same exploration, the string
@@ -669,7 +695,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 })
 
     def test_unicode_characters_are_set_and_get_correctly_in_default_namespace(
-            self):
+        self
+    ) -> None:
         """Test to make sure that default namespace values (ints, floats,
         strings, boolean, lists, and dicts) can be set to the cache without
         errors and retrieved from the cache without any alterations.
@@ -680,7 +707,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'b', 'c']),
             {})
         cache_strings_response = caching_services.set_multi(
@@ -689,7 +717,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                None,
                 ['a', 'b', 'c']),
             {
                 'a': '%#$', 'b': '\t',
@@ -697,7 +726,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_explorations_with_unicode_characters_are_set_and_get_correctly(
-            self):
+        self
+    ) -> None:
         """Test to make sure that a default explorations initialized with
         unicode characters is set to the cache without errors and retrieved from
         the cache without any alterations (in an identical state to when it was
@@ -731,7 +761,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_collections_with_unicode_characters_are_set_and_get_correctly(
-            self):
+        self
+    ) -> None:
         """Test to make sure that a default collection initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -766,7 +797,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             collections[collection_id].to_dict())
 
     def test_skills_with_unicode_characters_are_set_and_get_correctly(
-            self):
+        self
+    ) -> None:
         """Test to make sure that a default skill initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -812,7 +844,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             skills[skill_id].to_dict())
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
-            self):
+        self
+    ) -> None:
         """Test to make sure that a default topic initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -830,7 +863,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         default_topic = (
             topic_domain.Topic.create_default_topic(
                 topic_id, 'Name 😍', 'abbrev 😍',
-                'description 😍'))
+                'description 😍', 'fragm 😍'))
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_TOPIC,
@@ -848,7 +881,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             topics[topic_id].to_dict())
 
     def test_stories_with_unicode_characters_are_set_and_get_correctly(
-            self):
+        self
+    ) -> None:
         """Test to make sure that a default story initialized with unicode
         characters is set to the cache without errors and retrieved from the
         cache without any alterations (in an identical state to when it was
@@ -886,7 +920,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             stories[story_id].to_dict())
 
     def test_platform_parameters_with_unicode_are_set_and_get_correctly(
-            self):
+        self
+    ) -> None:
         """Test to make sure that a default platform parameter initialized with
         unicode characters is set to the cache without errors and retrieved from
         the cache without any alterations (in an identical state to when it was

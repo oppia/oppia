@@ -37,10 +37,10 @@ interface FetchSkillBackendResponse {
   };
   'grouped_skill_summaries': {
     [topicName: string]: SkillSummaryBackendDict[];
-  }
+  };
 }
 
-interface FetchSkillResponse {
+export interface FetchSkillResponse {
   skill: Skill;
   assignedSkillTopicData: {
     [topicName: string]: string;
@@ -161,7 +161,7 @@ export class SkillBackendApiService {
 
   private _doesSkillWithDescriptionExist(
       description: string,
-      successCallback: (value?: boolean) => void,
+      successCallback: (value: boolean | PromiseLike<boolean>) => void,
       errorCallback: (reason?: string) => void): void {
     let skillDescriptionUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE, {

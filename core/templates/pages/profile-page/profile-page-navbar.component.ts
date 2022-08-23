@@ -21,6 +21,9 @@ import { Component, OnInit } from '@angular/core';
 
 import { UrlService } from 'services/contextual/url.service';
 
+import './profile-page-navbar.component.css';
+
+
 @Component({
   selector: 'profile-page-navbar',
   templateUrl: './profile-page-navbar.component.html',
@@ -30,6 +33,7 @@ export class ProfilePageNavbarComponent implements OnInit {
   constructor(
     private urlService: UrlService
   ) {}
+
   username: string = '';
   ngOnInit(): void {
     this.username = this.urlService.getUsernameFromProfileUrl();

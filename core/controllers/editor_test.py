@@ -25,13 +25,14 @@ import os
 import zipfile
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -50,7 +51,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
-        super(BaseEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -113,7 +114,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
 class EditorTests(BaseEditorControllerTests):
 
     def setUp(self):
-        super(EditorTests, self).setUp()
+        super().setUp()
         exp_services.load_demo('0')
 
         rights_manager.release_ownership_of_exploration(
@@ -271,6 +272,67 @@ class EditorTests(BaseEditorControllerTests):
 
         self.logout()
 
+    def test_lock_exploration(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, True)
+
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        self.logout()
+
+    def test_cannot_update_exploration_when_locked(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='end state')
+        csrf_token = self.get_new_csrf_token()
+        edits_allowed_url = '/editsallowedhandler/%s' % exp_id
+        self.put_json(
+            edits_allowed_url,
+            {'edits_are_allowed': False},
+            csrf_token=csrf_token)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.edits_allowed, False)
+
+        response_dict = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'dummy update',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response_dict['error'],
+            'This exploration cannot be edited. Please contact the admin.')
+        self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
@@ -294,6 +356,7 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -337,6 +400,7 @@ interaction:
       value: 1
   default_outcome:
     dest: State B
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -380,6 +444,7 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -425,6 +490,7 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -473,6 +539,11 @@ written_translations:
         init_interaction.default_outcome.dest = exploration.init_state_name
         exp_services.update_exploration(
             owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'auto_tts_enabled',
+                    'new_value': True,
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
@@ -599,7 +670,7 @@ written_translations:
         golden_zip_filepath = os.path.join(
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')
-        with python_utils.open_file(
+        with utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
@@ -771,7 +842,7 @@ written_translations:
 class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationSnapshotsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
@@ -827,7 +898,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationStatisticsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
@@ -878,7 +949,7 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StartedTutorialEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_record_user_saw_tutorial(self):
@@ -908,7 +979,7 @@ class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TopUnresolvedAnswersHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -931,7 +1002,7 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateInteractionStatsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
@@ -974,7 +1045,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                 'Available states: [\'Introduction\']'
             ]
         )
-        self.assertRaisesRegexp(Exception, 'Bad response: 503')
+        self.assertRaisesRegex(Exception, 'Bad response: 503')
 
         self.logout()
 
@@ -1132,7 +1203,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 
     def setUp(self):
         """Create exploration with two versions."""
-        super(VersioningIntegrationTest, self).setUp()
+        super().setUp()
 
         exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
@@ -1163,6 +1234,13 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (
                 feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
             expected_status_int=404)
+
+    def test_check_revert_valid(self):
+        """Test if an old exploration version is valid."""
+        reader_dict = self.get_json(
+            '/createhandler/check_revert_valid/%s/%s' % (self.EXP_ID, 1))
+        self.assertTrue(reader_dict['valid'])
+        self.assertIsNone(reader_dict['details'])
 
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
@@ -1321,145 +1399,10 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
     COLLABORATOR2_USERNAME = 'collab2'
     COLLABORATOR3_EMAIL = 'collaborator3@example.com'
     COLLABORATOR3_USERNAME = 'collab3'
+    COLLABORATOR4_EMAIL = 'collaborator4@example.com'
+    COLLABORATOR4_USERNAME = 'collab4'
     RANDOM_USER_EMAIL = 'randomuser@example.com'
     RANDOM_USER_USERNAME = 'randomuser'
-
-    def test_for_assign_role_for_exploration(self):
-        """Test exploration rights handler for assign role for exploration."""
-        # Create several users.
-        self.signup(
-            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
-        self.signup(
-            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
-        self.signup(
-            self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
-
-        # Owner creates exploration.
-        self.login(self.OWNER_EMAIL)
-        exp_id = 'eid'
-        self.save_new_valid_exploration(
-            exp_id, self.owner_id, title='Title for rights handler test!',
-            category='My category')
-
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exploration.add_states(['State A', 'State 2', 'State 3'])
-        self.set_interaction_for_state(
-            exploration.states['State A'], 'TextInput')
-        self.set_interaction_for_state(
-            exploration.states['State 2'], 'TextInput')
-        self.set_interaction_for_state(
-            exploration.states['State 3'], 'TextInput')
-
-        csrf_token = self.get_new_csrf_token()
-
-        # Owner adds rights for other users.
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.VIEWER_USERNAME,
-                'new_member_role': rights_domain.ROLE_VIEWER
-            }, csrf_token=csrf_token)
-
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR2_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        # Check that viewer can access editor page but cannot edit.
-        self.login(self.VIEWER_EMAIL)
-        self.assert_cannot_edit(exp_id)
-        self.assert_cannot_voiceover(exp_id)
-        self.logout()
-
-        # Check that collaborator can access editor page and can edit.
-        self.login(self.COLLABORATOR_EMAIL)
-        self.assert_can_edit(exp_id)
-        self.assert_can_voiceover(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        # Check that collaborator can add a new state called 'State 4'.
-        response_dict = self.put_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-            {
-                'version': exploration.version,
-                'commit_message': 'Added State 4',
-                'change_list': [{
-                    'cmd': 'add_state',
-                    'state_name': 'State 4'
-                }]
-            },
-            csrf_token=csrf_token,
-            expected_status_int=200
-        )
-        self.assertIn('State 4', response_dict['states'])
-
-        # Check that collaborator cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-            }, csrf_token=csrf_token,
-            expected_status_int=401)
-
-        self.logout()
-
-        # Check that collaborator2 can access editor page and can edit.
-        self.login(self.COLLABORATOR2_EMAIL)
-        self.get_html_response('/create/%s' % exp_id)
-        self.assert_can_edit(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        # Check that collaborator2 can add a new state called 'State 5'.
-        response_dict = self.put_json(
-            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-            {
-                'version': exploration.version,
-                'commit_message': 'Added State 5',
-                'change_list': [{
-                    'cmd': 'add_state',
-                    'state_name': 'State 5'
-                }]
-            },
-            csrf_token=csrf_token,
-            expected_status_int=200
-        )
-        self.assertIn('State 5', response_dict['states'])
-
-        # Check that collaborator2 cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-                }, csrf_token=csrf_token, expected_status_int=401)
-
-        self.logout()
-
-        # Check that existing editor can be assigned to any other role.
-        self.login(self.OWNER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR_USERNAME,
-                'new_member_role': rights_domain.ROLE_OWNER
-            }, csrf_token=csrf_token)
-        self.logout()
 
     def test_for_deassign_editor_role(self):
         self.signup(
@@ -1614,6 +1557,343 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.get_json(
             '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
             expected_status_int=404)
+        self.logout()
+
+    def test_that_an_editor_can_edit_the_exploration(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator can add a new state called 'State B'.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200
+        )
+        self.assertIn('State B', response['states'])
+        self.logout()
+
+    def test_that_an_editor_cannot_assign_role_to_others(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator cannot add new members.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            }, csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.logout()
+
+    def test_that_a_viewer_cannot_edit_the_exploration(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator cannot add a new state called 'State B'.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have permissions to save this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+        self.logout()
+
+    def test_that_a_viewer_cannot_assign_role_to_others(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER
+            }, csrf_token=csrf_token)
+
+        # Check that collaborator cannot add new members.
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            }, csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+        self.logout()
+
+    def test_that_a_voice_artist_cannot_edit_the_exploration(self):
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, exp_id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        voiceover_artist_email = user_services.get_email_from_user_id(
+            self.voice_artist_id)
+
+        # Check that voiceover artist cannot add a new state
+        # called 'State B'.
+        self.login(voiceover_artist_email)
+        self.assert_cannot_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State B',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State B'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn('State B', reader_dict['states'])
+        self.logout()
+
+    def test_that_a_voice_artist_cannot_assign_role_to_others(self):
+        self.signup(
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A'])
+
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, exp_id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        voiceover_artist_email = user_services.get_email_from_user_id(
+            self.voice_artist_id)
+
+        # Check that voice artist cannot add new members.
+        self.login(voiceover_artist_email)
+        self.assert_cannot_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=401
+        )
+        error_msg = (
+            'You do not have credentials to change rights '
+            'for this exploration.'
+        )
+        self.assertEqual(response['error'], error_msg)
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertNotIn(
+            self.COLLABORATOR2_USERNAME,
+            reader_dict['rights']['editor_names']
+        )
         self.logout()
 
     def test_for_checking_username_is_valid(self):
@@ -1964,7 +2244,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
     EXP_ID = 'eid'
 
     def setUp(self):
-        super(ModeratorEmailsTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2131,7 +2411,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(FetchIssuesPlaythroughHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2291,7 +2571,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id1'
 
     def setUp(self):
-        super(ResolveIssueHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -2500,7 +2780,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             exploration_id=self.EXP_ID3).put()
 
     def setUp(self):
-        super(EditorAutosaveTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self._create_explorations_for_tests()
@@ -2635,6 +2915,45 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(response['draft_change_list_id'], 2)
         self.assertTrue(response['changes_are_mergeable'])
 
+    def test_draft_not_updated_without_editing_rights(self):
+        payload = {
+            'change_list': self.NEW_CHANGELIST,
+            'version': 10,
+        }
+
+        exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+            '%s.%s' % (self.owner_id, self.EXP_ID2))
+        self.assertNotEqual(
+            exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
+        self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
+
+        # User will behave as a voice artist because check_can_edit_activity
+        # is false but check_can_voiceover_activity is still true.
+        get_voiceover_swap = self.swap_to_always_return(
+            rights_manager, 'check_can_edit_activity', value=False)
+
+        with get_voiceover_swap:
+            response = self.put_json(
+                '/createhandler/autosave_draft/%s' % self.EXP_ID2,
+                payload,
+                csrf_token=self.csrf_token,
+                expected_status_int=400
+            )
+            exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
+                '%s.%s' % (self.owner_id, self.EXP_ID2))
+            self.assertNotEqual(
+                exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+            self.assertNotEqual(exp_user_data.draft_change_list_exp_version, 10)
+            self.assertNotEqual(exp_user_data.draft_change_list_id, 2)
+
+        error_msg = (
+            'Voice artist does not have permission to make some changes '
+            'in the change list.'
+        )
+
+        self.assertEqual(response['error'], error_msg)
+
     def test_draft_updated_version_invalid(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
@@ -2749,7 +3068,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def setUp(self):
-        super(LearnerAnswerInfoHandlerTests, self).setUp()
+        super().setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
@@ -2807,7 +3126,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         question = self.save_new_question(
             question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
-        self.assertNotEqual(question, None)
+        self.assertIsNotNone(question)
         interaction_id = question.question_state_data.interaction.id
         customization_args = (
             question.question_state_data.interaction.to_dict()[
@@ -2856,7 +3175,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 len(learner_answer_details.learner_answer_info_list), 1)
             learner_answer_info_id = (
                 learner_answer_details.learner_answer_info_list[0].id)
-            self.assertNotEqual(learner_answer_info_id, None)
+            self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 '%s/%s/%s?state_name=%s&learner_answer_info_id=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
@@ -2884,7 +3203,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         question = self.save_new_question(
             question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
-        self.assertNotEqual(question, None)
+        self.assertIsNotNone(question)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))
         self.assertEqual(state_reference, question_id)
@@ -2899,7 +3218,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 len(learner_answer_details.learner_answer_info_list), 1)
             learner_answer_info_id = (
                 learner_answer_details.learner_answer_info_list[0].id)
-            self.assertNotEqual(learner_answer_info_id, None)
+            self.assertIsNotNone(learner_answer_info_id)
             self.delete_json(
                 '%s/%s/%s?learner_answer_info_id=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
@@ -2935,5 +3254,153 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.assertTrue(response['can_voiceover'])
         self.assertFalse(response['can_unpublish'])
         self.assertFalse(response['can_manage_voice_artist'])
+
+        self.logout()
+
+
+class ImageUploadHandlerTests(BaseEditorControllerTests):
+
+    def test_return_error_when_image_not_uploaded(self):
+        """Test that an error is returned when no image is uploaded."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'image_file.svg'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # Check that the file is not already present.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        response = self.post_json(
+            publish_url, {
+                'image': 'sample_image',
+                'filename': filename,
+                'filename_prefix': filename_prefix
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+
+        error_msg = ('No image supplied')
+        self.assertEqual(response['error'], error_msg)
+
+        # Check that the file is not uploaded.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        self.logout()
+
+    def test_return_error_when_uploaded_image_already_exists(self):
+        """Test that an error is returned when uploaded
+        image already exists.
+        """
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'img.png'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # Check that the file is not already present.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        # Read raw image for testing.
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        get_image_exists_swap = self.swap_to_always_return(
+            fs_services.GcsFileSystem, 'isfile', value=True)
+
+        with get_image_exists_swap:
+            response = self.post_json(
+                publish_url, {
+                    'image': 'img',
+                    'filename': filename,
+                    'filename_prefix': filename_prefix
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=(('image', 'unused_filename', raw_image),)
+            )
+
+        error_msg = (
+            'A file with the name %s already exists. Please choose a '
+            'different name.' % filename
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        # Check that the file is not uploaded.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+
+        self.logout()
+
+    def test_upload_successful_when_image_uploaded(self):
+        """Test that no error is returned when valid image is uploaded."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename = 'img.png'
+        filename_prefix = 'image'
+
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        # Check that the file is not already present.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertFalse(fs.isfile(filepath))
+        # Read raw image for testing.
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        response = self.post_json(
+            publish_url, {
+                'image': 'img',
+                'filename': filename,
+                'filename_prefix': filename_prefix
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200,
+            upload_files=(('image', 'unused_filename', raw_image),)
+        )
+        self.assertEqual(response['filename'], filename)
+
+        # Check that the file is uploaded successfully.
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+        filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertTrue(fs.isfile(filepath))
 
         self.logout()

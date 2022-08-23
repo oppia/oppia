@@ -3,6 +3,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Test
 correctness_feedback_enabled: false
+edits_allowed: true
 init_state_name: Continue
 language_code: en
 objective: check all the interactions work

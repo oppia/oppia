@@ -18,15 +18,15 @@ from __future__ import annotations
 
 import io
 import logging
+import urllib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import value_generators_domain
 
 
@@ -85,7 +85,7 @@ class AssetDevHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            filename = python_utils.urllib_unquote(encoded_filename)
+            filename = urllib.parse.unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi
@@ -98,8 +98,7 @@ class AssetDevHandler(base.BaseHandler):
             if page_context not in self._SUPPORTED_PAGE_CONTEXTS:
                 raise self.InvalidInputException
 
-            fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(page_context, page_identifier))
+            fs = fs_services.GcsFileSystem(page_context, page_identifier)
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

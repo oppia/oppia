@@ -1,49 +1,50 @@
 <div class="h-100">
-  <div ng-if="!$ctrl.explanationEditorIsOpen"
+  <div *ngIf="!explanationEditorIsOpen"
        class="h-100"
-       ng-attr-title="<[$ctrl.isEditable ? 'Edit explanation' : '']>">
+       [attr.title]="isEditable ? 'Edit explanation' : ''">
     <div class="oppia-readonly-rule-tile"
-         ng-class="{'oppia-editable-section': $ctrl.isEditable}">
+         [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing"
-             ng-if="$ctrl.isEditable" ng-click="$ctrl.openExplanationEditor()">
+             *ngIf="isEditable" (click)="openExplanationEditor()">
           <i class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Explanation">&#xE254;
           </i>
         </div>
         <strong>Explanation:</strong>
         <span>
-          <angular-html-bind class="oppia-rte-editor" html-data="$ctrl.StateSolutionService.savedMemento.explanation.html">
-          </angular-html-bind>
+          <oppia-rte-output-display class="oppia-rte-editor" [rteString]="stateSolutionService.savedMemento.explanation.html">
+          </oppia-rte-output-display>
         </span>
       </div>
     </div>
   </div>
 
-  <div ng-if="$ctrl.isEditable && $ctrl.explanationEditorIsOpen">
+  <div *ngIf="isEditable && explanationEditorIsOpen">
     <div class="oppia-rule-details-header">
       <strong>Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-      <schema-based-editor schema="$ctrl.EXPLANATION_FORM_SCHEMA"
-                           local-value="$ctrl.StateSolutionService.displayed.explanation._html">
+      <schema-based-editor [schema]="getSchema()"
+                           [localValue]="stateSolutionService.displayed.explanation._html"
+                           (localValueChange)="updateExplanationHtml($event)">
       </schema-based-editor>
     </div>
 
-    <div ng-if="$ctrl.isSolutionExplanationLengthExceeded()" class="oppia-length-validation-error">
-      The solution explanation is too long. Please use at most 3000 characters.
+    <div *ngIf="isSolutionExplanationLengthExceeded()" class="oppia-length-validation-error">
+      The solution explanation is too long. Please use at most 1000 characters.
     </div>
 
     <div class="oppia-rule-save-cancel-buttons">
-      <div class="float-right">
+      <div class="modal-footer">
         <button type="button"
                 class="btn btn-secondary"
-                ng-click="$ctrl.cancelThisExplanationEdit()">
+                (click)="cancelThisExplanationEdit()">
           Cancel
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!$ctrl.StateSolutionService.displayed.explanation.html || $ctrl.isSolutionExplanationLengthExceeded()"
-                ng-click="$ctrl.saveThisExplanation()">
+                [disabled]="!stateSolutionService.displayed.explanation.html || isSolutionExplanationLengthExceeded()"
+                (click)="saveThisExplanation()">
           Save
         </button>
       </div>
@@ -52,3 +53,11 @@
     </div>
   </div>
 </div>
+
+<style>
+  @media screen and (max-width: 500px) {
+    .oppia-editor-edit-icon {
+      right: 3px;
+    }
+  }
+</style>

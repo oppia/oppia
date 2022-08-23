@@ -16,168 +16,171 @@
  * @fileoverview Component for question opportunities.
  */
 
-require('components/ck-editor-helpers/ck-editor-4-rte.component.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require(
-  'components/question-difficulty-selector/' +
-  'question-difficulty-selector.component.ts');
-require(
-  'components/question-directives/question-editor/' +
-  'question-editor.component.ts');
-require(
-  'pages/contributor-dashboard-page/login-required-message/' +
-  'login-required-message.component.ts');
-require(
-  'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.component.ts');
-require(
-  'pages/contributor-dashboard-page/modal-templates/' +
-  'question-suggestion-editor-modal.controller.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'question-opportunities-select-skill-and-difficulty-modal.controller.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import constants from 'assets/constants';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
+import { TranslationOpportunity } from '../modal-templates/translation-modal.component';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
 
-require(
-  'components/question-directives/questions-list/' +
-  'questions-list.constants.ajs.ts');
-require('directives/angular-html-bind.directive.ts');
-require('directives/mathjax-bind.directive.ts');
-require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
-require('third-party-imports/ui-codemirror.import.ts');
-require(
-  'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.component.ts');
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-opportunities.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/site-analytics.service.ts');
+interface Opportunity {
+  id: string;
+  heading: string;
+  subheading: string;
+  progressPercentage: string;
+  actionButtonTitle: string;
+}
 
-angular.module('oppia').component('questionOpportunities', {
-  template: require('./question-opportunities.component.html'),
-  controller: [
-    '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
-    'ContributionOpportunitiesService', 'QuestionObjectFactory',
-    'QuestionUndoRedoService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'MAX_QUESTIONS_PER_SKILL',
-    function(
-        $rootScope, $uibModal, AlertsService, ContextService,
-        ContributionOpportunitiesService, QuestionObjectFactory,
-        QuestionUndoRedoService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
-      const ctrl = this;
-      let userIsLoggedIn = false;
-      let allOpportunities = [];
+interface GetSkillOpportunitiesResponse {
+  opportunities: SkillOpportunity[];
+  more: boolean;
+}
 
-      var getPresentableOpportunitiesData = function({opportunities, more}) {
-        let opportunitiesDicts = [];
-        for (let index in opportunities) {
-          const opportunity = opportunities[index];
-          const heading = opportunity.getOpportunityHeading();
-          const subheading = opportunity.getOpportunitySubheading();
-          const progressPercentage = (
-            (opportunity.getQuestionCount() / MAX_QUESTIONS_PER_SKILL) *
-            100).toFixed(2);
-          var opportunityDict = {
-            id: opportunity.id,
-            heading: heading,
-            subheading: subheading,
-            progressPercentage: progressPercentage,
-            actionButtonTitle: 'Suggest Question',
-          };
-          allOpportunities[opportunityDict.id] = opportunityDict;
-          opportunitiesDicts.push(opportunityDict);
-        }
-        return {opportunitiesDicts, more};
+interface GetPresentableOpportunitiesResponse {
+  opportunitiesDicts: Opportunity[];
+  more: boolean;
+}
+
+@Component({
+  selector: 'oppia-question-opportunities',
+  templateUrl: './question-opportunities.component.html'
+})
+export class QuestionOpportunitiesComponent implements OnInit {
+  userIsLoggedIn: boolean = false;
+  allOpportunities = [];
+
+  constructor(
+    private alertsService: AlertsService,
+    private contextService: ContextService,
+    private contributionOpportunitiesService: ContributionOpportunitiesService,
+    private ngbModal: NgbModal,
+    private questionObjectFactory: QuestionObjectFactory,
+    private questionUndoRedoService: QuestionUndoRedoService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private userService: UserService,
+  ) {}
+
+  getPresentableOpportunitiesData(
+      opportunitiesObject: GetSkillOpportunitiesResponse
+  ): GetPresentableOpportunitiesResponse {
+    const opportunitiesDicts = [];
+    const more = opportunitiesObject.more;
+
+    for (let index in opportunitiesObject.opportunities) {
+      const opportunity = opportunitiesObject.opportunities[index];
+      const heading = opportunity.getOpportunityHeading();
+      const subheading = opportunity.getOpportunitySubheading();
+      const progressPercentage = (
+        (opportunity.getQuestionCount() / constants.MAX_QUESTIONS_PER_SKILL) *
+        100).toFixed(2);
+      const opportunityDict = {
+        id: opportunity.id,
+        heading: heading,
+        subheading: subheading,
+        progressPercentage: progressPercentage,
+        actionButtonTitle: 'Suggest Question',
       };
 
-      ctrl.createQuestion = function(skill, skillDifficulty) {
-        const skillId = skill.getId();
-        const question =
-          QuestionObjectFactory.createDefaultQuestion([skillId]);
-        const questionId = question.getId();
-        const questionStateData = question.getStateData();
-        QuestionUndoRedoService.clearChanges();
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/contributor-dashboard-page/modal-templates/' +
-            'question-suggestion-editor-modal.directive.html'),
-          size: 'lg',
-          backdrop: 'static',
-          keyboard: false,
-          resolve: {
-            suggestionId: () => '',
-            question: () => question,
-            questionId: () => questionId,
-            questionStateData: () => questionStateData,
-            skill: () => skill,
-            skillDifficulty: () => skillDifficulty
-          },
-          controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {}, function() {
-          ContextService.resetImageSaveDestination();
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-          $rootScope.$applyAsync();
-        });
-      };
-
-      ctrl.$onInit = function() {
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          userIsLoggedIn = userInfo.isLoggedIn();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-      };
-
-      ctrl.loadMoreOpportunities = function() {
-        return ContributionOpportunitiesService.getMoreSkillOpportunitiesAsync()
-          .then(getPresentableOpportunitiesData);
-      };
-
-      ctrl.loadOpportunities = function() {
-        return ContributionOpportunitiesService.getSkillOpportunitiesAsync()
-          .then(getPresentableOpportunitiesData);
-      };
-
-      ctrl.onClickSuggestQuestionButton = function(skillId) {
-        if (!userIsLoggedIn) {
-          ContributionOpportunitiesService.showRequiresLoginModal();
-          return;
-        }
-
-        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
-          'Question');
-
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
-            'select-skill-and-difficulty-modal.template.html'),
-          backdrop: true,
-          resolve: {
-            skillId: () => skillId
-          },
-          controller: (
-            'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
-        }).result.then(function(result) {
-          if (AlertsService.warnings.length === 0) {
-            ctrl.createQuestion(result.skill, result.skillDifficulty);
-          }
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
+      this.allOpportunities[opportunityDict.id] = opportunityDict;
+      opportunitiesDicts.push(opportunityDict);
     }
-  ]
-});
+
+    return {opportunitiesDicts, more};
+  }
+
+  createQuestion(
+      skill: Skill, skillDifficulty: number): void {
+    const skillId = skill.getId();
+    const question = (
+      this.questionObjectFactory.createDefaultQuestion([skillId]));
+    const questionId = question.getId();
+    const questionStateData = question.getStateData();
+    this.questionUndoRedoService.clearChanges();
+
+    const modalRef = this.ngbModal.open(
+      QuestionSuggestionEditorModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        keyboard: false,
+      });
+
+    modalRef.componentInstance.suggestionId = '';
+    modalRef.componentInstance.question = question;
+    modalRef.componentInstance.questionId = questionId;
+    modalRef.componentInstance.questionStateData = questionStateData;
+    modalRef.componentInstance.skill = skill;
+    modalRef.componentInstance.skillDifficulty = skillDifficulty;
+
+    modalRef.result.then(() => {}, () => {
+      this.contextService.resetImageSaveDestination();
+    });
+  }
+
+  loadMoreOpportunities(): Promise<{
+    opportunitiesDicts: TranslationOpportunity[];
+    more: boolean;
+  }> {
+    return (
+      this.contributionOpportunitiesService
+        .getMoreSkillOpportunitiesAsync().then(
+          this.getPresentableOpportunitiesData.bind(this)));
+  }
+
+  loadOpportunities(): Promise<{
+    opportunitiesDicts: TranslationOpportunity[];
+    more: boolean;
+  }> {
+    return (
+      this.contributionOpportunitiesService
+        .getSkillOpportunitiesAsync().then(
+          this.getPresentableOpportunitiesData.bind(this)));
+  }
+
+  onClickSuggestQuestionButton(skillId: string): void {
+    if (!this.userIsLoggedIn) {
+      this.contributionOpportunitiesService.showRequiresLoginModal();
+      return;
+    }
+
+    this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
+      'Question');
+
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      QuestionsOpportunitiesSelectDifficultyModalComponent, {
+        backdrop: true,
+      });
+
+    modalRef.componentInstance.skillId = skillId;
+
+    modalRef.result.then((result) => {
+      if (this.alertsService.warnings.length === 0) {
+        this.createQuestion(result.skill, result.skillDifficulty);
+      }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  ngOnInit(): void {
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });
+  }
+}
+
+angular.module('oppia').directive('oppiaQuestionOpportunities',
+  downgradeComponent({
+    component: QuestionOpportunitiesComponent
+  }) as angular.IDirectiveFactory);

@@ -34,87 +34,93 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Callable, Dict, List, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import question_models
+
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
     """Test the question services module."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create dummy user."""
-        super(QuestionServicesUnitTest, self).setUp()
+        super().setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.topic_manager_id = self.get_user_id_from_email(
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.topic_manager_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
             self.TOPIC_MANAGER_EMAIL)
-        self.new_user_id = self.get_user_id_from_email(
+        self.new_user_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
             self.NEW_USER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(
+        self.editor_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
             self.EDITOR_EMAIL)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.new_user = user_services.get_user_actions_info(self.new_user_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
-        self.save_new_topic(
+        self.save_new_topic(  # type: ignore[no-untyped-call]
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic_1], next_subtopic_id=2)
 
-        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)  # type: ignore[no-untyped-call]
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
 
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skill_1', self.admin_id, description='Skill Description 1')
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skill_2', self.admin_id, description='Skill Description 2')
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skill_3', self.admin_id, description='Skill Description 3')
 
         self.question_id = question_services.get_new_question_id()
-        self.question = self.save_new_question(
+        self.question = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'],
             inapplicable_skill_misconception_ids=[
                 'skillid12345-1', 'skillid12345-2'])
 
         self.question_id_1 = question_services.get_new_question_id()
-        self.question_1 = self.save_new_question(
+        self.question_1 = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id_1, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_2'])
 
         self.question_id_2 = question_services.get_new_question_id()
-        self.question_2 = self.save_new_question(
+        self.question_2 = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_2'])
 
-    def test_get_question_by_id(self):
+    def test_get_question_by_id(self) -> None:
         question = question_services.get_question_by_id(self.question_id)
 
         self.assertEqual(question.id, self.question_id)
-        question = question_services.get_question_by_id(
+        question_with_none = question_services.get_question_by_id(
             'question_id', strict=False)
-        self.assertIsNone(question)
+        self.assertIsNone(question_with_none)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Entity for class QuestionModel with id question_id '
             'not found'):
             question_services.get_question_by_id('question_id')
 
-    def test_get_questions_by_skill_ids_with_fetch_by_difficulty(self):
+    def test_get_questions_by_skill_ids_with_fetch_by_difficulty(self) -> None:
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -124,13 +130,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         questions = question_services.get_questions_by_skill_ids(
             2, ['skill_1', 'skill_2'], True)
-        questions.sort(key=lambda question: question.last_updated)
+        sort_fn: Callable[[question_domain.Question], float] = (
+            lambda question: question.last_updated.timestamp()
+            if question.last_updated else 0
+        )
+        questions.sort(key=sort_fn)
 
         self.assertEqual(len(questions), 2)
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
         self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())
 
-    def test_get_total_question_count_for_skill_ids(self):
+    def test_get_total_question_count_for_skill_ids(self) -> None:
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -163,7 +173,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 ['skill_1', 'skill_1', 'skill_2']))
         self.assertEqual(question_count, 3)
 
-    def test_update_question_skill_link_difficulty(self):
+    def test_update_question_skill_link_difficulty(self) -> None:
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
@@ -182,12 +192,14 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.9])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'The given question and skill are not linked.'):
             question_services.update_question_skill_link_difficulty(
                 self.question_id, 'skill_10', 0.9)
 
-    def test_get_questions_by_skill_ids_without_fetch_by_difficulty(self):
+    def test_get_questions_by_skill_ids_without_fetch_by_difficulty(
+        self
+    ) -> None:
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -197,7 +209,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         questions = question_services.get_questions_by_skill_ids(
             4, ['skill_1', 'skill_2'], False)
-        questions.sort(key=lambda question: question.last_updated)
+        sort_fn: Callable[[question_domain.Question], float] = (
+            lambda question: question.last_updated.timestamp()
+            if question.last_updated else 0
+        )
+        questions.sort(key=sort_fn)
 
         self.assertEqual(len(questions), 3)
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
@@ -205,19 +221,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())
 
     def test_get_questions_by_skill_ids_raise_error_with_high_question_count(
-            self):
-        with self.assertRaisesRegexp(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Question count is too high, please limit the question '
             'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             question_services.get_questions_by_skill_ids(
                 25, ['skill_1', 'skill_2'], False)
 
-    def test_create_multi_question_skill_links_for_question(self):
-        self.question = self.save_new_question(
+    def test_create_multi_question_skill_links_for_question(self) -> None:
+        self.question = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Skill difficulties and skill ids should match. '
             'The lengths of the two lists are different.'):
             question_services.link_multiple_skills_for_question(
@@ -229,9 +246,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         skill_ids = [skill.id for skill in
                      question_services.get_skills_linked_to_question(
                          self.question_id)]
-        self.assertItemsEqual(skill_ids, ['skill_1', 'skill_2'])
+        self.assertItemsEqual(skill_ids, ['skill_1', 'skill_2'])  # type: ignore[no-untyped-call]
 
-    def test_delete_question_skill_link(self):
+    def test_delete_question_skill_link(self) -> None:
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
@@ -241,7 +258,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         skill_ids = [skill.id for skill in
                      question_services.get_skills_linked_to_question(
                          self.question_id)]
-        self.assertItemsEqual(skill_ids, ['skill_2'])
+        self.assertItemsEqual(skill_ids, ['skill_2'])  # type: ignore[no-untyped-call]
 
         question_services.delete_question_skill_link(
             self.editor_id, self.question_id, 'skill_2')
@@ -250,9 +267,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id, strict=False)
         self.assertIsNone(question)
 
-    def test_linking_same_skill_to_question_twice(self):
+    def test_linking_same_skill_to_question_twice(self) -> None:
         question_id_2 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
         skill_ids = [skill.id for skill in
@@ -273,11 +290,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                      question_services.get_skills_linked_to_question(
                          question_id_2)]
         self.assertEqual(len(skill_ids), 2)
-        self.assertItemsEqual(skill_ids, ['skill_1', 'skill_2'])
+        self.assertItemsEqual(skill_ids, ['skill_1', 'skill_2'])  # type: ignore[no-untyped-call]
 
-    def test_create_and_get_question_skill_link(self):
+    def test_create_and_get_question_skill_link(self) -> None:
         question_id_2 = question_services.get_new_question_id()
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             re.escape(
                 'Entity for class QuestionModel with id %s not found' % (
@@ -285,12 +302,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id_2, 'skill_1', 0.5)
 
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
@@ -302,22 +319,26 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, 'skill_2', 0.2)
 
-        question_summaries, merged_question_skill_links = (
+        question_summaries_with_none, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3'], 0))
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], 0)
-        question_ids = [summary.id for summary in question_summaries]
+        question_ids = []
+        for summary in question_summaries_with_none:
+            # Ruling out the possibility of None for mypy type checking.
+            assert summary is not None
+            question_ids.append(summary.id)
 
         self.assertEqual(len(question_ids), 3)
         self.assertEqual(len(merged_question_skill_links), 3)
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             question_ids, [self.question_id, question_id_2, question_id_3])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             question_ids, [
                 question_skill_link.question_id
                 for question_skill_link in merged_question_skill_links])
@@ -342,23 +363,32 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertEqual(
                     [0.2], link_object.skill_difficulties)
 
-        question_summaries, merged_question_skill_links = (
+        question_summaries_with_none, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
                 5, ['skill_1', 'skill_3'], 0))
-        question_ids = [summary.id for summary in question_summaries]
+        question_ids = []
+        for summary in question_summaries_with_none:
+            # Ruling out the possibility of None for mypy type checking.
+            assert summary is not None
+            question_ids.append(summary.id)
         self.assertEqual(len(question_ids), 2)
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             question_ids, [self.question_id, question_id_2])
 
-        with self.assertRaisesRegexp(
-            Exception, 'The given question is already linked to given skill'):
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'The question with ID %s is already linked to skill skill_1' % (
+                self.question_id
+            )
+        ):
             question_services.create_new_question_skill_link(
                 self.editor_id, self.question_id, 'skill_1', 0.3)
 
     def test_get_displayable_question_skill_link_details_with_no_skill_ids(
-            self):
+        self
+    ) -> None:
         question_id = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
@@ -372,7 +402,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question_summaries, [])
         self.assertEqual(merged_question_skill_links, [])
 
-    def test_get_question_skill_links_of_skill(self):
+    def test_get_question_skill_links_of_skill(self) -> None:
         # If the skill id doesnt exist at all, it returns an empty list.
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
@@ -386,12 +416,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 0)
 
         question_id_2 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_2'])
         # Setting skill difficulty for self.question_id.
@@ -412,16 +442,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_skill_links[0], question_domain.QuestionSkillLink))
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             question_ids, [self.question_id, question_id_2])
         for question_skill in question_skill_links:
             if question_skill.question_id == self.question_id:
                 self.assertEqual(question_skill.skill_difficulty, 0.5)
 
-    def test_get_question_summaries_by_ids(self):
+    def test_get_question_summaries_by_ids(self) -> None:
         question_summaries = question_services.get_question_summaries_by_ids([
             self.question_id, 'invalid_question_id'])
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_summaries[0] is not None
         self.assertEqual(len(question_summaries), 2)
         self.assertEqual(question_summaries[0].id, self.question_id)
         self.assertEqual(
@@ -429,24 +461,24 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_CONTENT_STR)
         self.assertIsNone(question_summaries[1])
 
-    def test_delete_question(self):
+    def test_delete_question(self) -> None:
         question_summary_model = question_models.QuestionSummaryModel.get(
             self.question_id)
         self.assertFalse(question_summary_model is None)
 
         question_services.delete_question(self.editor_id, self.question_id)
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
 
-        with self.assertRaisesRegexp(Exception, (
+        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
             'Entity for class QuestionSummaryModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionSummaryModel.get(self.question_id)
 
-    def test_delete_question_marked_deleted(self):
+    def test_delete_question_marked_deleted(self) -> None:
         question_models.QuestionModel.delete_multi(
             [self.question_id], self.editor_id,
             feconf.COMMIT_MESSAGE_QUESTION_DELETED, force_deletion=False)
@@ -463,13 +495,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_models.QuestionSummaryModel.get(
                 self.question_id, strict=False), None)
 
-    def test_delete_question_model_with_deleted_summary_model(self):
+    def test_delete_question_model_with_deleted_summary_model(self) -> None:
         question_summary_model = (
             question_models.QuestionSummaryModel.get(self.question_id))
         question_summary_model.delete()
-        question_summary_model = (
+        question_summary_model_with_none = (
             question_models.QuestionSummaryModel.get(self.question_id, False))
-        self.assertIsNone(question_summary_model)
+        self.assertIsNone(question_summary_model_with_none)
 
         question_services.delete_question(
             self.editor_id, self.question_id, force_deletion=True)
@@ -480,7 +512,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_models.QuestionSummaryModel.get(
                 self.question_id, strict=False), None)
 
-    def test_update_question(self):
+    def test_update_question(self) -> None:
         new_question_data = self._create_valid_question_data('DEF')
         change_dict = {
             'cmd': 'update_question_property',
@@ -499,7 +531,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question.question_state_data.to_dict(), new_question_data.to_dict())
         self.assertEqual(question.version, 2)
 
-    def test_cannot_update_question_with_no_commit_message(self):
+    def test_cannot_update_question_with_no_commit_message(self) -> None:
         new_question_data = self._create_valid_question_data('DEF')
         change_dict = {
             'cmd': 'update_question_property',
@@ -509,13 +541,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         }
         change_list = [question_domain.QuestionChange(change_dict)]
 
-        with self.assertRaisesRegexp(
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected a commit message, received none.'):
             question_services.update_question(
-                self.editor_id, self.question_id, change_list, None)
+                self.editor_id, self.question_id, change_list, None)  # type: ignore[arg-type]
 
-    def test_cannot_update_question_with_no_change_list(self):
-        with self.assertRaisesRegexp(
+    def test_cannot_update_question_with_no_change_list(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save question'):
@@ -523,7 +558,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.editor_id, self.question_id, [],
                 'updated question data')
 
-    def test_update_question_language_code(self):
+    def test_update_question_language_code(self) -> None:
         self.assertEqual(self.question.language_code, 'en')
         change_dict = {
             'cmd': 'update_question_property',
@@ -541,11 +576,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question.language_code, 'bn')
         self.assertEqual(question.version, 2)
 
-    def test_update_inapplicable_skill_misconception_ids(self):
+    def test_update_inapplicable_skill_misconception_ids(self) -> None:
         self.assertEqual(
             self.question.inapplicable_skill_misconception_ids,
             ['skillid12345-1', 'skillid12345-2'])
-        change_dict = {
+        change_dict: Dict[str, Union[str, List[str]]] = {
             'cmd': 'update_question_property',
             'property_name': 'inapplicable_skill_misconception_ids',
             'new_value': ['skillid12345-1'],
@@ -562,36 +597,39 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question.inapplicable_skill_misconception_ids, ['skillid12345-1'])
         self.assertEqual(question.version, 2)
 
-    def test_cannot_update_question_with_invalid_change_list(self):
+    def test_cannot_update_question_with_invalid_change_list(self) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *args):
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaisesRegexp(
+        assert_raises_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, '\'str\' object has no attribute \'cmd\'')
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         with logging_swap, assert_raises_context_manager:
             question_services.update_question(
-                self.editor_id, self.question_id, 'invalid_change_list',
+                self.editor_id, self.question_id, 'invalid_change_list',  # type: ignore[arg-type]
                 'updated question language code')
 
         self.assertEqual(len(observed_log_messages), 1)
-        self.assertRegexpMatches(
+        self.assertRegex(
             observed_log_messages[0],
             'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
 
-    def test_replace_skill_id_for_all_questions(self):
+    def test_replace_skill_id_for_all_questions(self) -> None:
         question_id_2 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
@@ -608,7 +646,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             question_ids, [self.question_id, question_id_2])
         for question_skill in question_skill_links:
             if question_skill.question_id == self.question_id:
@@ -628,7 +666,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             question_ids, [self.question_id, question_id_2])
         for question_skill in question_skill_links:
             if question_skill.question_id == self.question_id:
@@ -637,34 +675,49 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, question_id_2, question_id_3])
         for question in questions:
+            # Ruling out the possibility of None for mypy type checking.
+            assert question is not None
             if question.id in ([self.question_id, question_id_2]):
-                self.assertItemsEqual(question.linked_skill_ids, ['skill_3'])
+                self.assertItemsEqual(question.linked_skill_ids, ['skill_3'])  # type: ignore[no-untyped-call]
             else:
-                self.assertItemsEqual(question.linked_skill_ids, ['skill_2'])
+                self.assertItemsEqual(question.linked_skill_ids, ['skill_2'])  # type: ignore[no-untyped-call]
 
-    def test_compute_summary_of_question(self):
+    def test_compute_summary_of_question(self) -> None:
+        question = question_services.get_question_by_id(self.question_id)
         question_summary = question_services.compute_summary_of_question(
-            self.question)
+            question)
 
         self.assertEqual(question_summary.id, self.question_id)
         self.assertEqual(
             question_summary.question_content,
             feconf.DEFAULT_INIT_STATE_CONTENT_STR)
 
-    def test_get_skills_of_question(self):
+    def test_raises_error_while_computing_summary_if_interaction_id_is_none(
+        self
+    ) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        question.question_state_data.interaction.id = None
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No interaction_id found for the given question.'
+        ):
+            question_services.compute_summary_of_question(question)
+
+    def test_get_skills_of_question(self) -> None:
         # If the question id doesnt exist at all, it returns an empty list.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Entity for class QuestionModel with id '
             'non_existent_question_id not found'):
             question_services.get_skills_linked_to_question(
                 'non_existent_question_id')
         question_id_2 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
@@ -683,17 +736,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(skills[0], skill_domain.Skill))
         self.assertEqual(len(skills), 2)
         skill_ids = [skill.id for skill in skills]
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             skill_ids, ['skill_1', 'skill_2'])
 
-    def test_get_interaction_id_for_question(self):
+    def test_get_interaction_id_for_question(self) -> None:
         self.assertEqual(
             question_services.get_interaction_id_for_question(
                 self.question_id), 'TextInput')
-        with self.assertRaisesRegexp(Exception, 'No questions exists with'):
+        with self.assertRaisesRegex(Exception, 'No questions exists with'):  # type: ignore[no-untyped-call]
             question_services.get_interaction_id_for_question('fake_q_id')
 
-    def test_untag_deleted_misconceptions_on_no_change_to_skill(self):
+    def test_untag_deleted_misconceptions_on_no_change_to_skill(self) -> None:
         misconceptions = [
             skill_domain.Misconception(
                 0, 'misconception-name', '<p>description</p>',
@@ -711,7 +764,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 4, 'misconception-name', '<p>description</p>',
                 '<p>default_feedback</p>', False)
         ]
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skillid12345', self.admin_id,
             description='Skill with misconceptions',
             misconceptions=misconceptions)
@@ -722,6 +775,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': '<p>Feedback</p>'
@@ -746,6 +800,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_2',
                         'html': '<p>Feedback</p>'
@@ -770,6 +825,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_0',
                         'html': '<p>Feedback</p>'
@@ -813,7 +869,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skillid12345-3',
             'skillid12345-4'
         ]
-        self.question = self.save_new_question(
+        self.question = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
             question_state_data, ['skillid12345'],
             inapplicable_skill_misconception_ids=(
@@ -848,7 +904,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
 
-    def test_untag_deleted_misconceptions_correctly_on_updating_skill(self):
+    def test_untag_deleted_misconceptions_correctly_on_updating_skill(
+        self
+    ) -> None:
         misconceptions = [
             skill_domain.Misconception(
                 0, 'misconception-name', '<p>description</p>',
@@ -866,7 +924,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 4, 'misconception-name', '<p>description</p>',
                 '<p>default_feedback</p>', False)
         ]
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skillid12345', self.admin_id,
             description='Skill with misconceptions',
             misconceptions=misconceptions)
@@ -877,6 +935,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': '<p>Feedback</p>'
@@ -901,6 +960,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_2',
                         'html': '<p>Feedback</p>'
@@ -925,6 +985,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_0',
                         'html': '<p>Feedback</p>'
@@ -968,7 +1029,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skillid12345-3',
             'skillid12345-4'
         ]
-        self.question = self.save_new_question(
+        self.question = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
             question_state_data, ['skillid12345'],
             inapplicable_skill_misconception_ids=(
@@ -1005,7 +1066,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'misconception_id': 4,
             })
         ]
-        skill_services.update_skill(
+        skill_services.update_skill(  # type: ignore[no-untyped-call]
             self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
         self.process_and_flush_pending_tasks()
@@ -1030,10 +1091,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
 
-    def test_migrate_question_state_from_v29_to_latest(self):
+    def test_migrate_question_state_from_v29_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1071,6 +1133,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1122,10 +1185,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(answer_groups[0].tagged_skill_misconception_id, None)
 
-    def test_migrate_question_state_from_v30_to_latest(self):
+    def test_migrate_question_state_from_v30_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1171,6 +1235,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1232,10 +1297,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                             'duration_secs': 0.0}},
                     'rule_input_1': {}}})
 
-    def test_migrate_question_state_from_v31_to_latest(self):
+    def test_migrate_question_state_from_v31_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1273,6 +1339,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1319,10 +1386,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             cust_args['buttonText'].value.unicode_str,
             'Add item')
 
-    def test_migrate_question_state_from_v32_to_latest(self):
+    def test_migrate_question_state_from_v32_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1364,6 +1432,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1409,13 +1478,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(cust_args['choices'].value, [])
         self.assertEqual(cust_args['showChoicesInShuffledOrder'].value, True)
 
-    def test_migrate_question_state_from_v33_to_latest(self):
+    def test_migrate_question_state_from_v33_to_latest(self) -> None:
         feedback_html_content = (
             '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-value="'
             '&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': feedback_html_content
@@ -1460,6 +1530,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1514,10 +1585,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             migrated_answer_group.outcome.feedback.html,
             expected_feeedback_html_content)
 
-    def test_migrate_question_state_from_v34_to_latest(self):
+    def test_migrate_question_state_from_v34_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1560,6 +1632,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1624,6 +1697,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1666,6 +1740,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1723,7 +1798,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
+        self.assertEqual(len(answer_groups[0].rule_specs), 2)
         self.assertEqual(
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
@@ -1732,6 +1807,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1769,6 +1845,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1835,6 +1912,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups_list = [{
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1846,7 +1924,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'x+y'
+                    'x': 'x=y'
                 },
                 'rule_type': 'IsMathematicallyEquivalentTo'
             }],
@@ -1855,6 +1933,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }, {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_2',
                     'html': '<p>Feedback</p>'
@@ -1900,6 +1979,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_3',
                         'html': 'Correct Answer'
@@ -1941,12 +2021,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id,
-            'AlgebraicExpressionInput')
+            'MathEquationInput')
         self.assertEqual(len(answer_groups), 1)
         self.assertEqual(
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
@@ -1955,7 +2035,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             state_data.written_translations.translations_mapping.keys()), [
                 'content_1', 'feedback_1', 'feedback_3'])
 
-    def test_migrate_question_state_from_v35_to_latest(self):
+    def test_migrate_question_state_from_v35_to_latest(self) -> None:
         # Test restructuring of written_translations.
         question_state_dict = {
             'content': {
@@ -1981,6 +2061,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2062,6 +2143,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2130,6 +2212,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2201,6 +2284,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2259,7 +2343,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'showChoicesInShuffledOrder': {'value': True}
             })
 
-    def test_migrate_question_state_from_v36_to_latest(self):
+    def test_migrate_question_state_from_v36_to_latest(self) -> None:
         # Test restructuring of written_translations.
         question_state_dict = {
             'content': {
@@ -2276,6 +2360,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'answer_groups': [{
                     'outcome': {
                         'dest': None,
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': 'feedback_1',
                             'html': 'Correct Answer'
@@ -2304,6 +2389,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2359,10 +2445,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'rule_type': 'Equals'
             })
 
-    def test_migrate_question_state_from_v37_to_latest(self):
+    def test_migrate_question_state_from_v37_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2400,6 +2487,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2444,12 +2532,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['customOskLetters'].value, ['x', 'α', 'β'])
+            cust_args['allowedVariables'].value, ['x', 'α', 'β'])
 
-    def test_migrate_question_state_from_v38_to_latest(self):
+    def test_migrate_question_state_from_v38_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2487,6 +2576,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2534,10 +2624,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             cust_args['placeholder'].value.unicode_str,
             'Type an expression here, using only numbers.')
 
-    def test_migrate_question_state_with_text_input_from_v40_to_latest(self):
+    def test_migrate_question_state_with_text_input_from_v40_to_latest(
+        self
+    ) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2583,6 +2676,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2620,8 +2714,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_group = question.question_state_data.interaction.answer_groups[0]
-        rule_spec = answer_group.rule_specs[0]
+        answer_group_object = (
+            question.question_state_data.interaction.answer_groups[0]
+        )
+        rule_spec = answer_group_object.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
             {
@@ -2630,10 +2726,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             })
         self.assertEqual(question.question_state_data.next_content_id_index, 5)
 
-    def test_migrate_question_state_with_set_input_from_v40_to_latest(self):
+    def test_migrate_question_state_with_set_input_from_v40_to_latest(
+        self
+    ) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2678,6 +2777,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2715,8 +2815,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_group = question.question_state_data.interaction.answer_groups[0]
-        rule_spec = answer_group.rule_specs[0]
+        answer_group_object = (
+            question.question_state_data.interaction.answer_groups[0]
+        )
+        rule_spec = answer_group_object.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
             {
@@ -2725,10 +2827,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             })
         self.assertEqual(question.question_state_data.next_content_id_index, 5)
 
-    def test_migrate_question_state_from_v41_with_item_selection_input_interaction_to_latest(self): # pylint: disable=line-too-long
+    def test_migrate_question_state_from_v41_with_item_selection_input_interaction_to_latest(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2778,6 +2883,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2822,19 +2928,24 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_group = question.question_state_data.interaction.answer_groups[0]
+        answer_group_object = question.question_state_data.interaction.answer_groups[0]
         solution = question.question_state_data.interaction.solution
-        rule_spec = answer_group.rule_specs[0]
+        # Ruling out the possibility of None for mypy type checking.
+        assert solution is not None
+        rule_spec = answer_group_object.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
             ['ca_choices_2', 'ca_choices_3'])
         self.assertEqual(
             solution.correct_answer, ['ca_choices_2'])
 
-    def test_migrate_question_state_from_v41_with_drag_and_drop_sort_input_interaction_to_latest(self): # pylint: disable=line-too-long
+    def test_migrate_question_state_from_v41_with_drag_and_drop_sort_input_interaction_to_latest(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2900,6 +3011,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2944,27 +3056,30 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_group = question.question_state_data.interaction.answer_groups[0]
+        answer_group_object = question.question_state_data.interaction.answer_groups[0]
         solution = question.question_state_data.interaction.solution
+        # Ruling out the possibility of None for mypy type checking.
+        assert solution is not None
         self.assertEqual(
-            answer_group.rule_specs[0].inputs['x'],
+            answer_group_object.rule_specs[0].inputs['x'],
             [['ca_choices_2', 'ca_choices_3', 'invalid_content_id']])
         self.assertEqual(
-            answer_group.rule_specs[1].inputs['x'],
+            answer_group_object.rule_specs[1].inputs['x'],
             [['ca_choices_2']])
         self.assertEqual(
-            answer_group.rule_specs[2].inputs['x'],
+            answer_group_object.rule_specs[2].inputs['x'],
             'ca_choices_2')
         self.assertEqual(
-            answer_group.rule_specs[3].inputs,
+            answer_group_object.rule_specs[3].inputs,
             {'x': 'ca_choices_2', 'y': 'ca_choices_3'})
         self.assertEqual(
             solution.correct_answer, [['ca_choices_2', 'ca_choices_3']])
 
-    def test_migrate_question_state_from_v42_to_latest(self):
+    def test_migrate_question_state_from_v42_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3010,6 +3125,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -3056,10 +3172,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             cust_args['useFractionForDivision'].value, True)
 
-    def test_migrate_question_state_from_v43_to_latest(self):
+    def test_migrate_question_state_from_v43_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3105,6 +3222,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -3146,10 +3264,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             linked_skill_id, None)
 
-    def test_migrate_question_state_from_v44_to_latest(self):
+    def test_migrate_question_state_from_v44_to_latest(self) -> None:
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3192,6 +3311,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -3234,3 +3354,146 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
             cust_args['requireNonnegativeInput'].value, False)
+
+    def test_migrate_question_state_from_v45_to_latest(self) -> None:
+        answer_group1 = {
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }, {
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'OmitsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesWithGeneralForm'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        answer_group2 = {
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesWithGeneralForm'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group1, answer_group2],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'customOskLetters': {
+                        'value': ['a', 'b']
+                    },
+                    'useFractionForDivision': {
+                        'value': False
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'AlgebraicExpressionInput'
+            },
+            'next_content_id_index': 4,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'card_is_checkpoint': False,
+            'linked_skill_id': None,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=45)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        answer_groups = question.question_state_data.interaction.answer_groups
+        self.assertEqual(len(answer_groups), 1)
+        rule_specs = answer_groups[0].rule_specs
+        self.assertEqual(len(rule_specs), 1)
+        self.assertEqual(rule_specs[0].rule_type, 'MatchesExactlyWith')
+
+        cust_args = question.question_state_data.interaction.customization_args
+        self.assertNotIn('customOskLetters', cust_args)
+        self.assertIn('allowedVariables', cust_args)

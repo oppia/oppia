@@ -23,10 +23,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { MaterialModule } from 'modules/material.module';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { BlogPostEditorComponent } from './blog-post-editor.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
@@ -98,8 +96,6 @@ describe('Blog Post Editor Component', () => {
       ],
       declarations: [
         BlogPostEditorComponent,
-        SchemaBasedEditorDirective,
-        AngularHtmlBindWrapperDirective,
         UploadBlogPostThumbnailComponent,
         ImageUploaderComponent,
         MockTranslatePipe
@@ -119,7 +115,7 @@ describe('Blog Post Editor Component', () => {
             isWindowNarrow: () => true,
             getResizeEvent() {
               return {
-                subscribe: (callb) => {
+                subscribe: (callb: () => void) => {
                   callb();
                   return {
                     unsubscribe() {}
@@ -206,10 +202,6 @@ describe('Blog Post Editor Component', () => {
   it('should get schema', () => {
     expect(component.getSchema())
       .toEqual(component.HTML_SCHEMA);
-  });
-
-  it('should return true for header enabled callback', () => {
-    expect(component.headersAreEnabledCallBack()).toBe(true);
   });
 
   it('should successfully fetch blog post editor data', fakeAsync(() => {

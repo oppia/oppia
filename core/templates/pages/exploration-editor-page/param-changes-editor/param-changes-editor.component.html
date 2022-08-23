@@ -19,14 +19,10 @@
     cursor: pointer;
     height: 30px;
     opacity: 0.5;
-    width: 30px;
-  }
-  param-changes-editor .oppia-delete-param-change-button {
     position: absolute;
-  }
-  param-changes-editor .oppia-delete-param-change-button {
     right: -30px;
     top: 0;
+    width: 30px;
   }
   param-changes-editor .oppia-delete-param-change-button:hover {
     opacity: 1;
@@ -52,7 +48,7 @@
        ui-sortable="PARAM_CHANGE_LIST_SORTABLE_OPTIONS"
        class="oppia-param-change-draggable-area">
     <div ng-repeat="paramChange in $ctrl.paramChangesService.displayed"
-         class="oppia-param-editor-row protractor-test-param-changes-list">
+         class="oppia-param-editor-row e2e-test-param-changes-list">
       <span class="oppia-param-change-sort-handle" ng-if="$ctrl.paramChangesService.displayed.length > 1">
         <picture>
           <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
@@ -87,7 +83,7 @@
   </div>
 
   <div>
-    <button type="button" class="btn btn-secondary btn-sm protractor-test-add-param-button"
+    <button type="button" class="btn btn-secondary btn-sm e2e-test-add-param-button"
             ng-click="addParamChange()">
       Add parameter change
     </button>
@@ -99,7 +95,7 @@
   </div>
 
   <button type="button"
-          class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-param-changes-button"
+          class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-param-changes-button"
           ng-click="saveParamChanges()"
           ng-disabled="!areDisplayedParamChangesValid()">
     Save Changes

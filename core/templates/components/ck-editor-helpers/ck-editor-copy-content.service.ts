@@ -33,6 +33,7 @@ interface CkEditorCopyEvent {
 })
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
+  private readonly OUTPUT_NG_TAG_NAME = 'OPPIA-RTE-OUTPUT-DISPLAY';
   private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
   private readonly ALLOWLISTED_WIDGETS = new Set([
     'oppia-noninteractive-collapsible',
@@ -73,7 +74,11 @@ export class CkEditorCopyContentService {
         containedWidgetTagName = currentTagName;
         break;
       }
-      if (parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+
+      if (
+        parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
+        parentElement.tagName === this.OUTPUT_NG_TAG_NAME
+      ) {
         break;
       }
 
@@ -122,26 +127,36 @@ export class CkEditorCopyContentService {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
-
+    html = html.replace(/<!--[^>]*-->/g, '').trim();
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
       const widgetName = elementTagName.replace('-noninteractive-', '');
 
       // Look for x-with-value="y" to extract x and y.
-      //  Group 1 (\w+): Any word containing [a-zA-Z0-9_] characters. This is
-      //    the name of the property.
+      //  Group 1 ([\w-]+): Any word containing [a-zA-Z0-9_-] characters. This
+      //    is the name of the property. (Note that this will also catch
+      //    ng-reflect-* which is added by angular).
       //  Group 2 (-with-value="): Matches characters literally.
       //  Group 3 ([^"]+): Matches any characters excluding ". This is the
       //    value of the property.
       //  Group 4 ("): Matches " literally.
-      const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
+      const valueMatcher = /([\w-]+)(-with-value=")([^"]+)(")/g;
 
       let match;
-      let startupData: {[id: string]: string} = {};
+      let startupData: {[id: string]: string | boolean} = {};
 
       while ((match = valueMatcher.exec(html)) !== null) {
         const key = match[1];
+        // Angular adds a new attribute for each @Input() variable. The
+        // attribute starts with ng-reflect and the full attribute is
+        // ng-reflect-attribute-name. ng-reflect has char limit on how much
+        // is added to the dom. So if these are not ignored we will get data
+        // parsing errors in the components we are trying to copy over to the
+        // editor.
+        if (key.startsWith('ng-reflect')) {
+          continue;
+        }
         // Must replace & for html escaper to properly work- html escaper
         // service depends on & already escaped.
         const value = match[3].replace(/&amp;/g, '&');
@@ -149,6 +164,7 @@ export class CkEditorCopyContentService {
         startupData[key] = JSON.parse(
           this.htmlEscaperService.escapedStrToUnescapedStr(value));
       }
+      startupData.isCopied = true;
 
       editor.execCommand(widgetName, { startupData });
     }

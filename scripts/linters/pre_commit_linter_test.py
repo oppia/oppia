@@ -76,14 +76,14 @@ def all_checks_passed(linter_stdout):
     Returns:
         bool. Whether all checks have passed or not.
     """
-    return 'All Checks Passed.' in linter_stdout[-1]
+    return 'All Linter Checks Passed.' in linter_stdout[-1]
 
 
 class PreCommitLinterTests(test_utils.LinterTestBase):
     """Tests for methods in pre_commit_linter module."""
 
     def setUp(self):
-        super(PreCommitLinterTests, self).setUp()
+        super().setUp()
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
         self.install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
@@ -120,23 +120,33 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             ['No files to check'], self.linter_stdout)
 
     def test_main_with_non_other_shard(self):
+        mock_shards = {
+            '1': [
+                'a/',
+                'b/',
+            ],
+        }
+
         def mock_get_filepaths_from_path(path, namespace):  # pylint: disable=unused-argument
-            if path == pre_commit_linter.SHARDS['1'][0]:
+            if path == mock_shards['1'][0]:
                 return [VALID_PY_FILEPATH]
             return []
+
+        shards_swap = self.swap(
+            pre_commit_linter, 'SHARDS', mock_shards)
 
         get_filenames_from_path_swap = self.swap_with_checks(
             pre_commit_linter, '_get_filepaths_from_path',
             mock_get_filepaths_from_path, expected_args=[
                 (prefix,)
-                for prefix in pre_commit_linter.SHARDS['1']
+                for prefix in mock_shards['1']
             ])
 
-        with self.print_swap, self.sys_swap:
+        with self.print_swap, self.sys_swap, shards_swap:
             with self.install_swap:
                 with get_filenames_from_path_swap:
                     pre_commit_linter.main(args=['--shard', '1'])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_invalid_shards(self):
         def mock_get_filepaths_from_path(unused_path, namespace):  # pylint: disable=unused-argument
@@ -146,19 +156,29 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             raise AssertionError(
                 'Third party libs should not be installed.')
 
+        mock_shards = {
+            '1': [
+                'a/',
+            ],
+        }
+
+        shards_swap = self.swap(
+            pre_commit_linter, 'SHARDS', mock_shards)
+
         get_filenames_from_path_swap = self.swap_with_checks(
             pre_commit_linter, '_get_filepaths_from_path',
-            mock_get_filepaths_from_path, expected_args=[
+            mock_get_filepaths_from_path,
+            expected_args=[
                 (prefix,)
-                for prefix in pre_commit_linter.SHARDS['1']
+                for prefix in mock_shards['1']
             ])
         install_swap = self.swap(
             install_third_party_libs, 'main',
             mock_install_third_party_main)
 
-        with self.print_swap, self.sys_swap, install_swap:
+        with self.print_swap, self.sys_swap, install_swap, shards_swap:
             with get_filenames_from_path_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     RuntimeError, 'mock_file in multiple shards'
                 ):
                     pre_commit_linter.main(args=['--shard', '1'])
@@ -172,9 +192,21 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             else:
                 return []
 
+        mock_shards = {
+            '1': [
+                'a/',
+            ],
+            'other': [
+                'b/',
+            ],
+        }
+
+        shards_swap = self.swap(
+            pre_commit_linter, 'SHARDS', mock_shards)
+
         filenames_from_path_expected_args = [(os.getcwd(),)] + [
             (prefix,)
-            for prefix in pre_commit_linter.SHARDS['1']
+            for prefix in mock_shards['1']
         ]
 
         get_filenames_from_path_swap = self.swap_with_checks(
@@ -182,12 +214,12 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             mock_get_filepaths_from_path,
             expected_args=filenames_from_path_expected_args)
 
-        with self.print_swap, self.sys_swap:
+        with self.print_swap, self.sys_swap, shards_swap:
             with self.install_swap:
                 with get_filenames_from_path_swap:
                     pre_commit_linter.main(
                         args=['--shard', pre_commit_linter.OTHER_SHARD_NAME])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self):
         with self.print_swap, self.sys_swap:
@@ -216,13 +248,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             'Unexpected whitespace before \":\"'], self.linter_stdout)
 
     def test_main_with_invalid_filepath_with_path_arg(self):
-        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
             pre_commit_linter.main(args=['--path=invalid_file.py'])
         self.assert_same_list_elements(
             ['Could not locate file or directory'], self.linter_stdout)
 
     def test_main_with_invalid_filepath_with_file_arg(self):
-        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
             pre_commit_linter.main(args=['--files=invalid_file.py'])
         self.assert_same_list_elements(
             ['The following file(s) do not exist'], self.linter_stdout)
@@ -240,7 +272,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             with self.install_swap:
                 with get_all_files_swap:
                     pre_commit_linter.main(args=['--path=scripts/linters/'])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg(self):
         with self.print_swap, self.sys_swap:
@@ -248,10 +280,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 pre_commit_linter.main(
                     args=['--path=%s' % VALID_TS_FILEPATH,
                           '--only-check-file-extensions=ts'])
-        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg_with_js_ts_options(self):
-        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
+        with self.print_swap, self.assertRaisesRegex(SystemExit, '1'):
             pre_commit_linter.main(
                 args=['--path=%s' % VALID_TS_FILEPATH,
                       '--only-check-file-extensions', 'ts', 'js'])
@@ -271,7 +303,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_html_file(self):
         with self.print_swap, self.sys_swap, self.install_swap:
             pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
-        self.assert_same_list_elements('All Checks Passed.', self.linter_stdout)
+        self.assert_same_list_elements(
+            'All Linter Checks Passed.', self.linter_stdout)
 
     def test_get_changed_filepaths(self):
         def mock_check_output(unused_list):

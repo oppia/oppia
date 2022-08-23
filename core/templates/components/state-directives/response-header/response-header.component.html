@@ -1,71 +1,53 @@
 <div class="oppia-response-header-block">
   <div class="oppia-response-header">
-    <span ng-if="$ctrl.showWarning()">⚠</span>
+    <span *ngIf="showWarning">⚠</span>
     <div class="oppia-response-container-desktop">
-      <i class="material-icons md-18 oppia-response-tick-cross oppia-response-cross" ng-if="!$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#x2718;</i>
-      <i class="material-icons md-18 oppia-response-tick-cross  oppia-response-tick protractor-test-correct-tick-mark" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">&#10004;</i>
+      <i class="material-icons md-18 oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">&#x2718;</i>
+      <i class="material-icons md-18 oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">&#10004;</i>
     </div>
     <div class="oppia-responses-mobile">
-      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" ng-if="!$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
         Incorrect
       </div>
-      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" ng-if="$ctrl.isCorrect() && $ctrl.isCorrectnessFeedbackEnabled() && $ctrl.isResponse() && !$ctrl.isCurrentInteractionLinear()">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
         Correct
       </div>
     </div>
-    <span class="oppia-response-summary" ng-attr-title="<[$ctrl.getSummary()]>">
-      <span class="oppia-response-short-summary"><[$ctrl.getShortSummary()]></span>
-      <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary position-relative oppia-num-rules">
-        +<[$ctrl.getNumRules() - 1]>
+    <span class="oppia-response-summary" [attr.title]="summary">
+      <span class="oppia-response-short-summary">{{shortSummary}}</span>
+      <span *ngIf="numRules > 1" class="badge badge-primary position-relative oppia-num-rules">
+        +{{numRules - 1}}
       </span>
     </span>
   </div>
 
   <br class="break-in-mobile">
-  <span ng-if="$ctrl.getOutcome()"> →</span>
-  <span ng-if="$ctrl.isCorrect() && $ctrl.isInQuestionMode()">
+  <span *ngIf="outcome"> →</span>
+  <span *ngIf="isCorrect() && isInQuestionMode()">
     Correct
   </span>
-  <span ng-if="$ctrl.getOutcome() && !$ctrl.isOutcomeLooping() && !$ctrl.isCreatingNewState() && !$ctrl.isInQuestionMode()"
-        ng-click="$ctrl.navigateToState($ctrl.getOutcome().dest)" class="oppia-nested-link">
-    <[$ctrl.getOutcome().dest]>
+  <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
+        (click)="returnToState()" class="oppia-nested-link">
+    {{outcome.dest}}
   </span>
-  <span class="oppia-nested-link" ng-if="$ctrl.getOutcome() && !$ctrl.isOutcomeLooping() && $ctrl.isCreatingNewState()">
-    <em ng-if="$ctrl.getOutcome().newStateName">(<[$ctrl.getOutcome().newStateName]>)</em>
-    <em ng-if="!$ctrl.getOutcome().newStateName">Nowhere yet...</em>
+  <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
+    <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
+    <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
   </span>
-  <span ng-if="$ctrl.getOutcome() && !$ctrl.isInQuestionMode() && $ctrl.isOutcomeLooping()">
+  <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
     <em>(try again)</em>
   </span>
-  <span ng-if="$ctrl.getOutcome() && $ctrl.isInQuestionMode() && !$ctrl.isCorrect()">
+  <span *ngIf="outcome && isInQuestionMode() && !isCorrect()">
     <em>Wrong<br> (try again)</em>
   </span>
 </div>
 
-<span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
-      ng-if="$ctrl.EditabilityService.isEditable() && $ctrl.getOnDeleteFn()"
-      ng-click="$ctrl.deleteResponse($event)">
-  <i class="material-icons md-18">&#xE5CD;</i>
-</span>
-
 <style>
-  response-header .oppia-delete-response-button {
-    cursor: pointer;
-    opacity: 0.5;
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    width: 20px;
+  .oppia-response-header-block {
+    margin-left: 39px;
   }
-  response-header .oppia-delete-response-button:hover {
-    opacity: 1;
-  }
-  response-header .oppia-response-header-block {
-    overflow: hidden;
-    padding-left: 24px;
-    white-space: nowrap;
-  }
-  response-header .oppia-nested-link {
+
+  .oppia-nested-link {
     color: #0844aa;
     cursor: pointer;
     display: inline-block;
@@ -75,68 +57,67 @@
     vertical-align: top;
     word-wrap: break-word;
   }
-  response-header .oppia-nested-link:hover {
+  .oppia-nested-link:hover {
     color: #3f2c76;
     text-decoration: underline;
   }
-  response-header .oppia-response-header {
-    float: left;
+  .oppia-response-header {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 78%;
   }
-  response-header .oppia-response-tick-cross {
+  .oppia-response-tick-cross {
     margin-bottom: 7px;
   }
-  response-header .oppia-response-cross {
-    color: #C55F45;
+  .oppia-response-cross {
+    color: #c55f45;
   }
-  response-header .oppia-response-tick {
-    color: #00645C;
+  .oppia-response-tick {
+    color: #00645c;
   }
-  response-header .oppia-response-summary {
+  .oppia-response-summary {
     display: flex;
     flex-flow: row;
   }
-  response-header .oppia-response-short-summary {
+  .oppia-response-short-summary {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  response-header .badge {
+  .badge {
     vertical-align: bottom;
   }
   /* This is to break the line only when screen is too narrow to have both divs
      in same line.*/
   @media screen and (min-width: 370px) {
-    response-header .break-in-mobile {
+    .break-in-mobile {
       display: none;
     }
   }
-  response-header .oppia-responses-mobile {
+  .oppia-responses-mobile {
     display: none;
   }
   @media screen and (max-width: 768px) {
-    response-header .oppia-responses-mobile {
+    .oppia-responses-mobile {
       display: block;
     }
-    response-header .oppia-response-mobile-item {
+    .oppia-response-mobile-item {
       border-radius: 10px 0 0 0;
       bottom: 0;
-      color: #FFF;
+      color: #fff;
       padding-left: 10px;
       padding-right: 6px;
       padding-top: 1px;
       position: absolute;
       right: 0;
     }
-    response-header .oppia-response-mobile-item-incorrect {
-      background-color: #FFA500;
+    .oppia-response-mobile-item-incorrect {
+      background-color: #ffa500;
     }
-    response-header .oppia-response-mobile-item-correct {
+    .oppia-response-mobile-item-correct {
       background-color: #449d44;
     }
-    response-header .oppia-response-container-desktop {
+    .oppia-response-container-desktop {
       display: none;
     }
   }

@@ -1,0 +1,23 @@
+<div class="modal-header">
+  <h3>Start New Feedback Thread</h3>
+</div>
+
+<div class="modal-body">
+  <p>Thread subject: <input class="oppia-feedback-modal-input oppia-autofocus" type="text" [(ngModel)]="newThreadSubject" autofocus></p>
+  <p>Message text <textarea class="oppia-feedback-modal-textarea" [(ngModel)]="newThreadText" rows="6"></textarea></p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success" (click)="create(newThreadSubject, newThreadText)" [disabled]="!newThreadSubject || !newThreadText">Create Thread</button>
+</div>
+
+<style>
+  .oppia-feedback-modal-input {
+    min-height: 35px;
+  }
+  .oppia-feedback-modal-textarea {
+    margin-top: 5px;
+    min-height: 175px;
+  }
+</style>

@@ -1,70 +1,120 @@
 <div class="position-relative">
-  <form class="form-justify protractor-test-rule-details" role="form" name="$ctrl.ruleEditForm.form">
-    <div ng-if="$ctrl.rule.type != 'FuzzyMatches'" class="rule-parent">
-      <rule-type-selector class="protractor-test-answer-description" local-value="<[$ctrl.rule.type]>" on-selection-change="$ctrl.onSelectNewRuleType">
-      </rule-type-selector>
+  <form class="form-justify e2e-test-rule-details" role="form">
+    <div *ngIf="rule.type != 'FuzzyMatches'" class="rule-parent">
+      <oppia-rule-type-selector class="e2e-test-answer-description" [(localValue)]="rule.type" (onSelectionChange)="onSelectNewRuleType($event)">
+      </oppia-rule-type-selector>
 
-      <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group oppia-rule-editor-span protractor-test-answer-description-fragment">
-        <span ng-if="item.type == 'select'" class="text-dark">
-          <span ng-if="$ctrl.ruleDescriptionChoices.length === 1">
-            "<[$ctrl.ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
+      <span *ngFor="let item of ruleDescriptionFragments" class="form-group oppia-rule-editor-span e2e-test-answer-description-fragment">
+        <span *ngIf="item.type == 'select'" class="text-dark">
+          <span *ngIf="ruleDescriptionChoices.length === 1">
+            {{ ruleDescriptionChoices[0].val | convertToPlainText | truncate }}
           </span>
-          <span ng-if="$ctrl.ruleDescriptionChoices.length !== 1">
-            <html-select class="oppia-rule-description-choice" options="$ctrl.ruleDescriptionChoices" selection="$ctrl.rule.inputs[item.varName]">
-            </html-select>
+          <span *ngIf="ruleDescriptionChoices.length !== 1">
+            <oppia-html-select class="oppia-rule-description-choice" [options]="ruleDescriptionChoices" [(selection)]="rule.inputs[item.varName]" (onSelectionChange)="onSelectionChangeHtmlSelect($event, item)">
+            </oppia-html-select>
           </span>
         </span>
 
         <div class="oppia-custom-editor-container">
-          <span ng-if="item.type == 'checkboxes'" class="text-dark">
-            <object-editor modal-id="$ctrl.modalId" obj-type="SetOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          <span *ngIf="item.type == 'checkboxes'" class="text-dark">
+            <object-editor [modalId]="modalId"
+                           [objType]="'SetOfTranslatableHtmlContentIds'"
+                           [initArgs]="{choices: ruleDescriptionChoices}"
+                           [(ngModel)]="rule.inputs[item.varName]"
+                           [ngModelOptions]="{standalone: true}">
+            </object-editor>
           </span>
-          <span ng-if="item.type == 'dropdown'" class="text-dark">
-            <object-editor modal-id="$ctrl.modalId" obj-type="ListOfSetsOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          <span *ngIf="item.type == 'dropdown'" class="text-dark">
+            <object-editor [modalId]="modalId"
+                           [objType]="'ListOfSetsOfTranslatableHtmlContentIds'"
+                           [initArgs]="{choices: ruleDescriptionChoices}"
+                           [(ngModel)]="rule.inputs[item.varName]"
+                           [ngModelOptions]="{standalone: true}">
+            </object-editor>
           </span>
-          <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
-            <object-editor modal-id="$ctrl.modalId" obj-type="TranslatableHtmlContentId" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          <span *ngIf="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
+            <object-editor [modalId]="modalId"
+                           [objType]="'TranslatableHtmlContentId'"
+                           [initArgs]="{choices: ruleDescriptionChoices}"
+                           [(ngModel)]="rule.inputs[item.varName]"
+                           [ngModelOptions]="{standalone: true}">
+            </object-editor>
           </span>
-          <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
-            <object-editor modal-id="$ctrl.modalId" obj-type="DragAndDropPositiveInt" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          <span *ngIf="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
+            <object-editor [modalId]="modalId"
+                           [objType]="'DragAndDropPositiveInt'"
+                           [initArgs]="{choices: ruleDescriptionChoices}"
+                           [(ngModel)]="rule.inputs[item.varName]"
+                           [ngModelOptions]="{standalone: true}">
+            </object-editor>
           </span>
-          <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-            <object-editor modal-id="$ctrl.modalId" obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" class="text-dark"></object-editor>
+          <span *ngIf="item.type != 'select' &&
+                       item.type != 'noneditable' &&
+                       item.type != 'dragAndDropPositiveIntSelect' &&
+                       item.type != 'dragAndDropHtmlStringSelect' &&
+                       item.type != 'dropdown' &&
+                       item.type != 'checkboxes'">
+            <object-editor [modalId]="modalId"
+                           [objType]="item.type"
+                           [isEditable]="isEditable"
+                           [alwaysEditable]="true"
+                           [(ngModel)]="rule.inputs[item.varName]"
+                           [ngModelOptions]="{standalone: true}"
+                           class="text-dark">
+            </object-editor>
           </span>
-          <span ng-if="item.type == 'noneditable'">
-            <[item.text]>
+          <span *ngIf="item.type == 'noneditable'">
+            {{ item.text }}
           </span>
         </div>
       </span>
     </div>
   </form>
 
-  <div class="oppia-rule-save-cancel-buttons" ng-if="$ctrl.isEditingRuleInline()">
+  <div class="oppia-rule-save-cancel-buttons" *ngIf="isEditingRuleInline">
     <div class="float-right">
-      <button type="button" class="btn btn-default" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid || $ctrl.isInvalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
+      <button type="button" class="btn btn-default cancel-button" (click)="cancelThisEdit()">Cancel</button>
+      <button type="button" class="btn btn-success e2e-test-save-answer save-button" [disabled]="isInvalid" (click)="saveThisRule()">Save Answer</button>
     </div>
 
     <div class="oppia-clear"></div>
   </div>
 </div>
 <style>
-  rule-editor .form-justify {
+  .form-justify {
     justify-content: center;
   }
 
-  rule-editor .form-group.oppia-rule-editor-span {
+  .form-group.oppia-rule-editor-span {
     display: inline-block;
     margin-right: 5px;
     width: 100%;
   }
-  rule-editor .oppia-rule-description-choice {
+  .oppia-rule-description-choice {
     width: 200px;
   }
-  rule-editor .oppia-custom-editor-container {
+  .oppia-custom-editor-container {
     max-height: 320px;
     overflow-x: hidden;
     overflow-y: auto;
     text-overflow: ellipsis;
+  }
+  @media screen and (max-width: 700px) {
+    .oppia-rule-save-cancel-buttons {
+      margin-top: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-justify {
+      margin-bottom: -80px;
+    }
+
+    .form-group.oppia-rule-editor-span {
+      margin-bottom: 0;
+      margin-top: 0;
+      position: relative;
+      top: -30px;
+    }
   }
 </style>

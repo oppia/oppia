@@ -29,16 +29,16 @@ from core.tests import test_utils
 class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     """Tests for subtopic page domain objects."""
 
-    topic_id = 'topic_id'
-    subtopic_id = 1
+    topic_id: str = 'topic_id'
+    subtopic_id: int = 1
 
-    def setUp(self):
-        super(SubtopicPageDomainUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.topic_id))
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         expected_subtopic_page_dict = {
             'id': 'topic_id-1',
             'topic_id': 'topic_id',
@@ -66,7 +66,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
-    def test_create_default_subtopic_page(self):
+    def test_create_default_subtopic_page(self) -> None:
         """Tests the create_default_topic() function."""
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
@@ -98,34 +98,46 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(subtopic_page.to_dict(), expected_subtopic_page_dict)
 
-    def test_get_subtopic_page_id(self):
+    def test_get_subtopic_page_id(self) -> None:
         self.assertEqual(
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id('abc', 1),
             'abc-1')
 
-    def test_get_subtopic_id_from_subtopic_page_id(self):
+    def test_get_subtopic_id_from_subtopic_page_id(self) -> None:
         self.assertEqual(
             self.subtopic_page.get_subtopic_id_from_subtopic_page_id(), 1)
 
-    def _assert_validation_error(self, expected_error_substring):
+    def _assert_subtopic_validation_error(
+        self, expected_error_substring: str
+    ) -> None:
         """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             self.subtopic_page.validate()
 
-    def test_subtopic_topic_id_validation(self):
-        self.subtopic_page.topic_id = 1
-        self._assert_validation_error('Expected topic_id to be a string')
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_subtopic_topic_id_validation(self) -> None:
+        self.subtopic_page.topic_id = 1  # type: ignore[assignment]
+        self._assert_subtopic_validation_error(
+            'Expected topic_id to be a string'
+        )
 
-    def test_language_code_validation(self):
-        self.subtopic_page.language_code = 0
-        self._assert_validation_error('Expected language code to be a string')
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_language_code_validation(self) -> None:
+        self.subtopic_page.language_code = 0  # type: ignore[assignment]
+        self._assert_subtopic_validation_error(
+            'Expected language code to be a string'
+        )
 
         self.subtopic_page.language_code = 'xz'
-        self._assert_validation_error('Invalid language code')
+        self._assert_subtopic_validation_error('Invalid language code')
 
-    def test_update_audio(self):
-        recorded_voiceovers_dict = {
+    def test_update_audio(self) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
                     'en': {
@@ -137,7 +149,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        expected_subtopic_page_dict = {
+        expected_subtopic_page_dict: subtopic_page_domain.SubtopicPageDict = {
             'id': 'topic_id-1',
             'topic_id': 'topic_id',
             'page_contents': {
@@ -163,7 +175,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
-    def test_update_html(self):
+    def test_update_html(self) -> None:
         expected_subtopic_page_dict = {
             'id': 'topic_id-1',
             'topic_id': 'topic_id',
@@ -196,8 +208,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
-    def test_update_written_translations(self):
-        written_translations_dict = {
+    def test_update_written_translations(self) -> None:
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {
                     'en': {
@@ -208,7 +220,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        expected_subtopic_page_dict = {
+        expected_subtopic_page_dict: subtopic_page_domain.SubtopicPageDict = {
             'id': 'topic_id-1',
             'topic_id': 'topic_id',
             'page_contents': {
@@ -234,7 +246,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
-    def test_create_subtopic_page_change(self):
+    def test_create_subtopic_page_change(self) -> None:
         subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
             'cmd': subtopic_page_domain.CMD_CREATE_NEW,
             'topic_id': self.topic_id,
@@ -248,22 +260,28 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'subtopic_id': 'subtopic_id'
             })
 
-    def test_validate_version_number(self):
-        self.subtopic_page.version = 'invalid_version'
-        with self.assertRaisesRegexp(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_version_number(self) -> None:
+        self.subtopic_page.version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected version number to be an int'):
             self.subtopic_page.validate()
 
-    def test_validate_page_contents_schema_version_type(self):
-        self.subtopic_page.page_contents_schema_version = 'invalid_version'
-        with self.assertRaisesRegexp(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_page_contents_schema_version_type(self) -> None:
+        self.subtopic_page.page_contents_schema_version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Expected page contents schema version to be an integer'):
             self.subtopic_page.validate()
 
-    def test_validate_page_contents_schema_version(self):
+    def test_validate_page_contents_schema_version(self) -> None:
         self.subtopic_page.page_contents_schema_version = 0
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Expected page contents schema version to be %s'
             % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
@@ -271,13 +289,13 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 
 
 class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
-    def setUp(self):
-        super(SubtopicPageContentsDomainUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents
             .create_default_subtopic_page_contents())
 
-    def test_create_default_subtopic_page(self):
+    def test_create_default_subtopic_page(self) -> None:
         subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents
             .create_default_subtopic_page_contents())
@@ -301,8 +319,10 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
             subtopic_page_contents.to_dict(),
             expected_subtopic_page_contents_dict)
 
-    def test_to_and_from_dict(self):
-        subtopic_page_contents_dict = {
+    def test_to_and_from_dict(self) -> None:
+        subtopic_page_contents_dict: (
+            subtopic_page_domain.SubtopicPageContentsDict
+        ) = {
             'subtitled_html': {
                 'html': '<p>test</p>',
                 'content_id': 'content'
@@ -340,18 +360,20 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
 
 class SubtopicPageChangeTests(test_utils.GenericTestBase):
 
-    def test_subtopic_page_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
+    def test_subtopic_page_change_object_with_missing_cmd(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Missing cmd key in change dict'):
             subtopic_page_domain.SubtopicPageChange({'invalid': 'data'})
 
-    def test_subtopic_page_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
+    def test_subtopic_page_change_object_with_invalid_cmd(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Command invalid is not allowed'):
             subtopic_page_domain.SubtopicPageChange({'cmd': 'invalid'})
 
-    def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+    def test_subtopic_page_change_object_with_missing_attribute_in_cmd(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
@@ -360,8 +382,10 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
                 'property_name': '<p>page_contents_html</p>',
             })
 
-    def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
+    def test_subtopic_page_change_object_with_extra_attribute_in_cmd(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             subtopic_page_domain.SubtopicPageChange({
@@ -372,8 +396,9 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             })
 
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
-            self):
-        with self.assertRaisesRegexp(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
                 'invalid is not allowed')):
@@ -386,7 +411,8 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             })
 
     def test_subtopic_page_change_object_with_update_subtopic_page_property(
-            self):
+        self
+    ) -> None:
         subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
             'cmd': 'update_subtopic_page_property',
             'subtopic_id': 'subtopic_id',
@@ -403,7 +429,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_page_change_object.new_value, 'new_value')
         self.assertEqual(subtopic_page_change_object.old_value, 'old_value')
 
-    def test_subtopic_page_change_object_with_create_new(self):
+    def test_subtopic_page_change_object_with_create_new(self) -> None:
         subtopic_page_change_object = (
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': 'create_new',
@@ -415,7 +441,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_page_change_object.topic_id, 'topic_id')
         self.assertEqual(subtopic_page_change_object.subtopic_id, 'subtopic_id')
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         subtopic_page_change_dict = {
             'cmd': 'create_new',
             'topic_id': 'topic_id',
@@ -425,3 +451,41 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             subtopic_page_change_dict)
         self.assertEqual(
             subtopic_page_change_object.to_dict(), subtopic_page_change_dict)
+
+
+class SubtopicPageSummaryTests(test_utils.GenericTestBase):
+
+    SUBTOPIC_ID = 1
+    SUBTOPIC_TITLE = 'subtopic_title'
+    TOPIC_ID = 'topic_id'
+    TOPIC_TITLE = 'topic_title'
+    SUBTOPIC_MASTERY = 0.5
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.subtopic_page_summary = subtopic_page_domain.SubtopicPageSummary(
+            self.SUBTOPIC_ID, self.SUBTOPIC_TITLE, self.TOPIC_ID,
+            self.TOPIC_TITLE, 'thumbnail_filename', 'red',
+            self.SUBTOPIC_MASTERY
+        )
+
+    def test_to_dict(self) -> None:
+        subtopic_page_summary_dict = self.subtopic_page_summary.to_dict()
+
+        self.assertEqual(
+            subtopic_page_summary_dict['subtopic_id'], self.SUBTOPIC_ID
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['subtopic_title'], self.SUBTOPIC_TITLE
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['parent_topic_id'], self.TOPIC_ID
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['parent_topic_name'], self.TOPIC_TITLE
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['subtopic_mastery'],
+            self.SUBTOPIC_MASTERY
+        )

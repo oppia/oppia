@@ -27,7 +27,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class OppiaNoninteractiveSkillreviewConceptCardModalComponent extends
   ConfirmOrCancelModal implements OnInit {
   // This property is initialized using Angular lifecycle hooks
-  // therefore we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
   skillIds: string[] = [];

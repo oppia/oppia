@@ -133,7 +133,7 @@ describe('Interactions', function() {
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('some content'));
+      await forms.toRichText('some content'), true);
     await explorationEditorPage.saveChanges();
 
     var defaultOutcomeSet = false;
@@ -149,9 +149,9 @@ describe('Interactions', function() {
         // Delete any leftover rules that may remain from previous tests of the
         // same interaction, so they won't interfere with the current test.
         var deleteResponseButton = element(by.css(
-          '.protractor-test-delete-response'));
+          '.e2e-test-delete-response'));
         var confirmDeleteResponseButton = element(by.css(
-          '.protractor-test-confirm-delete-response'));
+          '.e2e-test-confirm-delete-response'));
         if (await deleteResponseButton.isPresent()) {
           await action.click('Delete Response button', deleteResponseButton);
           await action.click(
@@ -186,9 +186,9 @@ describe('Interactions', function() {
         }
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
-          '.protractor-test-close-help-card-button'));
+          '.e2e-test-close-help-card-button'));
         var helpCard = element(
-          by.css('.protractor-test-conversation-skin-help-card'));
+          by.css('.e2e-test-conversation-skin-help-card'));
         var isPresent = await clearHelpcardButton.isPresent();
         if (isPresent) {
           await action.click('Clear Helper Button', clearHelpcardButton);
@@ -222,7 +222,7 @@ describe('Interactions', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Draw a complete graph with the given vertices.'));
+      'Draw a complete graph with the given vertices.'), true);
     var graphDictForInput = {
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
@@ -244,16 +244,16 @@ describe('Interactions', function() {
     await explorationEditorMainTab.moveToState('MathExp');
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendPlainText(
-        'Please simplify the following expression: 16x^{12}/4x^2');
-    });
+        'Please simplify the following expression: 16x^{4}/4x^2');
+    }, true);
 
     await explorationEditorMainTab.setInteraction(
       'AlgebraicExpressionInput', ['x']);
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
       'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',
-      true, 'IsEquivalentTo', '(16(x^12))/(4x^2)');
-    // Expecting answer to be 4x^10.
+      true, 'IsEquivalentTo', '(16(x^4))/(4x^2)');
+    // Expecting answer to be 4x^2.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setFeedback(await forms.toRichText(
@@ -291,11 +291,91 @@ describe('Interactions', function() {
 
     // Play Math Expression Input interaction.
     await explorationPlayerPage.submitAnswer(
-      'AlgebraicExpressionInput', '4 * x^10');
+      'AlgebraicExpressionInput', '4 * x^2');
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('Good job!'));
     await explorationPlayerPage.clickThroughToNextCard();
 
+    await explorationPlayerPage.expectExplorationToBeOver();
+    await users.logout();
+  });
+
+  // This e2e test was added to catch a regression in playing explorations with
+  // supplemental cards used in succession (e.g. #14253).
+  it('should successfully play through exploration containing ' +
+     'two supplemental card interactions', async() => {
+    await users.createAndLoginUser(
+      'supplementalCardEditor@interactions.com', 'supplementalCardEditor');
+    await workflow.createExploration(true);
+    await explorationEditorMainTab.setStateName('Graph');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'Draw a complete graph with the given vertices.'), true);
+    var graphDictForInput = {
+      vertices: [[277, 77], [248, 179], [405, 144]]
+    };
+    await explorationEditorMainTab.setInteraction(
+      'GraphInput', graphDictForInput);
+    var graphDictForResponse = {
+      edges: [[0, 1], [1, 2], [0, 2]],
+      vertices: [[277, 77], [248, 179], [405, 144]]
+    };
+    await explorationEditorMainTab.addResponse(
+      'GraphInput', await forms.toRichText('Good job!'), 'CodeRepl',
+      true, 'IsIsomorphicTo', graphDictForResponse);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText(
+      'A complete graph is a graph in which each pair of graph vertices is ' +
+      'connected by an edge.'));
+
+    await explorationEditorMainTab.moveToState('CodeRepl');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'this is card 2 with non-inline interaction'), true);
+    await explorationEditorMainTab.setInteraction('CodeRepl');
+    await explorationEditorMainTab.addResponse(
+      'CodeRepl', await forms.toRichText('Nice. Press continue button'),
+      'final card', true, 'CodeDoesNotContain', 'test');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('try again'));
+
+    // Setup a terminating state.
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(
+      'Supplemental Test Exploration');
+    await explorationEditorSettingsTab.setObjective(
+      'To publish and play this exploration');
+    await explorationEditorSettingsTab.setCategory('Logic');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    await users.logout();
+
+    await users.createAndLoginUser(
+      'supplementalLearner@interactions.com', 'supplementalLearner');
+    await libraryPage.get();
+    await libraryPage.findExploration('Supplemental Test Exploration');
+    await libraryPage.playExploration('Supplemental Test Exploration');
+    await explorationPlayerPage.expectExplorationNameToBe(
+      'Supplemental Test Exploration');
+
+    // Play Graph Input interaction.
+    await explorationPlayerPage.expectContentToMatch(await forms.toRichText(
+      'Draw a complete graph with the given vertices.'));
+    var graphDictForAnswer = {
+      edges: [[1, 2], [1, 0], [0, 2]]
+    };
+    await explorationPlayerPage.submitAnswer('GraphInput', graphDictForAnswer);
+    await explorationPlayerPage.expectLatestFeedbackToMatch(
+      await forms.toRichText('Good job!'));
+    await explorationPlayerPage.clickThroughToNextCard();
+
+    await explorationPlayerPage.submitAnswer('CodeRepl');
+
+    await explorationPlayerPage.clickThroughToNextCard();
     await explorationPlayerPage.expectExplorationToBeOver();
     await users.logout();
   });

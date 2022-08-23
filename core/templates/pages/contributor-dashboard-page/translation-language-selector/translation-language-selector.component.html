@@ -1,27 +1,29 @@
-<div #dropdown class="oppia-translation-language-selector-container protractor-test-language-selector">
+<div #dropdown class="oppia-translation-language-selector-container e2e-test-language-selector">
   <div class="oppia-translation-language-selector-featured-tooltip">
-    <span class="oppia-translation-language-selector-featured-tooltip-content protractor-test-language-selector-featured-explanation"
+    <span class="oppia-translation-language-selector-featured-tooltip-content e2e-test-language-selector-featured-explanation"
           *ngIf="explanationPopupShown"
           [ngStyle]="{'top': explanationPopupPxOffsetY + 'px'}">
       {{explanationPopupContent}}
     </span>
   </div>
-  <div class="oppia-translation-language-selector-inner-container protractor-test-language-selector-selected" (click)="toggleDropdown()">
-    {{languageSelection}}
+  <div class="oppia-translation-language-selector-inner-container" (click)="toggleDropdown()">
+    <span class="oppia-language-selector-label e2e-test-language-selector-selected">
+      {{languageSelection}}
+    </span>
     <span class="material-icons oppia-translation-language-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
       arrow_drop_down
     </span>
   </div>
 
-  <div *ngIf="dropdownShown" class="oppia-translation-language-selector-dropdown-container protractor-test-language-selector-dropdown">
-    <div *ngIf="featuredLanguages.length > 0" class="protractor-test-featured-language-container">
+  <div *ngIf="dropdownShown" class="oppia-translation-language-selector-dropdown-container e2e-test-language-selector-dropdown">
+    <div *ngIf="featuredLanguages.length > 0" class="e2e-test-featured-language-container">
       <div class="oppia-translation-language-selector-dropdown-label">Most needed</div>
       <div *ngFor="let featuredOption of featuredLanguages; index as i">
-        <div class="oppia-translation-language-selector-dropdown-option protractor-test-featured-language"
+        <div class="oppia-translation-language-selector-dropdown-option e2e-test-featured-language"
              *ngIf="languageIdToDescription[featuredOption.languageCode]"
              (click)="selectOption(featuredOption.languageCode)"
              [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : featuredOption.languageCode === activeLanguageCode}">
-          <span class="material-icons oppia-translation-language-selector-info-icon protractor-test-featured-language-tooltip"
+          <span class="material-icons oppia-translation-language-selector-info-icon e2e-test-featured-language-tooltip"
                 *ngIf="featuredOption.explanation"
                 (mouseenter)="showExplanationPopup(i)"
                 (mouseleave)="hideExplanationPopup()">
@@ -33,7 +35,7 @@
     </div>
 
     <div class="oppia-translation-language-selector-dropdown-label">All languages</div>
-    <div class="oppia-translation-language-selector-dropdown-option protractor-test-language-selector-option"
+    <div class="oppia-translation-language-selector-dropdown-option e2e-test-language-selector-option"
          *ngFor="let option of options"
          (click)="selectOption(option.id)"
          [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
@@ -47,10 +49,12 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     padding: 10px 20px;
     position: relative;
+    width: 100%;
   }
 
   .oppia-translation-language-selector-inner-container {
@@ -61,6 +65,7 @@
 
   .oppia-translation-language-selector-inner-container-arrow {
     color: #009688;
+    cursor: pointer;
   }
 
   .oppia-translation-language-selector-dropdown-container {
@@ -108,10 +113,15 @@
 
   .oppia-translation-language-selector-dropdown-option {
     color: rgb(104, 104, 104);
+    cursor: pointer;
     display: flex;
     flex: 1;
     margin-left: 16px;
     padding: 8px;
+  }
+
+  .oppia-translation-language-selector-dropdown-option:hover {
+    background-color: rgb(238, 238, 238);
   }
 
   .oppia-translation-language-selector-dropdown-option-selected {
@@ -132,5 +142,11 @@
     right: 0;
     width: 250px;
     z-index: 1;
+  }
+
+  @media screen and (max-width: 700px) {
+    .oppia-language-selector-label {
+      font-size: 18px;
+    }
   }
 </style>

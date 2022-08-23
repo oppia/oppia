@@ -30,6 +30,7 @@ export class InteractiveMapRulesService {
   static degreesToRadians(angle: number): number {
     return angle / 180 * Math.PI;
   }
+
   static getDistanceInKm(point1: number[], point2: number[]): number {
     var latitude1: number = InteractiveMapRulesService.degreesToRadians(
       point1[0]);
@@ -57,6 +58,7 @@ export class InteractiveMapRulesService {
       inputs.p, answer);
     return actualDistance <= inputs.d;
   }
+
   NotWithin(
       answer: InteractiveMapAnswer,
       inputs: InteractiveMapRuleInputs): boolean {

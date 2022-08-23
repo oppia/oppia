@@ -39,12 +39,19 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
+from typing import List, Sequence, Tuple
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import story_models
+    from mypy_imports import user_models
+
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
-transaction_services = models.Registry.import_transaction_services()
 
 
-def get_new_story_id():
+def get_new_story_id() -> str:
     """Returns a new story id.
 
     Returns:
@@ -53,7 +60,12 @@ def get_new_story_id():
     return story_models.StoryModel.get_new_id('')
 
 
-def _create_story(committer_id, story, commit_message, commit_cmds):
+def _create_story(
+    committer_id: str,
+    story: story_domain.Story,
+    commit_message: str,
+    commit_cmds: List[story_domain.StoryChange]
+) -> None:
     """Creates a new story.
 
     Args:
@@ -85,7 +97,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
     create_story_summary(story.id)
 
 
-def save_new_story(committer_id, story):
+def save_new_story(committer_id: str, story: story_domain.Story) -> None:
     """Saves a new story.
 
     Args:
@@ -102,7 +114,9 @@ def save_new_story(committer_id, story):
 
 
 # Repository SAVE and DELETE methods.
-def apply_change_list(story_id, change_list):
+def apply_change_list(
+    story_id: str, change_list: List[story_domain.StoryChange]
+) -> Tuple[story_domain.Story, List[str], List[str]]:
     """Applies a changelist to a story and returns the result.
 
     Args:
@@ -114,6 +128,9 @@ def apply_change_list(story_id, change_list):
         Story, list(str), list(str). The resulting story domain object, the
         exploration IDs removed from story and the exploration IDs added to
         the story.
+
+    Raises:
+        Exception. The elements in change list are not of domain object type.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -152,14 +169,23 @@ def apply_change_list(story_id, change_list):
                         change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
                     story.update_node_acquired_skill_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
                     story.update_node_prerequisite_skill_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
                     story.update_node_destination_node_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
@@ -196,6 +222,10 @@ def apply_change_list(story_id, change_list):
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
                 if change.property_name == story_domain.NODE:
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.old_value, int)
+                    assert isinstance(change.new_value, int)
                     story.rearrange_node_in_story(
                         change.old_value, change.new_value)
             elif (
@@ -223,7 +253,7 @@ def apply_change_list(story_id, change_list):
         raise e
 
 
-def does_story_exist_with_url_fragment(url_fragment):
+def does_story_exist_with_url_fragment(url_fragment: str) -> bool:
     """Checks if the url fragment for the story exists.
 
     Args:
@@ -237,17 +267,21 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 
 def validate_prerequisite_skills_in_story_contents(
-        corresponding_topic_id, story_contents):
+    skill_ids_in_corresponding_topic: List[str],
+    story_contents: story_domain.StoryContents
+) -> None:
     """Validates the prerequisites skills in the story contents.
 
     Args:
-        corresponding_topic_id: str. The corresponding topic id of the story.
+        skill_ids_in_corresponding_topic: list(str). List of skill IDs in
+            the corresponding topic of the story.
         story_contents: StoryContents. The story contents.
 
     Raises:
         ValidationError. Expected prerequisite skills to have been acquired in
             previous nodes.
         ValidationError. Expected story to not contain loops.
+        Exception. Initial node id should not be none.
     """
     if len(story_contents.nodes) == 0:
         return
@@ -256,6 +290,8 @@ def validate_prerequisite_skills_in_story_contents(
     # structure.
     nodes_queue = []
     is_node_visited = [False] * len(story_contents.nodes)
+    # Ruling out the possibility of None for mypy type checking.
+    assert story_contents.initial_node_id is not None
     starting_node_index = story_contents.get_node_index(
         story_contents.initial_node_id)
     nodes_queue.append(story_contents.nodes[starting_node_index].id)
@@ -290,12 +326,9 @@ def validate_prerequisite_skills_in_story_contents(
                 raise utils.ValidationError(
                     'Loops are not allowed in stories.')
             destination_node = story_contents.nodes[node_index]
-            skill_ids_present_in_topic = (
-                topic_fetchers.get_topic_by_id(
-                    corresponding_topic_id).get_all_skill_ids())
             # Include only skill ids relevant to the topic for validation.
             topic_relevant_skill_ids = list(
-                set(skill_ids_present_in_topic).intersection(
+                set(skill_ids_in_corresponding_topic).intersection(
                     set(destination_node.prerequisite_skill_ids)))
             if not (
                     set(
@@ -312,7 +345,9 @@ def validate_prerequisite_skills_in_story_contents(
             nodes_queue.append(node_id)
 
 
-def validate_explorations_for_story(exp_ids, strict):
+def validate_explorations_for_story(
+    exp_ids: List[str], strict: bool
+) -> List[str]:
     """Validates the explorations in the given story and checks whether they
     are compatible with the mobile app and ready for publishing.
 
@@ -334,6 +369,7 @@ def validate_explorations_for_story(exp_ids, strict):
             explorations before adding them to a story.
         ValidationError. All explorations in a story should be of the same
             category.
+        Exception. Exploration validation failed for given exploration IDs.
     """
     validation_error_messages = []
 
@@ -370,6 +406,17 @@ def validate_explorations_for_story(exp_ids, strict):
                 validation_error_messages.append(error_string)
 
     if exps_dict:
+        for exp_id, exp in exps_dict.items():
+            if exp.category not in constants.ALL_CATEGORIES:
+                error_string = (
+                    'All explorations in a story should be of a '
+                    'default category. The exploration with ID %s has'
+                    ' an invalid category %s.' % (exp_id, exp.category))
+                if strict:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+    if exps_dict:
         for exp_id in exp_ids:
             if exp_id in exps_dict:
                 sample_exp_id = exp_id
@@ -386,18 +433,53 @@ def validate_explorations_for_story(exp_ids, strict):
                 validation_error_messages.append(error_string)
             try:
                 validation_error_messages.extend(
-                    exp_services.validate_exploration_for_story(exp, strict))
+                    exp_services.validate_exploration_for_story(exp, strict))  # type: ignore[no-untyped-call]
             except Exception as e:
                 logging.exception(
                     'Exploration validation failed for exploration with ID: '
                     '%s. Error: %s' % (exp_id, e))
-                raise Exception(e)
+                raise Exception(e) from e
 
     return validation_error_messages
 
 
+def populate_story_model_fields(
+    story_model: story_models.StoryModel, story: story_domain.Story
+) -> story_models.StoryModel:
+    """Populate story model with the data from story object.
+
+    Args:
+        story_model: StoryModel. The model to populate.
+        story: Story. The story domain object which should be used to
+            populate the model.
+
+    Returns:
+        StoryModel. Populated model.
+    """
+    story_model.description = story.description
+    story_model.title = story.title
+    story_model.thumbnail_bg_color = story.thumbnail_bg_color
+    story_model.thumbnail_filename = story.thumbnail_filename
+    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
+    story_model.notes = story.notes
+    story_model.language_code = story.language_code
+    story_model.story_contents_schema_version = (
+        story.story_contents_schema_version)
+    story_model.story_contents = story.story_contents.to_dict()
+    story_model.corresponding_topic_id = story.corresponding_topic_id
+    story_model.version = story.version
+    story_model.url_fragment = story.url_fragment
+    story_model.meta_tag_content = story.meta_tag_content
+    return story_model
+
+
 def _save_story(
-        committer_id, story, commit_message, change_list, story_is_published):
+    committer_id: str,
+    story: story_domain.Story,
+    commit_message: str,
+    change_list: List[story_domain.StoryChange],
+    story_is_published: bool
+) -> None:
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -421,8 +503,10 @@ def _save_story(
             'save story %s: %s' % (story.id, change_list))
 
     story.validate()
+    corresponding_topic = (
+        topic_fetchers.get_topic_by_id(story.corresponding_topic_id))
     validate_prerequisite_skills_in_story_contents(
-        story.corresponding_topic_id, story.story_contents)
+        corresponding_topic.get_all_skill_ids(), story.story_contents)
 
     if story_is_published:
         exp_ids = []
@@ -445,26 +529,14 @@ def _save_story(
             'Unexpected error: trying to update version %s of story '
             'from version %s. Please reload the page and try again.'
             % (story_model.version, story.version))
-    elif story.version < story_model.version:
+
+    if story.version < story_model.version:
         raise Exception(
             'Trying to update version %s of story from version %s, '
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    story_model.description = story.description
-    story_model.title = story.title
-    story_model.thumbnail_bg_color = story.thumbnail_bg_color
-    story_model.thumbnail_filename = story.thumbnail_filename
-    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
-    story_model.notes = story.notes
-    story_model.language_code = story.language_code
-    story_model.story_contents_schema_version = (
-        story.story_contents_schema_version)
-    story_model.story_contents = story.story_contents.to_dict()
-    story_model.corresponding_topic_id = story.corresponding_topic_id
-    story_model.version = story.version
-    story_model.url_fragment = story.url_fragment
-    story_model.meta_tag_content = story.meta_tag_content
+    story_model = populate_story_model_fields(story_model, story)
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -472,7 +544,7 @@ def _save_story(
     story.version += 1
 
 
-def is_story_published_and_present_in_topic(story):
+def is_story_published_and_present_in_topic(story: story_domain.Story) -> bool:
     """Returns whether a story is published. Raises an exception if the story
     is not present in the corresponding topic's story references.
 
@@ -481,6 +553,10 @@ def is_story_published_and_present_in_topic(story):
 
     Returns:
         bool. Whether the supplied story is published.
+
+    Raises:
+        ValidationError. The story does not belong to any valid topic.
+        Exception. The story does not belong to the expected topic.
     """
     topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
@@ -506,7 +582,11 @@ def is_story_published_and_present_in_topic(story):
 
 
 def update_story(
-        committer_id, story_id, change_list, commit_message):
+    committer_id: str,
+    story_id: str,
+    change_list: List[story_domain.StoryChange],
+    commit_message: str
+) -> None:
     """Updates a story. Commits changes.
 
     # NOTE: This function should not be called on its own. Access it
@@ -518,11 +598,13 @@ def update_story(
         story_id: str. The story id.
         change_list: list(StoryChange). These changes are applied in sequence to
             produce the resulting story.
-        commit_message: str or None. A description of changes made to the
+        commit_message: str. A description of changes made to the
             story.
 
     Raises:
+        ValueError. Expected a commit message but received None.
         ValidationError. Exploration is already linked to a different story.
+        ValidationError. Story url fragment is not unique across the site.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')
@@ -531,11 +613,11 @@ def update_story(
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
     story_is_published = is_story_published_and_present_in_topic(new_story)
-    exploration_context_models_to_be_deleted = (
+    exploration_context_models_to_be_deleted_with_none = (
         exp_models.ExplorationContextModel.get_multi(
             exp_ids_removed_from_story))
     exploration_context_models_to_be_deleted = [
-        model for model in exploration_context_models_to_be_deleted
+        model for model in exploration_context_models_to_be_deleted_with_none
         if model is not None]
     exploration_context_models_collisions_list = (
         exp_models.ExplorationContextModel.get_multi(
@@ -573,7 +655,9 @@ def update_story(
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 
-def delete_story(committer_id, story_id, force_deletion=False):
+def delete_story(
+    committer_id: str, story_id: str, force_deletion: bool = False
+) -> None:
     """Deletes the story with the given story_id.
 
     Args:
@@ -600,13 +684,15 @@ def delete_story(committer_id, story_id, force_deletion=False):
         suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
             exp_ids)
 
-    exploration_context_models = (
+    exploration_context_models: Sequence[
+        exp_models.ExplorationContextModel
+    ] = (
         exp_models.ExplorationContextModel.get_all().filter(
             exp_models.ExplorationContextModel.story_id == story_id
         ).fetch()
     )
     exp_models.ExplorationContextModel.delete_multi(
-        exploration_context_models
+        list(exploration_context_models)
     )
 
     # This must come after the story is retrieved. Otherwise the memcache
@@ -623,7 +709,7 @@ def delete_story(committer_id, story_id, force_deletion=False):
         story_id)
 
 
-def delete_story_summary(story_id):
+def delete_story_summary(story_id: str) -> None:
     """Delete a story summary model.
 
     Args:
@@ -634,7 +720,9 @@ def delete_story_summary(story_id):
     story_models.StorySummaryModel.get(story_id).delete()
 
 
-def compute_summary_of_story(story):
+def compute_summary_of_story(
+    story: story_domain.Story
+) -> story_domain.StorySummary:
     """Create a StorySummary domain object for a given Story domain
     object and return it.
 
@@ -646,6 +734,9 @@ def compute_summary_of_story(story):
     """
     story_model_node_titles = [
         node.title for node in story.story_contents.nodes]
+    # Ruling out the possibility of None for mypy type checking.
+    assert story.created_on is not None
+    assert story.last_updated is not None
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
         story.version, story_model_node_titles, story.thumbnail_bg_color,
@@ -656,7 +747,7 @@ def compute_summary_of_story(story):
     return story_summary
 
 
-def create_story_summary(story_id):
+def create_story_summary(story_id: str) -> None:
     """Creates and stores a summary of the given story.
 
     Args:
@@ -667,13 +758,19 @@ def create_story_summary(story_id):
     save_story_summary(story_summary)
 
 
-def save_story_summary(story_summary):
-    """Save a story summary domain object as a StorySummaryModel
-    entity in the datastore.
+def populate_story_summary_model_fields(
+    story_summary_model: story_models.StorySummaryModel,
+    story_summary: story_domain.StorySummary
+) -> story_models.StorySummaryModel:
+    """Populate story summary model with the data from story summary object.
 
     Args:
-        story_summary: StorySummary. The story summary object to be saved in the
-            datastore.
+        story_summary_model: StorySummaryModel. The model to populate.
+        story_summary: StorySummary. The story summary domain object which
+            should be used to populate the model.
+
+    Returns:
+        StorySummaryModel. Populated model.
     """
     story_summary_dict = {
         'title': story_summary.title,
@@ -689,21 +786,36 @@ def save_story_summary(story_summary):
         'story_model_created_on': (
             story_summary.story_model_created_on)
     }
-
-    story_summary_model = (
-        story_models.StorySummaryModel.get_by_id(story_summary.id))
     if story_summary_model is not None:
         story_summary_model.populate(**story_summary_dict)
-        story_summary_model.update_timestamps()
-        story_summary_model.put()
     else:
         story_summary_dict['id'] = story_summary.id
-        model = story_models.StorySummaryModel(**story_summary_dict)
-        model.update_timestamps()
-        model.put()
+        story_summary_model = story_models.StorySummaryModel(
+            **story_summary_dict)
+
+    return story_summary_model
 
 
-def record_completed_node_in_story_context(user_id, story_id, node_id):
+def save_story_summary(story_summary: story_domain.StorySummary) -> None:
+    """Save a story summary domain object as a StorySummaryModel
+    entity in the datastore.
+
+    Args:
+        story_summary: StorySummary. The story summary object to be saved in the
+            datastore.
+    """
+    existing_skill_summary_model = (
+        story_models.StorySummaryModel.get_by_id(story_summary.id))
+    story_summary_model = populate_story_summary_model_fields(
+        existing_skill_summary_model, story_summary
+    )
+    story_summary_model.update_timestamps()
+    story_summary_model.put()
+
+
+def record_completed_node_in_story_context(
+    user_id: str, story_id: str, node_id: str
+) -> None:
     """Records a node by a given user in a given story
     context as having been played.
 
