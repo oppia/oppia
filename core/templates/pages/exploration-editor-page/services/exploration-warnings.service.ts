@@ -236,6 +236,28 @@ export class ExplorationWarningsService {
     return indexes;
   }
 
+  _getStatesWithInvalidRedirection(links: GraphLink[]): string[] {
+    let results = [];
+    let states = this.explorationStatesService.getStates();
+    states.getStateNames().forEach((stateName) => {
+      // Go through all states, taking in the dest and source
+      // calculate distance for each, if invalid push in results.
+      let interaction = states.getState(stateName).interaction;
+      let defaultDest = interaction.defaultOutcome.dest;
+      if(defaultDest !== stateName && !this.redirectionIsValid(defaultDest, stateName, links)) {
+        results.push(stateName);
+      }
+      let answerGroups = interaction.answerGroups;
+      for (let i = 0; i < answerGroups.length; i++) {
+        let dest = answerGroups[i].outcome.dest;
+        if(!this.redirectionIsValid(dest, stateName, links)) {
+          results.push(stateName);
+        }
+      }
+    })
+    return results;
+  }
+
   _getStatesAndAnswerGroupsWithEmptyClassifiers():
     _getStatesAndAnswerGroupsWithEmptyClassifiersResult[] {
     let results = [];
@@ -290,8 +312,6 @@ export class ExplorationWarningsService {
 
   _updateWarningsList(): void {
 
-    console.log("Updated warning list");
-
     this._warningsList = [];
     this.stateWarnings = {};
     this.checkpointCountWarning = '';
@@ -341,11 +361,13 @@ export class ExplorationWarningsService {
         AppConstants.STATE_ERROR_MESSAGES.ADD_INTERACTION);
     });
 
-    this.statesWithInvalidRedirection.forEach((stateName) => {
-      console.log("run");
+    let statesWithInvalidRedirection =
+      this._getStatesWithInvalidRedirection(_graphData.links);
+    statesWithInvalidRedirection.forEach((stateName) => {
       _extendStateWarnings(
-        stateName, AppConstants.STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
+        stateName, AppConstants.STATE_ERROR_MESSAGES.INVALID_REDIRECTION);
     });
+    console.log(statesWithInvalidRedirection);
 
     let statesWithAnswersThatMustBeResolved =
       this._getStatesWithAnswersThatMustBeResolved();
@@ -510,6 +532,54 @@ export class ExplorationWarningsService {
 
   updateWarnings(): void {
     this._updateWarningsList();
+  }
+
+  redirectionIsValid(
+    sourceStateName: string, destStateName: string, links: GraphLink[]) : boolean {
+    let distance = this.getDistanceToDestState(sourceStateName, destStateName, links);
+    console.log(sourceStateName + " " + destStateName+ " " + distance);
+    // Raise validation error if the creator redirects the learner
+    // back by more than MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards.
+    if(distance > AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION) {
+      return false;
+    } 
+    else {
+      return true;
+    }
+  }
+
+  getDistanceToDestState(
+    sourceStateName: string, destStateName: string, links: GraphLink[]): number {
+      let distance = -1;
+      let stateFound = false;
+      let stateNamesInBfsOrder: string[] = [];
+      let queue: string[] = [];
+      let seen: Record<string, boolean> = {};
+      seen[sourceStateName] = true;
+      queue.push(sourceStateName);
+      while (queue.length > 0 && !stateFound) {
+        // '.shift()' here can return an undefined value, but we're already
+        // checking for queue.length > 0, so this is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let currStateName = queue.shift()!;
+        if (currStateName == destStateName) {
+          stateFound = true;
+        }
+        distance++;
+        stateNamesInBfsOrder.push(currStateName);
+        for (let e = 0; e < links.length; e++) {
+          let edge = links[e];
+          let dest = edge.target;
+          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
+            seen[dest] = true;
+            queue.push(dest);
+          }
+        }
+      }
+      if(distance!= -1 && !stateFound) {
+        distance = -1;
+      }
+      return distance;
   }
 }
 

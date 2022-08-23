@@ -111,41 +111,6 @@ export class OutcomeEditorComponent implements OnInit {
     }
   }
 
-  getDistanceToDestState(
-    initStateId: string, states: States, sourceStateName: string, destStateName: string): number {
-      let distance = -1;
-      let stateFound = false;
-      let stateGraph = this.computeGraphService.compute(initStateId, states);
-      let stateNamesInBfsOrder: string[] = [];
-      let queue: string[] = [];
-      let seen: Record<string, boolean> = {};
-      seen[sourceStateName] = true;
-      queue.push(sourceStateName);
-      while (queue.length > 0 && !stateFound) {
-        // '.shift()' here can return an undefined value, but we're already
-        // checking for queue.length > 0, so this is safe.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        let currStateName = queue.shift()!;
-        if (currStateName == destStateName) {
-          stateFound = true;
-        }
-        distance++;
-        stateNamesInBfsOrder.push(currStateName);
-        for (let e = 0; e < stateGraph.links.length; e++) {
-          let edge = stateGraph.links[e];
-          let dest = edge.target;
-          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
-            seen[dest] = true;
-            queue.push(dest);
-          }
-        }
-      }
-      if(distance!= -1 && !stateFound) {
-        distance = -1;
-      }
-      return distance;
-  }
-
   isFeedbackLengthExceeded(): boolean {
     // TODO(#13764): Edit this check after appropriate limits are found.
     return (this.outcome.feedback._html.length > 10000);
@@ -227,18 +192,6 @@ export class OutcomeEditorComponent implements OnInit {
 
   saveThisDestination(): void {
     this.stateEditorService.onSaveOutcomeDestDetails.emit();
-    let activeStateName = this.stateEditorService.getActiveStateName();
-    let initStateName = this.explorationInitStateNameService.displayed;
-    let states = this.explorationStatesService.getStates();
-    let destStateName = this.outcome.dest;
-    if(!this.redirectionIsValid(
-      (initStateName) as string, states, destStateName, activeStateName)) {
-      console.log("Wrong Redirection.")
-      this.explorationWarningsService.raiseRedirectionError(activeStateName);
-    }
-    else {
-      //this.explorationWarningsService.removeFromInvalidRedirectionList(activeStateName);
-    }
     this.destinationEditorIsOpen = false;
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
     if (!this.isSelfLoop(this.outcome)) {
@@ -250,21 +203,6 @@ export class OutcomeEditorComponent implements OnInit {
       this.outcome.missingPrerequisiteSkillId;
 
     this.saveDest.emit(this.savedOutcome);
-    this.explorationWarningsService.updateWarnings();
-  }
-
-  redirectionIsValid(
-    initStateId: string, states: States, sourceStateName: string, destStateName: string) : boolean {
-    let distance = this.getDistanceToDestState(initStateId, states, sourceStateName, destStateName);
-    // Raise validation error if the creator redirects the learner
-    // back by more than MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards.
-    console.log(distance);
-    if(distance > AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION) {
-      return false;
-    } 
-    else {
-      return true;
-    }
   }
 
   onChangeCorrectnessLabel(): void {
