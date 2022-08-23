@@ -236,8 +236,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(deleted_skill_ids, ['skill_id_2'])
         self.assertEqual(
             skill_descriptions, {
-                'skill_id_1': 'Description 1',
-                'skill_id_2': None
+                'skill_id_1': 'Description 1'
             }
         )
 

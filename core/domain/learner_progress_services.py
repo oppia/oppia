@@ -93,7 +93,7 @@ class DisplayableTopicSummaryDict(TypedDict):
     classroom: str
     practice_tab_is_displayed: bool
     degrees_of_mastery: Dict[str, Optional[float]]
-    skill_descriptions: Tuple[Dict[str, Optional[str]], List[str]]
+    skill_descriptions: Tuple[Dict[str, str], List[str]]
     subtopics: List[topic_domain.SubtopicDict]
 
 

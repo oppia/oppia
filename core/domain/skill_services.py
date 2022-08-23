@@ -396,7 +396,7 @@ def get_rubrics_of_skills(
 
 def get_descriptions_of_skills(
     skill_ids: List[str]
-) -> Tuple[Dict[str, Optional[str]], List[str]]:
+) -> Tuple[Dict[str, str], List[str]]:
     """Returns a list of skill descriptions corresponding to the given skills.
 
     Args:
@@ -407,7 +407,7 @@ def get_descriptions_of_skills(
         corresponding ids and the list of deleted skill ids, if any.
     """
     skill_summaries = get_multi_skill_summaries(skill_ids)
-    skill_id_to_description_dict: Dict[str, Optional[str]] = {}
+    skill_id_to_description_dict: Dict[str, str] = {}
 
     for skill_summary in skill_summaries:
         if skill_summary is not None:
@@ -417,7 +417,6 @@ def get_descriptions_of_skills(
     deleted_skill_ids = []
     for skill_id in skill_ids:
         if skill_id not in skill_id_to_description_dict:
-            skill_id_to_description_dict[skill_id] = None
             deleted_skill_ids.append(skill_id)
 
     return skill_id_to_description_dict, deleted_skill_ids
