@@ -61,7 +61,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """
         change_dict = {}
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Missing cmd key in change dict',
         ):
@@ -73,7 +73,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """
         change_dict = {'cmd': 'wrong', }
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Command wrong is not allowed',
         ):
@@ -89,7 +89,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'old_value': 'old_value'
         }
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following required attributes are missing: new_value',
         ):
@@ -101,7 +101,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """
         change_dict = {'cmd': 'create_new', 'invalid': 'invalid'}
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid'
         ):
@@ -118,7 +118,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'old_value': 'old_value'
         }
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
             'Value for property_name in cmd update_question_property: '
             'wrong is not allowed'),
@@ -225,7 +225,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """
         change_dict = {}
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Missing cmd key in change dict',
         ):
@@ -237,7 +237,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """
         change_dict = {'cmd': 'wrong', }
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Command wrong is not allowed',
         ):
@@ -251,7 +251,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'cmd': 'create_new_fully_specified_question',
             'question_dict': 'question_dict',
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'skill_difficulty, skill_id'),
@@ -270,7 +270,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'invalid': 'invalid'
         }
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid',
         ):
