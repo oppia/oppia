@@ -83,7 +83,7 @@ export class TeachOppiaModalComponent
 
   fetchAndShowUnresolvedAnswers(
       expId: string, stateName: string): void {
-    var unresolvedAnswersUrl = (
+    let unresolvedAnswersUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/get_top_unresolved_answers/' +
         '<exploration_id>', {
@@ -112,11 +112,11 @@ export class TeachOppiaModalComponent
     this.unresolvedAnswers = [];
 
     unresolvedAnswers.forEach((item: {answer: InteractionAnswer}) => {
-      var answer = item.answer;
-      var classificationResult = (
+      let answer = item.answer;
+      let classificationResult = (
         this.answerClassificationService.getMatchingClassificationResult(
           this._stateName, this._state.interaction, answer, this.rulesService));
-      var classificationType = (
+      let classificationType = (
         classificationResult.classificationCategorization);
       if (classificationType !== (
         ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION) &&
@@ -124,11 +124,11 @@ export class TeachOppiaModalComponent
           ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION) &&
         !this.trainingDataService.isConfirmedUnclassifiedAnswer(
           answer)) {
-        var answerTemplate = (
+        let answerTemplate = (
           this.explorationHtmlFormatterService.getAnswerHtml(
             answer, this.stateInteractionIdService.savedMemento,
             this.stateCustomizationArgsService.savedMemento));
-        var feedbackHtml = (
+        let feedbackHtml = (
           classificationResult.outcome.feedback.html);
 
         this.unresolvedAnswers.push({

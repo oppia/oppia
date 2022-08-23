@@ -18,6 +18,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
 import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
@@ -26,7 +27,6 @@ import { QuestionPlayerConfig } from 'pages/exploration-player-page/learner-expe
 import { LoaderService } from 'services/loader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
-import { TranslateService } from '@ngx-translate/core';
 import { PracticeSessionsBackendApiService } from './practice-session-backend-api.service';
 
 @Component({

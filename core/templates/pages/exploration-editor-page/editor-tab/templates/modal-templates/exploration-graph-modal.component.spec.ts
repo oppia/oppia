@@ -19,8 +19,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ExplorationGraphModalComponent } from './exploration-graph-modal.component';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationGraphModalComponent } from './exploration-graph-modal.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 

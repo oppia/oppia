@@ -19,9 +19,9 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { HelpModalComponent } from 'pages/exploration-editor-page/modal-templates/help-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ContextService } from 'services/context.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { EditabilityService } from 'services/editability.service';

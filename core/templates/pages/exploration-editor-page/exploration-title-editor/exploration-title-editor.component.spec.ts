@@ -19,11 +19,11 @@
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExplorationTitleEditorComponent } from './exploration-title-editor.component';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { RouterService } from '../services/router.service';
 import { ExplorationTitleService } from '../services/exploration-title.service';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('Exploration Title Editor Component', () => {
   let component: ExplorationTitleEditorComponent;

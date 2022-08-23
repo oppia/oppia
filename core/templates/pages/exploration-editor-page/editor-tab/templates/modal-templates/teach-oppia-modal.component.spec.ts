@@ -19,6 +19,7 @@
 import { EventEmitter, Injector, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TrainingDataService } from '../../training-panel/training-data.service';
@@ -30,7 +31,6 @@ import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { ResponsesService } from '../../services/responses.service';
 import { TeachOppiaModalComponent } from './teach-oppia-modal.component';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';

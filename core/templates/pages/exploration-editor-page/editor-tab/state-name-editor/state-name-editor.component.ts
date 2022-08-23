@@ -53,7 +53,7 @@ export class StateNameEditorComponent
   ) {}
 
   openStateNameEditor(): void {
-    var stateName = this.stateEditorService.getActiveStateName();
+    let stateName = this.stateEditorService.getActiveStateName();
     this.stateNameService.setStateNameEditorVisibility(true);
     this.stateNameService.setStateNameSavedMemento(stateName);
     this.maxLen = AppConstants.MAX_STATE_NAME_LENGTH;
@@ -62,9 +62,9 @@ export class StateNameEditorComponent
   }
 
   saveStateName(newStateName: string): boolean {
-    var normalizedNewName =
+    let normalizedNewName =
       this._getNormalizedStateName(newStateName);
-    var savedMemento = this.stateNameService.getStateNameSavedMemento();
+    let savedMemento = this.stateNameService.getStateNameSavedMemento();
     if (!this._isNewStateNameValid(normalizedNewName)) {
       return false;
     }

@@ -19,9 +19,9 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor.component';
 import { ExplorationObjectiveService } from '../services/exploration-objective.service';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('Exploration Objective Editor Component', () => {
   let component: ExplorationObjectiveEditorComponent;
