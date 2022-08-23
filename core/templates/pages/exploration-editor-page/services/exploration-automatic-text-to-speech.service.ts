@@ -39,6 +39,7 @@ export class ExplorationAutomaticTextToSpeechService
     super(alertsService, changeListService, loggerService);
   }
 
+  // TODO(#13015): Remove use of unknown as a type.
   _isValid(value: unknown): boolean {
     return (typeof value === 'boolean');
   }

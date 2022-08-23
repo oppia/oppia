@@ -179,6 +179,7 @@ export class ExplorationMetadataModalComponent
     return Boolean(
       this.explorationTitleService.displayed &&
       this.explorationObjectiveService.displayed &&
+      // TODO(#13015): Remove use of unknown as a type.
       (this.explorationObjectiveService.displayed as unknown[]).length >= 15 &&
       this.explorationCategoryService.displayed &&
       this.explorationLanguageCodeService.displayed);
@@ -187,11 +188,13 @@ export class ExplorationMetadataModalComponent
   ngOnInit(): void {
     this.CATEGORY_LIST_FOR_SELECT2 = [];
     this.objectiveHasBeenPreviouslyEdited = (
+      // TODO(#13015): Remove use of unknown as a type.
       (this.explorationObjectiveService.savedMemento as unknown[]).length > 0);
 
     this.requireTitleToBeSpecified = (
       !this.explorationTitleService.savedMemento);
     this.requireObjectiveToBeSpecified = (
+      // TODO(#13015): Remove use of unknown as a type.
       (this.explorationObjectiveService.savedMemento as unknown[]).length < 15);
     this.requireCategoryToBeSpecified = (
       !this.explorationCategoryService.savedMemento);
@@ -199,6 +202,7 @@ export class ExplorationMetadataModalComponent
       this.explorationLanguageCodeService.savedMemento ===
       AppConstants.DEFAULT_LANGUAGE_CODE);
     this.askForTags = (
+      // TODO(#13015): Remove use of unknown as a type.
       (this.explorationTagsService.savedMemento as unknown[]).length === 0);
 
     for (let i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {

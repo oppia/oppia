@@ -95,7 +95,7 @@ export class TeachOppiaModalComponent
         params: {
           state_name: stateName
         }
-      }).then((response: {data: {unresolved_answers: unknown[]}}) => {
+      }).then((response) => {
         this.showUnresolvedAnswers(response.data.unresolved_answers);
       }, (response) => {
         this.loggerService.error(
@@ -106,7 +106,8 @@ export class TeachOppiaModalComponent
       });
   }
 
-  showUnresolvedAnswers(unresolvedAnswers: unknown[]): void {
+  showUnresolvedAnswers(
+      unresolvedAnswers: {answer: InteractionAnswer}[]): void {
     this.loadingDotsAreShown = false;
     this.unresolvedAnswers = [];
 
