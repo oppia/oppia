@@ -336,7 +336,6 @@ var AutocompleteDropdownEditor = function(elem) {
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-
       await action.sendKeys(
         'Dropdown Element',
         element(searchInputLocator),
@@ -344,7 +343,6 @@ var AutocompleteDropdownEditor = function(elem) {
 
       var searchInputLocatorText = element.all(by.cssContainingText(
         '.e2e-test-exploration-category-selector-choice', text)).first();
-
 
       await action.click(
         'Dropdown Element Select',

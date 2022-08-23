@@ -200,7 +200,6 @@ var ExplorationEditorPage = function() {
       'Language input Choice takes too long to be visible. ',
       LanguageChoiceOptionElement, true);
 
-
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);

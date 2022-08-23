@@ -26,7 +26,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var explorationCategoryInput = element(
+  var explorationCategory = element(
     by.css('.e2e-test-exploration-category'));
   var explorationLanguageInput = element(
     by.css('.e2e-test-exploration-language-select'));
@@ -119,10 +119,10 @@ var ExplorationEditorSettingsTab = function() {
   this.setCategory = async function(category) {
     await action.click('Neutral element', neutralElement);
     await waitFor.presenceOf(
-      explorationCategoryInput, 'Category input takes too long to be visible.');
+      explorationCategory, 'Category input takes too long to be visible.');
     await (
       await forms.AutocompleteDropdownEditor(
-        explorationCategoryInput)
+        explorationCategory)
     ).setValue(category);
   };
 
@@ -171,7 +171,7 @@ var ExplorationEditorSettingsTab = function() {
   this.expectCategoryToBe = async function(category) {
     var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
     await waitFor.presenceOf(
-      explorationCategoryInput,
+      explorationCategory,
       'Exploration category input takes too long to be visible.');
     expect(await element(containerLocator).getText()).
       toEqual(category);

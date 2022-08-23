@@ -26,7 +26,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var explorationCategoryInput = $('.e2e-test-exploration-category');
+  var explorationCategory = $('.e2e-test-exploration-category');
   var explorationLanguageInput = $('.e2e-test-exploration-language-select');
   var explorationObjectiveInput = $('.e2e-test-exploration-objective-input');
   var explorationObjectiveWarning = $(
@@ -106,9 +106,9 @@ var ExplorationEditorSettingsTab = function() {
   this.setCategory = async function(category) {
     await action.click('Neutral element', neutralElement);
     await waitFor.presenceOf(
-      explorationCategoryInput, 'Category input takes too long to be visible.');
+      explorationCategory, 'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(explorationCategoryInput)
+      await forms.AutocompleteDropdownEditor(explorationCategory)
     ).setValue(category);
   };
 
@@ -148,9 +148,9 @@ var ExplorationEditorSettingsTab = function() {
 
   this.expectCategoryToBe = async function(category) {
     await waitFor.presenceOf(
-      explorationCategoryInput,
+      explorationCategory,
       'Exploration category input takes too long to be visible.');
-    expect(await explorationCategoryInput.$('option:checked').getText()).
+    expect(await explorationCategory.$('option:checked').getText()).
       toEqual(category);
   };
 
