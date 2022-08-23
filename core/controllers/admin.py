@@ -28,6 +28,8 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
 from core.domain import blog_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -88,6 +90,7 @@ class AdminHandler(base.BaseHandler):
                         'generate_dummy_explorations', 'clear_search_index',
                         'generate_dummy_new_structures_data',
                         'generate_dummy_new_skill_data',
+                        'generate_dummy_classroom',
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
@@ -247,6 +250,8 @@ class AdminHandler(base.BaseHandler):
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
+            elif action == 'generate_dummy_classroom':
+                self._generate_dummy_classroom()
             elif action == 'save_config_properties':
                 new_config_property_values = self.normalized_payload.get(
                     'new_config_property_values')
@@ -672,6 +677,27 @@ class AdminHandler(base.BaseHandler):
                 exploration_ids_to_publish)
         else:
             raise Exception('Cannot generate dummy explorations in production.')
+
+    def _generate_dummy_classroom(self):
+        if constants.DEV_MODE:
+            logging.info(
+                '[ADMIN] %s generated dummy classroom.' % self.user_id)
+            new_classroom_id = classroom_config_services.get_new_classroom_id()
+            new_classroom_name = 'Dummy Classroom %s' % str(new_classroom_id)
+            classroom_dict = {
+                'classroom_id': new_classroom_id,
+                'name': new_classroom_name,
+                'url_fragment': '',
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_id_to_prerequisite_topic_ids': {}
+            }
+            classroom = classroom_config_domain.Classroom.from_dict(
+                classroom_dict)
+            classroom_config_services.update_or_create_classroom_model(
+                classroom)
+        else:
+            raise Exception('Cannot generate dummy classroom in production.')
 
 
 class AdminRoleHandler(base.BaseHandler):
