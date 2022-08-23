@@ -35,8 +35,8 @@ class Task:
     the cloud tasks emulator.
     """
 
-    # In the type annotation below, payload is of type Dict[str, Any] because
-    # the payload here has no constraints.
+    # Here we use type Any because the payload can accept Dict and
+    # it has no constraints over it's values.
     def __init__(
             self,
             queue_name: str,
@@ -85,6 +85,9 @@ class Emulator:
            can be executed using process_and_flush_tasks().
     """
 
+    # Here we use type Any because 'task_handler' can accept any kind of
+    # function that will handle the task execution. So, to allow every
+    # function we used Callable[..., Any] type here.
     def __init__(
             self,
             task_handler: Callable[..., Any],
@@ -170,8 +173,8 @@ class Emulator:
         """
         return sum(len(q) for q in self._queues.values())
 
-    # In the type annotation below, payload is of type Dict[str, Any] because
-    # the payload here has no constraints.
+    # Here we use type Any because the payload can accept Dict and
+    # it has no constraints over it's values.
     def create_task(
             self,
             queue_name: str,
