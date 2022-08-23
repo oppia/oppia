@@ -387,21 +387,21 @@ class AppFeedbackReport:
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
-            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name):
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value):
             return NavigationDrawerEntryPoint()
         elif entry_point_name == (
-            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name):
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value):
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.EntryPoint.REVISION_CARD.name):
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value):
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.EntryPoint.CRASH.name):
+            app_feedback_report_constants.EntryPoint.CRASH.value):
             return CrashEntryPoint()
         else:
             raise utils.InvalidInputException(

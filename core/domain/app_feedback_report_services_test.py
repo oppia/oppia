@@ -617,25 +617,25 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         stats_parameter_names = (
             app_feedback_report_constants.StatsParameterNames)
         expected_json = {
-            stats_parameter_names.REPORT_TYPE.name: {
+            stats_parameter_names.REPORT_TYPE.value: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
             },
-            stats_parameter_names.COUNTRY_LOCALE_CODE.name: {
+            stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            stats_parameter_names.ENTRY_POINT_NAME.name: {
+            stats_parameter_names.ENTRY_POINT_NAME.value: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
-            stats_parameter_names.TEXT_LANGUAGE_CODE.name: {
+            stats_parameter_names.TEXT_LANGUAGE_CODE.value: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            stats_parameter_names.AUDIO_LANGUAGE_CODE.name: {
+            stats_parameter_names.AUDIO_LANGUAGE_CODE.value: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            stats_parameter_names.ANDROID_SDK_VERSION.name: {
+            stats_parameter_names.ANDROID_SDK_VERSION.value: {
                 str(self.ANDROID_SDK_VERSION): 2
             },
-            stats_parameter_names.VERSION_NAME.name: {
+            stats_parameter_names.VERSION_NAME.value: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
