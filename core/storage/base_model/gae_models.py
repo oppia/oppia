@@ -1627,7 +1627,8 @@ class VersionedModel(BaseModel):
                     % (version_numbers[ind], cls.__name__, model_instance_id))
 
         # Here we use cast because we need to make sure that returned_models
-        # only contains BaseSnapshotMetadataModel and not None.
+        # only contains BaseSnapshotMetadataModel and not None. In above code,
+        # we are already throwing an error if None value is encountered.
         returned_models_without_none = cast(
             List[BaseSnapshotMetadataModel], returned_models)
         return [{
