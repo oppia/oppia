@@ -259,7 +259,7 @@ describe('Error reporting', function() {
     await browser.setupInterceptor();
     // Expect that the frontend error is sent to the backend handler.
     await browser.expectRequest('POST', '/frontend_errors', 200);
-    let createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+    let creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
     await action.click(
       'Creator Dashboard radio', createrDashboardRadio);
     // Add a 1 second delay to ensure that expected request gets triggered.
