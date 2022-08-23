@@ -182,7 +182,7 @@ describe('Settings Tab Component', () => {
       UserEmailPreferencesService);
     userService = TestBed.inject(UserService);
 
-    spyOnProperty(explorationTagsService, 'onExplorationPropertyChanged')
+    spyOn(explorationTagsService, 'onExplorationPropertyChanged')
       .and.returnValue(mockExplorationTagsServiceonPropertyChanged);
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
