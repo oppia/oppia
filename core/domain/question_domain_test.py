@@ -59,71 +59,66 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
-        change_dict = {}
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Missing cmd key in change dict',
-        ):
-            question_domain.QuestionChange(change_dict)
+            callableObj=question_domain.QuestionChange,
+            change_dict={}
+        )
 
     def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        change_dict = {'cmd': 'wrong', }
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Command wrong is not allowed',
-        ):
-            question_domain.QuestionChange(change_dict)
+            callableObj=question_domain.QuestionChange,
+            change_dict={'cmd': 'wrong', }
+        )
 
     def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
-        change_dict = {
-            'cmd': 'update_question_property',
-            'property_name': 'question_state_data',
-            'old_value': 'old_value'
-        }
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'The following required attributes are missing: new_value',
-        ):
-            question_domain.QuestionChange(change_dict)
+            'The following required attributes are present: new_value',
+            callableObj=question_domain.QuestionChange,
+            change_dict={
+                'cmd': 'update_question_property',
+                'property_name': 'question_state_data',
+                'old_value': 'old_value'
+            }
+        )
 
     def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
-        change_dict = {'cmd': 'create_new', 'invalid': 'invalid'}
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
-            'The following extra attributes are present: invalid'
-        ):
-            question_domain.QuestionChange(change_dict)
+            'The following extra attributes are present: invalid',
+            callableObj=question_domain.QuestionChange,
+            change_dict={'cmd': 'create_new', 'invalid': 'invalid'}
+        )
 
     def test_update_question_property_with_wrong_property_name(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
-        change_dict = {
-            'cmd': 'update_question_property',
-            'property_name': 'wrong',
-            'new_value': 'new_value',
-            'old_value': 'old_value'
-        }
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, (
-            'Value for property_name in cmd update_question_property: '
-            'wrong is not allowed'),
-        ):
-            question_domain.QuestionChange(change_dict)
+                'Value for property_name in cmd update_question_property: '
+                'wrong is not allowed'),
+            callableObj=question_domain.QuestionChange,
+            change_dict={
+                'cmd': 'update_question_property',
+                'property_name': 'wrong',
+                'new_value': 'new_value',
+                'old_value': 'old_value'
+            }
+        )
 
     def test_create_new(self) -> None:
         """Test to verify __init__ method of the Question Change object
@@ -223,58 +218,54 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
-        change_dict = {}
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Missing cmd key in change dict',
-        ):
-            question_domain.QuestionSuggestionChange(change_dict)
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={}
+        )
 
     def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
-        change_dict = {'cmd': 'wrong', }
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Command wrong is not allowed',
-        ):
-            question_domain.QuestionSuggestionChange(change_dict)
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={'cmd': 'wrong', }
+        )
 
     def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with missing attributes in cmd.
         """
-        change_dict = {
-            'cmd': 'create_new_fully_specified_question',
-            'question_dict': 'question_dict',
-        }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            utils.ValidationError, (
-                'The following required attributes are missing: '
-                'skill_difficulty, skill_id'),
-        ):
-            question_domain.QuestionSuggestionChange(change_dict)
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'The following required attributes are present: new_value',
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={
+                'cmd': 'create_new_fully_specified_question',
+                'question_dict': 'question_dict',
+            }
+        )
 
     def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
-        change_dict = {
-            'cmd': 'create_new_fully_specified_question',
-            'question_dict': 'question_dict',
-            'skill_id': 'skill_1',
-            'skill_difficulty': '0.3',
-            'invalid': 'invalid'
-        }
-
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid',
-        ):
-            question_domain.QuestionSuggestionChange(change_dict)
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={
+                'cmd': 'create_new_fully_specified_question',
+                'question_dict': 'question_dict',
+                'skill_id': 'skill_1',
+                'skill_difficulty': '0.3',
+                'invalid': 'invalid'
+            }
+        )
 
     def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
