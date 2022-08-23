@@ -29,6 +29,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -936,3 +937,167 @@ class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['students_info'], student_info)
         self.assertEqual(
             response['invited_students_info'], invited_student_info)
+
+
+class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
+    """Checks learner group syllabus being fetched correctly"""
+
+    STUDENT_ID = 'student_user_1'
+    TOPIC_ID = 'topic_id_1'
+    STORY_ID = 'story_id_1'
+    SUBTOPIC_PAGE_ID = 'topic_id_1:1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+
+        learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.facilitator_id], [self.STUDENT_ID], [self.SUBTOPIC_PAGE_ID],
+            [self.STORY_ID])
+
+        # Set up topics, subtopics and stories for learner group syllabus.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'Place Values', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Naming Numbers', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.admin_id, topic)
+        self.save_new_story(
+            self.STORY_ID, self.admin_id, self.TOPIC_ID,
+            'Story test')
+        topic_services.add_canonical_story(
+            self.admin_id, self.TOPIC_ID, self.STORY_ID)
+
+        # Publish the topic and its stories.
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+    def test_get_learner_group_syllabus(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        response = self.get_json(
+            '/learner_group_syllabus_handler/%s' % self.LEARNER_GROUP_ID
+        )
+
+        self.assertEqual(response['learner_group_id'], self.LEARNER_GROUP_ID)
+
+        story_summary_dicts = response['story_summary_dicts']
+        self.assertEqual(len(story_summary_dicts), 1)
+        self.assertEqual(story_summary_dicts[0]['id'], self.STORY_ID)
+        self.assertEqual(story_summary_dicts[0]['title'], 'Story test')
+        self.assertEqual(story_summary_dicts[0]['topic_name'], 'Place Values')
+
+        subtopic_summary_dicts = response['subtopic_summary_dicts']
+        self.assertEqual(len(subtopic_summary_dicts), 1)
+        self.assertEqual(subtopic_summary_dicts[0]['subtopic_id'], 1)
+        self.assertEqual(
+            subtopic_summary_dicts[0]['subtopic_title'], 'Naming Numbers')
+        self.assertEqual(
+            subtopic_summary_dicts[0]['parent_topic_name'], 'Place Values')
+        self.assertEqual(
+            subtopic_summary_dicts[0]['thumbnail_filename'], 'image.svg')
+        self.assertEqual(
+            subtopic_summary_dicts[0]['parent_topic_id'], self.TOPIC_ID)
+        self.assertIsNone(subtopic_summary_dicts[0]['subtopic_mastery'])
+
+        self.logout()
+
+    def test_get_learner_group_syllabus_for_invalid_group(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        self.get_json(
+            '/learner_group_syllabus_handler/invalidId', expected_status_int=400
+        )
+
+        self.logout()
+
+
+class StudentStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for Student Stories Chapters Progress Handler."""
+
+    NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_2 = story_domain.NODE_ID_PREFIX + '2'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.USER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        self.story_id = story_services.get_new_story_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(  # type: ignore[no-untyped-call]
+            self.TOPIC_ID, self.USER_ID, name='Topic',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
+        self.save_new_story(
+            self.story_id, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
+        )
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+            self.USER_ID, self.TOPIC_ID, self.story_id)
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.story_id, changelist,
+            'Added node.')
+        self.story = story_fetchers.get_story_by_id(self.story_id)
+
+        self.exp_id_1 = 'expid1'
+        self.save_new_valid_exploration(self.exp_id_1, self.USER_ID)
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'old_value': None,
+                'new_value': self.exp_id_1
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.story_id, change_list,
+            'Added node.')
+
+    def test_get_student_stories_chapters_progress(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        user_services.update_learner_checkpoint_progress(
+            self.USER_ID, self.exp_id_1, 'Introduction', 1)
+
+        params = {
+            'story_ids': json.dumps([self.story_id])
+        }
+        response = self.get_json(
+            '/user_progress_in_stories_chapters_handler/%s' % (
+                self.NEW_USER_USERNAME), params=params)
+
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]['exploration_id'], self.exp_id_1)
+        self.assertEqual(response[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(response[0]['total_checkpoints_count'], 1)
+
+        self.logout()

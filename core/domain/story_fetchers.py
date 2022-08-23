@@ -465,13 +465,15 @@ def get_user_progress_in_story_chapters(
         if node.exploration_id
     ]
     exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
+    user_id_exp_id_combinations = list(itertools.product([user_id], exp_ids))
     exp_user_data_models = (
         user_models.ExplorationUserDataModel.get_multi(
-            [user_id], exp_ids))
+            user_id_exp_id_combinations))
 
     all_chapters_progress: List[
         story_domain.StoryChapterProgressSummaryDict] = []
-    for i, exp_id in enumerate(exp_ids):
+    for i, user_id_exp_id_pair in enumerate(user_id_exp_id_combinations):
+        exp_id = user_id_exp_id_pair[1]
         exploration = exp_id_to_exp_map[exp_id]
         all_checkpoints = user_services.get_checkpoints_in_order(
             exploration.init_state_name,

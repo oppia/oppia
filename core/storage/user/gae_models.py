@@ -1642,23 +1642,23 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-        cls, user_ids: List[str], exploration_ids: List[str]
+        cls, user_id_exp_id_combinations: List[Tuple[str, str]]
     ) -> List[Optional[ExplorationUserDataModel]]:
         """Gets all ExplorationUserDataModels for the given users for given
         exploration ids.
 
         Args:
-            user_ids: list(str). A list of user_ids.
-            exploration_ids: list(str). The list of ids of the explorations.
+            user_id_exp_id_combinations: list(tuple(str, str)). A list of
+                combinations of user_ids and exploration ids for which
+                ExplorationUserDataModels are to be fetched.
 
         Returns:
             list(ExplorationUserDataModel|None). The ExplorationUserDataModel
             instance which matches with the given user_ids and exploration_ids.
         """
-        all_combinations = itertools.product(user_ids, exploration_ids)
         instance_ids = [
             cls._generate_id(user_id, exploration_id)
-            for (user_id, exploration_id) in all_combinations
+            for (user_id, exploration_id) in user_id_exp_id_combinations
         ]
 
         return super(ExplorationUserDataModel, cls).get_multi(instance_ids)
