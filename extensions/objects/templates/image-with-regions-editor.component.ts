@@ -94,8 +94,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     private utilsService: UtilsService,
     private ngbModal: NgbModal,
     private svgSanitizerService: SvgSanitizerService,
-    private windowRef: WindowRef) {
-  ) {}
+    private windowRef: WindowRef) {}
 
   // Calculates the dimensions of the image, assuming that the width
   // of the image is scaled down to fit the svg element if necessary.
