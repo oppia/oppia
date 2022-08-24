@@ -97,7 +97,7 @@
           </div>
 
           <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
-          <div *ngIf="!libraryWindowIsNarrow">
+          <div *ngIf="!libraryWindowIsNarrow" class="carousel-box">
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                     (click)="scroll(idx, true)"
                     *ngIf="leftmostCardIndices[idx] != 0">
