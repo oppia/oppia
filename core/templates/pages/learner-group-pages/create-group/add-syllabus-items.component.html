@@ -154,7 +154,7 @@
           </div>
         </div>
         <div class="syllabus-item-cta-buttons-container">
-          <button class="btn btn-primary syllabus-item-details-cta-button" (click)="onClickSyllabusItem(item)">
+          <button class="btn btn-primary syllabus-item-details-cta-button">
             <span translate="I18N_LEARNER_GROUP_STORY_VIEW_DETAILS"></span>
           </button>
           <button *ngIf="!isStoryPartOfAddedSyllabus(storySummary.getId()) && !isStoryPartOfGroupSyllabus(storySummary.getId())"

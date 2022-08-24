@@ -175,6 +175,7 @@
   background: #fff;
   border: 1px solid #00609c;
   color: #00609c;
+  display: none;
   font-weight: 700;
   min-width: 130px;
 }

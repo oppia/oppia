@@ -39,12 +39,12 @@
                     {{subtopicSummary.subtopicTitle}}
                   </div>
                   <div class="progress-summary-info"
-                       [ngClass]="{'warning': getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0}">
-                    {{getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length}} learners are struggling with this skill
+                       [ngClass]="{'warning': getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0}">
+                    {{getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length}} learners are struggling with this skill
                   </div>
                 </div>
-                <div *ngIf="getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-learners">
-                  <div class="learner-info-card" *ngFor="let learnerInfo of getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId)">
+                <div *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-learners">
+                  <div class="learner-info-card" *ngFor="let learnerInfo of getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId)">
                     <img [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
                     <div>{{learnerInfo.username}}</div>
                   </div>

@@ -90,7 +90,7 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
     return this.activeTab === tabName;
   }
 
-  getStudentsCount(): number {
+  getLearnersCount(): number {
     return this.learnerGroup.studentUsernames.length;
   }
 
