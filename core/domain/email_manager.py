@@ -434,7 +434,7 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
             'email_body_template': (
                 'Hi %s,<br><br>'
                 'This is to let you know that you have successfully achieved the %s '
-                'rank for correcting  practice questions. Your efforts help Oppia grow '
+                'rank for correcting practice questions. Your efforts help Oppia grow '
                 'better every day and support students around the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
@@ -442,7 +442,7 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
                 'Best wishes,<br>The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
-                'Oppia Question Reviewer Milestone Achievement!'
+                'Oppia Question Reviewer Rank Achievement!'
             )
         }
     }
@@ -1945,19 +1945,13 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 def send_mail_to_notify_contributor_ranking_achievement(
     contributor_ranking_email_info: (
         suggestion_registry.ContributorMilestoneEmailInfo)) -> None:
-    """Sends an email to each reviewer notifying them of the suggestions on the
-    Contributor Dashboard that have been waiting the longest for review, and
-    that the reviewer has permission to review.
+    """Sends an email to translation/question submitters and reviewers when
+    they achieve a new rank.
 
     Args:
-        reviewer_ids: list(str). A list of the Contributor Dashboard reviewer
-            user ids to notify.
         contributor_ranking_email_info:
-            ContributorMilestoneEmailInfo. A list of suggestion
-            email content info objects for each reviewer. These suggestion
-            email content info objects contain the key information about the
-            suggestions we're notifying reviewers about and will be used to
-            compose the email body for each reviewer.
+            ContributorMilestoneEmailInfo. An object with contributor ranking
+            email information.
     """
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
