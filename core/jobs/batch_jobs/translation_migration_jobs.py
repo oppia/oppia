@@ -95,7 +95,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
             logging.exception(e)
             return result.Err((exploration.id, e))
 
-        return result.Ok(language_code_to_translation.values())
+        return result.Ok(list(language_code_to_translation.values()))
 
     @staticmethod
     def _create_entity_translation_model(

@@ -686,7 +686,7 @@ def build_using_webpack(config_path: str) -> None:
 
     print('Building webpack')
     managed_webpack_compiler = servers.managed_webpack_compiler(
-        config_path=config_path, max_old_space_size=6144)
+        config_path=config_path, max_old_space_size=16384)
     with managed_webpack_compiler as p:
         p.wait()
     assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (
