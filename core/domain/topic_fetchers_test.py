@@ -66,7 +66,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1,
             'url_fragment': 'sample-fragment'
         })]
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
             abbreviated_name='name', url_fragment='name-one',
             description='Description',
@@ -85,8 +85,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_admin = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
         topic_services.update_topic_and_subtopic_pages(
@@ -95,8 +95,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.topic: Optional[topic_domain.Topic] = (
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         )
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
-        self.set_topic_managers(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
@@ -231,7 +231,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
@@ -256,7 +256,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
@@ -316,7 +316,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_by_version(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.user_id, name='topic name',
             abbreviated_name='topic-name', url_fragment='topic-name',
             description='Description', canonical_story_ids=[],
@@ -465,7 +465,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, change_list,
             'Moved skill to subtopic.')
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.user_id, name='Name 2', description='Description',
             abbreviated_name='random', url_fragment='name-three',
             canonical_story_ids=[], additional_story_ids=[],

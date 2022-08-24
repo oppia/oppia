@@ -32,7 +32,12 @@ EXCLUDED_DIRECTORIES = [
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
-    'venv/'
+    'venv/',
+    # The files in 'build_sources' and 'data' directories can be
+    # ignored while type checking, because these files are only
+    # used as resources for the tests.
+    'core/tests/build_sources/',
+    'core/tests/data/'
 ]
 
 # List of files who should be type-annotated but are not.
@@ -52,19 +57,7 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/wipeout_service_test.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
-    'core/tests/build_sources/extensions/CodeRepl.py',
-    'core/tests/build_sources/extensions/DragAndDropSortInput.py',
-    'core/tests/build_sources/extensions/base.py',
-    'core/tests/build_sources/extensions/base_test.py',
-    'core/tests/build_sources/extensions/models_test.py',
-    'core/tests/data/failing_tests.py',
-    'core/tests/data/image_constants.py',
-    'core/tests/data/unicode_and_str_handler.py',
-    'core/tests/gae_suite.py',
-    'core/tests/gae_suite_test.py',
-    'core/tests/load_tests/feedback_thread_summaries_test.py',
-    'core/tests/test_utils.py',
-    'core/tests/test_utils_test.py',
+    'core/storage/storage_models_test.py',
     'extensions/',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',
