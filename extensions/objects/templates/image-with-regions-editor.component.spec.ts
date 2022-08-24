@@ -69,10 +69,11 @@ describe('ImageWithRegionsEditorComponent', () => {
       declarations: [ImageWithRegionsEditorComponent],
       providers: [
         ContextService,
-      {
-        provide: WindowRef,
-        useClass: MockWindowRef
-      }],
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
