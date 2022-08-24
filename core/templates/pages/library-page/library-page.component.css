@@ -126,9 +126,9 @@ oppia-library-page .oppia-library-group-header a,
     font-size: 6vw;
   }
 }
-.carousel-box{
-  display: flex;
+.carousel-box {
   align-items: center;
+  display: flex;
 }
 .oppia-library-carousel-scroller {
   color: #2c4841;
