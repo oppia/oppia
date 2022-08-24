@@ -115,7 +115,7 @@ export const AppConstants = {
   FATAL_ERROR_CODES: [400, 401, 404, 500],
 
   // Maximum number of states the learner can be directed back from a state
-  // by an editor in an exploration
+  // by an editor in an exploration.
   MAX_CARD_COUNT_FOR_VALID_REDIRECTION: 3,
 
   // Do not modify these, for backwards-compatibility reasons. These strings are

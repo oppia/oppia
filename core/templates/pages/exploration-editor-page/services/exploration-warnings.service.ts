@@ -308,7 +308,6 @@ export class ExplorationWarningsService {
   }
 
   _updateWarningsList(): void {
-
     this._warningsList = [];
     this.stateWarnings = {};
     this.checkpointCountWarning = '';
@@ -549,27 +548,29 @@ export class ExplorationWarningsService {
   ): number {
     let distance = -1;
     let stateFound = false;
-    let stateNamesInBfsOrder: string[] = [];
     let queue: string[] = [];
     let seen: Record<string, boolean> = {};
     seen[sourceStateName] = true;
     queue.push(sourceStateName);
     while (queue.length > 0 && !stateFound) {
-      // '.shift()' here can return an undefined value, but we're already
-      // checking for queue.length > 0, so this is safe.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      let currStateName = queue.shift()!;
-      if (currStateName === destStateName) {
-        stateFound = true;
-      }
+      let queueSize = queue.length;
       distance++;
-      stateNamesInBfsOrder.push(currStateName);
-      for (let e = 0; e < links.length; e++) {
-        let edge = links[e];
-        let dest = edge.target;
-        if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
-          seen[dest] = true;
-          queue.push(dest);
+      while (queueSize > 0) {
+        // '.shift()' here can return an undefined value, but we're already
+        // checking for queue.length > 0, so this is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let currStateName = queue.shift()!;
+        if (currStateName === destStateName) {
+          stateFound = true;
+        }
+        queueSize--;
+        for (let e = 0; e < links.length; e++) {
+          let edge = links[e];
+          let dest = edge.target;
+          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
+            seen[dest] = true;
+            queue.push(dest);
+          }
         }
       }
     }
