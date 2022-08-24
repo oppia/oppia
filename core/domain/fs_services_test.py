@@ -36,7 +36,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, 'eid')
 
@@ -45,7 +45,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), b'file_contents')
 
     def test_validate_entity_parameters(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid entity_id received: 1'
         ):
             # The argument `entity_id` of GcsFileSystem() can only accept
@@ -54,12 +54,12 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             # error, we added an ignore statement here.
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)  # type: ignore[arg-type]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Entity id cannot be empty'
         ):
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, '')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid entity_name received: '
             'invalid_name.'
@@ -74,18 +74,18 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             IOError, 'File abc.png not found'
         ):
             self.fs.get('abc.png')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             IOError, 'File does not exist: fake_file.png'
         ):
             self.fs.delete('fake_file.png')
 
     def test_listdir(self) -> None:
-        self.assertItemsEqual(self.fs.listdir(''), [])  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(self.fs.listdir(''), [])
 
         self.fs.commit('abc.png', b'file_contents')
         self.fs.commit('abcd.png', b'file_contents_2')
@@ -94,14 +94,14 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
         file_names = ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png']
 
-        self.assertItemsEqual(self.fs.listdir(''), file_names)  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(self.fs.listdir(''), file_names)
 
         self.assertEqual(self.fs.listdir('abc'), ['abc/abcd.png'])
 
-        with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(IOError, 'Invalid filepath'):
             self.fs.listdir('/abc')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             IOError,
             (
                 'The dir_name should not start with /'
@@ -133,7 +133,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
         super().setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
     def test_invalid_filepaths_are_caught(self) -> None:
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 'eid')
@@ -142,15 +142,15 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             '..', '../another_exploration', '../', '/..', '/abc']
 
         for filepath in invalid_filepaths:
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.isfile(filepath)
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.get(filepath)
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.commit(filepath, b'raw_file')
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.delete(filepath)
-            with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(IOError, 'Invalid filepath'):
                 fs.listdir(filepath)
 
 
@@ -166,9 +166,9 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self) -> None:
