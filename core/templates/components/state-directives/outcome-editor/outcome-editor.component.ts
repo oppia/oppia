@@ -27,7 +27,6 @@ import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { States } from 'domain/exploration/StatesObjectFactory';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
