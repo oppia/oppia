@@ -51,7 +51,7 @@ export class LearnerViewInfoComponent {
   topicName!: string;
   topicNameTranslationKey!: string;
   isLinkedToTopic!: boolean;
-  expInfo?: LearnerExplorationSummaryBackendDict;
+  expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
 
   constructor(
@@ -123,9 +123,11 @@ export class LearnerViewInfoComponent {
     }
   }
 
-  getTopicUrl(): string {
-    let topicUrlFragment!: string;
-    let classroomUrlFragment!: string;
+  // Returns null if the topic is not linked to the learner's current
+  // exploration.
+  getTopicUrl(): string | null {
+    let topicUrlFragment: string | null = null;
+    let classroomUrlFragment: string | null = null;
 
     try {
       topicUrlFragment = (

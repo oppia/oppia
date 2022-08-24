@@ -49,17 +49,17 @@ if MYPY:  # pragma: no cover
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_exp_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             exp_domain.ExplorationChange({'invalid': 'data'})
 
     def test_exp_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             exp_domain.ExplorationChange({'cmd': 'invalid'})
 
     def test_exp_change_object_with_deprecated_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.DeprecatedCommandError, 'Command clone is deprecated'):
             exp_domain.ExplorationChange({
                 'cmd': 'clone',
@@ -68,7 +68,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_deprecated_cmd_argument(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.DeprecatedCommandError,
             'Value for property_name in cmd edit_state_property: '
             'fallbacks is deprecated'):
@@ -80,7 +80,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value')):
@@ -91,7 +91,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_extra_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             exp_domain.ExplorationChange({
@@ -102,7 +102,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_invalid_exploration_property(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_exploration_property: '
                 'invalid is not allowed')):
@@ -114,7 +114,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exp_change_object_with_invalid_state_property(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_state_property: '
                 'invalid is not allowed')):
@@ -370,14 +370,14 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_create_exploration_change_with_invalid_change_dict(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Missing cmd key in change dict'):
             exp_domain.ExplorationChange({
                 'invalid_cmd': 'invalid'
             })
 
     def test_cannot_create_exploration_change_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Command invalid_cmd is not allowed'):
             exp_domain.ExplorationChange({
                 'cmd': 'invalid_cmd'
@@ -394,7 +394,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         })
         self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Value for property_name in cmd edit_state_property: '
             'invalid_property is not allowed'):
@@ -415,7 +415,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         })
         self.assertTrue(isinstance(exp_change, exp_domain.ExplorationChange))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Value for property_name in cmd edit_exploration_property: '
             'invalid_property is not allowed'):
@@ -456,7 +456,7 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
     # rid of the tests that intentionally test wrong inputs that we
     # can normally catch by typing.
     def test_validate_exp_version(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected version to be an int, received invalid_version'):
             exp_domain.ExpVersionReference('exp_id', 'invalid_version')  # type: ignore[arg-type]
@@ -465,7 +465,7 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
     # rid of the tests that intentionally test wrong inputs that we
     # can normally catch by typing.
     def test_validate_exp_id(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected exp_id to be a str, received 0'):
             exp_domain.ExpVersionReference(0, 1)  # type: ignore[arg-type]
 
@@ -517,7 +517,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
 
     def test_exploration_id_incorrect_type(self) -> None:
         self.transient_checkpoint_url.exploration_id = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected exploration_id to be a str'
         ):
@@ -527,7 +527,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.transient_checkpoint_url.furthest_reached_checkpoint_state_name = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected furthest_reached_checkpoint_state_name to be a str'
         ):
@@ -537,7 +537,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.transient_checkpoint_url.furthest_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected furthest_reached_checkpoint_exp_version to be an int'
         ):
@@ -547,7 +547,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.transient_checkpoint_url.most_recently_reached_checkpoint_state_name = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected most_recently_reached_checkpoint_state_name to be a str'
         ):
@@ -557,7 +557,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.transient_checkpoint_url.most_recently_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected most_recently_reached_checkpoint_exp_version to be an int'
         ):
@@ -573,24 +573,24 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             exp_domain.Exploration.create_default_exploration('eid'))
         self.new_state = state_domain.State.create_default_state(
             'Introduction', is_initial_state=True)
-        self.set_interaction_for_state(self.new_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(self.new_state, 'TextInput')
         self.exploration.init_state_name = 'Introduction'
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state
         }
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             self.exploration.states[self.exploration.init_state_name],
             'TextInput')
         self.init_state = (
             self.exploration.states[self.exploration.init_state_name])
         self.end_state = state_domain.State.create_default_state('End')
-        self.set_interaction_for_state(self.end_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(self.end_state, 'EndExploration')
 
         self.end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
         self.init_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of first state to '
             'be True but found it to be False'):
             self.exploration.validate(strict=True)
@@ -606,7 +606,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
         self.end_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of terminal state '
             'to be False but found it to be True'):
             self.exploration.validate(strict=True)
@@ -636,10 +636,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         for i in range(8):
             self.exploration.add_states(['State%s' % i])
             self.exploration.states['State%s' % i].card_is_checkpoint = True
-            self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            self.set_interaction_for_state(
                 self.exploration.states['State%s' % i],
                 'Continue')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected checkpoint count to be between 1 and 8 '
             'inclusive but found it to be 9'
             ):
@@ -669,9 +669,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #        └───────────────┘.
 
         second_state = state_domain.State.create_default_state('Second')
-        self.set_interaction_for_state(second_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(second_state, 'TextInput')
         third_state = state_domain.State.create_default_state('Third')
-        self.set_interaction_for_state(third_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(third_state, 'TextInput')
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -752,7 +752,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # The exploration can be completed via third_state. Hence, making
         # second_state a checkpoint raises a validation error.
         second_state.card_is_checkpoint = True
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Cannot make Second a checkpoint as it is'
             ' bypassable'
             ):
@@ -834,13 +834,13 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                    └───────────┘.
 
         a_state = state_domain.State.create_default_state('A')
-        self.set_interaction_for_state(a_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(a_state, 'TextInput')
         b_state = state_domain.State.create_default_state('B')
-        self.set_interaction_for_state(b_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(b_state, 'TextInput')
         c_state = state_domain.State.create_default_state('C')
-        self.set_interaction_for_state(c_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(c_state, 'TextInput')
         d_state = state_domain.State.create_default_state('D')
-        self.set_interaction_for_state(d_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(d_state, 'TextInput')
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -972,7 +972,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # d_state becomes bypassable. Hence, making d_state a checkpoint raises
         # validation error.
         d_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
@@ -1046,7 +1046,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                  └───────────┘           └───────────┘.
 
         new_end_state = state_domain.State.create_default_state('End 2')
-        self.set_interaction_for_state(new_end_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(new_end_state, 'EndExploration')
         new_end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
 
         self.exploration.states = {
@@ -1103,7 +1103,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             c_state_answer_groups)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
@@ -1132,7 +1132,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.states = {}
 
         exploration.title = 'Hello #'
-        self._assert_validation_error(exploration, 'Invalid character #')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'Invalid character #')
 
         exploration.title = 'Title'
         exploration.category = 'Category'
@@ -1142,23 +1142,23 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # sentinel for an invalid state name.
         bad_state = state_domain.State.create_default_state('/')
         exploration.states = {'/': bad_state}
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Invalid character / in a state name')
 
         new_state = state_domain.State.create_default_state('ABC')
         second_state = state_domain.State.create_default_state('BCD')
-        self.set_interaction_for_state(new_state, 'TextInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(second_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(new_state, 'TextInput')
+        self.set_interaction_for_state(second_state, 'TextInput')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'exploration has no states')
         exploration.states = {'A string #': new_state}
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Invalid character # in a state name')
         exploration.states = {'A string _': new_state}
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Invalid character _ in a state name')
 
         exploration.states = {
@@ -1166,12 +1166,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'BCD': second_state
         }
 
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'has no initial state name')
 
         exploration.init_state_name = 'initname'
 
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             r'There is no state in \[\'ABC\'\, \'BCD\'\] corresponding to '
             'the exploration\'s initial state name initname.')
@@ -1181,7 +1181,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state_name: new_state,
             'BCD': second_state
         }
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'destination ABC is not a valid')
 
         # Restore a valid exploration.
@@ -1241,7 +1241,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_group = answer_groups[0]
 
         default_outcome.dest_if_really_stuck = 'ABD'
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'The destination for the stuck learner '
             'ABD is not a valid state')
 
@@ -1250,30 +1250,30 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Testing the default outcome does not direct stuck learner
         # back to the same state.
         default_outcome.dest_if_really_stuck = exploration.init_state_name
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'The destination for a stuck learner '
             'cannot be the same state.')
 
         default_outcome.dest_if_really_stuck = None
 
         answer_group.outcome.dest = 'DEF'
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'destination DEF is not a valid')
         answer_group.outcome.dest = exploration.init_state_name
 
         answer_group.outcome.dest_if_really_stuck = 'XYZ'
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'The destination for the stuck learner '
             'XYZ is not a valid state')
 
         answer_group.outcome.dest_if_really_stuck = exploration.init_state_name
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'The destination for a stuck learner '
             'cannot be the same state.')
         answer_group.outcome.dest_if_really_stuck = None
 
         # Restore a valid exploration.
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             init_state, 'TextInput')
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_groups)
@@ -1288,31 +1288,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Validate RuleSpec.
         rule_spec = answer_group.rule_specs[0]
         rule_spec.inputs = {}
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'RuleSpec \'Contains\' is missing inputs')
 
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected inputs to be a dict')
 
         rule_spec.inputs = {'x': 'Test'}
         rule_spec.rule_type = 'FakeRuleType'
-        self._assert_validation_error(exploration, 'Unrecognized rule type')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'Unrecognized rule type')
 
         rule_spec.inputs = {'x': {
             'contentId': 'rule_input_Equals',
             'normalizedStrSet': 15
         }}
         rule_spec.rule_type = 'Contains'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 15'
         ):
             exploration.validate()
 
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             exploration.states[exploration.init_state_name],
             'PencilCodeEditor')
         temp_rule = old_answer_groups[0]['rule_specs'][0]
@@ -1327,7 +1327,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
         old_answer_groups[0]['rule_specs'][0] = temp_rule
 
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'RuleSpec \'ErrorContains\' has an input with name \'x\' which '
             'refers to an unknown parameter within the exploration: '
@@ -1346,7 +1346,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         outcome.dest = None  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Every outcome should have a destination.')
 
         outcome.dest = destination
@@ -1358,7 +1358,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # can normally catch by typing.
         default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
 
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected dest_if_really_stuck to be a string')
 
         default_outcome.dest_if_really_stuck = None
@@ -1368,7 +1368,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         outcome.dest = 15  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected outcome dest to be a string')
 
         outcome.dest = destination
@@ -1380,14 +1380,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'The "labelled_as_correct" field should be a boolean')
 
         # Test that labelled_as_correct must be False for self-loops, and that
         # this causes a strict validation failure but not a normal validation
         # failure.
         outcome.labelled_as_correct = True
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'is labelled correct but is a self-loop.'
         ):
             exploration.validate(strict=True)
@@ -1402,7 +1402,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected dest_if_really_stuck to be a string')
 
         outcome.dest_if_really_stuck = 'BCD'
@@ -1412,7 +1412,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # the outcome is labelled correct.
         outcome.labelled_as_correct = True
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The outcome for the state is labelled '
             'correct but a destination for the stuck learner '
             'is specified.'
@@ -1428,7 +1428,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         outcome.param_changes = 'Changes'  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected outcome param_changes to be a list')
 
         # TODO(#13059): After we fully type the codebase we plan to get
@@ -1436,7 +1436,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # can normally catch by typing.
         outcome.param_changes = [param_domain.ParamChange(
             0, 'generator_id', {})]  # type: ignore[arg-type]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Expected param_change name to be a string, received 0')
 
@@ -1447,7 +1447,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Expected outcome refresher_exploration_id to be a string')
 
@@ -1461,7 +1461,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Expected outcome missing_prerequisite_skill_id to be a string')
 
@@ -1477,7 +1477,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.dest = new_state_name
         outcome.refresher_exploration_id = 'another_string'
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'has a refresher exploration ID, but is not a self-loop')
 
@@ -1490,14 +1490,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         interaction.id = 15  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected interaction id to be a string')
 
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
-        self._assert_validation_error(exploration, 'Invalid interaction id')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'Invalid interaction id')
         interaction.id = 'PencilCodeEditor'
 
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'TextInput')
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
@@ -1515,14 +1515,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         interaction.customization_args = []  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected customization args to be a dict')
 
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         interaction.customization_args = {15: ''}  # type: ignore[dict-item]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             (
                 'Expected customization arg value to be a '
@@ -1538,18 +1538,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             })
         }
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
         interaction.customization_args = valid_text_input_cust_args
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         interaction.answer_groups = {}  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
 
         new_answer_groups = [
@@ -1557,20 +1557,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             for answer_group in old_answer_groups
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(init_state, 'EndExploration')  # type: ignore[no-untyped-call]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'EndExploration')
+        self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'TextInput')
         init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
-        self.set_interaction_for_state(init_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.interaction.answer_groups = answer_groups
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
 
@@ -1580,7 +1580,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Restore a valid exploration.
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'TextInput')
         init_state.update_interaction_answer_groups(answer_groups)  # type: ignore[no-untyped-call]
         init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
         exploration.validate()
@@ -1597,7 +1597,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
 
@@ -1607,7 +1607,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         interaction.hints = {}  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected hints to be a list')
         interaction.hints = []
 
@@ -1636,7 +1636,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state.update_interaction_answer_groups([state_answer_group])  # type: ignore[no-untyped-call]
 
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Expected tagged skill misconception id to be a str, received 1')
         state_answer_group = state_domain.AnswerGroup(
@@ -1660,7 +1660,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state.update_interaction_answer_groups([state_answer_group])  # type: ignore[no-untyped-call]
 
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Expected the format of tagged skill misconception id '
             'to be <skill_id>-<misconception_id>, received '
@@ -1670,13 +1670,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         init_state.interaction.answer_groups[0].rule_specs = {}  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None
         first_answer_group.rule_specs = []
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'There must be at least one rule or training data for each'
             ' answer group.')
@@ -1686,14 +1686,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.State.create_default_state(
                     exploration.init_state_name, is_initial_state=True))
         }
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             exploration.states[exploration.init_state_name], 'TextInput')
         exploration.validate()
 
         exploration.language_code = 'fake_code'
-        self._assert_validation_error(exploration, 'Invalid language_code')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'English'
-        self._assert_validation_error(exploration, 'Invalid language_code')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'en'
         exploration.validate()
 
@@ -1701,14 +1701,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         exploration.param_specs = 'A string'  # type: ignore[assignment]
-        self._assert_validation_error(exploration, 'param_specs to be a dict')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'param_specs to be a dict')
 
         exploration.param_specs = {
             '@': param_domain.ParamSpec.from_dict({
                 'obj_type': 'UnicodeString'
             })
         }
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Only parameter names with characters')
 
         exploration.param_specs = {
@@ -1722,7 +1722,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
         exploration.validate()
 
@@ -1730,40 +1730,40 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         exploration.tags = 'this should be a list'  # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Expected \'tags\' to be a list')
 
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         exploration.tags = [123]  # type: ignore[list-item]
-        self._assert_validation_error(exploration, 'to be a string')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'to be a string')
         exploration.tags = ['abc', 123]  # type: ignore[list-item]
-        self._assert_validation_error(exploration, 'to be a string')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'to be a string')
 
         exploration.tags = ['']
-        self._assert_validation_error(exploration, 'Tags should be non-empty')  # type: ignore[no-untyped-call]
+        self._assert_validation_error(exploration, 'Tags should be non-empty')
 
         exploration.tags = ['123']
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'should only contain lowercase letters and spaces')
         exploration.tags = ['ABC']
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'should only contain lowercase letters and spaces')
 
         exploration.tags = [' a b']
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Tags should not start or end with whitespace')
         exploration.tags = ['a b ']
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Tags should not start or end with whitespace')
 
         exploration.tags = ['a    b']
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Adjacent whitespace in tags should be collapsed')
 
         exploration.tags = ['abc', 'abc']
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Some tags duplicate each other')
 
         exploration.tags = ['computer science', 'analysis', 'a b c']
@@ -1779,19 +1779,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         exploration.validate()
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'title must be specified'
             ):
             exploration.validate(strict=True)
         exploration.title = 'A title'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'category must be specified'
             ):
             exploration.validate(strict=True)
         exploration.category = 'A category'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'objective must be specified'
             ):
             exploration.validate(strict=True)
@@ -2125,7 +2125,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
 
         # Adds 1 to content count to exploration (ca_placeholder_0)
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'TextInput')
 
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
@@ -2201,7 +2201,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -2224,7 +2224,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(init_state, 'TextInput')
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -2236,7 +2236,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
             '<p>hint one</p>')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'State Invalid state does not exist'):
             exploration.get_content_html('Invalid state', 'hint_1')
 
@@ -2299,7 +2299,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         demo_dict['param_specs'] = {
             'ParamSpec': {'obj_type': 'UnicodeString'}
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Parameter myParam was used in a state but not '
             'declared in the exploration param_specs.'):
@@ -2315,7 +2315,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.category = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected category to be a string, received 1'):
             exploration.validate()
 
@@ -2329,7 +2329,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.objective = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected objective to be a string, received 1'):
             exploration.validate()
 
@@ -2343,7 +2343,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.blurb = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected blurb to be a string, received 1'):
             exploration.validate()
 
@@ -2357,7 +2357,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.language_code = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected language_code to be a string, received 1'):
             exploration.validate()
 
@@ -2371,7 +2371,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.author_notes = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected author_notes to be a string, received 1'):
             exploration.validate()
 
@@ -2385,7 +2385,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.states = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected states to be a dict, received 1'):
             exploration.validate()
 
@@ -2399,7 +2399,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.init_state.interaction.default_outcome.dest = None  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Every outcome should have a destination.'):
             exploration.validate()
 
@@ -2413,7 +2413,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.init_state.interaction.default_outcome.dest = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected outcome dest to be a string, received 1'):
             exploration.validate()
 
@@ -2427,7 +2427,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.states_schema_version = None  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This exploration has no states schema version.'):
             exploration.validate()
 
@@ -2441,7 +2441,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.auto_tts_enabled = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
             exploration.validate()
 
@@ -2455,7 +2455,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.correctness_feedback_enabled = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
@@ -2470,7 +2470,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         exploration.edits_allowed = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected edits_allowed to be a bool, received 1'):
             exploration.validate()
@@ -2488,7 +2488,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             1: param_domain.ParamSpec.from_dict(  # type: ignore[dict-item]
                 {'obj_type': 'UnicodeString'})
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected parameter name to be a string, received 1'):
             exploration.validate()
 
@@ -2502,7 +2502,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
         exploration.param_changes = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected param_changes to be a list, received 1'):
             exploration.validate()
 
@@ -2519,7 +2519,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'name': 'invalid',
             'generator_id': 'RandomSelector'
         })]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No parameter named \'invalid\' exists in this '
             'exploration'):
@@ -2538,7 +2538,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'name': 'all',
             'generator_id': 'RandomSelector'
         })]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The exploration-level parameter with name \'all\' is '
             'reserved. Please choose a different name.'):
@@ -2561,7 +2561,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             default_outcome
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The default outcome for state Introduction has a refresher '
             'exploration ID, but is not a self-loop.'):
@@ -2599,7 +2599,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.init_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             [state_answer_group])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The parameter ParamChange was used in an answer group, '
             'but it does not exist in this exploration'):
@@ -2612,10 +2612,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['End'])
         end_state = exploration.states['End']
-        self.set_interaction_for_state(end_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Please fix the following issues before saving this exploration: '
             '1. The following states are not reachable from the initial state: '
@@ -2631,7 +2631,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.update_init_state_name('End')
         self.assertEqual(exploration.init_state_name, 'End')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid new initial state name: invalid_state;'):
             exploration.update_init_state_name('invalid_state')
@@ -2648,7 +2648,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(exploration.states.get('End'))
         self.assertTrue(exploration.states.get('new state name'))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'State invalid_state does not exist'):
             exploration.rename_state('invalid_state', 'new state name')
 
@@ -2666,7 +2666,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.default_outcome
             .dest) = exploration.init_state_name
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The default outcome for state Introduction is labelled '
             'correct but is a self-loop'):
@@ -2765,7 +2765,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 self.dummy_entity_translations)
         ]
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translatable_contents,
             [
                 '<p>state outcome html</p>',
@@ -2783,7 +2783,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
         self.exp_summary = exp_fetchers.get_exploration_summary_by_id('eid')
@@ -2800,7 +2800,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_title(self) -> None:
         self.exp_summary.title = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected title to be a string, received 0'):
             self.exp_summary.validate()
@@ -2810,7 +2810,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_category(self) -> None:
         self.exp_summary.category = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected category to be a string, received 0'):
             self.exp_summary.validate()
@@ -2820,7 +2820,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_objective(self) -> None:
         self.exp_summary.objective = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected objective to be a string, received 0'):
             self.exp_summary.validate()
@@ -2830,14 +2830,14 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_language_code(self) -> None:
         self.exp_summary.language_code = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language_code to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.exp_summary.language_code = 'invalid'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid'):
             self.exp_summary.validate()
 
@@ -2846,7 +2846,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_tags(self) -> None:
         self.exp_summary.tags = 'tags'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected \'tags\' to be a list, received tags'):
             self.exp_summary.validate()
@@ -2856,20 +2856,20 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_tag_in_tags(self) -> None:
         self.exp_summary.tags = ['tag', 2]  # type: ignore[list-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each tag in \'tags\' to be a string, received \'2\''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self) -> None:
         self.exp_summary.tags = ['', 'abc']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Tags should be non-empty'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_unallowed_characters_in_tag(self) -> None:
         self.exp_summary.tags = ['123', 'abc']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Tags should only contain lowercase '
                 'letters and spaces, received \'123\'')):
@@ -2877,21 +2877,21 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_whitespace_in_tag_start(self) -> None:
         self.exp_summary.tags = [' ab', 'abc']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \' ab\''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self) -> None:
         self.exp_summary.tags = ['ab ', 'abc']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \'ab \''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self) -> None:
         self.exp_summary.tags = ['a   b', 'abc']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Adjacent whitespace in tags should '
                 'be collapsed, received \'a   b\'')):
@@ -2899,7 +2899,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_duplicate_tags(self) -> None:
         self.exp_summary.tags = ['abc', 'abc', 'ab']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Some tags duplicate each other'):
             self.exp_summary.validate()
 
@@ -2908,13 +2908,13 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_rating_type(self) -> None:
         self.exp_summary.ratings = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected ratings to be a dict, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_rating_keys(self) -> None:
         self.exp_summary.ratings = {'1': 0, '10': 1}
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected ratings to have keys: 1, 2, 3, 4, 5, received 1, 10'):
             self.exp_summary.validate()
@@ -2924,13 +2924,13 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_value_type_for_ratings(self) -> None:
         self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}  # type: ignore[dict-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected value to be int, received one'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_value_for_ratings(self) -> None:
         self.exp_summary.ratings = {'1': 0, '2': -1, '3': 0, '4': 0, '5': 0}
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected value to be non-negative, received -1'):
             self.exp_summary.validate()
@@ -2945,7 +2945,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_scaled_average_rating(self) -> None:
         self.exp_summary.scaled_average_rating = 'one'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected scaled_average_rating to be float, received one'
         ):
@@ -2956,7 +2956,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_status(self) -> None:
         self.exp_summary.status = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected status to be string, received 0'):
             self.exp_summary.validate()
 
@@ -2965,7 +2965,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_community_owned(self) -> None:
         self.exp_summary.community_owned = '1'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected community_owned to be bool, received 1'):
             self.exp_summary.validate()
@@ -2975,7 +2975,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_contributors_summary(self) -> None:
         self.exp_summary.contributors_summary = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributors_summary to be dict, received 0'):
             self.exp_summary.validate()
@@ -2985,7 +2985,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_owner_ids_type(self) -> None:
         self.exp_summary.owner_ids = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected owner_ids to be list, received 0'):
             self.exp_summary.validate()
 
@@ -2994,7 +2994,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_owner_id_in_owner_ids(self) -> None:
         self.exp_summary.owner_ids = ['1', 2, '3']  # type: ignore[list-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in owner_ids to be string, received 2'):
             self.exp_summary.validate()
@@ -3004,7 +3004,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_editor_ids_type(self) -> None:
         self.exp_summary.editor_ids = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected editor_ids to be list, received 0'):
             self.exp_summary.validate()
@@ -3016,7 +3016,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.exp_summary.editor_ids = ['1', 2, '3']  # type: ignore[list-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in editor_ids to be string, received 2'):
             self.exp_summary.validate()
@@ -3026,7 +3026,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_voice_artist_ids_type(self) -> None:
         self.exp_summary.voice_artist_ids = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected voice_artist_ids to be list, received 0'):
             self.exp_summary.validate()
@@ -3038,7 +3038,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.exp_summary.voice_artist_ids = ['1', 2, '3']  # type: ignore[list-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in voice_artist_ids to be string, received 2'):
             self.exp_summary.validate()
@@ -3048,7 +3048,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_viewer_ids_type(self) -> None:
         self.exp_summary.viewer_ids = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected viewer_ids to be list, received 0'):
             self.exp_summary.validate()
@@ -3060,7 +3060,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.exp_summary.viewer_ids = ['1', 2, '3']  # type: ignore[list-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in viewer_ids to be string, received 2'):
             self.exp_summary.validate()
@@ -3070,7 +3070,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.exp_summary.editor_ids = ['2', '3']
         self.exp_summary.voice_artist_ids = ['4']
         self.exp_summary.viewer_ids = ['2']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Users should not be assigned to multiple roles at once, '
                 'received users: 1, 2, 3, 4, 2')
@@ -3082,7 +3082,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_contributor_ids_type(self) -> None:
         self.exp_summary.contributor_ids = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected contributor_ids to be list, received 0'):
             self.exp_summary.validate()
@@ -3094,7 +3094,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.exp_summary.contributor_ids = ['1', 2, '3']  # type: ignore[list-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.exp_summary.validate()
@@ -3307,7 +3307,7 @@ title: Title
 
     def test_creation_with_invalid_yaml_schema_version(self) -> None:
         """Test that a schema version that is too big is detected."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v46 to v[0-9]+ exploration YAML files '
             'at present.'):
@@ -3331,12 +3331,12 @@ title: Title
         yaml_content_2 = exploration2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Please ensure that you are uploading a YAML text file, '
             'not a zip file. The YAML parser returned the following error: '):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Please ensure that you are uploading a YAML text file, not a zip'
             ' file. The YAML parser returned the following error: mapping '
@@ -3344,7 +3344,7 @@ title: Title
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Please ensure that you are uploading a YAML text file, not a zip'
             ' file. The YAML parser returned the following error: while '
@@ -5137,7 +5137,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5243,7 +5243,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5396,7 +5396,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5512,7 +5512,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5627,7 +5627,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5664,8 +5664,6 @@ states:
         ca_buttonText: {}
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -5676,8 +5674,6 @@ states:
             translation: hello
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
   END:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -5704,7 +5700,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5801,7 +5797,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.add_states(['first state'])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Cannot delete initial state'
             ):
             exploration.delete_state(exploration.init_state_name)
@@ -5809,7 +5805,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['second state'])
         exploration.delete_state('second state')
 
-        with self.assertRaisesRegex(ValueError, 'fake state does not exist'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
 
 
@@ -5850,10 +5846,10 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_content(  # type: ignore[no-untyped-call]
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
-        self.set_interaction_for_state(state1, 'TextInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(state2, 'MultipleChoiceInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(state3, 'ItemSelectionInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(state4, 'DragAndDropSortInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(state1, 'TextInput')
+        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
+        self.set_interaction_for_state(state3, 'ItemSelectionInput')
+        self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
         customization_args_dict1 = {
             'placeholder': {
@@ -6035,7 +6031,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         actual_outcome_list = exploration.get_all_html_content_strings()
 
-        self.assertItemsEqual(set(actual_outcome_list), set(expected_html_list))  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(set(actual_outcome_list), set(expected_html_list))
 
 
 class ExplorationChangesMergeabilityUnitTests(
@@ -11928,7 +11924,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
             'constants.NON_METADATA_PROPERTIES if you don\'t want '
             'to use this as a metadata property.'
         )
-        with swapped_metadata_properties, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with swapped_metadata_properties, self.assertRaisesRegex(
             Exception, error_message
         ):
             self._require_metadata_properties_to_be_synced()
@@ -11949,7 +11945,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
             'new property in the ExplorationMetadata domain object '
             'also.' % ('new_property')
         )
-        with swapped_metadata_properties, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with swapped_metadata_properties, self.assertRaisesRegex(
             Exception, error_message
         ):
             self._require_metadata_properties_to_be_synced()
