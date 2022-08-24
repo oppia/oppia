@@ -60,7 +60,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
                 'check': False
             }])
 
-        with swap_subprocess_run, self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError,
             'Run backend tests before running this script. ' +
             '\nOUTPUT: No data to report.\nERROR: None'
@@ -84,7 +84,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
                 'check': False
             }])
 
-        with swap_subprocess_run, self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError,
             'Failed to calculate coverage because subprocess failed. ' +
             '\nOUTPUT: Some error occured.\nERROR: Some error.'
@@ -107,7 +107,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
                 'check': False
             }])
 
-        with swap_subprocess_run, self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError, 'Error in parsing coverage report.'
         ):
             check_overall_backend_test_coverage.main()
