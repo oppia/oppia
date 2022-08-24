@@ -162,7 +162,7 @@ class EntityTranslationsModel(base_models.BaseModel):
     @classmethod
     def create_new(
         cls,
-        entity_type: feconf.TranslatableEntityType,
+        entity_type: str,
         entity_id: str,
         entity_version: int,
         language_code: str,
@@ -183,7 +183,9 @@ class EntityTranslationsModel(base_models.BaseModel):
         """
         return cls(
             id=cls._generate_id(
-                entity_type, entity_id, entity_version, language_code),
+                feconf.TranslatableEntityType(
+                    entity_type),
+                entity_id, entity_version, language_code),
             entity_type=entity_type,
             entity_id=entity_id,
             entity_version=entity_version,

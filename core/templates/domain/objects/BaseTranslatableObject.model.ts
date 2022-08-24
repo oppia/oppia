@@ -49,7 +49,11 @@ export class BaseTranslatableObject {
         let writtenTranslation = entityTranslations.getWrittenTranslation(
           contentId);
         if (this._isValidStringTranslation(writtenTranslation)) {
-          translatableField.html = writtenTranslation.translation as string;
+          if (translatableField instanceof SubtitledHtml) {
+            translatableField.html = writtenTranslation.translation as string;
+          } else if (translatableField instanceof SubtitledUnicode) {
+            translatableField.unicode = writtenTranslation.translation as string;
+          }
         }
       }
     });
