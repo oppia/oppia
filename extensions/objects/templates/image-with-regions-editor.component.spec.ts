@@ -1473,6 +1473,7 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   it('should get the preview URL when the image save destination is ' +
   'server', () => {
+    spyOn(contextService, 'getEntityId').and.returnValue('exp_id');
     spyOn(contextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION);
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
