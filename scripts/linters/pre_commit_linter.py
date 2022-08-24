@@ -91,7 +91,6 @@ OTHER_SHARD_NAME = 'other'
 # another shard.  Currently we are not sharding the lint checks, so the
 # only shard is the `other` shard that contains all files.
 SHARDS = {
-    '1': ['core/platform'],
     'other': None,
 }
 
