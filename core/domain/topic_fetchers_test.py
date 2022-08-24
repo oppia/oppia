@@ -85,18 +85,18 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
         self.topic: Optional[topic_domain.Topic] = (
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         )
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
-        self.set_topic_managers(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
@@ -231,7 +231,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
@@ -256,7 +256,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):

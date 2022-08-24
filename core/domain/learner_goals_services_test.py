@@ -78,11 +78,11 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.curriculum_admin_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.curriculum_admin_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         # Save the topics.
         self.save_new_topic(
@@ -168,7 +168,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The topic id Topic_id_1 is already present in the learner goals'):
             learner_progress_services.validate_and_add_topic_to_learn_goal(
@@ -227,7 +227,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self.viewer_id), [self.TOPIC_ID_2])
 
         # Removing the same topic raises error.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The topic id Topic_id_1 is not present in LearnerGoalsModel'):
             learner_goals_services.remove_topics_from_learn_goal(

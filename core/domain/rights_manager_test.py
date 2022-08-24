@@ -56,15 +56,15 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_c = self.get_user_id_from_email('c@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_d = self.get_user_id_from_email('d@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_e = self.get_user_id_from_email('e@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_f = self.get_user_id_from_email('f@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_moderator = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_c = self.get_user_id_from_email('c@example.com')
+        self.user_id_d = self.get_user_id_from_email('d@example.com')
+        self.user_id_e = self.get_user_id_from_email('e@example.com')
+        self.user_id_f = self.get_user_id_from_email('f@example.com')
+        self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
-        self.user_id_voiceover_admin = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.user_id_voiceover_admin = self.get_user_id_from_email(
             self.VOICEOVER_ADMIN_EMAIL)
 
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -87,7 +87,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_get_exploration_rights_for_nonexistent_exploration(self) -> None:
         non_exp_id = 'this_exp_does_not_exist_id'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationRightsModel with id '
             'this_exp_does_not_exist_id not found'
@@ -293,7 +293,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_get_activity_rights_raise_error_for_invalid_activity_type(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Cannot get activity rights for unknown activity'
         ):
             rights_manager._get_activity_rights('invalid_type', self.user_id_a)  # pylint: disable=protected-access
@@ -376,7 +376,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegex(Exception, 'No activity_rights exists'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'No activity_rights exists'):
             rights_manager.assign_role_for_exploration(
                 self.user_b, 'abcdefg', self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -389,7 +389,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -398,7 +398,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_EDITOR)
 
-        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -521,10 +521,10 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
 
-        with self.assertRaisesRegex(Exception, 'already the current value'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already the current value'):
             rights_manager.set_private_viewability_of_exploration(
                 self.user_a, self.EXP_ID, False)
-        with self.assertRaisesRegex(Exception, 'cannot be changed'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'cannot be changed'):
             rights_manager.set_private_viewability_of_exploration(
                 self.user_b, self.EXP_ID, True)
 
@@ -628,7 +628,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegex(Exception, 'This user already owns this'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'This user already owns this'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_a,
                 rights_domain.ROLE_OWNER)
@@ -655,7 +655,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_domain.ROLE_VOICE_ARTIST)
@@ -683,7 +683,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Could not assign voice artist to private activity.'
         ):
             rights_manager.assign_role_for_exploration(
@@ -722,7 +722,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
-        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_domain.ROLE_VOICE_ARTIST)
@@ -736,7 +736,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can voiceover this'):
             rights_manager.assign_role_for_exploration(
                 self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
@@ -750,7 +750,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can view this'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
@@ -764,7 +764,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Public explorations can be viewed by anyone.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
@@ -774,7 +774,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegex(Exception, 'Invalid role: invalid_role'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid role: invalid_role'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b, 'invalid_role')
 
@@ -784,7 +784,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No activity_rights exists for the given activity_id'
         ):
             rights_manager.deassign_role_for_exploration(
@@ -794,7 +794,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Could not deassign role'):
             rights_manager.deassign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_a)
@@ -862,7 +862,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b)
@@ -871,7 +871,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.signup('testuser@example.com', 'TestUser')
-        test_user = self.get_user_id_from_email('testuser@example.com')  # type: ignore[no-untyped-call]
+        test_user = self.get_user_id_from_email('testuser@example.com')
         editor_username = 'TestUser'
         self.assertEqual(
             user_services.get_username(test_user),
@@ -940,12 +940,12 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.signup('e@example.com', 'E')
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_c = self.get_user_id_from_email('c@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_d = self.get_user_id_from_email('d@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_e = self.get_user_id_from_email('e@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_moderator = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_c = self.get_user_id_from_email('c@example.com')
+        self.user_id_d = self.get_user_id_from_email('d@example.com')
+        self.user_id_e = self.get_user_id_from_email('e@example.com')
+        self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
@@ -961,7 +961,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_get_collection_rights_for_nonexistent_collection(self) -> None:
         non_col_id = 'this_collection_does_not_exist_id'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionRightsModel with id '
             'this_collection_does_not_exist_id not found'
@@ -1049,7 +1049,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)
 
-        with self.assertRaisesRegex(Exception, 'This user already owns this'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'This user already owns this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_a,
                 rights_domain.ROLE_OWNER)
@@ -1183,7 +1183,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_EDITOR)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can edit this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1198,7 +1198,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can voiceover this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1213,7 +1213,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can view this'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1226,7 +1226,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Public collections can be viewed by anyone.'):
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1333,7 +1333,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
 
-        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -1342,7 +1342,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_domain.ROLE_EDITOR)
 
-        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_c,
                 rights_domain.ROLE_VIEWER)
@@ -1414,7 +1414,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_deassign_without_rights_fails(self) -> None:
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Could not deassign role'):
             rights_manager.deassign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_a)
@@ -1491,7 +1491,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_deassign_non_existent_fails(self) -> None:
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b)
@@ -1508,8 +1508,8 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.moderator = user_services.get_user_actions_info(self.moderator_id)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.save_new_valid_exploration(
@@ -1559,9 +1559,9 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.moderator = user_services.get_user_actions_info(self.moderator_id)
         self.save_new_valid_exploration(

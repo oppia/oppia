@@ -89,8 +89,8 @@ class ExplorationDisplayableSummariesTest(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         self.albert = user_services.get_user_actions_info(self.albert_id)
         self.bob = user_services.get_user_actions_info(self.bob_id)
@@ -122,7 +122,7 @@ class ExplorationDisplayableSummariesTest(
 
         exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This exploration cannot be published'
             ):
             rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
@@ -134,8 +134,8 @@ class ExplorationDisplayableSummariesTest(
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
         self.signup(self.USER_C_EMAIL, self.USER_C_NAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
-        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
         user_services.update_profile_picture_data_url(
             self.user_c_id, self.USER_C_PROFILE_PICTURE)
 
@@ -279,9 +279,9 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
 
         super().setUp()
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+        csrf_token = self.get_new_csrf_token()
 
-        self.post_json(  # type: ignore[no-untyped-call]
+        self.post_json(
             '/adminhandler', {
                 'action': 'reload_exploration',
                 'exploration_id': '2'
@@ -351,8 +351,8 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.get_user_actions_info(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -362,7 +362,7 @@ class FeaturedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_for_featured_explorations(self) -> None:
         """Note that both EXP_ID_1 and EXP_ID_2 are public. However, only
@@ -456,8 +456,8 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -503,7 +503,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         )
 
     def test_raises_error_if_invalid_collection_id_provided(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No collection exists for the given collection id'):
             summary_services.get_learner_collection_dict_by_id(
@@ -518,7 +518,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
@@ -538,7 +538,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # A collection cannot access someone else's private exploration.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
@@ -561,7 +561,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # A public collection referencing a private exploration is bad, however.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
             'collection, exploration ID: exploration_id'):
@@ -656,10 +656,10 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
-        self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)  # type: ignore[no-untyped-call]
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         self.albert = user_services.get_user_actions_info(self.albert_id)
 
@@ -683,7 +683,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_8)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_9)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_at_most_eight_top_rated_explorations(self) -> None:
         """Note that at most 8 explorations should be returned."""
@@ -811,8 +811,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.get_user_actions_info(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -829,7 +829,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_for_recently_published_explorations(self) -> None:
         """Tests for recently published explorations."""
@@ -917,17 +917,17 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def test_requiring_nonexistent_activities_be_public_raises_exception(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'non-existent exploration'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'non-existent exploration'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_EXPLORATION, 'fake')])
-        with self.assertRaisesRegex(Exception, 'non-existent collection'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'non-existent collection'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_COLLECTION, 'fake')])
@@ -940,11 +940,11 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        with self.assertRaisesRegex(Exception, 'private exploration'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'private exploration'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
-        with self.assertRaisesRegex(Exception, 'private collection'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'private collection'):
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
@@ -987,8 +987,8 @@ class CollectionNodeMetadataDictsTest(
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         self.albert = user_services.get_user_actions_info(self.albert_id)
         self.bob = user_services.get_user_actions_info(self.bob_id)

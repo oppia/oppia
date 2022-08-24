@@ -93,11 +93,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.signup(self.NORMAL_USER_EMAIL, 'normaluser')
-        self.normal_user_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.normal_user_id = self.get_user_id_from_email(
             self.NORMAL_USER_EMAIL)
         self.save_new_valid_exploration(
             self.target_id, self.author_id, category='Algebra')
@@ -231,7 +231,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_create_suggestion_with_invalid_suggestion_type(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid suggestion type'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid suggestion type'):
             suggestion_services.create_suggestion(  # type: ignore[call-overload]
                 'invalid_suggestion_type',
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -239,7 +239,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.author_id, self.change, 'test description')
 
     def test_cannot_create_suggestion_with_invalid_author_id(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected author_id to be in a valid user ID format'):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -259,7 +259,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>Translation for invalid content.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The Exploration content has changed since this translation '
             'was submitted.'):
@@ -330,7 +330,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Review message cannot be empty.'):
             suggestion_services.reject_suggestion(
                 suggestion.suggestion_id, self.reviewer_id, '')
@@ -505,7 +505,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'You cannot accept the suggestion with id %s because it does not '
             'exist.' % (self.suggestion_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             self.mock_accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
                 'review message')
@@ -544,7 +544,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'Invalid math tags found in the suggestion with id %s.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             self.mock_accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
                 'review message')
@@ -556,7 +556,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def test_raises_exception_for_invalid_suggestion_id_with_strict_true(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'No suggestion model exists'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'No suggestion model exists'):
             suggestion_services.get_suggestion_by_id('invalid_id')
 
     def test_accept_suggestion_raises_exception_if_suggestion_already_accepted(
@@ -574,7 +574,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, '')
 
@@ -594,7 +594,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, '')
 
@@ -607,7 +607,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected score_category to be of the form '
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
@@ -621,7 +621,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Commit message cannot be empty.'):
             suggestion_services.accept_suggestion(
                 self.suggestion_id, self.reviewer_id,
@@ -687,7 +687,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'You cannot reject the suggestion with id %s because it does not '
             'exist.' % (self.suggestion_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 self.suggestion_id, self.reviewer_id, 'review message')
 
@@ -708,7 +708,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 self.suggestion_id, self.reviewer_id, 'reject review message')
 
@@ -733,7 +733,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The suggestion with id %s has already been accepted/rejected.' % (
                 self.suggestion_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 self.suggestion_id, self.reviewer_id, 'reject review message')
 
@@ -787,7 +787,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
 
         # Can't resubmit a rejected suggestion if the summary message is empty.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, '', self.author_id, resubmit_change)
@@ -810,7 +810,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'old_state_name': '',
             }
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, 'resubmit summary message',
                 self.author_id, resubmit_change
@@ -841,7 +841,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'old_state_name': '',
             }
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 self.suggestion_id, 'resubmit summary message',
@@ -865,12 +865,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration = (
-            self.save_new_linear_exp_with_state_names_and_interactions(  # type: ignore[no-untyped-call]
+            self.save_new_linear_exp_with_state_names_and_interactions(
                 'exploration1', self.author_id, ['state 1'], ['TextInput'],
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(
+        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -910,7 +910,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_question_suggestion_to_change_question_state(self) -> None:
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
@@ -987,7 +987,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             skill_id, self.author_id, description='description')
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
@@ -1034,12 +1034,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration = (
-            self.save_new_linear_exp_with_state_names_and_interactions(  # type: ignore[no-untyped-call]
+            self.save_new_linear_exp_with_state_names_and_interactions(
                 'exploration1', self.author_id, ['state 1'], ['TextInput'],
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(
+        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1221,14 +1221,14 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.AUTHOR_EMAIL_1, 'author1')
-        self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)  # type: ignore[no-untyped-call]
+        self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)
         self.signup(self.REVIEWER_EMAIL_1, 'reviewer1')
-        self.reviewer_id_1 = self.get_user_id_from_email(self.REVIEWER_EMAIL_1)  # type: ignore[no-untyped-call]
+        self.reviewer_id_1 = self.get_user_id_from_email(self.REVIEWER_EMAIL_1)
 
         self.signup(self.AUTHOR_EMAIL_2, 'author2')
-        self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)  # type: ignore[no-untyped-call]
+        self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.signup(self.REVIEWER_EMAIL_2, 'reviewer2')
-        self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)  # type: ignore[no-untyped-call]
+        self.reviewer_id_2 = self.get_user_id_from_email(self.REVIEWER_EMAIL_2)
         self.opportunity_summary_ids = [
             self.explorations[0].id, self.explorations[1].id,
             self.explorations[2].id]
@@ -1344,7 +1344,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id_1),
             ('invalid_field', 'value')
         ]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
@@ -1892,9 +1892,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -1904,7 +1904,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         # Create exploration.
         exploration = (
-            self.save_new_linear_exp_with_state_names_and_interactions(  # type: ignore[no-untyped-call]
+            self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id,
                 ['State 1', 'State 2', 'End State'],
                 ['TextInput'], category='Algebra',
@@ -2142,7 +2142,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def test_delete_skill_rejects_question_suggestion(self) -> None:
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, description='description')  # type: ignore[no-untyped-call]
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -2299,8 +2299,8 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup('user1@example.com', 'user1')
         self.signup('user2@example.com', 'user2')
-        self.user_1_id = self.get_user_id_from_email('user1@example.com')  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email('user2@example.com')  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email('user1@example.com')
+        self.user_2_id = self.get_user_id_from_email('user2@example.com')
 
     def test_get_all_user_ids_who_are_allowed_to_review(self) -> None:
         user_models.UserContributionProficiencyModel.create(
@@ -2364,7 +2364,7 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup('author@example.com', 'author')
-        self.author_id = self.get_user_id_from_email('author@example.com')  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email('author@example.com')
 
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_id',
@@ -2388,7 +2388,7 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
             self.voiceover_application_model.id)
 
         self.voiceover_application_model.target_type = 'invalid_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid target type for voiceover application: invalid_type'):
             suggestion_services.get_voiceover_application(
@@ -2522,10 +2522,10 @@ class ReviewableSuggestionEmailInfoUnitTests(
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(
             self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
 
@@ -2543,7 +2543,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
         with self.swap(
             suggestion_services, 'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS',
             suggestion_emphasized_text_getter_functions_mock):
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception,
                 'Expected suggestion type to be offered on the Contributor '
                 'Dashboard, received: %s.' % (
@@ -3200,12 +3200,12 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
-        self.reviewer_1_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_1_id = self.get_user_id_from_email(
             self.REVIEWER_1_EMAIL)
         self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
-        self.reviewer_2_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
 
@@ -3823,13 +3823,13 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(
             self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        self.save_new_skill(self.skill_id, self.author_id)  # type: ignore[no-untyped-call]
+        self.save_new_skill(self.skill_id, self.author_id)
 
     def test_create_edit_state_content_suggestion_does_not_change_the_counts(
         self
@@ -4379,15 +4379,15 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
-        self.reviewer_1_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_1_id = self.get_user_id_from_email(
             self.REVIEWER_1_EMAIL)
         self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
-        self.reviewer_2_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        self.save_new_skill(self.skill_id, self.author_id)  # type: ignore[no-untyped-call]
+        self.save_new_skill(self.skill_id, self.author_id)
 
     def test_get_returns_empty_for_suggestion_type_not_on_contributor_dashboard(
         self
@@ -4640,11 +4640,11 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        self.save_new_skill(self.skill_id, self.author_id)  # type: ignore[no-untyped-call]
+        self.save_new_skill(self.skill_id, self.author_id)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_id = self.get_user_id_from_email(
             self.REVIEWER_EMAIL)
 
     def test_get_returns_no_reviewers_needed_if_no_suggestions_exist(

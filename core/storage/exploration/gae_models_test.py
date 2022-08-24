@@ -562,7 +562,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'max_age must be a datetime.timedelta instance or None.'
         ):
             # TODO(#13528): Remove this test after the backend is fully
@@ -1070,7 +1070,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             exp_models.TransientCheckpointUrlModel)
 
         # Test get_new_progress_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New id generator is producing too many collisions.'
         ):

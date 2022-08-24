@@ -71,13 +71,13 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
-        self.set_topic_managers(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
@@ -144,7 +144,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 versioned_story_contents, story_id
         )
         versioned_story_contents['schema_version'] = 6
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
@@ -293,13 +293,13 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(node_index, 0)
 
         # Tests error should be raised if story or node doesn't exist.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id node_5 is not part of this story.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 self.story_id, 'node_5')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Story with id story_id_2 does not exist.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1)

@@ -268,12 +268,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             user_models.UserSettingsModel.get_by_role(
                 feconf.ROLE_ID_CURRICULUM_ADMIN), actual_users)
 
     def test_export_data_for_nonexistent_user_raises_exception(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user not found'):
             user_models.UserSettingsModel.export_data('fake_user')
@@ -356,7 +356,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.DeletedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.DeletedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -368,7 +368,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.UserSettingsModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -929,9 +929,9 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         # User A has no created explorations, one edited exploration.
         # User B has two created and edited explorations.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL) # type: ignore[no-untyped-call]
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL) # type: ignore[no-untyped-call]
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
 
         # Note that creating an exploration counts as editing it.
         self.save_new_valid_exploration(
@@ -2812,7 +2812,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
     def test_create_entry_already_exists_failure(self) -> None:
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is already a UserContributionProficiencyModel '
             'entry with the given id: category1.user1'):
             user_models.UserContributionProficiencyModel.create(
@@ -3263,7 +3263,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.PseudonymizedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -3292,7 +3292,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.PseudonymizedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
