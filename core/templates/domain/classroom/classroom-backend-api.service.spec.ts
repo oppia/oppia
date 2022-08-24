@@ -152,7 +152,9 @@ describe('Classroom backend API service', function() {
         '/classroom_data_handler/0');
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
+
       flushMicrotasks();
+
       expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -215,6 +217,7 @@ describe('Classroom backend API service', function() {
     req.flush({classroom_id: 'classroomId'});
 
     flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalledWith('classroomId');
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -262,6 +265,7 @@ describe('Classroom backend API service', function() {
     });
 
     flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalledWith(
       classroomIdToClassroomNameDict);
     expect(failHandler).not.toHaveBeenCalled();
@@ -321,6 +325,7 @@ describe('Classroom backend API service', function() {
     req.flush({classroom_dict: classroomBackendDict});
 
     flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalledWith(
       {classroomDict: expectedClassroomDict}
     );
@@ -376,6 +381,7 @@ describe('Classroom backend API service', function() {
 
     req.flush(
       { status: 200, statusText: 'Success.'});
+
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -431,6 +437,7 @@ describe('Classroom backend API service', function() {
 
     req.flush(
       { status: 200, statusText: 'Success.'});
+
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
