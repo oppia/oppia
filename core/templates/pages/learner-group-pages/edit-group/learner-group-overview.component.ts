@@ -36,7 +36,7 @@ import './learner-group-overview.component.css';
 })
 export class LearnerGroupOverviewComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
-  studentsProgress!: LearnerGroupUserProgress[];
+  learnersProgress!: LearnerGroupUserProgress[];
   activeTab!: string;
   EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
     LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
@@ -53,8 +53,8 @@ export class LearnerGroupOverviewComponent implements OnInit {
       this.learnerGroupSyllabusBackendApiService
         .fetchLearnersProgressInAssignedSyllabus(
           this.learnerGroup.id, this.learnerGroup.studentUsernames
-        ).then(studentsProgress => {
-          this.studentsProgress = studentsProgress;
+        ).then(learnersProgress => {
+          this.learnersProgress = learnersProgress;
         });
     }
   }
@@ -69,16 +69,16 @@ export class LearnerGroupOverviewComponent implements OnInit {
 
   getStoryCompletionsInfo(storyId: string): LearnerGroupUserInfo[] {
     let storyCompletionsInfo: LearnerGroupUserInfo[] = [];
-    this.studentsProgress.forEach(studentProgress => {
-      studentProgress.storiesProgress.map(storyProgress => {
+    this.learnersProgress.forEach(learnerProgress => {
+      learnerProgress.storiesProgress.map(storyProgress => {
         if (storyProgress.getId() === storyId &&
           storyProgress.getCompletedNodeTitles().length ===
           storyProgress.getNodeTitles().length
         ) {
           storyCompletionsInfo.push(
             new LearnerGroupUserInfo(
-              studentProgress.username,
-              studentProgress.profilePictureDataUrl,
+              learnerProgress.username,
+              learnerProgress.profilePictureDataUrl,
               ''
             )
           );
@@ -88,27 +88,27 @@ export class LearnerGroupOverviewComponent implements OnInit {
     return storyCompletionsInfo;
   }
 
-  getStrugglingStudentsInfoInSubtopics(
+  getStrugglingLearnersInfoInSubtopics(
       subtopicPageId: string
   ): LearnerGroupUserInfo[] {
-    let strugglingStudentsInfo: LearnerGroupUserInfo[] = [];
-    this.studentsProgress.forEach(studentProgress => {
-      studentProgress.subtopicsProgress.map(subtopicProgress => {
+    let strugglingLearnerInfo: LearnerGroupUserInfo[] = [];
+    this.learnersProgress.forEach(learnerProgress => {
+      learnerProgress.subtopicsProgress.map(subtopicProgress => {
         if (subtopicProgress.subtopicPageId === subtopicPageId &&
         subtopicProgress.subtopicMastery &&
         subtopicProgress.subtopicMastery < 0.6
         ) {
-          strugglingStudentsInfo.push(
+          strugglingLearnerInfo.push(
             new LearnerGroupUserInfo(
-              studentProgress.username,
-              studentProgress.profilePictureDataUrl,
+              learnerProgress.username,
+              learnerProgress.profilePictureDataUrl,
               ''
             )
           );
         }
       });
     });
-    return strugglingStudentsInfo;
+    return strugglingLearnerInfo;
   }
 
   getProfileImageDataUrl(dataUrl: string): string {

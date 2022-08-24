@@ -69,39 +69,39 @@
 }
 
 .oppia-learner-group-preferences .edit-learner-group-details-section,
-.oppia-learner-group-preferences .edit-learner-group-students-section {
+.oppia-learner-group-preferences .edit-learner-group-learners-section {
   display: grid;
   margin-top: 40px;
 }
 
-.oppia-learner-group-preferences .edit-learner-group-students-section .btn-primary {
+.oppia-learner-group-preferences .edit-learner-group-learners-section .btn-primary {
   margin-top: unset;
 }
 
-.invite-students-modal .modal-body {
+.invite-learners-modal .modal-body {
   padding: 30px;
 }
 
-.invite-students-modal .modal-footer {
+.invite-learners-modal .modal-footer {
   border-top: unset;
   padding: 0 30px 30px;
 }
 
-.invite-students-modal .modal-dialog {
+.invite-learners-modal .modal-dialog {
   margin: 200px auto;
 }
 
-.oppia-learner-group-preferences .group-students-title {
+.oppia-learner-group-preferences .group-learners-title {
   color: #00609c;
   font-size: 14px;
   font-weight: 500;
 }
 
-.oppia-learner-group-preferences .current-group-students {
+.oppia-learner-group-preferences .current-group-learners {
   margin-bottom: 20px;
 }
 
-.oppia-learner-group-preferences .group-students-card {
+.oppia-learner-group-preferences .group-learners-card {
   align-items: center;
   border: 1px solid #e6e6e6;
   border-radius: 4px;
@@ -114,26 +114,26 @@
   padding: 10px 30px;
 }
 
-.oppia-learner-group-preferences .group-students-card .group-students-card-avatar {
+.oppia-learner-group-preferences .group-learners-card .group-learners-card-avatar {
   border-radius: 50%;
   height: 40px;
   width: 40px;
 }
 
-.oppia-learner-group-preferences .group-students-card-info {
+.oppia-learner-group-preferences .group-learners-card-info {
   align-items: center;
   display: flex;
   font-size: 14px;
   gap: 10px;
 }
 
-.oppia-learner-group-preferences .group-students-card-buttons {
+.oppia-learner-group-preferences .group-learners-card-buttons {
   display: flex;
   font-size: 14px;
   gap: 20px;
 }
 
-.oppia-learner-group-preferences .group-students-card-button {
+.oppia-learner-group-preferences .group-learners-card-button {
   align-items: center;
   color: #00609c;
   cursor: pointer;
@@ -142,37 +142,37 @@
   gap: 5px;
 }
 
-.oppia-learner-group-preferences .current-group-students .group-students-card {
+.oppia-learner-group-preferences .current-group-learners .group-learners-card {
   background: #e5eef4;
   border-color: #e5eef4;
 }
 
-.oppia-learner-group-preferences .no-students-text {
+.oppia-learner-group-preferences .no-learners-text {
   color: #9e9e9e;
   font-size: 14px;
   margin-top: 20px;
   text-align: center;
 }
 
-.remove-student-modal .modal-dialog,
-.withdraw-student-invitation-modal .modal-dialog,
+.remove-learner-modal .modal-dialog,
+.withdraw-learner-invitation-modal .modal-dialog,
 .invite-successfull-modal .modal-dialog {
   margin: 200px auto;
 }
 
-.remove-student-modal .modal-header,
-.withdraw-student-invitation-modal .modal-header {
+.remove-learner-modal .modal-header,
+.withdraw-learner-invitation-modal .modal-header {
   border-bottom: unset;
   padding-left: 40px
 }
 
-.remove-student-modal .modal-body,
-.withdraw-student-invitation-modal .modal-body {
+.remove-learner-modal .modal-body,
+.withdraw-learner-invitation-modal .modal-body {
   padding: 0 40px 30px;
 }
 
-.remove-student-modal .modal-footer,
-.withdraw-student-invitation-modal .modal-footer {
+.remove-learner-modal .modal-footer,
+.withdraw-learner-invitation-modal .modal-footer {
   border-top: unset;
   padding-bottom: 40px;
   padding-right: 40px;

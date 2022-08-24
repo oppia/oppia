@@ -93,7 +93,7 @@ describe('LearnerGroupPreferencesComponent', () => {
 
     tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS
-        .GROUP_STUDENTS);
+        .GROUP_LEARNERS);
     expect(tabIsActive).toBeFalse();
   });
 
@@ -119,22 +119,22 @@ describe('LearnerGroupPreferencesComponent', () => {
   });
 
   it('should initialize', fakeAsync(() => {
-    const studentInfo1 = LearnerGroupUserInfo.createFromBackendDict({
+    const learnerInfo1 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username1',
       profile_picture_data_url: 'picture',
       error: ''
     });
-    const studentInfo2 = LearnerGroupUserInfo.createFromBackendDict({
+    const learnerInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
       profile_picture_data_url: 'picture2',
       error: ''
     });
-    const studentInfo3 = LearnerGroupUserInfo.createFromBackendDict({
+    const learnerInfo3 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'user3',
       profile_picture_data_url: 'picture3',
       error: ''
     });
-    const allStudentsInfo = LearnerGroupAllStudentsInfo.createFromBackendDict({
+    const allLearnersInfo = LearnerGroupAllStudentsInfo.createFromBackendDict({
       students_info: [{
         username: 'user3',
         profile_picture_data_url: 'picture3',
@@ -152,15 +152,15 @@ describe('LearnerGroupPreferencesComponent', () => {
       }]
     });
     spyOn(learnerGroupBackendApiService, 'fetchStudentsInfoAsync')
-      .and.returnValue(Promise.resolve(allStudentsInfo));
+      .and.returnValue(Promise.resolve(allLearnersInfo));
 
     expect(component.learnerGroup).toEqual(learnerGroup);
 
     component.ngOnInit();
     tick(100);
 
-    expect(component.currentStudentsInfo).toEqual([studentInfo3]);
-    expect(component.invitedStudentsInfo).toEqual([studentInfo1, studentInfo2]);
+    expect(component.currentLearnersInfo).toEqual([learnerInfo3]);
+    expect(component.invitedLearnersInfo).toEqual([learnerInfo1, learnerInfo2]);
   }));
 
   it('should save learner group info successfully', fakeAsync(() => {
@@ -192,13 +192,13 @@ describe('LearnerGroupPreferencesComponent', () => {
     expect(component.learnerGroup.description).toBe('description');
   }));
 
-  it('should update invited students to learner group successfully', () => {
-    expect(component.invitedStudents).toEqual([]);
-    component.updateInvitedStudents(['username1', 'username2']);
-    expect(component.invitedStudents).toEqual(['username1', 'username2']);
+  it('should update invited learners to learner group successfully', () => {
+    expect(component.invitedLearners).toEqual([]);
+    component.updateInvitedLearners(['username1', 'username2']);
+    expect(component.invitedLearners).toEqual(['username1', 'username2']);
   });
 
-  it('should add new student to learner group successfully', fakeAsync(() => {
+  it('should add new learner to learner group successfully', fakeAsync(() => {
     const demoLearnerGroupBackendDict = {
       id: 'groupId',
       title: 'title',
@@ -211,7 +211,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     };
     const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
       demoLearnerGroupBackendDict);
-    const newStudentInfo = LearnerGroupUserInfo.createFromBackendDict({
+    const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username1',
       profile_picture_data_url: 'picture',
       error: ''
@@ -221,15 +221,15 @@ describe('LearnerGroupPreferencesComponent', () => {
       .and.returnValue(Promise.resolve(learnerGroup));
 
     component.learnerGroup = demoLearnerGroup;
-    component.currentStudentsInfo = [];
-    component.invitedStudentsInfo = [newStudentInfo];
+    component.currentLearnersInfo = [];
+    component.invitedLearnersInfo = [newLearnerInfo];
 
-    component.addStudentToLearnerGroup(newStudentInfo);
+    component.addLearnerToLearnerGroup(newLearnerInfo);
     tick(100);
     fixture.detectChanges();
 
     expect(component.learnerGroup).toEqual(learnerGroup);
-    expect(component.currentStudentsInfo).toEqual([newStudentInfo]);
+    expect(component.currentLearnersInfo).toEqual([newLearnerInfo]);
   }));
 
   it('should get user profile image data url correctly', () => {
@@ -237,7 +237,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     expect(component.getProfileImageDataUrl(dataUrl)).toBe('/images/url/1');
   });
 
-  it('should open invite students modal successfully', fakeAsync(() => {
+  it('should open invite learners modal successfully', fakeAsync(() => {
     const demoLearnerGroupBackendDict = {
       id: 'groupId',
       title: 'title',
@@ -250,7 +250,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     };
     const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
       demoLearnerGroupBackendDict);
-    const newStudentInfo = LearnerGroupUserInfo.createFromBackendDict({
+    const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username1',
       profile_picture_data_url: 'picture',
       error: ''
@@ -261,8 +261,8 @@ describe('LearnerGroupPreferencesComponent', () => {
         learnerGroupId: 'groupId'
       },
       result: Promise.resolve({
-        invitedStudents: ['username1'],
-        invitedStudentsInfo: [newStudentInfo]
+        invitedLearners: ['username1'],
+        invitedLearnersInfo: [newLearnerInfo]
       })
     } as NgbModalRef,
     {
@@ -277,17 +277,17 @@ describe('LearnerGroupPreferencesComponent', () => {
       .and.returnValue(Promise.resolve(learnerGroup));
 
     component.learnerGroup = demoLearnerGroup;
-    component.invitedStudentsInfo = [];
+    component.invitedLearnersInfo = [];
 
-    component.openInviteStudentsModal();
+    component.openInviteLearnersModal();
     tick(100);
     fixture.detectChanges();
 
     expect(component.learnerGroup).toEqual(learnerGroup);
-    expect(component.invitedStudentsInfo).toEqual([newStudentInfo]);
+    expect(component.invitedLearnersInfo).toEqual([newLearnerInfo]);
   }));
 
-  it('should close invite students modal successfully',
+  it('should close invite learners modal successfully',
     fakeAsync(() => {
       const demoLearnerGroupBackendDict = {
         id: 'groupId',
@@ -301,7 +301,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       };
       const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
         demoLearnerGroupBackendDict);
-      const studentInfo = LearnerGroupUserInfo.createFromBackendDict({
+      const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
         profile_picture_data_url: 'picture',
         error: ''
@@ -318,14 +318,14 @@ describe('LearnerGroupPreferencesComponent', () => {
         .and.returnValue(Promise.resolve(demoLearnerGroup));
 
       component.learnerGroup = demoLearnerGroup;
-      component.currentStudentsInfo = [studentInfo];
+      component.currentLearnersInfo = [learnerInfo];
 
-      component.openInviteStudentsModal();
+      component.openInviteLearnersModal();
       tick(100);
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(demoLearnerGroup);
-      expect(component.currentStudentsInfo).toEqual([studentInfo]);
+      expect(component.currentLearnersInfo).toEqual([learnerInfo]);
     })
   );
 
@@ -343,7 +343,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       };
       const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
         demoLearnerGroupBackendDict);
-      const newStudentInfo = LearnerGroupUserInfo.createFromBackendDict({
+      const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'username1',
         profile_picture_data_url: 'picture',
         error: ''
@@ -354,8 +354,8 @@ describe('LearnerGroupPreferencesComponent', () => {
           learnerGroupId: 'groupId'
         },
         result: Promise.resolve({
-          invitedStudents: ['username1'],
-          invitedStudentsInfo: [newStudentInfo]
+          invitedLearners: ['username1'],
+          invitedLearnersInfo: [newLearnerInfo]
         })
       } as NgbModalRef,
       {
@@ -370,18 +370,18 @@ describe('LearnerGroupPreferencesComponent', () => {
         .and.returnValue(Promise.resolve(learnerGroup));
 
       component.learnerGroup = demoLearnerGroup;
-      component.invitedStudentsInfo = [];
+      component.invitedLearnersInfo = [];
 
-      component.openInviteStudentsModal();
+      component.openInviteLearnersModal();
       tick(100);
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
-      expect(component.invitedStudentsInfo).toEqual([newStudentInfo]);
+      expect(component.invitedLearnersInfo).toEqual([newLearnerInfo]);
     })
   );
 
-  it('should open remove student from group modal successfully',
+  it('should open remove learner from group modal successfully',
     fakeAsync(() => {
       const demoLearnerGroupBackendDict = {
         id: 'groupId',
@@ -395,7 +395,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       };
       const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
         demoLearnerGroupBackendDict);
-      const studentInfo = LearnerGroupUserInfo.createFromBackendDict({
+      const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
         profile_picture_data_url: 'picture',
         error: ''
@@ -403,7 +403,7 @@ describe('LearnerGroupPreferencesComponent', () => {
 
       spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: {
-          confirmationTitle: 'Remove Student',
+          confirmationTitle: 'Remove Learner',
           confirmationMessage: 'Some confirmation message.'
         },
         result: Promise.resolve()
@@ -413,18 +413,18 @@ describe('LearnerGroupPreferencesComponent', () => {
         .and.returnValue(Promise.resolve(learnerGroup));
 
       component.learnerGroup = demoLearnerGroup;
-      component.currentStudentsInfo = [studentInfo];
+      component.currentLearnersInfo = [learnerInfo];
 
-      component.openRemoveStudentFromGroupModal(studentInfo);
+      component.openRemoveLearnerFromGroupModal(learnerInfo);
       tick(100);
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
-      expect(component.currentStudentsInfo).toEqual([]);
+      expect(component.currentLearnersInfo).toEqual([]);
     })
   );
 
-  it('should open withdraw student invitation modal successfully',
+  it('should open withdraw learner invitation modal successfully',
     fakeAsync(() => {
       const demoLearnerGroupBackendDict = {
         id: 'groupId',
@@ -438,7 +438,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       };
       const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
         demoLearnerGroupBackendDict);
-      const studentInfo = LearnerGroupUserInfo.createFromBackendDict({
+      const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
         profile_picture_data_url: 'picture',
         error: ''
@@ -456,14 +456,14 @@ describe('LearnerGroupPreferencesComponent', () => {
         .and.returnValue(Promise.resolve(learnerGroup));
 
       component.learnerGroup = demoLearnerGroup;
-      component.invitedStudentsInfo = [studentInfo];
+      component.invitedLearnersInfo = [learnerInfo];
 
-      component.openWithdrawStudentInvitationModal(studentInfo);
+      component.openWithdrawLearnerInvitationModal(learnerInfo);
       tick(100);
       fixture.detectChanges();
 
       expect(component.learnerGroup).toEqual(learnerGroup);
-      expect(component.invitedStudentsInfo).toEqual([]);
+      expect(component.invitedLearnersInfo).toEqual([]);
     })
   );
 });

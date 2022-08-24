@@ -662,7 +662,7 @@
 	"I18N_LEARNER_GROUP_PROGRESS_IN_STORIES_SECTION": "Section title text in learner progress tab on the edit learner group page.",
 	"I18N_LEARNER_GROUP_PROGRESS_NO_LEARNERS": "Text shown in learner progress tab on edit learner group page. It indicates that there is not progress to show as no student had joined the group.",
 	"I18N_LEARNER_GROUP_SEARCH_BY_USERNAME": "Label text of the search input field on the learner progress tab of the edit learner group page.",
-	"I18N_LEARNER_GROUP_SHOWING_PROGRESS_FOR_STUDENT": "Title text shown for learner specific progress in the learner progress tab of the edit learner group page.",
+	"I18N_LEARNER_GROUP_SHOWING_PROGRESS_FOR_LEARNER": "Title text shown for learner specific progress in the learner progress tab of the edit learner group page.",
 	"I18N_LEARNER_GROUP_SKILLS_ANALYSIS_SECTION": "Section title text shown on the overview tab of the edit learner group page.",
 	"I18N_LEARNER_GROUP_SKILLS_SECTION_PROGRESS_DESCRIPTION": "Description text shown under skills section on the overview tab of the edit learner group page.",
 	"I18N_LEARNER_GROUP_STORIES_SECTION_PROGRESS_DESCRIPTION": "Description text shown under stories section on the overview tab of the edit learner group page.",

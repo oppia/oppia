@@ -1,7 +1,7 @@
 <div class="oppia-learner-group-overview">
   <div class="learner-group-summary-card">
-    <div class="students-info">
-      <div class="students-count">{{learnerGroup.studentUsernames.length}}</div>
+    <div class="learners-info">
+      <div class="learners-count">{{learnerGroup.studentUsernames.length}}</div>
       <div>{{'I18N_LEARNER_GROUP_LEARNERS_SECTION' | translate:{learnersCount: learnerGroup.studentUsernames.length, messageFormat: true} }}</div>
     </div>
     <div class="assigned-skills-info">
@@ -31,8 +31,8 @@
       <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
         <div class="tab-description">
           <span translate="I18N_LEARNER_GROUP_SKILLS_SECTION_PROGRESS_DESCRIPTION"></span>
-          <div *ngIf="studentsProgress">
-            <div *ngFor="let subtopicSummary of studentsProgress[0].subtopicsProgress">
+          <div *ngIf="learnersProgress">
+            <div *ngFor="let subtopicSummary of learnersProgress[0].subtopicsProgress">
               <div class="progress-summary">
                 <div class="progress-summary-header">
                   <div class="progress-summary-title">
@@ -40,13 +40,13 @@
                   </div>
                   <div class="progress-summary-info"
                        [ngClass]="{'warning': getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0}">
-                    {{getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length}} students are struggling with this skill
+                    {{getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length}} learners are struggling with this skill
                   </div>
                 </div>
-                <div *ngIf="getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-students">
-                  <div class="student-info-card" *ngFor="let studentInfo of getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId)">
-                    <img [src]="getProfileImageDataUrl(studentInfo.userProfilePictureUrl)">
-                    <div>{{studentInfo.username}}</div>
+                <div *ngIf="getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-learners">
+                  <div class="learner-info-card" *ngFor="let learnerInfo of getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId)">
+                    <img [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
+                    <div>{{learnerInfo.username}}</div>
                   </div>
                 </div>
               </div>
@@ -56,21 +56,21 @@
       </div>
       <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
         <span translate="I18N_LEARNER_GROUP_STORIES_SECTION_PROGRESS_DESCRIPTION"></span>
-        <div *ngIf="studentsProgress">
-          <div *ngFor="let storySummary of studentsProgress[0].storiesProgress">
+        <div *ngIf="learnersProgress">
+          <div *ngFor="let storySummary of learnersProgress[0].storiesProgress">
             <div class="progress-summary">
               <div class="progress-summary-header">
                 <div class="progress-summary-title">
                   {{storySummary.getTitle()}} · {{storySummary.getNodeTitles().length}} Lessons
                 </div>
                 <div class="progress-summary-info">
-                  {{getStoryCompletionsInfo(storySummary.getId()).length}} students have completed this story
+                  {{getStoryCompletionsInfo(storySummary.getId()).length}} learners have completed this story
                 </div>
               </div>
-              <div *ngIf="getStoryCompletionsInfo(storySummary.getId()).length > 0" class="progress-summary-students">
-                <div class="student-info-card" *ngFor="let studentInfo of getStoryCompletionsInfo(storySummary.getId())">
-                  <img [src]="getProfileImageDataUrl(studentInfo.userProfilePictureUrl)">
-                  <div>{{studentInfo.username}}</div>
+              <div *ngIf="getStoryCompletionsInfo(storySummary.getId()).length > 0" class="progress-summary-learners">
+                <div class="learner-info-card" *ngFor="let learnerInfo of getStoryCompletionsInfo(storySummary.getId())">
+                  <img [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
+                  <div>{{learnerInfo.username}}</div>
                 </div>
               </div>
             </div>

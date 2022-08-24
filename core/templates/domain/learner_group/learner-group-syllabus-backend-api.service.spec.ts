@@ -155,7 +155,7 @@ describe('Learner Group Syllabus Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      const LEARNER_GROUP_STUDENTS_PROGRESS_URL = (
+      const LEARNER_GROUP_LEARNERS_PROGRESS_URL = (
         '/learner_group_user_progress_handler/groupId');
 
       const studentProgressDicts = [{
@@ -171,7 +171,7 @@ describe('Learner Group Syllabus Backend API Service', () => {
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        LEARNER_GROUP_STUDENTS_PROGRESS_URL +
+        LEARNER_GROUP_LEARNERS_PROGRESS_URL +
         '?student_usernames=%5B%22user1%22%5D');
       expect(req.request.method).toEqual('GET');
       req.flush(studentProgressDicts);

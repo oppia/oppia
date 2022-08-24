@@ -12,7 +12,7 @@
   text-align: center;
 }
 
-.oppia-learner-group-overview .learner-group-summary-card .students-info,
+.oppia-learner-group-overview .learner-group-summary-card .learners-info,
 .oppia-learner-group-overview .learner-group-summary-card .assigned-skills-info,
 .oppia-learner-group-overview .learner-group-summary-card .assigned-stories-info {
   color: #00645c;
@@ -21,7 +21,7 @@
   width: 33.3%;
 }
 
-.oppia-learner-group-overview .learner-group-summary-card .students-count,
+.oppia-learner-group-overview .learner-group-summary-card .learners-count,
 .oppia-learner-group-overview .learner-group-summary-card .assigned-skills-count,
 .oppia-learner-group-overview .learner-group-summary-card .assigned-stories-count {
   font-family: 'Capriola', sans-serif;
@@ -93,7 +93,7 @@
   color: #c30000;
 }
 
-.oppia-learner-group-overview .progress-summary-students {
+.oppia-learner-group-overview .progress-summary-learners {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -101,7 +101,7 @@
   padding: 30px;
 }
 
-.oppia-learner-group-overview .student-info-card {
+.oppia-learner-group-overview .learner-info-card {
   background: #fff;
   border: 1px solid #27635c;
   border-radius: 5px;

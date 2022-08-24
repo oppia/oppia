@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Invite students modal.
+ * @fileoverview Component for Invite learners modal.
  */
 
 import { Component } from '@angular/core';
@@ -22,13 +22,13 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 
 @Component({
-  selector: 'oppia-invite-students-modal',
-  templateUrl: './invite-students-modal.component.html'
+  selector: 'oppia-invite-learners-modal',
+  templateUrl: './invite-learners-modal.component.html'
 })
-export class InviteStudentsModalComponent extends ConfirmOrCancelModal {
+export class InviteLearnersModalComponent extends ConfirmOrCancelModal {
   learnerGroupId!: string;
-  invitedStudents: string[] = [];
-  invitedStudentsInfo: LearnerGroupUserInfo[] = [];
+  invitedLearners: string[] = [];
+  invitedLearnersInfo: LearnerGroupUserInfo[] = [];
 
 
   constructor(
@@ -39,18 +39,18 @@ export class InviteStudentsModalComponent extends ConfirmOrCancelModal {
 
   confirm(): void {
     this.ngbActiveModal.close({
-      invitedStudents: this.invitedStudents,
-      invitedStudentsInfo: this.invitedStudentsInfo
+      invitedLearners: this.invitedLearners,
+      invitedLearnersInfo: this.invitedLearnersInfo
     });
   }
 
-  updateNewlyInvitedStudents(invitedStudents: string[]): void {
-    this.invitedStudents = invitedStudents;
+  updateNewlyInvitedLearners(invitedLearners: string[]): void {
+    this.invitedLearners = invitedLearners;
   }
 
-  updateNewlyInvitedStudentsInfo(
-      invitedStudentsInfo: LearnerGroupUserInfo[]
+  updateNewlyInvitedLearnersInfo(
+      invitedLearnersInfo: LearnerGroupUserInfo[]
   ): void {
-    this.invitedStudentsInfo = invitedStudentsInfo;
+    this.invitedLearnersInfo = invitedLearnersInfo;
   }
 }

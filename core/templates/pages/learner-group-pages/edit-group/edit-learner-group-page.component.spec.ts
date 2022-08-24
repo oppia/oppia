@@ -135,13 +135,13 @@ describe('EditLearnerGroupPageComponent', () => {
 
   it('should set active tab and check if tab is active correctly', () => {
     component.setActiveTab(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.STUDENTS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.STUDENTS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
 
     let tabIsActive = component.isTabActive(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.STUDENTS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
     expect(tabIsActive).toBeTrue();
 
     tabIsActive = component.isTabActive(

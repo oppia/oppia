@@ -22,7 +22,7 @@ import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { InviteStudentsModalComponent } from './invite-students-modal.component';
+import { InviteLearnersModalComponent } from './invite-learners-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,15 +34,15 @@ class MockActiveModal {
   }
 }
 
-describe('Invite Students Modal Component', function() {
-  let component: InviteStudentsModalComponent;
-  let fixture: ComponentFixture<InviteStudentsModalComponent>;
+describe('Invite Learners Modal Component', function() {
+  let component: InviteLearnersModalComponent;
+  let fixture: ComponentFixture<InviteLearnersModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        InviteStudentsModalComponent,
+        InviteLearnersModalComponent,
         MockTranslatePipe
       ],
       providers: [{
@@ -55,7 +55,7 @@ describe('Invite Students Modal Component', function() {
 
   beforeEach(() => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    fixture = TestBed.createComponent(InviteStudentsModalComponent);
+    fixture = TestBed.createComponent(InviteLearnersModalComponent);
     component = fixture.componentInstance;
 
     fixture.detectChanges();
@@ -69,24 +69,24 @@ describe('Invite Students Modal Component', function() {
     spyOn(ngbActiveModal, 'close');
     component.confirm();
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      invitedStudents: component.invitedStudents,
-      invitedStudentsInfo: component.invitedStudentsInfo
+      invitedLearners: component.invitedLearners,
+      invitedLearnersInfo: component.invitedLearnersInfo
     });
   });
 
   it('should update newly invited students and their info', () => {
-    const studentInfo = LearnerGroupUserInfo.createFromBackendDict({
+    const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'user1',
       profile_picture_data_url: 'picture',
       error: ''
     });
 
-    expect(component.invitedStudents).toEqual([]);
-    component.updateNewlyInvitedStudents(['user1', 'user2']);
-    expect(component.invitedStudents).toEqual(['user1', 'user2']);
+    expect(component.invitedLearners).toEqual([]);
+    component.updateNewlyInvitedLearners(['user1', 'user2']);
+    expect(component.invitedLearners).toEqual(['user1', 'user2']);
 
-    expect(component.invitedStudentsInfo).toEqual([]);
-    component.updateNewlyInvitedStudentsInfo([studentInfo]);
-    expect(component.invitedStudentsInfo).toEqual([studentInfo]);
+    expect(component.invitedLearnersInfo).toEqual([]);
+    component.updateNewlyInvitedLearnersInfo([learnerInfo]);
+    expect(component.invitedLearnersInfo).toEqual([learnerInfo]);
   });
 });

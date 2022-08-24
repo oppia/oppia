@@ -1,12 +1,12 @@
 <div class="modal-body">
   <oppia-invite-students [learnerGroupID]="learnerGroupId"
-                         (updateLearnerGroupInvitedStudents)="updateNewlyInvitedStudents($event)"
-                         (updateLearnerGroupInvitedStudentsInfo)="updateNewlyInvitedStudentsInfo($event)">
+                         (updateLearnerGroupInvitedStudents)="updateNewlyInvitedLearners($event)"
+                         (updateLearnerGroupInvitedStudentsInfo)="updateNewlyInvitedLearnersInfo($event)">
   </oppia-invite-students>
 </div>
 <div class="modal-footer">
   <button class="btn btn-primary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
-  <button class="btn btn-primary send-invitation-button" [disabled]="invitedStudents.length === 0" (click)="confirm()">Send Invitation</button>
+  <button class="btn btn-primary send-invitation-button" [disabled]="invitedLearners.length === 0" (click)="confirm()">Send Invitation</button>
 </div>
 
 <style>

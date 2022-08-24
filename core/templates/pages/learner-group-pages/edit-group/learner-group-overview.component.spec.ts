@@ -147,7 +147,7 @@ describe('LearnerGroupOverviewComponent', () => {
       'fetchLearnersProgressInAssignedSyllabus'
     ).and.returnValue(Promise.resolve([sampleLearnerGroupUserProg]));
     expect(component.activeTab).toBeUndefined();
-    expect(component.studentsProgress).toBeUndefined();
+    expect(component.learnersProgress).toBeUndefined();
 
     component.ngOnInit();
     tick();
@@ -156,7 +156,7 @@ describe('LearnerGroupOverviewComponent', () => {
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
         .SKILLS_ANALYSIS);
     expect(component.learnerGroup).toEqual(learnerGroup);
-    expect(component.studentsProgress).toEqual([sampleLearnerGroupUserProg]);
+    expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
   }));
 
   it('should check whether the given tab is active successfully', () => {
@@ -177,10 +177,10 @@ describe('LearnerGroupOverviewComponent', () => {
 
   it('should set active tab correctly', () => {
     component.setActiveTab(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.STUDENTS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.STUDENTS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
   });
 
   it('should get story completions info correctly', fakeAsync(() => {
@@ -194,14 +194,14 @@ describe('LearnerGroupOverviewComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.studentsProgress).toEqual([sampleLearnerGroupUserProg]);
+    expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
 
     const storyCompletionsInfo = component.getStoryCompletionsInfo(
       'sample_story_id');
     expect(storyCompletionsInfo).toEqual([userInfo]);
   }));
 
-  it('should get info of students struggling with subtopics correctly',
+  it('should get info of learners struggling with subtopics correctly',
     fakeAsync(() => {
       spyOn(
         learnerGroupSyllabusBackendApiService,
@@ -213,11 +213,11 @@ describe('LearnerGroupOverviewComponent', () => {
       component.ngOnInit();
       tick(100);
 
-      expect(component.studentsProgress).toEqual([sampleLearnerGroupUserProg]);
+      expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
 
-      const strugglingStudentsInfo = (
-        component.getStrugglingStudentsInfoInSubtopics('topicId1:1'));
-      expect(strugglingStudentsInfo).toEqual([userInfo]);
+      const strugglingLearnersInfo = (
+        component.getStrugglingLearnersInfoInSubtopics('topicId1:1'));
+      expect(strugglingLearnersInfo).toEqual([userInfo]);
     })
   );
 

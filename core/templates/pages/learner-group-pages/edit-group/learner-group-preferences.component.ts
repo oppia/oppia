@@ -23,7 +23,7 @@ import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-grou
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
+import { InviteLearnersModalComponent } from '../templates/invite-learners-modal.component';
 import { InviteSuccessfullModalComponent } from '../templates/invite-successfull-modal.component';
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
@@ -41,9 +41,9 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   newLearnerGroupTitle!: string;
   newLearnerGroupDescription!: string;
   readOnlyMode = true;
-  invitedStudentsInfo!: LearnerGroupUserInfo[];
-  currentStudentsInfo!: LearnerGroupUserInfo[];
-  invitedStudents: string[] = [];
+  invitedLearnersInfo!: LearnerGroupUserInfo[];
+  currentLearnersInfo!: LearnerGroupUserInfo[];
+  invitedLearners: string[] = [];
   EDIT_PREFERENCES_SECTIONS_I18N_IDS = (
     LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS);
 
@@ -57,9 +57,9 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     this.activeTab = this.EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS;
     if (this.learnerGroup) {
       this.learnerGroupBackendApiService.fetchStudentsInfoAsync(
-        this.learnerGroup.id).then((studentsInfo) => {
-        this.currentStudentsInfo = studentsInfo.studentsInfo;
-        this.invitedStudentsInfo = studentsInfo.invitedStudentsInfo;
+        this.learnerGroup.id).then((learnersInfo) => {
+        this.currentLearnersInfo = learnersInfo.studentsInfo;
+        this.invitedLearnersInfo = learnersInfo.invitedStudentsInfo;
       });
     }
   }
@@ -106,23 +106,23 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     this.toggleReadOnlyMode();
   }
 
-  openInviteStudentsModal(): void {
+  openInviteLearnersModal(): void {
     let modalRef = this.ngbModal.open(
-      InviteStudentsModalComponent,
+      InviteLearnersModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'invite-students-modal'
+        windowClass: 'invite-learners-modal'
       }
     );
     modalRef.componentInstance.learnerGroupId = this.learnerGroup.id;
 
     modalRef.result.then((data) => {
-      this.invitedStudents = data.invitedStudents;
-      this.learnerGroup.inviteStudents(this.invitedStudents);
+      this.invitedLearners = data.invitedLearners;
+      this.learnerGroup.inviteStudents(this.invitedLearners);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
         this.learnerGroup = learnerGroup;
-        this.invitedStudentsInfo.push(...data.invitedStudentsInfo);
+        this.invitedLearnersInfo.push(...data.invitedLearnersInfo);
       });
       let successModalRef = this.ngbModal.open(
         InviteSuccessfullModalComponent,
@@ -134,7 +134,7 @@ export class LearnerGroupPreferencesComponent implements OnInit {
       successModalRef.componentInstance.successMessage = (
         'An invitation has been sent to ');
       successModalRef.componentInstance.invitedUsernames = (
-        this.invitedStudents);
+        this.invitedLearners);
 
       successModalRef.result.then(() => {
         // Note to developers:
@@ -152,37 +152,37 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     });
   }
 
-  openRemoveStudentFromGroupModal(student: LearnerGroupUserInfo): void {
+  openRemoveLearnerFromGroupModal(learner: LearnerGroupUserInfo): void {
     let modalRef = this.ngbModal.open(
       RemoveItemModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'remove-student-modal'
+        windowClass: 'remove-learner-modal'
       }
     );
-    modalRef.componentInstance.confirmationTitle = 'Remove Student';
+    modalRef.componentInstance.confirmationTitle = 'Remove Learner';
     modalRef.componentInstance.confirmationMessage = (
-      'Are you sure you want to remove this student from the group?'
+      'Are you sure you want to remove this learner from the group?'
     );
 
     modalRef.result.then(() => {
-      this.learnerGroup.removeStudent(student.username);
+      this.learnerGroup.removeStudent(learner.username);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
         this.learnerGroup = learnerGroup;
-        this.currentStudentsInfo = this.currentStudentsInfo.filter(
-          (currentStudent) => currentStudent.username !== student.username
+        this.currentLearnersInfo = this.currentLearnersInfo.filter(
+          (currentLearner) => currentLearner.username !== learner.username
         );
       });
     });
   }
 
-  openWithdrawStudentInvitationModal(student: LearnerGroupUserInfo): void {
+  openWithdrawLearnerInvitationModal(learner: LearnerGroupUserInfo): void {
     let modalRef = this.ngbModal.open(
       RemoveItemModalComponent,
       {
         backdrop: 'static',
-        windowClass: 'withdraw-student-invitation-modal'
+        windowClass: 'withdraw-learner-invitation-modal'
       }
     );
     modalRef.componentInstance.confirmationTitle = 'Withdraw Invitation';
@@ -191,9 +191,9 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     );
 
     modalRef.result.then(() => {
-      this.learnerGroup.revokeInvitation(student.username);
-      this.invitedStudentsInfo = this.invitedStudentsInfo.filter(
-        (invitedStudent) => invitedStudent.username !== student.username
+      this.learnerGroup.revokeInvitation(learner.username);
+      this.invitedLearnersInfo = this.invitedLearnersInfo.filter(
+        (invitedLearner) => invitedLearner.username !== learner.username
       );
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
@@ -202,25 +202,25 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     });
   }
 
-  updateInvitedStudents(invitedStudents: string[]): void {
-    this.invitedStudents = invitedStudents;
+  updateInvitedLearners(invitedLearners: string[]): void {
+    this.invitedLearners = invitedLearners;
   }
 
   getProfileImageDataUrl(dataUrl: string): string {
     return decodeURIComponent(dataUrl);
   }
 
-  addStudentToLearnerGroup(student: LearnerGroupUserInfo): void {
-    this.learnerGroup.addStudent(student.username);
-    this.learnerGroup.revokeInvitation(student.username);
-    this.invitedStudentsInfo = this.invitedStudentsInfo.filter(
-      (invitedStudent) => invitedStudent.username !== student.username
+  addLearnerToLearnerGroup(learner: LearnerGroupUserInfo): void {
+    this.learnerGroup.addStudent(learner.username);
+    this.learnerGroup.revokeInvitation(learner.username);
+    this.invitedLearnersInfo = this.invitedLearnersInfo.filter(
+      (invitedLearner) => invitedLearner.username !== learner.username
     );
     this.learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
-      this.learnerGroup.id, student.username, true, true
+      this.learnerGroup.id, learner.username, true, true
     ).then((learnerGroup) => {
       this.learnerGroup = learnerGroup;
-      this.currentStudentsInfo.push(student);
+      this.currentLearnersInfo.push(learner);
     });
   }
 }
