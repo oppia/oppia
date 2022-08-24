@@ -3896,7 +3896,7 @@ class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
             actual_info.language_code, self.LANGUAGE_CODE
         )
         self.assertEqual(
-            actual_info.ranking_name, self.RANK_NAME
+            actual_info.rank_name, self.RANK_NAME
         )
 
 
