@@ -3428,6 +3428,9 @@ class State(translation_domain.BaseTranslatableObject):
                 )
             )
             interaction_id = state['interaction']['id']
+            if interaction_id is None:
+                continue
+
             interaction = state['interaction']
             answer_groups = interaction['answer_groups']
             rule_descriptions = interaction_specs[interaction_id][
