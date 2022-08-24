@@ -33,7 +33,7 @@
             </div>
             <div class="oppia-learner-group-summary-card-students">
               <span>{{learnerGroupSummary.studentsCount}} &nbsp;</span>
-              <span translate="I18N_LEARNER_GROUP_LEARNERS"></span>
+              <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS'  | translate:{learnersCount: learnerGroupSummary.studentsCount, messageFormat: true}"></span>
             </div>
             <i class="fa fa-chevron-right"></i>
           </a>

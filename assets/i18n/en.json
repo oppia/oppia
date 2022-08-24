@@ -649,7 +649,7 @@
     "I18N_LEARNER_GROUP_INVITE_LIST_TEXT": "Invite List",
     "I18N_LEARNER_GROUP_ITEM_ADDED_TO_SYLLABUS": "Added",
     "I18N_LEARNER_GROUP_ITEM_ALREADY_ADDED_TO_SYLLABUS": "Already In Syllabus",
-    "I18N_LEARNER_GROUP_LEARNERS": "LEARNERS",
+    "I18N_LEARNER_GROUP_LEARNERS": "{learnersCount, plural, =1{LEARNER} other{LEARNERS}}",
     "I18N_LEARNER_GROUP_LEARNERS_PROGRESS_TAB": "Learners' Progress",
     "I18N_LEARNER_GROUP_LEARNERS_SECTION": "{learnersCount, plural, =1{Learner} other{Learners}}",
     "I18N_LEARNER_GROUP_MINIMUM_SYLLABUS_ITEMS_INFO": "You need to add at least one syllabus item(Skill/Story) in order to make a group.",
