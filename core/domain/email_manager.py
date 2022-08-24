@@ -356,12 +356,14 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
         feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE: {
             'email_body_template': (
                 'Hi %s,<br><br>'
-                'This is to let you know that you have successfully achieved the %s '
-                'rank for submitting translations in %s. Your efforts help Oppia grow '
-                'better every day and support students around the world.<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for submitting translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
                 'Best wishes,<br>The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
@@ -371,12 +373,14 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
         feconf.CONTRIBUTION_SUB_TYPE_REVIEW: {
             'email_body_template': (
                 'Hi %s,<br><br>'
-                'This is to let you know that you have successfully achieved the %s '
-                'rank for reviewing translations in %s. Your efforts help Oppia grow '
-                'better every day and support students around the world.<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for reviewing translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
                 'Best wishes,<br>The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
@@ -386,12 +390,14 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
         feconf.CONTRIBUTION_SUB_TYPE_EDIT: {
             'email_body_template': (
                 'Hi %s,<br><br>'
-                'This is to let you know that you have successfully achieved the %s '
-                'rank for correcting translations in %s. Your efforts help Oppia grow '
-                'better every day and support students around the world.<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for correcting translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
                 'Best wishes,<br>The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
@@ -403,12 +409,14 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
         feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE: {
             'email_body_template': (
                 'Hi %s,<br><br>'
-                'This is to let you know that you have successfully achieved the %s '
-                'rank for submitting  practice questions. Your efforts help Oppia grow '
-                'better every day and support students around the world.<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for submitting  practice questions. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
                 'Best wishes,<br>The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
@@ -418,12 +426,15 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
         feconf.CONTRIBUTION_SUB_TYPE_REVIEW: {
             'email_body_template': (
                 'Hi %s,<br><br>'
-                'This is to let you know that you have successfully achieved the %s '
-                'rank for reviewing  practice questions. Your efforts help Oppia grow '
-                'better every day and support students around the world.<br><br>'
+                'This is to let you know that you have successfully '
+                'achieved the %s '
+                'rank for reviewing  practice questions. Your efforts help '
+                'Oppia grow better every day and support students around the '
+                'world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
                 'Best wishes,<br>The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
@@ -433,12 +444,15 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
         feconf.CONTRIBUTION_SUB_TYPE_EDIT: {
             'email_body_template': (
                 'Hi %s,<br><br>'
-                'This is to let you know that you have successfully achieved the %s '
-                'rank for correcting practice questions. Your efforts help Oppia grow '
-                'better every day and support students around the world.<br><br>'
+                'This is to let you know that you have successfully '
+                'achieved the %s '
+                'rank for correcting practice questions. Your efforts help '
+                'Oppia grow better every day and support students around '
+                'the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!<br><br>'
+                'Best wishes and we hope you can continue to '
+                'contribute!<br><br>'
                 'Best wishes,<br>The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
