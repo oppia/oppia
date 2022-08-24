@@ -208,7 +208,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'exp_id1', 1)
         self.assertEqual(exploration_stats, None)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'ExplorationStatsModel id="exp_id1.1" does not exist'
         ):
@@ -249,7 +249,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegex(Exception, 'does not exist'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'does not exist'):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_returns_if_state_name_is_undefined(self) -> None:
@@ -368,7 +368,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegex(Exception, 'does not exist'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'does not exist'):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_calls_to_stats_methods(self) -> None:
@@ -378,9 +378,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         created or updated.
         """
         # Initialize call counters.
-        stats_for_new_exploration_log = test_utils.CallCounter(  # type: ignore[no-untyped-call]
+        stats_for_new_exploration_log = test_utils.CallCounter(
             stats_services.get_stats_for_new_exploration)
-        stats_for_new_exp_version_log = test_utils.CallCounter(  # type: ignore[no-untyped-call]
+        stats_for_new_exp_version_log = test_utils.CallCounter(
             stats_services.get_stats_for_new_exp_version)
 
         # Create exploration object in datastore.
@@ -535,7 +535,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         # Test addition of states.
         exploration.add_states(['New state', 'New state 2'])
         exploration.version += 1
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'ExplorationVersionsDiff cannot be None when the change'
         ):
@@ -1069,7 +1069,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_update_exp_issues_for_new_exp_version(self) -> None:
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         exp = self.save_new_valid_exploration('exp_id', admin_id)
 
         stats_models.ExplorationIssuesModel.delete_by_id(
@@ -1096,7 +1096,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats.num_actual_starts_v2 += 5
         exploration_stats.num_completions_v2 += 2
         exploration_stats.exp_id = 'Invalid_id'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No exploration stats model exists'
         ):
             stats_services.save_stats_model(exploration_stats)
@@ -1108,8 +1108,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.exp = self.save_new_linear_exp_with_state_names_and_interactions(  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp = self.save_new_linear_exp_with_state_names_and_interactions(
             'exp_id', self.owner_id,
             ['A', 'B'], ['TextInput', 'EndExploration'])
 
@@ -1610,7 +1610,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
             ]
         )
         exp_issues.exp_id = 'Invalid_id'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No ExplorationIssuesModel exists'
         ):
             stats_services.save_exp_issues_model(exp_issues)
@@ -1857,7 +1857,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
 
@@ -2227,7 +2227,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
 
@@ -2341,7 +2341,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
     def test_raises_error_while_fetching_exp_issues_with_invalid_id_and_strict(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No ExplorationIssues model found'
         ):
             stats_services.get_exp_issues('Invalid_id', 0, strict=True)
@@ -2379,8 +2379,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.get_user_id_from_email(self.OWNER_EMAIL)
+        with self.assertRaisesRegex(
             Exception, 'Entity .* not found'):
             stats_services.get_state_reference_for_exploration(
                 'fake_exp', 'state_name')
@@ -2389,11 +2389,11 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No state with the given state name was found'):
             stats_services.get_state_reference_for_exploration(
@@ -2403,7 +2403,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
@@ -2415,7 +2415,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     def test_get_state_reference_for_question_with_invalid_question_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No question with the given question id exists'):
             stats_services.get_state_reference_for_question(
@@ -2425,10 +2425,10 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self
     ) -> None:
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        editor_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
         question_id = question_services.get_new_question_id()
-        question = self.save_new_question(  # type: ignore[no-untyped-call]
+        question = self.save_new_question(
             question_id, editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
         self.assertNotEqual(question, None)
@@ -2498,7 +2498,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             len(learner_answer_details.learner_answer_info_list), 0)
 
     def test_delete_learner_answer_info_with_invalid_input(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.delete_learner_answer_info(
@@ -2525,7 +2525,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_info_id = 'id_1'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Learner answer info with the given id not found'):
             stats_services.delete_learner_answer_info(
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -2572,7 +2572,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             len(learner_answer_details.learner_answer_info_list), 1)
 
     def test_update_with_invalid_input_raises_exception(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.update_state_reference(
