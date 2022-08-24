@@ -3874,13 +3874,13 @@ class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
     CONTRIBUTION_TYPE: Final = 'translation'
     CONTRIBUTION_SUB_TYPE: Final = 'submission'
     LANGUAGE_CODE: Final = 'es'
-    CONTRIBUTIONS_COUNT: Final = 1
+    RANK_NAME: Final = 'Initial Contributor'
 
     def test_create_contribution_milestone_email_info(self) -> None:
         actual_info = suggestion_registry.ContributorMilestoneEmailInfo(
             self.CONTRIBUTOR_USER_ID, self.CONTRIBUTION_TYPE,
             self.CONTRIBUTION_SUB_TYPE, self.LANGUAGE_CODE,
-            self.CONTRIBUTIONS_COUNT
+            self.RANK_NAME
         )
 
         self.assertEqual(
@@ -3896,7 +3896,7 @@ class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
             actual_info.language_code, self.LANGUAGE_CODE
         )
         self.assertEqual(
-            actual_info.contributions_count, self.CONTRIBUTIONS_COUNT
+            actual_info.ranking_name, self.RANK_NAME
         )
 
 

@@ -2003,6 +2003,172 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS)
 
 
+class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
+    """Test that correct email is sent while notifying contributor
+    achievements."""
+
+    USERNAME: Final = 'user'
+    USER_EMAIL: Final = 'user@example.com'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_EMAIL, self.USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
+            self.user_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+
+    # def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
+    #     with self.can_not_send_emails_ctx:
+    #         email_manager.send_mail_to_notify_users_to_review(
+    #             self.reviewer_id, 'Algebra')
+
+    #     messages = self._get_sent_email_messages(
+    #         self.REVIEWER_EMAIL)
+    #     self.assertEqual(len(messages), 0)
+
+    def test_that_contributor_acceptance_ranking_email_is_sent(self) -> None:
+        expected_email_subject = 'Oppia Translator Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for submitting translations in हिन्दी (Hindi). '
+            'Your efforts help Oppia grow better every day and support '
+            'students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'translation', 'acceptance', 'hi',
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+    def test_that_reviewer_review_ranking_email_is_sent(self) -> None:
+        expected_email_subject = 'Oppia Translation Reviewer Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for reviewing translations in हिन्दी (Hindi). '
+            'Your efforts help Oppia grow better every day and support '
+            'students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'translation', 'review', 'hi',
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+    def test_that_reviewer_edit_ranking_email_is_sent(self) -> None:
+        expected_email_subject = 'Oppia Translation Reviewer Rank Achievement!'
+        expected_email_html_body = (
+            'Hi user,<br><br>'
+            'This is to let you know that you have successfully achieved the '
+            'Initial Contributor rank for correcting translations in हिन्दी (Hindi). '
+            'Your efforts help Oppia grow better every day and support '
+            'students around the world.<br><br>'
+            'You can check all the achievements you earned in the '
+            '<a href="http://localhost:8181/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Best wishes and we hope you can continue to contribute!<br><br>'
+            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+
+        contributor_ranking_email_info = (
+            suggestion_registry.ContributorMilestoneEmailInfo(
+                self.user_id, 'translation', 'edit', 'hi',
+                'Initial Contributor'
+            ))
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_contributor_ranking_achievement(
+                contributor_ranking_email_info)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(self.USER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[email_models.SentEmailModel] = (
+                email_models.SentEmailModel.get_all().fetch()
+            )
+            sent_email_model = all_models[0]
+            self.assertEqual(sent_email_model.subject, expected_email_subject)
+            self.assertEqual(sent_email_model.recipient_id, self.user_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.USER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+
+
+
 class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
     """Tests the send_mail_to_notify_contributor_dashboard_reviewers method,
     which sends an email to reviewers with information regarding the suggestions
