@@ -103,7 +103,7 @@ describe('EditLearnerGroupPageComponent', () => {
     expect(component.activeTab).toEqual(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.OVERVIEW);
     expect(component.learnerGroup).toEqual(learnerGroup);
-    expect(component.getStudentsCount()).toBe(1);
+    expect(component.getLearnersCount()).toBe(1);
   }));
 
   it('should call set page title whenever the language is changed',
