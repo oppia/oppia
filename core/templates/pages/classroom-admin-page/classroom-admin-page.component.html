@@ -4,8 +4,19 @@
         <h3 class="classroom-admin-header">Classroom config properties</h3>
     </div>
     <div>
-      <em>Configure the details of a classroom.</em>
-      <p class="existing-classroom-header"><strong>Existing Classrooms</strong></p>
+      <em>
+        Configure the details of a classroom.
+      </em>
+
+      <p class="existing-classroom-header">
+        <strong>Existing Classrooms</strong>
+      </p>
+
+      <mat-spinner class="loading-spinner" *ngIf="!pageInitialized" [diameter]="30"></mat-spinner>
+
+      <em *ngIf="pageInitialized && classroomCount === 0">
+        No classroom exists at this moment.
+      </em>
 
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
         <mat-list class="oppia-classroom-tile">
@@ -24,86 +35,101 @@
           </mat-list-item>
         </mat-list>
 
-        <div class="classroom-details" *ngIf="classroomDetailsIsShown && classroomId === classroom.key">
+        <mat-list class="classroom-details" *ngIf="classroomDetailsIsShown && classroomId === classroom.key">
           <div *ngIf="classroomViewerMode" (click)="openClassroomConfigEditor()">
             <i class="material-icons oppia-edit-icon" title="Edit Classroom">&#xE254;</i>
           </div>
           <div class="row oppia-description-text-container">
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              Name
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Name</strong>
             </span>
             <span *ngIf="classroomViewerMode">{{classroomName}}</span>
             <input *ngIf="classroomEditorMode" [(ngModel)]="classroomName" (blur)="updateClassroomName()">
           </div>
           <div class="row oppia-description-text-container">
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              Url fragment
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Url fragment</strong>
             </span>
             <span *ngIf="classroomViewerMode">{{urlFragment}}</span>
-            <input *ngIf="classroomEditorMode" [(ngModel)]="urlFrgament" (blur)="updateUrlFragment()">
+            <input *ngIf="classroomEditorMode" [(ngModel)]="urlFragment" (blur)="updateUrlFragment()">
           </div>
           <div class="row oppia-description-text-container">
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              Course details
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Course details</strong>
             </span>
             <span *ngIf="classroomViewerMode">{{courseDetails}}</span>
             <input *ngIf="classroomEditorMode" [(ngModel)]="courseDetails" (blur)="updateCourseDetails()">
           </div>
           <div class="row oppia-description-text-container">
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              topic list intro
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Topic list intro</strong>
             </span>
             <span *ngIf="classroomViewerMode">{{topicListIntro}}</span>
             <input *ngIf="classroomEditorMode" [(ngModel)]="topicListIntro" (blur)="updateTopicListIntro()">
           </div>
           <div class="row oppia-description-text-container">
-            <span class="col-lg-2 col-md-2 col-sm-2">
-              Topic Ids
+            <span class="col-lg-3 col-md-3 col-sm-3">
+              <strong>Topic Ids</strong>
             </span>
-            <div *ngFor="let topicId of topicIds">
-              <span>{{ topicId }}</span>
-              <button mat-button matSuffix mat-icon-button
-                      aria-label="Clear"
-                      (click)="removeTopicIdFromClassroom(classroom.key)">
-                <mat-icon matListIcon>close</mat-icon>
-              </button>
+            <div *ngIf="classroomViewerMode">
+              <div *ngFor="let topicId of topicIds">
+                <span>{{ topicId }}</span>
+                <button mat-button matSuffix mat-icon-button
+                        aria-label="Clear"
+                        (click)="removeTopicIdFromClassroom(classroom.key)">
+                  <mat-icon matListIcon>close</mat-icon>
+                </button>
+              </div>
             </div>
-            <div>
-              <button>Add topic</button>
-              <input>
-              <button mat-button matSuffix mat-icon-button
-                      aria-label="Clear"
-                      (click)="removeTopicIdFromClassroom(classroom.key)">
-                <mat-icon matListIcon>close</mat-icon>
-              </button>
+            <div *ngIf="classroomEditorMode">
+              <button *ngIf="!newTopicIdInput" mat-button matSuffix (click)="openNewTopicIdInput()">Add topic</button>
+              <div *ngIf="newTopicIdInput">
+                <input>
+                <button mat-button matSuffix mat-icon-button
+                        aria-label="Clear"
+                        (click)="removeTopicIdFromClassroom(classroom.key)">
+                  <mat-icon matListIcon>close</mat-icon>
+                </button>
+                <button mat-button matSuffix mat-icon-button
+                        aria-label="Done"
+                        (click)="addNewTopicIdToClassroom(classroom.key)">
+                  <mat-icon matListIcon>check</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
           <div *ngIf="classroomEditorMode">
             <button class="btn btn-success action-buttons" [disabled]="!classroomDataChanged" (click)="saveClassroomData(classroom.key)">Save</button>
             <button class="btn btn-secondary action-buttons" (click)="closeClassroomConfigEditor()">Cancel</button>
           </div>
-        </div>
+        </mat-list>
       </div>
 
     </div>
       <!-- Button on add a new classroom. -->
-    <button (click)="getClassroomData()">
+    <button (click)="createNewClassroom()">
       Add new classroom
     </button>
 </div>
 </mat-card>
 
 <style>
+  .oppia-description-text-container {
+    margin-top: 10px;
+  }
+  .loading-spinner {
+    margin-left: 45%;
+  }
   .classroom-details {
     margin: 10px 20px;
+    padding: 0 15px;
   }
   .existing-classroom-header {
     margin-top: 20px;
     margin-bottom: 0px;
   }
   .action-buttons {
-    float: right;
-    margin-right: 5px;
+    margin: 10px 5px;
   }
   .oppia-edit-icon {
     font-size: 16px;

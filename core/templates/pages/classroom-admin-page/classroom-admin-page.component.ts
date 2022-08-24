@@ -14,6 +14,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
   ) {}
+  classroomCount: number;
   selectedClassroomDict;
   updatedClassroomDict;
   classroomIdToClassroomName;
@@ -31,10 +32,15 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomDetailsIsShown: boolean = false;
   classroomViewerMode: boolean = false;
   classroomEditorMode: boolean = false;
+  newTopicIdInput: boolean = false;
 
   getClassroomData(classroomId: string) {
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
+
+        if (this.classroomEditorMode) {
+          this.closeClassroomConfigEditor();
+        }
 
         if (this.classroomId === classroomId && this.classroomViewerMode) {
           this.classroomDetailsIsShown = false;
@@ -65,6 +71,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       .getAllClassroomIdToClassroomNameDictAsync().then(response => {
         this.pageInitialized = true;
         this.classroomIdToClassroomName = response;
+        this.classroomCount = Object.keys(response).length;
       }
     );
   }
@@ -90,11 +97,16 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.classroomDataChanged = true;
   }
 
-  addNewTopicIdToClassroom() {
+  addNewTopicIdToClassroom(classroomId: string) {
+    this.newTopicIdInput = false;
   }
 
   removeTopicIdFromClassroom(classroomId) {
-    console.log(classroomId);
+    this.newTopicIdInput = false;
+  }
+
+  openNewTopicIdInput() {
+    this.newTopicIdInput = true;
   }
 
 
@@ -112,6 +124,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.classroomBackendApiService.deleteClassroomAsync(classroomId).then(
       () => {
         delete this.classroomIdToClassroomName[classroomId];
+        this.classroomCount--;
       }
     );
   }
@@ -155,9 +168,33 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   createNewClassroom() {
-    let newClassroomId = this.getNewClassroomId();
+    this.classroomBackendApiService.getNewClassroomIdAsync().then(
+      newClassroomId => {
+        console.log(newClassroomId);
+        console.log('nikhil')
 
+        this.updatedClassroomDict = {
+          classroomId: newClassroomId,
+          name: '',
+          urlFragment: '',
+          courseDetails: '',
+          topicListintro: '',
+          topicIdToPrerequisiteTopicIds: {}
+        }
 
+        this.classroomIdToClassroomName[newClassroomId] = '';
+        this.classroomId = newClassroomId;
+        this.classroomName = '';
+        this.urlFragment = '';
+        this.courseDetails = '';
+        this.topicListintro = '';
+        this.topicIds = []
+        this.topicIdToPrerequisiteTopicIds = {}
+
+        this.classroomEditorMode = true;
+        this.classroomDetailsIsShown = true;
+      }
+    );
   }
 
   ngOnInit(): void {
