@@ -54,7 +54,7 @@ class MockNumbersModel(datastore_services.Model):
 class BaseEventHandlerTests(test_utils.GenericTestBase):
 
     def test_handle_event_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'Subclasses of BaseEventHandler should implement the '
@@ -538,7 +538,7 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.exploration = (
             self.save_new_valid_exploration('exp_id', self.admin_id))
 

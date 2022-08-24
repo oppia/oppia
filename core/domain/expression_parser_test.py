@@ -82,13 +82,13 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             expression_parser.contains_at_least_one_variable('tan(30)'))
 
-        with self.assertRaisesRegex(Exception, 'Invalid bracket pairing.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid bracket pairing.'):
             expression_parser.contains_at_least_one_variable('1 +2)')
-        with self.assertRaisesRegex(Exception, 'Invalid character: ~.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid character: ~.'):
             expression_parser.contains_at_least_one_variable('a~2')
-        with self.assertRaisesRegex(Exception, 'Invalid character: !.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid character: !.'):
             expression_parser.contains_at_least_one_variable('4! 2')
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.contains_at_least_one_variable(
                 'alpha + bet/22.3.4')
 
@@ -245,48 +245,48 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
             lambda x: x.text, expression_parser.tokenize(expression))
         self.assertEqual(list(actual_output), expected_output)
 
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('a.3')
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('.3 -  2.4')
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('1.2.3 + 4/2')
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('a . . 3')
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('3..4')
-        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('..5')
 
     def test_get_variables(self) -> None:
         """Tests for get_variables method."""
-        self.assertItemsEqual(expression_parser.get_variables('a^2.3'), ['a'])  # type: ignore[no-untyped-call]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(expression_parser.get_variables('a^2.3'), ['a'])
+        self.assertItemsEqual(
             expression_parser.get_variables('abs(alpha)'), ['alpha'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('alpha/gamma'), ['alpha', 'gamma'])
         self.assertEqual(expression_parser.get_variables('A + 2/3'), ['A'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('alphabetagamma'),
             ['alpha', 'beta', 'gamma'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('betalphaa'),
             ['a', 'p', 'beta', 'l', 'h'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('a+a*a/aa^a-a'), ['a'])
-        self.assertItemsEqual(expression_parser.get_variables(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(expression_parser.get_variables(
             'sqrt(3+x^y)/abs(gamma)'), ['y', 'x', 'gamma'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('a=3+4'), ['a'])
-        self.assertItemsEqual(expression_parser.get_variables(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(expression_parser.get_variables(
             '(a-2)^beta = alpha/gamma'), ['a', 'alpha', 'beta', 'gamma'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('4=abs(-4)'), [])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('a^pi + e/2'), ['a', 'pi', 'e'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('pi-3.14e'), ['pi', 'e'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expression_parser.get_variables('epi'), ['pi', 'e'])
 
 
@@ -299,9 +299,9 @@ class TokenUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expression_parser.Token('abs').category, 'function')
         self.assertEqual(expression_parser.Token('tan').category, 'function')
 
-        with self.assertRaisesRegex(Exception, 'Invalid token: tan().'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: tan().'):
             expression_parser.Token('tan()')
-        with self.assertRaisesRegex(Exception, 'Invalid token: Sqrt.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: Sqrt.'):
             expression_parser.Token('Sqrt')
 
     def test_is_identifier(self) -> None:
@@ -312,7 +312,7 @@ class TokenUnitTests(test_utils.GenericTestBase):
             expression_parser.Token('alpha').category, 'identifier')
         self.assertEqual(expression_parser.Token('A').category, 'identifier')
 
-        with self.assertRaisesRegex(Exception, 'Invalid token: al.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: al.'):
             expression_parser.Token('al')
         self.assertNotEqual(
             expression_parser.Token('5').category, 'identifier')
@@ -326,7 +326,7 @@ class TokenUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expression_parser.Token('pi').category, 'number')
         self.assertEqual(expression_parser.Token('e').category, 'number')
 
-        with self.assertRaisesRegex(Exception, 'Invalid token: 8.4.3.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid token: 8.4.3.'):
             expression_parser.Token('8.4.3')
 
     def test_is_operator(self) -> None:

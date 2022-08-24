@@ -62,6 +62,6 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         """Tests that an error is raised when fetching an incorrect issue
         type.
         """
-        with self.assertRaisesRegex(KeyError, self.invalid_issue_type):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, self.invalid_issue_type):
             playthrough_issue_registry.Registry.get_issue_by_type(
                 self.invalid_issue_type)

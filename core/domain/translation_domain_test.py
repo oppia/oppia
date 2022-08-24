@@ -185,7 +185,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             self.translatable_object1.get_translatable_contents_collection()
             .content_id_to_translatable_content.values())
 
-        self.assertItemsEqual(expected_contents, [ # type: ignore[no-untyped-call]
+        self.assertItemsEqual(expected_contents, [
             translatable_content.content_value
             for translatable_content in translatable_contents
         ])
@@ -194,7 +194,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         translatable_object = DummyTranslatableObjectWithoutRegisterMethod(
             'My name is jack.', 'My name is jhon.')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Must be implemented in subclasses.'):
             translatable_object.get_translatable_contents_collection()
 
@@ -204,7 +204,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
                 'My name is jack.', 'My name is jhon.')
         )
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Content_id content_id_2 already exists in the '
             'TranslatableContentsCollection.'):
@@ -234,7 +234,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             translatable_content.content_value
             for translatable_content in contents_which_need_translation
         ]
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expected_list_of_contents_which_need_translataion,
             list_of_contents_which_need_translataion)
 
@@ -363,7 +363,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
         self.translation.source_language_code = 'ABC'
         expected_error_message = (
             'Invalid source language code: ABC')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 
@@ -371,7 +371,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
         self.translation.target_language_code = 'ABC'
         expected_error_message = (
             'Invalid target language code: ABC')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 
@@ -383,7 +383,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
         expected_error_message = (
             'Expected source_language_code to be different from '
             'target_language_code: "en" = "en"')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 

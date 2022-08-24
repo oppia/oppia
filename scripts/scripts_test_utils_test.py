@@ -105,7 +105,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        with self.assertRaisesRegex(OSError, 'rejected'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(OSError, 'rejected'):
             popen.terminate()
 
         self.assertEqual(popen.terminate_count, 1)
@@ -132,7 +132,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        with self.assertRaisesRegex(OSError, 'rejected'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(OSError, 'rejected'):
             popen.kill()
 
         self.assertEqual(popen.kill_count, 1)
@@ -159,7 +159,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        with self.assertRaisesRegex(OSError, 'rejected'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(OSError, 'rejected'):
             popen.send_signal(signal.SIGINT)
 
         self.assertEqual(popen.signals_received, [signal.SIGINT])
@@ -291,7 +291,7 @@ class PopenStubTests(test_utils.TestBase):
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
-        with self.assertRaisesRegex(RuntimeError, 'entered an infinite loop'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(RuntimeError, 'entered an infinite loop'):
             popen.wait()
 
     def test_wait_with_timeout_on_unresponive_popen_raises_timeout_error(
@@ -300,7 +300,7 @@ class PopenStubTests(test_utils.TestBase):
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
-        with self.assertRaisesRegex(psutil.TimeoutExpired, '10'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(psutil.TimeoutExpired, '10'):
             popen.wait(timeout=10)
 
     def test_communicate_on_unresponsive_popen_raises_runtime_error(
@@ -309,5 +309,5 @@ class PopenStubTests(test_utils.TestBase):
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
-        with self.assertRaisesRegex(RuntimeError, 'entered an infinite loop'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(RuntimeError, 'entered an infinite loop'):
             popen.communicate()

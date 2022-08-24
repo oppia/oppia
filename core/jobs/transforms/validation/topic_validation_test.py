@@ -548,7 +548,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_topic_summary_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'TopicSummaryModel', 'id'),
             ['TopicModel', 'TopicRightsModel'])

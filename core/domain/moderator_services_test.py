@@ -30,13 +30,13 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
         super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
 
         self.no_user = None

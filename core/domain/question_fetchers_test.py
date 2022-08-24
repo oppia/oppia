@@ -41,22 +41,22 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description 1')
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_2', self.admin_id, description='Skill Description 2')
 
         self.question_id = question_services.get_new_question_id()
-        self.question = self.save_new_question(  # type: ignore[no-untyped-call]
+        self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
@@ -82,7 +82,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_questions_with_multi_skill_ids(self) -> None:
         question_id_1 = question_services.get_new_question_id()
-        question_1 = self.save_new_question(  # type: ignore[no-untyped-call]
+        question_1 = self.save_new_question(
             question_id_1, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
         question_services.create_new_question_skill_link(
@@ -102,7 +102,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_questions_by_ids(self) -> None:
         question_id_2 = question_services.get_new_question_id()
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('DEF'), ['skill_1'])
         questions = question_fetchers.get_questions_by_ids(

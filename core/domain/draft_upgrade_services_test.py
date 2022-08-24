@@ -62,7 +62,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID))
 
     def test_try_upgrade_raises_exception_if_versions_are_invalid(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Current draft version is greater than the exploration version.'):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
@@ -1575,7 +1575,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_v33_dict_list = [
             change.to_dict() for change in migrated_draft_change_list_v33
         ]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expected_draft_change_list_v33_dict_list,
             migrated_draft_change_list_v33_dict_list)
 

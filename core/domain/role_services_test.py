@@ -39,7 +39,7 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(isinstance(action_name, str))
 
     def test_get_all_actions(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Role TEST_ROLE does not exist.'):
             role_services.get_all_actions(['TEST_ROLE'])
 
@@ -50,7 +50,7 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
     def test_action_allocated_to_all_allowed_roles(self) -> None:
         role_actions = role_services.get_role_actions()
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             list(role_actions), feconf.ALLOWED_USER_ROLES)
 
     def test_log_role_query(self) -> None:

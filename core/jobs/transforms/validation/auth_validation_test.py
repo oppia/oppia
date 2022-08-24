@@ -102,23 +102,23 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_user_auth_details_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserAuthDetailsModel', 'firebase_auth_id'),
             ['UserIdByFirebaseAuthIdModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserAuthDetailsModel', 'gae_id'),
             ['UserIdentifiersModel'])
 
     def test_user_id_by_firebase_auth_id_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserIdByFirebaseAuthIdModel', 'user_id'),
             ['UserAuthDetailsModel'])
 
     def test_user_identifiers_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserIdentifiersModel', 'user_id'),
             ['UserAuthDetailsModel'])

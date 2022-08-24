@@ -31,7 +31,7 @@ class ConfigServicesTests(test_utils.GenericTestBase):
 
     def test_can_not_set_config_property_containing_email(self) -> None:
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError, 'Validation failed: does_not_contain_email .*'
         ):
             config_services.set_property(
@@ -40,7 +40,7 @@ class ConfigServicesTests(test_utils.GenericTestBase):
     def test_can_not_set_config_property_with_invalid_config_property_name(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No config property with name new_config_property_name found.'):
             config_services.set_property(
@@ -56,7 +56,7 @@ class ConfigServicesTests(test_utils.GenericTestBase):
     def test_can_not_revert_config_property_with_invalid_config_property_name(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No config property with name new_config_property_name found.'):
             config_services.revert_property('admin', 'new_config_property_name')

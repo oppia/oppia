@@ -32,7 +32,7 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
                 calculation_registry.Registry.get_calculation_by_id(
                     'AnswerFrequencies'),
                 models.AnswerFrequencies))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, '\'a\' is not a valid calculation id.'):
             # get_calculation_by_id has calculation_id argument, which
             # can accept only keys of CalculationDict and 'a' is not

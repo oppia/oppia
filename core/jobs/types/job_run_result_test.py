@@ -52,7 +52,7 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(run_result.stdout, '')
 
     def test_empty_result_raises_value_error(self) -> None:
-        with self.assertRaisesRegex(ValueError, 'must not be empty'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'must not be empty'):
             job_run_result.JobRunResult()
 
     def test_enormous_stdout_result_is_truncated(self) -> None:
@@ -72,9 +72,9 @@ class JobRunResultTests(test_utils.TestBase):
             job_run_result.JobRunResult(stdout='def', stderr='456'),
         ])[0]
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             single_job_run_result.stdout.split('\n'), ['abc', 'def'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             single_job_run_result.stderr.split('\n'), ['123', '456'])
 
     def test_accumulate_one_less_than_limit_is_not_truncated(self) -> None:
@@ -85,7 +85,7 @@ class JobRunResultTests(test_utils.TestBase):
 
         self.assertEqual(len(accumulated_results), 1)
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             accumulated_results[0].stderr.split('\n'), ['a' * 1999, 'b' * 3000])
 
     def test_accumulate_one_more_than_limit_case_is_split(self) -> None:

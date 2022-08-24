@@ -32,7 +32,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
     def test_send_mail_raises_exception_for_invalid_permissions(self) -> None:
         """Tests the send_mail exception raised for invalid user permissions."""
         send_email_exception = (
-            self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
         with send_email_exception, self.swap(constants, 'DEV_MODE', False):
             email_services.send_mail(
@@ -72,7 +72,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
            permissions.
         """
         send_email_exception = (
-            self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            self.assertRaisesRegex(
                 Exception, 'This app cannot send emails to users.'))
         with send_email_exception, (
             self.swap(constants, 'DEV_MODE', False)
@@ -102,7 +102,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """
         # Case when malformed_recipient_email is None when calling send_mail.
         malformed_recipient_email = None
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
@@ -117,7 +117,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         # Case when malformed_recipient_email is an empty string when
         # calling send_mail.
         malformed_recipient_email = ''
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
@@ -127,7 +127,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         # Case when sender is malformed for send_mail.
         malformed_sender_email = 'x@x@x'
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
@@ -138,7 +138,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         # Case when the SENDER_EMAIL in brackets of 'SENDER NAME <SENDER_EMAIL>
         # is malformed when calling send_mail.
         malformed_sender_email = 'Name <malformed_email>'
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
@@ -148,7 +148,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         # Case when sender is malformed when calling send_bulk_mail.
         malformed_sender_email = 'name email@email.com'
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
@@ -158,7 +158,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         # Case when sender is malformed when calling send_bulk_mail.
         malformed_recipient_emails = ['a@a.com', 'email.com']
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_emails[1])
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
@@ -169,7 +169,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
     def test_unsuccessful_status_codes_raises_exception(self) -> None:
         """Test that unsuccessful status codes returned raises an exception."""
 
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             Exception, 'Bulk email failed to send. Please try again later or' +
             ' contact us to report a bug at https://www.oppia.org/contact.')
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -183,7 +183,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
 
-        email_exception = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        email_exception = self.assertRaisesRegex(
             Exception, (
                 'Email to %s failed to send. Please try again later or ' +
                 'contact us to report a bug at ' +

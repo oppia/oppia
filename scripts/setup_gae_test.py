@@ -146,7 +146,7 @@ class SetupGaeTests(test_utils.GenericTestBase):
 
         with self.walk_swap, self.remove_swap, self.makedirs_swap:
             with self.print_swap, self.url_retrieve_swap, exists_swap:
-                with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                with self.assertRaisesRegex(
                     Exception, 'Error downloading Google Cloud SDK.'):
                     setup_gae.main(args=[])
         self.assertEqual(

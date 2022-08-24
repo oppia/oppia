@@ -37,31 +37,31 @@ if MYPY: # pragma: no cover
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_blog_post_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostModel', 'id'),
             ['BlogPostSummaryModel', 'BlogPostRightsModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_summary_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostSummaryModel', 'id'),
             ['BlogPostModel', 'BlogPostRightsModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostSummaryModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_rights_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostRightsModel', 'id'),
             ['BlogPostModel', 'BlogPostSummaryModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostRightsModel', 'editor_ids'),
             ['UserSettingsModel'])

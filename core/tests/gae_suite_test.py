@@ -22,21 +22,25 @@ from core.tests import gae_suite
 from core.tests import test_utils
 from scripts import common
 
+from typing import List
+
 
 class GaeSuiteTests(test_utils.GenericTestBase):
 
-    def test_cannot_create_test_suites_with_invalid_test_target_format(self):
+    def test_cannot_create_test_suites_with_invalid_test_target_format(
+        self
+    ) -> None:
         with self.assertRaisesRegex(
             Exception, 'The delimiter in test_target should be a dot (.)'):
             gae_suite.create_test_suites(test_target='core/controllers')
 
-    def test_create_test_suites(self):
+    def test_create_test_suites(self) -> None:
         test_suite = gae_suite.create_test_suites(
             test_target='core.tests.gae_suite_test')
         self.assertEqual(len(test_suite), 1)
         self.assertEqual(type(test_suite[0]), unittest.suite.TestSuite)
 
-    def test_cannot_add_directory_with_invalid_path(self):
+    def test_cannot_add_directory_with_invalid_path(self) -> None:
         dir_to_add_swap = self.swap(
             common, 'DIRS_TO_ADD_TO_SYS_PATH', ['invalid_path'])
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
@@ -44,9 +48,11 @@ class GaeSuiteTests(test_utils.GenericTestBase):
         with assert_raises_regexp_context_manager, dir_to_add_swap:
             gae_suite.main(args=[])
 
-    def test_failing_tests(self):
+    def test_failing_tests(self) -> None:
 
-        def _mock_create_test_suites(**unused_test_target):
+        def _mock_create_test_suites(
+            **_: str
+        ) -> List[unittest.TestSuite]:
             """Mocks create_test_suites()."""
 
             loader = unittest.TestLoader()
@@ -61,9 +67,11 @@ class GaeSuiteTests(test_utils.GenericTestBase):
         with create_test_suites_swap, assert_raises_regexp_context_manager:
             gae_suite.main(args=[])
 
-    def test_no_tests_run_with_invalid_filename(self):
+    def test_no_tests_run_with_invalid_filename(self) -> None:
 
-        def _mock_create_test_suites(**unused_test_target):
+        def _mock_create_test_suites(
+            **_: str
+        ) -> List[unittest.TestSuite]:
             """Mocks create_test_suites()."""
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('invalid_test')]

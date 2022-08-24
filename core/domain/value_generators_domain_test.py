@@ -42,7 +42,7 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
     def test_generate_value_of_base_value_generator_raises_error(self) -> None:
         base_generator = value_generators_domain.BaseValueGenerator()
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'generate_value() method has not yet been implemented')):

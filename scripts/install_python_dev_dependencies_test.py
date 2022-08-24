@@ -89,7 +89,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         environ_swap = self.swap(os, 'environ', {})
         expected_error = (
             'Oppia must be developed within a virtual environment.')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError, expected_error
         ):
             with prefix_swap, base_prefix_swap, real_prefix_manager:
@@ -341,7 +341,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
-                with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                with self.assertRaisesRegex(
                         RuntimeError, error_regex):
                     install_python_dev_dependencies.main(
                         ['--assert_compiled'])

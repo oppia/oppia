@@ -160,19 +160,19 @@ class RatingServicesTests(test_utils.GenericTestBase):
             {'1': 0, '2': 0, '3': 1, '4': 0, '5': 1})
 
     def test_invalid_ratings_are_forbidden(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected a rating 1-5, received 0'
             ):
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, 0)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected a rating 1-5, received 7'
             ):
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, 7)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received 2'
             ):
             # TODO(#13059): After we fully type the codebase we plan to get
@@ -181,7 +181,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
             rating_services.assign_rating_to_exploration(
                 self.USER_ID_1, self.EXP_ID, '2')  # type: ignore[arg-type]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Expected the rating to be an integer, received aaa'
             ):
             # TODO(#13059): After we fully type the codebase we plan to get
@@ -191,7 +191,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
                 self.USER_ID_1, self.EXP_ID, 'aaa')  # type: ignore[arg-type]
 
     def test_invalid_exploration_ids_are_forbidden(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid exploration id invalid_id'
             ):
             rating_services.assign_rating_to_exploration(

@@ -40,8 +40,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.blog_post_a = blog_services.create_new_blog_post(self.user_id_a)
         self.blog_post_b = blog_services.create_new_blog_post(self.user_id_b)
@@ -227,13 +227,13 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_publish_invalid_blog_post(self) -> None:
         """Checks that an invalid blog post is not published."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, ('Title should not be empty')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
         blog_services.update_blog_post(
             self.blog_post_a_id, self.change_dict_one)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, ('Atleast one tag should be selected')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
@@ -245,12 +245,12 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         }
 
         blog_services.update_blog_post(self.blog_post_a_id, change_dict_three)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, ('Content can not be empty')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
         blog_services.delete_blog_post(self.blog_post_a_id)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, ('The given blog post does not exist')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
@@ -275,7 +275,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_unpublish_invalid_blog_post(self) -> None:
         blog_services.delete_blog_post(self.blog_post_a_id)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, ('The given blog post does not exist')):
             blog_services.unpublish_blog_post(self.blog_post_a_id)
 
@@ -307,7 +307,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_by_id(self.blog_post_a_id))
         self.assertEqual(updated_blog_post.tags, ['one', 'two'])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Blog Post with given title already exists: %s'
                 % 'Sample Title')):
@@ -330,12 +330,12 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
     # rid of the tests that intentionally test wrong inputs that we
     # can normally catch by typing.
     def test_get_blog_posy_by_invalid_url(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Blog Post URL fragment should be a string. Recieved:'
             r'\[123\]'):
             blog_services.does_blog_post_with_url_fragment_exist([123])  # type: ignore[arg-type]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Blog Post URL fragment should be a string. Recieved:'
             '123'):
@@ -508,7 +508,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.put()
 
         # Invalid month.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'time data \'123/09/2000, 00:00:00:00\' does not match' +
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
@@ -516,7 +516,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, self.user_id_b, '123/09/2000')
 
         # Invalid day.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'time data \'01/38/2000, 00:00:00:00\' does not match' +
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
@@ -524,7 +524,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, self.user_id_b, '01/38/2000')
 
         # Invalid year.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'time data \'01/22/31126, 00:00:00:00\' does not match' +
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
@@ -534,7 +534,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
     def test_update_blog_model_author_and_publish_on_with_invalid_blog_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class BlogPostModel with id invalid_blog_id not found'):
             blog_services.update_blog_models_author_and_published_on_date(

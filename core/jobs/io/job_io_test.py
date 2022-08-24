@@ -61,5 +61,5 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
             )
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)
-        self.assertItemsEqual(result.stdout.split('\n'), ['abc', 'def', 'ghi']) # type: ignore[no-untyped-call]
-        self.assertItemsEqual(result.stderr.split('\n'), ['123', '456', '789']) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(result.stdout.split('\n'), ['abc', 'def', 'ghi'])
+        self.assertItemsEqual(result.stderr.split('\n'), ['123', '456', '789'])

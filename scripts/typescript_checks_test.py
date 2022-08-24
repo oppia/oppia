@@ -58,7 +58,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     config_data['compilerOptions']['outDir'], '')
             compiled_js_dir_swap = self.swap(
                 typescript_checks, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR)
-            with compiled_js_dir_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with compiled_js_dir_swap, self.assertRaisesRegex(
                 Exception,
                 'COMPILED_JS_DIR: %s does not match the output directory '
                 'in %s: %s' % (
@@ -108,14 +108,14 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
-            with self.assertRaisesRegex(SystemExit, '1'):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(SystemExit, '1'):
                 typescript_checks.compile_and_check_typescript(
                     typescript_checks.TSCONFIG_FILEPATH)
 
     def test_no_error_for_invalid_compilation_of_strict_tsconfig(self) -> None:
         """Test that error is produced if stdout is not empty."""
         typescript_checks.TS_STRICT_EXCLUDE_PATHS = []
-        with self.assertRaisesRegex(SystemExit, '1'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(SystemExit, '1'):
             typescript_checks.compile_and_check_typescript(
                 typescript_checks.STRICT_TSCONFIG_FILEPATH)
 

@@ -157,7 +157,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             subscriber_hash)
 
         sample_email_2 = 5
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid type for email. Expected string, received 5'):
             mailchimp_bulk_email_services._get_subscriber_hash(sample_email_2) # type: ignore[arg-type]  # pylint: disable=protected-access
 
@@ -178,14 +178,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         logging_swap = self.swap(logging, 'exception', _mock_logging_function)
         with logging_swap:
             mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
-            self.assertItemsEqual( # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 observed_log_messages, ['Mailchimp API key is not available.'])
 
             observed_log_messages = []
             swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
             with swap_api:
                 mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
-                self.assertItemsEqual( # type: ignore[no-untyped-call]
+                self.assertItemsEqual(
                     observed_log_messages, ['Mailchimp username is not set.'])
 
             # For the tests below, the email ID for the user doesn't matter
@@ -239,7 +239,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 mailchimp.lists.members.users_data[2]['status'], 'subscribed')
 
             mailchimp.lists.members.users_data = None # type: ignore[assignment]
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'Server Error'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_1, True)
@@ -263,7 +263,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(mailchimp.lists.members.users_data), 2)
 
             # Create user raises exception for other errors.
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'Server Issue'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'test5@example.com', True)
@@ -284,7 +284,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(mailchimp.lists.members.users_data), 1)
 
             mailchimp.lists.members.users_data = None # type: ignore[assignment]
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'Server Error'):
                 mailchimp_bulk_email_services.permanently_delete_user_from_list(
                     self.user_email_1)

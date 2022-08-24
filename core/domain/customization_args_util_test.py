@@ -205,7 +205,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid customization arg name: 23'
         ):
@@ -220,7 +220,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             (
                 'Interaction ItemSelectionInput does not support '
@@ -281,7 +281,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # does not contain some of the required specs.
 
         # Check if error is produced for missing customization args.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Customization argument is missing key: allowImproperFraction'
         ):
@@ -293,7 +293,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when arg name is invalid.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid customization arg name: False'
         ):
@@ -308,7 +308,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             (
                 'Interaction FractionInput does not support customization '
@@ -342,7 +342,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # A general check to see if error are produced when customization args
         # is not of type dict.
         customization_args_with_invalid_type = 23
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected customization args to be a dict, received %s'
             % customization_args_with_invalid_type
@@ -374,7 +374,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': ['']}
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Could not convert str to int: 1b'
         ):
             customization_args_util.validate_customization_args_and_values(

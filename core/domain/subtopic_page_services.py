@@ -27,7 +27,7 @@ from core.domain import subtopic_page_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, overload
+from typing import Dict, List, Optional, Sequence, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -248,7 +248,7 @@ def save_subtopic_page(
     committer_id: str,
     subtopic_page: subtopic_page_domain.SubtopicPage,
     commit_message: str,
-    change_list: List[change_domain.BaseChange]
+    change_list: Sequence[change_domain.BaseChange]
 ) -> None:
     """Validates a subtopic page and commits it to persistent storage. If
     successful, increments the version number of the incoming subtopic page

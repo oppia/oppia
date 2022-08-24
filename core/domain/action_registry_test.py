@@ -34,7 +34,7 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         # Testing with invalid action type.
         # Invalid action type raises 'KeyError' with invalid_key
         # as the error message.
-        with self.assertRaisesRegex(KeyError, 'fakeAction'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'fakeAction'):
             action_registry.Registry.get_action_by_type('fakeAction')
 
     def test_can_get_action_by_valid_type(self) -> None:

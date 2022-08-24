@@ -174,7 +174,7 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult(stdout='Request successful')
             ])
 
-            self.assertItemsEqual(  # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 mailchimp.lists.parent_emails, self.first_batch_emails)
 
     def test_job_runs_correctly_for_second_batch(self) -> None:
@@ -197,7 +197,7 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
                 job_run_result.JobRunResult(stdout='Request successful')
             ])
 
-            self.assertItemsEqual(  # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 mailchimp.lists.parent_emails, self.second_batch_emails)
 
     def test_job_runs_correctly_with_invalid_email(self) -> None:
