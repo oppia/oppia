@@ -4904,7 +4904,6 @@ export default {
     "Mathematics": "#cd672b",
     "Algebra": "#cd672b",
     "Arithmetic": "#d68453",
-
     "Calculus": "#b86330",
     "Logic": "#d68453",
     "Combinatorics": "#cf5935",
@@ -4972,6 +4971,11 @@ export default {
     "direction": "ltr",
     "decimal_separator": "."
   }, {
+    "code": "ak",
+    "description": "Ákán (Akan)",
+    "direction": "ltr",
+    "decimal_separator": "."
+  },{
     "code": "ar",
     "description": "العربية (Arabic)",
     "direction": "rtl",
@@ -5967,7 +5971,7 @@ export default {
     "linked_skill_id": null,
     "content": {
       "html": "",
-      "content_id": "<placholder1>"
+      "content_id": "content"
     },
     "interaction": {
       "id": null,
@@ -5977,7 +5981,7 @@ export default {
         "dest": "Introduction",
         "dest_if_really_stuck": null,
         "feedback": {
-          "content_id": "<placholder2>",
+          "content_id": "default_outcome",
           "html": ""
         },
         "labelled_as_correct": false,
@@ -5992,7 +5996,10 @@ export default {
     "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
-      "voiceovers_mapping": {}
+      "voiceovers_mapping": {
+        "content": {},
+        "default_outcome": {}
+      }
     },
     "solicit_answer_details": false,
     "card_is_checkpoint": false,

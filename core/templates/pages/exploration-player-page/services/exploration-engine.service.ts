@@ -367,14 +367,16 @@ export class ExplorationEngineService {
       this.checkAlwaysAskLearnersForAnswerDetails();
       this._loadInitialState(successCallback);
     }
+
+    this.contentTranslationManagerService.init(
+      'exploration', this._explorationId, this.version);
+
     this.contentTranslationLanguageService.init(
       displayableLanguageCodes,
       preferredContentLanguageCodes,
       this.exploration.getLanguageCode()
     );
 
-    this.contentTranslationManagerService.init(
-      'exploration', this._explorationId, this.version);
   }
 
   moveToExploration(successCallback: (StateCard, string) => void): void {

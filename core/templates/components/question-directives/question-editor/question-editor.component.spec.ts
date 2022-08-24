@@ -28,6 +28,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditabilityService } from 'services/editability.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { QuestionEditorComponent } from './question-editor.component';
 
 class MockNgbModal {
@@ -47,6 +48,7 @@ describe('Question Editor Component', () => {
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
   let questionUpdateService: QuestionUpdateService;
+  let generateContentIdService: GenerateContentIdService;
   let question = null;
 
   beforeEach(waitForAsync(() => {
@@ -61,6 +63,7 @@ describe('Question Editor Component', () => {
         StateEditorService,
         StateInteractionIdService,
         QuestionUpdateService,
+        GenerateContentIdService,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -80,6 +83,7 @@ describe('Question Editor Component', () => {
     editabilityService = TestBed.inject(EditabilityService);
     questionUpdateService = TestBed.inject(QuestionUpdateService);
     ngbModal = TestBed.inject(NgbModal);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
 
     question = questionObjectFactory.createFromBackendDict({
       id: '1',
@@ -163,23 +167,12 @@ describe('Question Editor Component', () => {
             }
           }
         },
-        written_translations: {
-          translations_mapping: {
-            content: {
-              en: {
-                data_format: '',
-                needs_update: false,
-                translation: ''
-              }
-            }
-          }
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: null,
       },
+      next_content_id_index: 1,
       inapplicable_skill_misconception_ids: null,
       language_code: 'en',
       linked_skill_ids: [],
@@ -385,12 +378,17 @@ describe('Question Editor Component', () => {
       .toHaveBeenCalledWith(['InapplicableID']);
   });
 
-  it('should save next content ID index when interaction is saved', () => {
-    expect(component.questionStateData.nextContentIdIndex).toBe(null);
+  it('should save next content ID index after generating new id', () => {
+    component.ngOnInit();
 
-    component.saveNextContentIdIndex(2);
+    expect(component.nextContentIdIndexDisplayedValue).toBe(1);
+    expect(component.nextContentIdIndexMemento).toBe(1);
 
-    expect(component.questionStateData.nextContentIdIndex).toBe(2);
+    generateContentIdService.getNextStateId('interaction');
+    component.saveNextContentIdIndex();
+
+    expect(component.nextContentIdIndexDisplayedValue).toBe(2);
+    expect(component.nextContentIdIndexMemento).toBe(2);
   });
 
   it('should show mark all audio needing update modal and mark all unflagged' +

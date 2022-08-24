@@ -19,12 +19,14 @@
 from __future__ import annotations
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -41,10 +43,135 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
 
-(exp_models, opportunity_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.opportunity])
+(
+    exp_models, opportunity_models,
+    translation_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.opportunity,
+    models.NAMES.translation
+])
 
 
+EXP_V46__DICT = utils.dict_from_yaml(
+"""
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Art
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - <p>Choice 1</p>
+              - <p>Choice 2</p>
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - <p>Choice 1</p>
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: <p>Choice 1</p>
+            y: 1
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x: <p>Choice 1</p>
+            y: <p>Choice 2</p>
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
 # Exploration migration backend tests with BEAM jobs involves creating and
 # publishing the exploration. This requires a ElasticSearch stub for running
 # while the backend tests run. JobTestBase does not initialize a
@@ -201,39 +328,85 @@ class MigrateExplorationJobTests(
             'Added node.')
 
     def test_unmigrated_exp_is_migrated(self) -> None:
-        swap_states_schema_48 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
-        swap_exp_schema_53 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category=EXP_V46__DICT["category"],
+            title=EXP_V46__DICT["title"],
+            objective=EXP_V46__DICT["objective"],
+            language_code=EXP_V46__DICT["language_code"],
+            tags=EXP_V46__DICT["tags"],
+            blurb=EXP_V46__DICT["blurb"],
+            author_notes=EXP_V46__DICT["author_notes"],
+            states_schema_version=EXP_V46__DICT["states_schema_version"],
+            init_state_name=EXP_V46__DICT["init_state_name"],
+            states=EXP_V46__DICT["states"],
+            auto_tts_enabled=EXP_V46__DICT["auto_tts_enabled"],
+            correctness_feedback_enabled=EXP_V46__DICT["correctness_feedback_enabled"]
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, "", [])
+        exp_summary_model= exp_models.ExpSummaryModel(**{
+            'id': self.NEW_EXP_ID,
+            'title': exp_model.title,
+            'category': exp_model.category,
+            'objective': exp_model.objective,
+            'language_code': exp_model.language_code,
+            'tags': exp_model.tags,
+            'ratings': None,
+            'scaled_average_rating': 4.0,
+            'exploration_model_last_updated': exp_model.last_updated,
+            'exploration_model_created_on': exp_model.created_on,
+            'first_published_msec': None,
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'community_owned': False,
+            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
+            'contributor_ids': [],
+            'contributors_summary': {},
+            'version': exp_model.version
+        })
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
 
-        with swap_states_schema_48, swap_exp_schema_53:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration( # type: ignore[no-untyped-call]
-                feconf.SYSTEM_COMMITTER_ID, exploration)
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            exp_model.id,
+            exp_model.version,
+            'hi',
+            {}
+        ).put()
 
-            owner_action = user_services.get_user_actions_info(
-                feconf.SYSTEM_COMMITTER_ID)
-            exp_services.publish_exploration_and_update_user_profiles( # type: ignore[no-untyped-call]
-                owner_action, self.NEW_EXP_ID)
-            opportunity_model = (
-                opportunity_models.ExplorationOpportunitySummaryModel(
-                    id=self.NEW_EXP_ID,
-                    topic_id='topic_id1',
-                    topic_name='topic',
-                    story_id='story_id_1',
-                    story_title='A story title',
-                    chapter_title='Title 1',
-                    content_count=20,
-                    incomplete_translation_language_codes=['hi', 'ar'],
-                    translation_counts={'hi': 1, 'ar': 2},
-                    language_codes_needing_voice_artists=['en'],
-                    language_codes_with_assigned_voice_artists=[]))
-            opportunity_model.put()
+        all_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
 
-            self.create_story_linked_to_exploration()
+        self.assertEqual(
+            len(all_translation_models), 1)
 
-            self.assertEqual(exploration.states_schema_version, 48)
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID)
+        exp_services.publish_exploration_and_update_user_profiles( # type: ignore[no-untyped-call]
+            owner_action, self.NEW_EXP_ID)
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[]))
+        opportunity_model.put()
+
+        self.create_story_linked_to_exploration()
+
+        self.assertEqual(exp_model.states_schema_version, 41)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
@@ -256,9 +429,18 @@ class MigrateExplorationJobTests(
             'topic_name': 'topic',
             'chapter_title': 'Title 1',
             'story_title': 'A story title',
-            'content_count': 1,
-            'translation_counts': {},
+            'content_count': 4,
+            'translation_counts': {
+                'hi': 0
+            },
             'translation_in_review_counts': {}}
 
         self.assertEqual(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
+
+        all_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+
+        self.assertEqual(len(all_translation_models), 2)
+        self.assertEqual(
+            [m.entity_version for m in all_translation_models], [1, 2])

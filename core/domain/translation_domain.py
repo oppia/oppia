@@ -153,6 +153,16 @@ class TranslatedContent:
             'needs_update': self.needs_update
         }
 
+    @classmethod
+    def from_dict(cls, translated_content_dict) -> TranslatedContent:
+        """Returns the TranslatedContent object."""
+        return cls(
+            translated_content_dict['content_value'],
+            TranslatableContentFormat(
+                translated_content_dict['content_format']),
+            translated_content_dict['needs_update']
+        )
+
 
 class TranslatableContentsCollection:
     """A class to collect all TranslatableContents from a translatable object
@@ -453,7 +463,7 @@ class EntityTranslation:
                     translated_content.needs_update)
             if isinstance(translated_content.content_value, list):
                 for content_value in translated_content.content_value:
-                    if not isinstance(translated_content.content_value, str):
+                    if not isinstance(content_value, str):
                         raise utils.ValidationError(
                             'content_value must be a string, but got %r' %
                             content_value)

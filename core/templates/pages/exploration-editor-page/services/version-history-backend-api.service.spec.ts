@@ -23,7 +23,7 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { VersionHistoryBackendApiService } from './version-history-backend-api.service';
 
-describe('Version history backend api service', () => {
+fdescribe('Version history backend api service', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let http: HttpTestingController;
   let stateObjectFactory: StateObjectFactory;
@@ -56,15 +56,15 @@ describe('Version history backend api service', () => {
       last_edited_version_number: 1,
       state_name_in_previous_version: 'Introduction',
       state_dict_in_previous_version: stateObjectFactory.createDefaultState(
-        'Introduction'
+        'Introduction', 'content_0', 'default_putcome_1'
       ).toBackendDict(),
       last_edited_committer_username: 'user1'
     };
     const sampleStateVersionHistory = {
       lastEditedVersionNumber: 1,
       stateNameInPreviousVersion: 'Introduction',
-      stateInPreviousVersion: (
-        stateObjectFactory.createDefaultState('Introduction')),
+      stateInPreviousVersion: stateObjectFactory.createDefaultState(
+        'Introduction', 'content_0', 'default_putcome_1'),
       lastEditedCommitterUsername: 'user1'
     };
     versionHistoryBackendApiService.fetchStateVersionHistoryAsync(

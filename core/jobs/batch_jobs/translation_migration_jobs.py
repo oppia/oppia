@@ -92,7 +92,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
             for entity_translation in language_code_to_translation.values():
                 entity_translation.validate()
         except Exception as e:
-            logging.exception('Got exception on main handler')
+            logging.exception(e)
             return result.Err((exploration.id, e))
 
         return result.Ok(language_code_to_translation.values())
@@ -111,19 +111,24 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
         Returns:
             list(suggestion_model). List of suggestion models to update.
         """
-        with datastore_services.get_ndb_context():
-            translation_model = translation_models.EntityTranslationsModel.create_new(
-                entity_translation.entity_type,
-                entity_translation.entity_id,
-                entity_translation.entity_version,
-                entity_translation.language_code,
-                entity_translation.to_dict()['translations']
-            )
-        translation_model.update_timestamps()
-        return translation_model
+        try:
+
+            with datastore_services.get_ndb_context():
+                translation_model = translation_models.EntityTranslationsModel.create_new(
+                    entity_translation.entity_type,
+                    entity_translation.entity_id,
+                    entity_translation.entity_version,
+                    entity_translation.language_code,
+                    entity_translation.to_dict()['translations']
+                )
+            translation_model.update_timestamps()
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((entity_translation.entity_id, e))
+
+        return result.Ok(translation_model)
 
     def run(self):
-
         entity_translations_result = (
             self.pipeline
             | 'Get all exploration models' >> ndb_io.GetModels(
@@ -133,21 +138,46 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
                 self._generate_validated_entity_translations_for_exploration)
         )
 
-        unused_put_results = (
+        new_translation_models_results = (
             entity_translations_result
             | 'Filter the results with OK status' >> beam.Filter(
                 lambda result: result.is_ok())
-            | 'Fetch the models to be put' >> beam.Map(
+            | 'Fetch the translation objects' >> beam.Map(
                 lambda result: result.unwrap())
             | 'Flatten the list of lists of objects' >> beam.FlatMap(
                 lambda x: x)
             | 'Create models from objects' >> beam.Map(
                 self._create_entity_translation_model)
+        )
+
+        (
+            new_translation_models_results
+            | 'Filter model results with OK status' >> beam.Filter(
+                lambda result: result.is_ok())
+            | 'Fetch the models to be put' >> beam.Map(
+                lambda result: result.unwrap())
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
+        traverse_exp_job_run_results = (
             entity_translations_result
-            | 'Transform Results to JobRunResults' >> (
-                job_result_transforms.ResultsToJobRunResults())
+            | 'Generate traverse results' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'EXPLORATION MODELS TRAVERSED'))
+        )
+
+        generate_translations_job_run_results = (
+            new_translation_models_results
+            | 'Generate translation results' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'GENERATED TRANSLATIONS'))
+        )
+
+        return (
+            (
+                generate_translations_job_run_results,
+                traverse_exp_job_run_results
+            )
+            | beam.Flatten()
+
         )

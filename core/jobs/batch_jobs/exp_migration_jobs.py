@@ -27,7 +27,6 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -37,19 +36,19 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Dict, Iterable, Optional, Sequence, Tuple
+from typing import Iterable, List, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
+    from mypy_imports import translation_models
 
-(base_models, exp_models, opportunity_models) = (
+(base_models, exp_models, translation_models) = (
     models.Registry.import_models(
         [models.NAMES.base_model, models.NAMES.exploration,
-         models.NAMES.opportunity]))
+         models.NAMES.translation]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -178,6 +177,41 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         return updated_exp_summary_model
 
+
+    @staticmethod
+    def _extract_required_translation_model(
+        exp_translation_models, exp_version):
+        if not exp_translation_models:
+            return []
+
+        all_models = []
+        for translation_model in list(exp_translation_models[0]):
+            if translation_model.entity_version == exp_version:
+                all_models.append(translation_model)
+        return all_models
+    @staticmethod
+    def _generate_new_translation_model(
+            exp_translation_model: translation_models.EntityTranslationsModel
+        ):
+        """
+        """
+        try:
+            with datastore_services.get_ndb_context():
+                new_model = translation_models.EntityTranslationsModel.create_new(
+                    exp_translation_model.entity_type,
+                    exp_translation_model.entity_id,
+                    exp_translation_model.entity_version + 1,
+                    exp_translation_model.language_code,
+                    exp_translation_model.translations
+                )
+
+                datastore_services.update_timestamps_multi([new_model])
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((exp_translation_model.entity_id, e))
+
+        return result.Ok(new_model)
+
     @staticmethod
     def _update_exploration(
         exp_model: exp_models.ExplorationModel,
@@ -224,103 +258,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 # Here, we are narrowing down the type from object to BaseModel.
                 assert isinstance(model, base_models.BaseModel)
                 models_to_put_values.append(model)
-            if opportunity_services.is_exploration_available_for_contribution(
-                migrated_exp.id
-            ):
-                (
-                    opportunity_services
-                    .update_opportunity_with_updated_exploration(
-                        migrated_exp.id))
         datastore_services.update_timestamps_multi(list(models_to_put_values))
 
         return models_to_put_values
-
-    @staticmethod
-    def _update_exploration_opportunity_summary_models(
-        exp_id: str,
-        migrated_exp: exp_domain.Exploration,
-        exp_id_to_exp_opp_summary_model: Optional[Dict[
-            str,
-            opportunity_models.ExplorationOpportunitySummaryModel
-        ]] = None
-    ) -> Optional[opportunity_models.ExplorationOpportunitySummaryModel]:
-        """Generates newly updated exploration opportunity summary models.
-
-        Args:
-            exp_id: str. The ID of the exploration to be updated.
-            migrated_exp: Exploration. The updated exploration domain object.
-            exp_id_to_exp_opp_summary_model: ExplorationOpportunitySummaryModel.
-                The exploration opportunity summary model.
-
-        Returns:
-            sequence(BaseModel). Sequence of models which should be put into
-            the datastore.
-        """
-        exp_opp_summary_model = None
-        if (
-            exp_id_to_exp_opp_summary_model is not None and
-            exp_id in exp_id_to_exp_opp_summary_model
-        ):
-            content_count = migrated_exp.get_content_count()
-            translation_counts = migrated_exp.get_translation_counts()
-            complete_translation_language_list = (
-                migrated_exp.get_languages_with_complete_translation())
-
-            exp_opp_summary_model = (
-                exp_id_to_exp_opp_summary_model[migrated_exp.id])
-            exp_opp_summary = (
-                opportunity_services
-                    .get_exploration_opportunity_summary_from_model(
-                        exp_opp_summary_model))
-            exp_opp_summary.content_count = content_count
-            exp_opp_summary.translation_counts = translation_counts
-            exp_opp_summary.incomplete_translation_language_codes = (
-                utils.compute_list_difference(
-                    exp_opp_summary
-                    .incomplete_translation_language_codes,
-                    complete_translation_language_list))
-
-            new_languages_for_voiceover = (
-                set(complete_translation_language_list) - set(
-                exp_opp_summary.language_codes_with_assigned_voice_artists)
-            )
-
-            language_codes_needing_voice_artists_set = set(
-                exp_opp_summary.language_codes_needing_voice_artists)
-            language_codes_needing_voice_artists_set |= set(
-                new_languages_for_voiceover)
-
-            exp_opp_summary.language_codes_needing_voice_artists = list(
-                language_codes_needing_voice_artists_set)
-
-            exp_opp_summary.validate()
-
-            with datastore_services.get_ndb_context():
-                exp_opp_summary_model = (
-                    opportunity_models.ExplorationOpportunitySummaryModel(
-                        id=exp_opp_summary.id,
-                        topic_id=exp_opp_summary.topic_id,
-                        topic_name=exp_opp_summary.topic_name,
-                        story_id=exp_opp_summary.story_id,
-                        story_title=exp_opp_summary.story_title,
-                        chapter_title=exp_opp_summary.chapter_title,
-                        content_count=exp_opp_summary.content_count,
-                        incomplete_translation_language_codes=(
-                            exp_opp_summary
-                                .incomplete_translation_language_codes),
-                        translation_counts=exp_opp_summary.translation_counts,
-                        language_codes_needing_voice_artists=(
-                            exp_opp_summary
-                                .language_codes_needing_voice_artists),
-                        language_codes_with_assigned_voice_artists=(
-                            exp_opp_summary
-                                .language_codes_with_assigned_voice_artists)
-                    )
-                )
-
-            datastore_services.update_timestamps_multi([exp_opp_summary_model])
-
-        return exp_opp_summary_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration migration.
@@ -363,18 +303,15 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 lambda exp_summary_model: exp_summary_model.id)
         )
 
-        exp_opp_summary_models = (
+        exp_translation_models = (
             self.pipeline
-            | 'Get all non-deleted exp opportunity summary models' >> (
-                ndb_io.GetModels(
-                    opportunity_models
-                        .ExplorationOpportunitySummaryModel.get_all()))
-            | 'Combine exp opp summary and ids' >> beam.Map(# pylint: disable=no-value-for-parameter
-                lambda model: (model.id, model))
+            | 'Get all translation models' >> (
+                ndb_io.GetModels(translation_models.EntityTranslationsModel.get_all()))
+            | 'Add entity ID from translation model' >> beam.WithKeys(# pylint: disable=no-value-for-parameter
+                lambda translation_model: translation_model.entity_id)
+            | 'Group all translation of exploration' >> beam.GroupByKey()
         )
 
-        exp_opp_summary_models_to_exp = beam.pvalue.AsDict(
-            exp_opp_summary_models)
 
         migrated_exp_results = (
             unmigrated_exploration_models
@@ -408,7 +345,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exp_summary_model': exp_summary_models,
                 'exp_rights_model': exp_rights_models,
                 'exploration': migrated_exp,
-                'exp_changes': exp_changes
+                'exp_changes': exp_changes,
+                'exp_translation_models': exp_translation_models
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
@@ -426,7 +364,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 'exploration': objects['exploration'][0],
                 'exp_rights_model': objects['exp_rights_model'][0],
                 'exp_summary_model': objects['exp_summary_model'][0],
-                'exp_changes': objects['exp_changes']
+                'exp_changes': objects['exp_changes'],
+                'exp_translation_models': (
+                    self._extract_required_translation_model(
+                        objects['exp_translation_models'],
+                        objects['exp_model'][0].version
+                    )
+                )
             })
         )
 
@@ -479,20 +423,35 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
-        exp_opp_summary_models_to_put = (
-            migrated_exp
-            | 'Generate exp opportunity summary models to put' >> (
-                beam.MapTuple(
-                    self._update_exploration_opportunity_summary_models,
-                    exp_id_to_exp_opp_summary_model=(
-                        exp_opp_summary_models_to_exp)))
+        translation_models_results = (
+            transformed_exp_objects_list
+            | 'Fetch translation models' >> beam.Map(
+                lambda x: x['exp_translation_models'])
+            | 'Create list of models' >> beam.FlatMap(lambda x: x)
+            | 'Generate new translation models to put' >> beam.Map(
+                self._generate_new_translation_model)
+        )
+
+        translation_models_job_run_results = (
+            translation_models_results
+            | 'Generate results for new translation models' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'TRANSLATION MODELS GENERATED'))
+        )
+
+        translation_models_to_put = (
+            translation_models_results
+            | 'Filter models generated with Ok status' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap models from the result' >> beam.Map(
+                lambda result_item: result_item.unwrap())
         )
 
         unused_put_results = (
             (
                 exp_models_to_put,
                 exp_summary_models_to_put,
-                exp_opp_summary_models_to_put
+                translation_models_to_put
             )
             | 'Merge models' >> beam.Flatten()
             | 'Filter None models' >> beam.Filter(
@@ -505,7 +464,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 cache_deletion_job_run_results,
                 migrated_exp_job_run_results,
                 exp_objects_list_job_run_results,
-                already_migrated_job_run_results
+                already_migrated_job_run_results,
+                translation_models_job_run_results
             )
             | beam.Flatten()
         )

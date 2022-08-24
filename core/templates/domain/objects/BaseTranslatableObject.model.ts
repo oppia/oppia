@@ -59,7 +59,7 @@ export class BaseTranslatableObject {
     });
   }
 
-  getAllContents(): SubtitledHtml[] {
+  getAllContents(): (SubtitledHtml | SubtitledUnicode)[] {
     let translatableFields = this._translatableFields;
 
     this._translatableObjects.forEach((translatableObject) => {

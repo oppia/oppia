@@ -297,10 +297,12 @@ class ExplorationHandler(base.BaseHandler):
         has_viewed_lesson_info_modal_once = None
 
         displayable_language_codes = []
-        if exp_services.get_story_id_linked_to_exploration(exploration_id):
-            displayable_language_codes = (
-                translation_services.get_displayable_translation_languages(
-                    feconf.TranslatableEntityType.EXPLORATION, exploration))
+        # TODO remove "not"
+        displayable_language_codes = (
+            translation_services.get_displayable_translation_languages(
+                feconf.TranslatableEntityType.EXPLORATION, exploration))
+
+        # if exp_services.get_story_id_linked_to_exploration(exploration_id):
 
         if user_settings is not None:
             preferred_audio_language_code = (

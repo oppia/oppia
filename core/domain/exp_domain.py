@@ -27,6 +27,7 @@ import collections
 import copy
 import datetime
 import json
+import logging
 import re
 import string
 
@@ -2485,6 +2486,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
+    @classmethod
     def _convert_states_v51_dict_to_v52_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:

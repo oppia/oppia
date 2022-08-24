@@ -1608,7 +1608,7 @@ COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 # BaseTranslatableObject.
 ContentValueType = Union[str, List[str]]
 
-MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5
+MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5000
 
 class TranslatableEntityType(enum.Enum):
     """Represents all possible entity types which support new translations

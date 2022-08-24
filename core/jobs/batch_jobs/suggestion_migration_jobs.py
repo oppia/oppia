@@ -18,8 +18,11 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
-from core.domain import exp_fetchers
+from core.domain import question_domain
+from core.domain import question_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
@@ -225,6 +228,112 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             (
                 migrated_suggestion_job_run_results,
                 suggestion_objects_list_job_run_results
+            )
+            | beam.Flatten()
+        )
+
+
+class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
+    """Regenerate question dict in question suggestion to latest schema."""
+    @staticmethod
+    def _migrate_question_dict(question_suggestion_model):
+        """
+        """
+        question_dict = question_suggestion_model.change_cmd['question_dict']
+        versioned_question_state: question_domain.VersionedQuestionStateDict = {
+            'state': question_dict['question_state_data'],
+            'state_schema_version': question_dict[
+                'question_state_data_schema_version']
+        }
+
+        try:
+            next_content_id_index = question_fetchers.migrate_state_schema(
+                versioned_question_state)
+
+            if next_content_id_index is not None:
+                question_dict['next_content_id_index'] = next_content_id_index
+            question_dict['question_state_data_schema_version'] = (
+                versioned_question_state['state_schema_version'])
+
+            suggestion = suggestion_services.get_suggestion_from_model(
+                question_suggestion_model)
+            suggestion.validate()
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((question_suggestion_model.id, e))
+
+        return result.Ok(question_suggestion_model)
+
+    def run(self):
+        question_suggestions = (
+            self.pipeline
+            | 'Get all GeneralSuggestionModels' >> ndb_io.GetModels(
+                suggestion_models.GeneralSuggestionModel.get_all(
+                    include_deleted=False))
+            | 'Filter question suggestions' >> (
+                beam.Filter(
+                    lambda model: (
+                        model.suggestion_type ==
+                        feconf.SUGGESTION_TYPE_ADD_QUESTION
+                        and model.status == suggestion_models.STATUS_IN_REVIEW
+                    ),
+                ))
+        )
+
+        already_migrated_suggestions = (
+            question_suggestions
+            | 'Filter already migrated suggestions' >> beam.Filter(
+                lambda model: (
+                    model.change_cmd['question_dict'][
+                        'question_state_data_schema_version'] == (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION)
+                ))
+        )
+
+        already_migrated_job_run_results = (
+            already_migrated_suggestions
+            | 'Transform suggestions into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'ALREADY MIGRATED'))
+        )
+
+        migrate_suggestion_results = (
+            question_suggestions
+            | 'Filter suggestions required migration' >> beam.Filter(
+                lambda model: (
+                    model.change_cmd['question_dict'][
+                        'question_state_data_schema_version'] != (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION)
+                ))
+            | 'Migrate question_dict in change field' >> beam.Map(
+                self._migrate_question_dict
+            )
+        )
+
+        migrated_suggestions = (
+            migrate_suggestion_results
+            | 'Filter oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+
+        migrated_exp_job_run_results = (
+            migrate_suggestion_results
+            | 'Generate results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'SUGGESTION MIGRATED'))
+        )
+
+        unused_put_results = (
+            migrated_suggestions
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
+
+        return (
+            (
+                already_migrated_job_run_results,
+                migrated_exp_job_run_results
             )
             | beam.Flatten()
         )

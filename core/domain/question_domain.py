@@ -22,6 +22,7 @@ import collections
 import copy
 import datetime
 import re
+import logging
 
 from core import feconf
 from core import schema_utils
@@ -1401,6 +1402,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
         return question_state_dict
 
+    @classmethod
     def _convert_state_v51_dict_to_v52_dict(
         cls, question_state_dict: state_domain.StateDict
     ) -> state_domain.StateDict:
@@ -1430,11 +1432,12 @@ class Question(translation_domain.BaseTranslatableObject):
         del question_state_dict['written_translations']
         states_dict, next_content_id_index = (
             state_domain.State
-            .update_old_content_id_to_new_content_id_in_v52_states(
-                [states_dict])
+            .update_old_content_id_to_new_content_id_in_v52_states({
+                'question_state': question_state_dict
+                })
         )
 
-        return states_dict[0], next_content_id_index
+        return states_dict['question_state'], next_content_id_index
 
     @classmethod
     def update_state_from_model(
@@ -1463,7 +1466,7 @@ class Question(translation_domain.BaseTranslatableObject):
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
 
-        if current_state_schema_version == 51:
+        if current_state_schema_version == 52:
             versioned_question_state['state'], next_content_id_index = (
                 conversion_fn(versioned_question_state['state'])
             )

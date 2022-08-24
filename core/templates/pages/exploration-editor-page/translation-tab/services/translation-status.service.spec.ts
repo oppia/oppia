@@ -26,6 +26,7 @@ import { StateWrittenTranslationsService } from 'components/state-editor/state-e
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 
 class MockNgbModal {
@@ -36,7 +37,7 @@ class MockNgbModal {
   }
 }
 
-describe('Translation status service', () => {
+fdescribe('Translation status service', () => {
   let tss: TranslationStatusService;
   let ess = null;
   let srvs = null;
@@ -60,6 +61,7 @@ describe('Translation status service', () => {
         StateWrittenTranslationsService,
         TranslationTabActiveModeService,
         ExplorationStatesService,
+        GenerateContentIdService,
         {
           provide: NgbModal,
           useClass: MockNgbModal

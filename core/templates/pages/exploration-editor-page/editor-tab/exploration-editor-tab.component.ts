@@ -69,6 +69,7 @@ require('services/site-analytics.service.ts');
 require('services/ngb-modal.service.ts');
 
 import { Subscription } from 'rxjs';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 
 angular.module('oppia').component('explorationEditorTab', {
   bindings: {
@@ -81,7 +82,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'ExplorationInitStateNameService',
     'ExplorationNextContentIdIndexService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'FocusManagerService',
-    'GenerateContentIdService', 'GraphDataService', 'LoaderService',
+    'GenerateContentIdService', 'GraphDataService', 'LoaderService', 'NgbModal',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
@@ -92,7 +93,7 @@ angular.module('oppia').component('explorationEditorTab', {
         ExplorationInitStateNameService,
         ExplorationNextContentIdIndexService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService,
-        GenerateContentIdService, GraphDataService, LoaderService,
+      GenerateContentIdService, GraphDataService, LoaderService, NgbModal,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -290,6 +291,31 @@ angular.module('oppia').component('explorationEditorTab', {
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
           contentIds) {
+        var stateName = StateEditorService.getActiveStateName();
+        var state = ExplorationStatesService.getState(stateName);
+        var recordedVoiceovers = state.recordedVoiceovers;
+        var writtenTranslations = state.writtenTranslations;
+        const shouldPrompt = contentIds.some(contentId => {
+          return recordedVoiceovers.hasUnflaggedVoiceovers(contentId);
+        });
+        if (shouldPrompt) {
+          NgbModal.open(
+            MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
+            backdrop: 'static',
+          }).result.then(function () {
+            contentIds.forEach(contentId => {
+              if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+                recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                  contentId);
+                ExplorationStatesService.saveRecordedVoiceovers(
+                  stateName, recordedVoiceovers);
+              }
+            });
+          }, function () {
+            // This callback is triggered when the Cancel button is
+            // clicked. No further action is needed.
+          });
+        }
       };
 
       ctrl.navigateToState = function(stateName) {
