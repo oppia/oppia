@@ -47,8 +47,8 @@ import { LearnerGroupDetailsComponent } from
   '../create-group/learner-group-details.component';
 import { InviteLearnersModalComponent } from
   '../templates/invite-learners-modal.component';
-import { InviteStudentsComponent }
-  from '../create-group/invite-students.component';
+import { InviteLearnersComponent }
+  from '../create-group/invite-learners.component';
 import { LearnerGroupLearnersProgressComponent }
   from './learner-group-learners-progress.component';
 import { LearnerGroupLearnerSpecificProgressComponent }
@@ -74,7 +74,7 @@ import { LearnerGroupLearnerSpecificProgressComponent }
     LearnerGroupPreferencesComponent,
     LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
-    InviteStudentsComponent,
+    InviteLearnersComponent,
     LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
     AddedSyllabusItemsSuccessfullyModalComponent,
@@ -89,7 +89,7 @@ import { LearnerGroupLearnerSpecificProgressComponent }
     LearnerGroupPreferencesComponent,
     LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
-    InviteStudentsComponent,
+    InviteLearnersComponent,
     LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
     AddedSyllabusItemsSuccessfullyModalComponent,

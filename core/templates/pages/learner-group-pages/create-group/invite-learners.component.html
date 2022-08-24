@@ -1,4 +1,4 @@
-<div class="oppia-invite-students">
+<div class="oppia-invite-learners">
   <div class="form-group">
     <b><span class="oppia-learner-group-invite-search-title" translate="I18N_LEARNER_GROUP_INVITE_LEARNERS_BY_USERNAME"></span></b>
     <input type="text"
@@ -9,17 +9,17 @@
            aria-label="Search bar"
            (keydown.enter)="onSearchQueryChangeExec($event.target.value)">
   </div>
-  <div class="invited-students-container">
-    <div class="invited-students-title">
+  <div class="invited-learners-container">
+    <div class="invited-learners-title">
       <span translate="I18N_LEARNER_GROUP_INVITE_LIST_TEXT"></span>
     </div>
-    <div class="invited-students-inner-container">
-      <div class="invited-student-card" *ngFor="let userInfo of invitedUsersInfo; trackBy: index">
+    <div class="invited-learners-inner-container">
+      <div class="invited-learner-card" *ngFor="let userInfo of invitedUsersInfo; trackBy: index">
         <img [src]="getProfileImageDataUrl(userInfo.userProfilePictureUrl)">
         <div>{{userInfo.username}}</div>
-        <i class="fa fa-times close-button" (click)="removeInvitedStudent(userInfo.username)"></i>
+        <i class="fa fa-times close-button" (click)="removeInvitedLearner(userInfo.username)"></i>
       </div>
-      <div *ngIf="!invitedUsersInfo.length" class="oppia-no-students-invited">
+      <div *ngIf="!invitedUsersInfo.length" class="oppia-no-learners-invited">
         <span translate="I18N_LEARNER_GROUP_NO_LEARNERS_INVITED"></span>
       </div>
     </div>
