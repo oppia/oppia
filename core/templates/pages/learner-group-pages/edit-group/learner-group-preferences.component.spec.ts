@@ -329,7 +329,7 @@ describe('LearnerGroupPreferencesComponent', () => {
     })
   );
 
-  it('should close invitation successfull modal successfully',
+  it('should close invitation successful modal successfully',
     fakeAsync(() => {
       const demoLearnerGroupBackendDict = {
         id: 'groupId',

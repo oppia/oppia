@@ -14,16 +14,14 @@
 
 
 /**
- * @fileoverview Unit tests for the added syllabus successfully items modal
- * component.
+ * @fileoverview Unit tests for the invite successful modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from
-  '@angular/core/testing';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AddedSyllabusItemsSuccessfullyModalComponent } from
-  './added-syllabus-items-successfully-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { InviteSuccessfulModalComponent } from './invite-successful-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -35,14 +33,15 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Exploration Modal Component', function() {
-  let component: AddedSyllabusItemsSuccessfullyModalComponent;
-  let fixture: ComponentFixture<AddedSyllabusItemsSuccessfullyModalComponent>;
+describe('Invite successful Modal Component', function() {
+  let component: InviteSuccessfulModalComponent;
+  let fixture: ComponentFixture<InviteSuccessfulModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        AddedSyllabusItemsSuccessfullyModalComponent
+        InviteSuccessfulModalComponent,
+        MockTranslatePipe
       ],
       providers: [{
         provide: NgbActiveModal,
@@ -53,9 +52,7 @@ describe('Delete Exploration Modal Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      AddedSyllabusItemsSuccessfullyModalComponent
-    );
+    fixture = TestBed.createComponent(InviteSuccessfulModalComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

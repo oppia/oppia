@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Added syllabus items successfully message modal.
+ * @fileoverview Component for Syllabus addition success modal.
  */
 
 import { Component } from '@angular/core';
@@ -21,10 +21,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-added-syllabus-items-successfully-modal',
-  templateUrl: './added-syllabus-items-successfully-modal.component.html'
+  selector: 'oppia-syllabus-addition-success-modal',
+  templateUrl: './syllabus-addition-success-modal.component.html'
 })
-export class AddedSyllabusItemsSuccessfullyModalComponent
+export class SyllabusAdditionSuccessModalComponent
   extends ConfirmOrCancelModal {
   itemsAddedCount!: number;
 

@@ -26,7 +26,7 @@ import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/lear
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AddedSyllabusItemsSuccessfullyModalComponent } from '../templates/added-syllabus-items-successfully-modal.component';
+import { SyllabusAdditionSuccessModalComponent } from '../templates/syllabus-addition-success-modal.component';
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
 
@@ -185,7 +185,7 @@ export class LearnerGroupSyllabusComponent implements OnInit {
     });
 
     let modelRef = this.ngbModal.open(
-      AddedSyllabusItemsSuccessfullyModalComponent, {
+      SyllabusAdditionSuccessModalComponent, {
         backdrop: true,
         windowClass: 'added-syllabus-items-successfully-modal'
       });

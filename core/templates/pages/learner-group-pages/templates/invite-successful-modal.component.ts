@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Invite Successfull modal.
+ * @fileoverview Component for Invite successful modal.
  */
 
 import { Component } from '@angular/core';
@@ -21,10 +21,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-invite-successfull-modal',
-  templateUrl: './invite-successfull-modal.component.html'
+  selector: 'oppia-invite-successful-modal',
+  templateUrl: './invite-successful-modal.component.html'
 })
-export class InviteSuccessfullModalComponent extends ConfirmOrCancelModal {
+export class InviteSuccessfulModalComponent extends ConfirmOrCancelModal {
   successMessage!: string;
   invitedUsernames!: string[];
 

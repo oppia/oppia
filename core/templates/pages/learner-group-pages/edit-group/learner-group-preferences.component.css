@@ -156,7 +156,7 @@
 
 .remove-learner-modal .modal-dialog,
 .withdraw-learner-invitation-modal .modal-dialog,
-.invite-successfull-modal .modal-dialog {
+.invite-successful-modal .modal-dialog {
   margin: 200px auto;
 }
 
@@ -178,22 +178,22 @@
   padding-right: 40px;
 }
 
-.invite-successfull-modal .modal-content,
-.invite-successfull-modal .modal-dialog {
+.invite-successful-modal .modal-content,
+.invite-successful-modal .modal-dialog {
   min-width: unset;
 }
 
-.invite-successfull-modal .modal-header {
+.invite-successful-modal .modal-header {
   border-bottom: unset;
   min-height: unset;
   padding: unset;
 }
 
-.invite-successfull-modal .modal-body {
+.invite-successful-modal .modal-body {
   padding: 50px;
 }
 
-.invite-successfull-modal .close {
+.invite-successful-modal .close {
   cursor: pointer;
   font-size: 2.7rem;
   font-weight: 400;

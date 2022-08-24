@@ -24,7 +24,7 @@ import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-in
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { InviteLearnersModalComponent } from '../templates/invite-learners-modal.component';
-import { InviteSuccessfullModalComponent } from '../templates/invite-successfull-modal.component';
+import { InviteSuccessfulModalComponent } from '../templates/invite-successful-modal.component';
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
 
@@ -125,10 +125,10 @@ export class LearnerGroupPreferencesComponent implements OnInit {
         this.invitedLearnersInfo.push(...data.invitedLearnersInfo);
       });
       let successModalRef = this.ngbModal.open(
-        InviteSuccessfullModalComponent,
+        InviteSuccessfulModalComponent,
         {
           backdrop: 'static',
-          windowClass: 'invite-successfull-modal'
+          windowClass: 'invite-successful-modal'
         }
       );
       successModalRef.componentInstance.successMessage = (

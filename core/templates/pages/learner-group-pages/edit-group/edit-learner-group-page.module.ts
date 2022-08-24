@@ -39,20 +39,22 @@ import { AddSyllabusItemsComponent } from
   '../create-group/add-syllabus-items.component';
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
-import { AddedSyllabusItemsSuccessfullyModalComponent } from
-  '../templates/added-syllabus-items-successfully-modal.component';
+import { SyllabusAdditionSuccessModalComponent } from
+  '../templates/syllabus-addition-success-modal.component';
 import { LearnerGroupPreferencesComponent } from
   './learner-group-preferences.component';
 import { LearnerGroupDetailsComponent } from
   '../create-group/learner-group-details.component';
 import { InviteLearnersModalComponent } from
   '../templates/invite-learners-modal.component';
-import { InviteLearnersComponent }
-  from '../create-group/invite-learners.component';
-import { LearnerGroupLearnersProgressComponent }
-  from './learner-group-learners-progress.component';
-import { LearnerGroupLearnerSpecificProgressComponent }
-  from './learner-group-learner-specific-progress.component';
+import { InviteLearnersComponent } from
+  '../create-group/invite-learners.component';
+import { LearnerGroupLearnersProgressComponent } from
+  './learner-group-learners-progress.component';
+import { LearnerGroupLearnerSpecificProgressComponent } from
+  './learner-group-learner-specific-progress.component';
+import { InviteSuccessfulModalComponent } from
+  '../templates/invite-successful-modal.component';
 
 @NgModule({
   imports: [
@@ -77,9 +79,9 @@ import { LearnerGroupLearnerSpecificProgressComponent }
     InviteLearnersComponent,
     LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
-    AddedSyllabusItemsSuccessfullyModalComponent,
+    SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
-    InviteSuccessfullModalComponent
+    InviteSuccessfulModalComponent
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
@@ -92,9 +94,9 @@ import { LearnerGroupLearnerSpecificProgressComponent }
     InviteLearnersComponent,
     LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
-    AddedSyllabusItemsSuccessfullyModalComponent,
+    SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
-    InviteSuccessfullModalComponent
+    InviteSuccessfulModalComponent
   ],
   providers: [
     {
@@ -131,7 +133,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { InviteSuccessfullModalComponent } from '../templates/invite-successfull-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

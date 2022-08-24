@@ -87,6 +87,10 @@
   color: #757575;
 }
 
+.oppia-learner-group-learners-progress .learner-info img {
+  border-radius: 50%;
+}
+
 .learner-specific-progress-view-selectors {
   display: flex;
   justify-content: space-between;
@@ -108,10 +112,6 @@
   min-width: 218px;
 }
 
-.learner-info img {
-  border-radius: 50%;
-}
-
 .learner-specific-progress-view-selectors .learner-info {
   border-radius: 50%;
   cursor: pointer;
@@ -121,6 +121,10 @@
   height: 26px;
   min-width: 180px;
   padding: 1px;
+}
+
+.learner-specific-progress-view-selectors .learner-info img {
+  border-radius: 50%;
 }
 
 .learner-specific-progress-view-selectors .back-to-all-learners-progress-button {
