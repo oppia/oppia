@@ -261,7 +261,7 @@ describe('Error reporting', function() {
     await browser.expectRequest('POST', '/frontend_errors', 200);
     let creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
     await action.click(
-      'Creator Dashboard radio', createrDashboardRadio);
+      'Creator Dashboard radio', creatorDashboardRadio);
     // Add a 1 second delay to ensure that expected request gets triggered.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(1000);
