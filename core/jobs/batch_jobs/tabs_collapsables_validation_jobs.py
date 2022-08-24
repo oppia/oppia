@@ -167,8 +167,17 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
     @staticmethod
     def invalid_tabs_rte_tag(
         states_dict: Dict[str, state_domain.State]
-    ):
-        """
+    ) -> List[Dict[str, object]]:
+        """Validating the `tabs` RTE tag, validates the following
+            - `tab_contents-with-value` attribute should be present
+            - Atleast one tab should be present inside the tag
+            - RTE tags inside `tabs` should be valid
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            
         """
         errored_values = []
         for state_name, state in states_dict.items():
@@ -204,12 +213,11 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
         return errored_values
 
     @staticmethod
-    def invalid_collapsables_rte_tag(
+    def invalid_collapsibles_rte_tag(
         states_dict: Dict[str, state_domain.State]
     ):
         """
         """
-        # Work is not completed for this part.
         errored_values = []
         for state_name, state in states_dict.items():
             states_with_errored_values = []
@@ -218,34 +226,45 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             for tag in soup:
                 if tag.name != 'oppia-noninteractive-collapsible':
                     continue
+
                 if 'content-with-value' not in tag:
                     states_with_errored_values.append(
                         'No content attr in collapsible tag'
                     )
+                else:
+                    collapsible_content_json = (
+                        html_validation_service.unescape_html(
+                        tag['content-with-value'])
+                    )
+                    collapsible_content_list = json.loads(
+                        collapsible_content_json)
+                    if len(collapsible_content_list) == 0:
+                        states_with_errored_values.append(
+                            'No collapsible content')
+                    for collapsible_content in collapsible_content_list:
+                        states_with_errored_values = (
+                            TabsCollapsablesValidationJob.
+                            _filter_invalid_rte_values(
+                                collapsible_content['content'],
+                                states_with_errored_values
+                            )
+                        )
+
                 if 'heading-with-value' not in tag:
                     states_with_errored_values.append(
                         'No heading attr in collapsible tag'
                     )
                 else:
-                    collapsible_heading_json = html_validation_service.unescape_html(
+                    collapsible_heading_json = (
+                        html_validation_service.unescape_html(
                         tag['heading-with-value'])
-                    collapsible_heading_json = json.loads(collapsible_content_json)
-                    if len(collapsible_heading_json) == 0:
-                        states_with_errored_values.append('No collapsible')
-
-                collapsible_content_json = html_validation_service.unescape_html(
-                    tag['content-with-value'])
-                collapsible_content_list = json.loads(collapsible_content_json)
-                if len(collapsible_content_list) == 0:
-                    states_with_errored_values.append('No collapsible')
-                for collapsible_content in collapsible_content_list:
-                    states_with_errored_values = (
-                        TabsCollapsablesValidationJob.
-                        _filter_invalid_rte_values(
-                            collapsible_content['content'],
-                            states_with_errored_values
-                        )
                     )
+                    collapsible_heading_list = json.loads(
+                        collapsible_heading_json)
+                    if len(collapsible_heading_list) == 0:
+                        states_with_errored_values.append(
+                            'No collapsible heading')
+
             if len(states_with_errored_values) > 0:
                 errored_values.append(
                     {
@@ -279,11 +298,52 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             except Exception:
                 return None
 
+    @staticmethod
+    def convert_into_model_pair(
+        models_list_pair: Tuple[
+          List[exp_models.ExplorationModel],
+          List[opportunity_models.ExplorationOpportunitySummaryModel]
+    ]) -> Tuple[
+        Optional[exp_models.ExplorationModel],
+        Optional[opportunity_models.ExplorationOpportunitySummaryModel]
+    ]:
+        """Returns the pair of exp and opportunity models.
+        Args:
+            models_list_pair: tuple. The pair of models list.
+        Returns:
+            tuple. The pair of exp and opportunity models.
+        """
+        exp_model = None
+        opportunity_model = None
+        if len(models_list_pair[0]) == 1:
+            exp_model = models_list_pair[0][0]
+        if len(models_list_pair[1]) == 1:
+            opportunity_model = models_list_pair[1][0]
+        model_pair = (exp_model, opportunity_model)
+        return model_pair
+
+    @staticmethod
+    def filter_curated_explorations(model_pair: Tuple[
+        Optional[exp_models.ExplorationModel],
+        Optional[opportunity_models.ExplorationOpportunitySummaryModel]
+    ]) -> bool:
+        """Returns whether the exp model is curated or not.
+        Args:
+            model_pair: tuple. The pair of exp and opportunity models.
+        Returns:
+            bool. Returns whether the exp model is curated or not.
+        """
+        return (model_pair[0] is not None) and (model_pair[1] is not None)
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        all_explorations = (
+        exp_model_pipeline = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
+        )
+
+        all_explorations = (
+            exp_model_pipeline
             | 'Get exploration from model' >> beam.Map(
                 self.get_exploration_from_models)
             | 'Filter valid explorations' >> beam.Filter(
@@ -297,24 +357,153 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             )
         )
 
-        invalid_tabs = (
-            combine_exp_ids_and_states
-            | 'Get invalid values' >> beam.MapTuple(
-                lambda exp_id, exp_states, exp_date: (
-                    exp_id, self.invalid_tabs_rte_tag(exp_states), exp_date
-                )
+        exps_with_id_and_models = (
+            exp_model_pipeline
+            | 'Map id and exp model' >> beam.Map(
+                lambda exp: (exp.id, exp)
             )
         )
 
-        report = (
-          invalid_tabs
-          | 'Repirt' >> beam.MapTuple(
-            lambda exp_id, exp_multi_errors, exp_created_on: (
+        all_exp_opportunities = (
+            exps_with_id_and_models
+            | 'Get all ExplorationOpportunitySummaryModels' >>
+                ndb_io.GetModels(
+                    opportunity_models.ExplorationOpportunitySummaryModel
+                        .get_all(include_deleted=False))
+            | 'Create key-value pairs for opportunity models' >> beam.Map(
+                lambda exp_opportunity_model: (
+                    exp_opportunity_model.id, exp_opportunity_model))
+        )
+
+        # Curated exp code is taken from the PR #15298.
+        curated_explorations = (
+            (exps_with_id_and_models, all_exp_opportunities)
+            | 'Combine the PCollections s' >> beam.CoGroupByKey()
+            | 'Drop off the exp ids' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Get tuple pairs from both models' >> beam.Map(
+                self.convert_into_model_pair)
+            | 'Filter curated explorations' >> beam.Filter(
+                self.filter_curated_explorations)
+            | 'Get exploration from the model' >> beam.Map(
+                self.get_exploration_from_models)
+            | 'Filter valid curated explorations' >> beam.Filter(
+                lambda exp: exp is not None)
+            | 'Combine curated exp id and states' >> beam.Map(
+                lambda exp: (exp.id, exp.states, exp.created_on))
+        )
+
+        filter_invalid_tabs = (
+            combine_exp_ids_and_states
+            | 'Get invalid tabs values' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_date: (
+                    exp_id, self.invalid_tabs_rte_tag(exp_states),
+                    exp_date.date()
+                )
+            )
+            | 'Remove empty values in invalid tabs' >> beam.Filter(
+                lambda tabs: len(tabs[1]) > 0
+            )
+        )
+
+        report_invalid_tabs = (
+          filter_invalid_tabs
+          | 'Report invalid tabs value' >> beam.MapTuple(
+            lambda exp_id, tabs_errors, exp_created_on: (
                 job_run_result.JobRunResult.as_stderr(
-                    f'The error is {exp_multi_errors}'
+                    f'The id of the exp is {exp_id}, created on '
+                    f'{exp_created_on} and the invalid tabs values are '
+                    f'{tabs_errors}'
                 )
             )
           )
         )
 
-        return report
+        filter_invalid_curated_tabs = (
+            curated_explorations
+            | 'Get invalid curated tabs values' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_date: (
+                    exp_id, self.invalid_tabs_rte_tag(exp_states),
+                    exp_date.date()
+                )
+            )
+            | 'Remove empty values in invalid curated tabs' >> beam.Filter(
+                lambda tabs: len(tabs[1]) > 0
+            )
+        )
+
+        report_invalid_curated_tabs = (
+          filter_invalid_curated_tabs
+          | 'Report invalid curated tabs value' >> beam.MapTuple(
+            lambda exp_id, tabs_errors, exp_created_on: (
+                job_run_result.JobRunResult.as_stderr(
+                    f'The id of the exp is {exp_id}, created on '
+                    f'{exp_created_on} and the invalid curated tabs values '
+                    f'are {tabs_errors}'
+                )
+            )
+          )
+        )
+
+        filter_invalid_collapsibles = (
+            combine_exp_ids_and_states
+            | 'Get invalid collapsibles values' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_date: (
+                    exp_id, self.invalid_collapsibles_rte_tag(exp_states),
+                    exp_date.date()
+                )
+            )
+            | 'Remove empty values in invalid collapsibles' >> beam.Filter(
+                lambda tabs: len(tabs[1]) > 0
+            )
+        )
+
+        report_invalid_collapsibles = (
+          filter_invalid_collapsibles
+          | 'Report invalid collapsibles value' >> beam.MapTuple(
+            lambda exp_id, collapsibles_errors, exp_created_on: (
+                job_run_result.JobRunResult.as_stderr(
+                    f'The id of the exp is {exp_id}, created on '
+                    f'{exp_created_on} and the invalid collapsibles values '
+                    f'are {collapsibles_errors}'
+                )
+            )
+          )
+        )
+
+        filter_invalid_curated_collapsibles = (
+            curated_explorations
+            | 'Get invalid curated collapsibles values' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_date: (
+                    exp_id, self.invalid_collapsibles_rte_tag(exp_states),
+                    exp_date.date()
+                )
+            )
+            | 'Remove empty values in invalid curated collapsibles'
+            >> beam.Filter(
+                lambda tabs: len(tabs[1]) > 0
+            )
+        )
+
+        report_invalid_curated_collapsibles = (
+          filter_invalid_curated_collapsibles
+          | 'Report invalid curated collapsibles value' >> beam.MapTuple(
+            lambda exp_id, collapsibles_errors, exp_created_on: (
+                job_run_result.JobRunResult.as_stderr(
+                    f'The id of the exp is {exp_id}, created on '
+                    f'{exp_created_on} and the invalid curated collapsibles '
+                    f'values are {collapsibles_errors}'
+                )
+            )
+          )
+        )
+
+        return (
+            (
+                report_invalid_tabs,
+                report_invalid_curated_tabs,
+
+                report_invalid_collapsibles,
+                report_invalid_curated_collapsibles
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
