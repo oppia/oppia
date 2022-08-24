@@ -259,6 +259,10 @@ oppia-tutor-card .conversation-skin-oppia-completed-state-card .conversation-ski
   font-style: italic;
 }
 
+oppia-tutor-card .checkpoint-celebration-modal-container {
+  position: absolute;
+}
+
 /* When the size of the browser is reduced, and the answer submitted is
     correct, the continue button (in the tutor card) hides under the
     Correctness footer and the page cannot be scrolled down further.

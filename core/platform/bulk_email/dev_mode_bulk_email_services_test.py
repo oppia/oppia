@@ -34,7 +34,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_bulk_email_services.add_or_update_user_status(
                 'test@example.com', True)
-            self.assertItemsEqual( # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '
                  'preference in the service provider\'s db to True. Cannot '
@@ -43,7 +43,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages = []
             dev_mode_bulk_email_services.add_or_update_user_status(
                 'test@example.com', False)
-            self.assertItemsEqual( # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '
                  'preference in the service provider\'s db to False. Cannot '
@@ -58,7 +58,7 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_bulk_email_services.permanently_delete_user_from_list(
                 'test@example.com')
-            self.assertItemsEqual( # type: ignore[no-untyped-call]
+            self.assertItemsEqual(
                 observed_log_messages,
                 ['Email ID test@example.com permanently deleted from bulk '
                  'email provider\'s db. Cannot access API, since this is a '

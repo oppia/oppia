@@ -70,7 +70,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'id': correct_id
             }
         ]
-        assert_raises_ctx = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_ctx = self.assertRaisesRegex(
             Exception,
             'Failed to add document to index.')
         with assert_raises_ctx, self.swap(
