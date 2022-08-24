@@ -37,6 +37,7 @@ class PARAM_NAMES(enum.Enum): # pylint: disable=invalid-name
     dummy_parameter = 'dummy_parameter' # pylint: disable=invalid-name
 
     end_chapter_celebration = 'end_chapter_celebration' # pylint: disable=invalid-name
+    checkpoint_celebration = 'checkpoint_celebration' # pylint: disable=invalid-name
 
 
 # Platform parameters should all be defined below.
@@ -56,5 +57,11 @@ Registry.create_platform_parameter(
 Registry.create_feature_flag(
     PARAM_NAMES.end_chapter_celebration,
     'This flag is for the end chapter celebration feature.',
+    platform_parameter_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    PARAM_NAMES.checkpoint_celebration,
+    'This flag is for the checkpoint celebration feature.',
     platform_parameter_domain.FeatureStages.PROD,
 )
