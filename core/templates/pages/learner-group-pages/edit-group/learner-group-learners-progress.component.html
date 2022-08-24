@@ -1,36 +1,36 @@
-<div *ngIf="!isStudentSpecificViewActive()" class="oppia-learner-group-students-progress">
+<div *ngIf="!isLearnerSpecificViewActive()" class="oppia-learner-group-learners-progress">
   <div class="search-bar-label">{{'I18N_LEARNER_GROUP_SEARCH_BY_USERNAME' | translate}}</div>
   <div>
     <input class="search-bar-input"
            type="text"
            [(ngModel)]="searchUsernameQuery"
            (keyup)="getSearchUsernameResults()"
-           placeholder="Search Student"
+           placeholder="Search Learner"
     >
   </div>
-  <div *ngFor="let studentProgress of matchingUsersProgress; let idx = index">
-    <div *ngIf="studentProgress.isProgressSharingTurnedOn" class="student-progress-summary">
-      <div class="student-progress-summary-header">
-        <div class="student-info">
-          <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
-          <div>{{studentProgress.username}}</div>
+  <div *ngFor="let learnerProgress of matchingUsersProgress; let idx = index">
+    <div *ngIf="learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
+      <div class="learner-progress-summary-header">
+        <div class="learner-info">
+          <img [src]="getProfileImageDataUrl(learnerProgress.profilePictureDataUrl)">
+          <div>{{learnerProgress.username}}</div>
         </div>
-        <div class="view-details-button btn btn-primary" (click)="activateStudentSpecificView(studentProgress)">
+        <div class="view-details-button btn btn-primary" (click)="activateLearnerSpecificView(learnerProgress)">
           {{'I18N_LEARNER_GROUP_VIEW_DETAILS' | translate}}
         </div>
       </div>
-      <div class="student-progress-summary-info">
-        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfStudent(idx)}} skills
+      <div class="learner-progress-summary-info">
+        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfLearner(idx)}} skills
           <span class="divider"> | </span>
         </span>
-        <span>Completed {{getCompletedStoriesCountByStudent(idx)}} stories</span>
+        <span>Completed {{getCompletedStoriesCountByLearner(idx)}} stories</span>
       </div>
     </div>
-    <div *ngIf="!studentProgress.isProgressSharingTurnedOn" class="student-progress-summary">
-      <div class="student-progress-summary-header">
-        <div class="student-info">
-          <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
-          <div>{{studentProgress.username}}</div>
+    <div *ngIf="!learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
+      <div class="learner-progress-summary-header">
+        <div class="learner-info">
+          <img [src]="getProfileImageDataUrl(learnerProgress.profilePictureDataUrl)">
+          <div>{{learnerProgress.username}}</div>
         </div>
         <div class="permissions-message gray-message">
           {{'I18N_LEARNER_GROUP_PERMISSION_NOT_GIVEN' | translate}} &nbsp;
@@ -42,44 +42,44 @@
       </div>
     </div>
   </div>
-  <div *ngIf="studentsProgress && matchingUsersProgress.length === 0 && studentsProgress.length > 0" class="gray-message">
+  <div *ngIf="learnersProgress && matchingUsersProgress.length === 0 && learnersProgress.length > 0" class="gray-message">
     <span translate="I18N_NO_RESULTS_FOUND_FOR_MATCHING_USERNAME"></span>
   </div>
-  <div *ngIf="!studentsProgress || studentsProgress.length === 0" class="gray-message">
-    <span translate="I18N_LEARNER_GROUP_PROGRESS_NO_STUDENTS"></span>
+  <div *ngIf="!learnersProgress || learnersProgress.length === 0" class="gray-message">
+    <span translate="I18N_LEARNER_GROUP_PROGRESS_NO_LEARNERS"></span>
   </div>
 </div>
-<div *ngIf="isStudentSpecificViewActive()">
-  <div class="student-specific-progress-view-selectors">
-    <div (click)="disableStudentSpecificView()">
+<div *ngIf="isLearnerSpecificViewActive()">
+  <div class="learner-specific-progress-view-selectors">
+    <div (click)="disableLearnerSpecificView()">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
         <path d="M14 6.125H3.35125L8.2425 1.23375L7 0L0 7L7 14L8.23375 12.7662L3.35125 7.875H14V6.125Z" fill="#333333"/>
       </svg>
-      <span class="back-to-all-students-progress-button"> {{'I18N_LEARNER_GROUP_BACK_TO_ALL_STUDENTS_PROGRESS' | translate}}</span>
+      <span class="back-to-all-learners-progress-button"> {{'I18N_LEARNER_GROUP_BACK_TO_ALL_LEARNERS_PROGRESS' | translate}}</span>
     </div>
-    <div class="student-progress-selection-container">
+    <div class="learner-progress-selection-container">
       {{'I18N_LEARNER_GROUP_SHOWING_PROGRESS_FOR_STUDENT' | translate}}
-      <div class="student-progress-selection">
-        <div class="student-progress-selection-dropdown">
+      <div class="learner-progress-selection">
+        <div class="learner-progress-selection-dropdown">
           <div ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
             <button ngbDropdownToggle
-                    (click)="openSubmenu($event, 'student')"
+                    (click)="openSubmenu($event, 'learner')"
                     type="button"
-                    class="btn dropdown-toggle students-dropdown-toggle"
+                    class="btn dropdown-toggle learners-dropdown-toggle"
                     title="progress">
-              <div class="student-info">
-                <img [src]="getProfileImageDataUrl(specificStudentProgress.profilePictureDataUrl)">
-                <div>{{specificStudentProgress.username}}</div>
+              <div class="learner-info">
+                <img [src]="getProfileImageDataUrl(specificLearnerProgress.profilePictureDataUrl)">
+                <div>{{specificLearnerProgress.username}}</div>
               </div>
             </button>
             <ul ngbDropdownMenu
-                class="students-dropdown-menu dropdown-menu"
+                class="learners-dropdown-menu dropdown-menu"
                 role="menu">
-              <ng-container *ngFor="let studentProgress of studentsProgress">
+              <ng-container *ngFor="let learnerProgress of learnersProgress">
                 <li ngbDropdownItem>
-                  <div class="student-info" (click)="updateStudentSpecificProgress(studentProgress)">
-                    <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
-                    <div>{{studentProgress.username}}</div>
+                  <div class="learner-info" (click)="updateLearnerSpecificProgress(learnerProgress)">
+                    <img [src]="getProfileImageDataUrl(learnerProgress.profilePictureDataUrl)">
+                    <div>{{learnerProgress.username}}</div>
                   </div>
                 </li>
               </ng-container>
@@ -89,7 +89,7 @@
       </div>
     </div>
   </div>
-  <oppia-learner-group-student-specific-progress [studentProgress]="specificStudentProgress"
+  <oppia-learner-group-learner-specific-progress [learnerProgress]="specificLearnerProgress"
                                                  [storiesChaptersProgress]="storiesChaptersProgress">
-  </oppia-learner-group-student-specific-progress>
+  </oppia-learner-group-learner-specific-progress>
 </div>

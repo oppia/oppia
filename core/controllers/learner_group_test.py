@@ -938,6 +938,18 @@ class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['invited_students_info'], invited_student_info)
 
+    def test_getting_info_of_students_as_invalid_facilitator(self):
+        self.login(self.NEW_USER_USERNAME)
+
+        response = self.get_json(
+            '/learner_group_students_info_handler/%s' % self.LEARNER_GROUP_ID
+        )
+        self.assertEqual(
+            response['error'],
+            'You are not a facilitator of this learner group.')
+
+        self.logout()
+
 
 class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     """Checks learner group syllabus being fetched correctly"""

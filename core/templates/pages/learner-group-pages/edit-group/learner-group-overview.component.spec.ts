@@ -144,7 +144,7 @@ describe('LearnerGroupOverviewComponent', () => {
   it('should initialize', fakeAsync(() => {
     spyOn(
       learnerGroupSyllabusBackendApiService,
-      'fetchStudentsProgressInAssignedSyllabus'
+      'fetchLearnersProgressInAssignedSyllabus'
     ).and.returnValue(Promise.resolve([sampleLearnerGroupUserProg]));
     expect(component.activeTab).toBeUndefined();
     expect(component.studentsProgress).toBeUndefined();
@@ -186,7 +186,7 @@ describe('LearnerGroupOverviewComponent', () => {
   it('should get story completions info correctly', fakeAsync(() => {
     spyOn(
       learnerGroupSyllabusBackendApiService,
-      'fetchStudentsProgressInAssignedSyllabus'
+      'fetchLearnersProgressInAssignedSyllabus'
     ).and.returnValue(Promise.resolve([sampleLearnerGroupUserProg]));
 
     component.learnerGroup = learnerGroup;
@@ -205,7 +205,7 @@ describe('LearnerGroupOverviewComponent', () => {
     fakeAsync(() => {
       spyOn(
         learnerGroupSyllabusBackendApiService,
-        'fetchStudentsProgressInAssignedSyllabus'
+        'fetchLearnersProgressInAssignedSyllabus'
       ).and.returnValue(Promise.resolve([sampleLearnerGroupUserProg]));
 
       component.learnerGroup = learnerGroup;

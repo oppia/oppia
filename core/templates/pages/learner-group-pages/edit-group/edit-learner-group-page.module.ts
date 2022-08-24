@@ -49,10 +49,10 @@ import { InviteStudentsModalComponent } from
   '../templates/invite-students-modal.component';
 import { InviteStudentsComponent }
   from '../create-group/invite-students.component';
-import { LearnerGroupStudentsProgressComponent }
-  from './learner-group-students-progress.component';
-import { LearnerGroupStudentSpecificProgressComponent }
-  from './learner-group-student-specific-progress.component';
+import { LearnerGroupLearnersProgressComponent }
+  from './learner-group-learners-progress.component';
+import { LearnerGroupLearnerSpecificProgressComponent }
+  from './learner-group-learner-specific-progress.component';
 
 @NgModule({
   imports: [
@@ -70,9 +70,9 @@ import { LearnerGroupStudentSpecificProgressComponent }
     EditLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupSyllabusComponent,
-    LearnerGroupStudentsProgressComponent,
+    LearnerGroupLearnersProgressComponent,
     LearnerGroupPreferencesComponent,
-    LearnerGroupStudentSpecificProgressComponent,
+    LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
     InviteStudentsComponent,
     LearnerGroupDetailsComponent,
@@ -85,9 +85,9 @@ import { LearnerGroupStudentSpecificProgressComponent }
     EditLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupSyllabusComponent,
-    LearnerGroupStudentsProgressComponent,
+    LearnerGroupLearnersProgressComponent,
     LearnerGroupPreferencesComponent,
-    LearnerGroupStudentSpecificProgressComponent,
+    LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
     InviteStudentsComponent,
     LearnerGroupDetailsComponent,

@@ -677,7 +677,8 @@ class LearnerGroupStudentsInfoHandler(base.BaseHandler):
             self.user_id, learner_group_id)
 
         if not is_valid_request:
-            raise self.PageNotFoundException
+            raise self.UnauthorizedUserException(
+                'You are not a facilitator of this learner group.')
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             learner_group_id)

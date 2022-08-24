@@ -2,7 +2,7 @@
   <div class="learner-group-summary-card">
     <div class="students-info">
       <div class="students-count">{{learnerGroup.studentUsernames.length}}</div>
-      <div>{{'I18N_LEARNER_GROUP_STUDENTS_SECTION' | translate:{studentsCount: learnerGroup.studentUsernames.length, messageFormat: true} }}</div>
+      <div>{{'I18N_LEARNER_GROUP_LEARNERS_SECTION' | translate:{learnersCount: learnerGroup.studentUsernames.length, messageFormat: true} }}</div>
     </div>
     <div class="assigned-skills-info">
       <div class="assigned-skills-count">{{learnerGroup.subtopicPageIds.length}}</div>
@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div class="oppia-learner-group-students-progress-overview">
+  <div class="oppia-learner-group-learners-progress-overview">
     <div class="overview-tab-sections">
       <div class="overview-tab-sections-header">
         <div class="overview-tab-sections-header-title"

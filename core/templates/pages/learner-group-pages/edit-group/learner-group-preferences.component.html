@@ -19,7 +19,7 @@
       <div class="preferences-tab-sections-header-title"
            [ngClass]="{'active': isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)}"
            (click)="setActiveTab(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)">
-        <span [innerHTML]="'I18N_LEARNER_GROUP_STUDENTS_SECTION' | translate: {studentsCount: 0, messageFormat: true}"></span>
+        <span [innerHTML]="'I18N_LEARNER_GROUP_LEARNERS_SECTION' | translate: {learnersCount: 0, messageFormat: true}"></span>
       </div>
     </div>
     <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)" class="edit-learner-group-details-section">
@@ -43,7 +43,7 @@
     <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)" class="edit-learner-group-students-section">
       <button class="btn btn-primary add-new-learner-button"
               (click)="openInviteStudentsModal()">
-        + <span translate="I18N_LEARNER_GROUP_ADD_NEW_STUDENT"></span>
+        + <span translate="I18N_LEARNER_GROUP_ADD_NEW_LEARNER"></span>
       </button>
       <div class="current-group-students" *ngIf="learnerGroup">
         <span class="group-students-title">Current Group Students({{learnerGroup.studentUsernames.length}})</span>
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div *ngIf="currentStudentsInfo.length === 0" class="no-students-text">
-          {{'I18N_LEARNER_GROUP_NO_STUDENTS_HAVE_JOINED' | translate}}
+          {{'I18N_LEARNER_GROUP_NO_LEARNERS_HAVE_JOINED' | translate}}
         </div>
       </div>
       <div class="invited-group-students" *ngIf="learnerGroup">
@@ -83,7 +83,7 @@
           </div>
         </div>
         <div *ngIf="invitedStudentsInfo.length === 0" class="no-students-text">
-          {{'I18N_LEARNER_GROUP_NO_STUDENTS_INVITED' | translate}}
+          {{'I18N_LEARNER_GROUP_NO_LEARNERS_INVITED' | translate}}
         </div>
       </div>
     </div>

@@ -22,7 +22,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NavigationService } from 'services/navigation.service';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
-import { LearnerGroupStudentSpecificProgressComponent } from './learner-group-student-specific-progress.component';
+import { LearnerGroupLearnerSpecificProgressComponent } from './learner-group-learner-specific-progress.component';
 import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
@@ -38,9 +38,9 @@ class MockNavigationService {
   openSubmenu(evt: KeyboardEvent, menuName: string): void {}
 }
 
-describe('LearnerGroupStudentSpecificProgressComponent', () => {
-  let component: LearnerGroupStudentSpecificProgressComponent;
-  let fixture: ComponentFixture<LearnerGroupStudentSpecificProgressComponent>;
+describe('LearnerGroupLearnerSpecificProgressComponent', () => {
+  let component: LearnerGroupLearnerSpecificProgressComponent;
+  let fixture: ComponentFixture<LearnerGroupLearnerSpecificProgressComponent>;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
 
   const sampleLearnerGroupSubtopicSummaryDict = {
@@ -114,7 +114,7 @@ describe('LearnerGroupStudentSpecificProgressComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        LearnerGroupStudentSpecificProgressComponent,
+        LearnerGroupLearnerSpecificProgressComponent,
         MockTranslatePipe,
         MockTrunctePipe
       ],
@@ -132,10 +132,10 @@ describe('LearnerGroupStudentSpecificProgressComponent', () => {
     storyViewerBackendApiService = TestBed.inject(
       StoryViewerBackendApiService);
     fixture = TestBed.createComponent(
-      LearnerGroupStudentSpecificProgressComponent);
+      LearnerGroupLearnerSpecificProgressComponent);
     component = fixture.componentInstance;
 
-    component.studentProgress = sampleLearnerGroupUserProg;
+    component.learnerProgress = sampleLearnerGroupUserProg;
   });
 
   it('should initialize', fakeAsync(() => {
@@ -210,7 +210,7 @@ describe('LearnerGroupStudentSpecificProgressComponent', () => {
   );
 
   it('should check whether chapter is completed correctly', () => {
-    component.studentProgress = sampleLearnerGroupUserProg;
+    component.learnerProgress = sampleLearnerGroupUserProg;
 
     let chapterIsCompleted = component.isChapterCompleted(0, 0);
     expect(chapterIsCompleted).toBeTrue();
@@ -222,7 +222,7 @@ describe('LearnerGroupStudentSpecificProgressComponent', () => {
   it('should get completed chapter progress bar width correctly', () => {
     spyOn(component, 'getAllCheckpointsProgressOfChapter').and.returnValues(
       [1, 1, 1, 2, 0, 0], [1, 2, 0, 0, 0]);
-    component.studentProgress = sampleLearnerGroupUserProg;
+    component.learnerProgress = sampleLearnerGroupUserProg;
 
     let progressWidth = component.getCompletedProgressBarWidth(0, 0);
     expect(progressWidth).toBe(50);
@@ -234,7 +234,7 @@ describe('LearnerGroupStudentSpecificProgressComponent', () => {
   it('should get visited checkpoints count of chapter correctly', () => {
     spyOn(component, 'getAllCheckpointsProgressOfChapter').and.returnValues(
       [1, 1, 1, 2, 0, 0], [1, 2, 0, 0, 0], [0, 0, 0], [1, 1, 1]);
-    component.studentProgress = sampleLearnerGroupUserProg;
+    component.learnerProgress = sampleLearnerGroupUserProg;
 
     let visitedCheckpointsCount = component.getVisitedCheckpointsCount(0, 0);
     expect(visitedCheckpointsCount).toBe(4);
@@ -249,9 +249,9 @@ describe('LearnerGroupStudentSpecificProgressComponent', () => {
     expect(visitedCheckpointsCount).toBe(3);
   });
 
-  it('should get count of subtopics student is struggling with correctly',
+  it('should get count of subtopics learner is struggling with correctly',
     () => {
-      component.studentProgress = sampleLearnerGroupUserProg;
+      component.learnerProgress = sampleLearnerGroupUserProg;
 
       let strugglingSubtopicsCount = component.getStrugglingWithSubtopicsCount(
         'parentTopicName');

@@ -167,7 +167,7 @@ describe('Learner Group Syllabus Backend API Service', () => {
       }];
 
       learnerGroupSyllabusBackendApiService
-        .fetchStudentsProgressInAssignedSyllabus('groupId', ['user1'])
+        .fetchLearnersProgressInAssignedSyllabus('groupId', ['user1'])
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the learner group student specific progress.
+ * @fileoverview Component for the learner group learner specific progress.
  */
 
 import { Component, Input } from '@angular/core';
@@ -27,15 +27,15 @@ import { LearnerGroupUserProgress } from
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 
-import './learner-group-student-specific-progress.component.css';
+import './learner-group-learner-specific-progress.component.css';
 
 
 @Component({
-  selector: 'oppia-learner-group-student-specific-progress',
-  templateUrl: './learner-group-student-specific-progress.component.html'
+  selector: 'oppia-learner-group-learner-specific-progress',
+  templateUrl: './learner-group-learner-specific-progress.component.html'
 })
-export class LearnerGroupStudentSpecificProgressComponent {
-  @Input() studentProgress!: LearnerGroupUserProgress;
+export class LearnerGroupLearnerSpecificProgressComponent {
+  @Input() learnerProgress!: LearnerGroupUserProgress;
   @Input() storiesChaptersProgress!: ChapterProgressSummary[];
   activeTab!: string;
   topicNames: string[] = [];
@@ -53,13 +53,13 @@ export class LearnerGroupStudentSpecificProgressComponent {
 
   ngOnInit(): void {
     this.activeTab = this.EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS;
-    if (this.studentProgress) {
-      this.studentProgress.subtopicsProgress.forEach(subtopicProgress => {
+    if (this.learnerProgress) {
+      this.learnerProgress.subtopicsProgress.forEach(subtopicProgress => {
         if (!this.topicNames.includes(subtopicProgress.parentTopicName)) {
           this.topicNames.push(subtopicProgress.parentTopicName);
         }
       });
-      this.studentProgress.storiesProgress.forEach(storyProgress => {
+      this.learnerProgress.storiesProgress.forEach(storyProgress => {
         this.storyIds.push(storyProgress.getId());
         let previousChaptersCount = (
           this.cummulativeStoryChaptersCount.slice(-1).pop());
@@ -73,7 +73,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
       });
 
       this.storyViewerBackendApiService.fetchProgressInStoriesChapters(
-        this.studentProgress.username, this.storyIds
+        this.learnerProgress.username, this.storyIds
       ).then(storiesChaptersProgress => {
         this.storiesChaptersProgress = storiesChaptersProgress;
       });
@@ -119,7 +119,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
   }
 
   isChapterCompleted(storyIndex: number, chapterIndex: number): boolean {
-    const story = this.studentProgress.storiesProgress[storyIndex];
+    const story = this.learnerProgress.storiesProgress[storyIndex];
     const chapterTitle = story.getNodeTitles()[chapterIndex];
     if (story.getCompletedNodeTitles().includes(chapterTitle)) {
       return true;
@@ -154,7 +154,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
   }
 
   getStrugglingWithSubtopicsCount(topicName: string): number {
-    return this.studentProgress.subtopicsProgress.filter(
+    return this.learnerProgress.subtopicsProgress.filter(
       subtopicProgress => (
         subtopicProgress.parentTopicName === topicName &&
         subtopicProgress.subtopicMastery &&
@@ -165,8 +165,8 @@ export class LearnerGroupStudentSpecificProgressComponent {
 }
 
 angular.module('oppia').directive(
-  'oppiaLearnerGroupStudentSpecificProgress',
+  'oppiaLearnerGroupLearnerSpecificProgress',
   downgradeComponent(
-    {component: LearnerGroupStudentSpecificProgressComponent}
+    {component: LearnerGroupLearnerSpecificProgressComponent}
   )
 );

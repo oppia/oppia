@@ -1,9 +1,9 @@
 <div class="oppia-invite-students">
   <div class="form-group">
-    <b><span class="oppia-learner-group-invite-search-title" translate="I18N_LEARNER_GROUP_INVITE_STUDENTS_BY_USERNAME"></span></b>
+    <b><span class="oppia-learner-group-invite-search-title" translate="I18N_LEARNER_GROUP_INVITE_LEARNERS_BY_USERNAME"></span></b>
     <input type="text"
            class="form-control oppia-search-bar-text-input"
-           [placeholder]="'I18N_LEARNER_GROUP_INVITE_STUDENTS_PLACEHOLDER_TEXT' | translate"
+           [placeholder]="'I18N_LEARNER_GROUP_INVITE_LEARNERS_PLACEHOLDER_TEXT' | translate"
            [(ngModel)]="searchedUsername"
            [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
            aria-label="Search bar"
@@ -20,7 +20,7 @@
         <i class="fa fa-times close-button" (click)="removeInvitedStudent(userInfo.username)"></i>
       </div>
       <div *ngIf="!invitedUsersInfo.length" class="oppia-no-students-invited">
-        <span translate="I18N_LEARNER_GROUP_NO_STUDENTS_INVITED"></span>
+        <span translate="I18N_LEARNER_GROUP_NO_LEARNERS_INVITED"></span>
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
-<div class="oppia-learner-group-student-specific-progress">
-  <div class="oppia-learner-group-students-progress-overview">
+<div class="oppia-learner-group-learner-specific-progress">
+  <div class="oppia-learner-group-learners-progress-overview">
     <div class="overview-tab-sections">
       <div class="overview-tab-sections-header">
         <div class="overview-tab-sections-header-title"
@@ -15,8 +15,8 @@
       </div>
       <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
         <div class="tab-description">
-          <span>{{studentProgress.username}}'s Progress in Assigned Skills</span>
-          <div *ngIf="studentProgress" class="all-subtopics-progress">
+          <span>{{learnerProgress.username}}'s Progress in Assigned Skills</span>
+          <div *ngIf="learnerProgress" class="all-subtopics-progress">
             <div *ngFor="let topicName of topicNames" class="progress-dropdown">
               <mat-accordion>
                 <mat-expansion-panel hideToggle>
@@ -35,11 +35,11 @@
                       </div>
                     </mat-panel-title>
                   </mat-expansion-panel-header>
-                  <div *ngFor="let subtopicProgress of studentProgress.subtopicsProgress; let idx = index;">
+                  <div *ngFor="let subtopicProgress of learnerProgress.subtopicsProgress; let idx = index;">
                     <div *ngIf="subtopicProgress.parentTopicName === topicName">
                       <div class="subtopic-progress-card">
                         <div *ngIf="subtopicProgress.subtopicMastery && subtopicProgress.subtopicMastery < 0.6" class="struggling-with-subtopic">
-                          <span [innerHTML]="'I18N_STRUGGLING_WITH_SKILL' | translate: { username: studentProgress.username }"></span>
+                          <span [innerHTML]="'I18N_STRUGGLING_WITH_SKILL' | translate: { username: learnerProgress.username }"></span>
                         </div>
                         <div class="subtopic-progress-info">
                           <div class="subtopic-title">{{subtopicProgress.subtopicTitle}}</div>
@@ -68,9 +68,9 @@
         </div>
       </div>
       <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
-        <span class="tab-description">{{studentProgress.username}}'s Progress in Assigned Stories</span>
-        <div *ngIf="studentProgress" class="all-stories-progress">
-          <div *ngFor="let storyProgress of studentProgress.storiesProgress; let storyIndex = index" class="progress-dropdown story-progress-dropdown">
+        <span class="tab-description">{{learnerProgress.username}}'s Progress in Assigned Stories</span>
+        <div *ngIf="learnerProgress" class="all-stories-progress">
+          <div *ngFor="let storyProgress of learnerProgress.storiesProgress; let storyIndex = index" class="progress-dropdown story-progress-dropdown">
             <mat-accordion>
               <mat-expansion-panel hideToggle>
                 <mat-expansion-panel-header>

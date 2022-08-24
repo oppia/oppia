@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the learner group all students progress.
+ * @fileoverview Component for the learner group all learners progress.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -25,18 +25,18 @@ import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { NavigationService } from 'services/navigation.service';
 
-import './learner-group-students-progress.component.css';
+import './learner-group-learners-progress.component.css';
 
 
 @Component({
-  selector: 'oppia-learner-group-students-progress',
-  templateUrl: './learner-group-students-progress.component.html'
+  selector: 'oppia-learner-group-learners-progress',
+  templateUrl: './learner-group-learners-progress.component.html'
 })
-export class LearnerGroupStudentsProgressComponent implements OnInit {
+export class LearnerGroupLearnersProgressComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
-  studentsProgress: LearnerGroupUserProgress[] = [];
-  studentSpecificProgressViewIsActive = false;
-  specificStudentProgress!: LearnerGroupUserProgress;
+  learnersProgress: LearnerGroupUserProgress[] = [];
+  learnerSpecificProgressViewIsActive = false;
+  specificLearnerProgress!: LearnerGroupUserProgress;
   searchUsernameQuery: string = '';
   matchingUsersProgress: LearnerGroupUserProgress[] = [];
   storiesChaptersProgress: ChapterProgressSummary[] = [];
@@ -51,16 +51,16 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
   ngOnInit(): void {
     if (this.learnerGroup.studentUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
-        .fetchStudentsProgressInAssignedSyllabus(
+        .fetchLearnersProgressInAssignedSyllabus(
           this.learnerGroup.id, this.learnerGroup.studentUsernames
-        ).then(studentsProgress => {
-          this.studentsProgress = studentsProgress;
-          this.matchingUsersProgress = this.studentsProgress;
+        ).then(learnersProgress => {
+          this.learnersProgress = learnersProgress;
+          this.matchingUsersProgress = this.learnersProgress;
         });
     }
   }
 
-  getCompletedStoriesCountByStudent(index: number): number {
+  getCompletedStoriesCountByLearner(index: number): number {
     let completedStoriesCount = 0;
     const storiesProgress = this.matchingUsersProgress[index].storiesProgress;
     storiesProgress.forEach(storyProgress => {
@@ -74,7 +74,7 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
     return completedStoriesCount;
   }
 
-  getStrugglingSubtopicsCountOfStudent(index: number): number {
+  getStrugglingSubtopicsCountOfLearner(index: number): number {
     let strugglingSubtopicsCount = 0;
     const subtopicsProgress = (
       this.matchingUsersProgress[index].subtopicsProgress);
@@ -92,32 +92,32 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
     return decodeURIComponent(dataUrl);
   }
 
-  activateStudentSpecificView(
-      studentProgress: LearnerGroupUserProgress
+  activateLearnerSpecificView(
+      learnerProgress: LearnerGroupUserProgress
   ): void {
-    this.studentSpecificProgressViewIsActive = true;
-    this.specificStudentProgress = studentProgress;
+    this.learnerSpecificProgressViewIsActive = true;
+    this.specificLearnerProgress = learnerProgress;
   }
 
-  isStudentSpecificViewActive(): boolean {
-    return this.studentSpecificProgressViewIsActive;
+  isLearnerSpecificViewActive(): boolean {
+    return this.learnerSpecificProgressViewIsActive;
   }
 
-  disableStudentSpecificView(): void {
-    this.studentSpecificProgressViewIsActive = false;
+  disableLearnerSpecificView(): void {
+    this.learnerSpecificProgressViewIsActive = false;
   }
 
-  updateStudentSpecificProgress(
-      studentProgress: LearnerGroupUserProgress
+  updateLearnerSpecificProgress(
+      learnerProgress: LearnerGroupUserProgress
   ): void {
-    this.specificStudentProgress = studentProgress;
+    this.specificLearnerProgress = learnerProgress;
     let syllabusStoryIds: string[] = [];
-    studentProgress.storiesProgress.forEach(storyProgress => {
+    learnerProgress.storiesProgress.forEach(storyProgress => {
       syllabusStoryIds.push(storyProgress.getId());
     });
 
     this.storyViewerBackendApiService.fetchProgressInStoriesChapters(
-      studentProgress.username, syllabusStoryIds
+      learnerProgress.username, syllabusStoryIds
     ).then(storiesChaptersProgress => {
       this.storiesChaptersProgress = storiesChaptersProgress;
     });
@@ -125,10 +125,10 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
 
   getSearchUsernameResults(): LearnerGroupUserProgress[] {
     if (this.searchUsernameQuery === '') {
-      this.matchingUsersProgress = this.studentsProgress;
+      this.matchingUsersProgress = this.learnersProgress;
     }
-    this.matchingUsersProgress = this.studentsProgress.filter(
-      studentProgress => studentProgress.username.toLowerCase().includes(
+    this.matchingUsersProgress = this.learnersProgress.filter(
+      learnerProgress => learnerProgress.username.toLowerCase().includes(
         this.searchUsernameQuery.toLocaleLowerCase())
     );
     return this.matchingUsersProgress;
@@ -146,5 +146,5 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaLearnerGroupStudentsProgress',
-  downgradeComponent({component: LearnerGroupStudentsProgressComponent}));
+  'oppiaLearnerGroupLearnersProgress',
+  downgradeComponent({component: LearnerGroupLearnersProgressComponent}));

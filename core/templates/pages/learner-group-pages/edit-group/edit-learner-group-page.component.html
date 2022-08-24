@@ -52,7 +52,7 @@
           </svg>
         </span>
         <span class="oppia-dashboard-view-tabs-item-text">
-          {{'I18N_LEARNER_GROUP_STUDENTS_PROGRESS_TAB' | translate}}
+          {{'I18N_LEARNER_GROUP_LEARNERS_PROGRESS_TAB' | translate}}
         </span>
       </div>
       <div class="oppia-dashboard-view-tabs-item"
@@ -117,7 +117,7 @@
       <oppia-learner-group-syllabus [learnerGroup]="learnerGroup"></oppia-learner-group-syllabus>
     </div>
     <div *ngIf="activeTab === EDIT_LEARNER_GROUP_TABS_I18N_IDS.STUDENTS_PROGRESS">
-      <oppia-learner-group-students-progress [learnerGroup]="learnerGroup"></oppia-learner-group-students-progress>
+      <oppia-learner-group-learners-progress [learnerGroup]="learnerGroup"></oppia-learner-group-learners-progress>
     </div>
     <div *ngIf="activeTab === EDIT_LEARNER_GROUP_TABS_I18N_IDS.PREFERENCES">
       <oppia-learner-group-preferences [learnerGroup]="learnerGroup"></oppia-learner-group-preferences>

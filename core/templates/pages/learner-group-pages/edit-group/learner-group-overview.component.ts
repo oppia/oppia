@@ -51,7 +51,7 @@ export class LearnerGroupOverviewComponent implements OnInit {
     this.activeTab = this.EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS;
     if (this.learnerGroup && this.learnerGroup.studentUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
-        .fetchStudentsProgressInAssignedSyllabus(
+        .fetchLearnersProgressInAssignedSyllabus(
           this.learnerGroup.id, this.learnerGroup.studentUsernames
         ).then(studentsProgress => {
           this.studentsProgress = studentsProgress;

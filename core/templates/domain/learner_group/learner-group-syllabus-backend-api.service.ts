@@ -87,7 +87,7 @@ export class LearnerGroupSyllabusBackendApiService {
     });
   }
 
-  async fetchStudentsProgressInAssignedSyllabus(
+  async fetchLearnersProgressInAssignedSyllabus(
       learnerGroupId: string,
       studentUsernames: string[]
   ): Promise<LearnerGroupUserProgress[]> {

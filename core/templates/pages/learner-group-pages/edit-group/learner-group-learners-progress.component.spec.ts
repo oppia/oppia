@@ -24,7 +24,7 @@ import { NavigationService } from 'services/navigation.service';
 import { LearnerGroupSyllabusBackendApiService } from
   'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupStudentsProgressComponent } from './learner-group-students-progress.component';
+import { LearnerGroupLearnersProgressComponent } from './learner-group-learners-progress.component';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
@@ -40,9 +40,9 @@ class MockNavigationService {
   openSubmenu(evt: KeyboardEvent, menuName: string): void {}
 }
 
-describe('LearnerGroupStudentsProgressComponent', () => {
-  let component: LearnerGroupStudentsProgressComponent;
-  let fixture: ComponentFixture<LearnerGroupStudentsProgressComponent>;
+describe('LearnerGroupLearnersProgressComponent', () => {
+  let component: LearnerGroupLearnersProgressComponent;
+  let fixture: ComponentFixture<LearnerGroupLearnersProgressComponent>;
   let learnerGroupSyllabusBackendApiService:
     LearnerGroupSyllabusBackendApiService;
   let navigationService: NavigationService;
@@ -116,7 +116,7 @@ describe('LearnerGroupStudentsProgressComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        LearnerGroupStudentsProgressComponent,
+        LearnerGroupLearnersProgressComponent,
         MockTranslatePipe,
         MockTrunctePipe
       ],
@@ -136,7 +136,7 @@ describe('LearnerGroupStudentsProgressComponent', () => {
     navigationService = TestBed.inject(NavigationService);
     storyViewerBackendApiService = TestBed.inject(
       StoryViewerBackendApiService);
-    fixture = TestBed.createComponent(LearnerGroupStudentsProgressComponent);
+    fixture = TestBed.createComponent(LearnerGroupLearnersProgressComponent);
     component = fixture.componentInstance;
 
     component.learnerGroup = learnerGroup;
@@ -145,7 +145,7 @@ describe('LearnerGroupStudentsProgressComponent', () => {
   it('should initialize', fakeAsync(() => {
     spyOn(
       learnerGroupSyllabusBackendApiService,
-      'fetchStudentsProgressInAssignedSyllabus'
+      'fetchLearnersProgressInAssignedSyllabus'
     ).and.returnValue(Promise.resolve([sampleLearnerGroupUserProg]));
 
     expect(component.learnerGroup).toEqual(learnerGroup);
@@ -153,38 +153,38 @@ describe('LearnerGroupStudentsProgressComponent', () => {
     component.ngOnInit();
     tick(100);
 
-    expect(component.studentsProgress).toEqual([sampleLearnerGroupUserProg]);
+    expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
     expect(component.matchingUsersProgress).toEqual(
       [sampleLearnerGroupUserProg]);
   }));
 
-  it('should get count of completed stories by student correctly', () => {
-    component.studentsProgress = [sampleLearnerGroupUserProg];
+  it('should get count of completed stories by learner correctly', () => {
+    component.learnersProgress = [sampleLearnerGroupUserProg];
     component.matchingUsersProgress = [sampleLearnerGroupUserProg];
 
-    expect(component.getCompletedStoriesCountByStudent(0)).toBe(1);
+    expect(component.getCompletedStoriesCountByLearner(0)).toBe(1);
   });
 
-  it('should get count of struggling subtopics of student correctly', () => {
-    component.studentsProgress = [sampleLearnerGroupUserProg];
+  it('should get count of struggling subtopics of learner correctly', () => {
+    component.learnersProgress = [sampleLearnerGroupUserProg];
     component.matchingUsersProgress = [sampleLearnerGroupUserProg];
 
-    expect(component.getStrugglingSubtopicsCountOfStudent(0)).toBe(1);
+    expect(component.getStrugglingSubtopicsCountOfLearner(0)).toBe(1);
   });
 
-  it('should manipulate student specific progress view successfully', () => {
-    expect(component.isStudentSpecificViewActive()).toBeFalse();
+  it('should manipulate learner specific progress view successfully', () => {
+    expect(component.isLearnerSpecificViewActive()).toBeFalse();
 
-    component.activateStudentSpecificView(sampleLearnerGroupUserProg);
-    expect(component.isStudentSpecificViewActive()).toBeTrue();
+    component.activateLearnerSpecificView(sampleLearnerGroupUserProg);
+    expect(component.isLearnerSpecificViewActive()).toBeTrue();
 
-    component.disableStudentSpecificView();
-    expect(component.isStudentSpecificViewActive()).toBeFalse();
+    component.disableLearnerSpecificView();
+    expect(component.isLearnerSpecificViewActive()).toBeFalse();
   });
 
-  it('should search student progress with username matching keyword correctly',
+  it('should search learner progress with username matching keyword correctly',
     () => {
-      component.studentsProgress = [sampleLearnerGroupUserProg];
+      component.learnersProgress = [sampleLearnerGroupUserProg];
       component.matchingUsersProgress = [sampleLearnerGroupUserProg];
 
       component.searchUsernameQuery = '';
@@ -209,10 +209,10 @@ describe('LearnerGroupStudentsProgressComponent', () => {
     const clickEvent = new KeyboardEvent('click');
     spyOn(navigationService, 'openSubmenu');
 
-    component.openSubmenu(clickEvent, 'student');
+    component.openSubmenu(clickEvent, 'learner');
 
     expect(navigationService.openSubmenu).toHaveBeenCalledWith(
-      clickEvent, 'student');
+      clickEvent, 'learner');
   });
 
   it('should update learner specific progress successfully', fakeAsync(() => {
@@ -226,10 +226,10 @@ describe('LearnerGroupStudentsProgressComponent', () => {
     spyOn(storyViewerBackendApiService, 'fetchProgressInStoriesChapters')
       .and.returnValue(Promise.resolve([chaptersProgress]));
 
-    component.updateStudentSpecificProgress(sampleLearnerGroupUserProg);
+    component.updateLearnerSpecificProgress(sampleLearnerGroupUserProg);
     tick(100);
 
-    expect(component.specificStudentProgress).toEqual(
+    expect(component.specificLearnerProgress).toEqual(
       sampleLearnerGroupUserProg);
     expect(component.storiesChaptersProgress).toEqual([chaptersProgress]);
   }));
