@@ -23,7 +23,7 @@ from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
 
 from mailchimp3 import mailchimpclient
-from typing import Any, Dict
+from typing import Dict
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):
@@ -156,6 +156,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             mailchimp_bulk_email_services._get_subscriber_hash(sample_email), # pylint: disable=protected-access
             subscriber_hash)
 
+        # TODO(#13528): Here we use MyPy ignore because we remove this test
+        # after the backend is fully type-annotated. Here ignore[arg-type]
+        # is used to test method _get_subscriber_hash() for invalid argument
+        # type.
         sample_email_2 = 5
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'Invalid type for email. Expected string, received 5'):
@@ -164,14 +168,12 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_get_mailchimp_class_error(self) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(
-                msg: str, *args: Any, **unused_kwargs: Any) -> None:
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.exception().
 
             Args:
                 msg: str. The logging message.
                 *args: list(*). A list of arguments.
-                **unused_kwargs: *. Keyword arguments.
             """
             observed_log_messages.append(msg % args)
 
@@ -188,9 +190,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 self.assertItemsEqual( # type: ignore[no-untyped-call]
                     observed_log_messages, ['Mailchimp username is not set.'])
 
-            # For the tests below, the email ID for the user doesn't matter
-            # since the function should return earlier if mailchimp api key or
-            # username is not set.
+            # Here we use MyPy ignore because for the below test, the email
+            # ID for the user doesn't matter since the function should return
+            # earlier if mailchimp api key or username is not set.
             # Permanently deletes returns None when mailchimp keys are not set.
             self.assertIsNone(
                 mailchimp_bulk_email_services.permanently_delete_user_from_list( # type: ignore[func-returns-value]
@@ -238,6 +240,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 mailchimp.lists.members.users_data[2]['status'], 'subscribed')
 
+            # Here we use MyPy ignore because attribute 'users_data' can only
+            # accept Dict but for testing purposes here we are providing None
+            # which causes mypy to throw an error. Thus to avoid the error, we
+            # used ignore here.
             mailchimp.lists.members.users_data = None # type: ignore[assignment]
             with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 Exception, 'Server Error'):
@@ -283,6 +289,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 self.user_email_1)
             self.assertEqual(len(mailchimp.lists.members.users_data), 1)
 
+            # Here we use MyPy ignore because attribute 'users_data' can only
+            # accept Dict but for testing purposes here we are providing None
+            # which causes mypy to throw an error. Thus to avoid the error, we
+            # used ignore here.
             mailchimp.lists.members.users_data = None # type: ignore[assignment]
             with self.assertRaisesRegex( # type: ignore[no-untyped-call]
                 Exception, 'Server Error'):

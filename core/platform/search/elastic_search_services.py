@@ -58,8 +58,8 @@ def _create_index(index_name: str) -> None:
     ES.indices.create(index_name)
 
 
-# In the type annotation below Dict[str, Any] is used for documents because
-# there are no constraints for a document dictionary.
+# Here we use type Any because the argument 'documents' represents the list of
+# document dictionaries and there are no constraints for a document dictionary.
 # This can be seen from the type stubs of elastic search.
 # The type of 'body' here is Any.
 # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
@@ -141,9 +141,9 @@ def clear_index(index_name: str) -> None:
         })
 
 
-# In the type annotation below Dict[str, Any] is used in return type because
-# it returns the list of documents and document dictionaries can have
-# any value.
+# Here we use type Any because this method returns the list of document
+# dictionaries and document dictionaries can have any value. So, that's why
+# return value have Dict[str, Any] type.
 # This can be seen from the type stubs of elastic search.
 # The type of 'body' here is 'Any'.
 # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
@@ -199,9 +199,8 @@ def search(
     # Convert the query into a Query DSL object. See
     # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
     # for more details about Query DSL.
-    # In the type annotation below Dict[str, Any] is used for query_definiton
-    # because the query_definition is a dictionary having values of various
-    # types.
+    # Here we use type Any because the query_definition is a dictionary having
+    # values of various types.
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
