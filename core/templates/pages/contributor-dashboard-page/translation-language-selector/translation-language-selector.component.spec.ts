@@ -263,6 +263,22 @@ describe('Translation language selector', () => {
     });
   });
 
+  it('should toggle dropdown', () => {
+    component.ngOnInit();
+
+    expect(component.dropdownShown).toBe(false);
+
+    component.toggleDropdown();
+
+    expect(component.dropdownShown).toBe(true);
+    expect(component.optionsFilter).toBe('');
+    expect(component.filteredOptions).toBe(component.options);
+
+    component.toggleDropdown();
+
+    expect(component.dropdownShown).toBe(false);
+  });
+
   it('should filter language options based on the filter text', () => {
     component.ngOnInit();
 
