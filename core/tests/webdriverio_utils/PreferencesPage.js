@@ -24,7 +24,7 @@ var workflow = require('../webdriverio_utils/workflow.js');
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
-  var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+  var creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');
   var deleteAccountButton = $('.e2e-test-delete-account-button');
   var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
@@ -201,7 +201,7 @@ var PreferencesPage = function() {
 
   this.selectCreatorDashboard = async function() {
     await action.click(
-      'Creator Dashboard radio', createrDashboardRadio);
+      'Creator Dashboard radio', creatorDashboardRadio);
     await saveNewChanges('Creator Dashboard Option');
   };
 
