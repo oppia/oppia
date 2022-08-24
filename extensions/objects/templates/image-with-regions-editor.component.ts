@@ -416,6 +416,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   onSvgMouseMove(evt: MouseEvent): void {
     const svgElement: SVGSVGElement = this.el.nativeElement.querySelectorAll(
       '.oppia-image-with-regions-editor-svg')[0];
+    // The method Element.getBoundingClientRect() does not provide coordinates
+    // relative to the top-left corner of the document. To fix this, the scroll
+    // coordinates are added to the left and top attributes of
+    // getBoundingClientRect().
+    // See https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect.
     this.mouseX = evt.pageX - (
       svgElement.getBoundingClientRect().left +
       this.windowRef.nativeWindow.scrollX);
