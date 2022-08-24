@@ -938,11 +938,14 @@ class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['invited_students_info'], invited_student_info)
 
+        self.logout()
+
     def test_getting_info_of_students_as_invalid_facilitator(self):
-        self.login(self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
 
         response = self.get_json(
-            '/learner_group_students_info_handler/%s' % self.LEARNER_GROUP_ID
+            '/learner_group_students_info_handler/%s' % self.LEARNER_GROUP_ID,
+            expected_status_int=401
         )
         self.assertEqual(
             response['error'],
