@@ -2198,7 +2198,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         state.update_interaction_answer_groups(state_answer_group)
         states = {'Introduction': state}
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'States with a null destination can never be a checkpoint.'
         ):
@@ -2227,7 +2227,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.dest = None
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'States with a null destination can never be a checkpoint'
         ):

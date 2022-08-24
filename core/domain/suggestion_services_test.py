@@ -870,7 +870,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
+        exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1039,7 +1039,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
+        exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

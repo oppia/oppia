@@ -56,7 +56,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.get_deletion_policy()
 
     def test_apply_deletion_policy(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The apply_deletion_policy() method is missing from the '

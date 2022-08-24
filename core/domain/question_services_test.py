@@ -711,7 +711,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question = question_services.get_question_by_id(self.question_id)
         question.created_on = None
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No data available for when the question was last_updated'
         ):

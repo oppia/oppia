@@ -33,13 +33,13 @@ class ObjectRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
-        with self.assertRaisesRegex(TypeError, 'not a valid object class'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not a valid object class'):
             object_registry.Registry.get_object_class_by_type('FakeClass')
 
     def test_base_object_is_not_gettable(self) -> None:
         """Tests that BaseObject exists and cannot be set as an obj_type."""
         assert getattr(objects, 'BaseObject')
-        with self.assertRaisesRegex(TypeError, 'not a valid object class'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not a valid object class'):
             object_registry.Registry.get_object_class_by_type('BaseObject')
 
 

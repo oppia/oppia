@@ -91,10 +91,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         # Save a few explorations.
         self.save_new_valid_exploration(
@@ -1604,7 +1604,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add topics to config_domain.
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+        csrf_token = self.get_new_csrf_token()
         new_config_value = [{
             'name': 'math',
             'url_fragment': 'math',
@@ -1620,7 +1620,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                     new_config_value),
             }
         }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)  # type: ignore[no-untyped-call]
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
         self.logout()
 
         self.login(self.USER_EMAIL)
@@ -2128,7 +2128,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add topics to config_domain.
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+        csrf_token = self.get_new_csrf_token()
         new_config_value = [{
             'name': 'math',
             'url_fragment': 'math',
@@ -2144,7 +2144,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                     new_config_value),
             }
         }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)  # type: ignore[no-untyped-call]
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
         self.logout()
 
         # Add activities to the completed section.

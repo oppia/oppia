@@ -124,7 +124,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         self.story.created_on = None
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No data available for when the story was last_updated'
         ):

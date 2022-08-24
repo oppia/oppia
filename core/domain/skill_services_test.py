@@ -93,18 +93,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('admin2@example.com', 'adm2')
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME, 'adm2'])  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME, 'adm2'])
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
         self.user_admin_2 = user_services.get_user_actions_info(
             self.user_id_admin_2)
 
-        self.skill = self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='Description',
             misconceptions=misconceptions,
             skill_contents=skill_contents,
@@ -123,7 +123,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'invalid_property_name')]
 
-        with self.assertRaisesRegex(Exception, 'Invalid change dict.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid change dict.'):
             skill_services.apply_change_list(
                 self.SKILL_ID, invalid_skill_change_list, self.user_id_a)  # type: ignore[arg-type]
 
@@ -142,7 +142,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         skill.created_on = None
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No data available for when the skill was last_updated'
         ):
@@ -179,7 +179,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
 
     def test_get_new_skill_id(self) -> None:
         new_skill_id = skill_services.get_new_skill_id()
@@ -192,7 +192,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
         )
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -210,7 +210,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 })
             )
         )
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_id_2', self.user_id_admin, description='Description 2',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -245,7 +245,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
         )
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -263,7 +263,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 })
             )
         )
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_id_2', self.user_id_admin, description='Description 2',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -347,7 +347,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
 
     def test_get_filtered_skill_summaries(self) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
         augmented_skill_summaries, next_cursor, more = (
@@ -396,10 +396,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_cursor_behaves_correctly_when_fetching_skills_in_batches(
         self
     ) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=[])
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID3, self.USER_ID, description='Description3',
             prerequisite_skill_ids=[])
 
@@ -418,7 +418,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_filter_skills_by_status_all(self) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
@@ -439,7 +439,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_filter_skills_by_status_assigned(self) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
@@ -470,7 +470,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_filter_skills_by_status_unassigned(self) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
@@ -490,7 +490,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
@@ -526,12 +526,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_filter_skills_by_keywords(self) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Alpha',
             misconceptions=None,
             skill_contents=None,
             prerequisite_skill_ids=[])
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID3, self.USER_ID, description='Beta',
             misconceptions=None,
             skill_contents=None,
@@ -735,7 +735,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'Found topic \'Topic1\' contains the two skills to be merged. '
             'Please unassign one of these skills from topic '
             'and retry this operation.')
-        with self.assertRaisesRegex(Exception, error_message):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_message):
             skill_services.replace_skill_id_in_all_topics(
                 self.USER_ID, self.SKILL_ID, 'new_skill_id')
 
@@ -939,7 +939,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
         self.assertEqual(skill_model, None)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The suggestion with id %s has already been accepted/'
             'rejected.' % suggestion.suggestion_id):
             suggestion_services.auto_reject_question_suggestions_for_skill_id(
@@ -955,13 +955,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected a commit message, received none.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, '')
 
     def test_cannot_update_skill_with_empty_changelist(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save skill'):
@@ -980,7 +980,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
         skill_model.version = 0
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 0 of skill '
             'from version 1. Please reload the page and try again.'):
@@ -989,7 +989,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'Change language code.')
 
         skill_model.version = 2
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Trying to update version 2 of skill from version 1, which is too '
             'old. Please reload the page and try again.'):
@@ -1007,7 +1007,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The user does not have enough rights to edit the '
             'skill description.'):
@@ -1187,7 +1187,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_skill_has_associated_questions(self) -> None:
         skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
 
         # Testing that no question is linked to a skill.
         self.assertEqual(
@@ -1250,7 +1250,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
@@ -1273,7 +1273,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'Name'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1291,7 +1291,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': True
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1302,7 +1302,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
             'skill_id': 'skill_id_1'
         })]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The skill is already a prerequisite skill.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1313,7 +1313,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
             'skill_id': 'skill_id_5'
         })]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The skill to remove is not a prerequisite skill.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1326,7 +1326,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'explanations': ['<p>Explanation</p>']
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is no rubric for the given difficulty.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1338,7 +1338,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'misconception_id': 0
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Delete misconception')
@@ -1353,7 +1353,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new description'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1369,7 +1369,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new feedback'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is no misconception with the given id.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist,
@@ -1401,10 +1401,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_get_categorized_skill_ids_and_descriptions(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         linked_skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             linked_skill_id, self.user_id_admin, description='Description 3')
         subtopic_skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             subtopic_skill_id, self.user_id_admin,
             description='Subtopic Skill')
 

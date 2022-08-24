@@ -97,9 +97,9 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
 
     def test_gets_pending_deletion_request(self) -> None:
         wipeout_service.save_pending_deletion_requests(
@@ -205,17 +205,17 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.add_user_role(
             self.USER_1_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
         self.add_user_role(
             self.USER_1_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
-        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
 
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -290,7 +290,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         email_preferences = user_services.get_email_preferences(self.user_1_id)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             observed_log_messages,
             ['Email ID %s permanently deleted from bulk email provider\'s db. '
              'Cannot access API, since this is a dev environment'
@@ -385,7 +385,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
         with self.mock_datetime_utcnow(date_10_days_ago):
             self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
-        user_3_id = self.get_user_id_from_email(self.USER_3_EMAIL)  # type: ignore[no-untyped-call]
+        user_3_id = self.get_user_id_from_email(self.USER_3_EMAIL)
 
         wipeout_service.pre_delete_user(user_3_id)
         self.process_and_flush_pending_tasks()
@@ -606,7 +606,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'get_user_settings',
             user_settings
         ):
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception,
                 'No data available for when the user was created on.'
             ):
@@ -624,13 +624,13 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         date_10_days_ago = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
         with self.mock_datetime_utcnow(date_10_days_ago):
             self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
@@ -644,7 +644,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic_1], next_subtopic_id=2)
 
-        self.set_topic_managers([self.USER_1_USERNAME], self.topic_id)  # type: ignore[no-untyped-call]
+        self.set_topic_managers([self.USER_1_USERNAME], self.topic_id)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -845,8 +845,8 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
 
         app_feedback_report_models.AppFeedbackReportModel(
             id=self.REPORT_ID_1,
@@ -937,7 +937,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     def test_raises_error_when_field_name_is_not_provided_with_commit_model(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Field name can only be None when commit log model class'
         ):
@@ -1067,8 +1067,8 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         app_feedback_report_models.AppFeedbackReportModel(
             id=self.REPORT_ID_1,
             platform=self.PLATFORM_ANDROID,
@@ -1172,8 +1172,8 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         config_models.ConfigPropertyModel(
             id=self.CONFIG_1_ID, value='a'
         ).commit(self.user_1_id, [{'cmd': 'command'}])
@@ -1359,7 +1359,7 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         config_model = config_models.ConfigPropertyModel(
             id=self.CONFIG_2_ID, value='a'
         )
@@ -1410,8 +1410,8 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
         self.publish_collection(self.user_1_id, self.COL_1_ID)
         rights_manager.assign_role_for_collection(
@@ -1485,7 +1485,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             collection_models.CollectionRightsSnapshotContentModel.get_by_id(
                 '%s-3' % self.COL_1_ID)
         )
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             rights_content_model_2.content['owner_ids'],
             [
                 collection_mappings[self.COL_1_ID],
@@ -1538,7 +1538,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             log_messages,
             [
                 '[WIPEOUT] The commit log model '
@@ -1763,7 +1763,7 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
         self.publish_collection(self.user_1_id, self.COL_1_ID)
         self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
@@ -1814,8 +1814,8 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
         self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         rights_manager.assign_role_for_exploration(
@@ -1889,7 +1889,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
                 '%s-3' % self.EXP_1_ID)
         )
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             rights_content_model_2.content['owner_ids'],
             [
                 exploration_mappings[self.EXP_1_ID],
@@ -1941,7 +1941,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             log_messages,
             [
                 '[WIPEOUT] The commit log model '
@@ -2153,7 +2153,7 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
         self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
@@ -2207,8 +2207,8 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         feedback_models.GeneralFeedbackThreadModel(
             id=self.FEEDBACK_1_ID,
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
@@ -2426,7 +2426,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         feedback_models.GeneralFeedbackThreadModel(
             id=self.FEEDBACK_1_ID,
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
@@ -2501,7 +2501,7 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.improvements_model_1_id = (
             improvements_models.TaskEntryModel.create(
                 entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
@@ -2567,7 +2567,7 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         improvements_models.TaskEntryModel.create(
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_1_ID,
@@ -2639,11 +2639,11 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))  # type: ignore[no-untyped-call]
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
-        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)  # type: ignore[no-untyped-call]
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.USER_1_USERNAME, self.USER_2_USERNAME])
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
+        self.save_new_question(
             self.QUESTION_1_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC'),
@@ -2769,7 +2769,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, question_mappings[self.QUESTION_1_ID])
 
     def test_multiple_questions_are_pseudonymized(self) -> None:
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_2_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC'),
@@ -2816,7 +2816,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
     def test_multiple_questions_with_multiple_users_are_pseudonymized(
         self
     ) -> None:
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
             self._create_valid_question_data('ABC'),
@@ -2985,17 +2985,17 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))  # type: ignore[no-untyped-call]
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
-        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)  # type: ignore[no-untyped-call]
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.USER_1_USERNAME, self.USER_2_USERNAME])
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
+        self.save_new_question(
             self.QUESTION_1_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC'),
             [self.SKILL_1_ID]
         )
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
             self._create_valid_question_data('ABC'),
@@ -3043,10 +3043,10 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))  # type: ignore[no-untyped-call]
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
-        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.USER_1_USERNAME, self.USER_2_USERNAME])
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -3145,7 +3145,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, skill_mappings[self.SKILL_1_ID])
 
     def test_multiple_skills_are_pseudonymized(self) -> None:
-        self.save_new_skill(self.SKILL_2_ID, self.user_1_id)  # type: ignore[no-untyped-call]
+        self.save_new_skill(self.SKILL_2_ID, self.user_1_id)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -3175,7 +3175,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
     def test_multiple_skills_with_multiple_users_are_pseudonymized(
         self
     ) -> None:
-        self.save_new_skill(self.SKILL_2_ID, self.user_2_id)  # type: ignore[no-untyped-call]
+        self.save_new_skill(self.SKILL_2_ID, self.user_2_id)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -3293,11 +3293,11 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))  # type: ignore[no-untyped-call]
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
-        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)  # type: ignore[no-untyped-call]
-        self.save_new_skill(self.SKILL_2_ID, self.user_2_id)  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.USER_1_USERNAME, self.USER_2_USERNAME])
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
+        self.save_new_skill(self.SKILL_2_ID, self.user_2_id)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -3346,8 +3346,8 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_topic(
             self.TOPIC_1_ID,
             self.user_1_id,
@@ -3608,8 +3608,8 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_topic(
             self.TOPIC_1_ID, self.user_1_id, abbreviated_name='abbrev-four',
             url_fragment='frag-four')
@@ -3662,17 +3662,17 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     USER_2_EMAIL: Final = 'some-other@email.com'
     USER_2_USERNAME: Final = 'username2'
     TOP_1_ID: Final = 'top_1_id'
-    SUBTOP_1_ID: Final = 'subtop_1_id'
-    SUBTOP_2_ID: Final = 'subtop_2_id'
+    SUBTOP_1_ID: Final = 1
+    SUBTOP_2_ID: Final = 2
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
-        self.subtopic_page = self.save_new_subtopic(  # type: ignore[no-untyped-call]
+        self.subtopic_page = self.save_new_subtopic(
             self.SUBTOP_1_ID, self.user_1_id, self.TOP_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
@@ -3704,7 +3704,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     def test_one_subtopic_with_missing_snapshot_is_pseudonymized(self) -> None:
         subtopic_models.SubtopicPageCommitLogEntryModel(
             id='%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID),
-            subtopic_page_id=self.SUBTOP_2_ID,
+            subtopic_page_id=str(self.SUBTOP_2_ID),
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
@@ -3782,7 +3782,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
 
     def test_multiple_subtopics_are_pseudonymized(self) -> None:
-        self.save_new_subtopic(self.SUBTOP_2_ID, self.user_1_id, self.TOP_1_ID)  # type: ignore[no-untyped-call]
+        self.save_new_subtopic(self.SUBTOP_2_ID, self.user_1_id, self.TOP_1_ID)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -3820,7 +3820,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     def test_multiple_subtopics_with_multiple_users_are_pseudonymized(
         self
     ) -> None:
-        self.save_new_subtopic(self.SUBTOP_2_ID, self.user_2_id, self.TOP_1_ID)  # type: ignore[no-untyped-call]
+        self.save_new_subtopic(self.SUBTOP_2_ID, self.user_2_id, self.TOP_1_ID)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -3956,14 +3956,14 @@ class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     USER_1_EMAIL: Final = 'some@email.com'
     USER_1_USERNAME: Final = 'username1'
     TOP_1_ID: Final = 'top_1_id'
-    SUBTOP_1_ID: Final = 'subtop_1_id'
+    SUBTOP_1_ID: Final = 1
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
-        self.save_new_subtopic(self.SUBTOP_1_ID, self.user_1_id, self.TOP_1_ID)  # type: ignore[no-untyped-call]
+        self.save_new_subtopic(self.SUBTOP_1_ID, self.user_1_id, self.TOP_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -4010,8 +4010,8 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_1_ID,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
@@ -4167,8 +4167,8 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_1_ID,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
@@ -4239,8 +4239,8 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         user_services.add_user_role(
             self.user_1_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
         user_services.add_user_role(
@@ -4323,7 +4323,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             topic_models.TopicRightsSnapshotContentModel.get_by_id(
                 '%s-3' % self.TOP_1_ID)
         )
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             rights_content_model_2.content['manager_ids'],
             [
                 topic_mappings[self.TOP_1_ID],
@@ -4366,7 +4366,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             log_messages,
             [
                 '[WIPEOUT] The commit log model \'TopicCommitLogEntryModel\' '
@@ -4507,7 +4507,7 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
@@ -4557,8 +4557,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         user_models.CompletedActivitiesModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[],
             story_ids=[], learnt_topic_ids=[]
@@ -4573,7 +4573,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
         ).put()
-        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -4877,11 +4877,11 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertIsNone(user_services.get_user_settings(
             self.profile_user_id, strict=False
         ))
-        with self.assertRaisesRegex(Exception, 'User not found.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
             user_services.update_preferred_language_codes(
                 self.user_1_id, ['en'])
-        with self.assertRaisesRegex(Exception, 'User not found.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             # Try to do some action with the deleted user.
             user_services.update_preferred_language_codes(
                 self.profile_user_id, ['en'])
@@ -4899,9 +4899,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -5061,8 +5061,8 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_1_ID,
             author_id=self.user_1_id,
@@ -5305,10 +5305,10 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
         self.signup(self.USER_4_EMAIL, self.USER_4_USERNAME)
 
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_3_id = self.get_user_id_from_email(self.USER_3_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_4_id = self.get_user_id_from_email(self.USER_4_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.user_3_id = self.get_user_id_from_email(self.USER_3_EMAIL)
+        self.user_4_id = self.get_user_id_from_email(self.USER_4_EMAIL)
 
         learner_group_models.LearnerGroupModel(
             id=self.LEARNER_GROUP_ID_1,
@@ -5465,7 +5465,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         user_models.CompletedActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[],
             story_ids=[], learnt_topic_ids=[]
@@ -5576,7 +5576,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         user_models.CompletedActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[],
             story_ids=[], learnt_topic_ids=[]
@@ -5687,8 +5687,8 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.version_history_model_class = (
             exp_models.ExplorationVersionHistoryModel)
         self.save_new_valid_exploration(self.EXPLORATION_ID_0, self.user_1_id)

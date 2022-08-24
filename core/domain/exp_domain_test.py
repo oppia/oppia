@@ -590,7 +590,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
         self.init_state.update_card_is_checkpoint(False)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of first state to '
             'be True but found it to be False'):
             self.exploration.validate(strict=True)
@@ -608,7 +608,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
         self.end_state.update_card_is_checkpoint(True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of terminal state '
             'to be False but found it to be True'):
             self.exploration.validate(strict=True)
@@ -974,7 +974,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # d_state becomes bypassable. Hence, making d_state a checkpoint raises
         # validation error.
         d_state.update_card_is_checkpoint(True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
@@ -1349,7 +1349,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         destination = exploration.init_state_name
 
         outcome.dest = None
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration, 'Every outcome should have a destination.')
 
         outcome.dest = destination
@@ -1563,13 +1563,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
         self.set_interaction_for_state(init_state, 'TextInput')
         init_state.update_interaction_default_outcome(None)
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
@@ -1602,7 +1602,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
 
@@ -2406,7 +2406,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert exploration.init_state.interaction.default_outcome is not None
         exploration.init_state.interaction.default_outcome.dest = None
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Every outcome should have a destination.'):
             exploration.validate()
 

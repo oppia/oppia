@@ -112,17 +112,17 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.voice_artist_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
 
@@ -179,7 +179,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
             'new_value': 4
         })]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No classifier algorithm found for NumericInput interaction'
         ):
@@ -361,7 +361,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(exp_services.get_interaction_id_for_state(
             self.EXP_0_ID, 'Introduction'), 'MultipleChoiceInput')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There exist no state in the exploration'):
             exp_services.get_interaction_id_for_state(
                 self.EXP_0_ID, 'Fake state name')
@@ -644,7 +644,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
@@ -701,12 +701,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_1_id '
             'not found'):
@@ -777,7 +777,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
@@ -801,12 +801,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_1_id '
             'not found'):
@@ -836,7 +836,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id An_exploration_0_id '
             'not found'):
@@ -1097,7 +1097,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_that_default_exploration_fails_strict_validation(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_0_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'This state does not have any interaction specified.'
             ):
@@ -1177,7 +1177,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(retrieved_exp_summary.contributor_ids, [self.owner_id])
 
     def test_apply_change_list(self) -> None:
-        self.save_new_linear_exp_with_state_names_and_interactions(  # type: ignore[no-untyped-call]
+        self.save_new_linear_exp_with_state_names_and_interactions(
             self.EXP_0_ID, self.owner_id, ['State 1', 'State 2'],
             ['TextInput'], category='Algebra',
             correctness_feedback_enabled=True)
@@ -1315,7 +1315,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(utils.ValidationError, error_string):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(exploration, True)
 
     def test_validate_exploration_for_correctness_feedback_not_enabled(
@@ -1330,7 +1330,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(utils.ValidationError, error_string):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(exploration, True)
 
     def test_validate_exploration_for_default_category(self) -> None:
@@ -1344,7 +1344,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(utils.ValidationError, error_string):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(exploration, True)
 
     def test_validate_exploration_for_param_specs(self) -> None:
@@ -1359,7 +1359,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         errors = exp_services.validate_exploration_for_story(exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(utils.ValidationError, error_string):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(exploration, True)
 
     def test_validate_exploration_for_invalid_interaction_id(self) -> None:
@@ -1406,7 +1406,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             updated_exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 updated_exploration, True)
@@ -1456,7 +1456,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             updated_exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 updated_exploration, True)
@@ -1494,7 +1494,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
@@ -1515,7 +1515,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
@@ -1565,7 +1565,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
@@ -1599,7 +1599,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
@@ -1729,7 +1729,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'category': 'category 1',
             }])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'Exploration(id=exp_id_1, version=1, states_schema_version=3) '
@@ -1780,14 +1780,14 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
     def test_load_demo_with_invalid_demo_exploration_id_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid demo exploration id invalid_exploration_id'):
             exp_services.load_demo('invalid_exploration_id')
 
     def test_delete_demo_with_invalid_demo_exploration_id_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid demo exploration id invalid_exploration_id'):
             exp_services.delete_demo('invalid_exploration_id')
 
@@ -1968,7 +1968,7 @@ title: Title
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_loading_recent_yaml_loads_exploration_for_user(self) -> None:
         exp_services.save_new_exploration_from_yaml_and_assets(
@@ -2171,7 +2171,7 @@ title: Title
             self.DEFAULT_OUTCOME_AUDIO_FILE,
             self.HINT_AUDIO_FILE, self.SOLUTION_AUDIO_FILE)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid YAML file: missing schema version'):
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.owner_id, yaml_with_no_schema_version, self.EXP_ID, [])
@@ -3403,7 +3403,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_invalid_param_changes(self) -> None:
         """Check that updates cannot be made to non-existent parameters."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             r'The parameter with name \'myParam\' .* does not exist .*'
         ):
@@ -3423,7 +3423,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'name': 'all',
             'generator_id': 'RandomSelector'
         }]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             re.escape(
                 'The parameter name \'all\' is reserved. Please choose '
@@ -3449,7 +3449,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list, '')
 
         self.param_changes[0]['generator_id'] = 'fake'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid generator ID'
         ):
             exp_services.update_exploration(
@@ -3628,7 +3628,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'Add state name')
 
         self.interaction_default_outcome['dest'] = 'State 2'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Editing interaction handlers is no longer supported'
             ):
@@ -3802,7 +3802,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_state_invalid_state(self) -> None:
         """Test that rule destination states cannot be non-existent."""
         self.interaction_answer_groups[0]['outcome']['dest'] = 'INVALID'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The destination INVALID is not a valid state'
             ):
@@ -3841,7 +3841,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that parameters in rules must have the correct type."""
         self.interaction_answer_groups[0]['rule_specs'][0][
             'inputs']['x'] = 'abc'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Value has the wrong type. It should be a NonnegativeInt. '
             'The value is abc'
@@ -4388,7 +4388,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected solicit_answer_details to be a bool, received ')):
             exp_services.update_exploration(
@@ -4418,7 +4418,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected solicit_answer_details to be a bool, received ')):
             exp_services.update_exploration(
@@ -4543,7 +4543,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.card_is_checkpoint, True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected card_is_checkpoint to be a bool, received ')):
             exp_services.update_exploration(
@@ -4572,7 +4572,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected card_is_checkpoint to be a bool, received ')):
             exp_services.update_exploration(
@@ -4592,7 +4592,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_content_missing_key(self) -> None:
         """Test that missing keys in content yield an error."""
-        with self.assertRaisesRegex(KeyError, 'content_id'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'content_id'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name, 'content', {
@@ -4660,7 +4660,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_written_translations_with_list_fails(self) -> None:
         """Test update content translation with a list fails."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected written_translations to be a dict, received '):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -4712,7 +4712,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'version %s, received %s' % (
                 latest_schema_version, not_latest_schema_version)
         )
-        with self.assertRaisesRegex(Exception, exception_string):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, exception_string):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, migration_change_list,
                 'Ran Exploration Migration job.')
@@ -4746,7 +4746,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
         """Check published explorations demand commit messages."""
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is public so expected a commit message but received '
             'none.'
@@ -4808,7 +4808,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_snapshots_metadata(self) -> None:
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
-        second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)  # type: ignore[no-untyped-call]
+        second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
 
         v1_exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
@@ -4890,7 +4890,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # Using the old version of the exploration should raise an error.
         change_list_swap = self.swap_to_always_return(
             exp_services, 'apply_change_list', value=v1_exploration)
-        with change_list_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with change_list_swap, self.assertRaisesRegex(
             Exception, 'version 1, which is too old'):
             exp_services.update_exploration(
                 second_committer_id, self.EXP_0_ID, None, 'commit_message')
@@ -5006,7 +5006,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Perform an invalid action: delete a state that does not exist. This
         # should not create a new version.
-        with self.assertRaisesRegex(ValueError, 'does not exist'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'does not exist'):
             exploration.delete_state('invalid_state_name')
 
         # Now delete the new state.
@@ -5082,7 +5082,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # It is not possible to revert from anything other than the most
         # current version.
-        with self.assertRaisesRegex(Exception, 'too old'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'too old'):
             exp_services.revert_exploration(
                 'committer_id_v4', self.EXP_0_ID, 2, 1)
 
@@ -5195,7 +5195,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state'
         }]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: Trying to find change list from version %s '
             'of exploration to version %s.'
@@ -5681,8 +5681,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.albert = user_services.get_user_actions_info(self.albert_id)
         self.bob = user_services.get_user_actions_info(self.bob_id)
 
@@ -5725,7 +5725,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_exploration(self.albert_id, self.EXP_ID_1)
 
             # This commit should not be recorded.
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'This exploration cannot be published'
                 ):
                 rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
@@ -5740,7 +5740,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     def test_get_next_page_of_all_non_private_commits_with_invalid_max_age(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'max_age must be a datetime.timedelta instance. or None.'):
             exp_services.get_next_page_of_all_non_private_commits(
@@ -5784,7 +5784,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             self.assertEqual(set(categories), set(expected_exp_categories))
             return ids
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)  # type: ignore[no-untyped-call]
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
             search_services,
             'add_documents_to_index',
@@ -5837,7 +5837,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             actual_docs.extend(docs)
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)  # type: ignore[no-untyped-call]
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
             search_services,
             'add_documents_to_index',
@@ -5943,7 +5943,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
     def test_get_demo_exploration_components_with_invalid_path_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unrecognized file path: invalid_path'):
             exp_services.get_demo_exploration_components('invalid_path')
 
@@ -5963,8 +5963,8 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         super().setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
     def test_is_exp_summary_editable(self) -> None:
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
@@ -6142,7 +6142,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         exp_rights = rights_manager.get_exploration_rights(
             'exp_id', strict=True)
         exploration.created_on = None
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No data available for when the exploration was'
         ):
             exp_services.generate_new_exploration_summary(
@@ -6157,7 +6157,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         exp_rights = rights_manager.get_exploration_rights(
             'exp_id', strict=True)
         exploration.created_on = None
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No data available for when the exploration was'
         ):
             exp_services.generate_new_exploration_summary(
@@ -6200,8 +6200,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.albert = user_services.get_user_actions_info(self.albert_id)
         self.bob = user_services.get_user_actions_info(self.bob_id)
 
@@ -6232,7 +6232,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This exploration cannot be published'
             ):
             rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
@@ -6308,7 +6308,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         }
 
         # Check actual summaries equal expected summaries.
-        self.assertItemsEqual(actual_summaries, expected_summaries)  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(actual_summaries, expected_summaries)
 
     def test_get_top_rated_exploration_summaries(self) -> None:
         exploration_summaries = (
@@ -6318,7 +6318,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         top_rated_summaries_model = (
             exp_fetchers.get_exploration_summaries_from_models(
                 top_rated_summaries))
-        self.assertItemsEqual(exploration_summaries, top_rated_summaries_model)  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(exploration_summaries, top_rated_summaries_model)
 
     def test_get_recently_published_exp_summaries(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -6336,7 +6336,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             exp_fetchers.get_exploration_summaries_from_models(
                 recently_published_summaries))
         self.assertEqual(len(exploration_summaries), 3)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             exploration_summaries,
             recently_publshed_summaries_model)
 
@@ -6525,7 +6525,7 @@ title: Old Title
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
 
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
@@ -6553,7 +6553,7 @@ title: Old Title
                 'category': 'category',
             }])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v41-v%d exploration state schemas at '
             'present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
@@ -6568,7 +6568,7 @@ title: Old Title
             'property_name': 'title',
             'new_value': 'new title'
             })]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Voice artist does not have permission to make some '
             'changes in the change list.'):
@@ -6657,7 +6657,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):
@@ -6676,7 +6676,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid commit message for suggestion.'):
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
@@ -6691,7 +6691,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Commit messages for non-suggestions may not start with'):
             exp_services.update_exploration(
@@ -7252,7 +7252,7 @@ title: Old Title
             }
         }
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
             hints_update = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -7297,7 +7297,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
@@ -7339,7 +7339,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected hints_list to be a list.*'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
@@ -7454,7 +7454,7 @@ title: Old Title
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected recorded_voiceovers to be a dict'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -7485,7 +7485,7 @@ title: Old Title
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.NEW_EXP_ID, 1, change_list)
         self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected recorded_voiceovers to be a dict'):
             exp_services.update_exploration(
                 self.albert_id, self.NEW_EXP_ID, change_list,
@@ -7543,7 +7543,7 @@ title: Old Title
         exploration_model = exp_models.ExplorationModel.get('exp_id')
         exploration_model.version = 0
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):
@@ -7571,11 +7571,11 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         # Create explorations.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
@@ -7650,7 +7650,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
     def test_create_or_update_draft_when_by_voice_artist(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 utils.ValidationError,
                 'Voice artist does not have permission to make some '
                 'changes in the change list.'):
@@ -8600,7 +8600,7 @@ title: Title
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
@@ -8986,8 +8986,8 @@ title: Title
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])

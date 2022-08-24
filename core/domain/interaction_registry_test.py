@@ -240,7 +240,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
     def test_get_interaction_by_id_raises_error_for_none_interaction_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No interaction exists for the None interaction_id.'
         ):
             interaction_registry.Registry.get_interaction_by_id(None)
