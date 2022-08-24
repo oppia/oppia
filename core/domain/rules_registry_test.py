@@ -65,7 +65,7 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
     def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(  # pylint: disable=line-too-long
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No specs json file found for state schema'
         ):

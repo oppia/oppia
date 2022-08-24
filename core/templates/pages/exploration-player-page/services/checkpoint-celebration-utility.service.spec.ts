@@ -256,4 +256,39 @@ describe('Checkpoint celebration utility service', () => {
     expect(translateService.instant).toHaveBeenCalledWith(
       'DUMMY_CHECKPOINT_TITLE_I18N_KEY');
   });
+
+  it('should correctly set and retrieve isOnCheckpointedState value', () => {
+    expect(checkpointCelebrationUtilityService.getIsOnCheckpointedState())
+      .toBe(false);
+
+    checkpointCelebrationUtilityService.setIsOnCheckpointedState(true);
+
+    expect(checkpointCelebrationUtilityService.getIsOnCheckpointedState())
+      .toBe(true);
+
+    checkpointCelebrationUtilityService.setIsOnCheckpointedState(false);
+
+    expect(checkpointCelebrationUtilityService.getIsOnCheckpointedState())
+      .toBe(false);
+  });
+
+  it('should get emitter meant to open the lesson info modal', () => {
+    let mockLessonInfoModalEmitter = new EventEmitter<void>();
+
+    expect(
+      checkpointCelebrationUtilityService.getOpenLessonInformationModalEmitter()
+    ).toEqual(mockLessonInfoModalEmitter);
+  });
+
+  it('should emit the lesson info modal open event', () => {
+    spyOn(
+      checkpointCelebrationUtilityService
+        .getOpenLessonInformationModalEmitter(), 'emit');
+
+    checkpointCelebrationUtilityService.openLessonInformationModal();
+
+    expect(
+      checkpointCelebrationUtilityService
+        .getOpenLessonInformationModalEmitter().emit).toHaveBeenCalled();
+  });
 });

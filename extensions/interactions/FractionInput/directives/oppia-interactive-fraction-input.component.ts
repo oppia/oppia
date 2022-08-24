@@ -188,8 +188,11 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
           fraction, this.fractionInputRulesService);
       }
     } catch (parsingError) {
-      let error = parsingError as Error;
-      this.errorMessageI18nKey = error.message;
+      if (parsingError instanceof Error) {
+        this.errorMessageI18nKey = parsingError.message;
+      } else {
+        throw parsingError;
+      }
       this.isValid = false;
     }
   }

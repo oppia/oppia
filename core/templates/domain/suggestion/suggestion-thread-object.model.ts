@@ -17,9 +17,6 @@
    thread domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { SuggestionBackendDict, Suggestion } from
   'domain/suggestion/suggestion.model';
 import { ThreadMessage } from
@@ -105,11 +102,8 @@ export class SuggestionThread {
   getSuggestion(): Suggestion | null {
     return this.suggestion;
   }
-}
 
-@Injectable({providedIn: 'root'})
-export class SuggestionThreadObjectFactory {
-  private createEditExplorationStateContentSuggestionFromBackendDict(
+  private static createEditExplorationStateContentSuggestionFromBackendDict(
       suggestionBackendDict: SuggestionBackendDict): Suggestion | null {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
@@ -118,7 +112,7 @@ export class SuggestionThreadObjectFactory {
     return Suggestion.createFromBackendDict(suggestionBackendDict);
   }
 
-  createFromBackendDicts(
+  static createFromBackendDicts(
       feedbackThreadBackendDict: FeedbackThreadBackendDict,
       suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
     return new SuggestionThread(
@@ -135,7 +129,3 @@ export class SuggestionThreadObjectFactory {
         suggestionBackendDict));
   }
 }
-
-angular.module('oppia').factory(
-  'SuggestionThreadObjectFactory',
-  downgradeInjectable(SuggestionThreadObjectFactory));
