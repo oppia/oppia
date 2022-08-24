@@ -6007,7 +6007,8 @@ export default {
   },
 
   // Data required for Google Analytics.
-  "ANALYTICS_ID": "",
+  "GA_ANALYTICS_ID": "123",
+  "UA_ANALYTICS_ID": "456",
   "SITE_NAME_FOR_ANALYTICS": "",
 
   // Data required for Firebase authentication.

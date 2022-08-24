@@ -2,6 +2,7 @@
   "name": "oppia",
   "version": "3.2.7",
   "description": "Oppia enables the creation of interactive online lessons.",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

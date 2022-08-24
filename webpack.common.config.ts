@@ -23,6 +23,7 @@ const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
+const constants = require('./assets/constants.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
@@ -140,6 +141,15 @@ module.exports = {
   * once angularjs is removed from corresponding pages.
   */
   plugins: [
+    new HtmlWebpackPlugin({
+      chunks: ['header'],
+      filename: 'header_js_libs.html',
+      hybrid: true,
+      template: commonPrefix + '/pages/header_js_libs.html',
+      inject: false,
+      GA_ANALYTICS_ID: constants.GA_ANALYTICS_ID,
+      UA_ANALYTICS_ID: constants.UA_ANALYTICS_ID
+    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',

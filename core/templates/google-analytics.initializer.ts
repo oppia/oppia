@@ -25,7 +25,11 @@ export function initializeGoogleAnalytics() {
     return;
   }
 
-  if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
+  if (
+    constants.GA_ANALYTICS_ID &&
+    constants.UA_ANALYTICS_ID &&
+    constants.SITE_NAME_FOR_ANALYTICS
+  ) {
     // Reference doc:
     // https://developers.google.com/analytics/devguides/collection/gtagjs
     window.dataLayer = window.dataLayer || [];
@@ -36,7 +40,11 @@ export function initializeGoogleAnalytics() {
       'domains': [constants.SITE_NAME_FOR_ANALYTICS]
     });
     gtag('js', new Date());
-    gtag('config', constants.ANALYTICS_ID, {
+    gtag('config', constants.GA_ANALYTICS_ID, {
+      'anonymize_ip': true,
+      'forceSSL': true,
+    });
+    gtag('config', constants.UA_ANALYTICS_ID, {
       'anonymize_ip': true,
       'forceSSL': true,
     });
