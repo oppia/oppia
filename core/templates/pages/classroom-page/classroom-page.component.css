@@ -73,6 +73,7 @@
   margin-top: 40px;
   overflow-y: auto;
   padding-bottom: 18vh;
+  row-gap: 24px;
 }
 
 .oppia-topic-summary-tile {
