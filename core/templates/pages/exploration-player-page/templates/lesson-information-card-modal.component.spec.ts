@@ -35,6 +35,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 
 
@@ -56,6 +57,21 @@ export class MockSummarizeNonnegativeNumberPipe implements PipeTransform {
 export class MockLimitToPipe implements PipeTransform {
   transform(value: string): string {
     return value;
+  }
+}
+
+class MockCheckpointCelebrationUtilityService {
+  private isOnCheckpointedState: boolean = false;
+
+  getCheckpointMessage(
+      completedCheckpointCount: number, totalCheckpointCount: number
+  ): string {
+    return (
+      'checkpoint ' + completedCheckpointCount + '/' + totalCheckpointCount);
+  }
+
+  getIsOnCheckpointedState(): boolean {
+    return this.isOnCheckpointedState;
   }
 }
 
@@ -100,6 +116,8 @@ describe('Lesson Information card modal component', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let localStorageService: LocalStorageService;
   let clipboard: Clipboard;
+  let checkpointCelebrationUtilityService:
+    CheckpointCelebrationUtilityService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -126,6 +144,10 @@ describe('Lesson Information card modal component', () => {
         DateTimeFormatService,
         RatingComputationService,
         UrlInterpolationService,
+        {
+          provide: CheckpointCelebrationUtilityService,
+          useClass: MockCheckpointCelebrationUtilityService
+        },
         {
           provide: WindowRef,
           useValue: mockWindowRef
@@ -175,6 +197,8 @@ describe('Lesson Information card modal component', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     clipboard = TestBed.inject(Clipboard);
+    checkpointCelebrationUtilityService = TestBed.inject(
+      CheckpointCelebrationUtilityService);
 
     spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
       .and.returnValues(true, false);
@@ -287,6 +311,31 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.loggedOutProgressUniqueUrl).toEqual(
       'https://oppia.org/progress/abcdef');
   }));
+
+  it('should fetch checkpoint message if on checkpointed state', () => {
+    const getIsOnCheckpointedState = spyOn(
+      checkpointCelebrationUtilityService, 'getIsOnCheckpointedState').and
+      .returnValue(false);
+    spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage').and
+      .returnValue('checkpoint message');
+
+    componentInstance.ngOnInit();
+
+    expect(getIsOnCheckpointedState).toHaveBeenCalled();
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .not.toHaveBeenCalled();
+    expect(componentInstance.translatedCongratulatoryCheckpointMessage)
+      .toBeUndefined();
+
+    getIsOnCheckpointedState.and.returnValue(true);
+
+    componentInstance.ngOnInit();
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .toHaveBeenCalled();
+    expect(componentInstance.translatedCongratulatoryCheckpointMessage)
+      .toEqual('checkpoint message');
+  });
 
   it('should get image url correctly', () => {
     let imageUrl = 'image_url';

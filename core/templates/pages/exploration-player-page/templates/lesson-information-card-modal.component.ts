@@ -33,6 +33,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -78,6 +79,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   loggedOutProgressUniqueUrlId: string;
   loggedOutProgressUniqueUrl: string;
   saveProgressMenuIsShown: boolean = false;
+  // The below property is defined only when the learner is on a
+  // checkpointed state, and is undefined otherwise.
+  translatedCongratulatoryCheckpointMessage: string | undefined;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -90,7 +94,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private userService: UserService,
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
-    private explorationPlayerStateService: ExplorationPlayerStateService
+    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private checkpointCelebrationUtilityService:
+      CheckpointCelebrationUtilityService
   ) {
     super(ngbActiveModal);
   }
@@ -150,6 +156,11 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       this.loggedOutProgressUniqueUrl = (
         this.urlService.getOrigin() +
         '/progress/' + this.loggedOutProgressUniqueUrlId);
+    }
+    if (this.checkpointCelebrationUtilityService.getIsOnCheckpointedState()) {
+      this.translatedCongratulatoryCheckpointMessage = (
+        this.checkpointCelebrationUtilityService.getCheckpointMessage(
+          this.completedCheckpointsCount, this.checkpointCount));
     }
   }
 

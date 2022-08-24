@@ -37,6 +37,10 @@
             {{ idx + 1 }}
           </div>
         </div>
+        <p *ngIf="translatedCongratulatoryCheckpointMessage"
+           class="checkpoint-message-text">
+          {{ translatedCongratulatoryCheckpointMessage }}
+        </p>
         <div class="save-progress-btn-container">
           <button type="button"
                   class="btn btn-secondary save-progress-btn"

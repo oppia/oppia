@@ -201,6 +201,7 @@
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/button-directives/hint-and-solution-buttons.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/checkpoint-celebration-modal/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
 /core/templates/components/on-screen-keyboard/ @oppia/interaction-and-rte-reviewers

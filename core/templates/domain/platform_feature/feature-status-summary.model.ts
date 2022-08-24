@@ -25,6 +25,7 @@
 export enum FeatureNames {
   DummyFeature = 'dummy_feature',
   EndChapterCelebration = 'end_chapter_celebration',
+  CheckpointCelebration = 'checkpoint_celebration',
 }
 
 export interface FeatureStatusSummaryBackendDict {
