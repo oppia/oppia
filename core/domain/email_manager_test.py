@@ -36,7 +36,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Callable, Dict, List, Optional, Sequence, Set, Type
+from typing import Callable, Dict, List, Optional, Sequence, Set, Type, Union
 from typing_extensions import Final
 
 MYPY = False
@@ -54,7 +54,7 @@ class FailedMLTest(test_utils.EmailTestBase):
     """
 
     def setUp(self) -> None:
-        super(FailedMLTest, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
@@ -66,7 +66,7 @@ class FailedMLTest(test_utils.EmailTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert config_property is not None
         config_property.set_value(
-            'committer_id', [self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+            'committer_id', [self.get_user_id_from_email(
                 self.CURRICULUM_ADMIN_EMAIL)])
 
     def test_send_failed_ml_email(self) -> None:
@@ -168,17 +168,17 @@ class EmailRightsTest(test_utils.GenericTestBase):
     """Test that only certain users can send certain types of emails."""
 
     def setUp(self) -> None:
-        super(EmailRightsTest, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.set_moderators([self.MODERATOR_USERNAME])  # type: ignore[no-untyped-call]
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_sender_id_validation(self) -> None:
         sender_ids_to_test = [
@@ -202,23 +202,23 @@ class EmailRightsTest(test_utils.GenericTestBase):
                     email_manager.require_sender_id_is_valid(
                         intent, sender_id)
                 else:
-                    with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                    with self.assertRaisesRegex(
                         Exception, 'Invalid sender_id'
                     ):
                         email_manager.require_sender_id_is_valid(
                             intent, sender_id)
 
         # Also test null and invalid intent strings.
-        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 '', feconf.SYSTEM_COMMITTER_ID)
-        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 '', self.admin_id)
-        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 'invalid_intent', feconf.SYSTEM_COMMITTER_ID)
-        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid email intent string'):
             email_manager.require_sender_id_is_valid(
                 'invalid_intent', self.admin_id)
 
@@ -229,15 +229,15 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     EXPLORATION_TITLE: Final = 'Title'
 
     def setUp(self) -> None:
-        super(ExplorationMembershipEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title=self.EXPLORATION_TITLE)
 
         self.expected_email_subject = (
@@ -256,8 +256,8 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             self.login(self.EDITOR_EMAIL)
 
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
-            self.put_json('%s/%s' % (  # type: ignore[no-untyped-call]
+            csrf_token = self.get_new_csrf_token()
+            self.put_json('%s/%s' % (
                 feconf.EXPLORATION_RIGHTS_PREFIX, self.exploration.id), {
                     'version': self.exploration.version,
                     'new_member_username': self.NEW_USER_USERNAME,
@@ -565,7 +565,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that an exception is raised when an invalid
             # role is supplied.
-            with self.assertRaisesRegex(Exception, 'Invalid role'):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, 'Invalid role'):
                 email_manager.send_role_notification_email(
                     self.editor_id, self.new_user_id, rights_domain.ROLE_NONE,
                     self.exploration.id, self.exploration.title)
@@ -575,11 +575,11 @@ class SignupEmailTests(test_utils.EmailTestBase):
     """Test that signup-email sending functionality works as expected."""
 
     def setUp(self) -> None:
-        super(SignupEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.new_footer = (
             'Unsubscribe from emails at your '
@@ -619,10 +619,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            csrf_token = self.get_new_csrf_token()
 
-            self.post_json(  # type: ignore[no-untyped-call]
+            self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
@@ -636,7 +636,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_content_config_is_not_modified(self) -> None:
         can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
-        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
 
@@ -645,11 +645,11 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
-                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-                csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+                csrf_token = self.get_new_csrf_token()
 
                 # No user-facing error should surface.
-                self.post_json(  # type: ignore[no-untyped-call]
+                self.post_json(
                     feconf.SIGNUP_DATA_URL, {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
@@ -681,7 +681,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'html_body': 'New HTML body.',
             })
 
-        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
 
@@ -690,11 +690,11 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
-                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-                csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+                csrf_token = self.get_new_csrf_token()
 
                 # No user-facing error should surface.
-                self.post_json(  # type: ignore[no-untyped-call]
+                self.post_json(
                     feconf.SIGNUP_DATA_URL, {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
@@ -722,7 +722,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'html_body': 'New HTML body.<script>alert(3);</script>',
             })
 
-        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
 
@@ -731,11 +731,11 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
-                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-                csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+                csrf_token = self.get_new_csrf_token()
 
                 # No user-facing error should surface.
-                self.post_json(  # type: ignore[no-untyped-call]
+                self.post_json(
                     feconf.SIGNUP_DATA_URL, {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
@@ -765,10 +765,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 'Email Sender')
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            csrf_token = self.get_new_csrf_token()
 
-            self.post_json(  # type: ignore[no-untyped-call]
+            self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
@@ -799,10 +799,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            csrf_token = self.get_new_csrf_token()
 
-            self.post_json(  # type: ignore[no-untyped-call]
+            self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
@@ -814,7 +814,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(1, len(messages))
 
             # Send a second POST request.
-            self.post_json(  # type: ignore[no-untyped-call]
+            self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
@@ -835,10 +835,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_content)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            csrf_token = self.get_new_csrf_token()
 
-            self.post_json(  # type: ignore[no-untyped-call]
+            self.post_json(
                 feconf.SIGNUP_DATA_URL,
                 {
                     'agreed_to_terms': True,
@@ -852,7 +852,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(0, len(messages))
 
             # Redo the signup process with a good username.
-            self.post_json(  # type: ignore[no-untyped-call]
+            self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
@@ -881,10 +881,10 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(all_models), 0)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')  # type: ignore[no-untyped-call]
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
+            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            csrf_token = self.get_new_csrf_token()
 
-            self.post_json(  # type: ignore[no-untyped-call]
+            self.post_json(
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
@@ -905,7 +905,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
             self.assertEqual(
                 sent_email_model.recipient_id,
-                self.get_user_id_from_email(self.EDITOR_EMAIL))  # type: ignore[no-untyped-call]
+                self.get_user_id_from_email(self.EDITOR_EMAIL))
             self.assertEqual(
                 sent_email_model.recipient_email, self.EDITOR_EMAIL)
             self.assertEqual(
@@ -924,14 +924,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     """Test that duplicate emails are not sent."""
 
     def setUp(self) -> None:
-        super(DuplicateEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.new_footer = (
             'You can change your email preferences via the '
@@ -963,7 +963,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000)
 
-        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
 
@@ -1014,7 +1014,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         duplicate_email_ctx = self.swap(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2)
 
-        log_new_error_counter = test_utils.CallCounter(logging.error)  # type: ignore[no-untyped-call]
+        log_new_error_counter = test_utils.CallCounter(logging.error)
         log_new_error_ctx = self.swap(
             logging, 'error', log_new_error_counter)
 
@@ -1285,12 +1285,12 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
-        super(FeedbackMessageBatchEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
 
         self.expected_email_subject = (
@@ -1424,15 +1424,15 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
 class SuggestionEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
-        super(SuggestionEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
@@ -1532,15 +1532,15 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
 
 class SubscriptionEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
-        super(SubscriptionEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id)
@@ -1633,15 +1633,15 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
 class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
-        super(FeedbackMessageInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
@@ -1743,25 +1743,25 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
     """Test that emails are sent to moderators when explorations are flagged."""
 
     def setUp(self) -> None:
-        super(FlagExplorationEmailTest, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
         self.moderator2_email = 'moderator2@example.com'
         self.moderator2_username = 'moderator2'
         self.signup(self.moderator2_email, self.moderator2_username)
-        self.moderator2_id = self.get_user_id_from_email(self.moderator2_email)  # type: ignore[no-untyped-call]
+        self.moderator2_id = self.get_user_id_from_email(self.moderator2_email)
 
-        self.set_moderators([self.moderator2_username, self.MODERATOR_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_moderators([self.moderator2_username, self.MODERATOR_USERNAME])
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.owner_ids = [self.editor_id]
 
@@ -1865,9 +1865,9 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
     def setUp(self) -> None:
-        super(OnboardingReviewerInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -1941,9 +1941,9 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
     def setUp(self) -> None:
-        super(NotifyReviewerInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_id, True, False, False, False)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -2040,7 +2040,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'data_format': 'html'
         }
 
-        translation_suggestion = suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+        translation_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -2048,12 +2048,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'test description')
 
         translation_suggestion.last_updated = submission_datetime
-        # The return type of this method is assumed as Any type by MyPy.
-        # Because the functions that are used in this method are not type
-        # annotated yet. Once the required functions are annotated, MyPy
-        # will automatically ask to remove the ignore by throwing an
-        # error like: 'unused 'type: ignore' comment'.
-        return translation_suggestion  # type: ignore[no-any-return]
+        return translation_suggestion
 
     def _create_question_suggestion_with_question_html_and_datetime(
         self,
@@ -2065,12 +2060,16 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         """
         with self.swap(
             feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
-            add_question_change_dict = {
+            add_question_change_dict: Dict[
+                str, Union[str, float, question_domain.QuestionDict]
+            ] = {
                 'cmd': (
                     question_domain
                     .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                 'question_dict': {
-                    'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                    'id': 'test_id',
+                    'version': 12,
+                    'question_state_data': self._create_valid_question_data(
                         'default_state').to_dict(),
                     'language_code': constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
@@ -2082,7 +2081,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'skill_difficulty': 0.3
             }
 
-        question_suggestion = suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+        question_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -2090,12 +2089,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'test description')
 
         question_suggestion.last_updated = submission_datetime
-        # The return type of this method is assumed as Any type by MyPy.
-        # Because the functions that are used in this method are not type
-        # annotated yet. Once the required functions are annotated, MyPy
-        # will automatically ask to remove the ignore by throwing an
-        # error like: 'unused 'type: ignore' comment'.
-        return question_suggestion  # type: ignore[no-any-return]
+        return question_suggestion
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
         self,
@@ -2107,7 +2101,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
         return [
             (
-                suggestion_services  # type: ignore[no-untyped-call]
+                suggestion_services
                 .create_reviewable_suggestion_email_info_from_suggestion(
                     suggestion)
             ) for suggestion in suggestions
@@ -2155,22 +2149,22 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.logged_info.append(msg % args)
 
     def setUp(self) -> None:
-        super(NotifyContributionDashboardReviewersEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
-        self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)  # type: ignore[no-untyped-call]
+        self.reviewer_1_id = self.get_user_id_from_email(self.REVIEWER_1_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_1_id, True, False, False, False)
         self.signup(self.REVIEWER_2_EMAIL, self.REVIEWER_2_USERNAME)
-        self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.reviewer_2_id = self.get_user_id_from_email(self.REVIEWER_2_EMAIL)
         user_services.update_email_preferences(
             self.reviewer_2_id, True, False, False, False)
 
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.log_new_error_counter = test_utils.CallCounter(  # type: ignore[no-untyped-call]
+        self.log_new_error_counter = test_utils.CallCounter(
             logging.error)
         self.log_new_error_ctx = self.swap(
             logging, 'error', self.log_new_error_counter)
@@ -2179,13 +2173,13 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             logging, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        self.save_new_skill(self.skill_id, self.author_id)  # type: ignore[no-untyped-call]
+        self.save_new_skill(self.skill_id, self.author_id)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         self.reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
 
@@ -2201,7 +2195,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     [[self.reviewable_suggestion_email_info]]
                 )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -2219,7 +2213,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     [[self.reviewable_suggestion_email_info]]
                 )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -2240,7 +2234,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     [[self.reviewable_suggestion_email_info]]
                 )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -2259,7 +2253,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     [], [[self.reviewable_suggestion_email_info]]
                 )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -2278,7 +2272,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 [self.reviewer_1_id], [[]]
             )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(
             self.logged_info[0],
@@ -2296,7 +2290,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 1
@@ -2355,7 +2349,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 5
@@ -2414,7 +2408,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 1
@@ -2474,7 +2468,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 5
@@ -2534,7 +2528,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 1
@@ -2593,7 +2587,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 5
@@ -2652,7 +2646,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 5
@@ -2896,7 +2890,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
@@ -2956,7 +2950,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 5
@@ -3015,7 +3009,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
@@ -3076,7 +3070,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 5
@@ -3137,7 +3131,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
@@ -3198,7 +3192,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 5
@@ -3259,7 +3253,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 1
@@ -3653,19 +3647,14 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         }
 
         with self.mock_datetime_utcnow(submission_datetime):
-            translation_suggestion = suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+            translation_suggestion = suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, add_translation_change_dict,
                 'test description')
 
-        # The return type of this method is assumed as Any type by MyPy.
-        # Because the functions that are used in this method are not type
-        # annotated yet. Once the required functions are annotated, MyPy
-        # will automatically ask to remove the ignore by throwing an
-        # error like: 'unused 'type: ignore' comment'.
-        return translation_suggestion  # type: ignore[no-any-return]
+        return translation_suggestion
 
     def _create_question_suggestion_with_question_html_and_datetime(
         self,
@@ -3677,12 +3666,16 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         """
         with self.swap(
             feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
-            add_question_change_dict = {
+            add_question_change_dict: Dict[
+                str, Union[str, float, question_domain.QuestionDict]
+            ] = {
                 'cmd': (
                     question_domain
                     .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                 'question_dict': {
-                    'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                    'id': 'test_id',
+                    'version': 12,
+                    'question_state_data': self._create_valid_question_data(
                         'default_state').to_dict(),
                     'language_code': constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
@@ -3695,19 +3688,14 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             }
 
         with self.mock_datetime_utcnow(submission_datetime):
-            question_suggestion = suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+            question_suggestion = suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 feconf.ENTITY_TYPE_SKILL,
                 self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, add_question_change_dict,
                 'test description')
 
-        # The return type of this method is assumed as Any type by MyPy.
-        # Because the functions that are used in this method are not type
-        # annotated yet. Once the required functions are annotated, MyPy
-        # will automatically ask to remove the ignore by throwing an
-        # error like: 'unused 'type: ignore' comment'.
-        return question_suggestion  # type: ignore[no-any-return]
+        return question_suggestion
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
         self, suggestions: List[suggestion_registry.BaseSuggestion]
@@ -3718,7 +3706,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
         return [
             (
-                suggestion_services  # type: ignore[no-untyped-call]
+                suggestion_services
                 .create_reviewable_suggestion_email_info_from_suggestion(
                     suggestion)
             ) for suggestion in suggestions
@@ -3767,24 +3755,22 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.logged_info.append(msg % args)
 
     def setUp(self) -> None:
-        super(  # type: ignore[no-untyped-call]
-            NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests,
-            self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(
             self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_1_USERNAME)
-        self.admin_1_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.admin_1_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_1_EMAIL)
         self.signup(
             self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME)
-        self.admin_2_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.admin_2_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_2_EMAIL)
 
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.log_new_error_counter = test_utils.CallCounter(  # type: ignore[no-untyped-call]
+        self.log_new_error_counter = test_utils.CallCounter(
             logging.error)
         self.log_new_error_ctx = self.swap(
             logging, 'error', self.log_new_error_counter)
@@ -3793,13 +3779,13 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             logging, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        self.save_new_skill(self.skill_id, self.author_id)  # type: ignore[no-untyped-call]
+        self.save_new_skill(self.skill_id, self.author_id)
         question_suggestion = (
             self._create_question_suggestion_with_question_html_and_datetime(
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         self.reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
 
@@ -3822,7 +3808,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                             [self.reviewable_suggestion_email_info])
                     )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -3847,7 +3833,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                             [self.reviewable_suggestion_email_info])
                     )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -3873,7 +3859,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                             [self.reviewable_suggestion_email_info])
                     )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -3898,7 +3884,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                             [], [], [], [self.reviewable_suggestion_email_info])
                     )
 
-            messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -3921,7 +3907,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                         [self.admin_1_id], [], [], [])
                 )
 
-        messages = self._get_all_sent_email_messages()  # type: ignore[no-untyped-call]
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(
             self.logged_info[0],
@@ -3939,7 +3925,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 5
@@ -4086,7 +4072,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'hi', '<p>Sample translation</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
         review_wait_time = 5
@@ -4350,7 +4336,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 '<p>What is the meaning of life?</p>',
                 self.mocked_review_submission_datetime))
         reviewable_suggestion_email_info = (
-            suggestion_services  # type: ignore[no-untyped-call]
+            suggestion_services
             .create_reviewable_suggestion_email_info_from_suggestion(
                 question_suggestion))
         review_wait_time = 5
@@ -4470,12 +4456,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'data_format': 'html'
         }
 
-        # The return type of this method is assumed as Any type by MyPy.
-        # Because the functions that are used in this method are not type
-        # annotated yet. Once the required functions are annotated, MyPy
-        # will automatically ask to remove the ignore by throwing an
-        # error like: 'unused 'type: ignore' comment'.
-        return suggestion_services.create_suggestion(  # type: ignore[no-any-return, no-untyped-call]
+        return suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -4485,10 +4466,14 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def _create_question_suggestion(self) -> suggestion_registry.BaseSuggestion:
         """Creates a question suggestion."""
-        add_question_change_dict = {
+        add_question_change_dict: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(   # type: ignore[no-untyped-call]
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
@@ -4500,12 +4485,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'skill_difficulty': 0.3
         }
 
-        # The return type of this method is assumed as Any type by MyPy.
-        # Because the functions that are used in this method are not type
-        # annotated yet. Once the required functions are annotated, MyPy
-        # will automatically ask to remove the ignore by throwing an
-        # error like: 'unused 'type: ignore' comment'.
-        return suggestion_services.create_suggestion(  # type: ignore[no-any-return, no-untyped-call]
+        return suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -4554,27 +4534,25 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.logged_info.append(msg % args)
 
     def setUp(self) -> None:
-        super(   # type: ignore[no-untyped-call]
-            NotifyAdminsContributorDashboardReviewersNeededTests,
-            self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)   # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(
             self.CURRICULUM_ADMIN_1_EMAIL, self.CURRICULUM_ADMIN_1_USERNAME)
-        self.admin_1_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.admin_1_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_1_EMAIL)
         self.signup(
             self.CURRICULUM_ADMIN_2_EMAIL, self.CURRICULUM_ADMIN_2_USERNAME)
-        self.admin_2_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.admin_2_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_2_EMAIL)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
-        self.save_new_skill(self.skill_id, self.author_id)   # type: ignore[no-untyped-call]
+        self.save_new_skill(self.skill_id, self.author_id)
 
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
-        self.log_new_error_counter = test_utils.CallCounter(   # type: ignore[no-untyped-call]
+        self.log_new_error_counter = test_utils.CallCounter(
             logging.error)
         self.log_new_error_ctx = self.swap(
             logging, 'error', self.log_new_error_counter)
@@ -4597,7 +4575,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                     [self.admin_1_id], [], [],
                     self.suggestion_types_needing_reviewers)
 
-            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -4616,7 +4594,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                     [self.admin_1_id], [], [],
                     self.suggestion_types_needing_reviewers)
 
-            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -4636,7 +4614,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                     [], [], [],
                     self.suggestion_types_needing_reviewers)
 
-            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -4653,7 +4631,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 [self.admin_1_id], [], [], {})
 
-        messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+        messages = self._get_all_sent_email_messages()
         self.assertEqual(len(messages), 0)
         self.assertEqual(
             self.logged_info[0],
@@ -4671,7 +4649,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                     ['admin_id_without_email'], [], [],
                     self.suggestion_types_needing_reviewers)
 
-            messages = self._get_all_sent_email_messages()   # type: ignore[no-untyped-call]
+            messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
             self.assertEqual(self.log_new_error_counter.times_called, 1)
             self.assertEqual(
@@ -4688,10 +4666,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_question_suggestion()
         suggestion_types_needing_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_reviewers())   # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: set()})
         expected_email_html_body = (
             'Hi user1,'
             '<br><br>'
@@ -4734,10 +4712,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_question_suggestion()
         suggestion_types_needing_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_reviewers())   # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: set()})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -4804,7 +4782,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_reviewers())   # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
@@ -4849,7 +4827,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'enable_admin_notifications_for_reviewer_shortage', True)
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_reviewers())   # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
@@ -4918,7 +4896,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_reviewers())   # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
@@ -4970,7 +4948,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self._create_translation_suggestion_with_language_code('fr')
         self._create_translation_suggestion_with_language_code('hi')
         suggestion_types_needing_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_reviewers())   # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
@@ -5051,13 +5029,13 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self._create_translation_suggestion_with_language_code('hi')
         self._create_question_suggestion()
         suggestion_types_needing_reviewers = (
-            suggestion_services.get_suggestion_types_that_need_reviewers())   # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'fr', 'hi'},
-                feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
+                feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
             })
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
@@ -5174,18 +5152,18 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
     RECIPIENT_B_USERNAME: Final = 'userb'
 
     def setUp(self) -> None:
-        super(QueryStatusNotificationEmailTests, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
-        self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)   # type: ignore[no-untyped-call]
+        self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)
         self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
-        self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)   # type: ignore[no-untyped-call]
+        self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
         self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
-        self.set_curriculum_admins([self.SENDER_USERNAME, ])   # type: ignore[no-untyped-call]
-        self.recipient_a_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.SENDER_USERNAME, ])
+        self.recipient_a_id = self.get_user_id_from_email(
             self.RECIPIENT_A_EMAIL)
-        self.recipient_b_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.recipient_b_id = self.get_user_id_from_email(
             self.RECIPIENT_B_EMAIL)
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
@@ -5371,9 +5349,9 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
     APPLICANT_EMAIL: Final = 'applicant@example.com'
 
     def setUp(self) -> None:
-        super(VoiceoverApplicationEmailUnitTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
-        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)   # type: ignore[no-untyped-call]
+        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         user_services.update_email_preferences(
             self.applicant_id, True, False, False, False)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -5516,9 +5494,9 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     APPLICANT_EMAIL: Final = 'applicant@example.com'
 
     def setUp(self) -> None:
-        super(AccountDeletionEmailUnitTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
-        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)   # type: ignore[no-untyped-call]
+        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.can_not_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
@@ -5612,24 +5590,24 @@ class BulkEmailsTests(test_utils.EmailTestBase):
     RECIPIENT_B_USERNAME: Final = 'userb'
 
     def setUp(self) -> None:
-        super(BulkEmailsTests, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()
         # SENDER is authorised sender.
         # FAKE_SENDER is unauthorised sender.
         # A and B are recipients.
         self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
-        self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)   # type: ignore[no-untyped-call]
+        self.sender_id = self.get_user_id_from_email(self.SENDER_EMAIL)
         self.signup(self.FAKE_SENDER_EMAIL, self.FAKE_SENDER_USERNAME)
-        self.fake_sender_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.fake_sender_id = self.get_user_id_from_email(
             self.FAKE_SENDER_EMAIL)
         self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
         self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
-        self.recipient_a_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.recipient_a_id = self.get_user_id_from_email(
             self.RECIPIENT_A_EMAIL)
-        self.recipient_b_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.recipient_b_id = self.get_user_id_from_email(
             self.RECIPIENT_B_EMAIL)
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
-        self.set_curriculum_admins([self.SENDER_USERNAME])   # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.SENDER_USERNAME])
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self) -> None:
@@ -5696,7 +5674,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
 
     def test_that_exception_is_raised_for_unauthorised_sender(self) -> None:
         with self.can_send_emails_ctx, (
-            self.assertRaisesRegex(   # type: ignore[no-untyped-call]
+            self.assertRaisesRegex(
                 Exception, 'Invalid sender_id for email')):
             email_manager.send_user_query_email(
                 self.fake_sender_id, self.recipient_ids, 'email_subject',
@@ -5806,12 +5784,12 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
     RECIPIENT_USERNAME: Final = 'usera'
 
     def setUp(self) -> None:
-        super(ModeratorActionEmailsTests, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)   # type: ignore[no-untyped-call]
-        self.set_moderators([self.MODERATOR_USERNAME])   # type: ignore[no-untyped-call]
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.signup(self.RECIPIENT_EMAIL, self.RECIPIENT_USERNAME)
-        self.recipient_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.recipient_id = self.get_user_id_from_email(
             self.RECIPIENT_EMAIL)
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -5823,14 +5801,14 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
     def test_exception_raised_if_email_on_moderator_action_is_false(
         self
     ) -> None:
-        with self.assertRaisesRegex(   # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.'):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
     def test_exception_raised_if_can_send_emails_is_false(self) -> None:
-        with self.can_send_email_moderator_action_ctx, self.assertRaisesRegex(   # type: ignore[no-untyped-call]
+        with self.can_send_email_moderator_action_ctx, self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'CAN_SEND_EMAILS is set to True.'):
@@ -5876,21 +5854,21 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
 
     def setUp(self) -> None:
-        super(ContributionReviewerEmailTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
 
-        self.translation_reviewer_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.translation_reviewer_id = self.get_user_id_from_email(
             self.TRANSLATION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.translation_reviewer_id, True, False, False, False)
-        self.voiceover_reviewer_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.voiceover_reviewer_id = self.get_user_id_from_email(
             self.VOICEOVER_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.voiceover_reviewer_id, True, False, False, False)
-        self.question_reviewer_id = self.get_user_id_from_email(   # type: ignore[no-untyped-call]
+        self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.question_reviewer_id, True, False, False, False)
@@ -5916,7 +5894,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     def test_assign_translation_reviewer_email_for_invalid_review_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid review_category'):   # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
@@ -6092,7 +6070,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     def test_remove_translation_reviewer_email_for_invalid_review_category(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid review_category'):   # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid review_category'):
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
@@ -6259,7 +6237,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
     dummy_admin_address: str = 'admin@system.com'
 
     def setUp(self) -> None:
-        super(NotMergeableChangesEmailUnitTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.admin_email_ctx = self.swap(
             feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)

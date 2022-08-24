@@ -42,7 +42,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
 
     def setUp(self) -> None:
-        super(ExplorationStatsTests, self).setUp()
+        super().setUp()
 
         self.state_stats_dict = {
             'total_answers_count_v1': 0,
@@ -145,7 +145,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # validate() input type.
     def test_validate_with_int_exp_id(self) -> None:
         self.exploration_stats.exp_id = 10 # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_id to be a string')):
             self.exploration_stats.validate()
 
@@ -154,7 +154,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # validate() input type.
     def test_validation_with_string_num_actual_starts(self) -> None:
         self.exploration_stats.num_actual_starts_v2 = '0' # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected num_actual_starts_v2 to be an int')):
             self.exploration_stats.validate()
 
@@ -163,13 +163,13 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # validate() input type.
     def test_validation_with_list_state_stats_mapping(self) -> None:
         self.exploration_stats.state_stats_mapping = [] # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected state_stats_mapping to be a dict')):
             self.exploration_stats.validate()
 
     def test_validation_with_negative_num_completions(self) -> None:
         self.exploration_stats.num_completions_v2 = -5
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             '%s cannot have negative values' % ('num_completions_v2'))):
             self.exploration_stats.validate()
 
@@ -178,7 +178,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     # method validate().
     def test_validate_exp_version(self) -> None:
         self.exploration_stats.exp_version = 'invalid_exp_version' # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_version to be an int')):
             self.exploration_stats.validate()
 
@@ -249,7 +249,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""
 
     def setUp(self) -> None:
-        super(StateStatsTests, self).setUp()
+        super().setUp()
 
         self.state_stats = stats_domain.StateStats(
             0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
@@ -377,7 +377,7 @@ class StateStatsTests(test_utils.GenericTestBase):
 
     def test_hash(self) -> None:
         state_stats = stats_domain.StateStats.create_default()
-        with self.assertRaisesRegex(TypeError, 'unhashable'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'unhashable'):
             unused_hash = hash(state_stats)
 
     def test_aggregate_from_state_stats(self) -> None:
@@ -418,7 +418,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         # TODO(#13528): Remove this test after the backend is fully
         # type-annotated. Here ignore[arg-type] is used to test method
         # aggregate_from() input type.
-        with self.assertRaisesRegex(TypeError, 'can not be aggregated from'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'can not be aggregated from'):
             state_stats.aggregate_from(different_stats) # type: ignore[arg-type]
 
     def test_to_dict(self) -> None:
@@ -448,7 +448,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.state_stats.total_answers_count_v2 = '10' # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected total_answers_count_v2 to be an int')):
             self.state_stats.validate()
 
@@ -456,7 +456,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.state_stats.total_answers_count_v2 = -5
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             '%s cannot have negative values' % ('total_answers_count_v2'))):
             self.state_stats.validate()
 
@@ -584,7 +584,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
 
     def test_hash(self) -> None:
         session_state_stats = stats_domain.SessionStateStats.create_default()
-        with self.assertRaisesRegex(TypeError, 'unhashable'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'unhashable'):
             unused_hash = hash(session_state_stats)
 
     def test_to_dict(self) -> None:
@@ -618,7 +618,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
                 }
             }
         }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'num_starts not in aggregated stats dict.'
         ):
@@ -646,7 +646,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
                 }
             }
         }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected num_actual_starts to be an int, received invalid_type'
         ):
@@ -670,7 +670,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
                 }
             }
         }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'total_answers_count not in state stats mapping of Home in '
             'aggregated stats dict.'
@@ -699,7 +699,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
                 }
             }
         }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected first_hit_count to be an int, received invalid_count'
         ):
@@ -736,7 +736,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
 
     def setUp(self) -> None:
-        super(ExplorationIssuesTests, self).setUp()
+        super().setUp()
 
         self.exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', 1, [
@@ -830,7 +830,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     # validate() input type.
     def test_validate_with_int_exp_id(self) -> None:
         self.exp_issues.exp_id = 5 # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_id to be a string, received %s' % (type(5)))):
             self.exp_issues.validate()
 
@@ -840,7 +840,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def test_validate_exp_version(self) -> None:
         self.exp_issues.exp_version = 'invalid_version' # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_version to be an int')):
             self.exp_issues.validate()
 
@@ -850,7 +850,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def test_validate_unresolved_issues(self) -> None:
         self.exp_issues.unresolved_issues = 0 # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected unresolved_issues to be a list')):
             self.exp_issues.validate()
 
@@ -859,7 +859,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
     """Tests the Playthrough domain object."""
 
     def setUp(self) -> None:
-        super(PlaythroughTests, self).setUp()
+        super().setUp()
 
         self.playthrough = self._get_valid_early_quit_playthrough()
 
@@ -993,7 +993,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'issue_customization_args': {},
             'actions': []
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'exp_id not in playthrough data dict.'):
             stats_domain.Playthrough.from_dict(playthrough_dict)
@@ -1003,13 +1003,13 @@ class PlaythroughTests(test_utils.GenericTestBase):
     # validate() input type.
     def test_validate_with_string_exp_version(self) -> None:
         self.playthrough.exp_version = '1' # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_version to be an int, received %s' % (type('1')))):
             self.playthrough.validate()
 
     def test_validate_with_invalid_issue_type(self) -> None:
         self.playthrough.issue_type = 'InvalidIssueType'
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type: %s' % self.playthrough.issue_type)):
             self.playthrough.validate()
 
@@ -1024,7 +1024,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     }
                 },
             })]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid action type: %s' % 'InvalidActionType')):
             self.playthrough.validate()
 
@@ -1034,7 +1034,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_str_exp_id(self) -> None:
         self.playthrough.exp_id = 0 # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected exp_id to be a string')):
             self.playthrough.validate()
 
@@ -1044,7 +1044,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_str_issue_type(self) -> None:
         self.playthrough.issue_type = 0 # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected issue_type to be a string')):
             self.playthrough.validate()
 
@@ -1054,7 +1054,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_list_actions(self) -> None:
         self.playthrough.actions = 0 # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected actions to be a list')):
             self.playthrough.validate()
 
@@ -1064,7 +1064,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_non_dict_issue_customization_args(self) -> None:
         self.playthrough.issue_customization_args = 0 # type: ignore[assignment]
 
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected issue_customization_args to be a dict')):
             self.playthrough.validate()
 
@@ -1075,7 +1075,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     DUMMY_TIME_SPENT_IN_MSECS = 1000.0
 
     def setUp(self) -> None:
-        super(ExplorationIssueTests, self).setUp()
+        super().setUp()
 
         self.exp_issue = stats_domain.ExplorationIssue(
             'EarlyQuit', {
@@ -1176,7 +1176,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'issue_type not in exploration issue dict.'):
             stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
@@ -1258,7 +1258,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d and unversioned issue schemas at'
             ' present.' %
@@ -1278,7 +1278,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
@@ -1289,7 +1289,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _convert_issue_v1_dict_to_v2_dict() method is missing '
@@ -1306,7 +1306,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # the validate() method input type.
     def test_validate_with_int_issue_type(self) -> None:
         self.exp_issue.issue_type = 5 # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected issue_type to be a string, received %s' % (type(5)))):
             self.exp_issue.validate()
 
@@ -1315,13 +1315,13 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # the validate() method input type.
     def test_validate_with_string_schema_version(self) -> None:
         self.exp_issue.schema_version = '1' # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
             self.exp_issue.validate()
 
     def test_validate_issue_type(self) -> None:
         self.exp_issue.issue_type = 'invalid_issue_type'
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Invalid issue type')):
             self.exp_issue.validate()
 
@@ -1330,7 +1330,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # the validate() method input type.
     def test_validate_playthrough_ids(self) -> None:
         self.exp_issue.playthrough_ids = 'invalid_playthrough_ids' # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected playthrough_ids to be a list')):
             self.exp_issue.validate()
 
@@ -1339,7 +1339,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # that playthrough_id is a string.
     def test_validate_playthrough_id_type(self) -> None:
         self.exp_issue.playthrough_ids = [0, 1] # type: ignore[list-item]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected each playthrough_id to be a string')):
             self.exp_issue.validate()
 
@@ -1384,7 +1384,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""
 
     def setUp(self) -> None:
-        super(LearnerActionTests, self).setUp()
+        super().setUp()
 
         self.learner_action = stats_domain.LearnerAction(
             'ExplorationStart', {
@@ -1511,7 +1511,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d and unversioned action schemas'
             ' at present.' %
@@ -1539,7 +1539,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
@@ -1550,7 +1550,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
         learner_action_dict = learner_action.to_dict()
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _convert_action_v1_dict_to_v2_dict() method is missing '
@@ -1567,7 +1567,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
     # validate() input type.
     def test_validate_with_int_action_type(self) -> None:
         self.learner_action.action_type = 5 # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected action_type to be a string, received %s' % (type(5)))):
             self.learner_action.validate()
 
@@ -1576,7 +1576,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
     # validate() input type.
     def test_validate_with_string_schema_version(self) -> None:
         self.learner_action.schema_version = '1' # type: ignore[assignment]
-        with self.assertRaisesRegex(utils.ValidationError, ( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
             self.learner_action.validate()
 
@@ -1631,7 +1631,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswers domain object for validation."""
 
     def setUp(self) -> None:
-        super(StateAnswersValidationTests, self).setUp()
+        super().setUp()
         self.state_answers = stats_domain.StateAnswers(
             'exp_id', 1, 'initial_state', 'TextInput', [])
 
@@ -1643,7 +1643,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     # type of exploration_id.
     def test_exploration_id_must_be_string(self) -> None:
         self.state_answers.exploration_id = 0 # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers, 'Expected exploration_id to be a string')
 
     # TODO(#13528): Remove this test after the backend is fully
@@ -1651,7 +1651,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     # state_name is a string.
     def test_state_name_must_be_string(self) -> None:
         self.state_answers.state_name = ['state'] # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers, 'Expected state_name to be a string')
 
     # TODO(#13528): Remove this test after the backend is fully
@@ -1666,12 +1666,12 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     # type of interaction_id.
     def test_interaction_id_must_otherwise_be_string(self) -> None:
         self.state_answers.interaction_id = 10 # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers, 'Expected interaction_id to be a string')
 
     def test_interaction_id_must_refer_to_existing_interaction(self) -> None:
         self.state_answers.interaction_id = 'FakeInteraction'
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers, 'Unknown interaction_id: FakeInteraction')
 
     # TODO(#13528): Remove this test after the backend is fully
@@ -1679,7 +1679,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     # type of submitted_answer_list.
     def test_submitted_answer_list_must_be_list(self) -> None:
         self.state_answers.submitted_answer_list = {} # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers, 'Expected submitted_answer_list to be a list')
 
     # TODO(#13528): Remove this test after the backend is fully
@@ -1687,19 +1687,19 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     # type of schema_version.
     def test_schema_version_must_be_integer(self) -> None:
         self.state_answers.schema_version = '1' # type: ignore[assignment]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers, 'Expected schema_version to be an integer')
 
     def test_schema_version_must_be_between_one_and_current_version(
         self
     ) -> None:
         self.state_answers.schema_version = 0
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers, 'schema_version < 1: 0')
 
         self.state_answers.schema_version = (
             feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION + 1)
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers,
             'schema_version > feconf\\.CURRENT_STATE_ANSWERS_SCHEMA_VERSION')
 
@@ -1760,7 +1760,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[typeddict-item] is used to test
     # that the 'answer' key is in the submitted answer dict.
     def test_requires_answer_to_be_created_from_dict(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'answer'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'answer'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'interaction_id': 'TextInput',
                 'answer_group_index': 0,
@@ -1778,7 +1778,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[typeddict-item] is used to test
     # that the 'interaction_id' key is in the submitted answer dict.
     def test_requires_interaction_id_to_be_created_from_dict(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'interaction_id'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'interaction_id'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'answer_group_index': 0,
@@ -1796,7 +1796,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[typeddict-item] is used to test
     # that the 'answer_group_index' key is in the submitted answer dict.
     def test_requires_answer_group_index_to_be_created_from_dict(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'answer_group_index'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'answer_group_index'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1814,7 +1814,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[typeddict-item] is used to test
     # that the 'rule_spec_index' key is in the submitted answer dict.
     def test_requires_rule_spec_index_to_be_created_from_dict(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'rule_spec_index'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'rule_spec_index'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1835,7 +1835,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     def test_requires_classification_categ_to_be_created_from_dict(
         self
     ) -> None:
-        with self.assertRaisesRegex(KeyError, 'classification_categorization'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'classification_categorization'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1852,7 +1852,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[typeddict-item] is used to test
     # that the 'params' key is in the submitted answer dict.
     def test_requires_params_to_be_created_from_dict(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'params'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'params'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1870,7 +1870,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[typeddict-item] is used to test
     # that the 'session_id' key is in the submitted answer dict.
     def test_requires_session_id_to_be_created_from_dict(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'session_id'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'session_id'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1888,7 +1888,7 @@ class SubmittedAnswerTests(test_utils.GenericTestBase):
     # type-annotated. Here ignore[typeddict-item] is used to test
     # that the 'time_spent_in_sec' key is in the submitted answer dict.
     def test_requires_time_spent_in_sec_to_be_created_from_dict(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'time_spent_in_sec'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(KeyError, 'time_spent_in_sec'):
             stats_domain.SubmittedAnswer.from_dict({ # type: ignore[typeddict-item]
                 'answer': 'Text',
                 'interaction_id': 'TextInput',
@@ -1963,7 +1963,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     """Tests the SubmittedAnswer domain object for validation."""
 
     def setUp(self) -> None:
-        super(SubmittedAnswerValidationTests, self).setUp()
+        super().setUp()
         self.submitted_answer = stats_domain.SubmittedAnswer(
             'Text', 'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'session_id', 0.)
@@ -1974,7 +1974,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     def test_answer_may_be_none_only_for_linear_interaction(self) -> None:
         # It's valid for answer to be None if the interaction type is Continue.
         self.submitted_answer.answer = None
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'SubmittedAnswers must have a provided answer except for linear '
             'interactions')
@@ -1987,7 +1987,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that time_spent_in_sec is not None.
     def test_time_spent_in_sec_must_not_be_none(self) -> None:
         self.submitted_answer.time_spent_in_sec = None # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'SubmittedAnswers must have a provided time_spent_in_sec')
 
@@ -1996,12 +1996,12 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that time_spent_in_sec is int.
     def test_time_spent_in_sec_must_be_number(self) -> None:
         self.submitted_answer.time_spent_in_sec = '0' # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer, 'Expected time_spent_in_sec to be a number')
 
     def test_time_spent_in_sec_must_be_positive(self) -> None:
         self.submitted_answer.time_spent_in_sec = -1.
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'Expected time_spent_in_sec to be non-negative')
 
@@ -2010,7 +2010,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that session_id is not None.
     def test_session_id_must_not_be_none(self) -> None:
         self.submitted_answer.session_id = None # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'SubmittedAnswers must have a provided session_id')
 
@@ -2019,7 +2019,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that session_id is a string.
     def test_session_id_must_be_string(self) -> None:
         self.submitted_answer.session_id = 90 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer, 'Expected session_id to be a string')
 
     # TODO(#13528): Remove this test after the backend is fully
@@ -2027,7 +2027,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that params is a dict.
     def test_params_must_be_dict(self) -> None:
         self.submitted_answer.params = [] # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer, 'Expected params to be a dict')
 
     # TODO(#13528): Remove this test after the backend is fully
@@ -2035,7 +2035,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that answer_group_index is int.
     def test_answer_group_index_must_be_integer(self) -> None:
         self.submitted_answer.answer_group_index = '0' # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'Expected answer_group_index to be an integer')
 
@@ -2044,7 +2044,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that answer_group_index is positive.
     def test_answer_group_index_must_be_positive(self) -> None:
         self.submitted_answer.answer_group_index = -1
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'Expected answer_group_index to be non-negative')
 
@@ -2060,17 +2060,17 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that rule_spec_index is int.
     def test_rule_spec_index_must_be_integer(self) -> None:
         self.submitted_answer.rule_spec_index = '0' # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer, 'Expected rule_spec_index to be an integer')
         self.submitted_answer.rule_spec_index = '' # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer, 'Expected rule_spec_index to be an integer')
         self.submitted_answer.rule_spec_index = 0
         self.submitted_answer.validate()
 
     def test_rule_spec_index_must_be_positive(self) -> None:
         self.submitted_answer.rule_spec_index = -1
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'Expected rule_spec_index to be non-negative')
 
@@ -2088,7 +2088,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         self.submitted_answer.validate()
 
         self.submitted_answer.classification_categorization = 'soft'
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'Expected valid classification_categorization')
 
@@ -2097,7 +2097,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that rule_spec_str is None or str.
     def test_rule_spec_str_must_be_none_or_string(self) -> None:
         self.submitted_answer.rule_spec_str = 10 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'Expected rule_spec_str to be either None or a string')
 
@@ -2112,7 +2112,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     # that answer_str is None or str.
     def test_answer_str_must_be_none_or_string(self) -> None:
         self.submitted_answer.answer_str = 10 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.submitted_answer,
             'Expected answer_str to be either None or a string')
 
@@ -2245,7 +2245,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
         pass
 
     def setUp(self) -> None:
-        super(StateAnswersCalcOutputValidationTests, self).setUp()
+        super().setUp()
         self.state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
             'exp_id', 1, 'initial_state', 'TextInput', 'AnswerFrequencies',
             stats_domain.AnswerFrequencyList.from_raw_type([]))
@@ -2258,7 +2258,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     # that exploration_id is a string.
     def test_exploration_id_must_be_string(self) -> None:
         self.state_answers_calc_output.exploration_id = 0 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected exploration_id to be a string')
 
@@ -2267,7 +2267,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     # that sstate_name is a string.
     def test_state_name_must_be_string(self) -> None:
         self.state_answers_calc_output.state_name = ['state'] # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected state_name to be a string')
 
@@ -2276,7 +2276,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     # that calculation_id is a string.
     def test_calculation_id_must_be_string(self) -> None:
         self.state_answers_calc_output.calculation_id = ['calculation id'] # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected calculation_id to be a string')
 
@@ -2286,7 +2286,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     def test_calculation_output_must_be_known_type(self) -> None:
         self.state_answers_calc_output.calculation_output = (
             self.MockCalculationOutputObjectWithUnknownType()) # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected calculation output to be one of')
 
@@ -2298,7 +2298,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
         self.state_answers_calc_output.calculation_output = (
             stats_domain.AnswerFrequencyList(
                 [occurred_answer] * 200000))
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.state_answers_calc_output,
             'calculation_output is too big to be stored')
 
@@ -2306,7 +2306,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(LearnerAnswerDetailsTests, self).setUp()
+        super().setUp()
         self.learner_answer_details = stats_domain.LearnerAnswerDetails(
             'exp_id:state_name', feconf.ENTITY_TYPE_EXPLORATION,
             'TextInput', [stats_domain.LearnerAnswerInfo(
@@ -2419,7 +2419,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         self.assertNotEqual(
             self.learner_answer_details.accumulated_answer_info_json_size_bytes,
             0)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Learner answer info with the given id not found'):
             self.learner_answer_details.delete_learner_answer_info('id_3')
         self.assertEqual(
@@ -2439,7 +2439,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     # that state_reference is str.
     def test_state_reference_must_be_string(self) -> None:
         self.learner_answer_details.state_reference = 0 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Expected state_reference to be a string')
 
@@ -2448,32 +2448,32 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     # that entity_type is str.
     def test_entity_type_must_be_string(self) -> None:
         self.learner_answer_details.entity_type = 0 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Expected entity_type to be a string')
 
     def test_entity_type_must_be_valid(self,) -> None:
         self.learner_answer_details.entity_type = 'topic'
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Invalid entity type received topic')
 
     def test_state_reference_must_be_valid_for_exploration(self) -> None:
         self.learner_answer_details.state_reference = 'expidstatename'
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'For entity type exploration, the state reference should')
 
     def test_state_reference_must_be_valid_for_question(self) -> None:
         self.learner_answer_details.entity_type = 'question'
         self.learner_answer_details.state_reference = 'expid:statename'
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'For entity type question, the state reference should')
 
     def test_interaction_id_must_be_valid(self) -> None:
         self.learner_answer_details.interaction_id = 'MyInteraction'
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Unknown interaction_id: MyInteraction')
 
@@ -2482,13 +2482,13 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     # that interaction_id is str.
     def test_interaction_id_must_be_string(self) -> None:
         self.learner_answer_details.interaction_id = 0 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Expected interaction_id to be a string')
 
     def test_continue_interaction_cannot_solicit_answer_details(self) -> None:
         self.learner_answer_details.interaction_id = 'Continue'
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'The Continue interaction does not support '
             'soliciting answer details')
@@ -2497,7 +2497,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.learner_answer_details.interaction_id = 'EndExploration'
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'The EndExploration interaction does not support '
             'soliciting answer details')
@@ -2507,7 +2507,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     # that learner_answer_info is a List.
     def test_learner_answer_info_must_be_list(self) -> None:
         self.learner_answer_details.learner_answer_info_list = 'list' # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Expected learner_answer_info_list to be a list')
 
@@ -2516,7 +2516,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     # that learner_answer_info_schema_version is int.
     def test_learner_answer_info_schema_version_must_be_int(self) -> None:
         self.learner_answer_details.learner_answer_info_schema_version = 'v' # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Expected learner_answer_info_schema_version to be an int')
 
@@ -2526,7 +2526,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     def test_accumulated_answer_info_json_size_bytes_must_be_int(self) -> None:
         self.learner_answer_details.accumulated_answer_info_json_size_bytes = (
             'size') # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_details,
             'Expected accumulated_answer_info_json_size_bytes to be an int')
 
@@ -2534,7 +2534,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 class LearnerAnswerInfoTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(LearnerAnswerInfoTests, self).setUp()
+        super().setUp()
         self.learner_answer_info = stats_domain.LearnerAnswerInfo(
             'id_1', 'This is my answer', 'This is my answer details',
             datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
@@ -2604,12 +2604,12 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
     # id type.
     def test_id_must_be_string(self) -> None:
         self.learner_answer_info.id = 123 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info, 'Expected id to be a string')
 
     def test_answer_must_not_be_none(self) -> None:
         self.learner_answer_info.answer = None
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'The answer submitted by the learner cannot be empty')
 
@@ -2618,13 +2618,13 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
     # that answer is not an empty dict.
     def test_answer_must_not_be_empty_dict(self) -> None:
         self.learner_answer_info.answer = {} # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'The answer submitted cannot be an empty dict')
 
     def test_answer_must_not_be_empty_string(self) -> None:
         self.learner_answer_info.answer = ''
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'The answer submitted cannot be an empty string')
 
@@ -2633,7 +2633,7 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
     # that answer_details from learner_answer_info is not None.
     def test_answer_details_must_not_be_none(self) -> None:
         self.learner_answer_info.answer_details = None # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'Expected answer_details to be a string')
 
@@ -2642,19 +2642,19 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
     # answer_details is str.
     def test_answer_details_must_be_string(self) -> None:
         self.learner_answer_info.answer_details = 1 # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'Expected answer_details to be a string')
 
     def test_answer_details_must_not_be_empty_string(self) -> None:
         self.learner_answer_info.answer_details = ''
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'The answer details submitted cannot be an empty string')
 
     def test_large_answer_details_must_not_be_stored(self) -> None:
         self.learner_answer_info.answer_details = 'abcdef' * 2000
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'The answer details size is to large to be stored')
 
@@ -2663,6 +2663,6 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
     # that created_on is a datetime.
     def test_created_on_must_be_datetime_type(self) -> None:
         self.learner_answer_info.created_on = '19 June 2019' # type: ignore[assignment]
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             self.learner_answer_info,
             'Expected created_on to be a datetime')

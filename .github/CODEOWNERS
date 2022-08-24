@@ -201,6 +201,7 @@
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/button-directives/hint-and-solution-buttons.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/checkpoint-celebration-modal/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
 /core/templates/components/on-screen-keyboard/ @oppia/interaction-and-rte-reviewers
@@ -394,7 +395,7 @@
 /core/controllers/practice_sessions*.py @oppia/lace-backend-reviewers
 /core/controllers/question*.py @oppia/lace-backend-reviewers
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
-/core/domain/classroom_domain*.py @oppia/lace-backend-reviewers
+/core/domain/classroom*.py @oppia/lace-backend-reviewers
 /core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers

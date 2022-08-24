@@ -46,12 +46,12 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     STORY_ID_2 = 'story_id_2'
 
     def setUp(self) -> None:
-        super(LearnerGroupServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email( # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()
@@ -75,7 +75,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
-        self.save_new_story( # type: ignore[no-untyped-call]
+        self.save_new_story(
             self.STORY_ID_0, self.admin_id, self.TOPIC_ID_0,
             'Story test 0')
         topic_services.add_canonical_story( # type: ignore[no-untyped-call]
@@ -101,7 +101,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
-        self.save_new_story( # type: ignore[no-untyped-call]
+        self.save_new_story(
             self.STORY_ID_1, self.admin_id, self.TOPIC_ID_1,
             'Story test 1')
         topic_services.add_canonical_story( # type: ignore[no-untyped-call]
@@ -297,7 +297,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
         # Test for univited student.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Student was not invited to join the learner group.'
         ):

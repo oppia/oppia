@@ -59,7 +59,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_exploration_count(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
         exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
@@ -73,7 +73,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_exploration.objective, 'An Objective')
 
     def test_reconstitute(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
         exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
@@ -166,7 +166,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_6_NEW = 'id_6_new'
 
     def setUp(self) -> None:
-        super(ExplorationRightsModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
@@ -381,7 +381,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_COMMITTER = 'id_4'
 
     def setUp(self) -> None:
-        super(ExplorationRightsModelRevertUnitTest, self).setUp()
+        super().setUp()
         self.exploration_model = exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -562,7 +562,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'max_age must be a datetime.timedelta instance or None.'
         ):
             # TODO(#13528): Remove this test after the backend is fully
@@ -620,7 +620,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_3_NEW = 'id_3_new'
 
     def setUp(self) -> None:
-        super(ExpSummaryModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',
@@ -1070,7 +1070,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             exp_models.TransientCheckpointUrlModel)
 
         # Test get_new_progress_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New id generator is producing too many collisions.'
         ):

@@ -32,7 +32,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJob domain."""
 
     def setUp(self) -> None:
-        super(ClassifierTrainingJobDomainTests, self).setUp()
+        super().setUp()
 
         self.training_data: classifier_domain.TrainingDataType = [
             {
@@ -117,7 +117,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def test_validation_status(self) -> None:
         self.training_job_dict['status'] = 'invalid_status'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             re.escape(
                 'Expected status to be in %s'
@@ -127,7 +127,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def test_validation_interaction_id(self) -> None:
         self.training_job_dict['interaction_id'] = 'invalid_interaction_id'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid interaction id'):
             training_job.validate()
 
@@ -138,7 +138,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             }
         ]
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected answer_group_index to be a key in training_data'
             'list item'):
@@ -151,7 +151,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             }
         ]
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected answers to be a key in training_data list item'):
             training_job.validate()
@@ -163,21 +163,21 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def test_validation_with_invalid_state_name(self) -> None:
         self.training_job_dict['state_name'] = 'A string #'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid character # in the state name'):
             training_job.validate()
 
     def test_validation_with_invalid_algorithm_id(self) -> None:
         self.training_job_dict['algorithm_id'] = 'abc'
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid algorithm id'):
             training_job.validate()
 
     def test_validation_with_invalid_training_data(self) -> None:
         self.training_job_dict['training_data'] = {}
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected training_data to be a list'):
             training_job.validate()
 
@@ -193,7 +193,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
 
     def test_status_update_with_invalid_status(self) -> None:
         training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The status change %s to %s is not valid.' %
             ('NEW', 'invalid_status')):
@@ -251,7 +251,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     """Tests for the StateTrainingJobsMapping domain."""
 
     def setUp(self) -> None:
-        super(StateTrainingJobsMappingDomainTests, self).setUp()
+        super().setUp()
 
         self.mapping_dict: classifier_domain.StateTrainingJobsMappingDict = {
             'exp_id': 'exp_id1',
@@ -298,7 +298,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     def test_exp_version_with_invalid_data(self) -> None:
         self.mapping_dict['exp_version'] = -2
         mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected version to be greater than 0'):
             mapping.validate()
 
@@ -326,7 +326,7 @@ class OppiaMLAuthInfoDomainTests(unittest.TestCase):
     """Tests for the OppiaMLAuthInfo domain."""
 
     def setUp(self) -> None:
-        super(OppiaMLAuthInfoDomainTests, self).setUp()
+        super().setUp()
 
         self.oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
             'hello'.encode('utf-8'), 'world', '!')

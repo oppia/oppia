@@ -26,7 +26,7 @@
         </h4>
         <div class="progress-bar-container"
              [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
-          <div class="progress-bar"
+          <div class="lesson-progress-bar"
                [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
             <div class="completed-progress-bar"
                  [style.width.%]="getCompletedProgressBarWidth()">
@@ -37,6 +37,10 @@
             {{ idx + 1 }}
           </div>
         </div>
+        <p *ngIf="translatedCongratulatoryCheckpointMessage"
+           class="checkpoint-message-text">
+          {{ translatedCongratulatoryCheckpointMessage }}
+        </p>
         <div class="save-progress-btn-container">
           <button type="button"
                   class="btn btn-secondary save-progress-btn"

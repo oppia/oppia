@@ -43,15 +43,15 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     USER_ID: Final = 'user'
 
     def setUp(self) -> None:
-        super(StoryFetchersUnitTests, self).setUp()
+        super().setUp()
         self.story_id = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(
             self.story_id, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
         )
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
@@ -63,7 +63,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 'title': 'Title 1'
             })
         ]
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             self.USER_ID, self.story_id, changelist,
             'Added node.')
         self.story = story_fetchers.get_story_by_id(self.story_id)
@@ -71,13 +71,13 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
-        self.set_topic_managers(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
@@ -120,7 +120,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_latest_completed_node_ids(self) -> None:
         self.assertEqual(story_fetchers.get_latest_completed_node_ids(
             self.USER_ID, self.story_id), [])
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
         self.assertEqual(
             story_fetchers.get_latest_completed_node_ids(
@@ -144,7 +144,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 versioned_story_contents, story_id
         )
         versioned_story_contents['schema_version'] = 6
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
@@ -214,7 +214,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(user_stories_progress[0]['topic_name'], 'Topic')
 
-        story_services.record_completed_node_in_story_context( # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
 
         all_users_stories_progress = (
@@ -252,9 +252,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             story_fetchers.get_completed_node_ids('randomID', 'someID'),
             []
         )
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_2)
         self.assertEqual(
             story_fetchers.get_completed_node_ids(self.USER_ID, self.story_id),
@@ -274,9 +274,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_completed_nodes_in_story(self) -> None:
         story = story_fetchers.get_story_by_id(self.story_id)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_2)
         for ind, completed_node in enumerate(
                 story_fetchers.get_completed_nodes_in_story(
@@ -293,13 +293,13 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(node_index, 0)
 
         # Tests error should be raised if story or node doesn't exist.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id node_5 is not part of this story.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 self.story_id, 'node_5')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Story with id story_id_2 does not exist.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1)

@@ -25,6 +25,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { UserService } from 'services/user.service';
 import { ReleaseCoordinatorPageConstants } from '../release-coordinator-page.constants';
 import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.component';
+import { UserInfo } from 'domain/user/user-info.model';
 
 
 describe('Release coordinator navbar component', () => {
@@ -62,7 +63,7 @@ describe('Release coordinator navbar component', () => {
     spyOn(userService, 'getProfileImageDataUrlAsync')
       .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo);
+      .and.resolveTo(userInfo as UserInfo);
     spyOn(component.activeTabChange, 'emit');
     component.ngOnInit();
   }));

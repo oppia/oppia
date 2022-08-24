@@ -53,12 +53,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     skill_id_2 = 'skill_2'
 
     def setUp(self) -> None:
-        super(SubtopicPageServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email( # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
 
@@ -212,7 +212,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'title': 'Sample',
                 'url_fragment': 'sample-fragment-one'
             })])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unexpected error: received an invalid change list *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', [])
@@ -223,7 +223,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_id_1)
         subtopic_page_1.version = 2
         subtopic_page_model_1.version = 3
-        with self.assertRaisesRegex(Exception, 'Trying to update version *'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
                 [topic_domain.TopicChange({
@@ -234,7 +234,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 })])
         subtopic_page_1.version = 3
         subtopic_page_model_1.version = 2
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unexpected error: trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
@@ -264,13 +264,13 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         subtopic_page_services.delete_subtopic_page(
             self.user_id, self.TOPIC_ID, 1)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
                 'Entity for class SubtopicPageModel with id %s not found' % (
                     subtopic_page_id))):
             subtopic_models.SubtopicPageModel.get(subtopic_page_id)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
                 'Entity for class SubtopicPageModel with id %s not found' % (
@@ -620,7 +620,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v2 page schemas at present.')
 

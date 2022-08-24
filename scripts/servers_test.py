@@ -46,14 +46,14 @@ class ManagedProcessTests(test_utils.TestBase):
         collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
 
     def setUp(self):
-        super(ManagedProcessTests, self).setUp()
+        super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
             self.exit_stack.close()
         finally:
-            super(ManagedProcessTests, self).tearDown()
+            super().tearDown()
 
     @contextlib.contextmanager
     def swap_popen(self, unresponsive=False, num_children=0, outputs=()):
@@ -495,13 +495,13 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_to_always_return(
             common, 'wait_for_port_to_be_in_use'))
 
-        self.assertRaisesRegex(
+        with self.assertRaisesRegex(
             Exception,
             'The redis command line interface is not installed because '
             'your machine is on the Windows operating system. The redis '
-            'server cannot start.',
-            lambda: self.exit_stack.enter_context(
-                servers.managed_redis_server()))
+            'server cannot start.'
+        ):
+            self.exit_stack.enter_context(servers.managed_redis_server())
 
     def test_managed_redis_server(self):
         original_os_remove = os.remove
@@ -757,10 +757,12 @@ class ManagedProcessTests(test_utils.TestBase):
         str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
-        self.assertRaisesRegex(
-            IOError, 'First build never completed',
-            lambda: self.exit_stack.enter_context(
-                servers.managed_webpack_compiler(watch_mode=True)))
+        with self.assertRaisesRegex(
+            IOError, 'First build never completed'
+        ):
+            self.exit_stack.enter_context(
+                servers.managed_webpack_compiler(watch_mode=True)
+            )
         self.assert_matches_regexps(str_io.getvalue().strip().split('\n'), [
             'Starting new Webpack Compiler',
             'abc',

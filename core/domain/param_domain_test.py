@@ -29,17 +29,18 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
     def setUp(self) -> None:
-        self.sample_customization_args: param_domain.CustomizationArgsDict = {
+        self.sample_customization_args: (
+            param_domain.CustomizationArgsDictWithValue
+        ) = {
             'value': '5',
             'parse_with_jinja': True,
-            'list_of_values': []
         }
 
     def test_param_spec_validation(self) -> None:
         """Test validation of param specs."""
 
         param_spec = param_domain.ParamSpec('Real')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'is not among the supported object types'
         ):
             param_spec.validate()
@@ -58,7 +59,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_change_validation(self) -> None:
         """Test validation of parameter changes."""
         # Raise an error because the name is invalid.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Only parameter names'
         ):
             param_domain.ParamChange(
@@ -68,7 +69,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ).validate()
 
         # Raise an error because generator ID is not string.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected generator ID to be a string'
         ):
             # TODO(#13059): After we fully type the codebase we plan to get
@@ -81,7 +82,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ).validate()
 
         # Raise an error because no such generator type exists.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid generator ID'
         ):
             param_domain.ParamChange(
@@ -91,7 +92,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ).validate()
 
         # Raise an error because customization_args is not a dict.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected a dict'
         ):
             # TODO(#13059): After we fully type the codebase we plan to get
@@ -100,7 +101,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()  # type: ignore[arg-type]
 
         # Raise an error because the param_change name is not a string.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected param_change name to be a string, received'
         ):
@@ -115,12 +116,15 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
         # Raise an error because the arg names in customization_args are not
         # strings.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid parameter change customization_arg name:'):
             # TODO(#13059): After we fully type the codebase we plan to get
             # rid of the tests that intentionally test wrong inputs that we
             # can normally catch by typing.
-            param_domain.ParamChange('abc', 'Copier', {1: '1'}).validate()  # type: ignore[misc]
+            customization_args_dict = {1: '1'}
+            param_domain.ParamChange(
+                'abc', 'Copier', customization_args_dict  # type: ignore[arg-type]
+            ).validate()
 
     def test_param_spec_to_dict(self) -> None:
         sample_dict = {
@@ -138,18 +142,14 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
     def test_param_change_class(self) -> None:
         """Test the ParamChange class."""
-        # The argument `customization_args` of ParamChange() can only accept
-        # values of type CustomizationArgsDict, but for testing purposes here
-        # we are providing dictionary that only contain `value` key. Thus to
-        # avoid MyPy's missing keys error, we added an ignore here.
         param_change = param_domain.ParamChange(
-            'abc', 'Copier', {'value': '3'})   # type: ignore[typeddict-item]
+            'abc', 'Copier', {'value': '3', 'parse_with_jinja': True})
         self.assertEqual(param_change.name, 'abc')
         self.assertEqual(param_change.generator.id, 'Copier')
         self.assertEqual(param_change.to_dict(), {
             'name': 'abc',
             'generator_id': 'Copier',
-            'customization_args': {'value': '3'}
+            'customization_args': {'value': '3', 'parse_with_jinja': True}
         })
         self.assertEqual(param_change.get_value({}), '3')
 

@@ -54,12 +54,12 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
     USER_USERNAME: Final = 'user'
 
     def setUp(self) -> None:
-        super(LearnerPlaylistTests, self).setUp()
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
         # Save a few explorations.
         self.save_new_valid_exploration(
@@ -76,16 +76,16 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             category='Welcome', language_code='en')
 
         # Save a few collections.
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_0, self.owner_id, title='Bridges',
             category='Architecture')
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Introduce Oppia',
             category='Welcome')
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_2, self.user_id,
             title='Introduce Interactions in Oppia', category='Welcome')
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_3, self.owner_id, title='Welcome Oppia Collection',
             category='Welcome')
 

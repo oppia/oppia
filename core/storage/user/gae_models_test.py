@@ -65,7 +65,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     GENERIC_DISPLAY_ALIAS = 'display_alias'
 
     def setUp(self) -> None:
-        super(UserSettingsModelTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
@@ -268,12 +268,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             user_models.UserSettingsModel.get_by_role(
                 feconf.ROLE_ID_CURRICULUM_ADMIN), actual_users)
 
     def test_export_data_for_nonexistent_user_raises_exception(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user not found'):
             user_models.UserSettingsModel.export_data('fake_user')
@@ -356,7 +356,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.DeletedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.DeletedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -368,7 +368,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.UserSettingsModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -388,7 +388,7 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(CompletedActivitiesModelTests, self).setUp()
+        super().setUp()
 
         user_models.CompletedActivitiesModel(
             id=self.USER_1_ID,
@@ -488,7 +488,7 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(IncompleteActivitiesModelTests, self).setUp()
+        super().setUp()
 
         user_models.IncompleteActivitiesModel(
             id=self.USER_1_ID,
@@ -587,7 +587,7 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(LearnerGoalsModelTests, self).setUp()
+        super().setUp()
 
         user_models.LearnerGoalsModel(
             id=self.USER_1_ID,
@@ -677,7 +677,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     EXP_VERSION = 1
 
     def setUp(self) -> None:
-        super(ExpUserLastPlaythroughModelTest, self).setUp()
+        super().setUp()
 
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID_1, self.EXP_ID_0),
@@ -837,7 +837,7 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(LearnerPlaylistModelTests, self).setUp()
+        super().setUp()
 
         user_models.LearnerPlaylistModel(
             id=self.USER_ID_1,
@@ -925,13 +925,13 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserContributionsModelTests, self).setUp()
+        super().setUp()
         # User A has no created explorations, one edited exploration.
         # User B has two created and edited explorations.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL) # type: ignore[no-untyped-call]
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL) # type: ignore[no-untyped-call]
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
 
         # Note that creating an exploration counts as editing it.
         self.save_new_valid_exploration(
@@ -1042,7 +1042,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserEmailPreferencesModelTests, self).setUp()
+        super().setUp()
 
         user_models.UserEmailPreferencesModel(id=self.USER_ID_1).put()
         user_models.UserEmailPreferencesModel(
@@ -1157,7 +1157,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserSubscriptionsModelTests, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com'
@@ -1307,7 +1307,7 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserSubscribersModelTests, self).setUp()
+        super().setUp()
 
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
@@ -1380,7 +1380,7 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserRecentChangesBatchModelTests, self).setUp()
+        super().setUp()
 
         user_models.UserRecentChangesBatchModel(id=self.USER_ID_1).put()
         user_models.UserRecentChangesBatchModel(
@@ -1483,7 +1483,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserStatsModelTest, self).setUp()
+        super().setUp()
 
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -1624,7 +1624,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     EXP_ID_THREE = 'exp_id_three'
 
     def setUp(self) -> None:
-        super(ExplorationUserDataModelTest, self).setUp()
+        super().setUp()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_1_ID, self.EXP_ID_ONE),
             user_id=self.USER_1_ID,
@@ -1906,7 +1906,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
     COMPLETED_EXPLORATION_IDS_2 = ['exp_id_4', 'exp_id_5', 'exp_id_6']
 
     def setUp(self) -> None:
-        super(CollectionProgressModelTests, self).setUp()
+        super().setUp()
 
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1),
@@ -2099,7 +2099,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     COMPLETED_NODE_IDS_2 = ['node_id_a']
 
     def setUp(self) -> None:
-        super(StoryProgressModelTests, self).setUp()
+        super().setUp()
         user_models.StoryProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.STORY_ID_1),
             user_id=self.USER_ID_1,
@@ -2276,7 +2276,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserQueryModelTests, self).setUp()
+        super().setUp()
 
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
@@ -2480,7 +2480,7 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserBulkEmailsModelTests, self).setUp()
+        super().setUp()
 
         user_models.UserBulkEmailsModel(id=self.USER_ID_1).put()
         user_models.UserBulkEmailsModel(id=self.USER_ID_2, deleted=True).put()
@@ -2543,7 +2543,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     DEGREE_OF_MASTERY = 0.5
 
     def setUp(self) -> None:
-        super(UserSkillMasteryModelTests, self).setUp()
+        super().setUp()
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_1_ID, self.SKILL_ID_1),
@@ -2698,7 +2698,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UserContributionProficiencyModelTests, self).setUp()
+        super().setUp()
 
         user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
@@ -2812,7 +2812,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
     def test_create_entry_already_exists_failure(self) -> None:
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is already a UserContributionProficiencyModel '
             'entry with the given id: category1.user1'):
             user_models.UserContributionProficiencyModel.create(
@@ -3143,7 +3143,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(PendingDeletionRequestModelTests, self).setUp()
+        super().setUp()
 
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
@@ -3211,7 +3211,7 @@ class DeletedUserModelTests(test_utils.GenericTestBase):
     USER_1_ID = 'user_1_id'
 
     def setUp(self) -> None:
-        super(DeletedUserModelTests, self).setUp()
+        super().setUp()
         user_models.DeletedUserModel(
             id=self.USER_1_ID
         ).put()
@@ -3263,7 +3263,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.PseudonymizedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -3292,7 +3292,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.PseudonymizedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
