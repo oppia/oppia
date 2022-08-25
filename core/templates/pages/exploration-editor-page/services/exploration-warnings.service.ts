@@ -249,19 +249,21 @@ export class ExplorationWarningsService {
       // Go through all states, taking in the dest and source
       // calculate distance for each, if invalid push in results.
       seen[stateName] = true;
-      let interaction = states.getState(stateName).interaction;
-      if (interaction.defaultOutcome) {
-        let defaultDest = interaction.defaultOutcome.dest;
-        if (defaultDest !== stateName && seen[defaultDest] &&
-          !this.redirectionIsValid(defaultDest, stateName, links)) {
-          results.push(stateName);
+      let state = states.getState(stateName);
+      if(state && state.interaction) {
+        if (state.interaction.defaultOutcome) {
+          let defaultDest = state.interaction.defaultOutcome.dest;
+          if (defaultDest !== stateName && seen[defaultDest] &&
+            !this.redirectionIsValid(defaultDest, stateName, links)) {
+            results.push(stateName);
+          }
         }
-      }
-      let answerGroups = interaction.answerGroups;
-      for (let i = 0; i < answerGroups.length; i++) {
-        let dest = answerGroups[i].outcome.dest;
-        if (seen[dest] && !this.redirectionIsValid(dest, stateName, links)) {
-          results.push(stateName);
+        let answerGroups = state.interaction.answerGroups;
+        for (let i = 0; i < answerGroups.length; i++) {
+          let dest = answerGroups[i].outcome.dest;
+          if (seen[dest] && !this.redirectionIsValid(dest, stateName, links)) {
+            results.push(stateName);
+          }
         }
       }
     });
