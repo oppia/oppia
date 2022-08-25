@@ -17,42 +17,42 @@ import { LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict } from
 
 /**
  * @fileoverview Model for displaying instances of frontend domain objects of
- * all students info of the learner group.
+ * all learners info of the learner group.
  */
 
-export interface LearnerGroupAllStudentsInfoBackendDict {
-  students_info: LearnerGroupUserInfoBackendDict[];
-  invited_students_info: LearnerGroupUserInfoBackendDict[];
+export interface LearnerGroupAllLearnersInfoBackendDict {
+  learners_info: LearnerGroupUserInfoBackendDict[];
+  invited_learners_info: LearnerGroupUserInfoBackendDict[];
 }
 
-export class LearnerGroupAllStudentsInfo {
-  _studentsInfo: LearnerGroupUserInfo[];
-  _invitedStudentsInfo: LearnerGroupUserInfo[];
+export class LearnerGroupAllLearnersInfo {
+  _learnersInfo: LearnerGroupUserInfo[];
+  _invitedLearnersInfo: LearnerGroupUserInfo[];
 
   constructor(
-      studentsInfo: LearnerGroupUserInfo[],
-      invitedStudentsInfo: LearnerGroupUserInfo[]
+      learnersInfo: LearnerGroupUserInfo[],
+      invitedLearnersInfo: LearnerGroupUserInfo[]
   ) {
-    this._studentsInfo = studentsInfo;
-    this._invitedStudentsInfo = invitedStudentsInfo;
+    this._learnersInfo = learnersInfo;
+    this._invitedLearnersInfo = invitedLearnersInfo;
   }
 
-  get studentsInfo(): LearnerGroupUserInfo[] {
-    return this._studentsInfo;
+  get learnersInfo(): LearnerGroupUserInfo[] {
+    return this._learnersInfo;
   }
 
-  get invitedStudentsInfo(): LearnerGroupUserInfo[] {
-    return this._invitedStudentsInfo;
+  get invitedLearnersInfo(): LearnerGroupUserInfo[] {
+    return this._invitedLearnersInfo;
   }
 
   static createFromBackendDict(
-      infoBackendDict: LearnerGroupAllStudentsInfoBackendDict
-  ): LearnerGroupAllStudentsInfo {
-    return new LearnerGroupAllStudentsInfo(
-      infoBackendDict.students_info.map((info) => {
+      infoBackendDict: LearnerGroupAllLearnersInfoBackendDict
+  ): LearnerGroupAllLearnersInfo {
+    return new LearnerGroupAllLearnersInfo(
+      infoBackendDict.learners_info.map((info) => {
         return LearnerGroupUserInfo.createFromBackendDict(info);
       }),
-      infoBackendDict.invited_students_info.map((info) => {
+      infoBackendDict.invited_learners_info.map((info) => {
         return LearnerGroupUserInfo.createFromBackendDict(info);
       }));
   }

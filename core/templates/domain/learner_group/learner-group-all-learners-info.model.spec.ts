@@ -12,44 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { LearnerGroupAllStudentsInfo } from './learner-group-all-students-info.model';
+import { LearnerGroupAllLearnersInfo } from './learner-group-all-learners-info.model';
 
 /**
- * @fileoverview Tests for learner group all students info model.
+ * @fileoverview Tests for learner group all learners info model.
  */
 
-describe('Learner Group All Students Info', () => {
+describe('Learner Group All Learners Info', () => {
   it('should correctly convert backend dict to object', () => {
-    const sampleLearnerGroupAllStudentsInfoDict = {
-      students_info: [{
+    const sampleLearnerGroupAllLearnersInfoDict = {
+      learners_info: [{
         username: 'user1',
         profile_picture_data_url: 'profile_picture',
         error: 'some error message'
       }],
-      invited_students_info: [{
+      invited_learners_info: [{
         username: 'user2',
         profile_picture_data_url: 'profile_picture2',
         error: 'some error message'
       }]
     };
 
-    const sampleAllStudentsInfo = (
-      LearnerGroupAllStudentsInfo.createFromBackendDict(
-        sampleLearnerGroupAllStudentsInfoDict)
+    const sampleAllLearnersInfo = (
+      LearnerGroupAllLearnersInfo.createFromBackendDict(
+        sampleLearnerGroupAllLearnersInfoDict)
     );
 
-    expect(sampleAllStudentsInfo.studentsInfo[0].username).toEqual('user1');
+    expect(sampleAllLearnersInfo.learnersInfo[0].username).toEqual('user1');
     expect(
-      sampleAllStudentsInfo.studentsInfo[0].userProfilePictureUrl
+      sampleAllLearnersInfo.learnersInfo[0].userProfilePictureUrl
     ).toEqual('profile_picture');
-    expect(sampleAllStudentsInfo.studentsInfo[0].error).toEqual(
+    expect(sampleAllLearnersInfo.learnersInfo[0].error).toEqual(
       'some error message');
-    expect(sampleAllStudentsInfo.invitedStudentsInfo[0].username).toEqual(
+    expect(sampleAllLearnersInfo.invitedLearnersInfo[0].username).toEqual(
       'user2');
     expect(
-      sampleAllStudentsInfo.invitedStudentsInfo[0].userProfilePictureUrl
+      sampleAllLearnersInfo.invitedLearnersInfo[0].userProfilePictureUrl
     ).toEqual('profile_picture2');
-    expect(sampleAllStudentsInfo.invitedStudentsInfo[0].error).toEqual(
+    expect(sampleAllLearnersInfo.invitedLearnersInfo[0].error).toEqual(
       'some error message');
   });
 });

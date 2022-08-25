@@ -56,10 +56,10 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   ngOnInit(): void {
     this.activeTab = this.EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS;
     if (this.learnerGroup) {
-      this.learnerGroupBackendApiService.fetchStudentsInfoAsync(
+      this.learnerGroupBackendApiService.fetchLearnersInfoAsync(
         this.learnerGroup.id).then((learnersInfo) => {
-        this.currentLearnersInfo = learnersInfo.studentsInfo;
-        this.invitedLearnersInfo = learnersInfo.invitedStudentsInfo;
+        this.currentLearnersInfo = learnersInfo.learnersInfo;
+        this.invitedLearnersInfo = learnersInfo.invitedLearnersInfo;
       });
     }
   }
@@ -118,7 +118,7 @@ export class LearnerGroupPreferencesComponent implements OnInit {
 
     modalRef.result.then((data) => {
       this.invitedLearners = data.invitedLearners;
-      this.learnerGroup.inviteStudents(this.invitedLearners);
+      this.learnerGroup.inviteLearners(this.invitedLearners);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
         this.learnerGroup = learnerGroup;
@@ -166,7 +166,7 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     );
 
     modalRef.result.then(() => {
-      this.learnerGroup.removeStudent(learner.username);
+      this.learnerGroup.removeLearner(learner.username);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
         this.learnerGroup = learnerGroup;
@@ -211,7 +211,7 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   }
 
   addLearnerToLearnerGroup(learner: LearnerGroupUserInfo): void {
-    this.learnerGroup.addStudent(learner.username);
+    this.learnerGroup.addLearner(learner.username);
     this.learnerGroup.revokeInvitation(learner.username);
     this.invitedLearnersInfo = this.invitedLearnersInfo.filter(
       (invitedLearner) => invitedLearner.username !== learner.username

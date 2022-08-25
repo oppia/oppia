@@ -91,7 +91,7 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
   }
 
   getLearnersCount(): number {
-    return this.learnerGroup.studentUsernames.length;
+    return this.learnerGroup.learnerUsernames.length;
   }
 
   ngOnDestroy(): void {

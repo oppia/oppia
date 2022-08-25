@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the invite students modal component.
+ * @fileoverview Unit tests for the invite learners modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -74,7 +74,7 @@ describe('Invite Learners Modal Component', function() {
     });
   });
 
-  it('should update newly invited students and their info', () => {
+  it('should update newly invited learners and their info', () => {
     const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'user1',
       profile_picture_data_url: 'picture',

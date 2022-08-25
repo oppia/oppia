@@ -107,8 +107,8 @@ describe('LearnerGroupOverviewComponent', () => {
     title: 'title',
     description: 'description',
     facilitator_usernames: ['facilitator_username'],
-    student_usernames: ['username2'],
-    invited_student_usernames: ['username1'],
+    learner_usernames: ['username2'],
+    invited_learner_usernames: ['username1'],
     subtopic_page_ids: ['topicId1:1'],
     story_ids: ['sample_story_id']
   };

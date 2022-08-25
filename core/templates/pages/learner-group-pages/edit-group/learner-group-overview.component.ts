@@ -49,10 +49,10 @@ export class LearnerGroupOverviewComponent implements OnInit {
 
   ngOnInit(): void {
     this.activeTab = this.EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS;
-    if (this.learnerGroup && this.learnerGroup.studentUsernames.length > 0) {
+    if (this.learnerGroup && this.learnerGroup.learnerUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
         .fetchLearnersProgressInAssignedSyllabus(
-          this.learnerGroup.id, this.learnerGroup.studentUsernames
+          this.learnerGroup.id, this.learnerGroup.learnerUsernames
         ).then(learnersProgress => {
           this.learnersProgress = learnersProgress;
         });

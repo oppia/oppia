@@ -185,7 +185,7 @@ describe('Story viewer backend API service', () => {
       storyDataEventEmitter);
   });
 
-  it('should successfully fetch students progress in stories chapters',
+  it('should successfully fetch learners progress in stories chapters',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');

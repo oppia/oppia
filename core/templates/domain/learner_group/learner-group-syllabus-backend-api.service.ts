@@ -89,7 +89,7 @@ export class LearnerGroupSyllabusBackendApiService {
 
   async fetchLearnersProgressInAssignedSyllabus(
       learnerGroupId: string,
-      studentUsernames: string[]
+      learnerUsernames: string[]
   ): Promise<LearnerGroupUserProgress[]> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
@@ -103,7 +103,7 @@ export class LearnerGroupSyllabusBackendApiService {
       this.http.get<LearnerGroupUserProgressBackendDict[]>(
         learnerGroupUrl, {
           params: {
-            student_usernames: JSON.stringify(studentUsernames)
+            learner_usernames: JSON.stringify(learnerUsernames)
           }
         }).toPromise().then(usersProgressInfo => {
         resolve(

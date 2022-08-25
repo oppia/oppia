@@ -46,7 +46,7 @@
         + <span translate="I18N_LEARNER_GROUP_ADD_NEW_LEARNER"></span>
       </button>
       <div class="current-group-learners" *ngIf="learnerGroup">
-        <span class="group-learners-title">Current Group Learners({{learnerGroup.studentUsernames.length}})</span>
+        <span class="group-learners-title">Current Group Learners({{learnerGroup.learnerUsernames.length}})</span>
         <div class="group-learners-card" *ngFor="let learnerInfo of currentLearnersInfo">
           <div class="group-learners-card-info">
             <img class="group-learners-card-avatar" [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
@@ -66,7 +66,7 @@
         </div>
       </div>
       <div class="invited-group-learners" *ngIf="learnerGroup">
-        <span class="group-learners-title">Invites Pending({{learnerGroup.invitedStudentUsernames.length}})</span>
+        <span class="group-learners-title">Invites Pending({{learnerGroup.invitedLearnerUsernames.length}})</span>
         <div class="group-learners-card" *ngFor="let learnerInfo of invitedLearnersInfo">
           <div class="group-learners-card-info">
             <img class="group-learners-card-avatar" [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">

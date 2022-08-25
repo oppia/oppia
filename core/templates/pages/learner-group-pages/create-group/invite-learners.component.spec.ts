@@ -62,7 +62,7 @@ describe('InviteLearnersComponent', () => {
 
   it('should search new learners to add to the learner group',
     fakeAsync(() => {
-      spyOn(learnerGroupBackendApiService, 'searchNewStudentToAddAsync')
+      spyOn(learnerGroupBackendApiService, 'searchNewLearnerToAddAsync')
         .and.returnValue(Promise.resolve(userInfo));
 
       expect(component.invitedUsersInfo).toEqual([]);
@@ -86,7 +86,7 @@ describe('InviteLearnersComponent', () => {
     });
     const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
 
-    spyOn(learnerGroupBackendApiService, 'searchNewStudentToAddAsync')
+    spyOn(learnerGroupBackendApiService, 'searchNewLearnerToAddAsync')
       .and.returnValue(Promise.resolve(userInfo2));
 
     expect(component.invitedUsersInfo).toEqual([]);

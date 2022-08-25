@@ -3048,7 +3048,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # List of learner group ids which the student has been invited to join.
+    # List of learner group ids which the learner has been invited to join.
     invited_to_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
@@ -3150,7 +3150,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
             if learner_grp_usr_model is None:
                 continue
 
-            # If the user has been invited to join the group as student, delete
+            # If the user has been invited to join the group as learner, delete
             # the group id from the invited_to_learner_groups_ids list.
             if (
                 group_id in learner_grp_usr_model.invited_to_learner_groups_ids
@@ -3158,8 +3158,8 @@ class LearnerGroupsUserModel(base_models.BaseModel):
                 learner_grp_usr_model.invited_to_learner_groups_ids.remove(
                     group_id)
 
-            # If the user is a student of the group, delete the corresponding
-            # learner group details of the student stored in
+            # If the user is a learner of the group, delete the corresponding
+            # learner group details of the learner stored in
             # learner_groups_user_details field.
             updated_details = []
 

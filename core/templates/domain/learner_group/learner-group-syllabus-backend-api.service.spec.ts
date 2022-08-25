@@ -150,7 +150,7 @@ describe('Learner Group Syllabus Backend API Service', () => {
     })
   );
 
-  it('should successfully fetch students progress in assigned syllabus',
+  it('should successfully fetch learners progress in assigned syllabus',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -158,7 +158,7 @@ describe('Learner Group Syllabus Backend API Service', () => {
       const LEARNER_GROUP_LEARNERS_PROGRESS_URL = (
         '/learner_group_user_progress_handler/groupId');
 
-      const studentProgressDicts = [{
+      const learnerProgressDicts = [{
         username: 'user1',
         progress_sharing_is_turned_on: true,
         profile_picture_data_url: 'picture',
@@ -172,14 +172,14 @@ describe('Learner Group Syllabus Backend API Service', () => {
 
       var req = httpTestingController.expectOne(
         LEARNER_GROUP_LEARNERS_PROGRESS_URL +
-        '?student_usernames=%5B%22user1%22%5D');
+        '?learner_usernames=%5B%22user1%22%5D');
       expect(req.request.method).toEqual('GET');
-      req.flush(studentProgressDicts);
+      req.flush(learnerProgressDicts);
 
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        studentProgressDicts.map(
+        learnerProgressDicts.map(
           progressInfoDict => LearnerGroupUserProgress.createFromBackendDict(
             progressInfoDict)
         ));

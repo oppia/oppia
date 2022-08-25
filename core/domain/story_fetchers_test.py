@@ -322,7 +322,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         exp_id_1 = 'expid1'
         self.save_new_valid_exploration(exp_id_1, self.USER_ID)
 
-        student_id = 'student1'
+        learner_id = 'learner1'
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -338,10 +338,10 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             'Added node.')
 
         user_services.update_learner_checkpoint_progress(
-            student_id, exp_id_1, 'Introduction', 1)
+            learner_id, exp_id_1, 'Introduction', 1)
 
         user_progress = story_fetchers.get_user_progress_in_story_chapters(
-            student_id, [self.story_id])
+            learner_id, [self.story_id])
 
         self.assertEqual(len(user_progress), 1)
         self.assertEqual(user_progress[0]['exploration_id'], exp_id_1)

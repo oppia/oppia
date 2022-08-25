@@ -49,10 +49,10 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.learnerGroup.studentUsernames.length > 0) {
+    if (this.learnerGroup.learnerUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
         .fetchLearnersProgressInAssignedSyllabus(
-          this.learnerGroup.id, this.learnerGroup.studentUsernames
+          this.learnerGroup.id, this.learnerGroup.learnerUsernames
         ).then(learnersProgress => {
           this.learnersProgress = learnersProgress;
           this.matchingUsersProgress = this.learnersProgress;

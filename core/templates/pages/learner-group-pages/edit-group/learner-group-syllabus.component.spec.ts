@@ -126,8 +126,8 @@ describe('LearnerGroupSyllabusComponent', () => {
     title: 'title',
     description: 'description',
     facilitator_usernames: ['facilitator_username'],
-    student_usernames: [],
-    invited_student_usernames: ['username1'],
+    learner_usernames: [],
+    invited_learner_usernames: ['username1'],
     subtopic_page_ids: ['topicId1:1'],
     story_ids: ['story_id_0']
   };
@@ -259,8 +259,8 @@ describe('LearnerGroupSyllabusComponent', () => {
       title: 'title',
       description: 'description',
       facilitator_usernames: ['facilitator_username'],
-      student_usernames: [],
-      invited_student_usernames: ['username1'],
+      learner_usernames: [],
+      invited_learner_usernames: ['username1'],
       subtopic_page_ids: [],
       story_ids: ['story_id_1']
     };
@@ -319,8 +319,8 @@ describe('LearnerGroupSyllabusComponent', () => {
         title: 'title',
         description: 'description',
         facilitator_usernames: ['facilitator_username'],
-        student_usernames: [],
-        invited_student_usernames: ['username1'],
+        learner_usernames: [],
+        invited_learner_usernames: ['username1'],
         subtopic_page_ids: ['topicId1:0', 'topicId1:1'],
         story_ids: ['story_id_1']
       };
@@ -361,8 +361,8 @@ describe('LearnerGroupSyllabusComponent', () => {
       title: 'title',
       description: 'description',
       facilitator_usernames: ['facilitator_username'],
-      student_usernames: [],
-      invited_student_usernames: ['username1'],
+      learner_usernames: [],
+      invited_learner_usernames: ['username1'],
       subtopic_page_ids: ['topicId1:1'],
       story_ids: ['story_id_0', 'story_id_1']
     };

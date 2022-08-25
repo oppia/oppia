@@ -240,8 +240,8 @@ describe('CreateLearnerGroupPageComponent', () => {
       title: 'title',
       description: 'description',
       facilitator_usernames: ['facilitator_username'],
-      student_usernames: [],
-      invited_student_usernames: ['username1'],
+      learner_usernames: [],
+      invited_learner_usernames: ['username1'],
       subtopic_page_ids: ['subtopic_page_id'],
       story_ids: []
     };

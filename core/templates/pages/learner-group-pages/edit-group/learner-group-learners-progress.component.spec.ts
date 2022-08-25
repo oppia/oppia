@@ -104,8 +104,8 @@ describe('LearnerGroupLearnersProgressComponent', () => {
     title: 'title',
     description: 'description',
     facilitator_usernames: ['facilitator_username'],
-    student_usernames: ['username1'],
-    invited_student_usernames: ['username2'],
+    learner_usernames: ['username1'],
+    invited_learner_usernames: ['username2'],
     subtopic_page_ids: [],
     story_ids: ['story_id_1']
   };

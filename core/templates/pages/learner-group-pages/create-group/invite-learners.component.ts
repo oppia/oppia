@@ -67,7 +67,7 @@ export class InviteLearnersComponent {
         );
         return;
       }
-      this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
+      this.learnerGroupBackendApiService.searchNewLearnerToAddAsync(
         this.learnerGroupID, username
       ).then(userInfo => {
         if (!userInfo.error) {

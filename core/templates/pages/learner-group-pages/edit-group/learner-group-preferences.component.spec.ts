@@ -25,7 +25,7 @@ import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-grou
 import { LearnerGroupPreferencesComponent } from './learner-group-preferences.component';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
-import { LearnerGroupAllStudentsInfo } from 'domain/learner_group/learner-group-all-students-info.model';
+import { LearnerGroupAllLearnersInfo } from 'domain/learner_group/learner-group-all-learners-info.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Pipe({name: 'truncate'})
@@ -46,8 +46,8 @@ describe('LearnerGroupPreferencesComponent', () => {
     title: 'title',
     description: 'description',
     facilitator_usernames: ['facilitator_username'],
-    student_usernames: ['username1'],
-    invited_student_usernames: ['username2'],
+    learner_usernames: ['username1'],
+    invited_learner_usernames: ['username2'],
     subtopic_page_ids: [],
     story_ids: ['story_id_1']
   };
@@ -134,13 +134,13 @@ describe('LearnerGroupPreferencesComponent', () => {
       profile_picture_data_url: 'picture3',
       error: ''
     });
-    const allLearnersInfo = LearnerGroupAllStudentsInfo.createFromBackendDict({
-      students_info: [{
+    const allLearnersInfo = LearnerGroupAllLearnersInfo.createFromBackendDict({
+      learners_info: [{
         username: 'user3',
         profile_picture_data_url: 'picture3',
         error: ''
       }],
-      invited_students_info: [{
+      invited_learners_info: [{
         username: 'username1',
         profile_picture_data_url: 'picture',
         error: ''
@@ -151,7 +151,7 @@ describe('LearnerGroupPreferencesComponent', () => {
         error: ''
       }]
     });
-    spyOn(learnerGroupBackendApiService, 'fetchStudentsInfoAsync')
+    spyOn(learnerGroupBackendApiService, 'fetchLearnersInfoAsync')
       .and.returnValue(Promise.resolve(allLearnersInfo));
 
     expect(component.learnerGroup).toEqual(learnerGroup);
@@ -169,8 +169,8 @@ describe('LearnerGroupPreferencesComponent', () => {
       title: 'some title',
       description: 'some description',
       facilitator_usernames: ['facilitator_username'],
-      student_usernames: ['username1'],
-      invited_student_usernames: ['username2'],
+      learner_usernames: ['username1'],
+      invited_learner_usernames: ['username2'],
       subtopic_page_ids: [],
       story_ids: ['story_id_1']
     };
@@ -204,8 +204,8 @@ describe('LearnerGroupPreferencesComponent', () => {
       title: 'title',
       description: 'description',
       facilitator_usernames: ['facilitator_username'],
-      student_usernames: [],
-      invited_student_usernames: ['username1', 'username2'],
+      learner_usernames: [],
+      invited_learner_usernames: ['username1', 'username2'],
       subtopic_page_ids: [],
       story_ids: ['story_id_1']
     };
@@ -243,8 +243,8 @@ describe('LearnerGroupPreferencesComponent', () => {
       title: 'title',
       description: 'description',
       facilitator_usernames: ['facilitator_username'],
-      student_usernames: [],
-      invited_student_usernames: ['username1', 'username2'],
+      learner_usernames: [],
+      invited_learner_usernames: ['username1', 'username2'],
       subtopic_page_ids: [],
       story_ids: ['story_id_1']
     };
@@ -294,8 +294,8 @@ describe('LearnerGroupPreferencesComponent', () => {
         title: 'title',
         description: 'description',
         facilitator_usernames: ['facilitator_username'],
-        student_usernames: ['username1', 'user3'],
-        invited_student_usernames: ['username2'],
+        learner_usernames: ['username1', 'user3'],
+        invited_learner_usernames: ['username2'],
         subtopic_page_ids: [],
         story_ids: ['story_id_1']
       };
@@ -336,8 +336,8 @@ describe('LearnerGroupPreferencesComponent', () => {
         title: 'title',
         description: 'description',
         facilitator_usernames: ['facilitator_username'],
-        student_usernames: [],
-        invited_student_usernames: ['username1', 'username2'],
+        learner_usernames: [],
+        invited_learner_usernames: ['username1', 'username2'],
         subtopic_page_ids: [],
         story_ids: ['story_id_1']
       };
@@ -388,8 +388,8 @@ describe('LearnerGroupPreferencesComponent', () => {
         title: 'title',
         description: 'description',
         facilitator_usernames: ['facilitator_username'],
-        student_usernames: ['username1', 'user3'],
-        invited_student_usernames: ['username2'],
+        learner_usernames: ['username1', 'user3'],
+        invited_learner_usernames: ['username2'],
         subtopic_page_ids: [],
         story_ids: ['story_id_1']
       };
@@ -431,8 +431,8 @@ describe('LearnerGroupPreferencesComponent', () => {
         title: 'title',
         description: 'description',
         facilitator_usernames: ['facilitator_username'],
-        student_usernames: ['username1'],
-        invited_student_usernames: ['username2', 'user3'],
+        learner_usernames: ['username1'],
+        invited_learner_usernames: ['username2', 'user3'],
         subtopic_page_ids: [],
         story_ids: ['story_id_1']
       };

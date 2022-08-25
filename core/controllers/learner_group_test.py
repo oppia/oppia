@@ -57,7 +57,7 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
         payload = {
             'group_title': 'Learner Group Title',
             'group_description': 'Learner Group Description',
-            'invited_student_usernames':
+            'invited_learner_usernames':
                 [self.USER1_USERNAME, self.USER2_USERNAME],
             'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['story_id_1', 'story_id_2']
@@ -69,9 +69,9 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['title'], 'Learner Group Title')
         self.assertEqual(response['description'], 'Learner Group Description')
         self.assertEqual(
-            response['invited_student_usernames'],
+            response['invited_learner_usernames'],
             [self.USER1_USERNAME, self.USER2_USERNAME])
-        self.assertEqual(response['student_usernames'], [])
+        self.assertEqual(response['learner_usernames'], [])
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             response['id'])
@@ -115,8 +115,8 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
         payload = {
             'group_title': 'Updated Learner Group Title',
             'group_description': 'Learner Group Description',
-            'student_usernames': [],
-            'invited_student_usernames':
+            'learner_usernames': [],
+            'invited_learner_usernames':
                 [self.USER2_USERNAME],
             'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['story_id_1', 'story_id_2']
@@ -129,8 +129,8 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['title'], 'Updated Learner Group Title')
         self.assertEqual(response['description'], 'Learner Group Description')
         self.assertEqual(
-            response['invited_student_usernames'], [self.USER2_USERNAME])
-        self.assertEqual(response['student_usernames'], [])
+            response['invited_learner_usernames'], [self.USER2_USERNAME])
+        self.assertEqual(response['learner_usernames'], [])
         self.assertEqual(
             response['subtopic_page_ids'], ['subtopic_id_1', 'subtopic_id_2'])
         self.assertEqual(response['story_ids'], ['story_id_1', 'story_id_2'])
@@ -149,8 +149,8 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
         payload = {
             'group_title': 'Updated Learner Group Title',
             'group_description': 'Learner Group Description',
-            'student_usernames': [],
-            'invited_student_usernames':
+            'learner_usernames': [],
+            'invited_learner_usernames':
                 [self.USER2_USERNAME],
             'subtopic_page_ids': ['subtopic_id_1', 'subtopic_id_2'],
             'story_ids': ['story_id_1', 'story_id_2']
@@ -231,7 +231,7 @@ class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
 
     LEARNER_GROUP_ID = None
-    STUDENT_ID = 'student_user_1'
+    STUDENT_ID = 'learner_user_1'
     TOPIC_ID_0 = 'topic_id_0'
     TOPIC_ID_1 = 'topic_id_1'
     STORY_ID_0 = 'story_id_0'
@@ -379,9 +379,9 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
             response['description'], self.learner_group.description)
         self.assertEqual(
             response['facilitator_usernames'], [self.NEW_USER_USERNAME])
-        self.assertEqual(response['student_usernames'], [])
+        self.assertEqual(response['learner_usernames'], [])
         self.assertEqual(
-            response['invited_student_usernames'], [self.USER1_USERNAME])
+            response['invited_learner_usernames'], [self.USER1_USERNAME])
         self.assertEqual(response['subtopic_page_ids'], ['subtopic_id_1'])
         self.assertEqual(response['story_ids'], ['story_id_1'])
 
@@ -397,7 +397,7 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
+class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
     LEARNER_GROUP_ID = None
     STUDENT_1_EMAIL = 'user1@example.com'
@@ -549,14 +549,14 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
-        # Add the invited students to the learner group.
-        learner_group_services.add_student_to_learner_group(
+        # Add the invited learners to the learner group.
+        learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.STUDENT_ID_1, True)
 
-        learner_group_services.add_student_to_learner_group(
+        learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.STUDENT_ID_2, False)
 
-        # Add some progress for the students.
+        # Add some progress for the learners.
         story_services.record_completed_node_in_story_context(
             self.STUDENT_ID_1, self.STORY_ID_1, self.NODE_ID_1)
         story_services.record_completed_node_in_story_context(
@@ -570,11 +570,11 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.STUDENT_ID_2, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
 
-    def test_get_progress_of_students(self):
+    def test_get_progress_of_learners(self):
         self.login(self.NEW_USER_EMAIL)
 
         params = {
-            'student_usernames': json.dumps([
+            'learner_usernames': json.dumps([
                 self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
         }
 
@@ -582,11 +582,11 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
             '/learner_group_user_progress_handler/%s' % (
                 self.LEARNER_GROUP_ID), params=params)
 
-        students_prog = response
-        student1_stories_prog = students_prog[0]['stories_progress']
-        student2_stories_prog = students_prog[1]['stories_progress']
-        student1_subtopics_prog = students_prog[0]['subtopic_pages_progress']
-        student2_subtopics_prog = students_prog[1]['subtopic_pages_progress']
+        learners_prog = response
+        learner1_stories_prog = learners_prog[0]['stories_progress']
+        learner2_stories_prog = learners_prog[1]['stories_progress']
+        learner1_subtopics_prog = learners_prog[0]['subtopic_pages_progress']
+        learner2_subtopics_prog = learners_prog[1]['subtopic_pages_progress']
         story_summary = story_fetchers.get_story_summaries_by_ids(
             [self.STORY_ID_1])[0]
         story = story_fetchers.get_story_by_id(self.STORY_ID_1)
@@ -599,7 +599,7 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
         expected_story_prog_summary['all_node_dicts'] = (
             [node.to_dict() for node in story.story_contents.nodes])
 
-        expected_student1_subtopics_prog = [{
+        expected_learner1_subtopics_prog = [{
             'subtopic_id': 1,
             'subtopic_title': 'Subtopic Title 1',
             'parent_topic_id': self.TOPIC_ID_1,
@@ -609,26 +609,26 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
             'subtopic_mastery': self.DEGREE_OF_MASTERY_1
         }]
 
-        self.assertEqual(len(students_prog), 2)
-        self.assertEqual(students_prog[0]['username'], self.STUDENT_1_USERNAME)
-        self.assertEqual(students_prog[1]['username'], self.STUDENT_2_USERNAME)
+        self.assertEqual(len(learners_prog), 2)
+        self.assertEqual(learners_prog[0]['username'], self.STUDENT_1_USERNAME)
+        self.assertEqual(learners_prog[1]['username'], self.STUDENT_2_USERNAME)
         self.assertEqual(
-            students_prog[0]['progress_sharing_is_turned_on'], True)
+            learners_prog[0]['progress_sharing_is_turned_on'], True)
         self.assertEqual(
-            students_prog[1]['progress_sharing_is_turned_on'], False)
-        self.assertEqual(len(student1_stories_prog), 1)
-        self.assertEqual(student1_stories_prog[0], expected_story_prog_summary)
-        self.assertEqual(len(student2_stories_prog), 0)
-        self.assertEqual(len(student1_subtopics_prog), 1)
+            learners_prog[1]['progress_sharing_is_turned_on'], False)
+        self.assertEqual(len(learner1_stories_prog), 1)
+        self.assertEqual(learner1_stories_prog[0], expected_story_prog_summary)
+        self.assertEqual(len(learner2_stories_prog), 0)
+        self.assertEqual(len(learner1_subtopics_prog), 1)
         self.assertEqual(
-            student1_subtopics_prog, expected_student1_subtopics_prog)
-        self.assertEqual(len(student2_subtopics_prog), 0)
+            learner1_subtopics_prog, expected_learner1_subtopics_prog)
+        self.assertEqual(len(learner2_subtopics_prog), 0)
 
-    def test_get_progress_of_students_with_invalid_group_id(self):
+    def test_get_progress_of_learners_with_invalid_group_id(self):
         self.login(self.NEW_USER_EMAIL)
 
         params = {
-            'student_usernames': json.dumps([
+            'learner_usernames': json.dumps([
                 self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
         }
 
@@ -690,7 +690,7 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
+class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
     """Tests searching a given user to invite to the learner group"""
 
     def setUp(self):
@@ -707,7 +707,7 @@ class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner_group_search_student_handler', params=params
+            '/learner_group_search_learner_handler', params=params
         )
 
         self.assertEqual(response['username'], 'invalid_username')
@@ -724,7 +724,7 @@ class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner_group_search_student_handler', params=params
+            '/learner_group_search_learner_handler', params=params
         )
 
         self.assertEqual(response['username'], self.OWNER_USERNAME)
@@ -744,7 +744,7 @@ class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner_group_search_student_handler', params=params
+            '/learner_group_search_learner_handler', params=params
         )
 
         self.assertEqual(response['username'], self.NEW_USER_USERNAME)
@@ -765,7 +765,7 @@ class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner_group_search_student_handler', params=params
+            '/learner_group_search_learner_handler', params=params
         )
 
         user_settings = user_services.get_user_settings_from_username(
@@ -782,7 +782,7 @@ class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
 class EditLearnerGroupPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the edit learner page."""
 
-    STUDENT_ID = 'student_user_1'
+    STUDENT_ID = 'learner_user_1'
 
     def setUp(self):
         super().setUp()
@@ -831,8 +831,8 @@ class EditLearnerGroupPageTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerGroupStudentInvitationHandlerTests(test_utils.GenericTestBase):
-    """Checks student successfully accepting or declining a learner group
+class LearnerGroupLearnerInvitationHandlerTests(test_utils.GenericTestBase):
+    """Checks learner successfully accepting or declining a learner group
     invitation.
     """
 
@@ -850,51 +850,51 @@ class LearnerGroupStudentInvitationHandlerTests(test_utils.GenericTestBase):
             [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
-    def test_invitation_accepted_by_the_student(self) -> None:
+    def test_invitation_accepted_by_the_learner(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         payload = {
-            'student_username': self.NEW_USER_USERNAME,
+            'learner_username': self.NEW_USER_USERNAME,
             'is_invitation_accepted': 'true',
             'progress_sharing_permission': 'true'
         }
         response = self.put_json(
-            '/learner_group_student_invitation_handler/%s' % (
+            '/learner_group_learner_invitation_handler/%s' % (
                 self.LEARNER_GROUP_ID),
             payload, csrf_token=csrf_token)
 
         self.assertEqual(response['id'], self.LEARNER_GROUP_ID)
         self.assertEqual(
-            response['student_usernames'], [self.NEW_USER_USERNAME])
-        self.assertEqual(response['invited_student_usernames'], [])
+            response['learner_usernames'], [self.NEW_USER_USERNAME])
+        self.assertEqual(response['invited_learner_usernames'], [])
 
-    def test_invitation_declined_by_the_student(self) -> None:
+    def test_invitation_declined_by_the_learner(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         payload = {
-            'student_username': self.NEW_USER_USERNAME,
+            'learner_username': self.NEW_USER_USERNAME,
             'is_invitation_accepted': 'false',
             'progress_sharing_permission': 'false'
         }
         response = self.put_json(
-            '/learner_group_student_invitation_handler/%s' % (
+            '/learner_group_learner_invitation_handler/%s' % (
                 self.LEARNER_GROUP_ID),
             payload, csrf_token=csrf_token)
 
         self.assertEqual(response['id'], self.LEARNER_GROUP_ID)
-        self.assertEqual(response['student_usernames'], [])
-        self.assertEqual(response['invited_student_usernames'], [])
+        self.assertEqual(response['learner_usernames'], [])
+        self.assertEqual(response['invited_learner_usernames'], [])
 
 
-class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
-    """Checks fetching info of joined and invited to join students of a
+class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
+    """Checks fetching info of joined and invited to join learners of a
     learner group
     """
 
-    STUDENT_EMAIL = 'some.student@user.com'
-    STUDENT_USERNAME = 'somestudent'
+    STUDENT_EMAIL = 'some.learner@user.com'
+    STUDENT_USERNAME = 'somelearner'
 
     def setUp(self):
         super().setUp()
@@ -912,39 +912,39 @@ class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
             [self.FACILITATOR_ID], [self.STUDENT_ID_1, self.STUDENT_ID_2],
             ['subtopic_id_1'], ['story_id_1'])
-        learner_group_services.add_student_to_learner_group(
+        learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.STUDENT_ID_1, False)
 
-    def test_getting_info_of_students_and_invities(self) -> None:
+    def test_getting_info_of_learners_and_invities(self) -> None:
         self.login(self.OWNER_EMAIL)
         response = self.get_json(
-            '/learner_group_students_info_handler/%s' % self.LEARNER_GROUP_ID
+            '/learner_group_learners_info_handler/%s' % self.LEARNER_GROUP_ID
         )
 
-        students_user_settings = user_services.get_users_settings(
+        learners_user_settings = user_services.get_users_settings(
             [self.STUDENT_ID_1, self.STUDENT_ID_2], strict=True)
 
-        student_info = [{
+        learner_info = [{
             'username': self.NEW_USER_USERNAME,
             'profile_picture_data_url':
-                students_user_settings[0].profile_picture_data_url
+                learners_user_settings[0].profile_picture_data_url
         }]
-        invited_student_info = [{
+        invited_learner_info = [{
             'username': self.STUDENT_USERNAME,
             'profile_picture_data_url':
-                students_user_settings[1].profile_picture_data_url
+                learners_user_settings[1].profile_picture_data_url
         }]
-        self.assertEqual(response['students_info'], student_info)
+        self.assertEqual(response['learners_info'], learner_info)
         self.assertEqual(
-            response['invited_students_info'], invited_student_info)
+            response['invited_learners_info'], invited_learner_info)
 
         self.logout()
 
-    def test_getting_info_of_students_as_invalid_facilitator(self):
+    def test_getting_info_of_learners_as_invalid_facilitator(self):
         self.login(self.NEW_USER_EMAIL)
 
         response = self.get_json(
-            '/learner_group_students_info_handler/%s' % self.LEARNER_GROUP_ID,
+            '/learner_group_learners_info_handler/%s' % self.LEARNER_GROUP_ID,
             expected_status_int=401
         )
         self.assertEqual(
@@ -957,7 +957,7 @@ class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     """Checks learner group syllabus being fetched correctly"""
 
-    STUDENT_ID = 'student_user_1'
+    STUDENT_ID = 'learner_user_1'
     TOPIC_ID = 'topic_id_1'
     STORY_ID = 'story_id_1'
     SUBTOPIC_PAGE_ID = 'topic_id_1:1'
@@ -1045,8 +1045,8 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class StudentStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
-    """Tests for Student Stories Chapters Progress Handler."""
+class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for Learner Stories Chapters Progress Handler."""
 
     NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
     NODE_ID_2 = story_domain.NODE_ID_PREFIX + '2'
@@ -1097,7 +1097,7 @@ class StudentStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
             self.USER_ID, self.story_id, change_list,
             'Added node.')
 
-    def test_get_student_stories_chapters_progress(self) -> None:
+    def test_get_learner_stories_chapters_progress(self) -> None:
         self.login(self.NEW_USER_EMAIL)
 
         user_services.update_learner_checkpoint_progress(

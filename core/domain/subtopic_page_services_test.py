@@ -645,40 +645,40 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_multi_users_subtopic_pages_progress(self) -> None:
         degree_of_mastery = 0.5
-        student_id_1 = 'student_1'
-        student_id_2 = 'student_2'
+        learner_id_1 = 'learner_1'
+        learner_id_2 = 'learner_2'
 
-        # Add some subtopic progress for the student.
+        # Add some subtopic progress for the learner.
         skill_services.create_user_skill_mastery( # type: ignore[no-untyped-call]
-            student_id_1, 'skill_id_1', degree_of_mastery
+            learner_id_1, 'skill_id_1', degree_of_mastery
         )
 
         subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
         progress = (
             subtopic_page_services.get_multi_users_subtopic_pages_progress(
-                [student_id_1, student_id_2], [subtopic_page_id]
+                [learner_id_1, learner_id_2], [subtopic_page_id]
             )
         )
 
-        student_1_progress = progress[student_id_1]
-        student_2_progress = progress[student_id_2]
+        learner_1_progress = progress[learner_id_1]
+        learner_2_progress = progress[learner_id_2]
 
-        self.assertEqual(len(student_1_progress), 1)
-        self.assertEqual(len(student_2_progress), 1)
-        self.assertEqual(student_1_progress[0]['subtopic_id'], 1)
+        self.assertEqual(len(learner_1_progress), 1)
+        self.assertEqual(len(learner_2_progress), 1)
+        self.assertEqual(learner_1_progress[0]['subtopic_id'], 1)
         self.assertEqual(
-            student_1_progress[0]['subtopic_title'], 'Naming Numbers'
+            learner_1_progress[0]['subtopic_title'], 'Naming Numbers'
         )
         self.assertEqual(
-            student_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
+            learner_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
         )
         self.assertEqual(
-            student_1_progress[0]['parent_topic_name'], 'Place Values'
+            learner_1_progress[0]['parent_topic_name'], 'Place Values'
         )
         self.assertEqual(
-            student_1_progress[0]['subtopic_mastery'], degree_of_mastery
+            learner_1_progress[0]['subtopic_mastery'], degree_of_mastery
         )
-        self.assertIsNone(student_2_progress[0]['subtopic_mastery'])
+        self.assertIsNone(learner_2_progress[0]['subtopic_mastery'])
 
     def test_get_learner_group_syllabus_subtopic_page_summaries(self) -> None:
         subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
