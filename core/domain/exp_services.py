@@ -472,14 +472,18 @@ def apply_change_list(
                     change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
+                    # Here change is an instance of ExplorationChange and every
+                    # attribute on ExplorationChange is defined dynamically, and
+                    # every dynamically defined attribute have str type. Thus to
+                    # convert the type to list, we have used assert here.
                     assert isinstance(change.new_value, list)
                     state.update_param_changes(list(map(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
+                    # Here change is an instance of ExplorationChange and every
+                    # attribute on ExplorationChange is defined dynamically, and
+                    # every dynamically defined attribute have str type. Thus to
+                    # convert the type to dict, we have used assert here.
                     assert isinstance(change.new_value, dict)
                     content = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
@@ -490,8 +494,10 @@ def apply_change_list(
                     state.update_interaction_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
+                    # Here change is an instance of ExplorationChange and every
+                    # attribute on ExplorationChange is defined dynamically, and
+                    # every dynamically defined attribute have str type. Thus to
+                    # convert the type to int, we have used assert here.
                     assert isinstance(change.new_value, int)
                     next_content_id_index = max(
                         change.new_value, state.next_content_id_index)
@@ -501,8 +507,10 @@ def apply_change_list(
                     state.update_linked_skill_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
+                    # Here change is an instance of ExplorationChange and every
+                    # attribute on ExplorationChange is defined dynamically, and
+                    # every dynamically defined attribute have str type. Thus to
+                    # convert the type to dict, we have used assert here.
                     assert isinstance(change.new_value, dict)
                     state.update_interaction_customization_args(
                         change.new_value)
@@ -512,8 +520,10 @@ def apply_change_list(
                         'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
+                    # Here change is an instance of ExplorationChange and every
+                    # attribute on ExplorationChange is defined dynamically, and
+                    # every dynamically defined attribute have str type. Thus to
+                    # convert the type to list, we have used assert here.
                     assert isinstance(change.new_value, list)
                     answer_groups: List[state_domain.AnswerGroup] = (
                         change.new_value
@@ -527,8 +537,10 @@ def apply_change_list(
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
-                        # Ruling out the possibility of any other type for mypy
-                        # type checking.
+                        # Here change is an instance of ExplorationChange and every
+                        # attribute on ExplorationChange is defined dynamically, and
+                        # every dynamically defined attribute have str type. Thus to
+                        # convert the type to dict, we have used assert here.
                         assert isinstance(change.new_value, dict)
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
@@ -536,8 +548,10 @@ def apply_change_list(
                     state.update_interaction_default_outcome(new_outcome)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
+                    # Here change is an instance of ExplorationChange and every
+                    # attribute on ExplorationChange is defined dynamically, and
+                    # every dynamically defined attribute have str type. Thus to
+                    # convert the type to list, we have used assert here.
                     assert isinstance(change.new_value, list)
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
@@ -556,8 +570,11 @@ def apply_change_list(
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     new_solution = None
                     if change.new_value is not None:
-                        # Ruling out the possibility of any other type for mypy
-                        # type checking.
+                        # Here change is an instance of ExplorationChange and
+                        # every attribute on ExplorationChange is defined
+                        # dynamically, and every dynamically defined attribute
+                        # have str type. Thus to convert the type to dict, we
+                        # have used assert here.
                         assert isinstance(change.new_value, dict)
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value)
