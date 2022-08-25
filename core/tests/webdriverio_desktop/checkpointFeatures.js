@@ -163,7 +163,7 @@ describe('Checkpoints functionality', function() {
     await users.logout();
   });
 
-  it('should encounter checkpoint progress modal upon completing a checkpoint',
+  it('should display checkpoint progress modal upon completing a checkpoint',
     async function() {
       await topicAndStoryViewerPage.get(
         'math', 'topic-cf-one', 'checkpointfeaturesstory');
