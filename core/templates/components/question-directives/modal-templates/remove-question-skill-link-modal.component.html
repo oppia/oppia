@@ -13,8 +13,13 @@
   <div *ngIf="canEditQuestion">
     <p>
       The question cannot be removed because the given skill is assigned to
-      the diagnostic test(s) of the following topic(s) with less than or
-      equal to 2 questions.
+      the diagnostic
+      <span *ngIf="topicsCount === 1">test</span>
+      <span *ngIf="topicsCount > 1">tests</span>
+      of the following
+      <span *ngIf="topicsCount === 1">topic,</span>
+      <span *ngIf="topicsCount > 1">topics,</span>
+      and there are only 2 questions or fewer available for that skill.
     </p>
     <ul>
       <li *ngFor="let topic of topicNameToTopicId | keyvalue">
@@ -24,8 +29,10 @@
       </li>
     </ul>
     <p>
-      Please remove the skills from those topic(s) first, then perform this
-      operation.
+      Please remove the skill from the above
+      <span *ngIf="topicsCount === 1">topic</span>
+      <span *ngIf="topicsCount > 1">topics</span>
+      first, then perform this operation.
     </p>
   </div>
 </div>

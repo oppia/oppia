@@ -495,10 +495,11 @@ class MergeSkillHandler(base.BaseHandler):
 
 
 def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
-    """Normalizes a comma seperated topic IDs into a list of topic IDs.
+    """Normalizes a string of comma-separated topic IDs into a list of
+    topic IDs.
 
     Args:
-        comma_separated_topic_ids: str. Comma seperated topic IDs.
+        comma_separated_topic_ids: str. Comma separated topic IDs.
 
     Returns:
         list(str). A list of topic IDs.

@@ -49,9 +49,9 @@ export class UnassignSkillFromTopicsModalComponent
   // The topics that do not contain the given skill as their only diagnostic
   // test skill are eligible for the unassignment.
   eligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
-  inEligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
+  ineligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
   eligibleTopicsCount: number = 0;
-  inEligibleTopicsCount: number = 0;
+  ineligibleTopicsCount: number = 0;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -69,7 +69,7 @@ export class UnassignSkillFromTopicsModalComponent
       allTopicIds.push(topic.topicId);
     }
     this.eligibleTopicNameToTopicAssignments = {};
-    this.inEligibleTopicNameToTopicAssignments = {};
+    this.ineligibleTopicNameToTopicAssignments = {};
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
@@ -81,7 +81,7 @@ export class UnassignSkillFromTopicsModalComponent
               diagnosticTestSkillIds.length === 1 &&
               diagnosticTestSkillIds.indexOf(this.skillId) !== -1
             ) {
-              this.inEligibleTopicNameToTopicAssignments[topic.topicName] = {
+              this.ineligibleTopicNameToTopicAssignments[topic.topicName] = {
                 topicId: topic.topicId,
                 subtopicId: topic.subtopicId,
                 topicVersion: topic.topicVersion
@@ -97,8 +97,8 @@ export class UnassignSkillFromTopicsModalComponent
 
           this.eligibleTopicsCount = Object.keys(
             this.eligibleTopicNameToTopicAssignments).length;
-          this.inEligibleTopicsCount = Object.keys(
-            this.inEligibleTopicNameToTopicAssignments).length;
+          this.ineligibleTopicsCount = Object.keys(
+            this.ineligibleTopicNameToTopicAssignments).length;
         });
   }
 

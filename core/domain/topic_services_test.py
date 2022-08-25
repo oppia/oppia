@@ -1870,13 +1870,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             topic_services.get_topic_id_to_diagnostic_test_skill_ids(
-                [fractions_id, additions_id, 'incorrect_topic_id', None]),
-            expected_dict
-        )
+                [fractions_id, additions_id]), expected_dict)
 
-        self.assertEqual(
+        error_msg = (
+            'No corresponding topic models exist for these topic IDs %s.'
+            % (', '.join(['']))
+        )
+        with self.assertRaisesRegex(Exception, error_msg):
             topic_services.get_topic_id_to_diagnostic_test_skill_ids(
-                ['incorrect_topic_id']), {})
+                [additions_id, 'incorrect_topic_id'])
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class

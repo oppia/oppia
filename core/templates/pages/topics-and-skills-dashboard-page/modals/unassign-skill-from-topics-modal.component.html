@@ -4,17 +4,17 @@
   </h3>
 </div>
 <div class="modal-body">
-  <div *ngIf="inEligibleTopicsCount > 0">
+  <div *ngIf="ineligibleTopicsCount > 0">
     <div>
       <p>
         This skill is used as the only diagnostic test skill in the following
-        <span *ngIf="inEligibleTopicsCount === 1">topic</span>
-        <span *ngIf="inEligibleTopicsCount > 1">topics</span>
+        <span *ngIf="ineligibleTopicsCount === 1">topic</span>
+        <span *ngIf="ineligibleTopicsCount > 1">topics</span>
       </p>
       <ul>
-        <li *ngFor="let inEligibleTopicNameToTopicAssignment of inEligibleTopicNameToTopicAssignments | keyvalue">
-          <a [href]="getTopicEditorUrl(inEligibleTopicNameToTopicAssignment.value)" target="_blank" rel="noopener">
-            {{ inEligibleTopicNameToTopicAssignment.key }}
+        <li *ngFor="let ineligibleTopicNameToTopicAssignment of ineligibleTopicNameToTopicAssignments | keyvalue">
+          <a [href]="getTopicEditorUrl(ineligibleTopicNameToTopicAssignment.value)" target="_blank" rel="noopener">
+            {{ ineligibleTopicNameToTopicAssignment.key }}
           </a>
         </li>
       </ul>

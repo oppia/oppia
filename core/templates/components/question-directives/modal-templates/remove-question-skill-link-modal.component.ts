@@ -44,6 +44,7 @@ export class RemoveQuestionSkillLinkModalComponent
   questionRemovalIsAllowed: boolean = true;
   topicsAssignmentsAreFetched = false;
   topicNameToTopicId: TopicNameToTopicId = {};
+  topicsCount: number = 0;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -64,9 +65,12 @@ export class RemoveQuestionSkillLinkModalComponent
         this.topicNameToTopicId[topic.topicName] = topic.topicId;
       }
     }
+    this.topicsCount = Object.keys(this.topicNameToTopicId).length;
   }
 
   isQuestionRemovalAllowed(topicAssignments: AssignedSkill[]): void {
+    this.questionRemovalIsAllowed = true;
+
     if (!this.canEditQuestion) {
       this.questionRemovalIsAllowed = false;
       return;

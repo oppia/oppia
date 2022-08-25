@@ -42,8 +42,8 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
-  inEligibleTopicNameToTopicAssignments: TopicNameToTopicAssignments = {};
-  inEligibleTopicsCount: number = 0;
+  ineligibleTopicNameToTopicAssignments: TopicNameToTopicAssignments = {};
+  ineligibleTopicsCount: number = 0;
   topicsAssignments: AssignedSkill[] = [];
   topicsAssignmentsAreFetched: boolean = false;
   skillCanBeDeleted: boolean = true;
@@ -63,7 +63,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
     }
-    this.inEligibleTopicNameToTopicAssignments = {};
+    this.ineligibleTopicNameToTopicAssignments = {};
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
@@ -75,7 +75,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
               diagnosticTestSkillIds.length === 1 &&
               diagnosticTestSkillIds.indexOf(this.skillId) !== -1
             ) {
-              this.inEligibleTopicNameToTopicAssignments[topic.topicName] = {
+              this.ineligibleTopicNameToTopicAssignments[topic.topicName] = {
                 topicId: topic.topicId,
                 subtopicId: topic.subtopicId,
                 topicVersion: topic.topicVersion
@@ -83,8 +83,8 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
               this.skillCanBeDeleted = false;
             }
           }
-          this.inEligibleTopicsCount = Object.keys(
-            this.inEligibleTopicNameToTopicAssignments).length;
+          this.ineligibleTopicsCount = Object.keys(
+            this.ineligibleTopicNameToTopicAssignments).length;
           this.topicsAssignments = topicAssignments;
         });
   }

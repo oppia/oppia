@@ -194,12 +194,62 @@ describe('Topic object factory', () => {
         [skillSummary2]);
     });
 
-  it('should be able to get all the available skillIds for assignment in the ' +
-     'diagnostic test', () => {
-    _sampleTopic._skillSummariesForDiagnosticTest = [skillSummary1];
-    expect(_sampleTopic.getAvailableSkillSummariesForDiagnosticTest()).toEqual(
-      [skillSummary2, skillSummary3]);
-  });
+  it(
+    'should not be able to get available skill summaries when no skill is ' +
+    'assigned to the topic', () => {
+      _sampleTopic._uncategorizedSkillSummaries = [];
+      _sampleTopic._subtopics = [];
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([]);
+    });
+
+  it(
+    'should not be able to get available skill summaries when all skills is ' +
+    'assigned to the diagnostic test', () => {
+      expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
+        [skillSummary1, skillSummary2]);
+      expect(_sampleTopic._subtopics[0].getSkillSummaries()).toEqual(
+        [skillSummary3]);
+
+      _sampleTopic._skillSummariesForDiagnosticTest = (
+        [skillSummary1, skillSummary2, skillSummary3]);
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([]);
+    });
+
+  it(
+    'should be able to get all available skill summaries when no skill is ' +
+    'assigned to the diagnostic test', () => {
+      expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
+        [skillSummary1, skillSummary2]);
+      expect(_sampleTopic._subtopics[0].getSkillSummaries()).toEqual(
+        [skillSummary3]);
+
+      _sampleTopic._skillSummariesForDiagnosticTest = [];
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([skillSummary1, skillSummary2, skillSummary3]);
+    });
+
+  it(
+    'should able to get available skill summaries when a skill is assigned ' +
+    'to the diagnostic test', () => {
+      expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
+        [skillSummary1, skillSummary2]);
+      expect(_sampleTopic._subtopics[0].getSkillSummaries()).toEqual(
+        [skillSummary3]);
+
+      _sampleTopic._skillSummariesForDiagnosticTest = [skillSummary1];
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([skillSummary2, skillSummary3]);
+    });
 
   it('should correctly remove the various array elements', () => {
     _sampleTopic.removeCanonicalStory('story_1');

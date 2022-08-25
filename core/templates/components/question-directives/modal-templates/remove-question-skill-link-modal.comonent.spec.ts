@@ -132,8 +132,18 @@ describe('Question deletion modal', () => {
     'the diagnostic test and question count is less than equal to 2',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
-      componentInstance.numberOfQuestions = 2;
       componentInstance.canEditQuestion = true;
+      componentInstance.numberOfQuestions = 0;
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+      expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
+
+      componentInstance.numberOfQuestions = 1;
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+      expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
+
+      componentInstance.numberOfQuestions = 2;
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
       expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
@@ -144,8 +154,23 @@ describe('Question deletion modal', () => {
     'the diagnostic test and question count is greater than 2',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
-      componentInstance.numberOfQuestions = 3;
       componentInstance.canEditQuestion = true;
+      componentInstance.numberOfQuestions = 3;
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
+
+      componentInstance.numberOfQuestions = 4;
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
+
+      componentInstance.numberOfQuestions = 10;
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
+
+      componentInstance.numberOfQuestions = 100;
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
@@ -155,15 +180,24 @@ describe('Question deletion modal', () => {
     'should be able to remove questions when skill is not assigned to ' +
     'the diagnostic test',
     fakeAsync(() => {
+      componentInstance.canEditQuestion = true;
+      componentInstance.numberOfQuestions = 2;
+
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
+
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+
+      expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
+
       spyOn(
         skillBackendApiService,
         'getTopicNamesWithGivenSkillAssignedForDiagnosticTest'
       ).and.returnValue(Promise.resolve([]));
-      componentInstance.canEditQuestion = true;
-      componentInstance.numberOfQuestions = 3;
-      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
+
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
+
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
     }));
 });
