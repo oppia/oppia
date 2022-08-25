@@ -231,7 +231,7 @@ class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
 
     LEARNER_GROUP_ID = None
-    STUDENT_ID = 'learner_user_1'
+    LEARNER_ID = 'learner_user_1'
     TOPIC_ID_0 = 'topic_id_0'
     TOPIC_ID_1 = 'topic_id_1'
     STORY_ID_0 = 'story_id_0'
@@ -254,7 +254,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
 
         learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.facilitator_id], [self.STUDENT_ID], ['subtopic_id_1'],
+            [self.facilitator_id], [self.LEARNER_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
         # Set up topics, subtopics and stories for learner group syllabus.
@@ -400,12 +400,12 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
     LEARNER_GROUP_ID = None
-    STUDENT_1_EMAIL = 'user1@example.com'
-    STUDENT_1_USERNAME = 'user1'
-    STUDENT_2_EMAIL = 'user2@example.com'
-    STUDENT_2_USERNAME = 'user2'
-    STUDENT_ID_1 = None
-    STUDENT_ID_2 = None
+    LEARNER_1_EMAIL = 'user1@example.com'
+    LEARNER_1_USERNAME = 'user1'
+    LEARNER_2_EMAIL = 'user2@example.com'
+    LEARNER_2_USERNAME = 'user2'
+    LEARNER_ID_1 = None
+    LEARNER_ID_2 = None
     TOPIC_ID_1 = 'topic_id_1'
     STORY_ID_1 = 'story_id_1'
     SUBTOPIC_PAGE_ID_1 = TOPIC_ID_1 + ':1'
@@ -428,11 +428,11 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.signup(self.STUDENT_1_EMAIL, self.STUDENT_1_USERNAME)
-        self.signup(self.STUDENT_2_EMAIL, self.STUDENT_2_USERNAME)
+        self.signup(self.LEARNER_1_EMAIL, self.LEARNER_1_USERNAME)
+        self.signup(self.LEARNER_2_EMAIL, self.LEARNER_2_USERNAME)
 
-        self.STUDENT_ID_1 = self.get_user_id_from_email(self.STUDENT_1_EMAIL)
-        self.STUDENT_ID_2 = self.get_user_id_from_email(self.STUDENT_2_EMAIL)
+        self.LEARNER_ID_1 = self.get_user_id_from_email(self.LEARNER_1_EMAIL)
+        self.LEARNER_ID_2 = self.get_user_id_from_email(self.LEARNER_2_EMAIL)
         self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.admin_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
@@ -445,7 +445,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.facilitator_id], [self.STUDENT_ID_1, self.STUDENT_ID_2],
+            [self.facilitator_id], [self.LEARNER_ID_1, self.LEARNER_ID_2],
             [self.SUBTOPIC_PAGE_ID_1], [self.STORY_ID_1])
 
         # Set up topics, subtopics and stories for learner group syllabus.
@@ -551,31 +551,31 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         # Add the invited learners to the learner group.
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID_1, True)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
 
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID_2, False)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_2, False)
 
         # Add some progress for the learners.
         story_services.record_completed_node_in_story_context(
-            self.STUDENT_ID_1, self.STORY_ID_1, self.NODE_ID_1)
+            self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_1)
         story_services.record_completed_node_in_story_context(
-            self.STUDENT_ID_1, self.STORY_ID_1, self.NODE_ID_2)
+            self.LEARNER_ID_1, self.STORY_ID_1, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
-            self.STUDENT_ID_2, self.STORY_ID_1, self.NODE_ID_3)
+            self.LEARNER_ID_2, self.STORY_ID_1, self.NODE_ID_3)
 
         self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
         skill_services.create_user_skill_mastery(
-            self.STUDENT_ID_1, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
+            self.LEARNER_ID_1, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
         skill_services.create_user_skill_mastery(
-            self.STUDENT_ID_2, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
+            self.LEARNER_ID_2, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
 
     def test_get_progress_of_learners(self):
         self.login(self.NEW_USER_EMAIL)
 
         params = {
             'learner_usernames': json.dumps([
-                self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
+                self.LEARNER_1_USERNAME, self.LEARNER_2_USERNAME])
         }
 
         response = self.get_json(
@@ -610,8 +610,8 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
         }]
 
         self.assertEqual(len(learners_prog), 2)
-        self.assertEqual(learners_prog[0]['username'], self.STUDENT_1_USERNAME)
-        self.assertEqual(learners_prog[1]['username'], self.STUDENT_2_USERNAME)
+        self.assertEqual(learners_prog[0]['username'], self.LEARNER_1_USERNAME)
+        self.assertEqual(learners_prog[1]['username'], self.LEARNER_2_USERNAME)
         self.assertEqual(
             learners_prog[0]['progress_sharing_is_turned_on'], True)
         self.assertEqual(
@@ -629,7 +629,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         params = {
             'learner_usernames': json.dumps([
-                self.STUDENT_1_USERNAME, self.STUDENT_2_USERNAME])
+                self.LEARNER_1_USERNAME, self.LEARNER_2_USERNAME])
         }
 
         self.get_json(
@@ -782,7 +782,7 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
 class EditLearnerGroupPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the edit learner page."""
 
-    STUDENT_ID = 'learner_user_1'
+    LEARNER_ID = 'learner_user_1'
 
     def setUp(self):
         super().setUp()
@@ -795,7 +795,7 @@ class EditLearnerGroupPageTests(test_utils.GenericTestBase):
         )
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
+            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
     def test_page_with_disabled_learner_groups_leads_to_404(self):
@@ -841,13 +841,13 @@ class LearnerGroupLearnerInvitationHandlerTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.STUDENT_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.LEARNER_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()
         )
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
+            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
     def test_invitation_accepted_by_the_learner(self) -> None:
@@ -893,27 +893,27 @@ class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
     learner group
     """
 
-    STUDENT_EMAIL = 'some.learner@user.com'
-    STUDENT_USERNAME = 'somelearner'
+    LEARNER_EMAIL = 'some.learner@user.com'
+    LEARNER_USERNAME = 'somelearner'
 
     def setUp(self):
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.STUDENT_ID_1 = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(self.STUDENT_EMAIL, self.STUDENT_USERNAME)
-        self.STUDENT_ID_2 = self.get_user_id_from_email(self.STUDENT_EMAIL)
+        self.LEARNER_ID_1 = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.signup(self.LEARNER_EMAIL, self.LEARNER_USERNAME)
+        self.LEARNER_ID_2 = self.get_user_id_from_email(self.LEARNER_EMAIL)
 
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()
         )
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.STUDENT_ID_1, self.STUDENT_ID_2],
+            [self.FACILITATOR_ID], [self.LEARNER_ID_1, self.LEARNER_ID_2],
             ['subtopic_id_1'], ['story_id_1'])
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID_1, False)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, False)
 
     def test_getting_info_of_learners_and_invities(self) -> None:
         self.login(self.OWNER_EMAIL)
@@ -922,7 +922,7 @@ class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
         )
 
         learners_user_settings = user_services.get_users_settings(
-            [self.STUDENT_ID_1, self.STUDENT_ID_2], strict=True)
+            [self.LEARNER_ID_1, self.LEARNER_ID_2], strict=True)
 
         learner_info = [{
             'username': self.NEW_USER_USERNAME,
@@ -930,7 +930,7 @@ class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
                 learners_user_settings[0].profile_picture_data_url
         }]
         invited_learner_info = [{
-            'username': self.STUDENT_USERNAME,
+            'username': self.LEARNER_USERNAME,
             'profile_picture_data_url':
                 learners_user_settings[1].profile_picture_data_url
         }]
@@ -957,7 +957,7 @@ class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
 class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
     """Checks learner group syllabus being fetched correctly"""
 
-    STUDENT_ID = 'learner_user_1'
+    LEARNER_ID = 'learner_user_1'
     TOPIC_ID = 'topic_id_1'
     STORY_ID = 'story_id_1'
     SUBTOPIC_PAGE_ID = 'topic_id_1:1'
@@ -979,7 +979,7 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
 
         learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.facilitator_id], [self.STUDENT_ID], [self.SUBTOPIC_PAGE_ID],
+            [self.facilitator_id], [self.LEARNER_ID], [self.SUBTOPIC_PAGE_ID],
             [self.STORY_ID])
 
         # Set up topics, subtopics and stories for learner group syllabus.

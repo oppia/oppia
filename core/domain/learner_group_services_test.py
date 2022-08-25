@@ -38,7 +38,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     """Tests for skill fetchers."""
 
     FACILITATOR_ID = 'facilitator_user_1'
-    STUDENT_ID = 'learner_user_1'
+    LEARNER_ID = 'learner_user_1'
     TOPIC_ID_0 = 'topic_id_0'
     TOPIC_ID_1 = 'topic_id_1'
     STORY_ID_0 = 'story_id_0'
@@ -59,7 +59,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
+            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
         # Set up topics, subtopics and stories for learner group syllabus.
@@ -120,7 +120,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.learner_group.facilitator_user_ids, [self.FACILITATOR_ID])
         self.assertEqual(
-            self.learner_group.invited_learner_user_ids, [self.STUDENT_ID])
+            self.learner_group.invited_learner_user_ids, [self.LEARNER_ID])
         self.assertEqual(
             self.learner_group.subtopic_page_ids, ['subtopic_id_1'])
         self.assertEqual(self.learner_group.story_ids, ['story_id_1'])
@@ -165,7 +165,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             learner_group_services.is_user_facilitator(
-                self.STUDENT_ID, self.LEARNER_GROUP_ID))
+                self.LEARNER_ID, self.LEARNER_GROUP_ID))
 
     def test_get_matching_syllabus_to_add_with_default_filters(self) -> None:
         # Test 1: Default filters with topic name matching.
@@ -263,16 +263,16 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         assert learner_grp is not None
 
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=True)
+            self.LEARNER_ID, strict=True)
         self.assertEqual(
-            learner_grp.invited_learner_user_ids, [self.STUDENT_ID])
+            learner_grp.invited_learner_user_ids, [self.LEARNER_ID])
         self.assertEqual(
             learner_grp.learner_user_ids, [])
         self.assertEqual(
             learner_grps_user_model.learner_groups_user_details, [])
 
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
 
         learner_grp = learner_group_fetchers.get_learner_group_by_id(
             self.LEARNER_GROUP_ID)
@@ -280,12 +280,12 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         assert learner_grp is not None
 
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=True)
+            self.LEARNER_ID, strict=True)
 
         self.assertEqual(
             learner_grp.invited_learner_user_ids, [])
         self.assertEqual(
-            learner_grp.learner_user_ids, [self.STUDENT_ID])
+            learner_grp.learner_user_ids, [self.LEARNER_ID])
         self.assertEqual(
             learner_grps_user_model.learner_groups_user_details,
             [
@@ -323,25 +323,25 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         assert self.LEARNER_GROUP_ID is not None
 
         user_model = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=True)
+            self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
             [self.LEARNER_GROUP_ID])
 
         learner_group_services.invite_learners_to_learner_group(
-            'group_id_2', [self.STUDENT_ID])
+            'group_id_2', [self.LEARNER_ID])
 
         user_model = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=True)
+            self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
             [self.LEARNER_GROUP_ID, 'group_id_2'])
 
         learner_group_services.remove_invited_learners_from_learner_group(
-            self.LEARNER_GROUP_ID, [self.STUDENT_ID], True)
+            self.LEARNER_GROUP_ID, [self.LEARNER_ID], True)
 
         user_model = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=True)
+            self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
             ['group_id_2'])
@@ -352,7 +352,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         new_learner_id = 'new_learner_id'
         user_model_1 = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=True)
+            self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
             [self.LEARNER_GROUP_ID])
@@ -361,10 +361,10 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(user_model_2)
 
         learner_group_services.invite_learners_to_learner_group(
-            'group_id_2', [self.STUDENT_ID, new_learner_id])
+            'group_id_2', [self.LEARNER_ID, new_learner_id])
 
         user_model_1 = user_models.LearnerGroupsUserModel.get(
-            self.STUDENT_ID, strict=True)
+            self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
             [self.LEARNER_GROUP_ID, 'group_id_2'])
@@ -380,7 +380,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         (is_valid_invite, error_message) = (
             learner_group_services.can_user_be_invited(
-                self.STUDENT_ID, 'username1', self.LEARNER_GROUP_ID))
+                self.LEARNER_ID, 'username1', self.LEARNER_GROUP_ID))
         self.assertFalse(is_valid_invite)
         self.assertEqual(
             error_message,
@@ -391,7 +391,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     def test_can_user_be_invited_to_a_new_learner_group(self) -> None:
         (is_valid_invite, error_message) = (
             learner_group_services.can_user_be_invited(
-                self.STUDENT_ID, 'username1', ''))
+                self.LEARNER_ID, 'username1', ''))
         self.assertTrue(is_valid_invite)
         self.assertEqual(error_message, '')
 
@@ -408,10 +408,10 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
     def test_can_a_learner_be_invited_to_learner_group(self) -> None:
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
         (is_valid_invite, error_message) = (
             learner_group_services.can_user_be_invited(
-                self.STUDENT_ID, 'username1', self.LEARNER_GROUP_ID))
+                self.LEARNER_ID, 'username1', self.LEARNER_GROUP_ID))
         self.assertFalse(is_valid_invite)
         self.assertEqual(
             error_message,
@@ -427,7 +427,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
     def test_remove_learners_from_learner_group(self) -> None:
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
 
         self.learner_group = learner_group_services.update_learner_group(
             self.LEARNER_GROUP_ID, self.learner_group.title,
@@ -461,7 +461,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_GROUP_ID, self.learner_group.title,
             self.learner_group.description,
             self.learner_group.facilitator_user_ids, [],
-            [self.STUDENT_ID], ['topic1:2', 'topic1:1'],
+            [self.LEARNER_ID], ['topic1:2', 'topic1:1'],
             self.learner_group.story_ids)
 
         (
@@ -482,7 +482,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_GROUP_ID, self.learner_group.title,
             self.learner_group.description,
             self.learner_group.facilitator_user_ids, [],
-            [self.STUDENT_ID], ['topic1:2', 'topic1:1'],
+            [self.LEARNER_ID], ['topic1:2', 'topic1:1'],
             ['story_id1', 'story_id2'])
 
         learner_group_services.remove_story_reference_from_learner_groups(

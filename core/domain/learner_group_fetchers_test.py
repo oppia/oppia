@@ -28,8 +28,8 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for skill fetchers."""
 
     FACILITATOR_ID = 'facilitator_user_1'
-    STUDENT_ID_1 = 'learner_user_1'
-    STUDENT_ID_2 = 'learner_user_2'
+    LEARNER_ID_1 = 'learner_user_1'
+    LEARNER_ID_2 = 'learner_user_2'
 
     def setUp(self) -> None:
         super().setUp()
@@ -40,7 +40,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.STUDENT_ID_1, self.STUDENT_ID_2],
+            [self.FACILITATOR_ID], [self.LEARNER_ID_1, self.LEARNER_ID_2],
             ['subtopic_id_1'], ['story_id_1'])
 
     def test_get_new_learner_group_id(self) -> None:
@@ -79,12 +79,12 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_can_multi_learners_share_progress(self) -> None:
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID_1, True)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
 
         learner_group_services.add_learner_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID_2, False)
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_2, False)
 
         self.assertEqual(
             learner_group_fetchers.can_multi_learners_share_progress(
-                [self.STUDENT_ID_1, self.STUDENT_ID_2], self.LEARNER_GROUP_ID
+                [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
             ), [True, False])

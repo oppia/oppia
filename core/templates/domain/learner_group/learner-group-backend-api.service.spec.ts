@@ -257,7 +257,7 @@ describe('Learner Group Backend API Service', () => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    const SEARCH_STUDENT_URL = (
+    const SEARCH_LEARNER_URL = (
       '/learner_group_search_learner_handler?username=username1&' +
       'learner_group_id=groupId'
     );
@@ -270,7 +270,7 @@ describe('Learner Group Backend API Service', () => {
     learnerGroupBackendApiService.searchNewLearnerToAddAsync(
       'groupId', 'username1').then(successHandler, failHandler);
 
-    var req = httpTestingController.expectOne(SEARCH_STUDENT_URL);
+    var req = httpTestingController.expectOne(SEARCH_LEARNER_URL);
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserInfo);
 
@@ -299,7 +299,7 @@ describe('Learner Group Backend API Service', () => {
       }]
     };
 
-    const LEARNER_GROUP_STUDENT_INFO_GET_URL = (
+    const LEARNER_GROUP_LEARNER_INFO_GET_URL = (
       '/learner_group_learners_info_handler/groupId'
     );
 
@@ -307,7 +307,7 @@ describe('Learner Group Backend API Service', () => {
       'groupId').then(successHandler, failHandler);
 
     var req = httpTestingController.expectOne(
-      LEARNER_GROUP_STUDENT_INFO_GET_URL);
+      LEARNER_GROUP_LEARNER_INFO_GET_URL);
     expect(req.request.method).toEqual('GET');
     req.flush(allLearnersInfo);
 
@@ -334,7 +334,7 @@ describe('Learner Group Backend API Service', () => {
       story_ids: ['story_id_1']
     };
 
-    const LEARNER_GROUP_STUDENT_INVITES_GET_URL = (
+    const LEARNER_GROUP_LEARNER_INVITES_GET_URL = (
       '/learner_group_learner_invitation_handler/groupId'
     );
 
@@ -342,7 +342,7 @@ describe('Learner Group Backend API Service', () => {
       'groupId', 'learner1', true, true).then(successHandler, failHandler);
 
     var req = httpTestingController.expectOne(
-      LEARNER_GROUP_STUDENT_INVITES_GET_URL);
+      LEARNER_GROUP_LEARNER_INVITES_GET_URL);
     expect(req.request.method).toEqual('PUT');
     req.flush(sampleLearnerGroupData);
 
