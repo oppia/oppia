@@ -21,7 +21,6 @@ from __future__ import annotations
 import builtins
 import json
 import os
-import servers
 import subprocess
 import sys
 
@@ -30,6 +29,7 @@ from core.tests import test_utils
 from scripts import concurrent_task_utils
 from scripts import common
 from scripts import install_third_party_libs
+from scripts import servers
 from typing import Any
 
 
@@ -399,16 +399,16 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         ):
             run_backend_tests.main(args=[])
     
-    # def test_invalid_delimiter_in_test_path_argument_throws_error(self) -> None:
-    #     with self.swap_install_third_party_libs:
-    #         from scripts import run_backend_tests
+    def test_invalid_delimiter_in_test_path_argument_throws_error(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
         
-    #     with self.swap_fix_third_party_imports, self.assertRaisesRegex(
-    #         Exception,
-    #         'The delimiter in test_path should be a slash (/).'
-    #     ):
-    #         run_backend_tests.main(
-    #             args=['--test_path', 'scripts.run_backend_tests'])
+        with self.swap_fix_third_party_imports, self.assertRaisesRegex(
+            Exception,
+            r'The delimiter in test_path should be a slash \(/\)'
+        ):
+            run_backend_tests.main(
+                args=['--test_path', 'scripts.run_backend_tests'])
 
     def test_invalid_delimiter_in_test_target_argument_throws_error(
             self) -> None:
@@ -417,7 +417,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         
         with self.swap_fix_third_party_imports, self.assertRaisesRegex(
             Exception,
-            'The delimiter in test_target should be a dot (.).'
+            r'The delimiter in test_target should be a dot \(\.\)'
         ):
             run_backend_tests.main(
                 args=['--test_target', 'scripts/run_backend_tests'])
