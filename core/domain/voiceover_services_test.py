@@ -53,13 +53,13 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
 
         self.applicant = user_services.get_user_actions_info(self.applicant_id)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'
@@ -154,7 +154,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         voiceover_application_model.target_type = 'invalid_type'
         voiceover_application_model.update_timestamps()
         voiceover_application_model.put()
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid target type for voiceover application: invalid_type'):
             voiceover_services.get_voiceover_application_by_id('application_id')
@@ -328,7 +328,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Applicants are not allowed to review their own '
             'voiceover application.'):
             voiceover_services.accept_voiceover_application(
@@ -355,13 +355,13 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             opportunity_services,
             'get_exploration_opportunity_summaries_by_ids',
             exploration_opportunity_summary):
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'No exploration summary exists for'):
                 voiceover_services.accept_voiceover_application(
                     user_voiceover_applications[0].voiceover_application_id,
                     self.admin_id)
 
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'No exploration summary exists for'):
                 voiceover_services.reject_voiceover_application(
                     user_voiceover_applications[0].voiceover_application_id,
@@ -410,7 +410,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Applicants are not allowed to review their own '
             'voiceover application.'):
             voiceover_services.reject_voiceover_application(
@@ -466,7 +466,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     def test_get_text_to_create_voiceover_application_for_invalid_type(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid target type: invalid_type'):
             voiceover_services.get_text_to_create_voiceover_application(
                 'invalid_type', '0', 'hi')
