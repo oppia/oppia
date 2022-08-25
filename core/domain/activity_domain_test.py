@@ -44,7 +44,7 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(collection_hash, invalid_activity_hash)
 
     def test_validate_with_invalid_type(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid activity type: invalid_activity_type'):
             self.invalid_activity_reference_with_invalid_type.validate()
 
@@ -54,7 +54,7 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
         # for ActivityReference for invalid argument type.
         invalid_activity_reference_with_invalid_id = (
             activity_domain.ActivityReference('exploration', 1234)) # type: ignore[arg-type]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, ('Expected id to be a string but found 1234')):
             invalid_activity_reference_with_invalid_id.validate()
 
@@ -115,6 +115,6 @@ class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_fails_with_invalid_type_in_activity_reference_list(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid activity type: invalid_activity_type'):
             self.invalid_activity_references.validate()
