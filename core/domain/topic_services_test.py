@@ -1873,7 +1873,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 [fractions_id, additions_id]), expected_dict)
 
         error_msg = (
-            'No corresponding topic models exist for these topic IDs %s.'
+            'No corresponding topic models exist for these topic IDs: %s.'
             % (', '.join(['']))
         )
         with self.assertRaisesRegex(Exception, error_msg):

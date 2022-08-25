@@ -1266,7 +1266,7 @@ def get_topic_id_to_diagnostic_test_skill_ids(topic_ids):
     ]
     if incorrect_topic_ids:
         error_msg = (
-            'No corresponding topic models exist for these topic IDs %s.'
+            'No corresponding topic models exist for these topic IDs: %s.'
             % (', '.join(incorrect_topic_ids))
         )
         raise Exception(error_msg)

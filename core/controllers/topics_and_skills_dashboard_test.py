@@ -1102,8 +1102,9 @@ class TopicIdToDiagnosticTestSkillIdsHandlerTests(
         url = '%s/?comma_separated_topic_ids=%s' % (
             feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
             'incorrect_topic_id')
-        json_response = self.get_json(url)
+        json_response = self.get_json(url, expected_status_int=500)
         self.assertEqual(
-            json_response['topic_id_to_diagnostic_test_skill_ids'],
-            {}
+            json_response['error'],
+            'No corresponding topic models exist for these topic IDs: '
+            'incorrect_topic_id.'
         )
