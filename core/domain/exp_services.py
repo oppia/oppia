@@ -537,10 +537,11 @@ def apply_change_list(
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
-                        # Here change is an instance of ExplorationChange and every
-                        # attribute on ExplorationChange is defined dynamically, and
-                        # every dynamically defined attribute have str type. Thus to
-                        # convert the type to dict, we have used assert here.
+                        # Here change is an instance of ExplorationChange and
+                        # every attribute on ExplorationChange is defined
+                        # dynamically, and every dynamically defined attribute
+                        # have str type. Thus to convert the type to dict, we
+                        # have used assert here.
                         assert isinstance(change.new_value, dict)
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
