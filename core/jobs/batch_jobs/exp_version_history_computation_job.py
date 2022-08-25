@@ -68,7 +68,7 @@ class FormattedModelGroupDict(TypedDict):
 class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     """Computes and populates the version history data for an exploration."""
 
-    def filter_valid_model_group(
+    def is_valid_model_group(
         self, model_group: UnformattedModelGroupDict
     ) -> bool:
         """Returns True if the given model group is valid.
@@ -577,7 +577,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Get rid of exploration id' >>
                 beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter valid model groups' >> beam.Filter(
-                self.filter_valid_model_group
+                self.is_valid_model_group
             )
             | 'Format valid model groups' >> beam.Map(
                 self.convert_to_formatted_model_group_dict
@@ -713,7 +713,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             except Exception:
                 return None # type: ignore[return-value]
 
-    def filter_valid_model_group(
+    def is_valid_model_group(
         self, model_group: UnformattedModelGroupDict
     ) -> bool:
         """Returns True if the given model group is valid.
@@ -1126,7 +1126,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             | 'Get rid of exploration id' >>
                 beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter valid model groups' >> beam.Filter(
-                self.filter_valid_model_group
+                self.is_valid_model_group
             )
             | 'Format valid model groups' >> beam.Map(
                 self.convert_to_formatted_model_group_dict
