@@ -1603,7 +1603,7 @@ class Question(translation_domain.BaseTranslatableObject):
         # interaction.default_outcome can be None in the case of explorations
         # but while creating the questions we are always providing default
         # outcome. So, we are sure that here interaction.default_outcome is
-        # never going to be None, that's we used assert here.
+        # never going to be None, that's why we used assert here.
         assert interaction.default_outcome is not None
         if interaction.default_outcome.labelled_as_correct:
             at_least_one_correct_answer = True
