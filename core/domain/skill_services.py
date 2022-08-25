@@ -1417,16 +1417,12 @@ def get_categorized_skill_ids_and_descriptions(
         subtopics = topic.subtopics
         for skill_id in topic.uncategorized_skill_ids:
             description = skill_descriptions[skill_id]
-            # Ruling out the possibility of None for mypy type checking.
-            assert description is not None
             categorized_skills.add_uncategorized_skill(
                 topic.name, skill_id,
                 description)
         for subtopic in subtopics:
             for skill_id in subtopic.skill_ids:
                 description = skill_descriptions[skill_id]
-                # Ruling out the possibility of None for mypy type checking.
-                assert description is not None
                 categorized_skills.add_subtopic_skill(
                     topic.name, subtopic.title,
                     skill_id, description)

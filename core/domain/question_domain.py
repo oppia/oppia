@@ -1027,10 +1027,12 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
-        # Here we use MyPy ignore because MyPy expects a return value in every
-        # condition when we define a return type but here we are returning
-        # conditionally which causes MyPy to throw an 'Missing return statement'
-        # error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because MyPy expects a return value in
+        # every condition when we define a return type but here we are
+        # returning only in if-else conditions and we are not returning
+        # when none of the condition matches which causes MyPy to throw
+        # a 'Missing return statement' error. Thus to avoid the error,
+        # we used ignore here.
         def migrate_rule_inputs_and_answers(  # type: ignore[return]
             new_type: str,
             value: Union[List[List[str]], List[str], str],
