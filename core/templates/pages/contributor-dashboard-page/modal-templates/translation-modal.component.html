@@ -69,10 +69,10 @@
              [ngClass]="isTranslationExpanded ? 'oppia-expanded' : 'oppia-contracted'"
              #translationContainer>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
-                             [schema]="HTML_SCHEMA"
-                             [localValue]="activeWrittenTranslation"
-                             (localValueChange)="updateHtml($event)"
-                             #oppiaRTE>
+                               [schema]="HTML_SCHEMA"
+                               [localValue]="activeWrittenTranslation"
+                               (localValueChange)="updateHtml($event)"
+                               #oppiaRTE>
           </schema-based-editor>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
                                [schema]="UNICODE_SCHEMA"

@@ -85,6 +85,22 @@ angular.module('oppia').controller('RteHelperModalController', [
       }
     }
 
+    // The 'isDefaultRTEComponent' variable controls whether the delete button
+    // needs to be shown. If the RTE component has default values, there is no
+    // need for a delete button as the 'Cancel' button would have
+    // the same functionality.
+    $scope.isDefaultRTEComponent = true;
+    for (let i = 0; i < customizationArgSpecs.length; i++) {
+      let caName = customizationArgSpecs[i].name;
+      let attrsCaDict = attrsCustomizationArgsDict;
+      if (
+        attrsCaDict.hasOwnProperty(caName) &&
+        attrsCaDict[caName] !== customizationArgSpecs[i].default_value
+      ) {
+        $scope.isDefaultRTEComponent = false;
+      }
+    }
+
     $scope.cancel = function() {
       for (let i = 0; i < customizationArgSpecs.length; i++) {
         let caName = customizationArgSpecs[i].name;
@@ -102,6 +118,10 @@ angular.module('oppia').controller('RteHelperModalController', [
           return;
         }
       }
+      $uibModalInstance.dismiss(true);
+    };
+
+    $scope.delete = function() {
       $uibModalInstance.dismiss(true);
     };
 

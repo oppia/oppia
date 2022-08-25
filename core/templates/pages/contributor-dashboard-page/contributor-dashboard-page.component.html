@@ -7,7 +7,7 @@
             *ngFor="let item of tabsDetails | keyvalue"
             [attr.aria-label]="item.value.ariaLabel">
           <div *ngIf="item.value.enabled"
-                class="oppia-tabs-container">
+               class="oppia-tabs-container">
             <a role="button"
                (click)="onTabClick(item.key)"
                href="#"
