@@ -77,6 +77,7 @@ import { StateNameEditorComponent } from './editor-tab/state-name-editor/state-n
 import { EditorNavigationComponent } from './editor-navigation/editor-navigation.component';
 import { TeachOppiaModalComponent } from './editor-tab/templates/modal-templates/teach-oppia-modal.component';
 import { SettingsTabComponent } from './settings-tab/settings-tab.component';
+import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 
 @NgModule({
   imports: [
@@ -136,7 +137,8 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
     StateNameEditorComponent,
     EditorNavigationComponent,
     TeachOppiaModalComponent,
-    SettingsTabComponent
+    SettingsTabComponent,
+    UnresolvedAnswersOverviewComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -179,7 +181,8 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
     StateNameEditorComponent,
     EditorNavigationComponent,
     TeachOppiaModalComponent,
-    SettingsTabComponent
+    SettingsTabComponent,
+    UnresolvedAnswersOverviewComponent
   ],
   providers: [
     {
