@@ -42,6 +42,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
+import { CheckpointCelebrationModalComponent } from './checkpoint-celebration-modal/checkpoint-celebration-modal.component';
 import { BackgroundBannerModule } from './common-layout-directives/common-elements/background-banner.module';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
@@ -237,6 +238,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
+    CheckpointCelebrationModalComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
@@ -367,6 +369,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
+    CheckpointCelebrationModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
     OutcomeEditorComponent,
@@ -485,6 +488,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FeedbackPopupComponent,
+    CheckpointCelebrationModalComponent,
     LearnerAnswerInfoCard,
     MultiSelectionFieldComponent,
     FilteredChoicesFieldComponent,
