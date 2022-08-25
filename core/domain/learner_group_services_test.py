@@ -49,9 +49,9 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email( # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()
@@ -297,7 +297,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
         # Test for univited student.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Student was not invited to join the learner group.'
         ):
