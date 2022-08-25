@@ -21,6 +21,7 @@ from __future__ import annotations
 import builtins
 import json
 import os
+import servers
 import subprocess
 import sys
 
@@ -46,6 +47,22 @@ class MockTask:
     task_results = []
 
 
+class MockCompiler:
+    def wait(self) -> None: # pylint: disable=missing-docstring
+        pass
+
+
+class MockCompilerContextManager():
+    def __init__(self) -> None:
+        pass
+
+    def __enter__(self) -> MockCompiler:
+        return MockCompiler()
+
+    def __exit__(self, *unused_args: Any) -> None:
+        pass
+
+
 class RunBackendTestsTests(test_utils.GenericTestBase):
     """Test the methods for run_backend_tests script."""
 
@@ -61,6 +78,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             pass
         self.swap_install_third_party_libs = self.swap(
             install_third_party_libs, 'main', mock_install_third_party_libs)
+        def mock_fix_third_party_imports() -> None:
+            pass
+        self.swap_fix_third_party_imports = self.swap(
+            common, 'fix_third_party_imports', mock_fix_third_party_imports)
 
         test_target_flag = '--test_target=random_test'
         self.coverage_exc_list = [
@@ -72,6 +93,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mock_log(msg: str) -> None:
             self.terminal_logs.append(msg)
         self.swap_logs = self.swap(concurrent_task_utils, 'log', mock_log)
+        def mock_context_manager() -> MockCompilerContextManager:
+            return MockCompilerContextManager()
+        self.swap_redis_server = self.swap(
+            servers, 'managed_redis_server', mock_context_manager)
+        self.swap_cloud_datastore_emulator = self.swap(
+            servers, 'managed_cloud_datastore_emulator', mock_context_manager)
 
     def test_run_shell_command_successfully(self) -> None:
         class MockTask:
@@ -359,12 +386,38 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        new_directory = 'new_directory'
-        swap_directory_list = self.swap(
-            common, 'DIRS_TO_ADD_TO_SYS_PATH', [
-            os.path.join(os.path.abspath(os.getcwd()), new_directory)
-        ])
+        def mock_path_exists(dirname: str) -> None:
+            for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
+                if os.path.dirname(directory) == dirname:
+                    return False
+            return True
+        swap_path_exists = self.swap(os.path, 'exists', mock_path_exists)
 
-        with swap_directory_list, self.assertRaisesRegex(
-                Exception, 'Directory %s does not exist.' % new_directory):
+        with swap_path_exists, self.assertRaisesRegex(
+            Exception,
+            'Directory %s does not exist.' % common.DIRS_TO_ADD_TO_SYS_PATH[0]
+        ):
             run_backend_tests.main(args=[])
+    
+    # def test_invalid_delimiter_in_test_path_argument_throws_error(self) -> None:
+    #     with self.swap_install_third_party_libs:
+    #         from scripts import run_backend_tests
+        
+    #     with self.swap_fix_third_party_imports, self.assertRaisesRegex(
+    #         Exception,
+    #         'The delimiter in test_path should be a slash (/).'
+    #     ):
+    #         run_backend_tests.main(
+    #             args=['--test_path', 'scripts.run_backend_tests'])
+
+    def test_invalid_delimiter_in_test_target_argument_throws_error(
+            self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+        
+        with self.swap_fix_third_party_imports, self.assertRaisesRegex(
+            Exception,
+            'The delimiter in test_target should be a dot (.).'
+        ):
+            run_backend_tests.main(
+                args=['--test_target', 'scripts/run_backend_tests'])

@@ -418,19 +418,6 @@ def main(args=None):
 
     common.fix_third_party_imports()
 
-    test_specs_provided = sum([
-        1 if argument else 0
-        for argument in (
-            parsed_args.test_target,
-            parsed_args.test_path,
-            parsed_args.test_shard
-        )
-    ])
-
-    if test_specs_provided > 1:
-        raise Exception(
-            'At most one of test_path, test_target and test_shard may '
-            'be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
