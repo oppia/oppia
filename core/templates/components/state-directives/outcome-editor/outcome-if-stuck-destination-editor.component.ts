@@ -110,7 +110,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
       // new state.
 
       this.destinationChoices = [{
-        id: null,
+        id: this.currentStateName,
         text: 'None'
       }];
 

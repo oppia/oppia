@@ -125,10 +125,16 @@ export class States {
         if (groups[i].outcome.dest === oldStateName) {
           groups[i].outcome.dest = newStateName;
         }
+        if (groups[i].outcome.destIfReallyStuck === oldStateName) {
+          groups[i].outcome.destIfReallyStuck = newStateName;
+        }
       }
       if (interaction.defaultOutcome) {
         if (interaction.defaultOutcome.dest === oldStateName) {
           interaction.defaultOutcome.dest = newStateName;
+        }
+        if (interaction.defaultOutcome.destIfReallyStuck === oldStateName) {
+          interaction.defaultOutcome.destIfReallyStuck = newStateName;
         }
       }
     }
