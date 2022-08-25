@@ -1268,7 +1268,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'The destination for the stuck learner '
             'XYZ is not a valid state')
-
+        
         answer_group.outcome.dest_if_really_stuck = None
 
         # Restore a valid exploration.
