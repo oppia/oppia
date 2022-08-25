@@ -297,7 +297,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
         # Test for univited learner.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Learner was not invited to join the learner group.'
         ):
