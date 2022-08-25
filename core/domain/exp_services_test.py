@@ -6156,12 +6156,16 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         exp_rights = rights_manager.get_exploration_rights(
             'exp_id', strict=True)
+
+        exp_summary = exp_services.generate_new_exploration_summary(
+            exploration, exp_rights
+        )
         exploration.created_on = None
         with self.assertRaisesRegex(
             Exception, 'No data available for when the exploration was'
         ):
-            exp_services.generate_new_exploration_summary(
-                exploration, exp_rights
+            exp_services.update_exploration_summary(
+                exploration, exp_rights, exp_summary
             )
 
 
