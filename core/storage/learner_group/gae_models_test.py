@@ -92,7 +92,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             learner_group_models.LearnerGroupModel)
 
         # Test create method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'A learner group with the given group ID exists already.'
         ):
@@ -105,7 +105,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
                 learner_group_model_cls.create('Abcd', 'title', 'description')
 
         # Test get_new_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New id generator is producing too many collisions.'
         ):
