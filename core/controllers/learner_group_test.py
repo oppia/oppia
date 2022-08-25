@@ -1095,7 +1095,7 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         ]
         story_services.update_story(
             self.USER_ID, self.story_id, change_list,
-            'Added node.')
+            'Added a node.')
 
     def test_get_learner_stories_chapters_progress(self) -> None:
         self.login(self.NEW_USER_EMAIL)
