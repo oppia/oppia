@@ -557,7 +557,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 question_state_dict['interaction']['answer_groups'] = (
                     new_answer_groups)
                 if question_state_dict['interaction']['solution'] is not None:
-                    # Ruling out the possibility of Any other type for mypy type
+                    # Ruling out the possibility of any other type for MyPy type
                     # checking, because for 'ExpressionInput' interactions, the
                     # correct_answer is formatted as a Dict type.
                     assert isinstance(
@@ -1077,22 +1077,24 @@ class Question(translation_domain.BaseTranslatableObject):
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calling itself
-                # recursively and because of this MyPy assuming it's type as
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes it's type as
                 # recursive, like if this method returns List[str] then MyPy
-                # assumes it's type as List[List[str]]. So because of this MyPy
-                # throws an error. Thus to avoid the error, we used ignore here.
+                # assumes it's type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
                     migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calling itself
-                # recursively and because of this MyPy assuming it's type as
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes its type as
                 # recursive, like if this method returns List[str] then MyPy
-                # assumes it's type as List[List[str]]. So because of this MyPy
-                # throws an error. Thus to avoid the error, we used ignore here.
+                # assumes it's type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
                     migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'SetOfTranslatableHtmlContentIds', html_set, choices
@@ -1109,7 +1111,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 # The solution type will be migrated from SetOfHtmlString to
                 # SetOfTranslatableHtmlContentIds.
                 if solution is not None:
-                    # Ruling out the possibility of Any other type for mypy type
+                    # Ruling out the possibility of any other type for MyPy type
                     # checking because for interaction 'ItemSelectionInput',
                     # the correct_answer is formatted as List[str] type.
                     assert isinstance(solution['correct_answer'], list)
@@ -1127,7 +1129,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 # The solution type will be migrated from ListOfSetsOfHtmlString
                 # to ListOfSetsOfTranslatableHtmlContentIds.
                 if solution is not None:
-                    # Ruling out the possibility of Any other type for mypy type
+                    # Ruling out the possibility of any other type for MyPy type
                     # checking because for interaction 'DragAndDropSortInput',
                     # the correct_answer is formatted as List[List[str]] type.
                     assert isinstance(solution['correct_answer'], list)
@@ -1153,8 +1155,8 @@ class Question(translation_domain.BaseTranslatableObject):
                         # All rule inputs for ItemSelectionInput will be
                         # migrated from SetOfHtmlString to
                         # SetOfTranslatableHtmlContentIds.
-                        # Ruling out the possibility of Any other type
-                        # for mypy type checking because for interaction
+                        # Ruling out the possibility of any other type
+                        # for MyPy type checking because for interaction
                         # 'ItemSelectionInput', the rule inputs are formatted
                         # as List[str] type.
                         assert isinstance(rule_inputs['x'], list)
@@ -1177,8 +1179,8 @@ class Question(translation_domain.BaseTranslatableObject):
                             # the x input will be migrated from
                             # ListOfSetsOfHtmlStrings to
                             # ListOfSetsOfTranslatableHtmlContentIds.
-                            # Ruling out the possibility of Any other type
-                            # for mypy type checking because for interaction
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
                             # 'DragAndDropSortInput', the rule inputs are
                             # formatted as List[List[str]] type.
                             assert isinstance(rule_inputs['x'], list)
@@ -1198,8 +1200,8 @@ class Question(translation_domain.BaseTranslatableObject):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId, and the y input will
                             # remain as DragAndDropPositiveInt.
-                            # Ruling out the possibility of Any other type
-                            # for mypy type checking because for interaction
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
                             # 'HasElementXAtPositionY', the rule inputs are
                             # formatted as str type.
                             assert isinstance(rule_inputs['x'], str)
@@ -1214,8 +1216,8 @@ class Question(translation_domain.BaseTranslatableObject):
                             # TranslatableHtmlContentId.
                             for rule_input_name in ['x', 'y']:
                                 rule_input_value = rule_inputs[rule_input_name]
-                                # Ruling out the possibility of Any other type
-                                # for mypy type checking because for interaction
+                                # Ruling out the possibility of any other type
+                                # for MyPy type checking because for interaction
                                 # 'HasElementXBeforeElementY', the rule inputs
                                 # are formatted as str type.
                                 assert isinstance(rule_input_value, str)
