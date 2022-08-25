@@ -57,6 +57,7 @@ describe('rich-text components', function() {
         'Video', 'M7lc1UVf-VE', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
+      await browser.debug();
       await richTextEditor.addRteComponent(
         'Collapsible', 'title', await forms.toRichText('inner'));
       await richTextEditor.addRteComponent('Tabs', [{

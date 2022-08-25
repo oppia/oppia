@@ -24,6 +24,10 @@ var suites = {
       'protractor_desktop/explorationHistoryTab.js'
     ],
 
+    extensions: [
+      'protractor_desktop/extensions.js'
+    ],
+
     featureGating: [
       'protractor/featureGatingFlow.js'
     ],

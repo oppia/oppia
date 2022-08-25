@@ -279,14 +279,14 @@ var RichTextEditor = async function(elem) {
           'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
         // RteElementFirst can be found in beginning of RichTextEditor function.
-        await action.setValue(
+        await action.addValue(
           'First RTE Element',
           rteElements[0],
           'PageDown');
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      await action.setValue(
+      await action.addValue(
         'First RTE Element',
         rteElements[0],
         ['Control', 'End']);
@@ -716,13 +716,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
      * expectTextToBe() function should be used when possible.
      */
     expectTextWithHighlightingToBe: async function(expectedTextDict) {
-      console.log(11);
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
-      console.log(12);
       await _compareText(expectedTextDict, true);
-      console.log(13);
     },
     /**
      * Compares text with codeMirror. The input should be a string (with
@@ -748,7 +745,7 @@ var CodeStringEditor = function(elem) {
     setValue: async function(code) {
       var stringEditorTextArea = await elem.$('textarea');
       await action.clear('String Editor Text Area', stringEditorTextArea);
-      await action.setValue(
+      await action.addValue(
         'String Editor Text Area',
         stringEditorTextArea,
         code);
