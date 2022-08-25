@@ -39,7 +39,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -135,6 +135,9 @@ export class TranslationModalComponent {
   isTranslationExpanded: boolean = true;
   isContentOverflowing: boolean = false;
   isTranslationOverflowing: boolean = false;
+  // The value of cutoff must be equal to 'max-height' - 1 set
+  // in the class '.oppia-contracted' in 'translation-modal.component.html'.
+  cutoff_height: number = 29;
   ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
@@ -162,7 +165,7 @@ export class TranslationModalComponent {
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly windowRef: WindowRef
+    private readonly wds: WindowDimensionsService
   ) {
     this.contextService = OppiaAngularRootComponent.contextService;
   }
@@ -212,22 +215,17 @@ export class TranslationModalComponent {
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.computePanelOverflowState();
-    }, 500);
+    this.computePanelOverflowState();
   }
 
   ngAfterViewChecked(): void {
+    this.computeTranslationEditorOverflowState();
+  }
+
+  computeTranslationEditorOverflowState(): void {
     setTimeout(() => {
-      const windowHeight = (
-        this.windowRef?.nativeWindow.innerHeight ||
-        this.windowRef?.nativeWindow.document.documentElement.clientHeight ||
-        this.windowRef?.nativeWindow.document.body.clientHeight
-      );
-      // The value of cutoff must be equal to 'max-height' - 1 set
-      // in the class '.oppia-contracted' in 'translation-modal.component.html'.
-      const cutoff = 29;
-      const heightLimit = windowHeight * (cutoff) / 100;
+      const windowHeight = this.wds.getHeight();
+      let heightLimit = windowHeight * (this.cutoff_height) / 100;
 
       this.isTranslationOverflowing = (
         this.translationContainer?.nativeElement.offsetHeight >=
@@ -241,7 +239,7 @@ export class TranslationModalComponent {
       this.isContentOverflowing = (
         this.contentPanel?.elementRef.nativeElement.offsetHeight >
         this.contentContainer?.nativeElement.offsetHeight);
-    }, 0);
+    }, 500);
   }
 
   // TODO(#13221): Remove this method completely after the change detection
