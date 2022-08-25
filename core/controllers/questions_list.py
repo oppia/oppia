@@ -59,6 +59,7 @@ class QuestionsListHandler(base.BaseHandler):
             }
         }
     }
+
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
