@@ -22,7 +22,7 @@ import { FormControl, FormsModule } from '@angular/forms';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
-import { Schema } from 'services/schema-default-value.service';
+import { Schema, SchemaDefaultValue } from 'services/schema-default-value.service';
 
 describe('Schema Based Dict Editor Component', () => {
   let component: SchemaBasedDictEditorComponent;
@@ -50,7 +50,7 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: Record<string, unknown>) {
+    let mockFunction = function(value: Record<string, SchemaDefaultValue>) {
       return value;
     };
     component.registerOnChange(mockFunction);
