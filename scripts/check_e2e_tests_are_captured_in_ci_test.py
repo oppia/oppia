@@ -191,7 +191,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'TEST_SUITES_NOT_RUN_IN_CI', [])
 
         with mock_ci_scripts:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'publication is expected to be in '
                            'the e2e test suites extracted from the script '
                            'section of CI config files, but it is '
@@ -199,7 +199,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_protractor_test_suites, mock_tests_not_in_ci:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'publication is expected to be in '
                            'the e2e test suites extracted from the '
                            'protractor.conf.js file, but it is missing.'):
