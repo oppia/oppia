@@ -328,7 +328,7 @@ class CollectionModel(base_models.VersionedModel):
         )
 
         # Here we use cast because the additional_models is list of BaseModels
-        # and we want to hint the MyPy that this is CollectionRightsModel.
+        # and we want to hint to MyPy that this is CollectionRightsModel.
         collection_rights_model = cast(
             CollectionRightsModel, additional_models['rights_model']
         )

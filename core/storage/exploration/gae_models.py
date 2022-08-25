@@ -333,7 +333,7 @@ class ExplorationModel(base_models.VersionedModel):
         )
 
         # Here we use cast because the additional_models is list of BaseModels
-        # and we want to hint the MyPy that this is ExplorationRightsModel.
+        # and we want to hint to MyPy that this is ExplorationRightsModel.
         exploration_rights_model = cast(
             ExplorationRightsModel, additional_models['rights_model']
         )

@@ -1173,12 +1173,9 @@ class UserSubscriptionsModel(base_models.BaseModel):
             UserSettingsModel.get_multi(user_model.creator_ids)
         )
         filtered_creator_user_models = []
-        for index, creator_user_model in enumerate(creator_user_models):
+        for creator_user_model in creator_user_models:
             if creator_user_model is None:
-                raise Exception(
-                    'No UserSettingsModel exist for the given creator_id: %s'
-                    % user_model.creator_ids[index]
-                )
+                continue
             filtered_creator_user_models.append(creator_user_model)
         creator_usernames = [
             creator.username for creator in filtered_creator_user_models]

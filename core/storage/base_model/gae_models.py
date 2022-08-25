@@ -891,14 +891,14 @@ class VersionedModel(BaseModel):
 
     # Here we use type Any because the method 'compute_snapshot' defined in
     # subclasses of VersionedModel can return different Dict/TypedDict types.
-    # So, to allow every Dict/TypedDict type we used any here.
+    # So, to allow every Dict/TypedDict type we used Any here.
     def compute_snapshot(self) -> Dict[str, Any]:
         """Generates a snapshot (dict) from the model property values."""
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
     # Here we use type Any because the method '_reconstitute' defined in
     # subclasses of VersionedModel can accept different Dict/TypedDict types.
-    # So, to allow every Dict/TypedDict type we used any here.
+    # So, to allow every Dict/TypedDict type we used Any here.
     def _reconstitute(
         self: SELF_VERSIONED_MODEL,
         snapshot_dict: Dict[str, Any]
@@ -1238,7 +1238,7 @@ class VersionedModel(BaseModel):
             cls.update_timestamps_multi(entities)
             BaseModel.put_multi_transactional(entities)
 
-    # Here we use type Any because to denote the compatibility with the
+    # Here we use type Any because we need to denote the compatibility with the
     # overridden constructor of the parent class i.e BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """For VersionedModels, this method is replaced with commit()."""
@@ -1829,7 +1829,7 @@ class BaseSnapshotContentModel(BaseModel):
 
     # Here we use type Any because the method 'create' defined in subclasses
     # of BaseSnapshotContentModel can accept different Dict/TypedDict types.
-    # So, to allow every Dict/TypedDict type we used any here.
+    # So, to allow every Dict/TypedDict type we used Any here.
     @classmethod
     def create(
         cls: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL],

@@ -27,6 +27,8 @@ from core import feconf
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
+from typing import Optional
+
 
 def _get_subscriber_hash(email: str) -> str:
     """Returns Mailchimp subscriber hash from email.
@@ -49,7 +51,7 @@ def _get_subscriber_hash(email: str) -> str:
     return md5_hash.hexdigest()
 
 
-def _get_mailchimp_class() -> mailchimp3.MailChimp:
+def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     """Returns the mailchimp api class. This is separated into a separate
     function to facilitate testing.
 
@@ -59,13 +61,9 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
         Mailchimp. A mailchimp class instance with the API key and username
         initialized.
     """
-    # Here we use MyPy ignore because adding a Union[] type annotation to handle
-    # both None and mailchimp3.MailChimp causes errors where the return value is
-    # called (for eg: client.lists), since NoneType does not have an attribute
-    # lists.
     if not feconf.MAILCHIMP_API_KEY:
         logging.exception('Mailchimp API key is not available.')
-        return None # type: ignore[return-value]
+        return None
 
     if not feconf.MAILCHIMP_USERNAME:
         logging.exception('Mailchimp username is not set.')
@@ -101,8 +99,13 @@ def _create_user_in_mailchimp_db(user_email: str) -> bool:
     }
     client = _get_mailchimp_class()
 
+    # Here, 'client' is of type Optional[MailChimp] but before calling
+    # `_create_user_in_mailchimp_db` private method we are already checking
+    # and handling the None case of client. So, we are assured that the 'client'
+    # is never going to be None here but just to suppress the MyPy error, we
+    # used ignore here. 
     try:
-        client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)
+        client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)  # type: ignore[union-attr]
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the

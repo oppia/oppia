@@ -90,7 +90,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'method': 'POST'
         }
         # Here we use type Any because this function mocks requests.post
-        # function where the type of JSON has been defined Any, hence using
+        # function where the type of JSON has been defined as Any, hence using
         # Dict[str, Any] here.
         # https://github.com/python/typeshed/blob/5e0fc4607323a4657b587bf70e3c26becf1c88d0/stubs/requests/requests/api.pyi#L78
         def mock_post(

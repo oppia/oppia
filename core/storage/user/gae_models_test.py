@@ -1208,11 +1208,21 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             last_checked=self.GENERIC_DATETIME
         ).put()
 
-        with self.assertRaisesRegex(
-            Exception,
-            'No UserSettingsModel exist for the given creator_id: Invalid_id'
-        ):
-            user_models.UserSubscriptionsModel.export_data('test_user')
+        exported_data = user_models.UserSubscriptionsModel.export_data(
+            'test_user'
+        )
+
+        # Here we are deleting 'last_checked_msec', because this key contains
+        # the time stamp which can be different at the time of creation of model
+        # and checking the output.
+        del exported_data['last_checked_msec']
+        expected_dict = {
+            'exploration_ids': ['exp_1', 'exp_2', 'exp_3'],
+            'collection_ids': ['23', '42', '4'],
+            'general_feedback_thread_ids': ['42', '4', '8'],
+            'creator_usernames': ['usernameuser_id_5', 'usernameuser_id_6']
+        }
+        self.assertEqual(expected_dict, exported_data)
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(

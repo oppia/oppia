@@ -31,7 +31,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
 
     # Here we use type Any because it emulates the behaviour of
     # dev_mode_taskqueue_services._task_handler. So, to match the
-    # type annotations with '_task_handler' we annotated payload
+    # type annotations with '_task_handler' we annotated the payload
     # as 'Dict[str, Any]'.
     def mock_task_handler(
             self,

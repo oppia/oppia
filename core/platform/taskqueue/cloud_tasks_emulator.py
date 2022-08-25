@@ -36,7 +36,7 @@ class Task:
     """
 
     # Here we use type Any because the payload can accept Dict and
-    # it has no constraints over it's values.
+    # this Dict has no constraints on its values.
     def __init__(
             self,
             queue_name: str,
@@ -174,7 +174,7 @@ class Emulator:
         return sum(len(q) for q in self._queues.values())
 
     # Here we use type Any because the payload can accept Dict and
-    # it has no constraints over it's values.
+    # this Dict has no constraints on its values.
     def create_task(
             self,
             queue_name: str,
