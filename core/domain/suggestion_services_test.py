@@ -32,8 +32,12 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -48,9 +52,11 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
-(suggestion_models, feedback_models, user_models) = (
+(suggestion_models, feedback_models, opportunity_models, user_models) = (
     models.Registry.import_models(
-        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user]
+        [models.NAMES.suggestion, models.NAMES.feedback,
+        models.NAMES.opportunity,
+        models.NAMES.user]
     )
 )
 
@@ -1892,11 +1898,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL) # type: ignore[no-untyped-call]
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.reviewer_id = self.editor_id
 
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
@@ -2082,6 +2095,465 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             translation_suggestion[0].contributor_user_id,
             'user_id'
+        )
+
+    def test_fetch_all_contribution_stats(self) -> None:
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id='user_id',
+            topic_id='topic_id',
+            submitted_translations_count=2,
+            submitted_translation_word_count=100,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=50,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173837)
+            ]
+        )
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code='es',
+            reviewer_user_id='user_id',
+            topic_id='topic_id',
+            reviewed_translations_count=1,
+            reviewed_translation_word_count=1,
+            accepted_translations_count=1,
+            accepted_translations_with_reviewer_edits_count=0,
+            accepted_translation_word_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id='user_id',
+            topic_id='topic_id',
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id='user_id',
+            topic_id='topic_id',
+            reviewed_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=1,
+            first_contribution_date=datetime.date.fromtimestamp(1616173836),
+            last_contribution_date=datetime.date.fromtimestamp(1616173836)
+        )
+        stats = suggestion_services.get_all_contributor_stats( # pylint: disable=line-too-long
+            'user_id')
+        self.assertEqual(stats.contributor_user_id, 'user_id')
+        self.assertEqual(len(stats.translation_contribution_stats), 1)
+        self.assertEqual(
+            stats.translation_contribution_stats[0].language_code, 'es')
+        self.assertEqual(len(stats.question_contribution_stats), 1)
+        self.assertEqual(
+            stats.question_contribution_stats[0].contributor_user_id, 'user_id')
+        self.assertEqual(len(stats.translation_review_stats), 1)
+        self.assertEqual(
+            stats.translation_review_stats[0].contributor_user_id, 'user_id')
+        self.assertEqual(len(stats.question_review_stats), 1)
+        self.assertEqual(
+            stats.question_review_stats[0].contributor_user_id, 'user_id')
+
+    def _publish_valid_topic(self, topic, uncategorized_skill_ids): # type: ignore[no-untyped-def]
+        """Saves and publishes a valid topic with linked skills and subtopic.
+
+        Args:
+            topic: Topic. The topic to be saved and published.
+            uncategorized_skill_ids: list(str). List of uncategorized skills IDs
+                to add to the supplied topic.
+        """
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        subtopic_id = 1
+        subtopic_skill_id = 'subtopic_skill_id' + topic.id
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                subtopic_id, 'Title', [subtopic_skill_id], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = [subtopic_skill_id]
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic.id))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic) # type: ignore[no-untyped-call]
+        topic_services.publish_topic(topic.id, self.admin_id) # type: ignore[no-untyped-call]
+
+        for skill_id in uncategorized_skill_ids:
+            self.save_new_skill( # type: ignore[no-untyped-call]
+                skill_id, self.admin_id, description='skill_description')
+            topic_services.add_uncategorized_skill( # type: ignore[no-untyped-call]
+                self.admin_id, topic.id, skill_id)
+
+    def test_update_translation_contribution_stats(self) -> None:
+        explorations = [self.save_new_valid_exploration(
+            '%s' % i,
+            self.owner_id,
+            title='title %d' % i,
+            category=constants.ALL_CATEGORIES[i],
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in range(3)]
+
+        for exp in explorations:
+            self.publish_exploration(self.owner_id, exp.id)
+
+        topic_id = '0'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
+        skill_id_0 = 'skill_id_0'
+        skill_id_1 = 'skill_id_1'
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
+
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
+            self.owner_id, self.admin_id, 'story_id_0', topic_id, '0')
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
+            self.owner_id, self.admin_id, 'story_id_1', topic_id, '1')
+
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        initial_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.author_id, change_dict, 'description')
+        latest_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '1', 1, self.author_id, change_dict, 'description')
+        suggestion_services.update_translation_contribution_stats(
+            initial_suggestion, self.author_id, '0', True
+        )
+        suggestion_services.update_translation_contribution_stats(
+            latest_suggestion, self.author_id, '1', True
+        )
+
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, '0'
+            )
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.submitted_translations_count, # type: ignore[union-attr]
+            2
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model # type: ignore[union-attr]
+                .submitted_translation_word_count
+            ),
+            6
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.accepted_translations_count, # type: ignore[union-attr]
+            0
+        )
+
+    def test_update_translation_review_stats(self) -> None:
+        explorations = [self.save_new_valid_exploration(
+            '%s' % i,
+            self.owner_id,
+            title='title %d' % i,
+            category=constants.ALL_CATEGORIES[i],
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in range(3)]
+
+        for exp in explorations:
+            self.publish_exploration(self.owner_id, exp.id)
+
+        topic_id = '0'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
+        skill_id_0 = 'skill_id_0'
+        skill_id_1 = 'skill_id_1'
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
+
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
+            self.owner_id, self.admin_id, 'story_id_01', topic_id, '0')
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
+            self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
+
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        initial_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.author_id, change_dict, 'description')
+        latest_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '1', 1, self.author_id, change_dict, 'description')
+
+        suggestion_services.update_translation_contribution_stats(
+            initial_suggestion, self.author_id, '0', True
+        )
+        suggestion_services.update_translation_contribution_stats(
+            latest_suggestion, self.author_id, '1', True
+        )
+
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, '0'
+            )
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.submitted_translations_count, # type: ignore[union-attr]
+            2
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model # type: ignore[union-attr]
+                .submitted_translation_word_count
+            ),
+            6
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.accepted_translations_count, # type: ignore[union-attr]
+            0
+        )
+
+        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.update_translation_review_stats(
+            initial_suggestion, self.reviewer_id, '0', True
+        )
+        suggestion_services.update_translation_review_stats(
+            latest_suggestion, self.reviewer_id, '1', True
+        )
+
+        translation_review_stats_model = (
+            suggestion_models.TranslationReviewStatsModel.get(
+                'hi', self.reviewer_id, '0'
+            )
+        )
+
+        self.assertEqual(
+            translation_review_stats_model.accepted_translations_count, # type: ignore[union-attr]
+            2
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model # type: ignore[union-attr]
+                .reviewed_translation_word_count
+            ),
+            6
+        )
+
+    def test_update_question_contribution_stats(self) -> None:
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill( # type: ignore[no-untyped-call]
+            skill_id_1, self.author_id, description='description')
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic( # type: ignore[no-untyped-call]
+            topic_id, 'topic_admin', name='Topic1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        suggestion_change_1 = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id_1,
+            'skill_difficulty': 0.3
+        }
+        suggestion_change_2 = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_2'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id_2,
+            'skill_difficulty': 0.3
+        }
+        initial_suggestion = suggestion_services.create_suggestion( # type: ignore[call-overload]
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
+            self.author_id, suggestion_change_1, 'test description')
+        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
+            self.author_id, suggestion_change_2, 'test description')
+        suggestion_services.update_question_contribution_stats(
+            initial_suggestion, self.author_id, skill_id_1, True
+        )
+        suggestion_services.update_question_contribution_stats(
+            latest_suggestion, self.author_id, skill_id_2, True
+        )
+
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id
+            )
+        )
+        self.assertEqual(
+            question_contribution_stats_model.submitted_questions_count,  # type: ignore[union-attr]
+            2
+        )
+        self.assertEqual(
+            question_contribution_stats_model.accepted_questions_count,  # type: ignore[union-attr]
+            0
+        )
+
+        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.update_question_review_stats(
+            initial_suggestion, self.reviewer_id, skill_id_1, True
+        )
+        suggestion_services.update_question_review_stats(
+            latest_suggestion, self.reviewer_id, skill_id_2, True
+        )
+
+        question_review_stats_model = (
+            suggestion_models.QuestionReviewStatsModel.get(
+                self.reviewer_id, topic_id
+            )
+        )
+
+        self.assertEqual(
+            question_review_stats_model.accepted_questions_count,  # type: ignore[union-attr]
+            2
+        )
+        self.assertEqual(
+            (
+                question_review_stats_model  # type: ignore[union-attr]
+                .reviewed_questions_count
+            ),
+            2
+        )
+
+    def test_update_question_review_stats(self) -> None:
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(  # type: ignore[no-untyped-call]
+            skill_id_1, self.author_id, description='description')
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(  # type: ignore[no-untyped-call]
+            topic_id, 'topic_admin', name='Topic1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        suggestion_change_1 = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id_1,
+            'skill_difficulty': 0.3
+        }
+        suggestion_change_2 = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_2'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id_2,
+            'skill_difficulty': 0.3
+        }
+        initial_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
+            self.author_id, suggestion_change_1, 'test description')
+        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
+            self.author_id, suggestion_change_2, 'test description')
+        suggestion_services.update_question_contribution_stats(
+            initial_suggestion, self.author_id, skill_id_1, True
+        )
+        suggestion_services.update_question_contribution_stats(
+            latest_suggestion, self.author_id, skill_id_2, True
+        )
+
+        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.update_question_review_stats(
+            initial_suggestion, self.reviewer_id, skill_id_1, True
+        )
+        suggestion_services.update_question_review_stats(
+            latest_suggestion, self.reviewer_id, skill_id_2, True
+        )
+
+        question_review_stats_model = (
+            suggestion_models.QuestionReviewStatsModel.get(
+                self.reviewer_id, topic_id
+            )
+        )
+
+        self.assertEqual(
+            question_review_stats_model.accepted_questions_count,  # type: ignore[union-attr]
+            2
+        )
+        self.assertEqual(
+            (
+                question_review_stats_model  # type: ignore[union-attr]
+                .reviewed_questions_count
+            ),
+            2
         )
 
     def test_create_and_reject_suggestion(self) -> None:
