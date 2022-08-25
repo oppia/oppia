@@ -1322,6 +1322,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'The destination %s is not a valid state.'
                         % default_outcome.dest)
+                
+                # Check default if-stuck destinations.
+                if (
+                    default_outcome.dest_if_really_stuck is not None and
+                    default_outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % default_outcome.dest_if_really_stuck)
 
                 if default_outcome.dest_if_really_stuck == state_name:
                     raise utils.ValidationError(
@@ -1344,6 +1354,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'The destination %s is not a valid state.'
                         % group.outcome.dest)
+
+                # Check group if-stuck destinations.
+                if (
+                    group.outcome.dest_if_really_stuck is not None and
+                    group.outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % group.outcome.dest_if_really_stuck)
 
                 if (
                     group.outcome.dest_if_really_stuck is not None and
