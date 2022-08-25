@@ -23,6 +23,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaBasedExpressionEditorComponent } from './schema-based-expression-editor.component';
 import { FormControl } from '@angular/forms';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 
 describe('Schema Based Expression Editor Component', () => {
   let component: SchemaBasedExpressionEditorComponent;
@@ -50,7 +51,7 @@ describe('Schema Based Expression Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: unknown) {
+    let mockFunction = function(value: SchemaDefaultValue) {
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -82,7 +83,7 @@ describe('Schema Based Expression Editor Component', () => {
   }));
 
   it('should update value when local value change', () => {
-    component.localValue = ['item1'];
+    component.localValue = ['item1'] as SchemaDefaultValue;
 
     expect(component.localValue).toEqual(['item1']);
 
