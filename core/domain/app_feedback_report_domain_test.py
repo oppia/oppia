@@ -330,7 +330,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         }
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name)
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value)
         navigation_drawer_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -340,7 +340,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.NavigationDrawerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name)
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value)
         lesson_player_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -350,7 +350,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.LessonPlayerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.EntryPoint.REVISION_CARD.name)
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value)
         revision_card_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -360,7 +360,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.RevisionCardEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.EntryPoint.CRASH.name)
+            app_feedback_report_constants.EntryPoint.CRASH.value)
         crash_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -765,7 +765,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name) # pylint: disable=line-too-long
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value) # pylint: disable=line-too-long
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -793,7 +793,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name)): # pylint: disable=line-too-long
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value)): # pylint: disable=line-too-long
             self.entry_point.validate()
 
 
@@ -808,7 +808,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name),
+                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -839,7 +839,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.name))
+                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -912,7 +912,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.REVISION_CARD.name),
+                app_feedback_report_constants.EntryPoint.REVISION_CARD.value),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -940,7 +940,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.REVISION_CARD.name))
+                app_feedback_report_constants.EntryPoint.REVISION_CARD.value))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -982,7 +982,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.CRASH.name)
+                app_feedback_report_constants.EntryPoint.CRASH.value)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -1010,7 +1010,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.CRASH.name)):
+                app_feedback_report_constants.EntryPoint.CRASH.value)):
             self.entry_point.validate()
 
 
@@ -1029,7 +1029,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name), # pylint: disable=line-too-long
+                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
@@ -1060,7 +1060,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.name), # pylint: disable=line-too-long
+                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
