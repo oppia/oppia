@@ -250,7 +250,7 @@ export class ExplorationWarningsService {
       // calculate distance for each, if invalid push in results.
       seen[stateName] = true;
       let state = states.getState(stateName);
-      if(state && state.interaction) {
+      if (state && state.interaction) {
         if (state.interaction.defaultOutcome) {
           let defaultDest = state.interaction.defaultOutcome.dest;
           if (defaultDest !== stateName && seen[defaultDest] &&
