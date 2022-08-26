@@ -1198,7 +1198,22 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, 0, self.ticket_id,
             None, android_user_supplied_feedback, android_device_system_context,
             android_app_context)
-daily_param_stats_report_id]
+
+        self.ticket_obj = app_feedback_report_domain.AppFeedbackReportTicket(
+            self.ticket_id, TICKET_NAME, PLATFORM_ANDROID, None, None, False,
+            REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
+
+    def test_to_dict(self) -> None:
+        expected_dict = {
+            'ticket_id': self.ticket_id,
+            'ticket_name': TICKET_NAME,
+            'platform': PLATFORM_ANDROID,
+            'github_issue_repo_name': None,
+            'github_issue_number': None,
+            'archived': False,
+            'newest_report_creation_timestamp': (
+                REPORT_SUBMITTED_TIMESTAMP.isoformat()),
+            'reports': [self.android_report_id]
         }
         self.assertDictEqual(
             expected_dict, self.ticket_obj.to_dict())
@@ -1508,7 +1523,15 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
 
 class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
 
-    def setUp(self) -> None:d
+    def setUp(self) -> None:
+        super().setUp()
+        self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
+            app_feedback_report_constants.FILTER_FIELD_NAMES.platform,
+            ['web', 'android'])
+
+    def test_to_dict(self) -> None:
+        app_feedback_report_constants.PLATFORM_CHOICES.sort()
+        expected_dict = {
             'filter_field': 'platform',
             'filter_options': app_feedback_report_constants.PLATFORM_CHOICES
         }
