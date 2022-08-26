@@ -25,7 +25,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import recommendations_models
 
 (base_models, recommendations_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.recommendations])
+    [models.NAMES.BASE_MODEL, models.NAMES.RECOMMENDATIONS])
 
 
 class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):

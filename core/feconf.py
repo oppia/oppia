@@ -136,37 +136,37 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
+class ValidModelNames(enum.Enum):
     """Enum for valid model names."""
 
-    activity = 'activity' # pylint: disable=invalid-name
-    app_feedback_report = 'app_feedback_report' # pylint: disable=invalid-name
-    audit = 'audit' # pylint: disable=invalid-name
-    base_model = 'base_model' # pylint: disable=invalid-name
-    beam_job = 'beam_job' # pylint: disable=invalid-name
-    blog = 'blog' # pylint: disable=invalid-name
-    classifier = 'classifier' # pylint: disable=invalid-name
-    classroom = 'classroom' # pylint: disable=invalid-name
-    collection = 'collection' # pylint: disable=invalid-name
-    config = 'config' # pylint: disable=invalid-name
-    email = 'email' # pylint: disable=invalid-name
-    exploration = 'exploration' # pylint: disable=invalid-name
-    feedback = 'feedback' # pylint: disable=invalid-name
-    improvements = 'improvements' # pylint: disable=invalid-name
-    job = 'job' # pylint: disable=invalid-name
-    learner_group = 'learner_group' # pylint: disable=invalid-name
-    opportunity = 'opportunity' # pylint: disable=invalid-name
-    question = 'question' # pylint: disable=invalid-name
-    recommendations = 'recommendations' # pylint: disable=invalid-name
-    skill = 'skill' # pylint: disable=invalid-name
-    statistics = 'statistics' # pylint: disable=invalid-name
-    auth = 'auth' # pylint: disable=invalid-name
-    story = 'story' # pylint: disable=invalid-name
-    subtopic = 'subtopic' # pylint: disable=invalid-name
-    suggestion = 'suggestion' # pylint: disable=invalid-name
-    topic = 'topic' # pylint: disable=invalid-name
-    translation = 'translation' # pylint: disable=invalid-name
-    user = 'user' # pylint: disable=invalid-name
+    ACTIVITY = 'activity'
+    APP_FEEDBACK_REPORT = 'app_feedback_report'
+    AUDIT = 'audit'
+    BASE_MODEL = 'base_model'
+    BEAM_JOB = 'beam_job'
+    BLOG = 'blog'
+    CLASSIFIER = 'classifier'
+    CLASSROOM = 'classroom'
+    COLLECTION = 'collection'
+    CONFIG = 'CONFIG'
+    EMAIL = 'email'
+    EXPLORATION = 'exploration'
+    FEEDBACK = 'feedback'
+    IMPROVEMENTS = 'improvements'
+    JOB = 'job'
+    LEARNER_GROUP = 'learner_group'
+    OPPORTUNITY = 'opportunity'
+    QUESTION = 'question'
+    RECOMMENDATIONS = 'recommendations'
+    SKILL = 'skill'
+    STATISTICS = 'statistics'
+    AUTH = 'auth'
+    STORY = 'story'
+    SUBTOPIC = 'subtopic'
+    SUGGESTION = 'suggestion'
+    TOPIC = 'topic'
+    TRANSLATION = 'translation'
+    USER = 'user'
 
 
 # A mapping of interaction ids to classifier properties.

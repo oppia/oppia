@@ -27,7 +27,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.NAMES.APP_FEEDBACK_REPORT])
 
 
 PLATFORM_CHOICE_ANDROID = app_feedback_report_models.PLATFORM_CHOICE_ANDROID
@@ -133,7 +133,7 @@ class AndroidNetworkType(enum.Enum):
     NONE = 'none'
 
 
-FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
+FILTER_FIELD_NAMES = app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
@@ -167,13 +167,13 @@ ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.android_sdk_version,
     STATS_PARAMETER_NAMES.version_name]
 ALLOWED_FILTERS = [
-    FILTER_FIELD_NAMES.report_type, FILTER_FIELD_NAMES.platform,
-    FILTER_FIELD_NAMES.entry_point, FILTER_FIELD_NAMES.submitted_on,
-    FILTER_FIELD_NAMES.android_device_model,
-    FILTER_FIELD_NAMES.android_sdk_version,
-    FILTER_FIELD_NAMES.text_language_code,
-    FILTER_FIELD_NAMES.audio_language_code, FILTER_FIELD_NAMES.platform_version,
-    FILTER_FIELD_NAMES.android_device_country_locale_code]
+    FILTER_FIELD_NAMES.REPORT_TYPE, FILTER_FIELD_NAMES.PLATFORM,
+    FILTER_FIELD_NAMES.ENTRY_POINT, FILTER_FIELD_NAMES.SUBMITTED_ON,
+    FILTER_FIELD_NAMES.ANDROID_DEVICE_MODEL,
+    FILTER_FIELD_NAMES.ANDROID_SDK_VERSION,
+    FILTER_FIELD_NAMES.TEXT_LANGUAGE_CODE,
+    FILTER_FIELD_NAMES.AUDIO_LANGUAGE_CODE, FILTER_FIELD_NAMES.PLATFORM_VERSION,
+    FILTER_FIELD_NAMES.ANDROID_DEVICE_COUNTRY_LOCALE_CODE]
 ALLOWED_ANDROID_NETWORK_TYPES = [
     AndroidNetworkType.WIFI, AndroidNetworkType.CELLULAR,
     AndroidNetworkType.NONE]

@@ -32,7 +32,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.NAMES.BASE_MODEL])
 
 
 class BaseAuditError(job_run_result.JobRunResult):

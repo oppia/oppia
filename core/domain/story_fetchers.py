@@ -40,7 +40,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.NAMES.STORY, models.NAMES.USER])
 
 
 def _migrate_story_contents_to_latest_schema(

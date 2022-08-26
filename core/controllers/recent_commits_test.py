@@ -22,7 +22,7 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.NAMES.EXPLORATION])
 
 
 class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):

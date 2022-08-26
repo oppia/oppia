@@ -53,8 +53,8 @@ from core.tests import test_utils
     feedback_models, exp_models, opportunity_models,
     recommendations_models, stats_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.exploration, models.NAMES.opportunity,
-    models.NAMES.recommendations, models.NAMES.statistics, models.NAMES.user
+    models.NAMES.FEEDBACK, models.NAMES.EXPLORATION, models.NAMES.OPPORTUNITY,
+    models.NAMES.RECOMMENDATIONS, models.NAMES.STATISTICS, models.NAMES.USER
 ])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()

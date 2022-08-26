@@ -28,7 +28,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import translation_models
 
 (base_models, translation_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.translation])
+    [models.NAMES.BASE_MODEL, models.NAMES.TRANSLATION])
 
 
 class EntityTranslationsModelTest(test_utils.GenericTestBase):

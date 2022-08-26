@@ -29,7 +29,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.NAMES.SKILL])
 
 
 class BaseSkillEditorControllerTests(test_utils.GenericTestBase):

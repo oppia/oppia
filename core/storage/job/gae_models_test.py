@@ -25,7 +25,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import job_models
 
 (base_models, job_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.job])
+    [models.NAMES.BASE_MODEL, models.NAMES.JOB])
 
 
 class JobModelTest(test_utils.GenericTestBase):

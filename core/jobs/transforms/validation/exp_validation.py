@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import story_models
 
 (exp_models, story_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.story
+    models.NAMES.EXPLORATION, models.NAMES.STORY
 ])
 
 

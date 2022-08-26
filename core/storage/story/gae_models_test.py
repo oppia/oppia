@@ -29,7 +29,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import story_models
 
 (base_models, story_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.story])
+    [models.NAMES.BASE_MODEL, models.NAMES.STORY])
 
 
 class StorySnapshotContentModelTests(test_utils.GenericTestBase):

@@ -34,7 +34,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (skill_models, suggestion_models, question_models) = models.Registry.import_models( # pylint: disable=line-too-long
-    [models.NAMES.skill, models.NAMES.suggestion, models.NAMES.question])
+    [models.NAMES.SKILL, models.NAMES.SUGGESTION, models.NAMES.QUESTION])
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):

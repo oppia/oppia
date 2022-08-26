@@ -26,7 +26,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import beam_job_models
 
 (base_models, beam_job_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.beam_job])
+    [models.NAMES.BASE_MODEL, models.NAMES.BEAM_JOB])
 
 
 class BeamJobRunModelTest(test_utils.GenericTestBase):

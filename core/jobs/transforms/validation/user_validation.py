@@ -49,9 +49,9 @@ if MYPY:  # pragma: no cover
     exp_models, feedback_models, skill_models,
     story_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.user
+    models.NAMES.AUTH, models.NAMES.COLLECTION, models.NAMES.EMAIL,
+    models.NAMES.EXPLORATION, models.NAMES.FEEDBACK, models.NAMES.SKILL,
+    models.NAMES.STORY, models.NAMES.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()

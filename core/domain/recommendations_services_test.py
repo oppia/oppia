@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import recommendations_models
 
 (recommendations_models,) = models.Registry.import_models(
-    [models.NAMES.recommendations]
+    [models.NAMES.RECOMMENDATIONS]
 )
 
 

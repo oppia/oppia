@@ -33,7 +33,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import question_models
 
 (base_models, question_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.question])
+    [models.NAMES.BASE_MODEL, models.NAMES.QUESTION])
 
 
 class ValidateQuestionSnapshotMetadataModelTests(

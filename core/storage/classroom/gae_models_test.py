@@ -29,7 +29,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
 
 (base_models, classroom_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.classroom])
+    [models.NAMES.BASE_MODEL, models.NAMES.CLASSROOM])
 
 
 class ClassroomModelUnitTest(test_utils.GenericTestBase):

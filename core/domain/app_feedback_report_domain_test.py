@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.NAMES.APP_FEEDBACK_REPORT])
 
 
 USER_1_EMAIL = 'some@email.com'
@@ -1526,7 +1526,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
-            app_feedback_report_constants.FILTER_FIELD_NAMES.platform,
+            app_feedback_report_constants.FILTER_FIELD_NAMES.PLATFORM,
             ['web', 'android'])
 
     def test_to_dict(self) -> None:

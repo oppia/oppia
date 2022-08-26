@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (email_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.email, models.NAMES.suggestion])
+    [models.NAMES.EMAIL, models.NAMES.SUGGESTION])
 
 
 class FailedMLTest(test_utils.EmailTestBase):

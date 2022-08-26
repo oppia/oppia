@@ -34,7 +34,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.NAMES.EXPLORATION])
 
 
 class RatingServicesTests(test_utils.GenericTestBase):

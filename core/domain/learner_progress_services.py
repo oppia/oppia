@@ -38,7 +38,7 @@ from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.NAMES.USER])
 datastore_services = models.Registry.import_datastore_services()
 
 

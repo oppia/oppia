@@ -40,7 +40,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (question_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.question, models.NAMES.skill])
+    [models.NAMES.QUESTION, models.NAMES.SKILL])
 
 transaction_services = models.Registry.import_transaction_services()
 

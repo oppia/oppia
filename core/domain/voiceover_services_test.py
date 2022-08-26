@@ -38,7 +38,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models,) = models.Registry.import_models([models.NAMES.SUGGESTION])
 
 
 class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):

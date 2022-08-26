@@ -23,7 +23,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.NAMES.USER])
 
 
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):

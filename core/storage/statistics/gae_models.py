@@ -43,7 +43,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.NAMES.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()

@@ -33,7 +33,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (email_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.user])
+    models.NAMES.EMAIL, models.NAMES.USER])
 
 
 class InformSubscribersTest(test_utils.EmailTestBase):

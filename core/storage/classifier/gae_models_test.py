@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
 (base_models, classifier_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.classifier])
+    [models.NAMES.BASE_MODEL, models.NAMES.CLASSIFIER])
 
 
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):

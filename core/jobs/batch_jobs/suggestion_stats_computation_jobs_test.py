@@ -38,7 +38,7 @@ if MYPY:
     from mypy_imports import suggestion_models
 
 (opportunity_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.opportunity, models.NAMES.suggestion
+    models.NAMES.OPPORTUNITY, models.NAMES.SUGGESTION
 ])
 
 StatsType = List[Tuple[str, Dict[str, Union[bool, int, str]]]]

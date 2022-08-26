@@ -32,7 +32,7 @@ from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,) = models.Registry.import_models([models.NAMES.STATISTICS])
 
 
 class StatisticsServicesTests(test_utils.GenericTestBase):

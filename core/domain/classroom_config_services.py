@@ -34,7 +34,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
 
-(classroom_models,) = models.Registry.import_models([models.NAMES.classroom])
+(classroom_models,) = models.Registry.import_models([models.NAMES.CLASSROOM])
 
 
 def get_all_classrooms() -> List[classroom_config_domain.Classroom]:

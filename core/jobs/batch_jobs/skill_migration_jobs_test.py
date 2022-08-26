@@ -35,7 +35,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.NAMES.SKILL])
 
 
 class MigrateSkillJobTests(job_test_utils.JobTestBase):

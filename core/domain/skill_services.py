@@ -46,8 +46,8 @@ if MYPY: # pragma: no cover
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
-        models.NAMES.skill, models.NAMES.user, models.NAMES.question,
-        models.NAMES.topic]))
+        models.NAMES.SKILL, models.NAMES.USER, models.NAMES.QUESTION,
+        models.NAMES.TOPIC]))
 datastore_services = models.Registry.import_datastore_services()
 
 

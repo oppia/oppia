@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import collection_models
 
 (base_models, collection_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.collection])
+    [models.NAMES.BASE_MODEL, models.NAMES.COLLECTION])
 
 
 class ValidateCollectionSnapshotMetadataModelTests(

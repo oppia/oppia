@@ -56,8 +56,8 @@ from core.tests import test_utils
     audit_models, blog_models, exp_models, opportunity_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.blog, models.NAMES.exploration,
-    models.NAMES.opportunity, models.NAMES.user
+    models.NAMES.AUDIT, models.NAMES.BLOG, models.NAMES.EXPLORATION,
+    models.NAMES.OPPORTUNITY, models.NAMES.USER
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'

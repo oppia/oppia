@@ -46,7 +46,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (base_models, story_models, topic_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.story, models.NAMES.topic
+    models.NAMES.BASE_MODEL, models.NAMES.STORY, models.NAMES.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()

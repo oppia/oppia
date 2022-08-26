@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.NAMES.AUTH, models.NAMES.USER]))
 
 
 class AuthIdUserIdPairTests(test_utils.TestBase):

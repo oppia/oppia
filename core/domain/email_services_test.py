@@ -22,7 +22,7 @@ from core.domain import email_services
 from core.platform import models
 from core.tests import test_utils
 
-(email_models,) = models.Registry.import_models([models.NAMES.email])
+(email_models,) = models.Registry.import_models([models.NAMES.EMAIL])
 platform_email_services = models.Registry.import_email_services()
 
 

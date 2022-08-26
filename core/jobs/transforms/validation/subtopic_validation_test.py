@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.subtopic])
+    [models.NAMES.BASE_MODEL, models.NAMES.SUBTOPIC])
 
 
 class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):

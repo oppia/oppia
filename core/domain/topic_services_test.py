@@ -42,7 +42,7 @@ from core.tests import test_utils
 (
     topic_models, suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.topic, models.NAMES.suggestion
+    models.NAMES.TOPIC, models.NAMES.SUGGESTION
 ])
 
 

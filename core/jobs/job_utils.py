@@ -33,7 +33,7 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.NAMES.BASE_MODEL])
 
 
 def clone_model(

@@ -30,7 +30,7 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,) = models.Registry.import_models([models.NAMES.STATISTICS])
 transaction_services = models.Registry.import_transaction_services()
 
 # NOTE TO DEVELOPERS: The functions:

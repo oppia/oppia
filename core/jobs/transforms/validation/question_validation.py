@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
 (question_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.question, models.NAMES.skill])
+    [models.NAMES.QUESTION, models.NAMES.SKILL])
 
 datastore_services = models.Registry.import_datastore_services()
 

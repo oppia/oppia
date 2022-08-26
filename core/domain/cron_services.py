@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (base_models, job_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.job, models.NAMES.user])
+    models.NAMES.BASE_MODEL, models.NAMES.JOB, models.NAMES.USER])
 datastore_services = models.Registry.import_datastore_services()
 
 # Only non-versioned models should be included in this list. Activities that

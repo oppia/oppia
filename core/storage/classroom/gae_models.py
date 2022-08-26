@@ -29,7 +29,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.NAMES.BASE_MODEL])
 
 
 class ClassroomModel(base_models.BaseModel):
