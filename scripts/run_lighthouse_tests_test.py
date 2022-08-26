@@ -265,7 +265,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen)
         swap_isdir = self.swap(
             os.path, 'isdir', lambda _: True)
-        swap_build = self.swap_with_checks(build, 'main', lambda args: None,
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda args: None,
             expected_kwargs=[{'args': []}])
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
 
@@ -294,7 +295,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen)
         swap_isdir = self.swap(
             os.path, 'isdir', lambda _: True)
-        swap_build = self.swap_with_checks(build, 'main', lambda args: None,
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda args: None,
             expected_kwargs=[{'args': ['--prod_env']}])
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
