@@ -23,7 +23,7 @@ import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/s
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
 
-fdescribe('Graph Data Service', () => {
+describe('Graph Data Service', () => {
   let graphDataService: GraphDataService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationStatesService: ExplorationStatesService;
