@@ -23,7 +23,7 @@ import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/s
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
 
-describe('Graph Data Service', () => {
+fdescribe('Graph Data Service', () => {
   let graphDataService: GraphDataService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationStatesService: ExplorationStatesService;
@@ -64,7 +64,7 @@ describe('Graph Data Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
-              dest_if_really_stuck: null,
+              dest_if_really_stuck: 'Me Llamo',
               feedback: {
                 content_id: 'feedback_1',
                 html: 'buen trabajo!',
@@ -128,6 +128,11 @@ describe('Graph Data Service', () => {
         target: 'Me Llamo',
         linkProperty: null,
         connectsDestIfStuck: false
+      }, {
+        source: 'Hola',
+        target: 'Me Llamo',
+        linkProperty: null,
+        connectsDestIfStuck: true
       }, {
         source: 'Hola',
         target: 'Hola',
