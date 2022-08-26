@@ -257,7 +257,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because AggregatedStatsDict can only accept
         # Dict[str, int] but for testing purpose here we are providing str for
         # one of the value which causes MyPy to throw a error. Thus to avoid
-        # the error, we used ignore here. 
+        # the error, we used ignore here.
         aggregated_stats: stats_domain.AggregatedStatsDict = {
             'num_starts': '1',  # type: ignore[typeddict-item]
             'num_actual_starts': 1,
