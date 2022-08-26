@@ -286,7 +286,7 @@ describe('States Object Factory', () => {
           answer_groups: [{
             outcome: {
               dest: 'second state',
-              dest_if_really_stuck: null,
+              dest_if_really_stuck: 'second state',
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -344,7 +344,7 @@ describe('States Object Factory', () => {
           answer_groups: [{
             outcome: {
               dest: 'first state',
-              dest_if_really_stuck: null,
+              dest_if_really_stuck: 'first state',
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -360,7 +360,7 @@ describe('States Object Factory', () => {
           }],
           default_outcome: {
             dest: 'first state',
-            dest_if_really_stuck: null,
+            dest_if_really_stuck: 'first state',
             feedback: {
               content_id: 'default_outcome',
               html: ''

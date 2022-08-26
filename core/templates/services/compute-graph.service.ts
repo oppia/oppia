@@ -24,7 +24,7 @@ import { States } from 'domain/exploration/StatesObjectFactory';
 
 export interface GraphLink {
   source: string;
-  target: string;
+  target: string | null;
   linkProperty: string | null;
   connectsDestIfStuck: boolean;
 }

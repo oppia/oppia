@@ -66,6 +66,7 @@ export class OutcomeEditorComponent implements OnInit {
   feedbackEditorIsOpen: boolean = false;
   destIfStuckFeatEnabled: boolean = (
     AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
+  
   onMobile: boolean = false;
   resizeSubscription!: Subscription;
   // The value of this variable should match the breapoint used in

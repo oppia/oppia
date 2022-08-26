@@ -88,7 +88,7 @@ describe('Graph Data Service', () => {
           },
           default_outcome: {
             dest: 'Hola',
-            dest_if_really_stuck: null,
+            dest_if_really_stuck: 'Hola',
             feedback: {
               content_id: 'default_outcome',
               html: 'try again!',
@@ -133,6 +133,11 @@ describe('Graph Data Service', () => {
         target: 'Hola',
         linkProperty: null,
         connectsDestIfStuck: false
+      }, {
+        source: 'Hola',
+        target: 'Hola',
+        linkProperty: null,
+        connectsDestIfStuck: true
       }],
       nodes: { Hola: 'Hola' }
     };
