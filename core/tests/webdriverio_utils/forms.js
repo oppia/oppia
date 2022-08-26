@@ -181,7 +181,7 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = async function(elem) {
-  var rteElements = await elem.$$('.e2e-test-rte');
+  var rteElement = elem.$('.e2e-test-rte');
   var modalDialogElementsSelector = function() {
     return $$('.modal-dialog');
   };
@@ -189,6 +189,9 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = (
     '.e2e-test-close-rich-text-component-editor');
   // Set focus in the RTE.
+  await waitFor.visibilityOf(
+    rteElement, 'First RTE element is not visible');
+  var rteElements = await elem.$$('.e2e-test-rte');
   await waitFor.elementToBeClickable(
     rteElements[0],
     'First RTE element taking too long to become clickable.'
