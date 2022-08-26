@@ -6749,8 +6749,8 @@ module.exports = {
     }
   },
 
-  "DEV_MODE": true,
-  "EMULATOR_MODE": true,
+  "DEV_MODE": false,
+  "EMULATOR_MODE": false,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
   "ASSET_TYPE_THUMBNAIL": "thumbnail",
