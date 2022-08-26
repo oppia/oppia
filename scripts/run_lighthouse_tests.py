@@ -189,7 +189,7 @@ def main(args=None) -> None:
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         print('Building files in production mode.')
         build.main(args=['--prod_env'])
-    elif lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
+    else:
         build.main(args=[])
         run_webpack_compilation()
 

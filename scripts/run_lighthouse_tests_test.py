@@ -21,6 +21,7 @@ import os
 import subprocess
 import sys
 
+from core.constants import constants
 from core.tests import test_utils
 from scripts import build
 from scripts import common
@@ -28,6 +29,7 @@ from scripts import run_lighthouse_tests
 from scripts import servers
 from typing import Any
 
+GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
 LIGHTHOUSE_CONFIG_FILENAMES = {
@@ -94,9 +96,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             servers, 'managed_firebase_auth_emulator', mock_context_manager)
         self.swap_cloud_datastore_emulator = self.swap(
             servers, 'managed_cloud_datastore_emulator', mock_context_manager)
-        self.swap_dev_appserver = self.swap(
+        self.swap_dev_appserver = self.swap_with_checks(
             servers, 'managed_dev_appserver',
-            lambda *unused_args, **unused_kwargs: MockCompilerContextManager())
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
+            expected_kwargs=[{
+                'port': GOOGLE_APP_ENGINE_PORT,
+                'log_level': 'critical',
+                'skip_sdk_update_check': True
+            }])
 
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
@@ -258,11 +265,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen)
         swap_isdir = self.swap(
             os.path, 'isdir', lambda _: True)
+        swap_build = self.swap_with_checks(build, 'main', lambda args: None,
+            expected_kwargs=[{'args': []}])
+        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_redis_server, self.swap_cloud_datastore_emulator:
-                    with self.swap_firebase_auth_emulator, swap_popen:
+                with self.swap_redis_server, swap_emulator_mode:
+                    with swap_popen, swap_build:
                         run_lighthouse_tests.main(
                             args=['--mode', 'accessibility', '--shard', '1'])
 
@@ -284,7 +294,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen)
         swap_isdir = self.swap(
             os.path, 'isdir', lambda _: True)
-        swap_build = self.swap(build, 'main', lambda args: None)
+        swap_build = self.swap_with_checks(build, 'main', lambda args: None,
+            expected_kwargs=[{'args': ['--prod_env']}])
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
