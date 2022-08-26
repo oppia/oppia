@@ -141,14 +141,9 @@ module.exports = {
   * once angularjs is removed from corresponding pages.
   */
   plugins: [
-    new HtmlWebpackPlugin({
-      chunks: ['header'],
-      filename: 'header_js_libs.html',
-      hybrid: true,
-      template: commonPrefix + '/pages/header_js_libs.html',
-      inject: false,
-      GA_ANALYTICS_ID: constants.GA_ANALYTICS_ID,
-      UA_ANALYTICS_ID: constants.UA_ANALYTICS_ID
+    new webpack.DefinePlugin({
+      GA_ANALYTICS_ID: JSON.stringify(constants.GA_ANALYTICS_ID),
+      UA_ANALYTICS_ID: JSON.stringify(constants.UA_ANALYTICS_ID)
     }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
