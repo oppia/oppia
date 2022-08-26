@@ -29,7 +29,6 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RolesAndActionsVisualizerComponent } from 'pages/admin-page/roles-tab/roles-and-actions-visualizer.component';
 import { ClassroomAdminNavbarComponent } from './navbar/classroom-admin-navbar.component';
 import { ClassroomAdminPageComponent } from './classroom-admin-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
@@ -64,7 +63,6 @@ declare var angular: ng.IAngularStatic;
     ClassroomEditorConfirmModalComponent,
     DeleteClassroomConfirmModalComponent,
     CreateNewClassroomModalComponent,
-    RolesAndActionsVisualizerComponent
   ],
   entryComponents: [
     ClassroomAdminNavbarComponent,
@@ -72,7 +70,6 @@ declare var angular: ng.IAngularStatic;
     ClassroomEditorConfirmModalComponent,
     DeleteClassroomConfirmModalComponent,
     CreateNewClassroomModalComponent,
-    RolesAndActionsVisualizerComponent
   ],
   providers: [
     {

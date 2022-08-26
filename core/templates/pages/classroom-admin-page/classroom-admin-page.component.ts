@@ -20,24 +20,23 @@ export class ClassroomAdminPageComponent implements OnInit {
     private ngbModal: NgbModal,
   ) {}
   classroomCount: number;
+  classroomIdToClassroomName: {[classroomId: string]: string};
   selectedClassroomDict;
   updatedClassroomDict;
-  classroomIdToClassroomName;
 
-  classroomId;
-  classroomName;
-  urlFragment;
-  courseDetails;
-  topicListIntro;
-  topicIds;
+  classroomId: string;
+  classroomName: string;
+  urlFragment: string;
+  courseDetails: string;
+  topicListIntro: string;
+  topicIds: string[];
   topicIdToPrerequisiteTopicIds;
 
-  pageInitialized: boolean = false;
-  classroomDataChanged: boolean = false;
+  pageIsInitialized: boolean = false;
+  classroomDataIsChanged: boolean = false;
   classroomDetailsIsShown: boolean = false;
   classroomViewerMode: boolean = false;
   classroomEditorMode: boolean = false;
-  newTopicIdInput: boolean = false;
 
   getClassroomData(classroomId: string) {
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
@@ -55,12 +54,13 @@ export class ClassroomAdminPageComponent implements OnInit {
 
         this.selectedClassroomDict = cloneDeep(response.classroomDict);
         this.updatedClassroomDict = cloneDeep(response.classroomDict);
-        this.classroomDataChanged = false;
-        this.classroomDetailsIsShown = true;
-        this.classroomViewerMode = true;
 
         this.updateClassroomPropertiesFromDict(
           cloneDeep(this.selectedClassroomDict));
+
+        this.classroomDataIsChanged = false;
+        this.classroomDetailsIsShown = true;
+        this.classroomViewerMode = true;
       }
     );
   }
@@ -68,7 +68,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   getAllClassroomIdToClassroomName() {
     this.classroomBackendApiService
       .getAllClassroomIdToClassroomNameDictAsync().then(response => {
-        this.pageInitialized = true;
+        this.pageIsInitialized = true;
         this.classroomIdToClassroomName = response;
         this.classroomCount = Object.keys(response).length;
       }
@@ -77,22 +77,34 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   updateClassroomName() {
     this.updatedClassroomDict.name = this.classroomName;
-    this.classroomDataChanged = true;
+    this.classroomDataIsChanged = true;
   }
 
   updateUrlFragment() {
     this.updatedClassroomDict.urlFragment = this.urlFragment;
-    this.classroomDataChanged = true;
+    this.classroomDataIsChanged = true;
   }
 
   updateCourseDetails() {
     this.updatedClassroomDict.courseDetails = this.courseDetails;
-    this.classroomDataChanged = true;
+    this.classroomDataIsChanged = true;
   }
 
   updateTopicListIntro() {
     this.updatedClassroomDict.topicListIntro = this.topicListIntro;
-    this.classroomDataChanged = true;
+    this.classroomDataIsChanged = true;
+  }
+
+  convertClassroomDictToBackendForm(classroomDict) {
+    return {
+      'classroom_id': classroomDict.classroomId,
+      'name': classroomDict.name,
+      'url_fragment': classroomDict.urlFragment,
+      'course_details': classroomDict.courseDetails,
+      'topic_list_intro': classroomDict.topicListIntro,
+      'topic_id_to_prerequisite_topic_ids': (
+        classroomDict.topicIdToPrerequisiteTopicIds)
+    };
   }
 
   saveClassroomData(classroomId: string) {
@@ -102,7 +114,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroomId, backendDict).then(() => {
         this.classroomEditorMode = false;
         this.classroomViewerMode = true;
-        this.classroomDataChanged = false;
+        this.classroomDataIsChanged = false;
         this.classroomIdToClassroomName[this.classroomId] = this.classroomName;
         this.selectedClassroomDict = cloneDeep(this.updatedClassroomDict);
       });
@@ -118,25 +130,12 @@ export class ClassroomAdminPageComponent implements OnInit {
         () => {
           delete this.classroomIdToClassroomName[classroomId];
           this.classroomCount--;
-        }
-      );
+        });
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is
       // clicked. No further action is needed.
     });
-  }
-
-  convertClassroomDictToBackendForm(classroomDict) {
-    return {
-      'classroom_id': classroomDict.classroomId,
-      'name': classroomDict.name,
-      'url_fragment': classroomDict.urlFragment,
-      'course_details': classroomDict.courseDetails,
-      'topic_list_intro': classroomDict.topicListIntro,
-      'topic_id_to_prerequisite_topic_ids': (
-        classroomDict.topicIdToPrerequisiteTopicIds)
-    };
   }
 
   openClassroomConfigEditor() {
@@ -145,7 +144,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   closeClassroomConfigEditor() {
-    if (this.classroomDataChanged) {
+    if (this.classroomDataIsChanged) {
       let modalRef: NgbModalRef = this.ngbModal.
         open(ClassroomEditorConfirmModalComponent, {
           backdrop: 'static'
@@ -154,7 +153,11 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomEditorMode = false;
         this.classroomViewerMode = true;
         this.classroomName = this.selectedClassroomDict.name;
-        this.classroomDataChanged = false;
+        this.classroomDataIsChanged = false;
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
       })
     } else {
       this.classroomEditorMode = false;
@@ -167,18 +170,17 @@ export class ClassroomAdminPageComponent implements OnInit {
       open(CreateNewClassroomModalComponent, {
         backdrop: 'static'
       });
-    console.log(Object.values(this.classroomIdToClassroomName));
     modalRef.componentInstance.existingClassroomNames = (
       Object.values(this.classroomIdToClassroomName)
     );
     modalRef.result.then((classroomDict) => {
       this.classroomIdToClassroomName[classroomDict.classroom_id] = (
         classroomDict.name);
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
     });
-  }
-
-  ngOnInit(): void {
-    this.getAllClassroomIdToClassroomName();
   }
 
   updateClassroomPropertiesFromDict(classroomDict) {
@@ -193,23 +195,8 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroomDict.topicIdToPrerequisiteTopicIds);
   }
 
-  addNewTopicIdToClassroom(classroomId: string) {
-    this.newTopicIdInput = false;
-  }
-
-  removeTopicIdFromClassroom(classroomId) {
-    this.newTopicIdInput = false;
-  }
-
-  openNewTopicIdInput() {
-    this.newTopicIdInput = true;
-  }
-  openTopicsDependencyGraphEditor() {
-
-  }
-
-  closeTopicsDependencyGraphEditor() {
-
+  ngOnInit(): void {
+    this.getAllClassroomIdToClassroomName();
   }
 }
 
