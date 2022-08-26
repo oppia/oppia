@@ -87,7 +87,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             expected_learner_group_dict)
 
     def test_validation(self) -> None:
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 [],
@@ -97,7 +97,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['story_1', 'story_2']),
             'Expected learner group to have at least one facilitator.')
 
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 ['user_1'],
@@ -107,7 +107,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['story_1', 'story_2']),
             'Learner group student cannot be invited to join the group.')
 
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 ['user_1'],
@@ -117,7 +117,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['story_1', 'story_2']),
             'Learner group facilitator cannot be a student of the group.')
 
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             learner_group_domain.LearnerGroup(
                 '3232', 'title', 'description',
                 ['user_1'],
