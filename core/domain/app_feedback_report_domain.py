@@ -1711,7 +1711,7 @@ class AppFeedbackReportFilter:
     """Domain object for a filter that can be applied to the collection of
     feedback reports.
     """
-    
+
     def __init__(
         self,
         filter_field: app_feedback_report_constants.FILTER_FIELD_NAMES,
