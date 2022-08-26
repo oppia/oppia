@@ -581,8 +581,6 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.enableCheckpointForCurrentState = async function() {
-    await waitFor.elementToBeClickable(
-      checkpointSelectionCheckbox, 'Checkpoint checkbox is not clickable');
     await action.click('Checkpoint checkbox', checkpointSelectionCheckbox);
   };
 

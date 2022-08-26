@@ -77,7 +77,6 @@
         "additionalEditorFeatures.js",
         "additionalPlayerFeatures.js",
         "adminTabFeatures.js",
-        "checkpointFeatures.js",
         "classroomPage.js",
         "classroomPageFileUploadFeatures.js",
         "collections.js",

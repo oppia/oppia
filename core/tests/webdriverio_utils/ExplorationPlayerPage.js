@@ -350,14 +350,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.dismissLessonInfoTooltip = async function() {
-    await waitFor.visibilityOf(
-      lessonInfoTooltip, 'Lesson info tooltip takes too long to appear');
     await action.click('Lesson Info Tooltip', lessonInfoTooltip);
   };
 
   this.expectCheckpointProgressMessageToBeDisplayedOnLessonInfoModal =
     async function() {
-      await waitFor.elementToBeClickable(explorationInfoIcon);
       await action.click('Exploration Info Icon', explorationInfoIcon);
       await waitFor.visibilityOf(
         lessonInfoModalCheckpointMessage,
