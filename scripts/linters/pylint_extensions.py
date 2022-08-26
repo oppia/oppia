@@ -44,7 +44,7 @@ EXCLUDED_PHRASES = [
 ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = [
     'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:']
 
-ALLOWED_LINES_OF_GAP_IN_COMMENT = 10
+ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
