@@ -2520,6 +2520,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 variable_two: str = '1234'
                 # Some other content of module one.
 
+                # Line 1 content.
+                # Line 2 content.
+                # Line 3 content.
+                # Line 4 content.
+
                 # Some other content of module two.
 
                 def test_foo(arg: str) -> str:
@@ -2535,7 +2540,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         )
         message1 = testutils.Message(
             msg_id='mypy-ignore-used',
-            line=13
+            line=18
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
@@ -2985,9 +2990,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
     def test_raises_error_if_gap_between_type_and_comment_is_more_than_ten(
         self
     ):
-        node_with_object_and_more_than_ten_gap = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
+        node_with_object_and_more_than_expected_gap = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
         )
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
@@ -3002,6 +3009,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 variable_two: str = '1234'
                 # Some other content of module one.
 
+                # Line 1 content.
+                # Line 2 content.
+                # Line 3 content.
+                # Line 4 content.
+
                 # Some other content of module two.
 
                 def test_foo(arg: str) -> str:
@@ -3010,14 +3022,16 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                     return 'hi' #@
                 """
             )
-        node_with_object_and_more_than_ten_gap.file = filename
+        node_with_object_and_more_than_expected_gap.file = filename
 
         self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_object_and_more_than_ten_gap)
+            pylint_utils.tokenize_module(
+                node_with_object_and_more_than_expected_gap
+            )
         )
         message = testutils.Message(
             msg_id='object-class-used',
-            line=13
+            line=18
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
