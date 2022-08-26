@@ -77,6 +77,9 @@ class SetupTests(test_utils.GenericTestBase):
         swap_path = self.swap(sys, 'path', dummy_path)
 
         with swap_setup, swap_path, swap_open:
+            # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
+            # sys.path when we run backend tests. We use a swap as we 
+            # need to remove these dirs to import setup.
             import setup # pylint: disable=import-error
             setup.main()
         
