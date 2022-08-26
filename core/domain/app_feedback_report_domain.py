@@ -442,7 +442,7 @@ class UserSuppliedFeedback:
         Args:
             report_type: ReportType. The type of feedback submitted by the user
                 as an enum.
-            category: CATEGORY. The category enum that this specific report_type
+            category: Category. The category enum that this specific report_type
                 is providing feedback on that correponds.
             user_feedback_selected_items: list(str). A list of strings that
                 represent any options selected by the user for the feedback
@@ -1718,7 +1718,7 @@ class AppFeedbackReportFilter:
         filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
-
+stats_obj
         Args:
             filter_field: FILTER_FIELD_NAMES. The enum type for the filter
                 category, correponding to a field in the AppFeedbackReport
