@@ -61,7 +61,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         self.assertEqual(featured_model_instance.activity_references, [])
 
     def test_retrieving_non_existent_list(self) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid ActivityListModel'):
             activity_models.ActivityReferencesModel.get_or_create(
                 'nonexistent_key')
 

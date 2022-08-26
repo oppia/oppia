@@ -20,6 +20,7 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var waitFor = require('../webdriverio_utils/waitFor.js');
 var GetStartedPage = require('../webdriverio_utils/GetStartedPage.js');
+var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
 
 describe('Oppia landing pages tour', function() {
   it('should visit the Fractions landing page', async function() {
@@ -245,4 +246,25 @@ describe('Static Pages Tour', function() {
       await waitFor.pageToFullyLoad();
       await general.expectErrorPage(404);
     });
+});
+
+describe('Error reporting', function() {
+  it('should report a client error to the backend', async() => {
+    let preferencesPage = new PreferencesPage.PreferencesPage();
+    await users.createUser('lorem@preferences.com', 'loremPreferences');
+    await users.login('lorem@preferences.com');
+    await preferencesPage.get();
+    // Deleting the cookies simulates an expired session error.
+    await browser.deleteCookies();
+    await browser.setupInterceptor();
+    // Expect that the frontend error is sent to the backend handler.
+    await browser.expectRequest('POST', '/frontend_errors', 200);
+    let creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+    await action.click(
+      'Creator Dashboard radio', creatorDashboardRadio);
+    // Add a 1 second delay to ensure that expected request gets triggered.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(1000);
+    await browser.assertExpectedRequestsOnly();
+  });
 });

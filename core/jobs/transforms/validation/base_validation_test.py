@@ -649,7 +649,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             post_commit_status='',
             commit_cmds=[{}])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _get_change_domain_class() method is missing from the '
