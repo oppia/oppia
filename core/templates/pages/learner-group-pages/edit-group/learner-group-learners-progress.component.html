@@ -20,10 +20,15 @@
         </div>
       </div>
       <div class="learner-progress-summary-info">
-        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfLearner(idx)}} skills
+        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfLearner(idx)}}
+          <span *ngIf="getStrugglingSubtopicsCountOfLearner(idx) === 1">skill</span>
+          <span *ngIf="getStrugglingSubtopicsCountOfLearner(idx) !== 1">skills</span>
           <span class="divider"> | </span>
         </span>
-        <span>Completed {{getCompletedStoriesCountByLearner(idx)}} stories</span>
+        <span>Completed {{getCompletedStoriesCountByLearner(idx)}}
+          <span *ngIf="getCompletedStoriesCountByLearner(idx) === 1">story</span>
+          <span *ngIf="getCompletedStoriesCountByLearner(idx) !== 1">stories</span>
+        </span>
       </div>
     </div>
     <div *ngIf="!learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">

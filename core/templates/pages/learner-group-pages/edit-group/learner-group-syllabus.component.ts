@@ -89,6 +89,7 @@ export class LearnerGroupSyllabusComponent implements OnInit {
       }
     });
 
+    this.displayOrderOfSyllabusItems = [];
     Object.values(topicNameToSyllabusMap).forEach(syllabus => {
       this.displayOrderOfSyllabusItems.push(...syllabus);
     });

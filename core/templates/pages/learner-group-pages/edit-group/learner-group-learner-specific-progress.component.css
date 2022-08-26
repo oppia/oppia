@@ -183,6 +183,7 @@
 }
 
 .oppia-learner-group-learner-specific-progress .story-chapter-progress {
+  align-items: center;
   border: 1px solid #e6e6e6;
   border-radius: 4px;
   box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.05);
@@ -210,9 +211,8 @@
   align-items: center;
   color: #00609c;
   display: flex;
-  gap: 10px;
-  justify-content: center;
-  min-width: 300px;
+  justify-content: space-between;
+  width: 330px;
 }
 
 .oppia-learner-group-learner-specific-progress .subtopic-progress-bar {
@@ -287,6 +287,19 @@
   color: #fff;
   height: 28px;
   width: 28px;
+}
+
+.oppia-learner-group-learner-specific-progress .checkpoints-progress-node.completed-checkpoint:after {
+  border-bottom: 3px solid #fff;
+  border-right: 3px solid #fff;
+  content: "";
+  height: 16px;
+  margin-top: -2px;
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+  width: 8px;
 }
 
 .oppia-learner-group-learner-specific-progress .checkpoints-progress-node.in-progress-checkpoint {

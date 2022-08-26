@@ -40,7 +40,10 @@
                   </div>
                   <div class="progress-summary-info"
                        [ngClass]="{'warning': getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0}">
-                    {{getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length}} learners are struggling with this skill
+                    {{getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length}}
+                    <span *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length === 1">learner is</span>
+                    <span *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length !== 1">learners are</span>
+                    struggling with this skill
                   </div>
                 </div>
                 <div *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-learners">
@@ -64,7 +67,10 @@
                   {{storySummary.getTitle()}} · {{storySummary.getNodeTitles().length}} Lessons
                 </div>
                 <div class="progress-summary-info">
-                  {{getStoryCompletionsInfo(storySummary.getId()).length}} learners have completed this story
+                  {{getStoryCompletionsInfo(storySummary.getId()).length}}
+                  <span *ngIf="getStoryCompletionsInfo(storySummary.getId()).length === 1">learner has</span>
+                  <span *ngIf="getStoryCompletionsInfo(storySummary.getId()).length !== 1">learners have</span>
+                  completed this story
                 </div>
               </div>
               <div *ngIf="getStoryCompletionsInfo(storySummary.getId()).length > 0" class="progress-summary-learners">
