@@ -1718,7 +1718,7 @@ class AppFeedbackReportFilter:
         filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
-stats_obj
+
         Args:
             filter_field: FILTER_FIELD_NAMES. The enum type for the filter
                 category, correponding to a field in the AppFeedbackReport
