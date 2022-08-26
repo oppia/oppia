@@ -38,6 +38,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
+import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
+import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
 
 declare var angular: ng.IAngularStatic;
 
@@ -58,11 +61,17 @@ declare var angular: ng.IAngularStatic;
   declarations: [
     ClassroomAdminNavbarComponent,
     ClassroomAdminPageComponent,
+    ClassroomEditorConfirmModalComponent,
+    DeleteClassroomConfirmModalComponent,
+    CreateNewClassroomModalComponent,
     RolesAndActionsVisualizerComponent
   ],
   entryComponents: [
     ClassroomAdminNavbarComponent,
     ClassroomAdminPageComponent,
+    ClassroomEditorConfirmModalComponent,
+    DeleteClassroomConfirmModalComponent,
+    CreateNewClassroomModalComponent,
     RolesAndActionsVisualizerComponent
   ],
   providers: [

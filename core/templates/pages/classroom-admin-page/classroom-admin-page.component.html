@@ -1,12 +1,12 @@
 <mat-card class="oppia-editor-card-with-avatar">
 <div class="card-content">
     <div>
-        <h3 class="classroom-admin-header">Classroom config properties</h3>
+        <h3>Classroom config properties</h3>
     </div>
     <div>
-      <em>
+      <p>
         Configure the details of a classroom.
-      </em>
+      </p>
 
       <p class="existing-classroom-header">
         <strong>Existing Classrooms</strong>
@@ -19,23 +19,22 @@
       </em>
 
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
-        <mat-list class="oppia-classroom-tile">
-          <mat-list-item (click)="getClassroomData(classroom.key)">
-            <span *ngIf="!(classroomEditorMode && classroom.key == classroomId)">
+        <div class="oppia-classroom-tile" (click)="getClassroomData(classroom.key)">
+          <span *ngIf="!(classroomEditorMode && classroom.key == classroomId)">
               {{classroom.value}}
             </span>
             <span *ngIf="classroomEditorMode && classroom.key == classroomId">
               {{this.classroomName}}
             </span>
-            <button mat-button matSuffix mat-icon-button
-                    aria-label="Clear"
-                    (click)="deleteClassroom(classroom.key)">
-              <mat-icon matListIcon>close</mat-icon>
-            </button>
-          </mat-list-item>
-        </mat-list>
+          <button mat-button matSuffix mat-icon-button
+                  aria-label="Clear"
+                  *ngIf="!(classroomEditorMode && classroom.key == classroomId)"
+                  (click)="deleteClassroom(classroom.key)">
+            <mat-icon matListIcon>close</mat-icon>
+          </button>
+        </div>
 
-        <mat-list class="classroom-details" *ngIf="classroomDetailsIsShown && classroomId === classroom.key">
+        <div class="classroom-details" *ngIf="classroomDetailsIsShown && classroomId === classroom.key">
           <div *ngIf="classroomViewerMode" (click)="openClassroomConfigEditor()">
             <i class="material-icons oppia-edit-icon" title="Edit Classroom">&#xE254;</i>
           </div>
@@ -102,12 +101,12 @@
             <button class="btn btn-success action-buttons" [disabled]="!classroomDataChanged" (click)="saveClassroomData(classroom.key)">Save</button>
             <button class="btn btn-secondary action-buttons" (click)="closeClassroomConfigEditor()">Cancel</button>
           </div>
-        </mat-list>
+        </div>
       </div>
 
     </div>
       <!-- Button on add a new classroom. -->
-    <button (click)="createNewClassroom()">
+    <button class="btn btn-primary" (click)="createNewClassroom()">
       Add new classroom
     </button>
 </div>
@@ -143,48 +142,17 @@
     cursor: pointer;
     background: #e0f2f1;
     margin: 10px 20px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   .card-content {
-    padding: 10px
-  }
-  .oppia-editable-section {
-    width: -webkit-fill-available;
+    padding: 20px
   }
 
   .oppia-editor-card-with-avatar {
     margin-top: 200px;
-  }
-  .oppia-exp-interaction-card-header {
-    font-size: 18px;
-    margin: 0;
-  }
-
-  .oppia-exp-interaction-card-header-container {
-    align-content: center;
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 20px;
-  }
-
-  .oppia-add-interaction-button-container {
-    padding: 20px 30px;
-  }
-
-  .oppia-exp-interaction-container {
-    border: 1.5px solid #d3d1d1;
-    border-radius: 4px;
-    margin: 15px auto 30px;
-    width: 87%;
-  }
-
-  .oppia-state-interaction-content {
-    margin-top: 0;
-  }
-
-  .oppia-interaction-preview-container {
-    padding: 5px;
-    pointer-events: none;
   }
 
   .oppia-editor-card-section {
@@ -196,27 +164,6 @@
   }
 
   @media screen and (max-width: 768px) {
-    .oppia-delete-interaction-button {
-      height: 25px;
-      padding: 0;
-      right: 0;
-      top: 2px;
-      width: 25px;
-    }
-
-    .oppia-exp-interaction-card-header {
-      padding: 0;
-    }
-
-    .oppia-exp-interaction-card-header-container i {
-      display: block;
-    }
-
-    .oppia-exp-interaction-card-header-container {
-      background-color: #fff;
-      padding: 0;
-    }
-
     .oppia-editor-card-with-avatar {
       margin-top: 20px;
     }

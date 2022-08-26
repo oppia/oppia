@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomBackendApiService } from '../../domain/classroom/classroom-backend-api.service';
-
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
+import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
+import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-classroom-admin-page',
@@ -13,20 +17,21 @@ export class ClassroomAdminPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
+    private ngbModal: NgbModal,
   ) {}
   classroomCount: number;
   selectedClassroomDict;
   updatedClassroomDict;
   classroomIdToClassroomName;
+
   classroomId;
   classroomName;
   urlFragment;
   courseDetails;
-  topicListintro;
+  topicListIntro;
   topicIds;
   topicIdToPrerequisiteTopicIds;
-  currentClassroomTopicIds;
-  currentClassroomTopicsGraph;
+
   pageInitialized: boolean = false;
   classroomDataChanged: boolean = false;
   classroomDetailsIsShown: boolean = false;
@@ -38,30 +43,24 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
 
-        if (this.classroomEditorMode) {
-          this.closeClassroomConfigEditor();
-        }
-
         if (this.classroomId === classroomId && this.classroomViewerMode) {
           this.classroomDetailsIsShown = false;
           this.classroomViewerMode = false;
           return;
         }
-        this.selectedClassroomDict = response.classroomDict;
-        this.updatedClassroomDict = response.classroomDict;
+
+        if (this.classroomId === classroomId && this.classroomEditorMode) {
+          return;
+        }
+
+        this.selectedClassroomDict = cloneDeep(response.classroomDict);
+        this.updatedClassroomDict = cloneDeep(response.classroomDict);
         this.classroomDataChanged = false;
         this.classroomDetailsIsShown = true;
         this.classroomViewerMode = true;
 
-        this.classroomId = this.selectedClassroomDict.classroomId;
-        this.classroomName = this.selectedClassroomDict.name;
-        this.urlFragment = this.selectedClassroomDict.urlFragment;
-        this.courseDetails = this.selectedClassroomDict.courseDetails;
-        this.topicListintro = this.selectedClassroomDict.topicListIntro;
-        this.topicIds = Object.keys(
-          this.selectedClassroomDict.topicIdToPrerequisiteTopicIds);
-        this.topicIdToPrerequisiteTopicIds = (
-          this.selectedClassroomDict.topicIdToPrerequisiteTopicIds);
+        this.updateClassroomPropertiesFromDict(
+          cloneDeep(this.selectedClassroomDict));
       }
     );
   }
@@ -79,7 +78,6 @@ export class ClassroomAdminPageComponent implements OnInit {
   updateClassroomName() {
     this.updatedClassroomDict.name = this.classroomName;
     this.classroomDataChanged = true;
-
   }
 
   updateUrlFragment() {
@@ -93,22 +91,9 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   updateTopicListIntro() {
-    this.updatedClassroomDict.topicListIntro = this.topicListintro;
+    this.updatedClassroomDict.topicListIntro = this.topicListIntro;
     this.classroomDataChanged = true;
   }
-
-  addNewTopicIdToClassroom(classroomId: string) {
-    this.newTopicIdInput = false;
-  }
-
-  removeTopicIdFromClassroom(classroomId) {
-    this.newTopicIdInput = false;
-  }
-
-  openNewTopicIdInput() {
-    this.newTopicIdInput = true;
-  }
-
 
   saveClassroomData(classroomId: string) {
     let backendDict = this.convertClassroomDictToBackendForm(
@@ -117,20 +102,29 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroomId, backendDict).then(() => {
         this.classroomEditorMode = false;
         this.classroomViewerMode = true;
+        this.classroomDataChanged = false;
+        this.classroomIdToClassroomName[this.classroomId] = this.classroomName;
+        this.selectedClassroomDict = cloneDeep(this.updatedClassroomDict);
       });
   }
 
   deleteClassroom(classroomId: string): void {
-    this.classroomBackendApiService.deleteClassroomAsync(classroomId).then(
-      () => {
-        delete this.classroomIdToClassroomName[classroomId];
-        this.classroomCount--;
-      }
-    );
-  }
-
-  getNewClassroomId(): void {
-    this.classroomBackendApiService.getNewClassroomIdAsync().then();
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(DeleteClassroomConfirmModalComponent, {
+        backdrop: 'static'
+      });
+    modalRef.result.then(() => {
+      this.classroomBackendApiService.deleteClassroomAsync(classroomId).then(
+        () => {
+          delete this.classroomIdToClassroomName[classroomId];
+          this.classroomCount--;
+        }
+      );
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
   }
 
   convertClassroomDictToBackendForm(classroomDict) {
@@ -145,20 +139,71 @@ export class ClassroomAdminPageComponent implements OnInit {
     };
   }
 
-  openClassroomViewer() {
-
-  }
-
   openClassroomConfigEditor() {
     this.classroomViewerMode = false;
     this.classroomEditorMode = true;
   }
 
   closeClassroomConfigEditor() {
-    this.classroomEditorMode = false;
-    this.classroomViewerMode = true;
+    if (this.classroomDataChanged) {
+      let modalRef: NgbModalRef = this.ngbModal.
+        open(ClassroomEditorConfirmModalComponent, {
+          backdrop: 'static'
+        });
+      modalRef.result.then(() => {
+        this.classroomEditorMode = false;
+        this.classroomViewerMode = true;
+        this.classroomName = this.selectedClassroomDict.name;
+        this.classroomDataChanged = false;
+      })
+    } else {
+      this.classroomEditorMode = false;
+      this.classroomViewerMode = true;
+    }
   }
 
+  createNewClassroom() {
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(CreateNewClassroomModalComponent, {
+        backdrop: 'static'
+      });
+    console.log(Object.values(this.classroomIdToClassroomName));
+    modalRef.componentInstance.existingClassroomNames = (
+      Object.values(this.classroomIdToClassroomName)
+    );
+    modalRef.result.then((classroomDict) => {
+      this.classroomIdToClassroomName[classroomDict.classroom_id] = (
+        classroomDict.name);
+    });
+  }
+
+  ngOnInit(): void {
+    this.getAllClassroomIdToClassroomName();
+  }
+
+  updateClassroomPropertiesFromDict(classroomDict) {
+    this.classroomId = classroomDict.classroomId;
+    this.classroomName = classroomDict.name;
+    this.urlFragment = classroomDict.urlFragment;
+    this.courseDetails = classroomDict.courseDetails;
+    this.topicListIntro = classroomDict.topicListIntro;
+    this.topicIds = Object.keys(
+      classroomDict.topicIdToPrerequisiteTopicIds);
+    this.topicIdToPrerequisiteTopicIds = (
+      classroomDict.topicIdToPrerequisiteTopicIds);
+  }
+
+  addNewTopicIdToClassroom(classroomId: string) {
+    this.newTopicIdInput = false;
+  }
+
+  removeTopicIdFromClassroom(classroomId) {
+    this.newTopicIdInput = false;
+  }
+
+  openNewTopicIdInput() {
+    this.newTopicIdInput = true;
+  }
   openTopicsDependencyGraphEditor() {
 
   }
@@ -166,42 +211,6 @@ export class ClassroomAdminPageComponent implements OnInit {
   closeTopicsDependencyGraphEditor() {
 
   }
-
-  createNewClassroom() {
-    this.classroomBackendApiService.getNewClassroomIdAsync().then(
-      newClassroomId => {
-        console.log(newClassroomId);
-        console.log('nikhil')
-
-        this.updatedClassroomDict = {
-          classroomId: newClassroomId,
-          name: '',
-          urlFragment: '',
-          courseDetails: '',
-          topicListintro: '',
-          topicIdToPrerequisiteTopicIds: {}
-        }
-
-        this.classroomIdToClassroomName[newClassroomId] = '';
-        this.classroomId = newClassroomId;
-        this.classroomName = '';
-        this.urlFragment = '';
-        this.courseDetails = '';
-        this.topicListintro = '';
-        this.topicIds = []
-        this.topicIdToPrerequisiteTopicIds = {}
-
-        this.classroomEditorMode = true;
-        this.classroomDetailsIsShown = true;
-      }
-    );
-  }
-
-  ngOnInit(): void {
-    this.getAllClassroomIdToClassroomName();
-  }
-
-
 }
 
 angular.module('oppia').directive(
