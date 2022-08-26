@@ -24,7 +24,7 @@ import { States } from 'domain/exploration/StatesObjectFactory';
 
 export interface GraphLink {
   source: string;
-  target: string | null;
+  target: string;
   linkProperty: string | null;
   connectsDestIfStuck: boolean;
 }
@@ -61,7 +61,7 @@ export class ComputeGraphService {
             linkProperty: null,
             connectsDestIfStuck: false
           });
-          if (groups[h].outcome.destIfReallyStuck !== null) {
+          if (groups[h].outcome.destIfReallyStuck) {
             links.push({
               source: stateName,
               target: groups[h].outcome.destIfReallyStuck,
