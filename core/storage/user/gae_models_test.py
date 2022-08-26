@@ -1190,7 +1190,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
-    def test_raises_error_if_no_user_setting_model_exist_for_invalid_creator_id(
+    def test_exclude_non_existing_creator_user_model_while_exporting_data(
         self
     ) -> None:
         user_models.UserSettingsModel(

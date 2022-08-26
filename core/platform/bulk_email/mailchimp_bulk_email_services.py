@@ -58,7 +58,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     NOTE: No other functionalities should be added to this function.
 
     Returns:
-        Mailchimp. A mailchimp class instance with the API key and username
+        Mailchimp|None. A mailchimp class instance with the API key and username
         initialized.
     """
     if not feconf.MAILCHIMP_API_KEY:
@@ -76,11 +76,15 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
-def _create_user_in_mailchimp_db(user_email: str) -> bool:
+def _create_user_in_mailchimp_db(
+    client: mailchimp3.MailChimp, user_email: str
+) -> bool:
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
 
     Args:
+        client: mailchimp3.MailChimp. A mailchimp instance with the API key and
+            username initialized.
         user_email: str. Email ID of the user. Email is used to uniquely
             identify the user in the mailchimp DB.
 
@@ -97,15 +101,9 @@ def _create_user_in_mailchimp_db(user_email: str) -> bool:
         'email_address': user_email,
         'status': 'subscribed'
     }
-    client = _get_mailchimp_class()
 
-    # Here, 'client' is of type Optional[MailChimp] but before calling
-    # `_create_user_in_mailchimp_db` private method we are already checking
-    # and handling the None case of client. So, we are assured that the 'client'
-    # is never going to be None here but just to suppress the MyPy error, we
-    # used ignore here. 
     try:
-        client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)  # type: ignore[union-attr]
+        client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
@@ -233,7 +231,7 @@ def add_or_update_user_status(
         if error_message['status'] == 404:
             if can_receive_email_updates:
                 user_creation_successful = _create_user_in_mailchimp_db(
-                    user_email)
+                    client, user_email)
                 if not user_creation_successful:
                     return False
         else:
