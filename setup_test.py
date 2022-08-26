@@ -41,12 +41,12 @@ class SetupTests(test_utils.GenericTestBase):
             f.write('module3==4.3.4\n')
 
         dummy_file_object = open('dummy_requirements.txt', encoding='utf-8')
-        
+
         swap_open = self.swap_with_checks(
             builtins, 'open',
             lambda *unused_args, **unused_kwargs: dummy_file_object,
             expected_args=(('requirements.txt',),))
-        
+
         with open(
             'dummy_requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
             # The 'parse_requirements' returns a list of 'Requirement' objects.
@@ -70,7 +70,7 @@ class SetupTests(test_utils.GenericTestBase):
             }])
 
         dummy_path = [
-            path for path in sys.path 
+            path for path in sys.path
             if common.GOOGLE_CLOUD_SDK_HOME not in path
         ]
 
@@ -78,10 +78,10 @@ class SetupTests(test_utils.GenericTestBase):
 
         with swap_setup, swap_path, swap_open:
             # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
-            # sys.path when we run backend tests. We use a swap as we 
+            # sys.path when we run backend tests. We use a swap as we
             # need to remove these dirs to import setup.
             import setup # pylint: disable=import-error
             setup.main()
-        
+
         dummy_file_object.close()
         os.remove('dummy_requirements.txt')

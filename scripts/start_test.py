@@ -16,13 +16,14 @@
 
 from __future__ import annotations
 
-from core.tests import test_utils
 from core.constants import constants
+from core.tests import test_utils
 from scripts import build
 from scripts import common
 from scripts import extend_index_yaml
 from scripts import install_third_party_libs
 from scripts import servers
+
 from typing import Any
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
@@ -60,7 +61,7 @@ class SetupTests(test_utils.GenericTestBase):
 
         # We need to create a swap for install_third_party_libs because
         # scripts/start.py installs third party libraries whenever it is
-        # imported. 
+        # imported.
         self.swap_install_third_party_libs = self.swap(
             install_third_party_libs, 'main', lambda: None)
         self.swap_extend_index_yaml = self.swap(
@@ -210,7 +211,7 @@ class SetupTests(test_utils.GenericTestBase):
                 )
             ],
             self.print_arr)
-    
+
     def test_source_maps_are_compiled_by_webpack(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
