@@ -52,19 +52,27 @@ var GraphEditor = function(graphInputContainer) {
     var addNodeButton = await graphInputContainer.$(
       '.e2e-test-Add-Node-button');
     await action.click('Add Node Button', addNodeButton);
+    console.log(await graphInputContainer);
+    console.log(xOffset)
+    console.log(yOffset)
+    await browser.debug();
     // Offsetting from the graph container.
-    await browser.moveToElement(graphInputContainer, xOffset, yOffset);
-    await browser.positionClick();
+    await graphInputContainer.moveTo(xOffset, yOffset);
+    await graphInputContainer.click({x: xOffset, y: yOffset});
+    await browser.debug();
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = await graphInputContainer.$(
       '.e2e-test-Add-Edge-button');
     await action.click('Add Edge Button', addEdgeButton);
-    await browser.moveToElement(vertexElement(vertexIndex1));
-    await browser.buttonDown();
-    await browser.moveToElement(vertexElement(vertexIndex2));
-    await browser.buttonUp();
+    var vertexElement1 = await vertexElement(vertexIndex1);
+    await vertexElement1.moveTo();
+    await browser.buttonDown(0);
+    var vertexElement2 = await vertexElement(vertexIndex2);
+    await vertexElement2.moveTo();
+    await browser.buttonUp(0);
+    await browser.debug();
   };
 
   return {
@@ -90,7 +98,8 @@ var GraphEditor = function(graphInputContainer) {
       await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await action.click(`Vertex Element ${i}`, vertexElement(i));
+        var graphVertexElement = await vertexElement(i);
+        await action.click(`Vertex Element ${i}`, graphVertexElement);
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {

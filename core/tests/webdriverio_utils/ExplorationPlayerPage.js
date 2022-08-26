@@ -202,6 +202,8 @@ var ExplorationPlayerPage = function() {
       conversationContent, 'Conversation not visible');
     var conversationContents = await conversationContentsSelector();
     var lastElement = conversationContents.length - 1;
+    console.log(conversationContents);
+    await browser.debug();
     await waitFor.visibilityOf(
       conversationContents[lastElement], 'Conversation not fully present');
     await forms.expectRichText(

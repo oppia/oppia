@@ -44,7 +44,7 @@ describe('rich-text components', function() {
 
   it('should display correctly', async function() {
     await users.createAndLoginUser(
-      'user@richTextComponents.com', 'userRichTextComponents');
+      'user@richTextComponents.com', 'userRichTextComponent9');
 
     await workflow.createExploration(true);
 
@@ -55,11 +55,12 @@ describe('rich-text components', function() {
       await richTextEditor.addRteComponent('Link', 'https://google.com/', true);
       await richTextEditor.addRteComponent(
         'Video', 'M7lc1UVf-VE', 10, 100, false);
+      await browser.debug();
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
-      await browser.debug();
       await richTextEditor.addRteComponent(
         'Collapsible', 'title', await forms.toRichText('inner'));
+      await browser.debug();
       await richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
         content: await forms.toRichText('contents 1')
@@ -127,8 +128,8 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should pass their own test suites', async function() {
-    await users.createUser('user@interactions.com', 'userInteractions');
+  fit('should pass their own test suites', async function() {
+    await users.createUser('user@interactions.com', 'userInteractions10');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
 

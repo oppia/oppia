@@ -30,7 +30,7 @@ var MathEditor = function(elem) {
   return {
     setValue: async function(text) {
       await waitFor.elementToBeClickable(
-        elem, `"${elem.getTagName()}" takes too long to be clickable`);
+        elem, `"${await elem.getTagName()}" takes too long to be clickable`);
       await action.click('Maths Editor', elem);
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
@@ -38,8 +38,8 @@ var MathEditor = function(elem) {
       lastElement = mathInputElem.length - 1;
       var present = await mathInputElem[lastElement].isExisting();
       if (present) {
-        await action.setValue(
-          'Maths Input Element', mathInputElem, text);
+        await action.addValue(
+          'Maths Input Element', mathInputElem[lastElement], text);
       }
     },
     getValue: async function() {
@@ -47,12 +47,11 @@ var MathEditor = function(elem) {
         elem, `"${elem.getTagName()}" takes too long to be clickable`);
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
-      var mathInputElem = $$(
-        '.e2e-test-guppy-div');
+      var mathInputElem = await $$('.e2e-test-guppy-div');
       lastElement = mathInputElem.length - 1;
       var present = await mathInputElem[lastElement].isExisting();
       if (present) {
-        var contentElem = mathInputElem.$('<annotation>');
+        var contentElem = await mathInputElem[lastElement].$('<annotation>');
         present = await contentElem.isExisting();
         if (present) {
           return await action.getText('Maths Input Element', contentElem);

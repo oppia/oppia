@@ -44,11 +44,11 @@
  */
 
 var INTERACTIONS = {
-  AlgebraicExpressionInput: require(
-    './AlgebraicExpressionInput/webdriverio.js'),
-  Continue: require('./Continue/webdriverio.js'),
-  EndExploration: require('./EndExploration/webdriverio.js'),
-  FractionInput: require('./FractionInput/webdriverio.js'),
+  // AlgebraicExpressionInput: require(
+  //   './AlgebraicExpressionInput/webdriverio.js'),
+  // Continue: require('./Continue/webdriverio.js'),
+  // EndExploration: require('./EndExploration/webdriverio.js'),
+  // FractionInput: require('./FractionInput/webdriverio.js'),
   GraphInput: require('./GraphInput/webdriverio.js'),
   ItemSelectionInput: require('./ItemSelectionInput/webdriverio.js'),
   MathEquationInput: require('./MathEquationInput/webdriverio.js'),

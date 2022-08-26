@@ -126,8 +126,8 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should pass their own test suites', async function() {
-    await users.createUser('user@interactions.com', 'userInteractions');
+  fit('should pass their own test suites', async function() {
+    await users.createUser('user@interactions.com', 'userInteractio10');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
 
