@@ -2241,11 +2241,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
-        suggestion_services.update_translation_contribution_stats(
-            initial_suggestion, self.author_id, '0', True
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            initial_suggestion, self.author_id, '0'
         )
-        suggestion_services.update_translation_contribution_stats(
-            latest_suggestion, self.author_id, '1', True
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            latest_suggestion, self.author_id, '1'
         )
 
         translation_contribution_stats_model = (
@@ -2311,11 +2311,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
 
-        suggestion_services.update_translation_contribution_stats(
-            initial_suggestion, self.author_id, '0', True
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            initial_suggestion, self.author_id, '0'
         )
-        suggestion_services.update_translation_contribution_stats(
-            latest_suggestion, self.author_id, '1', True
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            latest_suggestion, self.author_id, '1'
         )
 
         translation_contribution_stats_model = (
@@ -2420,11 +2420,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
-        suggestion_services.update_question_contribution_stats(
-            initial_suggestion, self.author_id, skill_id_1, True
+        suggestion_services.update_question_contribution_stats_at_submission(
+            initial_suggestion, self.author_id, skill_id_1
         )
-        suggestion_services.update_question_contribution_stats(
-            latest_suggestion, self.author_id, skill_id_2, True
+        suggestion_services.update_question_contribution_stats_at_submission(
+            latest_suggestion, self.author_id, skill_id_2
         )
 
         question_contribution_stats_model = (
@@ -2522,11 +2522,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
-        suggestion_services.update_question_contribution_stats(
-            initial_suggestion, self.author_id, skill_id_1, True
+        suggestion_services.update_question_contribution_stats_at_submission(
+            initial_suggestion, self.author_id, skill_id_1
         )
-        suggestion_services.update_question_contribution_stats(
-            latest_suggestion, self.author_id, skill_id_2, True
+        suggestion_services.update_question_contribution_stats_at_submission(
+            latest_suggestion, self.author_id, skill_id_2
         )
 
         initial_suggestion.status = suggestion_models.STATUS_ACCEPTED

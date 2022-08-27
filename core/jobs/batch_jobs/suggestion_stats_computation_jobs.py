@@ -186,7 +186,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
 
         for suggestion in suggestions:
             key = (
-                suggestion_models.TranslationContributionStatsModel.generate_id(
+                suggestion_models.TranslationContributionStatsModel.build_id(
                     suggestion.language_code, suggestion.author_id, topic_id))
             try:
                 change = suggestion.change

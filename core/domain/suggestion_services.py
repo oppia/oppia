@@ -1830,7 +1830,7 @@ def update_question_suggestion(
     return suggestion
 
 
-def _create_translation_review_stats_from_models(
+def _create_translation_review_stats_from_model(
     translation_review_stats_model: (
         suggestion_models.TranslationReviewStatsModel
     )) -> suggestion_registry.TranslationReviewStats:
@@ -1860,7 +1860,7 @@ def _create_translation_review_stats_from_models(
     )
 
 
-def _create_question_contribution_stats_from_models(
+def _create_question_contribution_stats_from_model(
     question_contribution_stats_model: (
         suggestion_models.QuestionContributionStatsModel
     )) -> suggestion_registry.QuestionContributionStats:
@@ -1888,7 +1888,7 @@ def _create_question_contribution_stats_from_models(
     )
 
 
-def _create_question_review_stats_from_models(
+def _create_question_review_stats_from_model(
     question_review_stats_model: (
         suggestion_models.QuestionReviewStatsModel
     )) -> suggestion_registry.QuestionReviewStats:
@@ -1934,7 +1934,7 @@ def _get_all_translation_review_stats(
         )
     )
     return [
-        _create_translation_review_stats_from_models(model)
+        _create_translation_review_stats_from_model(model)
         for model in translation_review_stats_models
     ]
 
@@ -1957,7 +1957,7 @@ def _get_all_question_contribution_stats(
         )
     )
     return [
-        _create_question_contribution_stats_from_models(model)
+        _create_question_contribution_stats_from_model(model)
         for model in question_contribution_stats_models
     ]
 
@@ -1980,7 +1980,7 @@ def _get_all_question_review_stats(
         )
     )
     return [
-        _create_question_review_stats_from_models(model)
+        _create_question_review_stats_from_model(model)
         for model in question_review_stats_models
     ]
 
@@ -1996,8 +1996,8 @@ def get_all_contributor_stats(
         ContributorStatsSummary. ContributorStatsSummary domain objects
         corresponding to the supplied user.
     """
-    translation_contribution_stats = (get_all_translation_contribution_stats(
-        user_id))
+    translation_contribution_stats = get_all_translation_contribution_stats(
+        user_id)
     translation_review_stats = _get_all_translation_review_stats(user_id)
     question_contribution_stats = _get_all_question_contribution_stats(user_id)
     question_review_stats = _get_all_question_review_stats(user_id)
@@ -2021,22 +2021,25 @@ def _update_translation_contribution_stats_models(
             A list of TranslationContributionStats domain objects.
     """
     stats_ids = []
+    stats_dict = {}
 
     for stat in translation_contribution_stats:
         # Ruling out the possibility of None for mypy type checking.
         assert stat is not None
-        stats_ids.append(
-            suggestion_models.TranslationContributionStatsModel.generate_id(stat.language_code, stat.contributor_user_id, stat.topic_id)) # type: ignore[arg-type]
+        stat_id = suggestion_models.TranslationContributionStatsModel.build_id(
+            stat.language_code, stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+        stats_ids.append(stat_id)
+        stats_dict[stat_id] = stat
 
     stats_models_to_update = (
         suggestion_models.TranslationContributionStatsModel.get_multi(
             stats_ids))
 
-    for index, stats_model in enumerate(stats_models_to_update):
+    for stats_model in stats_models_to_update:
 
         # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
-        stat = translation_contribution_stats[index]
+        stat = stats_dict[stats_model.id]
         stats_model.submitted_translations_count = (
             stat.submitted_translations_count)
         stats_model.submitted_translation_word_count = (
@@ -2071,23 +2074,22 @@ def _update_translation_review_stats_models(
             TranslationReviewStats domain objects.
     """
     stats_ids = []
+    stats_dict = {}
 
     for stat in translation_review_stats:
-        stats_ids.append(
-            suggestion_models.TranslationReviewStatsModel.generate_id(
-                stat.language_code,
-                stat.contributor_user_id,
-                stat.topic_id
-            ))
+        stat_id = suggestion_models.TranslationReviewStatsModel.build_id(
+            stat.language_code, stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+        stats_ids.append(stat_id)
+        stats_dict[stat_id] = stat
 
     stats_models_to_update = (
         suggestion_models.TranslationReviewStatsModel.get_multi(stats_ids))
 
-    for index, stats_model in enumerate(stats_models_to_update):
+    for stats_model in stats_models_to_update:
 
          # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
-        stat = translation_review_stats[index]
+        stat = stats_dict[stats_model.id]
         stats_model.reviewed_translations_count = (
             stat.reviewed_translations_count)
         stats_model.reviewed_translation_word_count = (
@@ -2119,22 +2121,22 @@ def _update_question_contribution_stats_models(
             QuestionContribution domain objects.
     """
     stats_ids = []
+    stats_dict = {}
 
     for stat in question_contribution_stats:
-        stats_ids.append(
-            suggestion_models.QuestionContributionStatsModel.generate_id(
-                stat.contributor_user_id,
-                stat.topic_id
-            ))
+        stat_id = suggestion_models.QuestionContributionStatsModel.build_id(
+            stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+        stats_ids.append(stat_id)
+        stats_dict[stat_id] = stat
 
     stats_models_to_update = (
         suggestion_models.QuestionContributionStatsModel.get_multi(stats_ids))
 
-    for index, stats_model in enumerate(stats_models_to_update):
+    for stats_model in stats_models_to_update:
 
          # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
-        stat = question_contribution_stats[index]
+        stat = stats_dict[stats_model.id]
         stats_model.submitted_questions_count = (
             stat.submitted_questions_count)
         stats_model.accepted_questions_count = (
@@ -2162,22 +2164,22 @@ def _update_question_review_stats_models(
             QuestionReviewStats domain objects.
     """
     stats_ids = []
+    stats_dict = {}
 
     for stat in question_review_stats:
-        stats_ids.append(
-            suggestion_models.QuestionReviewStatsModel.generate_id(
-                stat.contributor_user_id,
-                stat.topic_id
-            ))
+        stat_id = suggestion_models.QuestionReviewStatsModel.build_id(
+            stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+        stats_ids.append(stat_id)
+        stats_dict[stat_id] = stat
 
     stats_models_to_update = (
         suggestion_models.QuestionReviewStatsModel.get_multi(stats_ids))
 
-    for index, stats_model in enumerate(stats_models_to_update):
+    for stats_model in stats_models_to_update:
 
          # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
-        stat = question_review_stats[index]
+        stat = stats_dict[stats_model.id]
         stats_model.reviewed_questions_count = (
             stat.reviewed_questions_count)
         stats_model.accepted_questions_count = (
@@ -2194,19 +2196,17 @@ def _update_question_review_stats_models(
         stats_models_to_update)
 
 
-def update_translation_contribution_stats(
+def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion,
-    user_id: str, target_id: str, is_submission: bool) -> None:
+    user_id: str, target_id: str) -> None:
     """Creates/updates TranslationContributionStatsModel model for
-    given translation submitter when a translation is submitted or reviewed.
+    given translation submitter when a translation is submitted.
 
     Args:
         suggestion: Suggestion. The suggestion domain object that is being
-            submitted or reviewed.
+            submitted
         user_id: str. The ID of the corresponding submitter.
         target_id: str. The ID of the target entity being suggested to.
-        is_submission: bool. A boolean value which indicates whether this
-            function is called when submitting a translation or not.
     """
     topic_id = ''
     exp_opportunity_dict = (
@@ -2241,7 +2241,7 @@ def update_translation_contribution_stats(
             contribution_dates=[
                 datetime.datetime.strptime(
                     str(
-                        suggestion.last_updated.date().isoformat()),
+                        suggestion.last_updated.utcnow().date().isoformat()),
                         '%Y-%m-%d'
                     ).date()
             ]
@@ -2251,41 +2251,97 @@ def update_translation_contribution_stats(
             create_translation_contribution_stats_from_model(
                 translation_contribution_stat_model))
 
-        is_suggestion_accepted = (
-            suggestion.status == suggestion_models.STATUS_ACCEPTED)
-
-        is_suggestion_rejected = (
-            suggestion.status == suggestion_models.STATUS_REJECTED)
-
-        translation_contribution_stat.submitted_translations_count += 1 * int(
-            is_submission)
+        translation_contribution_stat.submitted_translations_count += 1
         translation_contribution_stat.submitted_translation_word_count += (
-            content_word_count) * int(is_submission)
+            content_word_count)
+        translation_contribution_stat.contribution_dates.append(    # type: ignore[attr-defined]
+            datetime.datetime.strptime(str(
+                suggestion.last_updated.utcnow().date().isoformat()),
+                '%Y-%m-%d'
+            ).date())
+
+        _update_translation_contribution_stats_models(
+            [translation_contribution_stat])
+
+
+def update_translation_contribution_stats_at_review(
+    suggestion: suggestion_registry.BaseSuggestion,
+    user_id: str, target_id: str) -> None:
+    """Creates/updates TranslationContributionStatsModel model for
+    given translation submitter when a translation is reviewed.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            reviewed.
+        user_id: str. The ID of the corresponding submitter.
+        target_id: str. The ID of the target entity being suggested to.
+        suggestion_is_submission: bool. Indicates whether this function is called when
+            submitting a translation.
+    """
+    topic_id = ''
+    exp_opportunity_dict = (
+        opportunity_services.get_exploration_opportunity_summaries_by_ids(
+            [target_id]))
+    exp_opportunity = exp_opportunity_dict[target_id]
+    # Ruling out the possibility of None for mypy type checking.
+    assert exp_opportunity is not None
+    topic_id = exp_opportunity.topic_id
+
+    content_plain_text = html_cleaner.strip_html_tags(
+        suggestion.change.translation_html)
+    content_word_count = len(content_plain_text.split())
+
+    translation_contribution_stat_model = (
+        suggestion_models.TranslationContributionStatsModel.get(
+            suggestion.change.language_code, user_id, topic_id
+        ))
+
+    if translation_contribution_stat_model is None:
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=suggestion.change.language_code,
+            contributor_user_id=user_id,
+            topic_id=topic_id,
+            submitted_translations_count=1,
+            submitted_translation_word_count=content_word_count,
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[
+                datetime.datetime.strptime(
+                    str(
+                        suggestion.last_updated.utcnow().date().isoformat()),
+                        '%Y-%m-%d'
+                    ).date()
+            ]
+        )
+    else:
+        translation_contribution_stat = (
+            create_translation_contribution_stats_from_model(
+                translation_contribution_stat_model))
+
+        suggestion_is_accepted = (
+        suggestion.status == suggestion_models.STATUS_ACCEPTED)
+
+        suggestion_is_rejected = (
+            suggestion.status == suggestion_models.STATUS_REJECTED)
         (
             translation_contribution_stat
             .accepted_translations_count
-        ) += 1 * int(not is_submission and is_suggestion_accepted)
+        ) += 1 * int(suggestion_is_accepted)
         (
             translation_contribution_stat
             .accepted_translations_without_reviewer_edits_count
-        ) += 1 + int(
-            not is_submission and suggestion.edited_by_reviewer)
+        ) += 1 + int(suggestion.edited_by_reviewer)
         translation_contribution_stat.accepted_translation_word_count += (
-            content_word_count) * int(
-                not is_submission and is_suggestion_accepted)
+            content_word_count) * int(suggestion_is_accepted)
         translation_contribution_stat.rejected_translations_count += 1 * int(
-            not is_submission and is_suggestion_rejected)
+            suggestion_is_rejected)
         (
             translation_contribution_stat.rejected_translation_word_count
         ) += content_word_count * int(
-            not is_submission and is_suggestion_rejected)
-
-        if is_submission:
-            translation_contribution_stat.contribution_dates.append(    # type: ignore[attr-defined]
-                datetime.datetime.strptime(str(
-                    suggestion.last_updated.date().isoformat()),
-                    '%Y-%m-%d'
-                ).date())
+            suggestion_is_rejected)
 
         _update_translation_contribution_stats_models(
             [translation_contribution_stat])
@@ -2295,7 +2351,7 @@ def update_translation_review_stats(
     suggestion: suggestion_registry.BaseSuggestion,
     user_id: str, target_id: str, is_accepted: bool) -> None:
     """Creates/updates TranslationReviewStatsModel model for given translation
-    reviewer when a translation is sreviewed.
+    reviewer when a translation is reviewed.
 
     Args:
         suggestion: Suggestion. The suggestion domain object that is being
@@ -2338,19 +2394,19 @@ def update_translation_review_stats(
             first_contribution_date=(
                 datetime.datetime.strptime(
                     str(
-                        suggestion.last_updated.date().isoformat()),
+                        suggestion.last_updated.utcnow().date().isoformat()),
                         '%Y-%m-%d'
                     ).date()),
             last_contribution_date=(
                 datetime.datetime.strptime(
                     str(
-                        suggestion.last_updated.date().isoformat()),
+                        suggestion.last_updated.utcnow().date().isoformat()),
                         '%Y-%m-%d'
                     ).date())
         )
     else:
         translation_review_stat = (
-            _create_translation_review_stats_from_models(
+            _create_translation_review_stats_from_model(
                 translation_review_stat_model))
 
         translation_review_stat.reviewed_translations_count += 1
@@ -2365,29 +2421,27 @@ def update_translation_review_stats(
         translation_review_stat.last_contribution_date = (
                 datetime.datetime.strptime(
                     str(
-                        suggestion.last_updated.date().isoformat()),
+                        suggestion.last_updated.utcnow().date().isoformat()),
                         '%Y-%m-%d'
                     ).date())
 
         _update_translation_review_stats_models([translation_review_stat])
 
-    update_translation_contribution_stats(
-        suggestion, suggestion.author_id, target_id, False)
+    update_translation_contribution_stats_at_review(
+        suggestion, suggestion.author_id, target_id)
 
 
-def update_question_contribution_stats(
+def update_question_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion,
-    user_id: str, target_id: str, is_submission: bool) -> None:
+    user_id: str, target_id: str) -> None:
     """Creates/updates QuestionContributionStatsModel model for given question
-    submitter when a question is submitted or reviewed.
+    submitter when a question is submitted.
 
     Args:
         suggestion: Suggestion. The suggestion domain object that is being
-            submitted or reviewed.
+            submitted.
         user_id: str. The ID of the corresponding submitter.
         target_id: str. The ID of the target entity being suggested to.
-        is_submission: bool. A boolean value which indicates whether this
-            function is called when submitting a question or not.
     """
     topic_ids = []
     topics = skill_services.get_all_topic_assignments_for_skill(target_id) # type: ignore[no-untyped-call]
@@ -2410,43 +2464,93 @@ def update_question_contribution_stats(
                 first_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.date().isoformat()),
+                            suggestion.last_updated.utcnow().date().isoformat()),
                             '%Y-%m-%d'
                         ).date()),
                 last_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.date().isoformat()),
+                            suggestion.last_updated.utcnow().date().isoformat()),
                             '%Y-%m-%d'
                         ).date())
             )
         else:
             question_contribution_stat = (
-                _create_question_contribution_stats_from_models(
+                _create_question_contribution_stats_from_model(
                     question_contribution_stat_model))
-
-            is_suggestion_accepted = (
-                suggestion.status == suggestion_models.STATUS_ACCEPTED)
 
             (
                 question_contribution_stat.submitted_questions_count
-            ) += 1 * int(is_submission)
+            ) += 1
+            question_contribution_stat.last_contribution_date = (
+                datetime.datetime.strptime(
+                    str(
+                        suggestion.last_updated.utcnow().date().isoformat()),
+                        '%Y-%m-%d'
+                    ).date())
+
+            _update_question_contribution_stats_models(
+                [question_contribution_stat])
+
+
+def update_question_contribution_stats_at_review(
+    suggestion: suggestion_registry.BaseSuggestion,
+    user_id: str, target_id: str) -> None:
+    """Creates/updates QuestionContributionStatsModel model for given question
+    submitter when a question is reviewed.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            reviewed.
+        user_id: str. The ID of the corresponding submitter.
+        target_id: str. The ID of the target entity being suggested to.
+    """
+    topic_ids = []
+    topics = skill_services.get_all_topic_assignments_for_skill(target_id) # type: ignore[no-untyped-call]
+    for topic in topics:
+        topic_ids.append(topic.topic_id)
+
+    for topic_id in topic_ids:
+        question_contribution_stat_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                user_id, topic_id
+            ))
+
+        if question_contribution_stat_model is None:
+            suggestion_models.QuestionContributionStatsModel.create(
+                contributor_user_id=user_id,
+                topic_id=topic_id,
+                submitted_questions_count=1,
+                accepted_questions_count=0,
+                accepted_questions_without_reviewer_edits_count=0,
+                first_contribution_date=(
+                    datetime.datetime.strptime(
+                        str(
+                            suggestion.last_updated.utcnow().date().isoformat()),
+                            '%Y-%m-%d'
+                        ).date()),
+                last_contribution_date=(
+                    datetime.datetime.strptime(
+                        str(
+                            suggestion.last_updated.utcnow().date().isoformat()),
+                            '%Y-%m-%d'
+                        ).date())
+            )
+        else:
+            question_contribution_stat = (
+                _create_question_contribution_stats_from_model(
+                    question_contribution_stat_model))
+
+            suggestion_is_accepted = (
+                suggestion.status == suggestion_models.STATUS_ACCEPTED)
             (
                 question_contribution_stat.accepted_questions_count
-            ) += 1 * int(not is_submission and is_suggestion_accepted)
+            ) += 1 * int(suggestion_is_accepted)
             (
                 question_contribution_stat
                 .accepted_questions_without_reviewer_edits_count
             ) += 1 + int(
-                not is_submission and suggestion.edited_by_reviewer)
-
-            if is_submission:
-                question_contribution_stat.last_contribution_date = (
-                    datetime.datetime.strptime(
-                        str(
-                            suggestion.last_updated.date().isoformat()),
-                            '%Y-%m-%d'
-                        ).date())
+                suggestion.edited_by_reviewer)
 
             _update_question_contribution_stats_models(
                 [question_contribution_stat])
@@ -2488,19 +2592,19 @@ def update_question_review_stats(
                 first_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.date().isoformat()),
+                            suggestion.last_updated.utcnow().date().isoformat()),
                             '%Y-%m-%d'
                         ).date()),
                 last_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.date().isoformat()),
+                            suggestion.last_updated.utcnow().date().isoformat()),
                             '%Y-%m-%d'
                         ).date())
             )
         else:
             question_review_stat = (
-                _create_question_review_stats_from_models(
+                _create_question_review_stats_from_model(
                     question_review_stat_model))
 
             question_review_stat.reviewed_questions_count += 1
@@ -2513,11 +2617,11 @@ def update_question_review_stats(
             question_review_stat.last_contribution_date = (
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.date().isoformat()),
+                            suggestion.last_updated.utcnow().date().isoformat()),
                             '%Y-%m-%d'
                         ).date())
 
             _update_question_review_stats_models([question_review_stat])
 
-    update_question_contribution_stats(
-        suggestion, suggestion.author_id, target_id, False)
+    update_question_contribution_stats_at_review(
+        suggestion, suggestion.author_id, target_id)

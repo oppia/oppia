@@ -1116,7 +1116,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         """Creates a new TranslationContributionStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             language_code, contributor_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1137,10 +1137,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def build_id(
         language_code: str, contributor_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a TranslationContributionStatsModel
+        """Builds a unique ID for a TranslationContributionStatsModel
         instance.
 
         Args:
@@ -1172,7 +1172,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             TranslationContributionStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             language_code, contributor_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1357,7 +1357,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
         """Creates a new TranslationReviewStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             language_code, reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1377,10 +1377,10 @@ class TranslationReviewStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def build_id(
         language_code: str, reviewer_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a TranslationReviewStatsModel
+        """Builds a unique ID for a TranslationReviewStatsModel
         instance.
 
         Args:
@@ -1412,7 +1412,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             TranslationReviewStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             language_code, reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1578,7 +1578,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
         """Creates a new QuestionContributionStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             contributor_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1595,10 +1595,10 @@ class QuestionContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def build_id(
         contributor_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a QuestionContributionStatsModel
+        """Builds a unique ID for a QuestionContributionStatsModel
         instance.
 
         Args:
@@ -1629,7 +1629,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
             QuestionContributionStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             contributor_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1784,7 +1784,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         """Creates a new QuestionReviewStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1801,10 +1801,10 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def generate_id(
+    def build_id(
         reviewer_user_id: str, topic_id: str
     ) -> str:
-        """Generates a unique ID for a QuestionReviewStatsModel
+        """Builds a unique ID for a QuestionReviewStatsModel
         instance.
 
         Args:
@@ -1835,7 +1835,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             QuestionReviewStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.generate_id(
+        entity_id = cls.build_id(
             reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
