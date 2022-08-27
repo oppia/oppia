@@ -52,7 +52,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
     def test_feedback_ids(self) -> None:
         """Test various conventions for thread and message ids."""
@@ -95,7 +95,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             r'Thread belonging to the GeneralFeedbackThreadModel class '
             r'with id:\[%s\] was not found.' % (thread_id)
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             feedback_services.create_message(
                 thread_id, self.user_id, None, None, 'Hello')
 
@@ -108,7 +108,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             r'Threads belonging to the GeneralFeedbackThreadModel class '
             r'with ids:\[%s\] were not found.' % (' '.join(thread_ids))
         )
-        with self.assertRaisesRegex(Exception, expected_exception_regexp):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, expected_exception_regexp):
             feedback_services.create_messages(
                 thread_ids, self.user_id, None, None, 'Hello')
 
@@ -117,7 +117,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     ) -> None:
         repeated_thread_ids = ['thread_id', 'thread_id']
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Thread ids must be distinct when calling create_messsages.'):
             feedback_services.create_messages(
@@ -182,7 +182,7 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
         self.save_new_default_exploration(self.EXP_1_ID, self.user_id)
         suggestion_services.create_suggestion(
@@ -333,9 +333,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id, title='Bridges in England',
@@ -683,7 +683,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         self.save_new_valid_exploration(exp_id, 'owner')
 
-        event_handler_call_counter_exploration = test_utils.CallCounter(  # type: ignore[no-untyped-call]
+        event_handler_call_counter_exploration = test_utils.CallCounter(
             event_services.FeedbackThreadCreatedEventHandler.record)
         with self.swap(
             event_services.FeedbackThreadCreatedEventHandler, 'record',
@@ -696,7 +696,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 event_handler_call_counter_exploration.times_called, 1)
 
         event_handler_call_counter_non_exploration = (
-            test_utils.CallCounter(  # type: ignore[no-untyped-call]
+            test_utils.CallCounter(
                 event_services.FeedbackThreadCreatedEventHandler.record))
         with self.swap(
             event_services.FeedbackThreadCreatedEventHandler, 'record',
@@ -839,7 +839,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
-        tasks = self.get_pending_tasks(  # type: ignore[no-untyped-call]
+        tasks = self.get_pending_tasks(
             queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
@@ -866,10 +866,12 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
-        tasks = self.get_pending_tasks(  # type: ignore[no-untyped-call]
+        tasks = self.get_pending_tasks(
             queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
+        # Ruling out the possibility of None for mypy type checking.
+        assert tasks[0].payload is not None
         self.assertDictEqual(tasks[0].payload['reference_dict'], reference_dict)
 
 
@@ -879,11 +881,11 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.signup('b@example.com', 'B')
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
@@ -1107,7 +1109,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
 
-            tasks = self.get_pending_tasks(  # type: ignore[no-untyped-call]
+            tasks = self.get_pending_tasks(
                 queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
             self.assertEqual(
                 tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
@@ -1239,10 +1241,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
@@ -1378,8 +1380,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             thread_id = threadlist[0].id
 
             self.login(self.EDITOR_EMAIL)
-            csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
-            self.post_json(  # type: ignore[no-untyped-call]
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),
                 {}, csrf_token=csrf_token)
@@ -1395,10 +1397,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
