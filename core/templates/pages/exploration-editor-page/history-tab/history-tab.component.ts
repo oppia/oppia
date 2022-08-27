@@ -22,7 +22,7 @@ import { CheckRevertExplorationModalComponent } from './modal-templates/check-re
 import { RevertExplorationModalComponent } from './modal-templates/revert-exploration-modal.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationMetadataDiffModalComponent } from '../modal-templates/exploration-metadata-diff-modal.component';
-import { Component, OnInit, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
