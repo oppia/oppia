@@ -1772,8 +1772,12 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object, None)
 
     def test_get_multiple_exploration_model_success(self) -> None:
+        user_id_exp_id_combinations = [
+            (self.USER_1_ID, self.EXP_ID_ONE),
+            (self.USER_2_ID, self.EXP_ID_ONE)
+        ]
         retrieved_object = user_models.ExplorationUserDataModel.get_multi(
-            [self.USER_1_ID, self.USER_2_ID], self.EXP_ID_ONE)
+            user_id_exp_id_combinations)
         # Mypy Type checking for None.
         assert retrieved_object[0] is not None
         assert retrieved_object[1] is not None

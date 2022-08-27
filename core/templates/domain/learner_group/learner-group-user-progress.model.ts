@@ -25,6 +25,7 @@ import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
 export interface LearnerGroupUserProgressBackendDict {
   username: string ;
   progress_sharing_is_turned_on: boolean;
+  profile_picture_data_url: string;
   stories_progress: StorySummaryBackendDict[];
   subtopic_pages_progress: LearnerGroupSubtopicSummaryBackendDict[];
 }
@@ -32,17 +33,20 @@ export interface LearnerGroupUserProgressBackendDict {
 export class LearnerGroupUserProgress {
   _username: string;
   _progressSharingIsTurnedOn: boolean;
+  _profilePictureDataUrl: string;
   _storiesProgress: StorySummary[];
   _subtopicsProgress: LearnerGroupSubtopicSummary[];
 
   constructor(
       username: string,
       progressSharingIsTurnedOn: boolean,
+      profilePictureDataUrl: string,
       storiesProgress: StorySummary[],
-      subtopicsProgress: LearnerGroupSubtopicSummary[]
+      subtopicsProgress: LearnerGroupSubtopicSummary[],
   ) {
     this._username = username;
     this._progressSharingIsTurnedOn = progressSharingIsTurnedOn;
+    this._profilePictureDataUrl = profilePictureDataUrl;
     this._storiesProgress = storiesProgress;
     this._subtopicsProgress = subtopicsProgress;
   }
@@ -53,6 +57,10 @@ export class LearnerGroupUserProgress {
 
   get isProgressSharingTurnedOn(): boolean {
     return this._progressSharingIsTurnedOn;
+  }
+
+  get profilePictureDataUrl(): string {
+    return this._profilePictureDataUrl;
   }
 
   get storiesProgress(): StorySummary[] {
@@ -88,6 +96,7 @@ export class LearnerGroupUserProgress {
     return new LearnerGroupUserProgress(
       progBackendDict.username,
       progBackendDict.progress_sharing_is_turned_on,
+      progBackendDict.profile_picture_data_url,
       storiesProgress,
       subtopicsProgress
     );

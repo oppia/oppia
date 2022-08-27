@@ -57,8 +57,8 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   syllabusSubtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   learnerGroupStoryIds: string[] = [];
   syllabusStorySummaries: StorySummary[] = [];
-  learnerGroupInvitedStudents: string[] = [];
-  learnerGroupInvitedStudentsInfo: LearnerGroupUserInfo[] = [];
+  learnerGroupInvitedLearners: string[] = [];
+  learnerGroupInvitedLearnersInfo: LearnerGroupUserInfo[] = [];
   learnerGroup!: LearnerGroupData;
   learnerGroupUrl: string = '';
 
@@ -133,14 +133,14 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.learnerGroupStoryIds = storyIds;
   }
 
-  updateLearnerGroupInvitedStudents(invitedUsernames: string[]): void {
-    this.learnerGroupInvitedStudents = invitedUsernames;
+  updateLearnerGroupInvitedLearners(invitedUsernames: string[]): void {
+    this.learnerGroupInvitedLearners = invitedUsernames;
   }
 
-  updateLearnerGroupInvitedStudentsInfo(
+  updateLearnerGroupInvitedLearnersInfo(
       invitedUsersInfo: LearnerGroupUserInfo[]
   ): void {
-    this.learnerGroupInvitedStudentsInfo = invitedUsersInfo;
+    this.learnerGroupInvitedLearnersInfo = invitedUsersInfo;
   }
 
   isAddSyllabusNextButtonDisabled(): boolean {
@@ -171,7 +171,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.learnerGroupBackendApiService.createNewLearnerGroupAsync(
       this.learnerGroupTitle,
       this.learnerGroupDescription,
-      this.learnerGroupInvitedStudents,
+      this.learnerGroupInvitedLearners,
       this.learnerGroupSubtopicPageIds,
       this.learnerGroupStoryIds
     ).then((responseLearnerGroup: LearnerGroupData) => {

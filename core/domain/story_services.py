@@ -31,6 +31,7 @@ from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import learner_group_services
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -707,6 +708,9 @@ def delete_story(
     # Delete the opportunities available.
     opportunity_services.delete_exp_opportunities_corresponding_to_story(
         story_id)
+
+    # Delete references of the story from all related learner groups.
+    learner_group_services.remove_story_reference_from_learner_groups(story_id)
 
 
 def delete_story_summary(story_id: str) -> None:

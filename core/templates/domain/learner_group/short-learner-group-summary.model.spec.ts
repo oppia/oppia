@@ -25,7 +25,7 @@ describe('Short Learner Group Summary', () => {
       title: 'sampleTitle',
       description: 'sampleDescription',
       facilitator_usernames: ['username1'],
-      students_count: 5
+      learners_count: 5
     };
 
     let sampleShortLearnerGroupSummary = (
@@ -39,6 +39,6 @@ describe('Short Learner Group Summary', () => {
       'sampleDescription');
     expect(sampleShortLearnerGroupSummary.facilitatorUsernames).toEqual(
       ['username1']);
-    expect(sampleShortLearnerGroupSummary.studentsCount).toEqual(5);
+    expect(sampleShortLearnerGroupSummary.learnersCount).toEqual(5);
   });
 });

@@ -13,23 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for inviting students to learner group.
+ * @fileoverview Unit tests for inviting learners to learner group.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { InviteStudentsComponent } from './invite-students.component';
+import { InviteLearnersComponent } from './invite-learners.component';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { LearnerGroupUserInfo } from
   'domain/learner_group/learner-group-user-info.model';
 
-describe('InviteStudentsComponent', () => {
-  let component: InviteStudentsComponent;
-  let fixture: ComponentFixture<InviteStudentsComponent>;
+describe('InviteLearnersComponent', () => {
+  let component: InviteLearnersComponent;
+  let fixture: ComponentFixture<InviteLearnersComponent>;
   let alertsService: AlertsService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
 
@@ -43,7 +43,7 @@ describe('InviteStudentsComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        InviteStudentsComponent,
+        InviteLearnersComponent,
         MockTranslatePipe
       ],
       providers: [],
@@ -55,14 +55,14 @@ describe('InviteStudentsComponent', () => {
     alertsService = TestBed.inject(AlertsService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
-    fixture = TestBed.createComponent(InviteStudentsComponent);
+    fixture = TestBed.createComponent(InviteLearnersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should search new students to add to the learner group',
+  it('should search new learners to add to the learner group',
     fakeAsync(() => {
-      spyOn(learnerGroupBackendApiService, 'searchNewStudentToAddAsync')
+      spyOn(learnerGroupBackendApiService, 'searchNewLearnerToAddAsync')
         .and.returnValue(Promise.resolve(userInfo));
 
       expect(component.invitedUsersInfo).toEqual([]);
@@ -77,7 +77,7 @@ describe('InviteStudentsComponent', () => {
     })
   );
 
-  it('should show alert message when trying to add an invalid students to ' +
+  it('should show alert message when trying to add an invalid learners to ' +
   'the learner group', fakeAsync(() => {
     const userInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
@@ -86,7 +86,7 @@ describe('InviteStudentsComponent', () => {
     });
     const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
 
-    spyOn(learnerGroupBackendApiService, 'searchNewStudentToAddAsync')
+    spyOn(learnerGroupBackendApiService, 'searchNewLearnerToAddAsync')
       .and.returnValue(Promise.resolve(userInfo2));
 
     expect(component.invitedUsersInfo).toEqual([]);
@@ -103,7 +103,7 @@ describe('InviteStudentsComponent', () => {
   }));
 
   it('should show alert message when trying to add an already invited ' +
-  'student to the learner group', fakeAsync(() => {
+  'learner to the learner group', fakeAsync(() => {
     const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
 
     component.invitedUsersInfo = [userInfo];
@@ -119,11 +119,11 @@ describe('InviteStudentsComponent', () => {
     expect(component.invitedUsernames).toEqual(['username1']);
   }));
 
-  it('should remove invited student successfully', () => {
+  it('should remove invited learner successfully', () => {
     component.invitedUsersInfo = [userInfo];
     component.invitedUsernames = ['username1'];
 
-    component.removeInvitedStudent('username1');
+    component.removeInvitedLearner('username1');
 
     expect(component.invitedUsersInfo).toEqual([]);
     expect(component.invitedUsernames).toEqual([]);

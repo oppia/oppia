@@ -33,7 +33,7 @@ describe('Teacher Dashboard Backend API Service', () => {
     title: 'title',
     description: 'description',
     facilitator_usernames: ['facilitator1'],
-    students_count: 5
+    learners_count: 5
   };
 
   const FACILITATOR_DASHBOARD_URL = '/facilitator_dashboard_handler';

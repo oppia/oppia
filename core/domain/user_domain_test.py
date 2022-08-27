@@ -1682,4 +1682,4 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
             user_domain.LearnerGroupsUser(
                 'user1', ['group_id_1'], [learner_group_user_details], 1),
             'Learner cannot be invited to join learner group group_id_1 since '
-            'they are already its student.')
+            'they are already its learner.')

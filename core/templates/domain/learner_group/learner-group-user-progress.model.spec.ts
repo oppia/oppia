@@ -63,6 +63,7 @@ describe('Learner Group User Progress', () => {
     let sampleLearnerGroupUserProgDict = {
       username: 'user1',
       progress_sharing_is_turned_on: true,
+      profile_picture_data_url: 'picture',
       stories_progress: [sampleStorySummaryBackendDict],
       subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
     };
@@ -74,6 +75,7 @@ describe('Learner Group User Progress', () => {
 
     expect(sampleLearnerGroupUserProg.username).toEqual('user1');
     expect(sampleLearnerGroupUserProg.isProgressSharingTurnedOn).toEqual(true);
+    expect(sampleLearnerGroupUserProg.profilePictureDataUrl).toEqual('picture');
     expect(sampleLearnerGroupUserProg.storiesProgress.length).toEqual(1);
     expect(sampleLearnerGroupUserProg.subtopicsProgress.length).toEqual(1);
 

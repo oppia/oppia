@@ -41,7 +41,7 @@ LEARNER_GROUP_SCHEMA = {
         },
         'default_value': None
     },
-    'student_usernames': {
+    'learner_usernames': {
         'schema': {
             'type': 'list',
             'items': {
@@ -54,7 +54,7 @@ LEARNER_GROUP_SCHEMA = {
         },
         'default_value': []
     },
-    'invited_student_usernames': {
+    'invited_learner_usernames': {
         'schema': {
             'type': 'list',
             'items': {
@@ -102,19 +102,19 @@ class CreateLearnerGroupHandler(base.BaseHandler):
 
         title = self.normalized_payload.get('group_title')
         description = self.normalized_payload.get('group_description')
-        invited_student_usernames = self.normalized_payload.get(
-            'invited_student_usernames')
+        invited_learner_usernames = self.normalized_payload.get(
+            'invited_learner_usernames')
         subtopic_page_ids = self.normalized_payload.get('subtopic_page_ids')
         story_ids = self.normalized_payload.get('story_ids')
 
-        invited_student_ids = user_services.get_multi_user_ids_from_usernames(
-            invited_student_usernames)
+        invited_learner_ids = user_services.get_multi_user_ids_from_usernames(
+            invited_learner_usernames)
 
         new_learner_grp_id = learner_group_fetchers.get_new_learner_group_id()
 
         learner_group = learner_group_services.create_learner_group(
             new_learner_grp_id, title, description, [self.user_id],
-            invited_student_ids, subtopic_page_ids, story_ids
+            invited_learner_ids, subtopic_page_ids, story_ids
         )
 
         self.render_json({
@@ -123,10 +123,10 @@ class CreateLearnerGroupHandler(base.BaseHandler):
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(
                 learner_group.facilitator_user_ids),
-            'student_usernames': user_services.get_usernames(
-                learner_group.student_user_ids),
-            'invited_student_usernames': user_services.get_usernames(
-                learner_group.invited_student_user_ids),
+            'learner_usernames': user_services.get_usernames(
+                learner_group.learner_user_ids),
+            'invited_learner_usernames': user_services.get_usernames(
+                learner_group.invited_learner_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'story_ids': learner_group.story_ids
         })
@@ -159,9 +159,9 @@ class LearnerGroupHandler(base.BaseHandler):
 
         title = self.normalized_payload.get('group_title')
         description = self.normalized_payload.get('group_description')
-        student_usernames = self.normalized_payload.get('student_usernames')
-        invited_student_usernames = self.normalized_payload.get(
-            'invited_student_usernames')
+        learner_usernames = self.normalized_payload.get('learner_usernames')
+        invited_learner_usernames = self.normalized_payload.get(
+            'invited_learner_usernames')
         subtopic_page_ids = self.normalized_payload.get('subtopic_page_ids')
         story_ids = self.normalized_payload.get('story_ids')
 
@@ -174,16 +174,16 @@ class LearnerGroupHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'You are not a facilitator of this learner group.')
 
-        student_ids = user_services.get_multi_user_ids_from_usernames(
-            student_usernames
+        learner_ids = user_services.get_multi_user_ids_from_usernames(
+            learner_usernames
         )
-        invited_student_ids = user_services.get_multi_user_ids_from_usernames(
-            invited_student_usernames
+        invited_learner_ids = user_services.get_multi_user_ids_from_usernames(
+            invited_learner_usernames
         )
 
         learner_group = learner_group_services.update_learner_group(
             learner_group_id, title, description, [self.user_id],
-            student_ids, invited_student_ids, subtopic_page_ids, story_ids
+            learner_ids, invited_learner_ids, subtopic_page_ids, story_ids
         )
 
         self.render_json({
@@ -192,10 +192,10 @@ class LearnerGroupHandler(base.BaseHandler):
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(
                 learner_group.facilitator_user_ids),
-            'student_usernames': user_services.get_usernames(
-                learner_group.student_user_ids),
-            'invited_student_usernames': user_services.get_usernames(
-                learner_group.invited_student_user_ids),
+            'learner_usernames': user_services.get_usernames(
+                learner_group.learner_user_ids),
+            'invited_learner_usernames': user_services.get_usernames(
+                learner_group.invited_learner_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'story_ids': learner_group.story_ids
         })
@@ -219,8 +219,8 @@ class LearnerGroupHandler(base.BaseHandler):
         })
 
 
-class LearnerGroupStudentProgressHandler(base.BaseHandler):
-    """Handles operations related to the learner group student's progress."""
+class LearnerGroupLearnerProgressHandler(base.BaseHandler):
+    """Handles operations related to the learner group learner's progress."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -239,7 +239,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'student_usernames': {
+            'learner_usernames': {
                 'schema': {
                     'type': 'custom',
                     'obj_type': 'JsonEncodedInString'
@@ -254,9 +254,9 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         group syllabus.
         """
 
-        student_usernames = self.normalized_request.get('student_usernames')
-        student_user_ids = user_services.get_multi_user_ids_from_usernames(
-            student_usernames)
+        learner_usernames = self.normalized_request.get('learner_usernames')
+        learner_user_ids = user_services.get_multi_user_ids_from_usernames(
+            learner_usernames)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             learner_group_id)
@@ -264,52 +264,98 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             raise self.InvalidInputException('No such learner group exists.')
 
         progress_sharing_permissions = (
-            learner_group_fetchers.can_multi_students_share_progress(
-                student_user_ids, learner_group_id
+            learner_group_fetchers.can_multi_learners_share_progress(
+                learner_user_ids, learner_group_id
             )
         )
-        students_with_progress_sharing_on = []
-        for i, user_id in enumerate(student_user_ids):
+        learners_with_progress_sharing_on = []
+        for i, user_id in enumerate(learner_user_ids):
             if progress_sharing_permissions[i]:
-                students_with_progress_sharing_on.append(user_id)
+                learners_with_progress_sharing_on.append(user_id)
 
         story_ids = learner_group.story_ids
         stories_progresses = (
             story_fetchers.get_multi_users_progress_in_stories(
-                students_with_progress_sharing_on, story_ids
+                learners_with_progress_sharing_on, story_ids
             )
         )
         subtopic_page_ids = learner_group.subtopic_page_ids
         subtopic_pages_progresses = (
             subtopic_page_services.get_multi_users_subtopic_pages_progress(
-                students_with_progress_sharing_on, subtopic_page_ids
+                learners_with_progress_sharing_on, subtopic_page_ids
             )
         )
 
-        all_students_progress = []
-        for i, user_id in enumerate(student_user_ids):
-            student_progress = {
-                'username': student_usernames[i],
+        all_users_settings = user_services.get_users_settings(learner_user_ids)
+        all_learners_progress = []
+        for i, user_id in enumerate(learner_user_ids):
+            learner_progress = {
+                'username': learner_usernames[i],
                 'progress_sharing_is_turned_on':
                     progress_sharing_permissions[i],
+                'profile_picture_data_url':
+                    all_users_settings[i].profile_picture_data_url,
                 'stories_progress': [],
                 'subtopic_pages_progress': []
             }
 
             # If progress sharing is turned off, then we don't need to
-            # show the progress of the student.
+            # show the progress of the learner.
             if not progress_sharing_permissions[i]:
-                all_students_progress.append(student_progress)
+                all_learners_progress.append(learner_progress)
                 continue
 
-            student_progress['stories_progress'] = stories_progresses[user_id]
-            student_progress['subtopic_pages_progress'] = (
+            learner_progress['stories_progress'] = stories_progresses[user_id]
+            learner_progress['subtopic_pages_progress'] = (
                 subtopic_pages_progresses[user_id]
             )
-            all_students_progress.append(student_progress)
+            all_learners_progress.append(learner_progress)
+
+        self.render_json(all_learners_progress)
+
+
+class LearnerGroupSyllabusHandler(base.BaseHandler):
+    """Handles fetching of the learner group syllabus."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id):
+        """Handles GET requests for the learner group syllabus."""
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+        if learner_group is None:
+            raise self.InvalidInputException('No such learner group exists.')
+
+        story_summary_dicts = (
+            story_fetchers.get_learner_group_syllabus_story_summaries(
+                learner_group.story_ids))
+        subtopic_summary_dicts = (
+            subtopic_page_services
+                .get_learner_group_syllabus_subtopic_page_summaries(
+                    learner_group.subtopic_page_ids))
 
         self.render_json({
-            'students_progress': all_students_progress
+            'learner_group_id': learner_group_id,
+            'story_summary_dicts': story_summary_dicts,
+            'subtopic_summary_dicts': subtopic_summary_dicts
         })
 
 
@@ -408,7 +454,7 @@ class FacilitatorDashboardHandler(base.BaseHandler):
                 'description': learner_group.description,
                 'facilitator_usernames': user_services.get_usernames(
                     self.user_id),
-                'students_count': len(learner_group.student_user_ids)
+                'learners_count': len(learner_group.learner_user_ids)
             })
 
         self.render_json({
@@ -456,10 +502,10 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
             'description': learner_group.description,
             'facilitator_usernames': user_services.get_usernames(
                 learner_group.facilitator_user_ids),
-            'student_usernames': user_services.get_usernames(
-                learner_group.student_user_ids),
-            'invited_student_usernames': user_services.get_usernames(
-                learner_group.invited_student_user_ids),
+            'learner_usernames': user_services.get_usernames(
+                learner_group.learner_user_ids),
+            'invited_learner_usernames': user_services.get_usernames(
+                learner_group.invited_learner_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'story_ids': learner_group.story_ids
         })
@@ -499,8 +545,8 @@ class CreateLearnerGroupPage(base.BaseHandler):
         self.render_template('create-learner-group-page.mainpage.html')
 
 
-class LearnerGroupSearchStudentHandler(base.BaseHandler):
-    """Handles searching of students to invite in learner group."""
+class LearnerGroupSearchLearnerHandler(base.BaseHandler):
+    """Handles searching of learners to invite in learner group."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -565,3 +611,219 @@ class LearnerGroupSearchStudentHandler(base.BaseHandler):
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'error': ''
         })
+
+
+class EditLearnerGroupPage(base.BaseHandler):
+    """Page for editing a learner group."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, group_id):
+        """Handles GET requests."""
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        is_valid_request = learner_group_services.is_user_facilitator(
+            self.user_id, group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
+
+        self.render_template('edit-learner-group-page.mainpage.html')
+
+
+class LearnerGroupLearnersInfoHandler(base.BaseHandler):
+    """Handles getting info of learners of a learner group."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id):
+        """Handles GET requests."""
+
+        is_valid_request = learner_group_services.is_user_facilitator(
+            self.user_id, learner_group_id)
+
+        if not is_valid_request:
+            raise self.UnauthorizedUserException(
+                'You are not a facilitator of this learner group.')
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+
+        learners_user_settings = user_services.get_users_settings(
+            learner_group.learner_user_ids, strict=True)
+        invited_user_settings = user_services.get_users_settings(
+            learner_group.invited_learner_user_ids, strict=True)
+
+        self.render_json({
+            'learners_info': [
+                {
+                    'username': user_settings.username,
+                    'profile_picture_data_url':
+                        user_settings.profile_picture_data_url
+                }
+                for user_settings in learners_user_settings
+            ],
+            'invited_learners_info': [
+                {
+                    'username': user_settings.username,
+                    'profile_picture_data_url':
+                        user_settings.profile_picture_data_url
+                }
+                for user_settings in invited_user_settings
+            ]
+        })
+
+
+class LearnerGroupLearnerInvitationHandler(base.BaseHandler):
+    """Handles a learner accepting or declining a learner group invitation."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'learner_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
+            },
+            'is_invitation_accepted': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': 'false'
+            },
+            'progress_sharing_permission': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': 'false'
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def put(self, learner_group_id):
+        """Handles PUT requests."""
+
+        learner_username = self.normalized_payload.get('learner_username')
+        is_invitation_accepted = (
+            self.normalized_payload.get('is_invitation_accepted') == 'true')
+        progress_sharing_permission = (
+            self.normalized_payload.get(
+                'progress_sharing_permission') == 'true')
+
+        learner_user_id = user_services.get_user_id_from_username(
+            learner_username)
+        if is_invitation_accepted:
+            learner_group_services.add_learner_to_learner_group(
+                learner_group_id, learner_user_id, progress_sharing_permission)
+        else:
+            learner_group_services.remove_invited_learners_from_learner_group(
+                learner_group_id, [learner_user_id], True)
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+
+        self.render_json({
+            'id': learner_group.group_id,
+            'title': learner_group.title,
+            'description': learner_group.description,
+            'facilitator_usernames': user_services.get_usernames(
+                learner_group.facilitator_user_ids),
+            'learner_usernames': user_services.get_usernames(
+                learner_group.learner_user_ids),
+            'invited_learner_usernames': user_services.get_usernames(
+                learner_group.invited_learner_user_ids),
+            'subtopic_page_ids': learner_group.subtopic_page_ids,
+            'story_ids': learner_group.story_ids
+        })
+
+
+class LearnerStoriesChaptersProgressHandler(base.BaseHandler):
+    """Handles fetching progress of a user in all chapters of given stories"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'default_value': ''
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'story_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, username):
+        """Handles GET requests."""
+
+        story_ids = self.normalized_request.get('story_ids')
+        user_id = user_services.get_user_id_from_username(username)
+
+        stories_chapters_progress = (
+            story_fetchers.get_user_progress_in_story_chapters(
+                user_id, story_ids))
+
+        self.render_json(stories_chapters_progress)

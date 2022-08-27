@@ -1,0 +1,85 @@
+.oppia-edit-learner-group {
+  text-align: left;
+  width: 90%;
+}
+
+.oppia-dashboard-view {
+  display: flex;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+  text-align: left;
+  width: 100%;
+}
+
+.oppia-dashboard-view-tabs-container {
+  background: #fff;
+  height: 100%;
+  padding: 15px 0;
+  width: 20%;
+}
+
+.oppia-dashboard-view-content-container {
+  height: 100%;
+  overflow: auto;
+  width: 80%;
+}
+
+.oppia-dashboard-view-tabs-container .group-info {
+  display: grid;
+  grid-gap: 10px;
+  padding: 0 40px;
+}
+
+.oppia-dashboard-view-tabs-container .group-info-title {
+  color: #00645c;
+  font-size: 20px;
+}
+
+.oppia-dashboard-view-tabs-container .group-info-description {
+  color: #757575;
+  font-size: 12px;
+}
+
+.oppia-edit-learner-group .oppia-dashboard-view-tabs {
+  display: grid;
+  grid-gap: 5px;
+  margin-top: 40px;
+}
+
+.oppia-edit-learner-group .oppia-dashboard-view-tabs-item {
+  cursor: pointer;
+  margin-right: 10px;
+  padding: 15px 40px;
+}
+
+.oppia-edit-learner-group .oppia-dashboard-view-tabs hr {
+  border-top: 1px solid #e6e6e6;
+  width: 80%;
+}
+
+.oppia-edit-learner-group .oppia-dashboard-view-tabs-item.active {
+  background: rgba(39, 99, 92, 0.1);
+  border-bottom-right-radius: 25px;
+  border-top-right-radius: 25px;
+  color: #00645c;
+}
+
+.oppia-edit-learner-group .learners-count {
+  margin-right: 3px;
+}
+
+.oppia-edit-learner-group .tab-icon {
+  margin-right: 8px;
+}
+
+.oppia-edit-learner-group .group-info-description svg {
+  vertical-align: baseline;
+}
+
+.oppia-edit-learner-group .oppia-dashboard-view-tabs-item svg {
+  vertical-align: text-top;
+}
+
+.oppia-edit-learner-group .oppia-dashboard-view-tabs-item.active svg path {
+  fill: #00645c;
+}

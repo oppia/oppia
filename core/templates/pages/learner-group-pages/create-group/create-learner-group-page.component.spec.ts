@@ -195,8 +195,8 @@ describe('CreateLearnerGroupPageComponent', () => {
     expect(component.learnerGroupSubtopicPageIds).toEqual([]);
     expect(component.syllabusSubtopicSummaries).toEqual([]);
     expect(component.syllabusStorySummaries).toEqual([]);
-    expect(component.learnerGroupInvitedStudents).toEqual([]);
-    expect(component.learnerGroupInvitedStudentsInfo).toEqual([]);
+    expect(component.learnerGroupInvitedLearners).toEqual([]);
+    expect(component.learnerGroupInvitedLearnersInfo).toEqual([]);
 
     component.updateLearnerGroupTitle('title');
     component.updateLearnerGroupDesc('description');
@@ -204,8 +204,8 @@ describe('CreateLearnerGroupPageComponent', () => {
     component.updateLearnerGroupSubtopicIds(['subtopic_page_id']);
     component.updateLearnerGroupSubtopics([sampleLearnerGroupSubtopicSummary]);
     component.updateLearnerGroupStories([sampleStorySummary]);
-    component.updateLearnerGroupInvitedStudents(['username1']);
-    component.updateLearnerGroupInvitedStudentsInfo([userInfo]);
+    component.updateLearnerGroupInvitedLearners(['username1']);
+    component.updateLearnerGroupInvitedLearnersInfo([userInfo]);
 
     expect(component.learnerGroupTitle).toBe('title');
     expect(component.learnerGroupDescription).toBe('description');
@@ -215,8 +215,8 @@ describe('CreateLearnerGroupPageComponent', () => {
     expect(component.syllabusSubtopicSummaries).toEqual(
       [sampleLearnerGroupSubtopicSummary]);
     expect(component.syllabusStorySummaries).toEqual([sampleStorySummary]);
-    expect(component.learnerGroupInvitedStudents).toEqual(['username1']);
-    expect(component.learnerGroupInvitedStudentsInfo).toEqual([userInfo]);
+    expect(component.learnerGroupInvitedLearners).toEqual(['username1']);
+    expect(component.learnerGroupInvitedLearnersInfo).toEqual([userInfo]);
   });
 
   it('should get progress tab status class', () => {
@@ -240,8 +240,8 @@ describe('CreateLearnerGroupPageComponent', () => {
       title: 'title',
       description: 'description',
       facilitator_usernames: ['facilitator_username'],
-      student_usernames: [],
-      invited_student_usernames: ['username1'],
+      learner_usernames: [],
+      invited_learner_usernames: ['username1'],
       subtopic_page_ids: ['subtopic_page_id'],
       story_ids: []
     };

@@ -25,6 +25,10 @@ import { LearnerGroupBackendDict, LearnerGroupData } from './learner-group.model
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict } from
   './learner-group-user-info.model';
+import {
+  LearnerGroupAllLearnersInfo,
+  LearnerGroupAllLearnersInfoBackendDict
+} from './learner-group-all-learners-info.model';
 
 
 interface DeleteLearnerGroupBackendResponse {
@@ -42,7 +46,7 @@ export class LearnerGroupBackendApiService {
 
   async createNewLearnerGroupAsync(
       title: string, description: string,
-      invitedStudentUsernames: string[],
+      invitedLearnerUsernames: string[],
       subtopicPageIds: string[],
       storyIds: string[]
   ): Promise<LearnerGroupData> {
@@ -52,7 +56,7 @@ export class LearnerGroupBackendApiService {
       const postData = {
         group_title: title,
         group_description: description,
-        invited_student_usernames: invitedStudentUsernames,
+        invited_learner_usernames: invitedLearnerUsernames,
         subtopic_page_ids: subtopicPageIds,
         story_ids: storyIds
       };
@@ -78,8 +82,8 @@ export class LearnerGroupBackendApiService {
       const putData = {
         group_title: learnerGroupData.title,
         group_description: learnerGroupData.description,
-        student_usernames: learnerGroupData.studentUsernames,
-        invited_student_usernames: learnerGroupData.invitedStudentUsernames,
+        learner_usernames: learnerGroupData.learnerUsernames,
+        invited_learner_usernames: learnerGroupData.invitedLearnerUsernames,
         subtopic_page_ids: learnerGroupData.subtopicPageIds,
         story_ids: learnerGroupData.storyIds
       };
@@ -143,12 +147,12 @@ export class LearnerGroupBackendApiService {
     return this._fetchLearnerGroupInfoAsync(learnerGroupId);
   }
 
-  async searchNewStudentToAddAsync(
+  async searchNewLearnerToAddAsync(
       learnerGroupId: string,
       username: string
   ): Promise<LearnerGroupUserInfo> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = '/learner_group_search_student_handler';
+      const learnerGroupUrl = '/learner_group_search_learner_handler';
       const filterData = {
         username: username,
         learner_group_id: learnerGroupId
@@ -159,6 +163,50 @@ export class LearnerGroupBackendApiService {
         }
       ).toPromise().then(response => {
         resolve(LearnerGroupUserInfo.createFromBackendDict(response));
+      });
+    });
+  }
+
+  async fetchLearnersInfoAsync(
+      learnerGroupId: string
+  ): Promise<LearnerGroupAllLearnersInfo> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_learners_info_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+      this.http.get<LearnerGroupAllLearnersInfoBackendDict>(
+        learnerGroupUrl).toPromise().then(response => {
+        resolve(LearnerGroupAllLearnersInfo.createFromBackendDict(response));
+      });
+    });
+  }
+
+  async updateLearnerGroupInviteAsync(
+      learnerGroupId: string,
+      learnerUsername: string,
+      isInviatationAccepted: boolean,
+      progressSharingPermission = false
+  ): Promise<LearnerGroupData> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_learner_invitation_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+      const putData = {
+        learner_username: learnerUsername,
+        is_invitation_accepted: isInviatationAccepted.toString(),
+        progress_sharing_permission: progressSharingPermission.toString()
+      };
+      this.http.put<LearnerGroupBackendDict>(
+        learnerGroupUrl, putData).toPromise().then(response => {
+        resolve(LearnerGroupData.createFromBackendDict(response));
       });
     });
   }

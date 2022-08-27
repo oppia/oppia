@@ -29,6 +29,7 @@ import './learner-group-details.component.css';
 export class LearnerGroupDetailsComponent {
   @Input() learnerGroupTitle!: string;
   @Input() learnerGroupDescription!: string;
+  @Input() readOnlyMode = false;
   @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
   @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
 
@@ -42,6 +43,10 @@ export class LearnerGroupDetailsComponent {
   updateGroupDescription(description: string): void {
     this.learnerGroupDescription = description;
     this.updateLearnerGroupDesc.emit(this.learnerGroupDescription);
+  }
+
+  isReadOnlyModeActive(): boolean {
+    return this.readOnlyMode;
   }
 }
 

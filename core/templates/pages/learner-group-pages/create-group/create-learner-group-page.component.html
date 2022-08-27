@@ -17,7 +17,7 @@
       <li [ngClass]="getProgressTabStatusClass(3)">
         <span *ngIf="getProgressTabStatusClass(3) != 'completed'" class="indicator">3</span>
         <span *ngIf="getProgressTabStatusClass(3) == 'completed'" class="indicator checkmark"></span>
-        <span translate="I18N_LEARNER_GROUP_INVITE_STUDENTS" class="title"></span>
+        <span translate="I18N_LEARNER_GROUP_INVITE_LEARNERS" class="title"></span>
       </li>
     </ul>
   </div>
@@ -53,7 +53,7 @@
       <div class="oppia-next-section-container">
         <div class="oppia-next-section-button"
              [ngClass]="{'active': !isAddSyllabusNextButtonDisabled()}"
-             (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.INVITE_STUDENTS, 3)">
+             (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.INVITE_LEARNERS, 3)">
           <span translate="I18N_LEARNER_GROUP_CREATION_NEXT_BUTTON_TEXT"></span>
         </div>
         <span *ngIf="isAddSyllabusNextButtonDisabled()"
@@ -62,12 +62,12 @@
         </span>
       </div>
     </div>
-    <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.INVITE_STUDENTS">
-      <oppia-invite-students [invitedUsersInfo]="learnerGroupInvitedStudentsInfo"
-                             [invitedUsernames]="learnerGroupInvitedStudents"
-                             (updateLearnerGroupInvitedStudentsInfo)="updateLearnerGroupInvitedStudentsInfo($event)"
-                             (updateLearnerGroupInvitedStudents)="updateLearnerGroupInvitedStudents($event)">
-      </oppia-invite-students>
+    <div *ngIf="activeSection === LEARNER_GROUP_CREATION_SECTION_I18N_IDS.INVITE_LEARNERS">
+      <oppia-invite-learners [invitedUsersInfo]="learnerGroupInvitedLearnersInfo"
+                             [invitedUsernames]="learnerGroupInvitedLearners"
+                             (updateLearnerGroupInvitedLearnersInfo)="updateLearnerGroupInvitedLearnersInfo($event)"
+                             (updateLearnerGroupInvitedLearners)="updateLearnerGroupInvitedLearners($event)">
+      </oppia-invite-learners>
       <div class="oppia-prev-section-container oppia-prev-section-button"
            (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS, 1)">
         <span>&lt; </span>
