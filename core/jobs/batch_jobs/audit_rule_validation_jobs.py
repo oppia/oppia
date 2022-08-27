@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
@@ -30,6 +31,7 @@ from core.platform import models
 import apache_beam as beam
 import bs4
 from typing import Any, Dict, List, Optional, Tuple
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -43,6 +45,27 @@ datastore_services = models.Registry.import_datastore_services()
     [models.NAMES.exploration, models.NAMES.opportunity])
 
 
+class RangeVariable(TypedDict):
+    """Dictionary representing the range variable for the NumericInput
+    interaction
+    """
+
+    ans_group_index: int
+    rule_spec_index: int
+    lower_bound: None
+    upper_bound: None
+    lb_inclusive: bool
+    ub_inclusive: bool
+
+class MatchedDenominator(TypedDict):
+    """Dictionary representing the matched denominator variable for the
+    FractionInput interaction
+    """
+
+    ans_group_index: int
+    rule_spec_index: int
+    denominator: int
+
 class ExpAuditRuleChecksJob(base_jobs.JobBase):
     """Job that filters out the explorations which contains only one answer
     group and one rule spec which is invalid according to our validation checks
@@ -55,48 +78,138 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
     @staticmethod
     def _filter_invalid_drag_ans_group(
         answer_group: state_domain.AnswerGroup,
-        multi_item_value: bool
-    ) -> bool:
+        multi_item_value: bool,
+        rule_specs_till_now: List[state_domain.RuleSpec],
+        ele_x_at_y_rules: List[Dict[str, int]],
+        equal_ordering_one_at_incorec_posn: List[Any]
+    ) -> Tuple[bool, List[Dict[str, int]], List[Any]]:
         """Helper function to check if the answer group is valid or not.
         It will check if the number of invalid rules are equal to the
         number of rules present inside the answer group, which is if
-        all the rules inside the answer group are invalid
+        all the rules inside the answer group are invalid. Validates the
+        following -
+            - All rules should be unique
+            - `X` and `Y` should not be equal in HasElementXBeforeElementY rule
+            - `==` should come before == +/- 1 if they are off by at
+            most 1 value
+            - `IsEqualToOrdering` rule should not have empty values
+            - `==` should come before idx(a) == b if it satisfies
+            that condition
+            - Multiple items can be in the same place iff the
+            setting is turned on
+            - `== +/- 1` should never be an option if the
+            "multiple items in same place" option is turned off
 
         Args:
             answer_group: state_domain.AnswerGroup. The answer group.
             multi_item_value: bool. If multiple items at same place are
                 allowed or not.
+            rule_specs_till_now: List[state_domain.RuleSpec]. The list of
+                rule specs till the previous answer group.
+            ele_x_at_y_rules: List[Dict[str, int]]. List of dictionary
+                containing the element as the key and its position as the
+                value in rule type HasElementXAtPositionY
+            equal_ordering_one_at_incorec_posn: List[str|int]. All the rule
+                values of rule type `IsEqualToOrderingWithOneItemAt
+                IncorrectPosition` to check if `Equals` rule come before.
 
         Returns:
-            bool. Returns True if number of invalid rules are equal to the
-            number of rules inside the answer group.
+            Tuple[bool, List[Dict[str, int]], List[Any]]. Tuple containing 3
+            values -
+            - First is a boolean which tells if the answer group is valid or
+            not
+            - Second is the List containing values for rule type
+            `HasElementXAtPositionY`
+            - Third is the list containing the rules of rule type
+            `IsEqualToOrderingWithOneItemAtIncorrectPosition` from the given
+            answer group.
         """
         invalid_rules = []
         for rule_spec in answer_group.rule_specs:
+            # All rules should be unique.
+            if rule_spec.to_dict() in rule_specs_till_now:
+                invalid_rules.append(rule_spec)
+            # `X` and `Y` should not be equal in HasElementXBeforeElementY
+            # rule.
             if (
                 rule_spec.rule_type == 'HasElementXBeforeElementY' and
                 rule_spec.inputs['x'] == rule_spec.inputs['y']
             ):
                 invalid_rules.append(rule_spec)
 
+            if rule_spec.rule_type == 'HasElementXAtPositionY':
+                element = rule_spec.inputs['x']
+                position = rule_spec.inputs['y']
+                ele_x_at_y_rules.append(
+                    {'element': element, 'position': position}
+                )
+
+            if (
+                rule_spec.rule_type ==
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            ):
+                equal_ordering_one_at_incorec_posn.append(
+                    rule_spec.inputs['x']
+                )
+
             if rule_spec.rule_type == 'IsEqualToOrdering':
+                # `IsEqualToOrdering` rule should not have empty values.
                 if (
                     len(rule_spec.inputs['x']) <= 0
                 ):
                     invalid_rules.append(rule_spec)
+                else:
+                    # `==` should come before idx(a) == b if it satisfies
+                    # that condition.
+                    for ele in ele_x_at_y_rules:
+                        ele_position = ele['position']
+                        ele_element = ele['element']
+                        rule_choice = rule_spec.inputs['x'][ele_position - 1]
+
+                        if len(rule_choice) > 1:
+                            for choice in rule_choice:
+                                if choice == ele_element:
+                                    invalid_rules.append(rule_spec)
+                        else:
+                            if rule_choice[0] == ele_element:
+                                invalid_rules.append(rule_spec)
+                    # `==` should come before == +/- 1 if they are off by
+                    # at most 1 value.
+                    dictionary = {}
+                    for layer_idx, layer in enumerate(
+                        rule_spec.inputs['x']
+                    ):
+                        for item in layer:
+                            dictionary[item] = layer_idx
+
+                    for ele in equal_ordering_one_at_incorec_posn:
+                        wrong_positions = 0
+                        for layer_idx, layer in enumerate(ele):
+                            for item in layer:
+                                if layer_idx != dictionary[item]:
+                                    wrong_positions += 1
+                        if wrong_positions <= 1:
+                            invalid_rules.append(rule_spec)
 
             if not multi_item_value:
+                # Multiple items can be in the same place iff the
+                # setting is turned on.
                 for ele in rule_spec.inputs['x']:
                     if len(ele) > 1:
                         invalid_rules.append(rule_spec)
 
+                # `== +/- 1` should never be an option if the
+                # "multiple items in same place" option is turned off.
                 if (
                     rule_spec.rule_type ==
                     'IsEqualToOrderingWithOneItemAtIncorrectPosition'
                 ):
                     invalid_rules.append(rule_spec)
 
-        return len(invalid_rules) == len(answer_group.rule_specs)
+        return (
+            len(set(invalid_rules)) == len(answer_group.rule_specs),
+            ele_x_at_y_rules, equal_ordering_one_at_incorec_posn
+        )
 
     @staticmethod
     def invalid_drag_drop_interactions(
@@ -106,9 +219,10 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         which we plan to remove. Need to check if all the rules inside
         the answer group is invalid and after removing it should not
         result in disconnection of current state to any other state.
-        We will perform this by checking the number of invalid answer
-        groups and the number of answer groups having destination other than
-        try again are equal then we will store the state name and ans group
+        We will perform this by checking the number of invalid answer groups
+        having valid destination and the total number of answer groups having
+        valid destination, if they both are same then the state will get
+        disconnected and we will return the details for that
 
         Args:
             states_dict: dict[str, state_domain.State]. The state dictionary.
@@ -129,17 +243,23 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             invalid_ans_group_count = 0
             valid_dest_ans_group_count = 0
             invalid_ans_groups = []
+            rule_specs_till_now = []
+            ele_x_at_y_rules = []
+            incorrect_position = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                if answer_group.outcome.dest == state_name:
-                    continue
-                valid_dest_ans_group_count += 1
-                can_delete_ans_group = (
+                can_delete_ans_group, ele_x_at_y_rules, incorrect_position = (
                     ExpAuditRuleChecksJob._filter_invalid_drag_ans_group(
-                        answer_group, multi_item_value)
+                        answer_group, multi_item_value, rule_specs_till_now,
+                        ele_x_at_y_rules, incorrect_position)
                 )
-                if can_delete_ans_group:
-                    invalid_ans_group_count += 1
-                    invalid_ans_groups.append(ans_group_idx)
+                for rule_spec in answer_group.rule_specs:
+                    rule_specs_till_now.append(rule_spec.to_dict())
+
+                if answer_group.outcome.dest != state_name:
+                    valid_dest_ans_group_count += 1
+                    if can_delete_ans_group:
+                        invalid_ans_group_count += 1
+                        invalid_ans_groups.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -182,7 +302,53 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return invalid_found
 
     @staticmethod
-    def item_selec_equals_value_between_min_max_value(
+    def _get_invalid_choices_indexes(
+        choices: List[Dict[str, str]]
+    ) -> Tuple[List[int], List[str]]:
+        """Helper function to calculate empty and duplicate choices for
+        MultipleInput and ItemSelection interaction. It returns the invalid
+        choices indexes and the content ids of the invalid choices
+
+        Args:
+            choices: List[Dict[str, str]]. Choices of MultipleChoiceInput
+                or ItemSelectionInput interaction.
+
+        Returns:
+            Tuple[List[int], List[str]]. Tuple containing the list of invalid
+            choices index and invalid choices content ids.
+        """
+        empty_choices = []
+        seen_choices = []
+        invalid_choices_index = []
+        invalid_choices_content_ids = []
+        for choice in choices:
+            if choice.html.strip() in ('<p></p>', ''):
+                empty_choices.append(choice)
+
+        # Only one choice is empty.
+        if len(empty_choices) == 1:
+            invalid_choices_index.append(choices.index(empty_choices[0]))
+            invalid_choices_content_ids.append(empty_choices[0].content_id)
+
+        # Multiple choices are empty.
+        else:
+            for idx, empty_choice in enumerate(empty_choices):
+                empty_choice.html = (
+                    '<p>' + 'Choice ' + str(idx+1) + '</p>'
+                )
+
+        # Duplicate choices.
+        for choice in choices:
+            if choice.html not in seen_choices:
+                seen_choices.append(choice.html)
+            else:
+                invalid_choices_index.append(choices.index(choice))
+                invalid_choices_content_ids.append(choice.content_id)
+
+        return (invalid_choices_index, invalid_choices_content_ids)
+
+    @staticmethod
+    def item_selec_invalid_values(
         states_dict: Dict[str, state_domain.State]
     ) -> List[Dict[str, object]]:
         """ItemSelection interaction having rule type `Equals` should
@@ -190,7 +356,10 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         allowed selection if it is not we need to remove the rule
         and for that we check if the state contains only one answer
         group and one rule spec because removing that will result in
-        disconnection of the current state to the next state
+        disconnection of the current state to the next state. Validates
+        the following -
+            - All rules should be unique
+            - Choices should be unique and non empty
 
         Args:
             states_dict: dict[str, state_domain.State]. The state dictionary.
@@ -199,86 +368,317 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             states_with_errored_values: List[Dict[str, str]]. List of invalid
             states with the invalid answer groups.
         """
-        states_with_errored_values = []
-
+        invalid_states = []
         for state_name, state in states_dict.items():
-            answer_groups = state.interaction.answer_groups
             if state.interaction.id != 'ItemSelectionInput':
                 continue
-            min_value = (
-                state.interaction.customization_args
-                ['minAllowableSelectionCount'].value)
-            max_value = (
-                state.interaction.customization_args
-                ['maxAllowableSelectionCount'].value)
+            choices = (
+                state.interaction.customization_args['choices'].value)
+
+            _, invalid_choices_content_ids = (
+                ExpAuditRuleChecksJob.
+                _get_invalid_choices_indexes(choices)
+            )
+
+            invalid_ans_groups = []
+            # Mark the rules invalid whose choice has been deleted.
+            answer_groups = state.interaction.answer_groups
+            valid_dest_ans_group_count = 0
+            invalid_ans_group_count = 0
+            rule_spec_till_now = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                if not answer_group.outcome.dest == state_name:
-                    invalid_rules = []
-                    for rule_spec in answer_group.rule_specs:
-                        if rule_spec.rule_type == 'Equals':
-                            if (
-                                len(rule_spec.inputs['x']) < min_value or
-                                len(rule_spec.inputs['x']) > max_value
-                            ):
-                                invalid_rules.append(rule_spec)
-                    if len(invalid_rules) == len(answer_group.rule_specs):
-                        states_with_errored_values.append(
-                            {
-                                'state_name': state_name,
-                                'ans_group': ans_group_idx
-                            }
-                        )
-        return states_with_errored_values
+                invalid_rules = []
+                for rule_spec in answer_group.rule_specs:
+                    if rule_spec.to_dict() in rule_spec_till_now:
+                        invalid_rules.append(rule_spec)
+                    rule_spec_till_now.append(rule_spec.to_dict())
+
+                    rule_values = rule_spec.inputs['x']
+                    check = any(
+                        item in rule_values for item in
+                        invalid_choices_content_ids
+                    )
+                    if check:
+                        invalid_rules.append(rule_spec)
+
+                if answer_group.outcome.dest != state_name:
+                    valid_dest_ans_group_count += 1
+                    if (
+                        len(invalid_rules) > 0 and
+                        len(set(invalid_rules)) == len(answer_group.rule_specs)
+                    ):
+                        invalid_ans_group_count += 1
+                        invalid_ans_groups.append(ans_group_idx)
+
+            if (
+                invalid_ans_group_count == valid_dest_ans_group_count and
+                invalid_ans_group_count != 0 and
+                valid_dest_ans_group_count != 0
+            ):
+                invalid_states.append(
+                    {
+                        'state_name': state_name,
+                        'ans_group_idx': invalid_ans_groups
+                    }
+                )
+
+        return invalid_states
+
+    @staticmethod
+    def _set_lower_and_upper_bounds(
+        range_var: RangeVariable,
+        lower_bound: float,
+        upper_bound: float,
+        lb_inclusive: bool,
+        ub_inclusive: bool
+    ) -> None:
+        """Sets the lower and upper bounds for the range_var, mainly
+        we need to set the range so to keep track if any other rule's
+        range lies in between or not to prevent redundancy
+
+        Args:
+            range_var: dict[str, Any]. To keep track of each rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive.
+            lower_bound: float. The lower range to set for the rule.
+            upper_bound: float. The upper range to set for the rule.
+            lb_inclusive: bool. If lower bound is inclusive.
+            ub_inclusive: bool. If upper bound is inclusive.
+        """
+        range_var['lower_bound'] = lower_bound
+        range_var['upper_bound'] = upper_bound
+        range_var['lb_inclusive'] = lb_inclusive
+        range_var['ub_inclusive'] = ub_inclusive
+
+    @staticmethod
+    def _is_enclosed_by(
+        range_compare_to: RangeVariable,
+        range_compare_with: RangeVariable
+    ) -> bool:
+        """Checks whether the ranges of rules enclosed or not
+
+        Args:
+            range_compare_to: dict[str, Any]. To keep track of each rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive, It represents the variable for
+                which we have to check the range.
+            range_compare_with: dict[str, Any]. To keep track of other rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive, It is the variable to which the
+                range is compared.
+
+        Returns:
+            is_enclosed: bool. Returns True if both rule's ranges are enclosed.
+        """
+        if (
+            range_compare_with['lower_bound'] is None or
+            range_compare_to['lower_bound'] is None or
+            range_compare_with['upper_bound'] is None or
+            range_compare_to['upper_bound'] is None
+        ):
+            return False
+        lb_satisfied = (
+            range_compare_with['lower_bound'] < range_compare_to[
+                'lower_bound'] or
+            (
+                range_compare_with['lower_bound'] == range_compare_to[
+                    'lower_bound'] and
+                (
+                    not range_compare_to['lb_inclusive'] or
+                    range_compare_with['lb_inclusive']
+                )
+            )
+        )
+        ub_satisfied = (
+            range_compare_with['upper_bound'] > range_compare_to[
+                'upper_bound'] or
+            (
+                range_compare_with['upper_bound'] == range_compare_to[
+                    'upper_bound'] and
+                (
+                    not range_compare_to['ub_inclusive'] or
+                    range_compare_with['ub_inclusive']
+                )
+            )
+        )
+        is_enclosed = lb_satisfied and ub_satisfied
+        return is_enclosed
 
     @staticmethod
     def _filter_invalid_numeric_ans_group(
-        answer_group: state_domain.AnswerGroup
-    ) -> bool:
+        answer_group: state_domain.AnswerGroup,
+        rule_spec_till_now: List[state_domain.RuleSpec],
+        ans_group_index: str, ranges
+    ) -> Tuple(bool, List[RangeVariable]):
         """Helper function to check if the answer group is valid or not.
         It will check if the number of invalid rules are equal to the
         number of rules present inside the answer group, which is if
-        all the rules inside the answer group are invalid
+        all the rules inside the answer group are invalid. Rules will be
+        invalid if -
+            - Range of the current rule intersects with the range of the
+            previous rules
+            - Rule value cannot be converted to float, means if it has
+            string value
+            - Rule is duplicate
+            - If the `tol` value from IsWithinTolerance rule is 0
 
         Args:
             answer_group: state_domain.AnswerGroup. The answer group.
 
         Returns:
-            bool. Returns True if number of invalid rules are equal to the
-            number of rules inside the answer group.
+            Tuple(bool, List[RangeVariable]). Returns tuple,
+            - First element is boolean and returns if the answer group is
+            valid or not
+            - Second element is the `ranges` variable which keeps track of
+            all the ranges of rules up till now.
         """
         invalid_rules = []
-        for rule_spec in answer_group.rule_specs:
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        for rule_spec_index, rule_spec in enumerate(answer_group.rule_specs):
+            if rule_spec.to_dict() in rule_spec_till_now:
+                invalid_rules.append(rule_spec)
+
+            range_var = {
+                'ans_group_index': int(ans_group_index),
+                'rule_spec_index': int(rule_spec_index),
+                'lower_bound': None,
+                'upper_bound': None,
+                'lb_inclusive': False,
+                'ub_inclusive': False
+            }
             if rule_spec.rule_type == 'IsLessThanOrEqualTo':
                 try:
-                    float(rule_spec.inputs['x'])
+                    rule_value = float(rule_spec.inputs['x'])
+                    (
+                        ExpAuditRuleChecksJob.
+                        _set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, True
+                        )
+                    )
                 except Exception:
                     invalid_rules.append(rule_spec)
 
             if rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
                 try:
-                    float(rule_spec.inputs['x'])
-                except Exception:
-                    invalid_rules.append(rule_spec)
-
-            if rule_spec.rule_type == 'IsLessThan':
-                try:
-                    float(rule_spec.inputs['x'])
-                except Exception:
-                    invalid_rules.append(rule_spec)
-
-            if rule_spec.rule_type == 'IsLessThan':
-                try:
-                    float(rule_spec.inputs['x'])
+                    rule_value = float(rule_spec.inputs['x'])
+                    (
+                        ExpAuditRuleChecksJob.
+                        _set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, True, False
+                        )
+                    )
                 except Exception:
                     invalid_rules.append(rule_spec)
 
             if rule_spec.rule_type == 'Equals':
                 try:
-                    float(rule_spec.inputs['x'])
+                    rule_value = float(rule_spec.inputs['x'])
+                    (
+                        ExpAuditRuleChecksJob.
+                        _set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            rule_value, True, True
+                        )
+                    )
                 except Exception:
                     invalid_rules.append(rule_spec)
 
-        return len(invalid_rules) == len(answer_group.rule_specs)
+            if rule_spec.rule_type == 'IsLessThan':
+                try:
+                    rule_value = float(rule_spec.inputs['x'])
+                    (
+                        ExpAuditRuleChecksJob.
+                        _set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, False
+                        )
+                    )
+                except Exception:
+                    invalid_rules.append(rule_spec)
+
+            if rule_spec.rule_type == 'IsWithinTolerance':
+                try:
+                    rule_value_x = float(rule_spec.inputs['x'])
+                    rule_value_tol = float(rule_spec.inputs['tol'])
+                    (
+                        ExpAuditRuleChecksJob.
+                        _set_lower_and_upper_bounds(
+                            range_var, rule_value_x - rule_value_tol,
+                            rule_value_x + rule_value_tol, True, True
+                        )
+                    )
+                    if rule_value_tol == 0:
+                        # Removing the `IsWithinTolerance` rule from the list
+                        # as we plan to convert this rule to `Equals` rule.
+                        if rule_spec.to_dict() in rule_spec_till_now:
+                            rule_spec_till_now.remove(rule_spec.to_dict())
+
+                        rule_spec = {
+                            'rule_type': 'Equals',
+                            'inputs': {
+                                'x': int(rule_value_x)
+                            }
+                        }
+                        rule_spec = state_domain.RuleSpec.from_dict(rule_spec)
+
+                        # Rule will be invalid if it already exists in our list.
+                        if rule_spec.to_dict() in rule_spec_till_now:
+                            invalid_rules.append(rule_spec)
+                        else:
+                            rule_spec_till_now.append(rule_spec.to_dict())
+                            rule_value = float(rule_spec.inputs['x'])
+                            (
+                                ExpAuditRuleChecksJob.
+                                _set_lower_and_upper_bounds(
+                                    range_var, rule_value,
+                                    rule_value, True, True
+                                )
+                            )
+                except Exception:
+                    invalid_rules.append(rule_spec)
+
+            if rule_spec.rule_type == 'IsGreaterThan':
+                try:
+                    rule_value = float(rule_spec.inputs['x'])
+                    (
+                        ExpAuditRuleChecksJob.
+                        _set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, False, False
+                        )
+                    )
+                except Exception:
+                    invalid_rules.append(rule_spec)
+
+            if rule_spec.rule_type == 'IsInclusivelyBetween':
+                try:
+                    rule_value_a = float(rule_spec.inputs['a'])
+                    rule_value_b = float(rule_spec.inputs['b'])
+                    (
+                        ExpAuditRuleChecksJob.
+                        _set_lower_and_upper_bounds(
+                            range_var, rule_value_a,
+                            rule_value_b, True, True
+                        )
+                    )
+                except Exception:
+                    invalid_rules.append(rule_spec)
+
+            for range_ele in ranges:
+                if (
+                    ExpAuditRuleChecksJob.
+                    _is_enclosed_by(range_var, range_ele)
+                ):
+                    invalid_rules.append(rule_spec)
+            ranges.append(range_var)
+
+        return (
+            len(set(invalid_rules)) == len(answer_group.rule_specs),
+            ranges
+        )
 
     @staticmethod
     def numeric_input_invalid_values(
@@ -307,15 +707,288 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             invalid_ans_group_count = 0
             valid_dest_ans_group_count = 0
             invalid_ans_groups = []
+            rule_spec_till_now = []
+            ranges = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                if not answer_group.outcome.dest == state_name:
-                    valid_dest_ans_group_count += 1
-                    can_delete_ans_group = (
-                        ExpAuditRuleChecksJob.
-                        _filter_invalid_numeric_ans_group(
-                            answer_group)
+                can_delete_ans_group, ranges = (
+                    ExpAuditRuleChecksJob.
+                    _filter_invalid_numeric_ans_group(
+                        answer_group, rule_spec_till_now, ans_group_idx,
+                        ranges
                     )
+                )
 
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_till_now.append(rule_spec)
+
+                if answer_group.outcome.dest != state_name:
+                    valid_dest_ans_group_count += 1
+                    if can_delete_ans_group:
+                        invalid_ans_group_count += 1
+                        invalid_ans_groups.append(ans_group_idx)
+
+            if (
+                invalid_ans_group_count == valid_dest_ans_group_count and
+                invalid_ans_group_count != 0 and
+                valid_dest_ans_group_count != 0
+            ):
+                invalid_states.append(
+                    {
+                        'state_name': state_name,
+                        'ans_group_idx': invalid_ans_groups
+                    }
+                )
+
+        return invalid_states
+
+    @staticmethod
+    def _should_check_range_criteria(
+        earlier_rule: state_domain.RuleSpec,
+        later_rule: state_domain.RuleSpec
+    ) -> bool:
+        """Checks the range criteria between two rules by comparing their
+        rule type
+
+        Args:
+            earlier_rule: state_domain.RuleSpec. Previous rule.
+            later_rule: state_domain.RuleSpec. Current rule.
+
+        Returns:
+            bool. Returns True if the rules passes the range criteria check.
+        """
+        if earlier_rule.rule_type != 'IsExactlyEqualTo':
+            return True
+        return later_rule.rule_type not in (
+            'IsExactlyEqualTo', 'IsEquivalentTo',
+            'IsEquivalentToAndInSimplestForm'
+        )
+
+    @staticmethod
+    def _get_rule_value_f(
+        rule_spec: state_domain.RuleSpec
+    ) -> float:
+        """Return rule values from the rule_spec
+
+        Args:
+            rule_spec: state_domain.RuleSpec. Rule spec of an answer group.
+
+        Returns:
+            rule_value_f: float. The value of the rule spec.
+        """
+        rule_value_f = rule_spec.inputs['f']
+        if rule_value_f['wholeNumber'] == 0:
+            rule_value_f = float(
+                rule_value_f['numerator'] / rule_value_f['denominator']
+            )
+        else:
+            rule_value_f = float(
+                rule_value_f['wholeNumber'] +
+                rule_value_f['numerator'] / rule_value_f['denominator']
+            )
+
+        return rule_value_f
+
+    @staticmethod
+    def _filter_invalid_fraction_ans_group(
+        answer_group: state_domain.AnswerGroup,
+        rule_spec_till_now: List[state_domain.RuleSpec],
+        ans_group_index: str,
+        ranges: List[RangeVariable],
+        matched_denominator_list: List[MatchedDenominator],
+        answer_groups: List[state_domain.AnswerGroup]
+    ) -> Tuple(bool, List[RangeVariable], List[MatchedDenominator]):
+        """Helper function to check if the answer group is valid or not.
+        It will check if the number of invalid rules are equal to the
+        number of rules present inside the answer group, which is if
+        all the rules inside the answer group are invalid. Rules will be
+        invalid if -
+            - Range of the current rule intersects with the range of the
+            previous rules
+            - Rule value cannot be converted to float, means if it has
+            string value
+            - Rule is duplicate
+
+        Args:
+            answer_group: state_domain.AnswerGroup. The answer group to
+                validate.
+            rule_spec_till_now: List[state_domain.RuleSpec]. The list of
+                rule specs uptil now.
+            ans_group_index: int. The index of the current answer group.
+            ranges: List[RangeVariable]. The list of range variables of
+                rules uptil now.
+            matched_denominator_list: List[MatchedDenominator]. The list of
+                matched denominators rules variables, to keep track of
+                denominators.
+            answer_groups: List[state_domain.AnswerGroup]. The list of the
+                complete answer groups.
+
+        Returns:
+            Tuple[bool, List[RangeVariable], List[MatchedDenominator]]. Returns
+            - First element is boolean which tells whether the answer group is
+            valid
+            - Second element is the list of the range variables, to keep track
+            of rules ranges uptil now
+            - Third element is the list of the denominator variables, to keep
+            track of rules denominators uptil now.
+        """
+        invalid_rules = []
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        for rule_spec in answer_group.rule_specs:
+            if rule_spec.to_dict() in rule_spec_till_now:
+                invalid_rules.append(rule_spec)
+
+            rule_spec_index = str(answer_group.rule_specs.index(
+                rule_spec))
+            range_var = {
+                'ans_group_index': int(ans_group_index),
+                'rule_spec_index': int(rule_spec_index),
+                'lower_bound': None,
+                'upper_bound': None,
+                'lb_inclusive': False,
+                'ub_inclusive': False
+            }
+            matched_denominator = {
+                'ans_group_index': int(ans_group_index),
+                'rule_spec_index': int(rule_spec_index),
+                'denominator': 0
+            }
+
+            if (
+                rule_spec.rule_type in (
+                    'IsEquivalentTo', 'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm'
+                )
+            ):
+                rule_value_f = (
+                    ExpAuditRuleChecksJob.
+                    _get_rule_value_f(rule_spec)
+                )
+
+                (
+                    ExpAuditRuleChecksJob.
+                    _set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        rule_value_f, True, True
+                    )
+                )
+
+            if rule_spec.rule_type == 'IsGreaterThan':
+                rule_value_f = (
+                    ExpAuditRuleChecksJob.
+                    _get_rule_value_f(rule_spec)
+                )
+
+                (
+                    ExpAuditRuleChecksJob.
+                    _set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        upper_infinity, False, False
+                    )
+                )
+
+            if rule_spec.rule_type == 'IsLessThan':
+                rule_value_f = (
+                    ExpAuditRuleChecksJob.
+                    _get_rule_value_f(rule_spec)
+                )
+
+                (
+                    ExpAuditRuleChecksJob.
+                    _set_lower_and_upper_bounds(
+                        range_var, lower_infinity,
+                        rule_value_f, False, False
+                    )
+                )
+
+            if rule_spec.rule_type == 'HasDenominatorEqualTo':
+                try:
+                    rule_value_x = int(rule_spec.inputs['x'])
+                    matched_denominator['denominator'] = rule_value_x
+                except Exception:
+                    invalid_rules.append(rule_spec)
+
+            for range_ele in ranges:
+                if (
+                    ExpAuditRuleChecksJob.
+                    _is_enclosed_by(range_var, range_ele)
+                ):
+                    earlier_rule = (
+                        answer_groups[range_ele['ans_group_index']]
+                        .rule_specs[range_ele['rule_spec_index']]
+                    )
+                    if (
+                        ExpAuditRuleChecksJob.
+                        _should_check_range_criteria(
+                            earlier_rule, rule_spec
+                        )
+                    ):
+                        invalid_rules.append(rule_spec)
+
+            for den in matched_denominator_list:
+                if (
+                    den is not None and rule_spec.rule_type ==
+                    'HasFractionalPartExactlyEqualTo'
+                ):
+                    if (
+                        den['denominator'] ==
+                        rule_spec.inputs['f']['denominator']
+                    ):
+                        invalid_rules.append(rule_spec)
+
+            ranges.append(range_var)
+            matched_denominator_list.append(matched_denominator)
+
+        return (
+            len(set(invalid_rules)) == len(answer_group.rule_specs),
+            ranges,
+            matched_denominator_list
+        )
+
+    @staticmethod
+    def fraction_input_invalid_values(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[Dict[str, object]]:
+        """FraactionInput interaction contains some invalid rules
+        which we plan to remove. Need to check if all the rules inside
+        the answer group is invalid and after removing it should not
+        result in disconnection of current state to any other state.
+        We will perform this by checking the number of invalid answer
+        groups and the number of answer groups having destination other than
+        try again are equal then we will store the state name and ans group
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            invalid_states: List[Dict[str, object]]. List of invalid states
+            with the invalid answer groups.
+        """
+        invalid_states = []
+        for state_name, state in states_dict.items():
+            if state.interaction.id != 'FractionInput':
+                continue
+            answer_groups = state.interaction.answer_groups
+            invalid_ans_group_count = 0
+            valid_dest_ans_group_count = 0
+            invalid_ans_groups = []
+            rule_spec_till_now = []
+            ranges = []
+            matched_denominator_list = []
+            for ans_group_idx, answer_group in enumerate(answer_groups):
+                can_delete_ans_group, ranges, matched_denominator_list = (
+                    ExpAuditRuleChecksJob.
+                    _filter_invalid_fraction_ans_group(
+                        answer_group, rule_spec_till_now, ans_group_idx,
+                        ranges, matched_denominator_list, answer_groups
+                    )
+                )
+
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_till_now.append(rule_spec.to_dict())
+
+                if answer_group.outcome.dest != state_name:
+                    valid_dest_ans_group_count += 1
                     if can_delete_ans_group:
                         invalid_ans_group_count += 1
                         invalid_ans_groups.append(ans_group_idx)
@@ -371,6 +1044,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             - If the invalid choices that we have to report is less than 4,
             then we report the state. We only use this value for the curated
             explorations
+            - If the rule is duplicate
 
         Args:
             states_dict: dict[str, state_domain.State]. The state dictionary.
@@ -384,46 +1058,37 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         for state_name, state in states_dict.items():
             if state.interaction.id != 'MultipleChoiceInput':
                 continue
-            invalid_ans_groups = []
             choices = (
                 state.interaction.customization_args['choices'].value)
-            empty_choices = []
-            seen_choices = []
-            invalid_choices_index = []
-            for choice in choices:
-                if choice.html.strip() in ('<p></p>', ''):
-                    empty_choices.append(choice)
+            invalid_choices_index, _ = (
+                ExpAuditRuleChecksJob.
+                _get_invalid_choices_indexes(choices)
+            )
 
-            # Only one choice is empty.
-            if len(empty_choices) == 1:
-                invalid_choices_index.append(choices.index(empty_choices[0]))
-
-            # Duplicate choices.
-            for choice in choices:
-                if choice.html not in seen_choices:
-                    seen_choices.append(choice.html)
-                else:
-                    invalid_choices_index.append(choices.index(choice))
-
+            invalid_ans_groups = []
             # Remove rules whose choice has been deleted.
             answer_groups = state.interaction.answer_groups
             valid_dest_ans_group_count = 0
             invalid_ans_group_count = 0
+            rule_spec_till_now = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                if answer_group.outcome.dest == state_name:
-                    continue
-                valid_dest_ans_group_count += 1
                 invalid_rules = []
                 for rule_spec in answer_group.rule_specs:
                     if rule_spec.rule_type == 'Equals':
                         if rule_spec.inputs['x'] in invalid_choices_index:
                             invalid_rules.append(rule_spec)
-                if (
-                    len(invalid_rules) > 0 and
-                    len(invalid_rules) == len(answer_group.rule_specs)
-                ):
-                    invalid_ans_group_count += 1
-                    invalid_ans_groups.append(ans_group_idx)
+                    if rule_spec.to_dict() in rule_spec_till_now:
+                        invalid_rules.append(rule_spec)
+                    rule_spec_till_now.append(rule_spec.to_dict())
+
+                if answer_group.outcome.dest != state_name:
+                    valid_dest_ans_group_count += 1
+                    if (
+                        len(invalid_rules) > 0 and
+                        len(set(invalid_rules)) == len(answer_group.rule_specs)
+                    ):
+                        invalid_ans_group_count += 1
+                        invalid_ans_groups.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -442,6 +1107,81 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states_for_choices_less_than_4.append(state_name)
 
         return (invalid_states, invalid_states_for_choices_less_than_4)
+
+    @staticmethod
+    def text_input_invalid_values(states_dict: Dict[str, state_domain.State]):
+        """
+        """
+        invalid_states = []
+        for state_name, state in states_dict.items():
+            if state.interaction.id != 'TextInput':
+                continue
+            seen_strings_contains = []
+            seen_strings_startswith = []
+            rule_spec_till_now = []
+            invalid_ans_groups = []
+            valid_dest_ans_group_count = 0
+            invalid_ans_group_count = 0
+            answer_groups = state.interaction.answer_groups
+            for ans_group_idx, answer_group in enumerate(answer_groups):
+                invalid_rules = []
+                for rule_spec in answer_group.rule_specs:
+                    if rule_spec.to_dict() in rule_spec_till_now:
+                        invalid_rules.append(rule_spec)
+                    else:
+                        rule_spec_till_now.append(rule_spec.to_dict())
+
+                    if rule_spec.rule_type == 'Contains':
+                        seen_strings_contains.append(
+                            rule_spec.inputs['x']['normalizedStrSet'])
+
+                    if rule_spec.rule_type == 'StartsWith':
+                        seen_strings_startswith.append(
+                            rule_spec.inputs['x']['normalizedStrSet']
+                        )
+                        rule_values = rule_spec.inputs['x']['normalizedStrSet']
+                        for contain_ele in seen_strings_contains:
+                            for item in contain_ele:
+                                for ele in rule_values:
+                                    if item in ele:
+                                        invalid_rules.append(rule_spec)
+
+                    if rule_spec.rule_type == 'Equals':
+                        rule_values = rule_spec.inputs['x']['normalizedStrSet']
+                        for contain_ele in seen_strings_contains:
+                            for item in contain_ele:
+                                for ele in rule_values:
+                                    if item in ele:
+                                        invalid_rules.append(rule_spec)
+
+                        for start_with_ele in seen_strings_startswith:
+                            for item in start_with_ele:
+                                for ele in rule_values:
+                                    if ele.startswith(item):
+                                        invalid_rules.append(rule_spec)
+
+                if answer_group.outcome.dest != state_name:
+                    valid_dest_ans_group_count += 1
+                    if (
+                        len(invalid_rules) > 0 and
+                        len(set(invalid_rules)) == len(answer_group.rule_specs)
+                    ):
+                        invalid_ans_group_count += 1
+                        invalid_ans_groups.append(ans_group_idx)
+
+            if (
+                invalid_ans_group_count == valid_dest_ans_group_count and
+                invalid_ans_group_count != 0 and
+                valid_dest_ans_group_count != 0
+            ):
+                invalid_states.append(
+                    {
+                        'state_name': state_name,
+                        'ans_group_idx': invalid_ans_groups
+                    }
+                )
+
+        return invalid_states
 
     @staticmethod
     def get_exploration_from_models(
@@ -548,6 +1288,38 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     exp_opportunity_model.id, exp_opportunity_model))
         )
 
+        all_explorations_summaries = (
+            self.pipeline
+            | 'Get all exp summary models' >> ndb_io.GetModels(
+            exp_models.ExpSummaryModel.get_all(include_deleted=False))
+            | 'Get exp summary from model' >> beam.Map(
+            exp_fetchers.get_exploration_summary_from_model)
+            | 'Filter valid exploration summaries' >> beam.Filter(
+                lambda exp_summ: exp_summ is not None)
+        )
+
+        exp_public_summ_models = (
+            all_explorations_summaries
+            | 'Get public explorations' >> beam.Filter(
+                lambda exp: exp.status == constants.ACTIVITY_STATUS_PUBLIC)
+            | 'Map public exp with id' >> beam.Map(
+                lambda exp_public: exp_public.id
+            )
+        )
+
+        # PCollection of public explorations.
+        exp_public_explorations = (
+            all_explorations
+            | 'Filter public exps' >> beam.Filter(
+                lambda exp, public_exp_list: exp.id in public_exp_list,
+                    public_exp_list=beam.pvalue.AsList(
+                        exp_public_summ_models)
+            )
+            | 'Map public exp id, states, created date' >> beam.Map(
+                lambda exp: (exp.id, exp.states, exp.created_on)
+            )
+        )
+
         # Curated exp code is taken from the PR #15298.
         curated_explorations = (
             (exps_with_id_and_models, all_exp_opportunities)
@@ -595,6 +1367,41 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                        f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'drag drop states are {exp_drag_errors}'
+                    )
+                )
+            )
+        )
+
+        # DragAndDrop invalid public rules.
+        filter_invalid_public_drag_drop_rules = (
+            exp_public_explorations
+            | 'Get invalid public drag drop rules' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.invalid_drag_drop_interactions(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values public drag drop rule' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0)
+        )
+
+        report_count_invalid_public_drag_drop_rules = (
+            filter_invalid_public_drag_drop_rules
+            | 'Report count for invalid public drag drop rules' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF PUBLIC EXPS WITH INVALID DRAG DROP RULES')
+            )
+        )
+
+        report_invalid_public_drag_drop_rules = (
+            filter_invalid_public_drag_drop_rules
+            | 'Show info for public drag drop' >> beam.MapTuple(
+                lambda exp_id, exp_drag_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'public drag drop states are {exp_drag_errors}'
                     )
                 )
             )
@@ -661,35 +1468,35 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             )
         )
 
-        # ItemSelection == should have b/w min and max number of selections.
-        filter_invalid_item_selec_equals_value_between_min_max = (
+        # ItemSelection interaction invalid values.
+        filter_invalid_item_selec_invalid_values = (
             combine_exp_ids_and_states
-            | 'Get invalid item selection equals value between min and max'
+            | 'Get invalid item selection invalid values'
             >> beam.MapTuple(
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
-                    self.item_selec_equals_value_between_min_max_value(
+                    self.item_selec_invalid_values(
                         exp_states),
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty values item selec equals value between min and max'
+            | 'Remove empty values item selec invalid values'
             >> beam.Filter(
                 lambda exp: len(exp[1]) > 0
             )
         )
 
-        report_count_invalid_item_selec_equals_value_between_min_max = (
-            filter_invalid_item_selec_equals_value_between_min_max
+        report_count_invalid_item_selec_invalid_values = (
+            filter_invalid_item_selec_invalid_values
             | 'Report count for invalid item selec values' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'NUMBER OF EXPS WITH INVALID ITEM SELECTION')
             )
         )
 
-        report_invalid_item_selec_equals_value_between_min_max = (
-            filter_invalid_item_selec_equals_value_between_min_max
-            | 'Show info for item selec equals value' >> beam.MapTuple(
+        report_invalid_item_selec_invalid_values = (
+            filter_invalid_item_selec_invalid_values
+            | 'Show info for item selec invalid value' >> beam.MapTuple(
                 lambda exp_id, exp_item_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
                        f'The id of exp is {exp_id}, '
@@ -700,36 +1507,74 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             )
         )
 
-        # ItemSelection curated exps == should have b/w min and
-        # max number of selections.
-        filter_curated_item_selec_equals_value_between_min_max = (
-            curated_explorations
-            | 'Get curated item selection equals value between min and max'
+        # ItemSelection public invalid values.
+        filter_public_item_selec_invalid_values = (
+            exp_public_explorations
+            | 'Get public item selection invalid values'
             >> beam.MapTuple(
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
-                    self.item_selec_equals_value_between_min_max_value(
+                    self.item_selec_invalid_values(
                         exp_states),
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty curated values for item selec equals value '
-            'between min and max' >> beam.Filter(
+            | 'Remove empty public item selection invalid values'
+            >> beam.Filter(
                 lambda exp: len(exp[1]) > 0
             )
         )
 
-        report_count_curated_item_selec_equals_value_between_min_max = (
-            filter_curated_item_selec_equals_value_between_min_max
+        report_count_public_item_selec_invalid_values = (
+            filter_public_item_selec_invalid_values
+            | 'Report count for public item selec values' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID PUBLIC ITEM SELECTION')
+            )
+        )
+
+        report_public_item_selec_invalid_values = (
+            filter_public_item_selec_invalid_values
+            | 'Show info for public item selec invalid value' >> beam.MapTuple(
+                lambda exp_id, exp_item_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'public item selection states are {exp_item_errors}'
+                    )
+                )
+            )
+        )
+
+        # ItemSelection curated invalid values.
+        filter_curated_item_selec_invalid_values = (
+            curated_explorations
+            | 'Get curated item selection invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.item_selec_invalid_values(
+                        exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty curated values for item selec invalid values'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_curated_item_selec_invalid_values = (
+            filter_curated_item_selec_invalid_values
             | 'Report count for curated item selec values' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'NUMBER OF EXPS WITH INVALID CURATED ITEM SELECTION')
             )
         )
 
-        report_curated_item_selec_equals_value_between_min_max = (
-            filter_curated_item_selec_equals_value_between_min_max
-            | 'Show info for curated item selec equals value' >> beam.MapTuple(
+        report_curated_item_selec_invalid_values = (
+            filter_curated_item_selec_invalid_values
+            | 'Show info for curated item selec invalid value' >> beam.MapTuple(
                 lambda exp_id, exp_item_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
                        f'The id of exp is {exp_id}, '
@@ -771,6 +1616,43 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                        f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'numeric input states are {exp_numeric_errors}'
+                    )
+                )
+            )
+        )
+
+        # NumericInput public invalid rules.
+        filter_invalid_public_numeric_input_values = (
+            exp_public_explorations
+            | 'Get invalid public numeric input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.numeric_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty public values numeric input' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_public_numeric_input_values = (
+            filter_invalid_public_numeric_input_values
+            | 'Report count for invalid public numeric input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID NUMERIC INPUT PUBLIC RULES')
+            )
+        )
+
+        report_invalid_public_numeric_input_values = (
+            filter_invalid_public_numeric_input_values
+            | 'Show info for public numeric input' >> beam.MapTuple(
+                lambda exp_id, exp_numeric_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'public numeric input states are {exp_numeric_errors}'
                     )
                 )
             )
@@ -929,6 +1811,46 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             )
         )
 
+        # Public MultipleChoiceInput invalid rules.
+        filter_invalid_public_multiple_choice_input_values = (
+            exp_public_explorations
+            | 'Get invalid public multiple choice input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.multiple_choice_invalid_values(exp_states)[0],
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values public multiple choice input'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_public_multiple_choice_input_values = (
+            filter_invalid_public_multiple_choice_input_values
+            | 'Report count for invalid public multiple choice input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID PUBLIC '
+                    'MULTIPLE CHOICE INPUT')
+            )
+        )
+
+        report_invalid_public_multiple_choice_input_values = (
+            filter_invalid_public_multiple_choice_input_values
+            | 'Show info for public multiple choice input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'public multiple choice input '
+                       f'states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
         # Curated exps with multiple choice input having choices less than 4.
         filter_invalid_curated_multiple_choice_have_choices_less_than_4 = (
             curated_explorations
@@ -971,24 +1893,263 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             )
         )
 
+        # FractionInput invalid rules.
+        filter_invalid_fraction_input_values = (
+            combine_exp_ids_and_states
+            | 'Get invalid fraction input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.fraction_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values from fraction input' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_fraction_input_values = (
+            filter_invalid_fraction_input_values
+            | 'Report count for invalid fraction input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID FRACTION INPUT')
+            )
+        )
+
+        report_invalid_fraction_input_values = (
+            filter_invalid_fraction_input_values
+            | 'Show info for fraction input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'fraction input states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
+        # Public FractionInput invalid rules.
+        filter_invalid_public_fraction_input_values = (
+            exp_public_explorations
+            | 'Get invalid public fraction input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.fraction_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values public fraction input'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_public_fraction_input_values = (
+            filter_invalid_public_fraction_input_values
+            | 'Report count for invalid public fraction input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID PUBLIC '
+                    'FRACTION INPUT')
+            )
+        )
+
+        report_invalid_public_fraction_input_values = (
+            filter_invalid_public_fraction_input_values
+            | 'Show info for public fraction input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'public fraction input states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
+        # Curated FractionInput invalid rules.
+        filter_invalid_curated_fraction_input_values = (
+            curated_explorations
+            | 'Get invalid curated fraction input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.fraction_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values curated fraction input'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_curated_fraction_input_values = (
+            filter_invalid_curated_fraction_input_values
+            | 'Report count for invalid curated fraction input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED '
+                    'FRACTION INPUT')
+            )
+        )
+
+        report_invalid_curated_fraction_input_values = (
+            filter_invalid_curated_fraction_input_values
+            | 'Show info for curated fraction input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'curated fraction input states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
+        # TextInput invalid rules.
+        filter_invalid_text_input_values = (
+            combine_exp_ids_and_states
+            | 'Get invalid text input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.text_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values from text input' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_text_input_values = (
+            filter_invalid_text_input_values
+            | 'Report count for invalid text input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID TEXT INPUT')
+            )
+        )
+
+        report_invalid_text_input_values = (
+            filter_invalid_text_input_values
+            | 'Show info for text input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'text input states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
+        # Public TextInput invalid rules.
+        filter_invalid_public_text_input_values = (
+            curated_explorations
+            | 'Get invalid public text input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.text_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values public text input'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_public_text_input_values = (
+            filter_invalid_public_text_input_values
+            | 'Report count for invalid public text input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID PUBLIC '
+                    'TEXT INPUT')
+            )
+        )
+
+        report_invalid_public_text_input_values = (
+            filter_invalid_public_text_input_values
+            | 'Show info for public text input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'public text input states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
+        # Curated TextInput invalid rules.
+        filter_invalid_curated_text_input_values = (
+            curated_explorations
+            | 'Get invalid curated text input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.text_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values curated text input'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_curated_text_input_values = (
+            filter_invalid_curated_text_input_values
+            | 'Report count for invalid curated text input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED '
+                    'TEXT INPUT')
+            )
+        )
+
+        report_invalid_curated_text_input_values = (
+            filter_invalid_curated_text_input_values
+            | 'Show info for curated text input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'curated text input states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
         return (
             (
                 report_count_invalid_drag_drop_rules,
                 report_invalid_drag_drop_rules,
+
+                report_count_invalid_public_drag_drop_rules,
+                report_invalid_public_drag_drop_rules,
 
                 report_count_invalid_curated_drag_drop_rules,
                 report_invalid_curated_drag_drop_rules,
 
                 report_continue_text_language_code_values,
 
-                report_count_invalid_item_selec_equals_value_between_min_max,
-                report_invalid_item_selec_equals_value_between_min_max,
+                report_count_invalid_item_selec_invalid_values,
+                report_invalid_item_selec_invalid_values,
 
-                report_count_curated_item_selec_equals_value_between_min_max,
-                report_curated_item_selec_equals_value_between_min_max,
+                report_count_public_item_selec_invalid_values,
+                report_public_item_selec_invalid_values,
+
+                report_count_curated_item_selec_invalid_values,
+                report_curated_item_selec_invalid_values,
 
                 report_count_invalid_numeric_input_values,
                 report_invalid_numeric_input_values,
+
+                report_count_invalid_public_numeric_input_values,
+                report_invalid_public_numeric_input_values,
 
                 report_count_invalid_curated_numeric_input_values,
                 report_invalid_curated_numeric_input_values,
@@ -999,11 +2160,32 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 report_count_invalid_multiple_choice_input_values,
                 report_invalid_multiple_choice_input_values,
 
+                report_count_invalid_public_multiple_choice_input_values,
+                report_invalid_public_multiple_choice_input_values,
+
                 report_count_invalid_curated_multiple_choice_input_values,
                 report_invalid_curated_multiple_choice_input_values,
 
                 report_count_invalid_curated_multi_interac_choices_less_than_4,
                 report_invalid_curated_multiple_interac_choices_less_than_4,
+
+                report_count_invalid_fraction_input_values,
+                report_invalid_fraction_input_values,
+
+                report_count_invalid_public_fraction_input_values,
+                report_invalid_public_fraction_input_values,
+
+                report_count_invalid_curated_fraction_input_values,
+                report_invalid_curated_fraction_input_values,
+
+                report_count_invalid_text_input_values,
+                report_invalid_text_input_values,
+
+                report_count_invalid_public_text_input_values,
+                report_invalid_public_text_input_values,
+
+                report_count_invalid_curated_text_input_values,
+                report_invalid_curated_text_input_values
             )
             | 'Combine results' >> beam.Flatten()
         )
