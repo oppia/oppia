@@ -3,7 +3,7 @@
     <span *ngIf="showWarning">⚠</span>
     <div class="oppia-response-container-desktop">
       <i class="fas fa-times oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
-      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick protractor-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
     </div>
     <div class="oppia-responses-mobile">
       <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
@@ -41,12 +41,6 @@
     <em>Wrong<br> (try again)</em>
   </span>
 </div>
-
-<span class="oppia-delete-response-button oppia-transition-200 e2e-test-delete-response"
-      *ngIf="editabilityService.isEditable() && !defaultOutcome"
-      (click)="deleteResponse($event)">
-  <i class="fas fa-times"></i>
-</span>
 
 <style>
   .oppia-response-header-block {
