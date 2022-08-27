@@ -2275,8 +2275,6 @@ def update_translation_contribution_stats_at_review(
             reviewed.
         user_id: str. The ID of the corresponding submitter.
         target_id: str. The ID of the target entity being suggested to.
-        suggestion_is_submission: bool. Indicates whether this function is
-            called when submitting a translation.
     """
     topic_id = ''
     exp_opportunity_dict = (
