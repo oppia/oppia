@@ -42,14 +42,14 @@ export class UnresolvedAnswersOverviewComponent
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean;
 
   constructor(
-    private improvementsService: ImprovementsService,
-    private explorationStatesService: ExplorationStatesService,
-    private stateEditorService: StateEditorService,
-    private stateTopAnswersStatsService: StateTopAnswersStatsService,
-    private stateInteractionIdService: StateInteractionIdService,
     private editabilityService: EditabilityService,
+    private explorationStatesService: ExplorationStatesService,
     private externalSaveService: ExternalSaveService,
+    private improvementsService: ImprovementsService,
     private ngbModal: NgbModal,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateTopAnswersStatsService: StateTopAnswersStatsService,
   ) { }
 
   isStateRequiredToBeResolved(stateName: string): boolean {

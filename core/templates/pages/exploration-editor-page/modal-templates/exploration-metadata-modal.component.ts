@@ -59,14 +59,14 @@ export class ExplorationMetadataModalComponent
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
-    private explorationTitleService: ExplorationTitleService,
-    private explorationObjectiveService: ExplorationObjectiveService,
+    private alertsService: AlertsService,
     private explorationCategoryService: ExplorationCategoryService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
-    private explorationTagsService: ExplorationTagsService,
-    private alertsService: AlertsService,
+    private explorationObjectiveService: ExplorationObjectiveService,
     private explorationStatesService: ExplorationStatesService,
+    private explorationTagsService: ExplorationTagsService,
+    private explorationTitleService: ExplorationTitleService,
+    private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }

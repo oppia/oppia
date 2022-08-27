@@ -36,9 +36,9 @@ export class ExplorationGraphModalComponent
   graphData: GraphData;
 
   constructor(
+    private graphDataService: GraphDataService,
     private ngbActiveModal: NgbActiveModal,
     private stateEditorService: StateEditorService,
-    private graphDataService: GraphDataService,
   ) {
     super(ngbActiveModal);
   }

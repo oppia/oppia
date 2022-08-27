@@ -59,24 +59,24 @@ export class TeachOppiaModalComponent
   rulesService;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
     private alertsService: AlertsService,
     private angularNameService: AngularNameService,
     private answerClassificationService: AnswerClassificationService,
     private contextService: ContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private explorationStatesService: ExplorationStatesService,
+    private injector: Injector,
+    private loggerService: LoggerService,
+    private ngbActiveModal: NgbActiveModal,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
+    private teachOppiaModalBackendApiService: TeachOppiaModalBackendApiService,
     private trainingDataService: TrainingDataService,
     private trainingModalService: TrainingModalService,
-    private urlInterpolationService: UrlInterpolationService,
     private truncateInputBasedOnInteractionAnswerTypePipe:
       TruncateInputBasedOnInteractionAnswerTypePipe,
-    private loggerService: LoggerService,
-    private injector: Injector,
-    private teachOppiaModalBackendApiService: TeachOppiaModalBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
   ) {
     super(ngbActiveModal);
   }

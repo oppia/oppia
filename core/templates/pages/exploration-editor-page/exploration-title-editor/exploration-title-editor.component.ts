@@ -40,9 +40,9 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   MAX_CHARS_IN_EXPLORATION_TITLE: number;
 
   constructor(
+    private explorationTitleService: ExplorationTitleService,
     private focusManagerService: FocusManagerService,
     private routerService: RouterService,
-    private explorationTitleService: ExplorationTitleService,
   ) { }
 
   inputFieldBlur(): void {

@@ -45,8 +45,8 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
 
   constructor(
     private explorationTitleService: ExplorationTitleService,
-    private routerService: RouterService,
     private focusManagerService: FocusManagerService,
+    private routerService: RouterService,
   ) {}
 
   editTitle(): void {
