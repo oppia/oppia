@@ -95,7 +95,7 @@ class SuggestionEmailHandler(base.BaseHandler):
 
 class ContributorDashboardAchievementEmailHandler(base.BaseHandler):
     """Handler task of sending email of contributor dashboard achievements."""
-    
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {

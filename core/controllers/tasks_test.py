@@ -213,7 +213,7 @@ class TasksTests(test_utils.EmailTestBase):
                     'nks!\n- The Oppia Team\n\nYou can change your'
                     ' email preferences via the Preferences page.')
                 self.assertEqual(messages[0].body, expected_message)
-                
+
     def test_email_is_sent_when_contributor_achieves_a_new_rank(self):
         """Tests ContributorDashboardAchievementEmailHandler functionality."""
 
@@ -225,7 +225,8 @@ class TasksTests(test_utils.EmailTestBase):
             payload = {
                 'contributor_user_id': user_id,
                 'contribution_type': feconf.CONTRIBUTION_TYPE_TRANSLATION,
-                'contribution_sub_type': feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE,
+                'contribution_sub_type': (
+                    feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE),
                 'language_code': 'hi',
                 'rank_name': 'Initial Contributor',
             }
@@ -244,14 +245,15 @@ class TasksTests(test_utils.EmailTestBase):
             expected_email_subject = 'Oppia Translator Rank Achievement!'
             expected_email_html_body = (
                 'Hi userA,<br><br>'
-                'This is to let you know that you have successfully achieved the '
-                'Initial Contributor rank for submitting translations in हिन्दी '
-                '(Hindi). Your efforts help Oppia grow better every day and '
-                'support students around the world.<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the Initial Contributor rank for submitting translations in '
+                'हिन्दी (Hindi). Your efforts help Oppia grow better every '
+                'day and support students around the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="http://localhost:8181/contributor-dashboard">'
                 'Contributor Dashboard</a>.<br><br>'
-                'Best wishes and we hope you can continue to contribute!<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
                 'Best wishes,<br>The Oppia Contributor Dashboard Team')
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].subject, expected_email_subject)

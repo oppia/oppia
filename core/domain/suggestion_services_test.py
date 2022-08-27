@@ -4820,8 +4820,8 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
                     'en', 'fr'},
                 feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
             })
-        
-        
+
+
 class EmailsTaskqueueTests(test_utils.GenericTestBase):
     """Tests for tasks in emails taskqueue."""
 
@@ -4848,11 +4848,14 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             .TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS)
         # Ruling out the possibility of None for mypy type checking.
         assert tasks[0].payload is not None
-        self.assertEqual(tasks[0].payload['contributor_user_id'], user_id)
-        self.assertEqual(tasks[0].payload['contribution_type'],
-                             feconf.CONTRIBUTION_TYPE_TRANSLATION)
-        self.assertEqual(tasks[0].payload['contribution_sub_type'],
-                             feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE)
+        self.assertEqual(
+            tasks[0].payload['contributor_user_id'], user_id)
+        self.assertEqual(
+            tasks[0].payload['contribution_type'],
+            feconf.CONTRIBUTION_TYPE_TRANSLATION)
+        self.assertEqual(
+            tasks[0].payload['contribution_sub_type'],
+            feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE)
         self.assertEqual(tasks[0].payload['language_code'], 'hi')
-        self.assertEqual(tasks[0].payload['rank_name'],
-                            'Initial Contributor')
+        self.assertEqual(
+            tasks[0].payload['rank_name'], 'Initial Contributor')
