@@ -195,7 +195,7 @@ describe('Topic object factory', () => {
     });
 
   it(
-    'should not be able to get available skill summaries when no skill is ' +
+    'should show no available skill summaries when no skill is ' +
     'assigned to the topic', () => {
       _sampleTopic._uncategorizedSkillSummaries = [];
       _sampleTopic._subtopics = [];
@@ -206,7 +206,7 @@ describe('Topic object factory', () => {
     });
 
   it(
-    'should not be able to get available skill summaries when all skills is ' +
+    'should show no available skill summaries when all skills are ' +
     'assigned to the diagnostic test', () => {
       expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
         [skillSummary1, skillSummary2]);
@@ -237,8 +237,8 @@ describe('Topic object factory', () => {
     });
 
   it(
-    'should able to get available skill summaries when a skill is assigned ' +
-    'to the diagnostic test', () => {
+    'should be able to get available skill summaries when a skill is ' +
+    'assigned to the diagnostic test', () => {
       expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
         [skillSummary1, skillSummary2]);
       expect(_sampleTopic._subtopics[0].getSkillSummaries()).toEqual(

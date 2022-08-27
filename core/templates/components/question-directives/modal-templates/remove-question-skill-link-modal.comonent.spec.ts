@@ -185,6 +185,10 @@ describe('Question deletion modal', () => {
 
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
 
+      // The backend API request is mocked such that the skill is assigned to
+      // the diagnostic test and the number of questions in the skill is 2,
+      // hence this function call is expected not to allow question removal
+      // from the skill.
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
 
@@ -195,6 +199,9 @@ describe('Question deletion modal', () => {
         'getTopicNamesWithGivenSkillAssignedForDiagnosticTest'
       ).and.returnValue(Promise.resolve([]));
 
+      // The backend API request is spied such that the skill is not assigned
+      // to the diagnostic test, hence this function call is expected to allow
+      // question removal from the skill.
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
 

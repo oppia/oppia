@@ -137,13 +137,16 @@ describe('Assign Skill to Topic Modal Component', () => {
   }));
 
   it(
-    'should not allow skill deletion when the given skill is assigned to ' +
-    'the diagnostic test in any topic',
+    'should not be able to delete the skill when the skill is linked to the ' +
+    'diagnostic test of any topic',
     fakeAsync(() => {
       let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
         TopicsAndSkillsDashboardBackendApiService);
       componentInstance.skillId = 'skill_id';
       componentInstance.topicsAssignmentsAreFetched = false;
+
+      // The backend API request is spied such that the skill is linked to the
+      // diagnostic test of a topic with topic ID topicId1.
       spyOn(
         topicsAndSkillsDashboardBackendApiService,
         'fetchTopicIdToDiagnosticTestSkillIdsAsync'
