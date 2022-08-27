@@ -159,4 +159,4 @@ export class CompareVersionsService {
 }
 
 angular.module('oppia').factory(
-  'ExplorationRightsService', downgradeInjectable(CompareVersionsService));
+  'CompareVersionsService', downgradeInjectable(CompareVersionsService));
