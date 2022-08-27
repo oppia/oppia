@@ -25,7 +25,7 @@
     </div>
     <br>
   </div>
-  <div>
+  <div class="unassign-info-text">
     <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicsCount !== 0">
       Tick the eligible topics that you want this skill to be unassigned from.
     </div>
@@ -37,23 +37,34 @@
     <mat-spinner [diameter]="30"></mat-spinner>
   </div>
   <div *ngFor="let eligibleTopicNameToTopicAssignment of eligibleTopicNameToTopicAssignments | keyvalue"
-       class="e2e-test-unassign-topic-label">
-    <input type="checkbox"
-           class="topic-name e2e-test-unassign-topic"
-           (click)="selectedTopicToUnassign(eligibleTopicNameToTopicAssignment.key)">
-    {{ eligibleTopicNameToTopicAssignment.key }}
+       class="topic-name-checkbox e2e-test-unassign-topic-label">
+    <label>
+      <input type="checkbox"
+             class="topic-name e2e-test-unassign-topic"
+             (click)="selectedTopicToUnassign(eligibleTopicNameToTopicAssignment.key)">
+      {{ eligibleTopicNameToTopicAssignment.key }}
+    </label>
   </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-danger e2e-test-confirm-unassign-skill-button"
-          (click)="close()" [disabled]="!topicsAssignmentsAreFetched"
-          *ngIf="eligibleTopicsCount.length !== 0">
+          (click)="close()"
+          [disabled]="!topicsAssignmentsAreFetched || selectedTopicNames.length === 0"
+          *ngIf="eligibleTopicsCount !== 0">
     <span>Unassign Skill</span>
   </button>
 </div>
 
 <style>
+  .unassign-info-text {
+    margin-bottom: 5px;
+  }
+  .topic-name-checkbox {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 20px;
+  }
   .unassign-skill-from-topics-modal .topic-name {
     font-weight: bold;
   }
