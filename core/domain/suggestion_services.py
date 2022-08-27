@@ -2275,8 +2275,8 @@ def update_translation_contribution_stats_at_review(
             reviewed.
         user_id: str. The ID of the corresponding submitter.
         target_id: str. The ID of the target entity being suggested to.
-        suggestion_is_submission: bool. Indicates whether this function is called when
-            submitting a translation.
+        suggestion_is_submission: bool. Indicates whether this function is
+            called when submitting a translation.
     """
     topic_id = ''
     exp_opportunity_dict = (
@@ -2464,13 +2464,15 @@ def update_question_contribution_stats_at_submission(
                 first_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.utcnow().date().isoformat()),
+                            suggestion.last_updated.utcnow().date()
+                            .isoformat()),
                             '%Y-%m-%d'
                         ).date()),
                 last_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.utcnow().date().isoformat()),
+                            suggestion.last_updated.utcnow().date()
+                            .isoformat()),
                             '%Y-%m-%d'
                         ).date())
             )
@@ -2526,13 +2528,15 @@ def update_question_contribution_stats_at_review(
                 first_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.utcnow().date().isoformat()),
+                            suggestion.last_updated.utcnow().date()
+                            .isoformat()),
                             '%Y-%m-%d'
                         ).date()),
                 last_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.utcnow().date().isoformat()),
+                            suggestion.last_updated.utcnow().date()
+                            .isoformat()),
                             '%Y-%m-%d'
                         ).date())
             )
@@ -2592,13 +2596,15 @@ def update_question_review_stats(
                 first_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.utcnow().date().isoformat()),
+                            suggestion.last_updated.utcnow().date()
+                            .isoformat()),
                             '%Y-%m-%d'
                         ).date()),
                 last_contribution_date=(
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.utcnow().date().isoformat()),
+                            suggestion.last_updated.utcnow().date()
+                            .isoformat()),
                             '%Y-%m-%d'
                         ).date())
             )
@@ -2617,7 +2623,8 @@ def update_question_review_stats(
             question_review_stat.last_contribution_date = (
                     datetime.datetime.strptime(
                         str(
-                            suggestion.last_updated.utcnow().date().isoformat()),
+                            suggestion.last_updated.utcnow().date()
+                            .isoformat()),
                             '%Y-%m-%d'
                         ).date())
 
