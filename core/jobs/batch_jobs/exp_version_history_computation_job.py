@@ -449,6 +449,16 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         )
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
+
+                        # Additional Log:
+                        for state_name in new_exploration.states:
+                            if state_name not in new_vh_model:
+                                print(
+                                    'State name %s was not found in the '
+                                    'version history model for version %d' % (
+                                        state_name, version
+                                    )
+                                )
                     except Exception as e:
                         return (exp_id, [], e, version)
 
