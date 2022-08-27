@@ -3,7 +3,7 @@
      #dropArea>
   <div class="image-uploader-text" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
   <span *ngIf="errorMessage"
-        class="image-uploader-error-message protractor-test-upload-error">
+        class="image-uploader-error-message e2e-test-upload-error">
     <i class="fas fa-exclamation-triangle"></i>
     {{ errorMessage }}
   </span>

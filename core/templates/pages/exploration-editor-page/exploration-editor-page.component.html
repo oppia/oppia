@@ -9,7 +9,7 @@
     <div class="navbar-icons">
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
-        <a href="#" class="nav-link navbar-tab protractor-test-main-tab" uib-tooltip="Editor" tooltip-placement="<[$ctrl.countWarnings() ? 'left' : 'bottom']>">
+        <a href="#" class="nav-link navbar-tab e2e-test-main-tab" uib-tooltip="Editor" tooltip-placement="<[$ctrl.countWarnings() ? 'left' : 'bottom']>">
           <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}"></i>
         </a>
         <div ng-show="$ctrl.countWarnings()" class="oppia-editor-warnings-indicator"
