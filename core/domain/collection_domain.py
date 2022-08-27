@@ -191,7 +191,7 @@ class CollectionChange(change_domain.BaseChange):
     }]
 
 
-class CreateNewCollectionChange(CollectionChange):
+class CreateNewCollectionCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_CREATE_NEW command.
     """
@@ -200,7 +200,7 @@ class CreateNewCollectionChange(CollectionChange):
     title: str
 
 
-class AddCollectionNodeChange(CollectionChange):
+class AddCollectionNodeCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_ADD_COLLECTION_NODE command.
     """
@@ -208,7 +208,7 @@ class AddCollectionNodeChange(CollectionChange):
     exploration_id: str
 
 
-class DeleteCollectionNodeChange(CollectionChange):
+class DeleteCollectionNodeCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_DELETE_COLLECTION_NODE command.
     """
@@ -216,7 +216,7 @@ class DeleteCollectionNodeChange(CollectionChange):
     exploration_id: str
 
 
-class SwapCollectionNodesChange(CollectionChange):
+class SwapCollectionNodesCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_SWAP_COLLECTION_NODES command.
     """
@@ -225,7 +225,7 @@ class SwapCollectionNodesChange(CollectionChange):
     second_index: int
 
 
-class EditCollectionPropertyChange(CollectionChange):
+class EditCollectionPropertyCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_EDIT_COLLECTION_PROPERTY command.
     """
@@ -235,7 +235,7 @@ class EditCollectionPropertyChange(CollectionChange):
     old_value: Union[str, List[str]]
 
 
-class EditCollectionNodePropertyChange(CollectionChange):
+class EditCollectionNodePropertyCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_EDIT_COLLECTION_NODE_PROPERTY command.
     """
@@ -246,7 +246,7 @@ class EditCollectionNodePropertyChange(CollectionChange):
     old_value: str
 
 
-class MigrateSchemaToLatestVersionChange(CollectionChange):
+class MigrateSchemaToLatestVersionCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
     """
@@ -255,7 +255,7 @@ class MigrateSchemaToLatestVersionChange(CollectionChange):
     to_version: int
 
 
-class AddCollectionSkillChange(CollectionChange):
+class AddCollectionSkillCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_ADD_COLLECTION_SKILL command.
     """
@@ -263,7 +263,7 @@ class AddCollectionSkillChange(CollectionChange):
     name: str
 
 
-class DeleteCollectionSkillChange(CollectionChange):
+class DeleteCollectionSkillCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_DELETE_COLLECTION_SKILL command.
     """
@@ -271,7 +271,7 @@ class DeleteCollectionSkillChange(CollectionChange):
     skill_id: str
 
 
-class AddQuestionIdToSkillChange(CollectionChange):
+class AddQuestionIdToSkillCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_ADD_QUESTION_ID_TO_SKILL command.
     """
@@ -280,7 +280,7 @@ class AddQuestionIdToSkillChange(CollectionChange):
     skill_id: str
 
 
-class RemoveQuestionIdFromSkillChange(CollectionChange):
+class RemoveQuestionIdFromSkillCmd(CollectionChange):
     """class representing the CollectionChange's
     CMD_ADD_QUESTION_ID_TO_SKILL command.
     """

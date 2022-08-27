@@ -775,7 +775,7 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # CollectionChange to a specific change command.
                 add_collection_node_change = cast(
-                    collection_domain.AddCollectionNodeChange,
+                    collection_domain.AddCollectionNodeCmd,
                     change
                 )
                 collection.add_node(add_collection_node_change.exploration_id)
@@ -783,7 +783,7 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # CollectionChange to a specific change command.
                 delete_collection_node_change = cast(
-                    collection_domain.DeleteCollectionNodeChange,
+                    collection_domain.DeleteCollectionNodeCmd,
                     change
                 )
                 collection.delete_node(
@@ -793,7 +793,7 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # CollectionChange to a specific change command.
                 swap_collection_nodes_change = cast(
-                    collection_domain.SwapCollectionNodesChange,
+                    collection_domain.SwapCollectionNodesCmd,
                     change
                 )
                 collection.swap_nodes(
@@ -804,7 +804,7 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # CollectionChange to a specific change command.
                 edit_collection_prop_change = cast(
-                    collection_domain.EditCollectionPropertyChange,
+                    collection_domain.EditCollectionPropertyCmd,
                     change
                 )
                 if (edit_collection_prop_change.property_name ==
