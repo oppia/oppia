@@ -1522,7 +1522,7 @@ def save_new_exploration(
         if exploration.title else 'New exploration created.')
     _create_exploration(
         committer_id, exploration, commit_message, [
-            exp_domain.ExplorationChange({
+            exp_domain.CreateNewExplorationCmd({
                 'cmd': exp_domain.CMD_CREATE_NEW,
                 'title': exploration.title,
                 'category': exploration.category,
@@ -2487,7 +2487,7 @@ def save_new_exploration_from_yaml_and_assets(
 
     _create_exploration(
         committer_id, exploration, create_commit_message, [
-            exp_domain.ExplorationChange({
+            exp_domain.CreateNewExplorationCmd({
                 'cmd': exp_domain.CMD_CREATE_NEW,
                 'title': exploration.title,
                 'category': exploration.category,

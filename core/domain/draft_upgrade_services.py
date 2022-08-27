@@ -941,12 +941,15 @@ class DraftUpgradeUtil:
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED):  # pylint: disable=line-too-long
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(change.new_value, dict)
-                voiceovers_dict: Dict[
-                    str, Dict[str, state_domain.VoiceoverDict]
-                ] = change.new_value
+                # Here we use cast because in this 'if clause' we are
+                # updating the recorded_voiceovers of a State which can
+                # only be of type Dict[str, Dict[str, state_domain.VoiceoverDict
+                # ]]. So, to rule out all other property types for MyPy
+                # type checking, we used cast here.
+                voiceovers_dict = cast(
+                    Dict[str, Dict[str, state_domain.VoiceoverDict]],
+                    change.new_value
+                )
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
