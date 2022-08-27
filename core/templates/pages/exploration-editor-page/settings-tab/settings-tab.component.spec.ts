@@ -926,7 +926,7 @@ describe('Settings Tab Component', () => {
 
   it('should enable save button when tile and username are valid', () => {
     component.newMemberUsername = 'newUser';
-    component.newMemberRole = 'owner';
+    component.newMemberRole = { name: 'owner', value: 'owner'};
     component.rolesSaveButtonEnabled = true;
     explorationTitleService.init('Exploration title');
     component.saveExplorationTitle();
