@@ -290,7 +290,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 return (
                     b'Task output',
                     b'No error.')
-        
+
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
             lambda *unused_args: None, expected_args=(('performance', '1'),))
