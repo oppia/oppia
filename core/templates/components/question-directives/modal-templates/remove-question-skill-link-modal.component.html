@@ -1,6 +1,9 @@
 <div class="modal-header">
-  <h3>
+  <h3 *ngIf="topicsAssignmentsAreFetched">
     Are you sure you want to remove the question from this skill?
+  </h3>
+  <h3 *ngIf="!topicsAssignmentsAreFetched">
+    Checking whether question can be removed ...
   </h3>
 </div>
 <div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
@@ -40,6 +43,7 @@
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-danger"
           (click)="confirm()"
+          [disabled]="!topicsAssignmentsAreFetched"
           *ngIf="questionRemovalIsAllowed">
     <span>Remove Question</span>
   </button>

@@ -81,6 +81,14 @@ describe('Classroom page functionality', function() {
         await
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 1', 'Concept card explanation', false));
+      await skillEditorPage.addRubricExplanationForDifficulty(
+        'Easy', 'Second explanation for easy difficulty.');
+      await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+      // A minimum of two questions are required for skill to get assigned in a
+      // topic’s diagnostic test.
+      await workflow.createQuestion();
+      await workflow.createQuestion();
+
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.assignSkillToTopic(
