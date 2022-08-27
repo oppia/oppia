@@ -30,7 +30,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models([
-    models.NAMES.BASE_MODEL, models.NAMES.SUBTOPIC])
+    models.Names.BASE_MODEL, models.Names.SUBTOPIC])
 
 
 class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):

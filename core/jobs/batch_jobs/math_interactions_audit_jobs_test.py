@@ -32,7 +32,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.EXPLORATION])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 datastore_services = models.Registry.import_datastore_services()
 

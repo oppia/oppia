@@ -28,7 +28,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
 (base_models, activity_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.ACTIVITY])
+    [models.Names.BASE_MODEL, models.Names.ACTIVITY])
 
 
 class ActivityListModelTest(test_utils.GenericTestBase):

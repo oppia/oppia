@@ -30,7 +30,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
 (base_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.SKILL])
+    [models.Names.BASE_MODEL, models.Names.SKILL])
 
 
 class SkillSnapshotContentModelTests(test_utils.GenericTestBase):

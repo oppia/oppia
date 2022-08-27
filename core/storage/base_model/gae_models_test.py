@@ -33,7 +33,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.BASE_MODEL])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):

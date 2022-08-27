@@ -44,7 +44,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (exp_models, user_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.EXPLORATION, models.NAMES.USER, models.NAMES.STATISTICS])
+    [models.Names.EXPLORATION, models.Names.USER, models.Names.STATISTICS])
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):

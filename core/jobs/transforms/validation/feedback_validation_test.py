@@ -31,7 +31,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.FEEDBACK])
+(feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
 class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):

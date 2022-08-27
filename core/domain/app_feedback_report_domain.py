@@ -40,7 +40,7 @@ if MYPY: # pragma: no cover
 # with 'invalid-import-from'.
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.APP_FEEDBACK_REPORT])
+    [models.Names.APP_FEEDBACK_REPORT])
 
 
 class AppFeedbackReport:

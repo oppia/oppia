@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.BASE_MODEL])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -2831,7 +2831,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (e.g. config, feedback, story, skill,
-    # question), the keys need to be from the core.platform.models.NAMES enum.
+    # question), the keys need to be from the core.platform.models.Names enum.
     # For each entity, we use a different pseudonymous user ID. Note that all
     # these pseudonymous user IDs originate from the same about-to-be-deleted
     # user. If a key is absent from the pseudonymizable_entity_mappings dict,

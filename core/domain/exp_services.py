@@ -69,10 +69,10 @@ from typing import Optional
 datastore_services = models.Registry.import_datastore_services()
 (base_models, exp_models, feedback_models, user_models) = (
     models.Registry.import_models([
-        models.NAMES.BASE_MODEL,
-        models.NAMES.EXPLORATION,
-        models.NAMES.FEEDBACK,
-        models.NAMES.USER
+        models.Names.BASE_MODEL,
+        models.Names.EXPLORATION,
+        models.Names.FEEDBACK,
+        models.Names.USER
     ])
 )
 

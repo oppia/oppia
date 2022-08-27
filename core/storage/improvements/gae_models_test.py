@@ -28,7 +28,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import improvements_models
 
 base_models, improvements_models = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.IMPROVEMENTS])
+    [models.Names.BASE_MODEL, models.Names.IMPROVEMENTS])
 
 
 class TaskEntryModelTests(test_utils.GenericTestBase):

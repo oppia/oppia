@@ -32,7 +32,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import improvements_models
 
 (improvements_models,) = models.Registry.import_models(
-    [models.NAMES.IMPROVEMENTS])
+    [models.Names.IMPROVEMENTS])
 
 
 # TODO(#15613): Due to incomplete typing of apache_beam library and absences

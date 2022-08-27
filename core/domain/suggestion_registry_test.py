@@ -44,7 +44,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.SUGGESTION])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 ChangeType = Dict[
     str, Union[str, float, Dict[str, Union[str, int, state_domain.StateDict]]]

@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import stats_models
 
 (base_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.STATISTICS])
+    [models.Names.BASE_MODEL, models.Names.STATISTICS])
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):

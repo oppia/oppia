@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (base_models, topic_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.TOPIC])
+    [models.Names.BASE_MODEL, models.Names.TOPIC])
 
 
 class ValidateCanonicalNameMatchesNameInLowercaseTests(

@@ -25,7 +25,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import feedback_models
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.FEEDBACK])
+(feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
 class InvalidEntityTypeError(base_validation_errors.BaseAuditError):

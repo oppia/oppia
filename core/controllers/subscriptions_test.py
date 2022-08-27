@@ -21,7 +21,7 @@ from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class SubscriptionTests(test_utils.GenericTestBase):

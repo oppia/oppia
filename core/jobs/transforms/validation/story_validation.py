@@ -30,7 +30,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import story_models
 
-(story_models,) = models.Registry.import_models([models.NAMES.STORY])
+(story_models,) = models.Registry.import_models([models.Names.STORY])
 
 
 @validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel)

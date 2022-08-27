@@ -38,13 +38,13 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.BASE_MODEL])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 _ALL_MODEL_TYPES: FrozenSet[Type[base_models.BaseModel]] = frozenset(
     models.Registry.get_all_storage_model_classes())
 
 _ALL_BASE_MODEL_TYPES: FrozenSet[Type[base_models.BaseModel]] = frozenset(
-    models.Registry.get_storage_model_classes([models.NAMES.BASE_MODEL]))
+    models.Registry.get_storage_model_classes([models.Names.BASE_MODEL]))
 
 _MODEL_TYPES_BY_BASE_CLASS: Dict[
     Type[base_models.BaseModel],

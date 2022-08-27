@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (blog_models, user_models) = models.Registry.import_models(
-    [models.NAMES.BLOG, models.NAMES.USER])
+    [models.Names.BLOG, models.Names.USER])
 
 
 @validation_decorators.AuditsExisting(blog_models.BlogPostModel)

@@ -35,7 +35,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import config_models
 
 (base_models, config_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.CONFIG])
+    [models.Names.BASE_MODEL, models.Names.CONFIG])
 
 
 class ValidateConfigPropertySnapshotMetadataModelTests(

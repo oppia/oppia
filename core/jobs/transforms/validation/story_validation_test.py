@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import story_models
 
 (base_models, story_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.STORY])
+    [models.Names.BASE_MODEL, models.Names.STORY])
 
 
 class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):

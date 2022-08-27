@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (user_models, email_models) = models.Registry.import_models(
-    [models.NAMES.USER, models.NAMES.EMAIL])
+    [models.Names.USER, models.Names.EMAIL])
 
 
 class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):

@@ -75,23 +75,23 @@ if MYPY: # pragma: no cover
     topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.APP_FEEDBACK_REPORT,
-    models.NAMES.AUTH,
-    models.NAMES.BASE_MODEL,
-    models.NAMES.BLOG,
-    models.NAMES.COLLECTION,
-    models.NAMES.CONFIG,
-    models.NAMES.EXPLORATION,
-    models.NAMES.FEEDBACK,
-    models.NAMES.IMPROVEMENTS,
-    models.NAMES.LEARNER_GROUP,
-    models.NAMES.QUESTION,
-    models.NAMES.SKILL,
-    models.NAMES.STORY,
-    models.NAMES.SUBTOPIC,
-    models.NAMES.SUGGESTION,
-    models.NAMES.TOPIC,
-    models.NAMES.USER
+    models.Names.APP_FEEDBACK_REPORT,
+    models.Names.AUTH,
+    models.Names.BASE_MODEL,
+    models.Names.BLOG,
+    models.Names.COLLECTION,
+    models.Names.CONFIG,
+    models.Names.EXPLORATION,
+    models.Names.FEEDBACK,
+    models.Names.IMPROVEMENTS,
+    models.Names.LEARNER_GROUP,
+    models.Names.QUESTION,
+    models.Names.SKILL,
+    models.Names.STORY,
+    models.Names.SUBTOPIC,
+    models.Names.SUGGESTION,
+    models.Names.TOPIC,
+    models.Names.USER
 ])
 
 

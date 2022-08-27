@@ -56,10 +56,10 @@ if MYPY: # pragma: no cover
     story_models,
     suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.FEEDBACK,
-    models.NAMES.OPPORTUNITY,
-    models.NAMES.STORY,
-    models.NAMES.SUGGESTION
+    models.Names.FEEDBACK,
+    models.Names.OPPORTUNITY,
+    models.Names.STORY,
+    models.Names.SUGGESTION
 ])
 
 

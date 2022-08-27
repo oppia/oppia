@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (auth_models, base_models, user_models) = models.Registry.import_models([
-    models.NAMES.AUTH, models.NAMES.BASE_MODEL, models.NAMES.USER
+    models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER
 ])
 
 

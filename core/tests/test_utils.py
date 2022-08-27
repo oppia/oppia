@@ -108,9 +108,9 @@ if MYPY:  # pragma: no cover
     feedback_models, question_models, skill_models,
     story_models, suggestion_models, topic_models
 ) = models.Registry.import_models([
-    models.NAMES.AUTH, models.NAMES.BASE_MODEL, models.NAMES.EXPLORATION,
-    models.NAMES.FEEDBACK, models.NAMES.QUESTION, models.NAMES.SKILL,
-    models.NAMES.STORY, models.NAMES.SUGGESTION, models.NAMES.TOPIC
+    models.Names.AUTH, models.Names.BASE_MODEL, models.Names.EXPLORATION,
+    models.Names.FEEDBACK, models.Names.QUESTION, models.Names.SKILL,
+    models.Names.STORY, models.Names.SUGGESTION, models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -276,11 +276,11 @@ def check_image_png_or_webp(image_string: str) -> bool:
     return image_string.startswith(('data:image/png', 'data:image/webp'))
 
 
-def get_storage_model_module_names() -> Iterator[models.NAMES]:
+def get_storage_model_module_names() -> Iterator[models.Names]:
     """Get all module names in storage."""
-    # As models.NAMES is an enum, it cannot be iterated over. So we use the
+    # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.NAMES:
+    for name in models.Names:
         yield name
 
 

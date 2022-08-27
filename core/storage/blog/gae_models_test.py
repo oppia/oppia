@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import blog_models
 
 (base_models, blog_models, user_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.BLOG, models.NAMES.USER])
+    [models.Names.BASE_MODEL, models.Names.BLOG, models.Names.USER])
 
 
 class BlogPostModelTest(test_utils.GenericTestBase):

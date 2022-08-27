@@ -36,7 +36,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.CLASSIFIER])
+(classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart

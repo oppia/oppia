@@ -32,7 +32,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import collection_models
 
-(collection_models,) = models.Registry.import_models([models.NAMES.COLLECTION])
+(collection_models,) = models.Registry.import_models([models.Names.COLLECTION])
 
 
 @validation_decorators.AuditsExisting(

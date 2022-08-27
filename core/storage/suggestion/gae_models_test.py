@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (base_models, suggestion_models, user_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.SUGGESTION, models.NAMES.USER])
+    [models.Names.BASE_MODEL, models.Names.SUGGESTION, models.Names.USER])
 
 
 class SuggestionModelUnitTests(test_utils.GenericTestBase):

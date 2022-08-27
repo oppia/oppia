@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (base_models, feedback_models, user_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.FEEDBACK, models.NAMES.USER])
+    [models.Names.BASE_MODEL, models.Names.FEEDBACK, models.Names.USER])
 
 CREATED_ON_FIELD = 'created_on'
 LAST_UPDATED_FIELD = 'last_updated'

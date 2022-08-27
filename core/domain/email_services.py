@@ -23,7 +23,7 @@ from core.platform import models
 
 from typing import List
 
-(email_models,) = models.Registry.import_models([models.NAMES.EMAIL])
+(email_models,) = models.Registry.import_models([models.Names.EMAIL])
 
 MYPY = False
 if MYPY: # pragma: no cover

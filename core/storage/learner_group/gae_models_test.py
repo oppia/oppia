@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import learner_group_models
 
 (base_models, learner_group_models) = models.Registry.import_models(
-        [models.NAMES.BASE_MODEL, models.NAMES.LEARNER_GROUP])
+        [models.Names.BASE_MODEL, models.Names.LEARNER_GROUP])
 
 
 class LearnerGroupModelUnitTest(test_utils.GenericTestBase):

@@ -32,7 +32,7 @@ if MYPY:
     from mypy_imports import exp_models
     from mypy_imports import search_services as platform_search_services
 
-(exp_models,) = models.Registry.import_models([models.NAMES.EXPLORATION])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 platform_search_services = models.Registry.import_search_services()
 

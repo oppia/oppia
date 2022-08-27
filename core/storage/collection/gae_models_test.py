@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (base_models, collection_models, user_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.COLLECTION, models.NAMES.USER])
+    [models.Names.BASE_MODEL, models.Names.COLLECTION, models.Names.USER])
 
 
 class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):

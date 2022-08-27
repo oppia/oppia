@@ -36,7 +36,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.BLOG])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class BlogPostChangeDict(TypedDict):

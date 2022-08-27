@@ -39,7 +39,7 @@ if MYPY:
     from mypy_imports import topic_models
 
 (story_models, topic_models) = models.Registry.import_models([
-    models.NAMES.STORY, models.NAMES.TOPIC
+    models.Names.STORY, models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()

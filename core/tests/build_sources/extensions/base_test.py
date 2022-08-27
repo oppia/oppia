@@ -26,7 +26,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
-(stats_models,) = models.Registry.import_models([models.NAMES.STATISTICS])
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 
 
 class ActionUnitTests(test_utils.GenericTestBase):

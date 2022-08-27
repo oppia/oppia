@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import improvements_models
 
 (improvements_models,) = (
-    models.Registry.import_models([models.NAMES.IMPROVEMENTS])
+    models.Registry.import_models([models.Names.IMPROVEMENTS])
 )
 datastore_services = models.Registry.import_datastore_services()
 

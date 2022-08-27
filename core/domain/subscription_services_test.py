@@ -38,7 +38,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 COLLECTION_ID: Final = 'col_id'
 COLLECTION_ID_2: Final = 'col_id_2'

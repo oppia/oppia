@@ -37,8 +37,8 @@ from core.tests import test_utils
 
 (user_models, stats_models, suggestion_models, feedback_models) = (
     models.Registry.import_models(
-        [models.NAMES.USER, models.NAMES.STATISTICS, models.NAMES.SUGGESTION,
-         models.NAMES.FEEDBACK]))
+        [models.Names.USER, models.Names.STATISTICS, models.Names.SUGGESTION,
+         models.Names.FEEDBACK]))
 
 
 class OldContributorDashboardRedirectPageTest(test_utils.GenericTestBase):

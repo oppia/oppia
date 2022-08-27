@@ -50,7 +50,7 @@ if MYPY:  # pragma: no cover
 
 (suggestion_models, feedback_models, user_models) = (
     models.Registry.import_models(
-        [models.NAMES.SUGGESTION, models.NAMES.FEEDBACK, models.NAMES.USER]
+        [models.Names.SUGGESTION, models.Names.FEEDBACK, models.Names.USER]
     )
 )
 

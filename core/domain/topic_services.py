@@ -43,7 +43,7 @@ from core.platform import models
 
 from typing import Optional
 
-(topic_models,) = models.Registry.import_models([models.NAMES.TOPIC])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 datastore_services = models.Registry.import_datastore_services()
 
 

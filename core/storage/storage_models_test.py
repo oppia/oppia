@@ -28,10 +28,10 @@ from core.tests import test_utils
     topic_models, suggestion_models, user_models,
     story_models, question_models, config_models
 ) = models.Registry.import_models([
-    models.NAMES.BASE_MODEL, models.NAMES.COLLECTION, models.NAMES.EMAIL,
-    models.NAMES.EXPLORATION, models.NAMES.FEEDBACK, models.NAMES.SKILL,
-    models.NAMES.TOPIC, models.NAMES.SUGGESTION, models.NAMES.USER,
-    models.NAMES.STORY, models.NAMES.QUESTION, models.NAMES.CONFIG])
+    models.Names.BASE_MODEL, models.Names.COLLECTION, models.Names.EMAIL,
+    models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.SKILL,
+    models.Names.TOPIC, models.Names.SUGGESTION, models.Names.USER,
+    models.Names.STORY, models.Names.QUESTION, models.Names.CONFIG])
 
 
 class StorageModelsTest(test_utils.GenericTestBase):

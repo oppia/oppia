@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import question_models
 
 (base_models, question_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.QUESTION])
+    [models.Names.BASE_MODEL, models.Names.QUESTION])
 
 
 class QuestionSnapshotContentModelTests(test_utils.GenericTestBase):

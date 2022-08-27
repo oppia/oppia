@@ -34,7 +34,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 MAX_CURRENT_GOALS_COUNT: Final = feconf.MAX_CURRENT_GOALS_COUNT
 

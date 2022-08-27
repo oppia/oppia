@@ -43,8 +43,8 @@ import webtest
     app_feedback_report_models, exp_models, job_models,
     suggestion_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.APP_FEEDBACK_REPORT, models.NAMES.EXPLORATION,
-    models.NAMES.JOB, models.NAMES.SUGGESTION, models.NAMES.USER
+    models.Names.APP_FEEDBACK_REPORT, models.Names.EXPLORATION,
+    models.Names.JOB, models.Names.SUGGESTION, models.Names.USER
 ])
 
 

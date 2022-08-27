@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.AUTH, models.NAMES.USER]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 UidsPartitionTupleType = Tuple[
     List[Tuple[int, str]],

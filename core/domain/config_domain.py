@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (config_models, suggestion_models,) = models.Registry.import_models(
-    [models.NAMES.CONFIG, models.NAMES.SUGGESTION])
+    [models.Names.CONFIG, models.Names.SUGGESTION])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 

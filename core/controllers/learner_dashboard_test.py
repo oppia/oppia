@@ -36,7 +36,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.SUGGESTION, models.NAMES.FEEDBACK])
+    models.Names.SUGGESTION, models.Names.FEEDBACK])
 
 
 class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):

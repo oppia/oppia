@@ -28,7 +28,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.USER])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 def get_learner_goals_from_model(

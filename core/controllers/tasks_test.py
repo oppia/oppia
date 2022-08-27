@@ -31,9 +31,9 @@ from core.platform import models
 from core.tests import test_utils
 
 (job_models, email_models) = models.Registry.import_models(
-    [models.NAMES.JOB, models.NAMES.EMAIL])
+    [models.Names.JOB, models.Names.EMAIL])
 (feedback_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.FEEDBACK, models.NAMES.SUGGESTION])
+    [models.Names.FEEDBACK, models.Names.SUGGESTION])
 transaction_services = models.Registry.import_transaction_services()
 
 

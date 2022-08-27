@@ -30,7 +30,7 @@ from mypy_imports import app_feedback_report_models, base_models # isort:skip
 from typing import List, Any # isort:skip # pylint: disable=unused-import
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
-    [models.NAMES.BASE_MODEL, models.NAMES.APP_FEEDBACK_REPORT])
+    [models.Names.BASE_MODEL, models.Names.APP_FEEDBACK_REPORT])
 
 
 class AppFeedbackReportModelTests(test_utils.GenericTestBase):

@@ -52,10 +52,10 @@ if MYPY: # pragma: no cover
 
 (auth_models, user_models, audit_models, suggestion_models) = (
     models.Registry.import_models([
-        models.NAMES.AUTH,
-        models.NAMES.USER,
-        models.NAMES.AUDIT,
-        models.NAMES.SUGGESTION
+        models.Names.AUTH,
+        models.Names.USER,
+        models.Names.AUDIT,
+        models.Names.SUGGESTION
     ])
 )
 

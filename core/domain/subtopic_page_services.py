@@ -34,7 +34,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
-(subtopic_models,) = models.Registry.import_models([models.NAMES.SUBTOPIC])
+(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
 def _migrate_page_contents_to_latest_schema(

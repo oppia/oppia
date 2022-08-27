@@ -30,7 +30,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import platform_auth_services
 
-auth_models, = models.Registry.import_models([models.NAMES.AUTH])
+auth_models, = models.Registry.import_models([models.Names.AUTH])
 
 platform_auth_services = models.Registry.import_auth_services()
 
