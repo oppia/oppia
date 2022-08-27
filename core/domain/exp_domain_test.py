@@ -11143,7 +11143,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'param_changes': [],
                 'dest': 'End',
-                'dest_if_really_stuck': None,
+                'dest_if_really_stuck': 'End',
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
