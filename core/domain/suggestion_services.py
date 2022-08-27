@@ -2356,8 +2356,8 @@ def update_translation_review_stats(
             reviewed.
         user_id: str. The ID of the corresponding reviewer.
         target_id: str. The ID of the target entity being suggested to.
-        is_accepted: bool. A boolean value which indicates whether the
-            suggestion is accepted or not.
+        is_accepted: bool. Indicates whether the suggestion is
+            accepted.
     """
     topic_id = ''
     exp_opportunity_dict = (
@@ -2569,8 +2569,8 @@ def update_question_review_stats(
             reviewed.
         user_id: str. The ID of the corresponding reviewer.
         target_id: str. The ID of the target entity being suggested to.
-        is_accepted: bool. A boolean value which indicates whether the
-            suggestion is accepted or not.
+        is_accepted: bool. Indicates whether whether the suggestion is
+            accepted.
     """
     topic_ids = []
     topics = skill_services.get_all_topic_assignments_for_skill(target_id) # type: ignore[no-untyped-call]
