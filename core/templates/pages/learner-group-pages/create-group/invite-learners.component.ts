@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the inviting students to learner group.
+ * @fileoverview Component for the inviting learners to learner group.
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
@@ -24,21 +24,21 @@ import { LearnerGroupBackendApiService } from
 import { LearnerGroupUserInfo } from
   'domain/learner_group/learner-group-user-info.model';
 
-import './invite-students.component.css';
+import './invite-learners.component.css';
 
 
 @Component({
-  selector: 'oppia-invite-students',
-  templateUrl: './invite-students.component.html'
+  selector: 'oppia-invite-learners',
+  templateUrl: './invite-learners.component.html'
 })
-export class InviteStudentsComponent {
+export class InviteLearnersComponent {
   @Input() learnerGroupID: string = '';
   @Input() invitedUsersInfo: LearnerGroupUserInfo[] = [];
   @Input() invitedUsernames: string[] = [];
-  @Output() updateLearnerGroupInvitedStudents:
+  @Output() updateLearnerGroupInvitedLearners:
     EventEmitter<string[]> = new EventEmitter();
 
-  @Output() updateLearnerGroupInvitedStudentsInfo:
+  @Output() updateLearnerGroupInvitedLearnersInfo:
     EventEmitter<LearnerGroupUserInfo[]> = new EventEmitter();
 
   searchedUsername: string = '';
@@ -49,10 +49,10 @@ export class InviteStudentsComponent {
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
 
-  updateInvitedStudents(): void {
-    this.updateLearnerGroupInvitedStudents.emit(
+  updateInvitedLearners(): void {
+    this.updateLearnerGroupInvitedLearners.emit(
       this.invitedUsernames);
-    this.updateLearnerGroupInvitedStudentsInfo.emit(
+    this.updateLearnerGroupInvitedLearnersInfo.emit(
       this.invitedUsersInfo);
   }
 
@@ -67,13 +67,13 @@ export class InviteStudentsComponent {
         );
         return;
       }
-      this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
+      this.learnerGroupBackendApiService.searchNewLearnerToAddAsync(
         this.learnerGroupID, username
       ).then(userInfo => {
         if (!userInfo.error) {
           this.invitedUsersInfo.push(userInfo);
           this.invitedUsernames.push(userInfo.username);
-          this.updateInvitedStudents();
+          this.updateInvitedLearners();
         } else {
           this.alertsService.addInfoMessage(userInfo.error, this.alertTimeout);
         }
@@ -81,12 +81,12 @@ export class InviteStudentsComponent {
     }
   }
 
-  removeInvitedStudent(username: string): void {
+  removeInvitedLearner(username: string): void {
     this.invitedUsersInfo = this.invitedUsersInfo.filter(
       (userInfo) => userInfo.username !== username);
     this.invitedUsernames = this.invitedUsernames.filter(
       (username) => username !== username);
-    this.updateInvitedStudents();
+    this.updateInvitedLearners();
   }
 
   getProfileImageDataUrl(dataUrl: string): string {
@@ -95,5 +95,5 @@ export class InviteStudentsComponent {
 }
 
 angular.module('oppia').directive(
-  'oppiaLearnerGroupDetails',
-  downgradeComponent({component: InviteStudentsComponent}));
+  'oppiaInviteLearners',
+  downgradeComponent({component: InviteLearnersComponent}));

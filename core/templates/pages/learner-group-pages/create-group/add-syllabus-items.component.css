@@ -175,6 +175,7 @@
   background: #fff;
   border: 1px solid #00609c;
   color: #00609c;
+  display: none;
   font-weight: 700;
   min-width: 130px;
 }
@@ -190,6 +191,15 @@
   color: #27635c;
   font-weight: 700;
   min-width: 130px;
+}
+
+.oppia-add-learner-group-syllabus .syllabus-item-added-cta-button {
+  background: #eaf0ef;
+  border: 1px solid #eaf0ef;
+  color: #9e9e9e;
+  font-weight: 700;
+  min-width: max-content;
+  pointer-events: none;
 }
 
 .oppia-add-learner-group-syllabus .syllabus-item-add-cta-button:hover {
