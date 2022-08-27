@@ -170,7 +170,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       modalRef.result.then(() => {
         this.classroomEditorMode = false;
         this.classroomViewerMode = true;
-        this.classroomName = this.selectedClassroomDict.name;
+        this.updateClassroomPropertiesFromDict(this.selectedClassroomDict);
         this.classroomDataIsChanged = false;
       }, () => {
         // Note to developers:

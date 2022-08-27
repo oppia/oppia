@@ -51,48 +51,60 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Name</strong>
             </span>
-            <span *ngIf="classroomViewerMode">
+            <span *ngIf="classroomViewerMode" class="classroom-field">
               {{classroomName}}
             </span>
-            <input *ngIf="classroomEditorMode"
+            <textarea *ngIf="classroomEditorMode"
                    [(ngModel)]="classroomName"
-                   (blur)="updateClassroomName()">
+                   (blur)="updateClassroomName()"
+                   rows="1"
+                   class="classroom-field">
+            </textarea>
           </div>
 
           <div class="row oppia-description-text-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Url fragment</strong>
             </span>
-            <span *ngIf="classroomViewerMode">
+            <span *ngIf="classroomViewerMode" class="classroom-field">
               {{urlFragment}}
             </span>
-            <input *ngIf="classroomEditorMode"
+            <textarea *ngIf="classroomEditorMode"
                    [(ngModel)]="urlFragment"
-                   (blur)="updateUrlFragment()">
+                   (blur)="updateUrlFragment()"
+                   rows="1"
+                   class="classroom-field">
+            </textarea>
           </div>
 
           <div class="row oppia-description-text-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Course details</strong>
             </span>
-            <span *ngIf="classroomViewerMode">
+            <span *ngIf="classroomViewerMode" class="classroom-field">
               {{courseDetails}}
             </span>
-            <input *ngIf="classroomEditorMode"
+            <textarea *ngIf="classroomEditorMode"
                    [(ngModel)]="courseDetails"
-                   (blur)="updateCourseDetails()">
+                   (blur)="updateCourseDetails()"
+                   rows="6"
+                   class="classroom-field">
+            </textarea>
           </div>
 
           <div class="row oppia-description-text-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Topic list intro</strong>
             </span>
-            <span *ngIf="classroomViewerMode">
+            <span *ngIf="classroomViewerMode" class="classroom-field">
                 {{topicListIntro}}
             </span>
-            <input *ngIf="classroomEditorMode"
+            <textarea *ngIf="classroomEditorMode"
                    [(ngModel)]="topicListIntro"
-                   (blur)="updateTopicListIntro()">
+                   (blur)="updateTopicListIntro()"
+                   rows="4"
+                   class="classroom-field">
+            </textarea>
           </div>
 
           <div *ngIf="classroomEditorMode">
@@ -117,6 +129,9 @@
 </mat-card>
 
 <style>
+  .classroom-field {
+    width: 400px;
+  }
   .oppia-description-text-container {
     margin-top: 10px;
   }

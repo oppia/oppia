@@ -1,19 +1,32 @@
 <div class="modal-header">
-    <h3>
-        Fill the basic details of a classroom
-    </h3>
+  <h3>
+    Fill the basic details of a classroom
+  </h3>
 </div>
 <div class="modal-body">
-    <p>
-        Enter the name of the new classroom
-    </p>
-    <p *ngIf="classroomNameAlreadyExist">
-        <em>A classroom with this name already exists</em>
-    </p>
+  <p>
+    Enter the name of the new classroom
+  </p>
+  <p *ngIf="classroomNameAlreadyExist">
+    <em>A classroom with this name already exists</em>
+  </p>
 
-    <input [(ngModel)]="newClassroomName">
+  <textarea class="new-classroom-name-input" [(ngModel)]="newClassroomName" rows="1"></textarea>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-    <button class="btn btn-success" (click)="createClassroom()">Create</button>
+  <button class="btn btn-secondary"
+          (click)="cancel()">
+    Cancel
+  </button>
+  <button class="btn btn-success"
+          (click)="createClassroom()"
+          [disabled]="newClassroomName === ''">
+    Create
+  </button>
 </div>
+
+<style>
+  .new-classroom-name-input{
+    width: 400px;
+  }
+</style>
