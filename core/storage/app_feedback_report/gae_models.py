@@ -52,13 +52,13 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-class FilterFieldNames(enum.Enum): # pylint: disable=invalid-name
+class FilterFieldNames(enum.Enum):
     """Enum for the model field names that can be filtered"""
 
     PLATFORM = 'platform'
     REPORT_TYPE = 'report_type'
     ENTRY_POINT = 'entry_point'
-    SUBMITTED_ON = 'SUBMITTED_ON'
+    SUBMITTED_ON = 'submitted_on'
     ANDROID_DEVICE_MODEL = 'android_device_model'
     ANDROID_SDK_VERSION = 'android_sdk_version'
     TEXT_LANGUAGE_CODE = 'text_language_code'
@@ -341,7 +341,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_field.name], distinct=True)
+        query = cls.query(projection=[filter_field.value], distinct=True)
         filter_values = []
         if filter_field == FilterFieldNames.REPORT_TYPE:
             filter_values = [model.report_type for model in query]

@@ -27,9 +27,9 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     core/domain/platform_parameter_list.py.
     """
 
-    EXPECTED_PARAM_NAMES = ['DUMMY_FEATURE', 'DUMMY_PARAMETER',
-                            'END_CHAPTER_CELEBRATION',
-                            'CHECKPOINT_CELEBRATION']
+    EXPECTED_PARAM_NAMES = ['dummy_feature', 'dummy_parameter',
+                            'end_chapter_celebration',
+                            'checkpoint_celebration']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
@@ -71,8 +71,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             missing_names,
-            msg='Platform parameters missing in registry: %s.' % (
-                list(missing_names))
+            msg='Platform parameters missing in registry: %s.' % (list(missing_names))
         )
 
     def test_no_unexpected_parameter_in_registry(self) -> None:

@@ -1532,7 +1532,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         app_feedback_report_constants.PLATFORM_CHOICES.sort()
         expected_dict = {
-            'filter_field': 'platform',
+            'filter_field': 'PLATFORM',
             'filter_options': app_feedback_report_constants.PLATFORM_CHOICES
         }
         self.assertDictEqual(

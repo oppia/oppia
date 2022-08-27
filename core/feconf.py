@@ -131,11 +131,7 @@ LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
     'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
 
 
-# Valid model names.
-# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
-# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
-# throughout the codebase according to the coding style guide.
-# https://github.com/oppia/oppia/wiki/Coding-style-guide
+
 class ValidModelNames(enum.Enum):
     """Enum for valid model names."""
 
