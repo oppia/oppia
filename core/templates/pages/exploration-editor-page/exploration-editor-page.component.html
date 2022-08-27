@@ -119,8 +119,8 @@
     <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
     </translation-tab>
     <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-    <preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
-    </preview-tab>
+    <oppia-preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
+    </oppia-preview-tab>
 
     <statistics-tab ng-show="$ctrl.getActiveTabName() === 'stats'">
     </statistics-tab>
