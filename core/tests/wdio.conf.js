@@ -192,7 +192,8 @@ exports.config = {
       logPath: 'logs',
       installArgs: { drivers },
       args: { drivers }
-    }]
+    }],
+    'intercept'
   ],
 
   // Framework you want to run your specs with.
