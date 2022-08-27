@@ -22,6 +22,7 @@ import copy
 
 from core import feconf
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import state_domain
 from core.jobs import base_jobs
@@ -46,8 +47,8 @@ datastore_services = models.Registry.import_datastore_services()
 class UnformattedModelGroupDict(TypedDict):
     """Dictionary representing an unformatted model group."""
 
-    all_exp_models: List[exp_models.ExplorationModel]
-    exp_models_vlatest: List[exp_models.ExplorationModel]
+    all_exp_models: List[exp_domain.Exploration]
+    exp_models_vlatest: List[exp_domain.Exploration]
     commit_log_models: List[exp_models.ExplorationCommitLogEntryModel]
     version_history_models: (
         List[Optional[exp_models.ExplorationVersionHistoryModel]]
@@ -57,8 +58,8 @@ class UnformattedModelGroupDict(TypedDict):
 class FormattedModelGroupDict(TypedDict):
     """Dictionary representing a formatted model group."""
 
-    exp_vlatest: exp_models.ExplorationModel
-    all_explorations: List[exp_models.ExplorationModel]
+    exp_vlatest: exp_domain.Exploration
+    all_explorations: List[exp_domain.Exploration]
     commit_log_models: List[exp_models.ExplorationCommitLogEntryModel]
     version_history_models: (
         List[Optional[exp_models.ExplorationVersionHistoryModel]]
@@ -136,11 +137,11 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         """
         exp_vlatest = model_group['exp_models_vlatest'][0]
 
-        all_explorations: List[Optional[exp_models.ExplorationModel]] = (
+        all_explorations: List[Optional[exp_domain.Exploration]] = (
             [None] * exp_vlatest.version
         )
-        for exp_model in model_group['all_exp_models']:
-            all_explorations[exp_model.version - 1] = exp_model
+        for exploration in model_group['all_exp_models']:
+            all_explorations[exploration.version - 1] = exploration
 
         commit_log_models: List[Optional[
             exp_models.ExplorationCommitLogEntryModel
@@ -396,48 +397,16 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     new_vh_model.update_timestamps()
                     version_history_models[version - 1] = new_vh_model
                 else:
-                    old_states_dict = old_exploration.states
-                    new_states_dict = new_exploration.states
-                    old_metadata_dict = {
-                        'title': old_exploration.title,
-                        'category': old_exploration.category,
-                        'objective': old_exploration.objective,
-                        'language_code': old_exploration.language_code,
-                        'tags': old_exploration.tags,
-                        'blurb': old_exploration.blurb,
-                        'author_notes': old_exploration.author_notes,
-                        'states_schema_version': (
-                            old_exploration.states_schema_version
-                        ),
-                        'init_state_name': old_exploration.init_state_name,
-                        'param_specs': old_exploration.param_specs,
-                        'param_changes': old_exploration.param_changes,
-                        'auto_tts_enabled': old_exploration.auto_tts_enabled,
-                        'correctness_feedback_enabled': (
-                            old_exploration.correctness_feedback_enabled
-                        ),
-                        'edits_allowed': old_exploration.edits_allowed
+                    old_states_dict = {
+                        state_name: state.to_dict()
+                        for state_name, state in old_exploration.states.items()
                     }
-                    new_metadata_dict = {
-                        'title': new_exploration.title,
-                        'category': new_exploration.category,
-                        'objective': new_exploration.objective,
-                        'language_code': new_exploration.language_code,
-                        'tags': new_exploration.tags,
-                        'blurb': new_exploration.blurb,
-                        'author_notes': new_exploration.author_notes,
-                        'states_schema_version': (
-                            new_exploration.states_schema_version
-                        ),
-                        'init_state_name': new_exploration.init_state_name,
-                        'param_specs': new_exploration.param_specs,
-                        'param_changes': new_exploration.param_changes,
-                        'auto_tts_enabled': new_exploration.auto_tts_enabled,
-                        'correctness_feedback_enabled': (
-                            new_exploration.correctness_feedback_enabled
-                        ),
-                        'edits_allowed': new_exploration.edits_allowed
+                    new_states_dict = {
+                        state_name: state.to_dict()
+                        for state_name, state in new_exploration.states.items()
                     }
+                    old_metadata_dict = old_exploration.get_metadata().to_dict()
+                    new_metadata_dict = new_exploration.get_metadata().to_dict()
 
                     old_vh_model = version_history_models[version - 2]
                     old_states_vh = {
@@ -511,6 +480,16 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             except Exception:
                 return None
 
+    def get_exploration_from_model(self, exploration_model):
+        """Gets Exploration object from model."""
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(
+                exploration_model
+            )
+            return exploration
+        except Exception:
+            return None
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
             self.pipeline
@@ -523,10 +502,12 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 beam.Filter(lambda model: model is not None)
             | 'Get reconstituted exploration models' >>
                 beam.Map(self.generate_exploration_from_snapshot)
-            | 'Filter exploration models without None' >>
+            | 'Get Exploration objects from models' >>
+                beam.Map(self.get_exploration_from_model)
+            | 'Filter explorations without None' >>
                 beam.Filter(lambda x: x is not None)
             | 'Get id-model pair for exploration models' >>
-                beam.Map(lambda model: (model.id, model))
+                beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_explorations_vlatest = (
@@ -535,8 +516,12 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 ndb_io.GetModels(exp_models.ExplorationModel.get_all(
                         include_deleted=False
                 ))
+            | 'Get Exploration objects from exp models vlatest' >>
+                beam.Map(self.get_exploration_from_model)
+            | 'Filter the explorations without None' >>
+                beam.Filter(lambda x: x is not None)
             | 'Get id-model pair for exploration models at vlatest' >>
-                beam.Map(lambda model: (model.id, model))
+                beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_commit_logs = (
