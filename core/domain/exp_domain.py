@@ -29,8 +29,7 @@ import datetime
 import json
 import re
 import string
-from urllib.parse import urlparse
-import bs4
+from urllib.parse import urlparse   # pylint: disable=import-only-modules
 
 from core import feconf
 from core import schema_utils
@@ -42,6 +41,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+import bs4
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Sequence,
     Set, Tuple, cast
@@ -2619,9 +2619,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(
+    def _convert_states_v52_dict_to_v53_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 52 to 53. Version 53 makes sure the links used
+        in the non-interactive link component are all 'https' links.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
         for state_dict in states_dict.values():
             content_html_list = [state_dict['content']['html']]
 
@@ -2632,27 +2644,37 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 acceptable_schemes = ['https', '']
 
                 for link in links:
-                    lnk = link['url-with-value'].replace('&quot;', '')
-                    txt = link['text-with-value'].replace('&quot;', '')
+                    lnk_attr = link.get('url-with-value')
+                    txt_attr = link.get('text-with-value')
 
-                    # If text is empty and the link is not
+                    if lnk_attr is None:
+                        # Delete the link.
+                        link.extract()
+                    if txt_attr is None:
+                        # Set link text to be the url itself.
+                        txt_attr = lnk_attr
+
+                    lnk = lnk_attr.replace('&quot;', '')
+                    txt = txt_attr.replace('&quot;', '')
+
+                    # If text is empty and the link is not.
                     if len(lnk) != 0 and len(txt) == 0:
                         txt = lnk
 
-                    # If link is http
+                    # If link is http.
                     if urlparse(lnk).scheme == 'http':
-                        # Replace http with https
+                        # Replace http with https.
                         lnk = lnk.replace('http', 'https')
 
-                    # If link is invalid
+                    # If link is invalid.
                     if urlparse(lnk).scheme not in acceptable_schemes:
-                        # Delete the link
+                        # Delete the link.
                         link.extract()
 
                     link['url-with-value'] = '&quot;' + lnk + '&quot;'
                     link['text-with-value'] = '&quot;' + txt + '&quot;'
 
-            return states_dict
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -2694,7 +2716,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 57
+    CURRENT_EXP_SCHEMA_VERSION = 58
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2968,6 +2990,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v57_dict_to_v58_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v57 exploration dict into a v58 exploration dict.
+        Version 58 updates the links in the non-interactive link component
+        such that all of the links use the 'https' schema
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v57.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v58.
+        """
+        exploration_dict['schema_version'] = 58
+
+        exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 53
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -3063,6 +3109,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v56_dict_to_v57_dict(
                 exploration_dict)
             exploration_schema_version = 57
+
+        if exploration_schema_version == 57:
+            exploration_dict = cls._convert_v56_dict_to_v57_dict(
+                exploration_dict)
+            exploration_schema_version = 58
 
         return exploration_dict
 

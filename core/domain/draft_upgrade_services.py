@@ -243,6 +243,23 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v52_dict_to_v53_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 52 to 53. State
+        version 53 ensures that the content html does not contains links
+        that use a schema other than 'https'.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v51_dict_to_v52_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
