@@ -891,6 +891,9 @@ TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_SUGGESTION_EMAILS = (
     '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS = (
+    '%s/email/contributordashboardachievemtnnotificationemailhandler' % (
+        TASKQUEUE_URL_PREFIX))
 TASK_URL_DEFERRED = (
     '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 

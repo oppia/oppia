@@ -34,6 +34,7 @@ from core.domain import html_validation_service
 from core.domain import question_domain
 from core.domain import state_domain
 from core.domain import suggestion_registry
+from core.domain import taskqueue_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -1826,3 +1827,30 @@ def update_question_suggestion(
     _update_suggestion(suggestion)
 
     return suggestion
+
+
+def enqueue_contributor_ranking_notification_email_task_transactional(
+    contributor_user_id: str, contribution_type: str,
+    contribution_sub_type: str, language_code: str, rank_name: str,
+) -> None:
+    """Adds a 'send feedback email' (instant) task into the task queue.
+
+    Attributes:
+        contributor_user_id: str. The ID of the contributor.
+        contribution_type: str. The type of the contribution i.e.
+            translation or question.
+        contribution_sub_type: str. The sub type of the contribution
+            i.e. submissions/acceptances/reviews/edits.
+        language_code: str. The language code of the suggestion.
+        rank_name: str. The name of the rank that the contributor achieved.
+    """
+    payload = {
+        'contributor_user_id': contributor_user_id,
+        'contribution_type': contribution_type,
+        'contribution_sub_type': contribution_sub_type,
+        'language_code': language_code,
+        'rank_name': rank_name,
+    }
+    taskqueue_services.enqueue_task(
+        feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS,
+        payload, 0)

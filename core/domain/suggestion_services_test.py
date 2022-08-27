@@ -34,6 +34,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -4819,3 +4820,39 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
                     'en', 'fr'},
                 feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
             })
+        
+        
+class EmailsTaskqueueTests(test_utils.GenericTestBase):
+    """Tests for tasks in emails taskqueue."""
+
+    def test_create_new_instant_task(self) -> None:
+        user_id = 'user'
+        (
+            suggestion_services
+            .enqueue_contributor_ranking_notification_email_task_transactional(
+                user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE, 'hi',
+                'Initial Contributor'
+            ))
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EMAILS),
+            1)
+
+        tasks = self.get_pending_tasks(
+            queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
+        self.assertEqual(
+            tasks[0].url,
+            feconf
+            .TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS)
+        # Ruling out the possibility of None for mypy type checking.
+        assert tasks[0].payload is not None
+        self.assertEqual(tasks[0].payload['contributor_user_id'], user_id)
+        self.assertEqual(tasks[0].payload['contribution_type'],
+                             feconf.CONTRIBUTION_TYPE_TRANSLATION)
+        self.assertEqual(tasks[0].payload['contribution_sub_type'],
+                             feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE)
+        self.assertEqual(tasks[0].payload['language_code'], 'hi')
+        self.assertEqual(tasks[0].payload['rank_name'],
+                            'Initial Contributor')

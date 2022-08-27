@@ -1072,6 +1072,11 @@ URLS.extend((
         r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
         tasks.SuggestionEmailHandler),
     get_redirect_route(
+        r'%s' % (
+            feconf
+            .TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS),
+        tasks.ContributorDashboardAchievementEmailHandler),
+    get_redirect_route(
         r'%s' % feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
         tasks.FlagExplorationEmailHandler),
     get_redirect_route(
