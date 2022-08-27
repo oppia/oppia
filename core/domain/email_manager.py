@@ -351,6 +351,117 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'Review')
 }
 
+NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
+    feconf.CONTRIBUTION_TYPE_TRANSLATION: {
+        feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for submitting translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Translator Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUB_TYPE_REVIEW: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for reviewing translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Translation Reviewer Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUB_TYPE_EDIT: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for correcting translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Translation Reviewer Rank Achievement!'
+            )
+        }
+    },
+    feconf.CONTRIBUTION_TYPE_QUESTION: {
+        feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for submitting  practice questions. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Question Submitter Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUB_TYPE_REVIEW: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully '
+                'achieved the %s '
+                'rank for reviewing  practice questions. Your efforts help '
+                'Oppia grow better every day and support students around the '
+                'world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Question Reviewer Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUB_TYPE_EDIT: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully '
+                'achieved the %s '
+                'rank for correcting practice questions. Your efforts help '
+                'Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to '
+                'contribute!<br><br>'
+                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Question Reviewer Rank Achievement!'
+            )
+        }
+    }
+}
+
 SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: user_services.is_moderator,
@@ -380,6 +491,8 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1841,6 +1954,62 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
             recipient_email=reviewer_emails[index])
+
+
+def send_mail_to_notify_contributor_ranking_achievement(
+    contributor_ranking_email_info: (
+        suggestion_registry.ContributorMilestoneEmailInfo)) -> None:
+    """Sends an email to translation/question submitters and reviewers when
+    they achieve a new rank.
+
+    Args:
+        contributor_ranking_email_info:
+            ContributorMilestoneEmailInfo. An object with contributor ranking
+            email information.
+    """
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
+    recipient_username = user_services.get_username(
+        contributor_ranking_email_info.contributor_user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        contributor_ranking_email_info.contributor_user_id
+    ).can_receive_email_updates
+
+    if not can_user_receive_email:
+        logging.error('This user can not recieve emails.')
+        return
+
+    email_template = NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT[
+        contributor_ranking_email_info.contribution_type][
+            contributor_ranking_email_info.contribution_sub_type]
+    email_body = ''
+    if contributor_ranking_email_info.contribution_type == (
+        feconf.CONTRIBUTION_TYPE_TRANSLATION):
+        language = utils.get_supported_audio_language_description(
+            contributor_ranking_email_info.language_code)
+        email_body = email_template['email_body_template'] % (
+                recipient_username,
+                contributor_ranking_email_info.rank_name,
+                language,
+                feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL
+            )
+    else:
+        email_body = email_template['email_body_template'] % (
+                recipient_username,
+                contributor_ranking_email_info.rank_name,
+                feconf.OPPIA_SITE_URL,
+                feconf.CONTRIBUTOR_DASHBOARD_URL
+            )
+
+    _send_email(
+        contributor_ranking_email_info.contributor_user_id,
+        feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
+        email_template['email_subject'], email_body,
+        feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_accepted_voiceover_application_email(
