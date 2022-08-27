@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the checkpoint features.
  */
 
+var action = require('../webdriverio_utils/action.js');
 var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
