@@ -428,6 +428,7 @@ import { VersionedExplorationCachingService } from 'pages/exploration-editor-pag
 import { ExplorationSaveService } from 'pages/exploration-editor-page/services/exploration-save.service';
 import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
+import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -888,5 +889,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationSaveService', ExplorationSaveService],
   ['ExplorationAutomaticTextToSpeechService',
     ExplorationAutomaticTextToSpeechService],
-  ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService]
+  ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
+  ['CompareVersionsService', CompareVersionsService]
 ];
