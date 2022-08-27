@@ -172,6 +172,11 @@ describe('Topic editor functionality', function() {
       await (
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 2', 'Concept card explanation', true));
+      // A minimum of two questions are required for skill to get assigned in a
+      // topic’s diagnostic test.
+      await workflow.createQuestion();
+      await workflow.createQuestion();
+
       await topicsAndSkillsDashboardPage.get();
       await (
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
@@ -179,10 +184,6 @@ describe('Topic editor functionality', function() {
       await skillEditorPage.addRubricExplanationForDifficulty(
         'Easy', 'Second explanation for easy difficulty.');
       await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-      // A minimum of two questions are required for skill to get assigned in a
-      // topic’s diagnostic test.
-      await workflow.createQuestion();
-      await workflow.createQuestion();
 
       var TOPIC_NAME = 'TASE2';
       var TOPIC_URL_FRAGMENT_NAME = 'tase-two';
