@@ -26,7 +26,7 @@ import { RouterService } from '../services/router.service';
 import { EditorNavbarBreadcrumbComponent } from './editor-navbar-breadcrumb.component';
 
 class MockNgbModal {
-  open() {
+  open(): { result: Promise<void> } {
     return {
       result: Promise.resolve()
     };

@@ -42,14 +42,14 @@ export class StateNameEditorComponent
   stateNameEditorIsShown: boolean;
 
   constructor(
-    private stateEditorService: StateEditorService,
-    private stateNameService: StateNameService,
-    private focusManagerService: FocusManagerService,
+    private editabilityService: EditabilityService,
     private explorationStatesService: ExplorationStatesService,
     private externalSaveService: ExternalSaveService,
-    private routerService: RouterService,
+    private focusManagerService: FocusManagerService,
     private normalizeWhitespacePipe: NormalizeWhitespacePipe,
-    private editabilityService: EditabilityService,
+    private routerService: RouterService,
+    private stateEditorService: StateEditorService,
+    private stateNameService: StateNameService,
   ) {}
 
   openStateNameEditor(): void {

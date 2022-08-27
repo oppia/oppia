@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-interface getPracticeSessionsData {
+interface GetPracticeSessionsData {
   skill_ids_to_descriptions_map: object;
   topic_name: string;
 }
@@ -34,8 +34,8 @@ export class PracticeSessionsBackendApiService {
   ) {}
 
   async _fetchPracticeSessionsData(practiceSessionsDataUrl: string):
-     Promise<getPracticeSessionsData> {
-    return this.http.get<getPracticeSessionsData>(
+     Promise<GetPracticeSessionsData> {
+    return this.http.get<GetPracticeSessionsData>(
       practiceSessionsDataUrl
     ).toPromise().then(backendResponse => {
       return backendResponse;
@@ -45,7 +45,7 @@ export class PracticeSessionsBackendApiService {
   }
 
   async fetchPracticeSessionsData(storyUrlFragment: string):
-     Promise<getPracticeSessionsData> {
+     Promise<GetPracticeSessionsData> {
     return this._fetchPracticeSessionsData(storyUrlFragment);
   }
 }

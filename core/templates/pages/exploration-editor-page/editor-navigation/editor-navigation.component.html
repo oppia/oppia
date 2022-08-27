@@ -19,7 +19,7 @@
             </a>
             <div [hidden]="!countWarnings()" class="oppia-editor-warnings-indicator" (click)="selectMainTab()" [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
               <span class="oppia-editor-warnings-count">
-                {{countWarnings()}}
+                {{ countWarnings() }}
               </span>
             </div>
           </li>
@@ -74,7 +74,7 @@
             </a>
             <div [hidden]="!getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
               <span class="oppia-exploration-open-threads-count">
-                  {{getOpenThreadsCount()}}&nbsp;open
+                  {{ getOpenThreadsCount() }}&nbsp;open
               </span>
             </div>
           </li>

@@ -71,13 +71,13 @@ describe('Editor Navigation Component', () => {
   class MockInternetConnectivityService {
     onInternetStateChange = mockConnectionServiceEmitter;
 
-    isOnline() {
+    isOnline(): boolean {
       return true;
     }
   }
 
   class MockUserService {
-    getUserInfoAsync() {
+    getUserInfoAsync(): Promise<UserInfo> {
       return Promise.resolve({
         isLoggedIn: () => true
       } as UserInfo);

@@ -78,7 +78,7 @@ export class SettingsTabComponent
   errorMessage: string;
   isRolesFormOpen: boolean;
   newMemberUsername: string;
-  newMemberRole;
+  newMemberRole: { name: string; value: string};
   isVoiceoverFormOpen: boolean;
   newVoiceArtistUsername: string;
   hasPageLoaded: boolean;

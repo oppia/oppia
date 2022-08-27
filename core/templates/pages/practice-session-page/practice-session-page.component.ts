@@ -71,9 +71,9 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   }
 
   _fetchSkillDetails(): void {
-    var topicUrlFragment = (
+    const topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
-    var practiceSessionsDataUrl = this.urlInterpolationService
+    const practiceSessionsDataUrl = this.urlInterpolationService
       .interpolateUrl(
         PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL, {
           topic_url_fragment: topicUrlFragment,
@@ -81,14 +81,14 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
             this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
           stringified_subtopic_ids: this.stringifiedSubtopicIds
         });
-    var practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+    const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: (
           this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
         stringified_subtopic_ids: this.stringifiedSubtopicIds
       });
-    var topicViewerUrl = this.urlInterpolationService.interpolateUrl(
+    const topicViewerUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.TOPIC_VIEWER_PAGE, {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: (
@@ -97,9 +97,9 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
 
     this.practiceSessionsBackendApiService.fetchPracticeSessionsData(
       practiceSessionsDataUrl).then((result) => {
-      var skillList = [];
-      var skillDescriptions = [];
-      for (var skillId in result.skill_ids_to_descriptions_map) {
+      const skillList = [];
+      const skillDescriptions = [];
+      for (let skillId in result.skill_ids_to_descriptions_map) {
         skillList.push(skillId);
         skillDescriptions.push(
           result.skill_ids_to_descriptions_map[skillId]);

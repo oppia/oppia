@@ -132,7 +132,7 @@ export class ExplorationSaveService {
     // Resolved when save is done
     // (regardless of success or failure of the operation).
     return new Promise((resolve, reject) => {
-      var changeList = this.changeListService.getChangeList();
+      const changeList = this.changeListService.getChangeList();
 
       if (this.explorationRightsService.isPrivate()) {
         this.siteAnalyticsService
@@ -217,11 +217,11 @@ export class ExplorationSaveService {
       }
 
       this.explorationDataService.getLastSavedDataAsync().then((data) => {
-        var oldStates = this.statesObjectFactory.createFromBackendDict(
+        const oldStates = this.statesObjectFactory.createFromBackendDict(
           data.states).getStateObjects();
-        var newStates = this.explorationStatesService.getStates()
+        const newStates = this.explorationStatesService.getStates()
           .getStateObjects();
-        var diffGraphData = this.explorationDiffService.getDiffGraphData(
+        const diffGraphData = this.explorationDiffService.getDiffGraphData(
           oldStates, newStates, [{
             changeList: this.changeListService.getChangeList(),
             directionForwards: true
@@ -248,7 +248,7 @@ export class ExplorationSaveService {
           return;
         }
 
-        var modalInstance = this.ngbModal.open(ExplorationSaveModalComponent, {
+        let modalInstance = this.ngbModal.open(ExplorationSaveModalComponent, {
           backdrop: 'static',
           windowClass: 'oppia-save-exploration-modal',
         });
@@ -297,14 +297,14 @@ export class ExplorationSaveService {
       // If the metadata has not yet been specified, open the pre-publication
       // 'add exploration metadata' modal.
       if (this.isAdditionalMetadataNeeded()) {
-        var modalInstance = this.ngbModal.open(
+        const modalInstance = this.ngbModal.open(
           ExplorationMetadataModalComponent, {
             backdrop: 'static',
           });
 
         modalInstance.result.then((metadataList) => {
           if (metadataList.length > 0) {
-            var commitMessage = (
+            const commitMessage = (
               'Add metadata: ' + metadataList.join(', ') + '.');
 
             if (onStartLoadingCallback) {
