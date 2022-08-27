@@ -2204,7 +2204,7 @@ def update_translation_contribution_stats_at_submission(
 
     Args:
         suggestion: Suggestion. The suggestion domain object that is being
-            submitted
+            submitted.
         user_id: str. The ID of the corresponding submitter.
         target_id: str. The ID of the target entity being suggested to.
     """
