@@ -131,8 +131,8 @@
     <oppia-settings-tab ng-show="$ctrl.getActiveTabName() === 'settings'" [current-user-is-curriculum-admin]="$ctrl.currentUserIsCurriculumAdmin" [current-user-is-moderator]="$ctrl.currentUserIsModerator">
     </oppia-settings-tab>
 
-    <history-tab ng-show="$ctrl.getActiveTabName() === 'history'">
-    </history-tab>
+    <oppia-history-tab ng-show="$ctrl.getActiveTabName() === 'history'">
+    </oppia-history-tab>
 
     <feedback-tab ng-show="$ctrl.getActiveTabName() === 'feedback'">
     </feedback-tab>

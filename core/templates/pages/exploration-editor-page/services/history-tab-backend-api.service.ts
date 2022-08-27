@@ -22,6 +22,7 @@ import { Injectable } from '@angular/core';
 
 interface HistoryTabDict {
   summaries: string[];
+  snapshots?: string;
 }
 
 interface HistoryTabCheckRevertValidDict {
