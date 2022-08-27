@@ -263,6 +263,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             return MockTask()
         swap_popen = self.swap(
             subprocess, 'Popen', mock_popen)
+        swap_run_lighthouse_tests = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_checks',
+            lambda *unused_args: None, expected_args=(('accessibility', '1'),))
         swap_isdir = self.swap(
             os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
@@ -273,14 +276,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, swap_emulator_mode:
-                    with swap_popen, swap_build:
+                    with swap_popen, swap_build, swap_run_lighthouse_tests:
                         run_lighthouse_tests.main(
                             args=['--mode', 'accessibility', '--shard', '1'])
 
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
-        self.assertIn(
-            'Lighthouse checks completed successfully.', self.print_arr)
 
     def test_run_lighthouse_tests_in_performance_mode(self) -> None:
         class MockTask:
@@ -289,6 +290,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 return (
                     b'Task output',
                     b'No error.')
+        
+        swap_run_lighthouse_tests = self.swap_with_checks(
+            run_lighthouse_tests, 'run_lighthouse_checks',
+            lambda *unused_args: None, expected_args=(('performance', '1'),))
         def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
@@ -303,12 +308,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, swap_build:
-                        with swap_popen:
+                        with swap_popen, swap_run_lighthouse_tests:
                             run_lighthouse_tests.main(
                                 args=['--mode', 'performance', '--shard', '1'])
 
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
-        self.assertIn(
-            'Lighthouse checks completed successfully.', self.print_arr)

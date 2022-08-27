@@ -35,10 +35,12 @@ class SetupTests(test_utils.GenericTestBase):
     """Unit tests for setup.py."""
 
     def test_setuptools_is_invoked_with_correct_parameters(self) -> None:
+        packages = (
+            'module1==2.1.2\n'
+            'module2==3.2.3\n'
+            'module3==4.3.4\n')
         with open('dummy_requirements.txt', 'w', encoding='utf-8') as f:
-            f.write('module1==2.1.2\n')
-            f.write('module2==3.2.3\n')
-            f.write('module3==4.3.4\n')
+            f.write(packages)
 
         dummy_file_object = open('dummy_requirements.txt', encoding='utf-8')
 
@@ -47,15 +49,10 @@ class SetupTests(test_utils.GenericTestBase):
             lambda *unused_args, **unused_kwargs: dummy_file_object,
             expected_args=(('requirements.txt',),))
 
-        with open(
-            'dummy_requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
-            # The 'parse_requirements' returns a list of 'Requirement' objects.
-            # We need to transform these to strings using the str() function.
-            required_packages = [
-                str(requirement)  # pylint: disable=replace-disallowed-function-calls
-                for requirement in pkg_resources.parse_requirements(
-                    requirements_txt)
-            ]
+        required_packages = [
+            str(requirement)
+            for requirement in pkg_resources.parse_requirements(packages)
+        ]
 
         swap_setup = self.swap_with_checks(
             setuptools, 'setup', lambda **unused_kwargs: None,
