@@ -452,7 +452,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
                         # Additional Log:
                         for state_name in new_exploration.states:
-                            if state_name not in new_vh_model:
+                            if state_name not in (
+                                new_vh_model.state_version_history
+                            ):
                                 print(
                                     'State name %s was not found in the '
                                     'version history model for version %d' % (
