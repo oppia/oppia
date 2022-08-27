@@ -87,7 +87,7 @@ describe('Checkpoints functionality', function() {
     await adminPage.editConfigProperty(
       'Enable checkpoints feature.', 'Boolean',
       async(elem) => await action.setValue(
-        'Enable checkpoints feature', elem, true));
+        'Enable checkpoints feature', elem, true, false));
 
     // The below lines enable the checkpoint_celebration flag in prod mode.
     // They should be removed after the checkpoint_celebration flag is
@@ -118,7 +118,7 @@ describe('Checkpoints functionality', function() {
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
         await action.setValue(
-          'Topic ID', elem, topicId);
+          'Topic ID', elem, topicId, false);
       });
 
     await topicsAndSkillsDashboardPage.get();
