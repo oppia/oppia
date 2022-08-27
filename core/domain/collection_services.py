@@ -47,7 +47,7 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, overload
+    Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, cast, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 
@@ -772,34 +772,91 @@ def apply_change_list(
         ]
         for change in changes:
             if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
-                collection.add_node(change.exploration_id)
+                # Here we use cast because we are narrowing down the type from
+                # CollectionChange to a specific change command.
+                add_collection_node_change = cast(
+                    collection_domain.AddCollectionNodeChange,
+                    change
+                )
+                collection.add_node(add_collection_node_change.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
-                collection.delete_node(change.exploration_id)
+                # Here we use cast because we are narrowing down the type from
+                # CollectionChange to a specific change command.
+                delete_collection_node_change = cast(
+                    collection_domain.DeleteCollectionNodeChange,
+                    change
+                )
+                collection.delete_node(
+                    delete_collection_node_change.exploration_id
+                )
             elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.first_index, int)
-                assert isinstance(change.second_index, int)
-                collection.swap_nodes(change.first_index, change.second_index)
+                # Here we use cast because we are narrowing down the type from
+                # CollectionChange to a specific change command.
+                swap_collection_nodes_change = cast(
+                    collection_domain.SwapCollectionNodesChange,
+                    change
+                )
+                collection.swap_nodes(
+                    swap_collection_nodes_change.first_index,
+                    swap_collection_nodes_change.second_index
+                )
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if (change.property_name ==
+                # Here we use cast because we are narrowing down the type from
+                # CollectionChange to a specific change command.
+                edit_collection_prop_change = cast(
+                    collection_domain.EditCollectionPropertyChange,
+                    change
+                )
+                if (edit_collection_prop_change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
-                    collection.update_title(change.new_value)
-                elif (change.property_name ==
+                    # Here we use cast because in this 'if clause' we are
+                    # updating the title of a collection which can only be
+                    # of type string. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    title = cast(
+                         str, edit_collection_prop_change.new_value
+                    )
+                    collection.update_title(title)
+                elif (edit_collection_prop_change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_CATEGORY):
-                    collection.update_category(change.new_value)
-                elif (change.property_name ==
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the category of a collection which can only be
+                    # of type string. So, to rule out all other property types
+                    # for MyPy type checking, we used cast here.
+                    category = cast(
+                        str, edit_collection_prop_change.new_value
+                    )
+                    collection.update_category(category)
+                elif (edit_collection_prop_change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
-                    collection.update_objective(change.new_value)
-                elif (change.property_name ==
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the objective of a collection which can only be
+                    # of type string. So, to rule out all other property types
+                    # for MyPy type checking, we used cast here.
+                    objective = cast(
+                        str, edit_collection_prop_change.new_value
+                    )
+                    collection.update_objective(objective)
+                elif (edit_collection_prop_change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
-                    collection.update_language_code(change.new_value)
-                elif (change.property_name ==
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the language_code of a collection which can
+                    # only be of type string. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    language_code = cast(
+                        str, edit_collection_prop_change.new_value
+                    )
+                    collection.update_language_code(language_code)
+                elif (edit_collection_prop_change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_TAGS):
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.new_value, list)
-                    collection.update_tags(change.new_value)
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the tags of a collection which can only be of
+                    # type List[str]. So, to rule out all other property types
+                    # for MyPy type checking, we used cast here.
+                    tags = cast(
+                        List[str], edit_collection_prop_change.new_value
+                    )
+                    collection.update_tags(tags)
             elif (change.cmd ==
                   collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an

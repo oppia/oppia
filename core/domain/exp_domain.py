@@ -61,6 +61,29 @@ if MYPY:  # pragma: no cover
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
+AllowedEditStatePropertyCmdTypes = Union[
+    int,
+    bool,
+    str,
+    state_domain.SubtitledHtmlDict,
+    List[param_domain.ParamChange],
+    state_domain.RecordedVoiceoversDict,
+    state_domain.WrittenTranslationsDict,
+    List[state_domain.AnswerGroup],
+    state_domain.OutcomeDict,
+    state_domain.HintDict,
+    state_domain.SolutionDict
+]
+
+AllowedEditExplorationPropertyCmdTypes = Union[
+    bool,
+    str,
+    List[str],
+    Dict[str, param_domain.ParamSpecDict],
+    List[param_domain.ParamChangeDict]
+]
+
+
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 # TODO(bhenning): Prior to July 2015, exploration changes involving rules were
@@ -422,6 +445,110 @@ class ExplorationChange(change_domain.BaseChange):
     DEPRECATED_COMMANDS: List[str] = [
         'clone', 'add_gadget', 'edit_gadget_property',
         'delete_gadget', 'rename_gadget']
+
+
+class CreateNewExplorationCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_CREATE_NEW command.
+    """
+
+    category: str
+    title: str
+
+
+class AddExplorationStateCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_ADD_STATE command.
+    """
+
+    state_name: str
+
+
+class DeleteExplorationStateCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_DELETE_STATE command.
+    """
+
+    state_name: str
+
+
+class RenameExplorationStateCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_RENAME_STATE command.
+    """
+
+    new_state_name: str
+    old_state_name: str
+
+
+class AddWrittenTranslationCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_ADD_WRITTEN_TRANSLATION command.
+    """
+
+    state_name: str
+    content_id: str
+    language_code: str
+    content_html: str
+    translation_html: str
+    data_format: str
+
+
+class MarkWrittenTranslationAsNeedingUpdateCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE command.
+    """
+
+    content_id: str
+    language_code: str
+    state_name: str
+
+
+class MarkWrittenTranslationsAsNeedingUpdateCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE command.
+    """
+
+    content_id: str
+    state_name: str
+
+
+class EditExplorationStatePropertyCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command.
+    """
+
+    property_name: str
+    state_name: str
+    new_value: AllowedEditStatePropertyCmdTypes
+    old_value: AllowedEditStatePropertyCmdTypes
+
+
+class EditExplorationPropertyCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: AllowedEditExplorationPropertyCmdTypes
+    old_value: AllowedEditExplorationPropertyCmdTypes
+
+
+class MigrateStatesSchemaToLatestVersionCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: int
+    to_version: int
+
+
+class RevertExplorationCmd(ExplorationChange):
+    """class representing the ExplorationChange's
+    CMD_REVERT_COMMIT command.
+    """
+
+    version_number: int
 
 
 class TransientCheckpointUrlDict(TypedDict):

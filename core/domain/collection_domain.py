@@ -33,7 +33,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from typing_extensions import Final, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -189,6 +189,104 @@ class CollectionChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class CreateNewCollectionChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_CREATE_NEW command.
+    """
+
+    category: str
+    title: str
+
+
+class AddCollectionNodeChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_ADD_COLLECTION_NODE command.
+    """
+
+    exploration_id: str
+
+
+class DeleteCollectionNodeChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_DELETE_COLLECTION_NODE command.
+    """
+
+    exploration_id: str
+
+
+class SwapCollectionNodesChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_SWAP_COLLECTION_NODES command.
+    """
+
+    first_index: int
+    second_index: int
+
+
+class EditCollectionPropertyChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: Union[str, List[str]]
+    old_value: Union[str, List[str]]
+
+
+class EditCollectionNodePropertyChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_NODE_PROPERTY command.
+    """
+
+    exploration_id: str
+    property_name: str
+    new_value: str
+    old_value: str
+
+
+class MigrateSchemaToLatestVersionChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: int
+    to_version: int
+
+
+class AddCollectionSkillChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_ADD_COLLECTION_SKILL command.
+    """
+
+    name: str
+
+
+class DeleteCollectionSkillChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_DELETE_COLLECTION_SKILL command.
+    """
+
+    skill_id: str
+
+
+class AddQuestionIdToSkillChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_ADD_QUESTION_ID_TO_SKILL command.
+    """
+
+    question_id: str
+    skill_id: str
+
+
+class RemoveQuestionIdFromSkillChange(CollectionChange):
+    """class representing the CollectionChange's
+    CMD_ADD_QUESTION_ID_TO_SKILL command.
+    """
+
+    question_id: str
+    skill_id: str
 
 
 class CollectionNodeDict(TypedDict):

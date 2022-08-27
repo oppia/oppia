@@ -27,7 +27,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -134,89 +134,107 @@ class DraftUpgradeUtil:
             # The change object has the key 'new_value' only if the
             # cmd is 'CMD_EDIT_STATE_PROPERTY' or
             # 'CMD_EDIT_EXPLORATION_PROPERTY'.
-            new_value = change.new_value
-            if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                # Ruling out the possibility of any other type for MyPy
-                # type checking, because here 'new_value' is a value of
-                # attribute that was dynamically defined on change_domain
-                # and that attribute has str type. Thus to convert the
-                # type, we used assert here.
-                assert isinstance(new_value, dict)
-                new_value['html'] = conversion_fn(new_value['html'])
-            elif (change.property_name ==
+            # Here we use cast because we are narrowing down the type from
+            # ExplorationChange to a specific change command.
+            edit_state_property_cmd = cast(
+                exp_domain.EditExplorationStatePropertyCmd,
+                change
+            )
+            new_value = edit_state_property_cmd.new_value
+            if (
+                edit_state_property_cmd.property_name ==
+                exp_domain.STATE_PROPERTY_CONTENT
+            ):
+                # Here we use cast because in this 'if clause' we are
+                # updating the content of a State which can only be of
+                # type SubtitledHtmlDict. So, to rule out all other
+                # property types for MyPy type checking, we used cast here.
+                state_content = cast(state_domain.SubtitledHtmlDict, new_value)
+                state_content['html'] = conversion_fn(state_content['html'])
+            elif (edit_state_property_cmd.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                # Only customization args with the key 'choices' have HTML
-                # content in them.
-                # Ruling out the possibility of any other type for MyPy type
-                # checking because here 'new_value' is a value of attribute
-                # that was dynamically defined on change_domain and that
-                # attribute has str type. Thus to convert the type, we used
-                # assert here.
-                assert isinstance(new_value, dict)
-                if 'choices' in new_value.keys():
+                # Here we use cast because in this 'elif clause' we are
+                # updating the interaction's customization args of a State
+                # which can only be of type Dict[str, Dict[str, Any]]. So,
+                # to rule out all other property types for MyPy type checking,
+                # we used cast here.
+                interaction_cust_arg = cast(
+                    Dict[str, Dict[str, Any]], new_value
+                )
+                if 'choices' in interaction_cust_arg.keys():
                     for value_index, value in enumerate(
-                            new_value['choices']['value']):
+                            interaction_cust_arg['choices']['value']):
                         if isinstance(value, dict) and 'html' in value:
-                            new_value['choices']['value'][value_index][
-                                'html'
-                            ] = conversion_fn(value['html'])
+                            interaction_cust_arg['choices']['value'][
+                                value_index
+                            ]['html'] = conversion_fn(value['html'])
                         elif isinstance(value, str):
-                            new_value['choices']['value'][value_index] = (
-                                conversion_fn(value))
-            elif (change.property_name ==
+                            interaction_cust_arg['choices']['value'][
+                                value_index
+                            ] = conversion_fn(value)
+            elif (edit_state_property_cmd.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                # Ruling out the possibility of any other type for MyPy
-                # type checking, because here 'new_value' is a value of
-                # attribute that was dynamically defined on change_domain
-                # and that attribute has str type. Thus to convert the
-                # type, we used assert here.
-                assert isinstance(new_value, dict)
+                # Here we use cast because in this 'elif clause' we are
+                # updating the written_translations of a State which can
+                # only be of type WrittenTranslationsDict. So, to rule out
+                # all other property types for MyPy type checking, we used
+                # cast here.
+                written_translations_dict = cast(
+                    state_domain.WrittenTranslationsDict, new_value
+                )
                 for content_id, language_code_to_written_translation in (
-                        new_value['translations_mapping'].items()):
+                        written_translations_dict[
+                            'translations_mapping'
+                        ].items()
+                    ):
                     for language_code in (
                             language_code_to_written_translation.keys()):
-                        new_value['translations_mapping'][
-                            content_id][language_code]['html'] = (
-                                conversion_fn(new_value[
+                        # In _convert_* functions, we allow less strict typing
+                        # because here we are working with previous versions
+                        # of the domain object and in previous versions of the
+                        # domain object there are some fields(eg: html) that are
+                        # discontinued in the latest domain object. So, while
+                        # accessing these discontinued fields MyPy throws an
+                        # error. Thus to avoid the error, we used ignore here.
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code]['html'] = (  # type: ignore[misc]
+                                conversion_fn(written_translations_dict[
                                     'translations_mapping'][content_id][
-                                        language_code]['html'])
+                                        language_code]['html'])  # type: ignore[misc]
                             )
-            elif (change.property_name ==
+            elif (edit_state_property_cmd.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   new_value is not None):
-                # Ruling out the possibility of any other type for MyPy
-                # type checking, because here 'new_value' is a value of
-                # attribute that was dynamically defined on change_domain
-                # and that attribute has str type. Thus to convert the
-                # type, we used assert here.
-                assert isinstance(new_value, dict)
-                new_value = (
+                # Here we use cast because in this 'elif clause' we are
+                # updating the interaction's default_outcome of a State
+                # which can only be of type OutcomeDict. So, to rule out
+                # all other property types for MyPy type checking, we used
+                # cast here.
+                default_outcome = cast(state_domain.OutcomeDict, new_value)
+                default_outcome = (
                     state_domain.Outcome.convert_html_in_outcome(
-                        new_value, conversion_fn))
-            elif (change.property_name ==
+                        default_outcome, conversion_fn))
+            elif (edit_state_property_cmd.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                # Ruling out the possibility of any other type for MyPy
-                # type checking, because here 'new_value' is a value of
-                # attribute that was dynamically defined on change_domain
-                # and that attribute has str type. Thus to convert the
-                # type, we used assert here.
-                assert isinstance(new_value, list)
-                hint_dicts: List[state_domain.HintDict] = new_value
-                new_value = [
+                # Here we use cast because in this 'elif clause' we are
+                # updating the interaction's hints of a State which can only
+                # be of type HintDict. So, to rule out all other property
+                # types for MyPy type checking, we used cast here.
+                hints = cast(List[state_domain.HintDict], new_value)
+                hints = [
                     (state_domain.Hint.convert_html_in_hint(
                         hint_dict, conversion_fn))
-                    for hint_dict in hint_dicts]
-            elif (change.property_name ==
+                    for hint_dict in hints]
+            elif (edit_state_property_cmd.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
                   new_value is not None):
-                # Ruling out the possibility of any other type for MyPy
-                # type checking, because here 'new_value' is a value of
-                # attribute that was dynamically defined on change_domain
-                # and that attribute has str type. Thus to convert the
-                # type, we used assert here.
-                assert isinstance(new_value, dict)
-                new_value['explanation']['html'] = (
-                    conversion_fn(new_value['explanation']['html']))
+                # Here we use cast because in this 'elif clause' we are
+                # updating the interaction's solution of a State which can
+                # only be of type SolutionDict. So, to rule out all other
+                # property types for MyPy type checking, we used cast here.
+                solution = cast(state_domain.SolutionDict, new_value)
+                solution['explanation']['html'] = (
+                    conversion_fn(solution['explanation']['html']))
                 # TODO(#9413): Find a way to include a reference to the
                 # interaction type in the Draft change lists.
                 # See issue: https://github.com/oppia/oppia/issues/9413.
@@ -225,37 +243,43 @@ class DraftUpgradeUtil:
                 # This code below should be updated if any new interaction
                 # is allowed to have HTML in the solution correct answer
                 # The typecheckings below can be avoided once #9413 is fixed.
-                if new_value['correct_answer']:
-                    if isinstance(new_value['correct_answer'], list):
+                if solution['correct_answer']:
+                    if isinstance(solution['correct_answer'], list):
                         for list_index, html_list in enumerate(
-                                new_value['correct_answer']):
+                                solution['correct_answer']):
                             if isinstance(html_list, list):
                                 for answer_html_index, answer_html in enumerate(
                                         html_list):
                                     if isinstance(answer_html, str):
-                                        new_value['correct_answer'][list_index][
+                                        # Here we use MyPy ignore because
+                                        # correct_answer is a union of all
+                                        # acceptable answer types and here
+                                        # we are indexing on union type which
+                                        # is not allowed by MyPy. So, because
+                                        # of this MyPy throw a error. To avoid
+                                        # the error, we used ignore here.
+                                        solution['correct_answer'][list_index][  # type: ignore[index]
                                             answer_html_index] = (
                                                 conversion_fn(answer_html))
-            elif (change.property_name ==
+            elif (edit_state_property_cmd.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 html_field_types_to_rule_specs = (
                     rules_registry.Registry.get_html_field_types_to_rule_specs(
                         state_schema_version=41))
-                # Ruling out the possibility of any other type for MyPy
-                # type checking, because here 'new_value' is a value of
-                # attribute that was dynamically defined on change_domain
-                # and that attribute has str type. Thus to convert the
-                # type, we used assert here.
-                assert isinstance(new_value, list)
-                answer_group_dicts: List[state_domain.AnswerGroupDict] = (
-                    new_value
+                # Here we use cast because in this 'elif clause' we are
+                # updating the interaction's answer_groups of a State which
+                # can only be of type AnswerGroupDict. So, to rule out all
+                # other property types for MyPy type checking, we used cast
+                # here.
+                answer_groups = cast(
+                    List[state_domain.AnswerGroupDict], new_value
                 )
-                new_value = [
+                answer_groups = [
                     state_domain.AnswerGroup.convert_html_in_answer_group(
                         answer_group, conversion_fn,
                         html_field_types_to_rule_specs
                     )
-                    for answer_group in answer_group_dicts]
+                    for answer_group in answer_groups]
             if new_value is not None:
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': change.cmd,
@@ -630,15 +654,16 @@ class DraftUpgradeUtil:
         for change in draft_change_list:
             if (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                # Find all RuleSpecs in AnwerGroups and change
-                # CaseSensitiveEquals rule types to Equals.
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(change.new_value, list)
-                answer_group_dicts: List[state_domain.AnswerGroupDict] = (
+                # Here we use cast because in this 'if clause' we are
+                # updating the interaction's answer_groups of a State
+                # which can only be of type AnswerGroupDict. So, to
+                # rule out all other property types for MyPy type checking,
+                # we used cast here.
+                answer_groups = cast(
+                    List[state_domain.AnswerGroupDict],
                     change.new_value
                 )
-                for answer_group_dict in answer_group_dicts:
+                for answer_group_dict in answer_groups:
                     for rule_spec_dict in answer_group_dict['rule_specs']:
                         if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
                             rule_spec_dict['rule_type'] = 'Equals'
@@ -808,13 +833,18 @@ class DraftUpgradeUtil:
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-                # Get the language code to access the language code correctly.
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.new_value, dict)
-                new_voiceovers_mapping: Dict[
-                    str, Dict[str, state_domain.VoiceoverDict]
-                ] = change.new_value['voiceovers_mapping']
+                # Here we use cast because in this 'if clause' we are
+                # updating the recorded_voiceovers of a State which can
+                # only be of type RecordedVoiceoversDict. So, to rule out
+                # all other property types for MyPy type checking, we used
+                # cast here.
+                recorded_voiceovers = cast(
+                    state_domain.RecordedVoiceoversDict,
+                    change.new_value
+                )
+                new_voiceovers_mapping = recorded_voiceovers[
+                    'voiceovers_mapping'
+                ]
                 # Initialize the value to migrate draft state to v31.
                 language_codes_to_audio_metadata = (
                     new_voiceovers_mapping.values())
@@ -851,14 +881,19 @@ class DraftUpgradeUtil:
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(change.new_value, dict)
-                new_value: state_domain.AnswerGroupDict = change.new_value
+                # Here we use cast because in this 'if clause' we are
+                # updating the interaction's answer_groups of a State
+                # which can only be of type AnswerGroupDict. So, to rule
+                # out all other property types for MyPy type checking,
+                # we used cast here.
+                answer_groups = cast(
+                    state_domain.AnswerGroupDict,
+                    change.new_value
+                )
                 answer_group_dict: state_domain.AnswerGroupDict = {
-                        'rule_specs': new_value['rule_specs'],
-                        'outcome': new_value['outcome'],
-                        'training_data': new_value['training_data'],
+                        'rule_specs': answer_groups['rule_specs'],
+                        'outcome': answer_groups['outcome'],
+                        'training_data': answer_groups['training_data'],
                         'tagged_skill_misconception_id': None
                 }
                 draft_change_list[i] = exp_domain.ExplorationChange({
