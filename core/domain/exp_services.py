@@ -931,7 +931,7 @@ def apply_change_list(
                 )
                 target_version_is_current_state_schema_version = (
                     migrate_states_schema_cmd.to_version ==
-                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION)
                 )
                 if not target_version_is_current_state_schema_version:
                     raise Exception(

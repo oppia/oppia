@@ -539,8 +539,8 @@ class MigrateStatesSchemaToLatestVersionCmd(ExplorationChange):
     CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION command.
     """
 
-    from_version: int
-    to_version: int
+    from_version: str
+    to_version: str
 
 
 class RevertExplorationCmd(ExplorationChange):
