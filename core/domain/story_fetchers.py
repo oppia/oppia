@@ -337,9 +337,10 @@ def get_learner_group_syllabus_story_summaries(
         list(LearnerGroupSyllabusStorySummaryDict). The story summaries
         corresponds to given story ids.
     """
-    # If story check is applied only for mypy type checks. All story ids are
-    # supposed to be valid as a part of validation done for learner group
-    # syllabus before calling this function.
+    # Validating if story exists before adding it to all stories list is only
+    # done for mypy type checks as all story ids are supposed to be valid as
+    # a part of validation done for learner group syllabus before calling
+    # this function.
     all_stories = [
         story for story in get_stories_by_ids(story_ids) if story
     ]
@@ -350,7 +351,9 @@ def get_learner_group_syllabus_story_summaries(
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
     topic_id_to_topic_map = {}
     for topic in topics:
-        # Ruling out the possibility of None for mypy type checking.
+        # Ruling out the possibility of None for mypy type checking. Topic is
+        # guaranteed to exist as a part of validation done for story ids since
+        # story is bound to be part of a topic.
         assert topic is not None
         topic_id_to_topic_map[topic.id] = topic
 
@@ -458,7 +461,7 @@ def get_user_progress_in_story_chapters(
     """
     all_valid_story_nodes: List[story_domain.StoryNode] = []
     for story in get_stories_by_ids(story_ids):
-        if story:
+        if story is not None:
             all_valid_story_nodes.extend(story.story_contents.nodes)
     exp_ids = [
         node.exploration_id for node in all_valid_story_nodes
