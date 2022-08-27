@@ -10984,6 +10984,13 @@ ngx-infinite-scroll@^10.0.1:
     "@scarf/scarf" "^1.1.0"
     opencollective-postinstall "^2.0.2"
 
+ngx-joyride@^2.3.1:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/ngx-joyride/-/ngx-joyride-2.5.0.tgz#21452ad0deadb4e49f11f5f940339e8e6e003bfa"
+  integrity sha512-C/J8C4uWZjKl9aMmRBt9egVjuIpwWFplJgBZDl1EfqNVTJkdEC51nt9DpAOuDwOgkbArhJ9sZIk3bZT4vkud/w==
+  dependencies:
+    tslib "^2.0.0"
+
 ngx-mat-select-search@^3.3.0:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/ngx-mat-select-search/-/ngx-mat-select-search-3.3.3.tgz#b867e2c8add58a3bc99f2b1634bd7fd25af0a834"

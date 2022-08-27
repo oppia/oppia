@@ -41,7 +41,7 @@
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab"
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
           ng-click="!$ctrl.connectedToInternet || $ctrl.selectPreviewTab()" uib-tooltip="Preview does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
         <a class="nav-link  navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}">&#xE037;</i>
@@ -113,8 +113,8 @@
       </div>
     </div>
 
-    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
-    </exploration-editor-tab>
+    <oppia-exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" [exploration-is-linked-to-story]="$ctrl.explorationIsLinkedToStory">
+    </oppia-exploration-editor-tab>
 
     <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
     </translation-tab>

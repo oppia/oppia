@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
+import { JoyrideModule } from 'ngx-joyride';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
@@ -78,6 +79,7 @@ import { EditorNavigationComponent } from './editor-navigation/editor-navigation
 import { TeachOppiaModalComponent } from './editor-tab/templates/modal-templates/teach-oppia-modal.component';
 import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
+import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
 
 @NgModule({
   imports: [
@@ -91,6 +93,7 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
     MatAutocompleteModule,
     ReactiveFormsModule,
     FormsModule,
+    JoyrideModule.forRoot(),
     RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -138,7 +141,8 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
     EditorNavigationComponent,
     TeachOppiaModalComponent,
     SettingsTabComponent,
-    UnresolvedAnswersOverviewComponent
+    UnresolvedAnswersOverviewComponent,
+    ExplorationEditorTabComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -182,7 +186,8 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
     EditorNavigationComponent,
     TeachOppiaModalComponent,
     SettingsTabComponent,
-    UnresolvedAnswersOverviewComponent
+    UnresolvedAnswersOverviewComponent,
+    ExplorationEditorTabComponent
   ],
   providers: [
     {

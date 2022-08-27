@@ -23,6 +23,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
+import { JoyrideModule } from 'ngx-joyride';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DynamicContentModule } from './interaction-display/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -189,6 +190,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
