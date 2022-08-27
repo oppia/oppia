@@ -787,11 +787,11 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         """
         exp_vlatest = model_group['exp_models_vlatest'][0]
 
-        all_explorations: List[Optional[exp_models.ExplorationModel]] = (
+        all_explorations: List[exp_domain.Exploration] = (
             [None] * exp_vlatest.version
         )
-        for exp_model in model_group['all_exp_models']:
-            all_explorations[exp_model.version - 1] = exp_model
+        for exploration in model_group['all_exp_models']:
+            all_explorations[exploration.version - 1] = exploration
 
         commit_log_models: List[Optional[
             exp_models.ExplorationCommitLogEntryModel
@@ -972,46 +972,17 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                         verified = False
                         break
                 else:
-                    old_states_dict = prev_exp.states
-                    new_states_dict = curr_exp.states
-                    old_metadata_dict = {
-                        'title': prev_exp.title,
-                        'category': prev_exp.category,
-                        'objective': prev_exp.objective,
-                        'language_code': prev_exp.language_code,
-                        'tags': prev_exp.tags,
-                        'blurb': prev_exp.blurb,
-                        'author_notes': prev_exp.author_notes,
-                        'states_schema_version': prev_exp.states_schema_version,
-                        'init_state_name': prev_exp.init_state_name,
-                        'param_specs': prev_exp.param_specs,
-                        'param_changes': prev_exp.param_changes,
-                        'auto_tts_enabled': prev_exp.auto_tts_enabled,
-                        'correctness_feedback_enabled': (
-                            prev_exp.correctness_feedback_enabled
-                        ),
-                        'edits_allowed': prev_exp.edits_allowed
+                    old_states_dict = {
+                        state_name: state.to_dict()
+                        for state_name, state in prev_exp.states.items()
                     }
-                    new_metadata_dict = {
-                        'title': curr_exp.title,
-                        'category': curr_exp.category,
-                        'objective': curr_exp.objective,
-                        'language_code': curr_exp.language_code,
-                        'tags': curr_exp.tags,
-                        'blurb': curr_exp.blurb,
-                        'author_notes': curr_exp.author_notes,
-                        'states_schema_version': (
-                            curr_exp.states_schema_version
-                        ),
-                        'init_state_name': curr_exp.init_state_name,
-                        'param_specs': curr_exp.param_specs,
-                        'param_changes': curr_exp.param_changes,
-                        'auto_tts_enabled': curr_exp.auto_tts_enabled,
-                        'correctness_feedback_enabled': (
-                            curr_exp.correctness_feedback_enabled
-                        ),
-                        'edits_allowed': curr_exp.edits_allowed
+                    new_states_dict = {
+                        state_name: state.to_dict()
+                        for state_name, state in curr_exp.states.items()
                     }
+                    old_metadata_dict = prev_exp.get_metadata().to_dict()
+                    new_metadata_dict = curr_exp.get_metadata().to_dict()
+
                     expected_state_vh = (
                         exp_services.update_states_version_history( # type: ignore[no-untyped-call]
                             copy.deepcopy(verified_state_vh[-1]),
@@ -1049,6 +1020,16 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
 
         return (exp_id, verified)
 
+    def get_exploration_from_model(self, exploration_model):
+        """Gets Exploration object from model."""
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(
+                exploration_model
+            )
+            return exploration
+        except Exception:
+            return None
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
             self.pipeline
@@ -1061,10 +1042,12 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 beam.Filter(lambda model: model is not None)
             | 'Get reconstituted exploration models' >>
                 beam.Map(self.generate_exploration_from_snapshot)
-            | 'Filter exploration models without None' >>
+            | 'Get Exploration objects from models' >>
+                beam.Map(self.get_exploration_from_model)
+            | 'Filter explorations without None' >>
                 beam.Filter(lambda x: x is not None)
             | 'Get id-model pair for exploration models' >>
-                beam.Map(lambda model: (model.id, model))
+                beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_explorations_vlatest = (
@@ -1073,8 +1056,12 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 ndb_io.GetModels(exp_models.ExplorationModel.get_all(
                         include_deleted=False
                 ))
+            | 'Get Exploration objects from exp models vlatest' >>
+                beam.Map(self.get_exploration_from_model)
+            | 'Filter the explorations without None' >>
+                beam.Filter(lambda x: x is not None)
             | 'Get id-model pair for exploration models at vlatest' >>
-                beam.Map(lambda model: (model.id, model))
+                beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_commit_logs = (
