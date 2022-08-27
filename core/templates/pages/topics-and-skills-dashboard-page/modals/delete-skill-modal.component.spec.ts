@@ -24,7 +24,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DeleteSkillModalComponent, TopicAssignmentsSummary } from './delete-skill-modal.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-describe('Assign Skill to Topic Modal Component', () => {
+describe('Delete Skill Modal Component', () => {
   let fixture: ComponentFixture<DeleteSkillModalComponent>;
   let componentInstance: DeleteSkillModalComponent;
   let urlInterpolationService: UrlInterpolationService;
