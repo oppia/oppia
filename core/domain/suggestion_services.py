@@ -2078,7 +2078,7 @@ def _update_translation_review_stats_models(
 
     for stat in translation_review_stats:
         stat_id = suggestion_models.TranslationReviewStatsModel.build_id(
-            stat.language_code, stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+            stat.language_code, stat.contributor_user_id, stat.topic_id)
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
@@ -2125,7 +2125,7 @@ def _update_question_contribution_stats_models(
 
     for stat in question_contribution_stats:
         stat_id = suggestion_models.QuestionContributionStatsModel.build_id(
-            stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+            stat.contributor_user_id, stat.topic_id)
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
@@ -2168,7 +2168,7 @@ def _update_question_review_stats_models(
 
     for stat in question_review_stats:
         stat_id = suggestion_models.QuestionReviewStatsModel.build_id(
-            stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+            stat.contributor_user_id, stat.topic_id)
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
