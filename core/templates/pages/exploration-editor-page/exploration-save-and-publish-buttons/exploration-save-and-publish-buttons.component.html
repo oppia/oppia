@@ -11,9 +11,8 @@
               ng-click="showPublishExplorationModal()"
               ng-disabled="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
         <span ng-if="!publishIsInProcess">
-          <i class="material-icons md-18 oppia-save-publish-button-icon"
+          <i class="fas fa-cloud-upload-alt oppia-save-publish-button-icon"
              alt="Publish to Oppia Library">
-            &#xE2C3;
           </i>
           <span class="oppia-save-publish-button-label">Publish</span>
         </span>
@@ -40,9 +39,8 @@
               ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()">
         <span ng-if="!saveIsInProcess">
           <span class="oppia-draft-label-container" ng-if="isPrivate()">
-            <i class="material-icons md-18 oppia-save-publish-button-icon"
+            <i class="fas fa-save oppia-save-publish-button-icon"
                alt="Save Draft">
-              &#xE161;
             </i>
             <span class="oppia-save-draft-button-label oppia-save-publish-button-label e2e-test-save-draft-message">Save Draft</span>
             <span class="d-none d-md-block oppia-num-changes-text" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
