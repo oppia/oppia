@@ -23,6 +23,7 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
@@ -33,11 +34,13 @@ describe('Classroom page functionality', function() {
   var classroomPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
+  var skillEditorPage = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = (
