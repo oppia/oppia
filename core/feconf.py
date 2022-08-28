@@ -28,8 +28,10 @@ from core.constants import constants
 from typing import Callable, Dict, List, Union
 from typing_extensions import Final, TypedDict
 
-CommandType = (
-    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
+MYPY = False
+if MYPY:  # pragma: no cover
+    # Here, we are importing 'state_domain' only for type checking.
+    from core.domain import state_domain
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -414,14 +416,14 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_RECORDED_VOICEOVERS: state_domain.RecordedVoiceoversDict = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
 }
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_WRITTEN_TRANSLATIONS: state_domain.WrittenTranslationsDict = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
