@@ -5315,8 +5315,8 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
             title='title_1',
             description='description_1',
             facilitator_user_ids=[self.user_1_id, self.user_4_id],
-            student_user_ids=[self.user_2_id],
-            invited_student_user_ids=[self.user_3_id],
+            learner_user_ids=[self.user_2_id],
+            invited_learner_user_ids=[self.user_3_id],
             subtopic_page_ids=[],
             story_ids=[]
         ).put()
@@ -5326,13 +5326,13 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
             title='title_2',
             description='description_2',
             facilitator_user_ids=[self.user_1_id],
-            student_user_ids=[self.user_2_id],
-            invited_student_user_ids=[self.user_3_id],
+            learner_user_ids=[self.user_2_id],
+            invited_learner_user_ids=[self.user_3_id],
             subtopic_page_ids=[],
             story_ids=[]
         ).put()
 
-    def test_delete_student_is_successful(self) -> None:
+    def test_delete_learner_is_successful(self) -> None:
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
 
@@ -5347,15 +5347,15 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(learner_group_model_2)
 
         self.assertTrue(
-            self.user_2_id in learner_group_model_1.student_user_ids)
+            self.user_2_id in learner_group_model_1.learner_user_ids)
         self.assertTrue(
-            self.user_2_id in learner_group_model_2.student_user_ids)
+            self.user_2_id in learner_group_model_2.learner_user_ids)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
 
         # Deleting a user should not delete the learner groups that the user
-        # is a student of but only remove their user id from student_user_ids
+        # is a learner of but only remove their user id from learner_user_ids
         # field of the learner group models.
         learner_group_model_1 = (
             learner_group_models.LearnerGroupModel.get_by_id(
@@ -5368,9 +5368,9 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(learner_group_model_2)
 
         self.assertTrue(
-            self.user_2_id not in learner_group_model_1.student_user_ids)
+            self.user_2_id not in learner_group_model_1.learner_user_ids)
         self.assertTrue(
-            self.user_2_id not in learner_group_model_2.student_user_ids)
+            self.user_2_id not in learner_group_model_2.learner_user_ids)
 
     def test_delete_invited_user_is_successful(self) -> None:
         wipeout_service.pre_delete_user(self.user_3_id)
@@ -5387,16 +5387,16 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(learner_group_model_2)
 
         self.assertTrue(
-            self.user_3_id in learner_group_model_1.invited_student_user_ids)
+            self.user_3_id in learner_group_model_1.invited_learner_user_ids)
         self.assertTrue(
-            self.user_3_id in learner_group_model_2.invited_student_user_ids)
+            self.user_3_id in learner_group_model_2.invited_learner_user_ids)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_3_id))
 
         # Deleting a user should not delete the learner groups that the user
-        # has been invited to join as student but only remove their user id
-        # from invited_student_user_ids field of the learner group models.
+        # has been invited to join as learner but only remove their user id
+        # from invited_learner_user_ids field of the learner group models.
         learner_group_model_1 = (
             learner_group_models.LearnerGroupModel.get_by_id(
                 self.LEARNER_GROUP_ID_1))
@@ -5409,10 +5409,10 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             self.user_3_id not in (
-                learner_group_model_1.invited_student_user_ids))
+                learner_group_model_1.invited_learner_user_ids))
         self.assertTrue(
             self.user_3_id not in (
-                learner_group_model_2.invited_student_user_ids))
+                learner_group_model_2.invited_learner_user_ids))
 
     def test_delete_facilitator_is_successful(self) -> None:
         wipeout_service.pre_delete_user(self.user_1_id)
