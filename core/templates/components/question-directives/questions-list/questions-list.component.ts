@@ -305,16 +305,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     modalRef.result.then(() => {
       this.deletedQuestionIds.push(questionId);
-      if (this.allSkillSummaries.length === 0) {
-        this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId);
-      } else {
-        let skillSummary = this.allSkillSummaries.find(
-          summary => summary.getDescription() === skillDescription
-        );
-        if (skillSummary) {
-          this.removeQuestionSkillLinkAsync(questionId, skillSummary.getId());
-        }
-      }
+      this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
