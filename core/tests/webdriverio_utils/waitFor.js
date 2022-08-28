@@ -192,22 +192,13 @@ var urlRedirection = async function(url) {
 };
 
 var numberOfElementsToBe = async function(
-    elementSelector, elementName, number) {
+    elementSelector, elementName, number, childSelector = null) {
   await browser.waitUntil(async function() {
-    var element = await $$(elementSelector);
-    return element.length === number;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
-    new Error().stack + '\n'
-  });
-};
-
-var numberOfChainedElementsToBe = async function(
-    parentSelector, childSelector, elementName, number) {
-  await browser.waitUntil(async function() {
-    var element = await $(parentSelector).$$(childSelector);
+    if (childSelector) {
+      var element = await $(elementSelector).$$(childSelector);
+    } else {
+      var element = await $$(elementSelector);
+    }
     return element.length === number;
   },
   {
@@ -303,5 +294,4 @@ exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
 exports.numberOfElementsToBe = numberOfElementsToBe;
-exports.numberOfChainedElementsToBe = numberOfChainedElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;
