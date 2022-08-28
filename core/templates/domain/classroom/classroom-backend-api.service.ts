@@ -55,7 +55,7 @@ interface NewClassroomIdBackendDict {
   'classroom_id': string;
 }
 
-interface ClassroomDict {
+export interface ClassroomBackendDict {
   'classroom_id': string;
   'name': string;
   'url_fragment': string;
@@ -66,21 +66,23 @@ interface ClassroomDict {
   };
 }
 
-interface FetchClassroomDataBackendDict {
-  'classroom_dict': ClassroomDict;
+export interface ClassroomDict {
+  classroomId: string;
+  name: string;
+  urlFragment: string;
+  courseDetails: string;
+  topicListIntro: string;
+  topicIdToPrerequisiteTopicIds: {
+    [topicId: string]: string[];
+  };
 }
 
-interface ClassroomDateResponse {
-  classroomDict: {
-    classroomId: string;
-    name: string;
-    urlFragment: string;
-    courseDetails: string;
-    topicListIntro: string;
-    topicIdToPrerequisiteTopicIds: {
-      [topicId: string]: string[];
-    };
-  };
+interface FetchClassroomDataBackendDict {
+  'classroom_dict': ClassroomBackendDict;
+}
+
+interface ClassroomDataResponse {
+  classroomDict: ClassroomDict;
 }
 
 @Injectable({
@@ -175,7 +177,7 @@ export class ClassroomBackendApiService {
 
   async getClassroomDataAsync(
       classroomId: string
-  ): Promise<ClassroomDateResponse> {
+  ): Promise<ClassroomDataResponse> {
     return new Promise((resolve, reject) => {
       let classroomUrl = this.urlInterpolationService.interpolateUrl(
         ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE, {
@@ -202,7 +204,7 @@ export class ClassroomBackendApiService {
   }
 
   async updateClassroomDataAsync(
-      classroomId: string, classroomDict: ClassroomDict
+      classroomId: string, classroomDict: ClassroomBackendDict
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       let classroomUrl = this.urlInterpolationService.interpolateUrl(
