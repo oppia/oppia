@@ -71,7 +71,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             missing_names,
-            msg='Platform parameters missing in registry: %s.' % (list(missing_names))
+            msg='Platform parameters missing in registry: %s.' % (
+                list(missing_names))
         )
 
     def test_no_unexpected_parameter_in_registry(self) -> None:

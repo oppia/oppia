@@ -714,7 +714,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_filter_options(self) -> None:
         filter_options = app_feedback_report_services.get_all_filter_options()
-        print(filter_options)
         filter_fields = [
             filter_obj.filter_field for filter_obj in filter_options]
 

@@ -64,8 +64,6 @@ class Platform:
         raise NotImplementedError(
             'import_models() method is not overwritten in derived classes')
 
-
-
 class _Gae(Platform):
     """Provides platform-specific imports related to
     GAE (Google App Engine).

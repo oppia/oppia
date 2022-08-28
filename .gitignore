@@ -65,3 +65,5 @@ dump.rdb
 ui-debug.log
 firebase-debug.log
 debug.log
+/mock_app.yaml
+/mock_app_dev.yaml
