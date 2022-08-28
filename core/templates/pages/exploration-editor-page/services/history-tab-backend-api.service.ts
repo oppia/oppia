@@ -19,10 +19,11 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ExplorationSnapshot } from '../history-tab/services/version-tree.service';
 
 interface HistoryTabDict {
   summaries: string[];
-  snapshots?: string;
+  snapshots?: ExplorationSnapshot[];
 }
 
 interface HistoryTabCheckRevertValidDict {

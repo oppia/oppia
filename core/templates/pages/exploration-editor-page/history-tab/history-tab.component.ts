@@ -16,14 +16,14 @@
  * @fileoverview Component for the exploration history tab.
  */
 
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { CheckRevertExplorationModalComponent } from './modal-templates/check-revert-exploration-modal.component';
 import { RevertExplorationModalComponent } from './modal-templates/revert-exploration-modal.component';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationMetadataDiffModalComponent } from '../modal-templates/exploration-metadata-diff-modal.component';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -33,7 +33,7 @@ import { ExplorationDataService } from '../services/exploration-data.service';
 import { HistoryTabBackendApiService } from '../services/history-tab-backend-api.service';
 import { RouterService } from '../services/router.service';
 import { CheckRevertService } from './services/check-revert.service';
-import { VersionTreeService } from './services/version-tree.service';
+import { ExplorationSnapshot, VersionTreeService } from './services/version-tree.service';
 import { CompareVersionsService } from './services/compare-versions.service';
 import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -58,17 +58,21 @@ export class HistoryTabComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  firstVersion;
-  secondVersion;
+  firstVersion: string;
+  secondVersion: string;
   hideHistoryGraph: boolean;
-  selectedVersionsArray;
+  selectedVersionsArray: number[];
 
   // Letiable explorationSnapshots is a list of all snapshots for the
   // exploration in ascending order.
-  explorationSnapshots = null;
-  currentPage = 0;
+  explorationSnapshots: ExplorationSnapshot[];
+  currentPage: number = 0;
   explorationVersionMetadata;
-  versionCheckboxArray = [];
+  versionCheckboxArray: {
+    vnum: number;
+    selected: boolean;
+  }[] | null = [];
+
   username: string;
   displayedCurrentPageNumber: number;
   versionNumbersToDisplay;
@@ -81,15 +85,14 @@ export class HistoryTabComponent
   checkRevertExplorationValidUrl: string;
   revertExplorationUrl: string;
   explorationDownloadUrl: string;
-  earlierVersionHeader;
-  laterVersionHeader;
+  earlierVersionHeader: string;
+  laterVersionHeader: string;
   totalExplorationVersionMetadata = [];
   compareVersionMetadata;
   currentVersion: number;
   comparisonsAreDisabled: boolean;
   compareVersionsButtonIsHidden: boolean;
   compareVersions: object;
-
   diffData: Metadata | object;
 
   constructor(
@@ -121,7 +124,12 @@ export class HistoryTabComponent
   // Changes the checkbox selection and provides an appropriate user
   // prompt.
   changeSelectedVersions(
-      snapshot: {versionNumber: string},
+      snapshot: {
+        versionNumber: number;
+        committerId: string;
+        createdOnMsecsStr: string;
+        commitMessage: string;
+      },
       item: number
   ): void {
     if (item === 1 && snapshot && !this.selectedVersionsArray.includes(
@@ -279,7 +287,7 @@ export class HistoryTabComponent
   }
 
   // Downloads the zip file for an exploration.
-  downloadExplorationWithVersion(versionNumber: string): void {
+  downloadExplorationWithVersion(versionNumber: number): void {
     // Note that this opens (and then immediately closes) a new tab. If
     // we do this in the same tab, the beforeunload handler is
     // triggered.
@@ -288,7 +296,7 @@ export class HistoryTabComponent
       '&output_format=zip');
   }
 
-  showCheckRevertExplorationModal(version: string): void {
+  showCheckRevertExplorationModal(version: number): void {
     const modalRef = this.ngbModal.open(CheckRevertExplorationModalComponent, {
       backdrop: true,
     });
@@ -310,7 +318,7 @@ export class HistoryTabComponent
       });
   }
 
-  showRevertExplorationModal(version: string): void {
+  showRevertExplorationModal(version: number): void {
     const modalRef = this.ngbModal.open(RevertExplorationModalComponent, {
       backdrop: true,
     });
