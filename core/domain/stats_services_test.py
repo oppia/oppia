@@ -551,6 +551,31 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 None
             )
 
+    def test_raises_error_when_both_exp_diff_and_revert_are_none_while_updating_exp_issue(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        # Create exploration object in datastore.
+        exp_id = 'exp_id'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list: List[List[str]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        # Test addition of states.
+        exploration.add_states(['New state', 'New state 2'])
+        exploration.version += 1
+        with self.assertRaisesRegex(
+            Exception,
+            'ExplorationVersionsDiff cannot be None when the change'
+        ):
+            stats_services.update_exp_issues_for_new_exp_version(
+                exploration, None, None
+            )
+
     def test_get_stats_for_new_exp_version(self) -> None:
         """Test the get_stats_for_new_exp_version method."""
         # Create exploration object in datastore.

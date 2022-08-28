@@ -941,7 +941,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration( # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange(
                 {
                     'cmd': 'edit_exploration_property',
@@ -952,7 +952,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration( # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange(
                 {
                     'cmd': 'edit_exploration_property',
@@ -1778,8 +1778,12 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object, None)
 
     def test_get_multiple_exploration_model_success(self) -> None:
+        user_id_exp_id_combinations = [
+            (self.USER_1_ID, self.EXP_ID_ONE),
+            (self.USER_2_ID, self.EXP_ID_ONE)
+        ]
         retrieved_object = user_models.ExplorationUserDataModel.get_multi(
-            [self.USER_1_ID, self.USER_2_ID], self.EXP_ID_ONE)
+            user_id_exp_id_combinations)
         # Mypy Type checking for None.
         assert retrieved_object[0] is not None
         assert retrieved_object[1] is not None

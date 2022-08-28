@@ -308,8 +308,8 @@ def advance_version_of_exp_stats(
         ExplorationStats. The newly created exploration stats object.
 
     Raises:
-        Exception. ExplorationVersionsDiff cannot be be None when the change
-            is a revert.
+        Exception. ExplorationVersionsDiff cannot be None when the change
+            is not a revert.
     """
 
     # Handling reverts.
@@ -443,7 +443,7 @@ def create_exp_issues_for_new_exploration(
 
 def update_exp_issues_for_new_exp_version(
     exploration: exp_domain.Exploration,
-    exp_versions_diff: exp_domain.ExplorationVersionsDiff,
+    exp_versions_diff: Optional[exp_domain.ExplorationVersionsDiff],
     revert_to_version: Optional[int]
 ) -> None:
     """Retrieves the ExplorationIssuesModel for the old exp_version and makes
@@ -455,6 +455,10 @@ def update_exp_issues_for_new_exp_version(
             the exploration versions difference, None if it is a revert.
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
+
+    Raises:
+        Exception. ExplorationVersionsDiff cannot be None when the change
+            is not a revert.
     """
     exp_issues = get_exp_issues(
         exploration.id, exploration.version - 1, strict=False
@@ -470,6 +474,12 @@ def update_exp_issues_for_new_exp_version(
         exp_issues.exp_version = exploration.version + 1
         create_exp_issues_model(exp_issues)
         return
+
+    if exp_versions_diff is None:
+        raise Exception(
+            'ExplorationVersionsDiff cannot be None when the change is'
+            ' not a revert.'
+        )
 
     deleted_state_names = exp_versions_diff.deleted_state_names
     old_to_new_state_names = exp_versions_diff.old_to_new_state_names

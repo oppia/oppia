@@ -22,6 +22,7 @@ import copy
 
 from core import feconf
 from core.domain import change_domain
+from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import subtopic_page_domain
 from core.domain import topic_fetchers
@@ -325,6 +326,8 @@ def delete_subtopic_page(
     subtopic_models.SubtopicPageModel.get(subtopic_page_id).delete(
         committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED,
         force_deletion=force_deletion)
+    learner_group_services.remove_subtopic_page_reference_from_learner_groups(
+        topic_id, subtopic_id)
 
 
 def get_topic_ids_from_subtopic_page_ids(
@@ -422,3 +425,41 @@ def get_multi_users_subtopic_pages_progress(
                 })
 
     return all_users_subtopic_prog_summaries
+
+
+def get_learner_group_syllabus_subtopic_page_summaries(
+    subtopic_page_ids: List[str]
+) -> List[subtopic_page_domain.SubtopicPageSummaryDict]:
+    """Returns summary dicts corresponding to the given subtopic page ids.
+
+    Args:
+        subtopic_page_ids: list(str). The ids of the subtopic pages.
+
+    Returns:
+        list(SubtopicPageSummaryDict). The summary dicts corresponding to the
+        given subtopic page ids.
+    """
+    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+
+    all_learner_group_subtopic_page_summaries: List[
+        subtopic_page_domain.SubtopicPageSummaryDict
+    ] = []
+    for topic in topics:
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic is not None
+        for subtopic in topic.subtopics:
+            subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
+            if subtopic_page_id not in subtopic_page_ids:
+                continue
+            all_learner_group_subtopic_page_summaries.append({
+                'subtopic_id': subtopic.id,
+                'subtopic_title': subtopic.title,
+                'parent_topic_id': topic.id,
+                'parent_topic_name': topic.name,
+                'thumbnail_filename': subtopic.thumbnail_filename,
+                'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                'subtopic_mastery': None
+            })
+
+    return all_learner_group_subtopic_page_summaries

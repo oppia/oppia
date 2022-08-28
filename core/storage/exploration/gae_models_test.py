@@ -64,7 +64,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration('id', exploration)
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
@@ -78,7 +78,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration('id', exploration)
         exp_model = exp_models.ExplorationModel.get_by_id('id')
         snapshot_dict = exp_model.compute_snapshot()
         snapshot_dict['skill_tags'] = ['tag1', 'tag2']
