@@ -41,6 +41,7 @@ import { LessonInformationCardModalComponent } from 'pages/exploration-player-pa
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ProgressReminderModalComponent } from 'pages/exploration-player-page/templates/progress-reminder-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 import './exploration-footer.component.css';
 
@@ -50,14 +51,13 @@ import './exploration-footer.component.css';
   templateUrl: './exploration-footer.component.html'
 })
 export class ExplorationFooterComponent {
+  directiveSubscriptions = new Subscription();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   iframed!: boolean;
   windowIsNarrow!: boolean;
-  resizeSubscription!: Subscription;
-  checkpointSubscription!: Subscription;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
 
@@ -96,7 +96,9 @@ export class ExplorationFooterComponent {
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private checkpointCelebrationUtilityService:
+      CheckpointCelebrationUtilityService
   ) {}
 
   ngOnInit(): void {
@@ -115,11 +117,11 @@ export class ExplorationFooterComponent {
         this.userIsLoggedIn = userInfo.isLoggedIn();
       });
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-      this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
-        .subscribe(evt => {
+      this.directiveSubscriptions.add(
+        this.windowDimensionsService.getResizeEvent().subscribe(evt => {
           this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-        });
-
+        })
+      );
       if (!this.contextService.isInQuestionPlayerMode() ||
           this.contextService.getQuestionPlayerIsManuallySet()) {
         this.explorationSummaryBackendApiService
@@ -162,8 +164,8 @@ export class ExplorationFooterComponent {
           }
         );
     }
-    this.checkpointSubscription = this.playerPositionService
-      .onLoadedMostRecentCheckpoint.subscribe(() => {
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
         if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
           if (this.checkpointCount) {
             this.showProgressReminderModal();
@@ -173,7 +175,14 @@ export class ExplorationFooterComponent {
             });
           }
         }
-      });
+      })
+    );
+    this.directiveSubscriptions.add(
+      this.checkpointCelebrationUtilityService
+        .getOpenLessonInformationModalEmitter().subscribe(() => {
+          this.showInformationCard();
+        })
+    );
   }
 
   showProgressReminderModal(): void {
@@ -321,12 +330,7 @@ export class ExplorationFooterComponent {
   }
 
   ngOnDestroy(): void {
-    if (this.resizeSubscription) {
-      this.resizeSubscription.unsubscribe();
-    }
-    if (this.checkpointSubscription) {
-      this.checkpointSubscription.unsubscribe();
-    }
+    this.directiveSubscriptions.unsubscribe();
   }
 
   getMostRecentlyReachedCheckpointIndex(): number {

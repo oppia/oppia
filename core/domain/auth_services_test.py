@@ -41,8 +41,8 @@ class AuthServicesTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.full_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
-        self.auth_id = self.get_auth_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.full_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.auth_id = self.get_auth_id_from_email(self.NEW_USER_EMAIL)
 
         self.modifiable_full_user_data = user_domain.ModifiableUserData(
             'full_user_1', '12345', [constants.DEFAULT_LANGUAGE_CODE],
@@ -77,13 +77,13 @@ class AuthServicesTests(test_utils.GenericTestBase):
     def test_create_profile_user_auth_details_with_self_as_parent_is_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(ValueError, 'cannot be its own parent'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'cannot be its own parent'):
             auth_services.create_profile_user_auth_details('uid', 'uid')
 
     def test_get_all_profiles_for_parent_user_id_returns_all_profiles(
         self
     ) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             auth_services.get_all_profiles_by_parent_user_id(self.full_user_id),
             [auth_models.UserAuthDetailsModel.get(self.profile_user_1_id),
              auth_models.UserAuthDetailsModel.get(self.profile_user_2_id)])
@@ -97,14 +97,14 @@ class AuthServicesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 auth_services.get_auth_claims_from_request(request),
                 auth_domain.AuthClaims(
-                    self.get_auth_id_from_email(self.NEW_USER_EMAIL),  # type: ignore[no-untyped-call]
+                    self.get_auth_id_from_email(self.NEW_USER_EMAIL),
                     self.NEW_USER_EMAIL, False))
 
         with self.super_admin_context():
             self.assertEqual(
                 auth_services.get_auth_claims_from_request(request),
                 auth_domain.AuthClaims(
-                    self.get_auth_id_from_email(self.SUPER_ADMIN_EMAIL),  # type: ignore[no-untyped-call]
+                    self.get_auth_id_from_email(self.SUPER_ADMIN_EMAIL),
                     self.SUPER_ADMIN_EMAIL,
                     True))
 
@@ -176,7 +176,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        with self.assertRaisesRegex(Exception, 'already associated'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'):
             auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
@@ -200,7 +200,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
-        with self.assertRaisesRegex(Exception, 'already associated'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'already associated'):
             auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
