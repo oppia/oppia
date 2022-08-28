@@ -2138,7 +2138,7 @@ class GenericTestBase(AppEngineTestBase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT: Final = (
+    SAMPLE_YAML_CONTENT: str = (
         """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -3038,7 +3038,7 @@ title: Title
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category='Algebra')
-        exp_services.save_new_exploration(owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
     def set_interaction_for_state(
@@ -3109,9 +3109,9 @@ title: Title
                 ca_value, ca_spec.schema, 'ca_%s' % ca_name)
             customization_args[ca_name] = {'value': ca_value}
 
-        state.update_interaction_id(interaction_id)  # type: ignore[no-untyped-call]
-        state.update_interaction_customization_args(customization_args)  # type: ignore[no-untyped-call]
-        state.update_next_content_id_index(next_content_id_index_dict['value'])  # type: ignore[no-untyped-call]
+        state.update_interaction_id(interaction_id)
+        state.update_interaction_customization_args(customization_args)
+        state.update_next_content_id_index(next_content_id_index_dict['value'])
 
     def save_new_valid_exploration(
         self,
@@ -3156,16 +3156,23 @@ title: Title
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             self.set_interaction_for_state(end_state, 'EndExploration')
-            end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+            end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
+            # Here, init_interaction is a InteractionInstance domain object
+            # and it is created using 'create_default_interaction' method.
+            # So, 'init_interaction' is a default_interaction and it is always
+            # going to contain a default_outcome. Thus to narrow down the type
+            # from Optional[Outcome] to Outcome for default_outcome, we used
+            # assert here.
+            assert init_interaction.default_outcome is not None
             init_interaction.default_outcome.dest = end_state_name
             if correctness_feedback_enabled:
                 init_interaction.default_outcome.labelled_as_correct = True
 
-        exp_services.save_new_exploration(owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
     def save_new_linear_exp_with_state_names_and_interactions(
@@ -3223,15 +3230,21 @@ title: Title
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
                 from_state, next(iterable_interaction_ids))
+            # Here, from_state is a State domain object and it is created using
+            # 'create_default_state' method. So, 'from_state' is a default_state
+            # and it is always going to contain a default_outcome. Thus to
+            # narrow down the type from Optional[Outcome] to Outcome for
+            # default_outcome, we used assert here.
+            assert from_state.interaction.default_outcome is not None
             from_state.interaction.default_outcome.dest = dest_state_name
             if correctness_feedback_enabled:
                 from_state.interaction.default_outcome.labelled_as_correct = (
                     True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
-        end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        end_state.update_interaction_default_outcome(None)
 
-        exp_services.save_new_exploration(owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
     def save_new_exp_with_custom_states_schema_version(
@@ -3988,7 +4001,7 @@ title: Title
             ]
         skill.language_code = language_code
         skill.version = 0
-        skill_services.save_new_skill(owner_id, skill)  # type: ignore[no-untyped-call]
+        skill_services.save_new_skill(owner_id, skill)
         return skill
 
     def save_new_skill_with_defined_schema_versions(
@@ -4063,7 +4076,7 @@ title: Title
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
+        state.update_interaction_id('TextInput')
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -4081,9 +4094,9 @@ title: Title
         assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, solution_dict)
-        state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
-        state.update_interaction_hints(hints_list)  # type: ignore[no-untyped-call]
-        state.update_interaction_customization_args({  # type: ignore[no-untyped-call]
+        state.update_interaction_solution(solution)
+        state.update_interaction_hints(hints_list)
+        state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder',
@@ -4092,12 +4105,15 @@ title: Title
             },
             'rows': {'value': 1}
         })
-        state.update_next_content_id_index(2)  # type: ignore[no-untyped-call]
+        state.update_next_content_id_index(2)
+        # Here, state is a State domain object and it is created using
+        # 'create_default_state' method. So, 'state' is a default_state
+        # and it is always going to contain a default_outcome. Thus to
+        # narrow down the type from Optional[Outcome] to Outcome for
+        # default_outcome, we used assert here.
+        assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.labelled_as_correct = True
-        # Here we use MyPy ignore because, dest can only accept string values
-        # but here we are providing None which causes MyPy to throw an error.
-        # Thus to avoid the error, we used ignore here.
-        state.interaction.default_outcome.dest = None  # type: ignore[assignment]
+        state.interaction.default_outcome.dest = None
         return state
 
 

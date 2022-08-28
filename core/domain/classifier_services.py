@@ -29,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.domain import fs_services
+from core.domain import state_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence
@@ -134,7 +135,7 @@ def handle_trainable_states(
     exp_version = exploration.version
     for state_name in state_names:
         state = exploration.states[state_name]
-        training_data = state.get_training_data()  # type: ignore[no-untyped-call]
+        training_data = state.get_training_data()
         interaction_id = state.interaction.id
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise Exception(
@@ -638,7 +639,7 @@ def migrate_state_training_jobs(
 
         for algorithm_id in algorithm_ids_to_add:
             next_scheduled_check_time = datetime.datetime.utcnow()
-            training_data = exploration.states[state_name].get_training_data()  # type: ignore[no-untyped-call]
+            training_data = exploration.states[state_name].get_training_data()
 
             classifier_domain.ClassifierTrainingJob(
                 'job_id_dummy', algorithm_id, interaction_id, exp_id,

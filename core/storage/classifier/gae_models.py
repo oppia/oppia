@@ -28,8 +28,8 @@ MYPY = False
 if MYPY: # pragma: no cover
     # Here, we are importing 'classifier_domain' and 'classifier_services'
     # only for type checking.
-    from core.domain import classifier_services  # pylint: disable=invalid-import # isort:skip
     from core.domain import classifier_domain  # pylint: disable=invalid-import # isort:skip
+    from core.domain import classifier_services  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 

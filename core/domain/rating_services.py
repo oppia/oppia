@@ -108,10 +108,10 @@ def assign_rating_to_exploration(
         exploration_id, user_id, new_rating, old_rating)
 
     exploration_summary.scaled_average_rating = (
-        exp_services.get_scaled_average_rating(  # type: ignore[no-untyped-call]
+        exp_services.get_scaled_average_rating(
             exploration_summary.ratings))
 
-    exp_services.save_exploration_summary(exploration_summary)  # type: ignore[no-untyped-call]
+    exp_services.save_exploration_summary(exploration_summary)
 
 
 def get_user_specific_rating_for_exploration(
