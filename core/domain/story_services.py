@@ -40,7 +40,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Sequence, Tuple
+from typing import List, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -140,95 +140,234 @@ def apply_change_list(
             if not isinstance(change, story_domain.StoryChange):
                 raise Exception('Expected change to be of type StoryChange')
             if change.cmd == story_domain.CMD_ADD_STORY_NODE:
-                story.add_node(change.node_id, change.title)
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                add_story_node_cmd = cast(
+                    story_domain.AddStoryNodeCmd,
+                    change
+                )
+                story.add_node(
+                    add_story_node_cmd.node_id,
+                    add_story_node_cmd.title
+                )
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
-                story.delete_node(change.node_id)
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                delete_story_node_cmd = cast(
+                    story_domain.DeleteStoryNodeCmd,
+                    change
+                )
+                story.delete_node(delete_story_node_cmd.node_id)
             elif (change.cmd ==
                   story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
-                if change.new_value:
-                    story.mark_node_outline_as_finalized(change.node_id)
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                update_story_node_outline_status = cast(
+                    story_domain.UpdateStoryNodeOutlineStatusCmd,
+                    change
+                )
+                if update_story_node_outline_status.new_value:
+                    story.mark_node_outline_as_finalized(
+                        update_story_node_outline_status.node_id
+                    )
                 else:
-                    story.mark_node_outline_as_unfinalized(change.node_id)
+                    story.mark_node_outline_as_unfinalized(
+                        update_story_node_outline_status.node_id
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
-                if (change.property_name ==
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                update_story_node_property = cast(
+                    story_domain.UpdateStoryNodePropertyCmd,
+                    change
+                )
+                if (update_story_node_property.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
-                    story.update_node_outline(change.node_id, change.new_value)
-                elif (change.property_name ==
+                    # Here we use cast because in this 'if clause' we are
+                    # updating the outline of a StoryNode which can only be
+                    # of type string. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    outline = cast(str, update_story_node_property.new_value)
+                    story.update_node_outline(
+                        update_story_node_property.node_id, outline
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_TITLE):
-                    story.update_node_title(change.node_id, change.new_value)
-                elif (change.property_name ==
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the title of a StoryNode which can only be
+                    # of type string. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    title = cast(str, update_story_node_property.new_value)
+                    story.update_node_title(
+                        update_story_node_property.node_id, title
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the description of a StoryNode which can only
+                    # be of type string. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    description = cast(
+                        str, update_story_node_property.new_value
+                    )
                     story.update_node_description(
-                        change.node_id, change.new_value)
-                elif (change.property_name ==
+                        update_story_node_property.node_id, description
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the 'thumbnail_filename' of a StoryNode which
+                    # can only be of type string. So, to rule out all other
+                    # property types for MyPy type checking, we used cast here.
+                    thumbnail_filename = cast(
+                        str, update_story_node_property.new_value
+                    )
                     story.update_node_thumbnail_filename(
-                        change.node_id, change.new_value)
-                elif (change.property_name ==
+                        update_story_node_property.node_id, thumbnail_filename
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the 'thumbnail_bg_color' of a StoryNode which
+                    # can only be of type string. So, to rule out all other
+                    # property types for MyPy type checking, we used cast here.
+                    thumbnail_bg_color = cast(
+                        str, update_story_node_property.new_value
+                    )
                     story.update_node_thumbnail_bg_color(
-                        change.node_id, change.new_value)
-                elif (change.property_name ==
+                        update_story_node_property.node_id, thumbnail_bg_color
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the acquired_skill_ids of a StoryNode which
+                    # can only be of type List[str]. So, to rule out all other
+                    # property types for MyPy type checking, we used cast here.
+                    acquired_skill_ids = cast(
+                        List[str], update_story_node_property.new_value
+                    )
                     story.update_node_acquired_skill_ids(
-                        change.node_id, change.new_value)
-                elif (change.property_name ==
+                        update_story_node_property.node_id, acquired_skill_ids
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the prerequisite_skill_ids of a StoryNode which
+                    # can only be of type List[str]. So, to rule out all other
+                    # property types for MyPy type checking, we used cast here.
+                    prerequisite_skill_ids = cast(
+                        List[str], update_story_node_property.new_value
+                    )
                     story.update_node_prerequisite_skill_ids(
-                        change.node_id, change.new_value)
-                elif (change.property_name ==
+                        update_story_node_property.node_id,
+                        prerequisite_skill_ids
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the destination_node_ids of a StoryNode which
+                    # can only be of type List[str]. So, to rule out all other
+                    # property types for MyPy type checking, we used cast here.
+                    destination_node_ids = cast(
+                        List[str], update_story_node_property.new_value
+                    )
                     story.update_node_destination_node_ids(
-                        change.node_id, change.new_value)
-                elif (change.property_name ==
+                        update_story_node_property.node_id,
+                        destination_node_ids
+                    )
+                elif (update_story_node_property.property_name ==
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
+                    # Here we use cast because in this 'elif clause' we
+                    # are updating the exploration_id of a StoryNode which
+                    # can only be of type string. So, to rule out all other
+                    # property types for MyPy type checking, we used cast here.
+                    exploration_id = cast(
+                        str, update_story_node_property.new_value
+                    )
                     story.update_node_exploration_id(
-                        change.node_id, change.new_value)
+                        update_story_node_property.node_id, exploration_id
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
-                if (change.property_name ==
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                update_story_property_cmd = cast(
+                    story_domain.UpdateStoryPropertyCmd,
+                    change
+                )
+                if (update_story_property_cmd.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
-                    story.update_title(change.new_value)
-                elif (change.property_name ==
+                    story.update_title(update_story_property_cmd.new_value)
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
-                    story.update_thumbnail_filename(change.new_value)
-                elif (change.property_name ==
+                    story.update_thumbnail_filename(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
-                    story.update_thumbnail_bg_color(change.new_value)
-                elif (change.property_name ==
+                    story.update_thumbnail_bg_color(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_DESCRIPTION):
-                    story.update_description(change.new_value)
-                elif (change.property_name ==
+                    story.update_description(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_NOTES):
-                    story.update_notes(change.new_value)
-                elif (change.property_name ==
+                    story.update_notes(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_LANGUAGE_CODE):
-                    story.update_language_code(change.new_value)
-                elif (change.property_name ==
+                    story.update_language_code(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_URL_FRAGMENT):
-                    story.update_url_fragment(change.new_value)
-                elif (change.property_name ==
+                    story.update_url_fragment(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_META_TAG_CONTENT):
-                    story.update_meta_tag_content(change.new_value)
+                    story.update_meta_tag_content(
+                        update_story_property_cmd.new_value
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
-                if (change.property_name ==
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                update_story_contents_property_cmd = cast(
+                    story_domain.UpdateStoryContentsPropertyCmd,
+                    change
+                )
+                if (update_story_contents_property_cmd.property_name ==
                         story_domain.INITIAL_NODE_ID):
-                    story.update_initial_node(change.new_value)
-                if change.property_name == story_domain.NODE:
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.old_value, int)
-                    assert isinstance(change.new_value, int)
-                    story.rearrange_node_in_story(
-                        change.old_value, change.new_value)
+                    # Here we use cast because in this 'if clause' we are
+                    # updating the initial_node_id of StoryContents, and 
+                    # initial_node_id can only be of type string. So, to
+                    # rule out all other property types for MyPy type
+                    # checking, we used cast here.
+                    initial_node = cast(
+                        str, update_story_contents_property_cmd.new_value
+                    )
+                    story.update_initial_node(initial_node)
+                if (
+                    update_story_contents_property_cmd.property_name ==
+                    story_domain.NODE
+                ):
+                    # Here we use cast because in this 'if clause' we are
+                    # rearranging the nodes of a StoryContent with the help
+                    # of indexes, and these indexes can only be of type int.
+                    # So, to rule out all other property types for MyPy type
+                    # checking, we used cast here.
+                    old_value = cast(
+                        int,
+                        update_story_contents_property_cmd.old_value
+                    )
+                    new_value = cast(
+                        int,
+                        update_story_contents_property_cmd.new_value
+                    )
+                    story.rearrange_node_in_story(old_value, new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):

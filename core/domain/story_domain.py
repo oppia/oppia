@@ -28,7 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import List, Optional, overload
+from typing import List, Optional, Union, overload
 from typing_extensions import Final, TypedDict
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
@@ -195,6 +195,81 @@ class StoryChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class CreateNewStoryCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_CREATE_NEW command.
+    """
+
+    title: str
+
+
+class MigrateSchemaToLatestVersionCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class UpdateStoryNodeOutlineStatusCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_OUTLINE_STATUS command.
+    """
+
+    node_id: str
+    old_value: bool
+    new_value: bool
+
+
+class DeleteStoryNodeCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_DELETE_STORY_NODE command.
+    """
+
+    node_id: str
+
+
+class AddStoryNodeCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_ADD_STORY_NODE command.
+    """
+
+    node_id: str
+    title: str
+
+
+class UpdateStoryContentsPropertyCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_UPDATE_STORY_CONTENTS_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: Union[str, int]
+    old_value: Union[str, int]
+
+
+class UpdateStoryNodePropertyCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command.
+    """
+
+    node_id: str
+    property_name: str
+    new_value: Union[str, List[str]]
+    old_value: Union[str, List[str]]
+
+
+class UpdateStoryPropertyCmd(StoryChange):
+    """class representing the StoryChange's
+    CMD_UPDATE_STORY_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: str
+    old_value: str
 
 
 class StoryNodeDict(TypedDict):
