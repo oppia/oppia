@@ -138,6 +138,13 @@ export class OutcomeEditorComponent implements OnInit {
       outcome.dest === this.stateEditorService.getActiveStateName());
   }
 
+  isSelfLoopDestStuck(outcome: Outcome): boolean {
+    return Boolean (
+      outcome &&
+      outcome.destIfReallyStuck === (
+        this.stateEditorService.getActiveStateName()));
+  }
+
   getCurrentInteractionId(): string {
     return this.stateInteractionIdService.savedMemento;
   }

@@ -101,7 +101,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   }
 
   updateOptionNames(): void {
-    // The seTimeout is being used here to update the view.
+    // The setTimeout is being used here to update the view.
     setTimeout(() => {
       this.currentStateName = this.stateEditorService.getActiveStateName();
       let questionModeEnabled = this.stateEditorService.isInQuestionMode();

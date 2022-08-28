@@ -61,7 +61,7 @@ export class ComputeGraphService {
             linkProperty: null,
             connectsDestIfStuck: false
           });
-          if (groups[h].outcome.destIfReallyStuck) {
+          if (groups[h].outcome && groups[h].outcome.destIfReallyStuck) {
             links.push({
               source: stateName,
               target: groups[h].outcome.destIfReallyStuck,
