@@ -1,7 +1,7 @@
 <mat-card class="oppia-editor-card-with-avatar">
   <div class="card-content">
     <div>
-        <h3>Classroom config properties</h3>
+      <h3>Classroom config properties</h3>
     </div>
     <div>
       <p>
@@ -33,7 +33,7 @@
           <button mat-button matSuffix mat-icon-button
                   aria-label="Clear"
                   *ngIf="!(classroomEditorMode && classroom.key == classroomId)"
-                  (click)="deleteClassroom(classroom.key)">
+                  (click)="deleteClassroom($event, classroom.key)">
             <mat-icon matListIcon>close</mat-icon>
           </button>
         </div>
@@ -55,10 +55,10 @@
               {{classroomName}}
             </span>
             <textarea *ngIf="classroomEditorMode"
-                   [(ngModel)]="classroomName"
-                   (blur)="updateClassroomName()"
-                   rows="1"
-                   class="classroom-field">
+                      [(ngModel)]="classroomName"
+                      (blur)="updateClassroomName()"
+                      rows="1"
+                      class="classroom-field">
             </textarea>
           </div>
 
@@ -70,10 +70,10 @@
               {{urlFragment}}
             </span>
             <textarea *ngIf="classroomEditorMode"
-                   [(ngModel)]="urlFragment"
-                   (blur)="updateUrlFragment()"
-                   rows="1"
-                   class="classroom-field">
+                      [(ngModel)]="urlFragment"
+                      (blur)="updateUrlFragment()"
+                      rows="1"
+                      class="classroom-field">
             </textarea>
           </div>
 
@@ -85,10 +85,10 @@
               {{courseDetails}}
             </span>
             <textarea *ngIf="classroomEditorMode"
-                   [(ngModel)]="courseDetails"
-                   (blur)="updateCourseDetails()"
-                   rows="6"
-                   class="classroom-field">
+                      [(ngModel)]="courseDetails"
+                      (blur)="updateCourseDetails()"
+                      rows="6"
+                      class="classroom-field">
             </textarea>
           </div>
 
@@ -100,10 +100,10 @@
                 {{topicListIntro}}
             </span>
             <textarea *ngIf="classroomEditorMode"
-                   [(ngModel)]="topicListIntro"
-                   (blur)="updateTopicListIntro()"
-                   rows="4"
-                   class="classroom-field">
+                      [(ngModel)]="topicListIntro"
+                      (blur)="updateTopicListIntro()"
+                      rows="4"
+                      class="classroom-field">
             </textarea>
           </div>
 
@@ -122,7 +122,7 @@
       </div>
     </div>
 
-    <button class="btn btn-primary" (click)="createNewClassroom()">
+    <button class="btn btn-primary add-new-classroom" (click)="createNewClassroom()">
       Add new classroom
     </button>
   </div>
@@ -143,28 +143,28 @@
     padding: 0 15px;
   }
   .existing-classroom-header {
+    margin-bottom: 0;
     margin-top: 20px;
-    margin-bottom: 0px;
   }
   .action-buttons {
     margin: 10px 5px;
   }
   .oppia-edit-icon {
+    cursor: pointer;
     font-size: 16px;
     position: absolute;
     right: 8%;
     -webkit-transition: all 200ms;
     transition: all 200ms;
-    cursor: pointer;
   }
   .oppia-classroom-tile {
-    cursor: pointer;
+    align-items: center;
     background: #e0f2f1;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
     margin: 10px 20px;
     padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
   }
   .card-content {
     padding: 20px
@@ -178,6 +178,10 @@
   }
   .classroom-admin-header {
     padding-top: 20px;
+  }
+  .add-new-classroom {
+    background-color: #00376d;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {

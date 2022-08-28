@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Delete classroom confirmation modal.
+ * @fileoverview Delete classroom confirmation modal component.
  */
 
 import { Component } from '@angular/core';
@@ -27,7 +27,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class DeleteClassroomConfirmModalComponent
   extends ConfirmOrCancelModal {
-
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {

@@ -352,7 +352,7 @@ URLS = [
         topic_viewer.TopicViewerPage),
     get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
-        classroom.ClassroomAdminPageHandler),
+        classroom.ClassroomAdminPage),
     get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
