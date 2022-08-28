@@ -32,7 +32,7 @@ from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 from typing_extensions import Final
 
 MYPY = False
@@ -392,11 +392,11 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
+        assets_list: List[Tuple[str, bytes]] = []
         with self.swap(
             stats_services, 'get_stats_for_new_exploration',
             stats_for_new_exploration_log):
-            exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+            exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
                 assets_list)
 
@@ -413,7 +413,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'get_stats_for_new_exp_version',
             stats_for_new_exp_version_log):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
         # Now, the stats creation for new explorations method will be called
@@ -429,8 +429,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -477,8 +477,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -494,7 +494,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         stats_services.save_stats_model(exploration_stats)
 
         # Update exploration to next version 2 and its stats.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             'committer_id_v2', exploration.id, [], 'Updated')
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 2)
@@ -506,7 +506,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         stats_services.save_stats_model(exploration_stats)
 
         # Revert to an older version.
-        exp_services.revert_exploration(  # type: ignore[no-untyped-call]
+        exp_services.revert_exploration(
             'committer_id_v3', exp_id, 2, 1)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 3
@@ -530,8 +530,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -559,8 +559,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -583,8 +583,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -1422,7 +1422,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange(
                 {'cmd': 'delete_state', 'state_name': 'B'})
         ], 'change')
@@ -1440,7 +1440,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     ['A', 'B', 'A'])
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': 'A',
@@ -1487,7 +1487,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('B')], 'B')
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange(
                 {'cmd': 'delete_state', 'state_name': 'B'})
         ], 'change')
@@ -1504,7 +1504,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_eq_playthrough('A')], 'A')
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': 'A',
@@ -1541,7 +1541,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 2)], 'B', 2)
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange(
                 {'cmd': 'delete_state', 'state_name': 'B'}),
         ], 'Delete B')
@@ -1558,7 +1558,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('A', 2)], 'A', 2)
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': 'A',
@@ -1604,7 +1604,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     [self._create_mis_playthrough('B', 3)], 'B', 3),
             ]))
 
-        exp_services.update_exploration(self.owner_id, self.exp.id, [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
             exp_domain.ExplorationChange(
                 {'cmd': 'delete_state', 'state_name': 'B'}),
         ], 'commit')
@@ -1616,7 +1616,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertFalse(exp_issues.unresolved_issues[1].is_valid)
         self.assertFalse(exp_issues.unresolved_issues[2].is_valid)
 
-        exp_services.revert_exploration(self.owner_id, self.exp.id, 2, 1)  # type: ignore[no-untyped-call]
+        exp_services.revert_exploration(self.owner_id, self.exp.id, 2, 1)
 
         exp_issues = (
             stats_services.get_exp_issues(self.exp.id, self.exp.version + 2))
@@ -1670,7 +1670,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
         first_state_name = exp.init_state_name
         second_state_name = 'State 2'
         third_state_name = 'State 3'
-        exp_services.update_exploration('fake@user.com', 'eid', [  # type: ignore[no-untyped-call]
+        exp_services.update_exploration('fake@user.com', 'eid', [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': first_state_name,

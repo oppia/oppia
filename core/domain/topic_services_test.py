@@ -670,7 +670,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
         # Throws error if exploration doesn't exist.
-        exp_services.delete_exploration(self.user_id_admin, 'exp_id')  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.user_id_admin, 'exp_id')
 
         with self.assertRaisesRegex(
             Exception, 'Expected story to only reference valid explorations, '
