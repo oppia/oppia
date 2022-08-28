@@ -36,3 +36,15 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_VIEWER_STORY_URL_TEMPLATE',
   ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'CLASSROOM_HANDLER_URL_TEMPLATE',
+  ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'CLASSROOM_ID_HANDLER_URL_TEMPLATE',
+  ClassroomDomainConstants.CLASSROOM_ID_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'CLASSROOM_ADMIN_DATA_HANDLER_URL_TEMPLATE',
+  ClassroomDomainConstants.CLASSROOM_ADMIN_DATA_HANDLER_URL_TEMPLATE);
