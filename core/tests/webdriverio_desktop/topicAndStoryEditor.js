@@ -169,8 +169,7 @@ describe('Topic editor functionality', function() {
   it('should assign a skill to, and from subtopics',
     async function() {
       await topicsAndSkillsDashboardPage.get();
-      (
-        await
+      await (
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 2', 'Concept card explanation', false));
       await skillEditorPage.addRubricExplanationForDifficulty(
