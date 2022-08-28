@@ -21,6 +21,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import isEqual from 'lodash/isEqual';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ParamChange, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
@@ -104,7 +105,7 @@ export class PreviewTabComponent
   showParameterSummary(): boolean {
     return (
       this.explorationFeaturesService.areParametersEnabled() &&
-      !angular.equals({}, this.allParams));
+      !isEqual({}, this.allParams));
   }
 
   showSetParamsModal(manualParamChanges: string[], callback: Function): void {
@@ -133,10 +134,11 @@ export class PreviewTabComponent
   resetPreview(): void {
     this.previewWarning = '';
     this.isExplorationPopulated = false;
-    let initStateNameForPreview = (
+    const initStateNameForPreview = (
       this.explorationInitStateNameService.savedMemento);
     setTimeout(() => {
-      let explorationId = this.contextService.getExplorationId();
+      const explorationId = this.contextService.getExplorationId();
+
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
         explorationId).then((returnDict) => {
         this.explorationEngineService.init(
