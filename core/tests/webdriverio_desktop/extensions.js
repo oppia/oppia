@@ -129,7 +129,7 @@ describe('Interactions', function() {
   });
 
   fit('should pass their own test suites', async function() {
-    await users.createUser('user@interactions.com', 'userInteractions10');
+    await users.createUser('user@interactions.com', 'userInteractions11');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
 

@@ -49,7 +49,7 @@ var INTERACTIONS = {
   // Continue: require('./Continue/webdriverio.js'),
   // EndExploration: require('./EndExploration/webdriverio.js'),
   // FractionInput: require('./FractionInput/webdriverio.js'),
-  GraphInput: require('./GraphInput/webdriverio.js'),
+  // GraphInput: require('./GraphInput/webdriverio.js'),
   ItemSelectionInput: require('./ItemSelectionInput/webdriverio.js'),
   MathEquationInput: require('./MathEquationInput/webdriverio.js'),
   MultipleChoiceInput: require('./MultipleChoiceInput/webdriverio.js'),

@@ -204,6 +204,10 @@ var numberOfElementsToBe = async function(
   });
 };
 
+// If we are using chained selectors in order to find the number of
+// elements then we are going to use number of chained elements to be.
+// For e.g if we have lot of <option> tags present then we can use the
+// parent element to distinguish uniquely the option tags.
 var numberOfChainedElementsToBe = async function(
     parentSelector, childSelector, elementName, number) {
   await browser.waitUntil(async function() {

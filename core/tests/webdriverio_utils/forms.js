@@ -52,14 +52,8 @@ var GraphEditor = function(graphInputContainer) {
     var addNodeButton = await graphInputContainer.$(
       '.e2e-test-Add-Node-button');
     await action.click('Add Node Button', addNodeButton);
-    console.log(await graphInputContainer);
-    console.log(xOffset)
-    console.log(yOffset)
-    await browser.debug();
     // Offsetting from the graph container.
-    await graphInputContainer.moveTo(xOffset, yOffset);
     await graphInputContainer.click({x: xOffset, y: yOffset});
-    await browser.debug();
   };
 
   var createEdge = async function(vertexIndex1, vertexIndex2) {
@@ -67,12 +61,9 @@ var GraphEditor = function(graphInputContainer) {
       '.e2e-test-Add-Edge-button');
     await action.click('Add Edge Button', addEdgeButton);
     var vertexElement1 = await vertexElement(vertexIndex1);
-    await vertexElement1.moveTo();
-    await browser.buttonDown(0);
     var vertexElement2 = await vertexElement(vertexIndex2);
-    await vertexElement2.moveTo();
-    await browser.buttonUp(0);
-    await browser.debug();
+
+    await vertexElement1.dragAndDrop(vertexElement2);
   };
 
   return {
@@ -109,14 +100,15 @@ var GraphEditor = function(graphInputContainer) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
         for (var i = 0; i < nodeCoordinatesList.length; i++) {
-          expect(await vertexElement(i).isDisplayed()).toBe(true);
+          var graphVertexElement = await vertexElement(i);
+          expect(await graphVertexElement.isDisplayed()).toBe(true);
         }
       }
       if (edgesList) {
         var allEdgesElement = await $$('.e2e-test-graph-edge');
         // Expecting total no. of edges on the graph matches with the given
         // dict's edges.
-        expect(await allEdgesElement.length).toEqual(edgesList.length);
+        expect(allEdgesElement.length).toEqual(edgesList.length);
       }
     }
   };
