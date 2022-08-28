@@ -277,7 +277,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             sorted(recommendations_services.RECOMMENDATION_CATEGORIES))
 
     def test_get_item_similarity(self) -> None:
-        exp_summaries = exp_services.get_all_exploration_summaries()  # type: ignore[no-untyped-call]
+        exp_summaries = exp_services.get_all_exploration_summaries()
 
         self.assertEqual(
             recommendations_services.get_item_similarity(
@@ -292,7 +292,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
         system_user = user_services.get_system_user()
         rights_manager.unpublish_exploration(system_user, 'exp_id_2')
-        exp_summaries = exp_services.get_all_exploration_summaries()  # type: ignore[no-untyped-call]
+        exp_summaries = exp_services.get_all_exploration_summaries()
         self.assertEqual(
             recommendations_services.get_item_similarity(
                 exp_summaries['exp_id_1'], exp_summaries['exp_id_2']),

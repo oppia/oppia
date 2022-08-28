@@ -37,8 +37,8 @@ class LearnerProgressInTopicsAndStories:
         topics_to_learn_summaries: List[topic_domain.TopicSummary],
         all_topic_summaries: List[topic_domain.TopicSummary],
         untracked_topic_summaries: List[topic_domain.TopicSummary],
-        completed_to_incomplete_story_titles: List[story_domain.StorySummary],
-        learnt_to_partially_learnt_topic_titles: List[story_domain.StorySummary]
+        completed_to_incomplete_story_titles: List[str],
+        learnt_to_partially_learnt_topic_titles: List[str]
     ) -> None:
         """Constructs a LearnerProgress domain object.
 
@@ -56,12 +56,12 @@ class LearnerProgressInTopicsAndStories:
                 in the edit goals.
             untracked_topic_summaries: list(TopicSummary). The summaries of the
                 topics not tracked for the user.
-            completed_to_incomplete_story_titles: list(StorySummary).
-                The summaries corresponding to those stories which have
-                been moved to the in progress section on account of new
+            completed_to_incomplete_story_titles: list(str).
+                The titles of summaries corresponding to those stories which
+                have been moved to the in progress section on account of new
                 nodes being added to them.
-            learnt_to_partially_learnt_topic_titles: list(StorySummary).
-                The summaries corresponding to those topics which have
+            learnt_to_partially_learnt_topic_titles: list(str).
+                The titles of summaries corresponding to those topics which have
                 been moved to the in progress section on account of new
                 stories being added to them.
         """
@@ -88,8 +88,7 @@ class LearnerProgressInCollections:
             collection_domain.CollectionSummary],
         collection_playlist: List[
             collection_domain.CollectionSummary],
-        completed_to_incomplete_collection_titles: List[
-            collection_domain.CollectionSummary],
+        completed_to_incomplete_collection_titles: List[str],
     ) -> None:
         """Constructs a LearnerProgress domain object.
 

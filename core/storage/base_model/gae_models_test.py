@@ -55,6 +55,15 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
                 'derived class.')):
             base_models.BaseModel.get_deletion_policy()
 
+    def test_apply_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The apply_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.')):
+            base_models.BaseModel.apply_deletion_policy('test_user_id')
+
     def test_has_reference_to_user_id(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,

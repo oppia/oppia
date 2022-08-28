@@ -82,12 +82,27 @@ class Registry:
         return list(cls._interactions.values())
 
     @classmethod
-    def get_interaction_by_id(cls, interaction_id: str) -> base.BaseInteraction:
+    def get_interaction_by_id(
+        cls, interaction_id: Optional[str]
+    ) -> base.BaseInteraction:
         """Gets an interaction by its id.
 
         Refreshes once if the interaction is not found; subsequently, throws a
         KeyError.
+
+        Args:
+            interaction_id: Optional[str]. The interaction id.
+
+        Returns:
+            BaseInteraction. An interaction for the given interaction_id.
+
+        Raises:
+            Exception. No interaction exists for the None interaction_id.
         """
+        if interaction_id is None:
+            raise Exception(
+                'No interaction exists for the None interaction_id.'
+            )
         if interaction_id not in cls._interactions:
             cls._refresh()
         return cls._interactions[interaction_id]

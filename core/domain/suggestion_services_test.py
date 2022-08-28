@@ -344,7 +344,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'state 1',
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, self.target_id, change_list, 'Add state.')
 
         new_suggestion_content = state_domain.SubtitledHtml(
@@ -870,7 +870,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
+        exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -881,7 +881,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'html': '<p>old content html</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1039,7 +1039,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
+        exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1050,7 +1050,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'html': '<p>old content html</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1074,7 +1074,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.accept_suggestion(
             suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
         )
-        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(  # type: ignore[no-untyped-call]
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             'exploration1')
 
         self.assertEqual(
@@ -1941,7 +1941,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'new_value': recorded_voiceovers_dict,
         })
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, exploration.id,
             [content_change, recorded_voiceovers_change], '')
 
@@ -2169,7 +2169,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.author_id, suggestion_change, 'test description')
         self.assert_created_suggestion_is_valid(skill_id, self.author_id)
 
-        skill_services.delete_skill(self.author_id, skill_id)  # type: ignore[no-untyped-call]
+        skill_services.delete_skill(self.author_id, skill_id)
 
         # Suggestion should be rejected after corresponding skill is deleted.
         suggestions = suggestion_services.query_suggestions(
@@ -2263,9 +2263,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Delete the exploration state corresponding to the translation
         # suggestion.
         init_state = exploration.states[exploration.init_state_name]
-        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        outcome_object = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert outcome_object is not None
+        default_outcome_dict = outcome_object.to_dict()
         default_outcome_dict['dest'] = 'End State'
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

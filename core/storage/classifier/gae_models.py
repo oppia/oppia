@@ -22,12 +22,14 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    # Here, we are importing 'classifier_domain' only for type checking.
+    # Here, we are importing 'classifier_domain' and 'classifier_services'
+    # only for type checking.
     from core.domain import classifier_domain  # pylint: disable=invalid-import # isort:skip
+    from core.domain import classifier_services  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -226,10 +228,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 
-    # TODO(#13523): Change 'job_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
-    def create_multi(cls, job_dicts_list: List[Dict[str, Any]]) -> List[str]:
+    def create_multi(
+        cls, job_dicts_list: List[classifier_services.JobInfoDict]
+    ) -> List[str]:
         """Creates multiple new  ClassifierTrainingJobModel entries.
 
         Args:

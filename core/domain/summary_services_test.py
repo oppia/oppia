@@ -97,7 +97,7 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -106,21 +106,21 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
             })], 'Changed title to Albert1 title.')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.albert_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
             })], 'Changed title to Albert2 title.')
 
-        exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)  # type: ignore[no-untyped-call]
+        exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
         with self.assertRaisesRegex(
             Exception, 'This exploration cannot be published'
@@ -131,7 +131,7 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
-        exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
         self.signup(self.USER_C_EMAIL, self.USER_C_NAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
@@ -140,14 +140,14 @@ class ExplorationDisplayableSummariesTest(
             self.user_c_id, self.USER_C_PROFILE_PICTURE)
 
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration updated title'
             })], 'Changed title once.')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -516,7 +516,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -890,7 +890,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
         # Test that editing an exploration does not change its
         # 'recently-published' status.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -1023,7 +1023,7 @@ class CollectionNodeMetadataDictsTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID3)
         rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
-        exp_services.index_explorations_given_ids([  # type: ignore[no-untyped-call]
+        exp_services.index_explorations_given_ids([
             self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,
             self.EXP_ID4])
 
@@ -1085,7 +1085,7 @@ class CollectionNodeMetadataDictsTest(
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
     def test_deleted_exps_are_not_returned(self) -> None:
-        exp_services.delete_exploration(self.albert_id, self.EXP_ID2)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
 
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))

@@ -47,7 +47,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
     def test_rating_assignation(self) -> None:
         """Check ratings are correctly assigned to an exploration."""
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             self.EXP_ID,
             exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
@@ -96,7 +96,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
         time_allowed_for_computation = datetime.timedelta(seconds=10)
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             self.EXP_ID,
             exp_domain.Exploration.create_default_exploration(self.EXP_ID))
 
@@ -123,10 +123,10 @@ class RatingServicesTests(test_utils.GenericTestBase):
         exp_id_a: Final = 'exp_id_A'
         exp_id_b: Final = 'exp_id_B'
 
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             exp_id_a,
             exp_domain.Exploration.create_default_exploration(exp_id_a))
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             exp_id_b,
             exp_domain.Exploration.create_default_exploration(exp_id_b))
 
@@ -235,7 +235,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
             'get_exploration_summary_by_id',
             _mock_get_exploration_summary_by_id
         ):
-            exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+            exp_services.save_new_exploration(
                 'exp_id_a',
                 exp_domain.Exploration.create_default_exploration('exp_id_a'))
 

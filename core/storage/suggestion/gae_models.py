@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    # Here, change domain is imported only for type checking.
+    # Here, 'change_domain' is imported only for type checking.
     from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services

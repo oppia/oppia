@@ -184,7 +184,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         # Update exploration to version 3.
@@ -192,7 +192,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state 2',
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         exploration_latest = exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
@@ -217,7 +217,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         # Update exploration to version 3.
@@ -225,7 +225,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state 2',
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         with self.assertRaisesRegex(
@@ -335,7 +335,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         self.assertIsNone(version_history)
 
-        exp_services.update_exploration( # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -693,7 +693,7 @@ title: Old Title
             'from_version': str(exploration_model.states_schema_version),
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             feconf.MIGRATION_BOT_USERNAME, exploration_model.id, commit_cmds,
             'Update exploration states from schema version %d to %d.' % (
                 exploration_model.states_schema_version,
@@ -713,7 +713,7 @@ title: Old Title
         exploration.validate(strict=True)
 
         # Version 5 is a reversion to version 1.
-        exp_services.revert_exploration('committer_id_v4', exp_id, 4, 1)  # type: ignore[no-untyped-call]
+        exp_services.revert_exploration('committer_id_v4', exp_id, 4, 1)
 
         # The exploration model itself should now be the old version
         # (pre-migration).
@@ -733,7 +733,7 @@ title: Old Title
         # The exploration should be valid after reversion.
         exploration.validate(strict=True)
 
-        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(  # type: ignore[no-untyped-call]
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             exp_id)
 
         # These are used to verify the correct history has been recorded after
@@ -775,7 +775,7 @@ title: Old Title
 
         # Ensure that if a converted, then reverted, then converted exploration
         # is saved, it will be the up-to-date version within the datastore.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.albert_id, exp_id, [], 'Resave after reversion')
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)

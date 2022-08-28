@@ -30,6 +30,8 @@ from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'classifier_services' only for type checking.
+    from core.domain import classifier_services
     from mypy_imports import base_models
     from mypy_imports import classifier_models
 
@@ -234,7 +236,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_multi_jobs(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
-        job_dicts_list = []
+        job_dicts_list: List[classifier_services.JobInfoDict] = []
         job_dicts_list.append({
             'exp_id': u'1',
             'exp_version': 1,

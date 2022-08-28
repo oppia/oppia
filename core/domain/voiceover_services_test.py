@@ -418,7 +418,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 self.applicant_id, 'Testing rejection')
 
     def test_get_text_to_create_voiceover_application(self) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -438,7 +438,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     def test_get_text_to_create_voiceover_application_in_diff_language(
         self
     ) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

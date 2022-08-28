@@ -434,7 +434,7 @@ def validate_explorations_for_story(
                 validation_error_messages.append(error_string)
             try:
                 validation_error_messages.extend(
-                    exp_services.validate_exploration_for_story(exp, strict))  # type: ignore[no-untyped-call]
+                    exp_services.validate_exploration_for_story(exp, strict))
             except Exception as e:
                 logging.exception(
                     'Exploration validation failed for exploration with ID: '
@@ -735,12 +735,17 @@ def compute_summary_of_story(
 
     Returns:
         StorySummary. The computed summary for the given story.
+
+    Raises:
+        Exception. No data available for when the story was last_updated on.
     """
     story_model_node_titles = [
         node.title for node in story.story_contents.nodes]
-    # Ruling out the possibility of None for mypy type checking.
-    assert story.created_on is not None
-    assert story.last_updated is not None
+
+    if story.created_on is None or story.last_updated is None:
+        raise Exception(
+            'No data available for when the story was last_updated on.'
+        )
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
         story.version, story_model_node_titles, story.thumbnail_bg_color,

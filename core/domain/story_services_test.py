@@ -119,6 +119,17 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
 
+    def test_raises_error_when_the_story_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        self.story.created_on = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No data available for when the story was last_updated'
+        ):
+            story_services.compute_summary_of_story(self.story)
+
     def test_get_new_story_id(self) -> None:
         new_story_id = story_services.get_new_story_id()
 
@@ -1423,7 +1434,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
@@ -1472,7 +1483,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
             end_state_name='End', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1520,7 +1531,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
             correctness_feedback_enabled=True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
@@ -1558,7 +1569,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id_2', self.user_id_a, title='title 2', category='Algebra',
             interaction_id='GraphInput', correctness_feedback_enabled=True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',

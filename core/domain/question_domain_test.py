@@ -353,6 +353,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         state.interaction.hints = []
         self._assert_question_domain_validation_error(
             'Expected the question to have at least one hint')
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.dest = 'abc'
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination as None.')
@@ -360,7 +362,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
-        state.interaction.default_outcome.dest = None  # type: ignore[assignment]
+        state.interaction.default_outcome.dest = None
         state.interaction.default_outcome.dest_if_really_stuck = 'pqr'
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination for the '
@@ -374,6 +376,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         strict as True for interaction with answer group.
         """
         state = self.question.question_state_data
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.labelled_as_correct = False
         rule_spec_input_test_dict: Dict[str, Union[str, List[str]]] = {
             'contentId': 'rule_input_4',
@@ -833,6 +837,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_data['interaction']['default_outcome'] is not None
         question_data['content']['html'] = '<br/>'
         question_data['interaction']['default_outcome'][
             'feedback']['html'] = '<br/>'
@@ -842,6 +848,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'state_schema_version': 33
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert test_value['state']['interaction']['default_outcome'] is not None
         self.assertEqual(
             test_value['state']['content']['html'], '<br/>')
         self.assertEqual(
@@ -981,6 +989,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         # Ruling out the possibility of None for mypy type checking.
         assert test_value['state']['interaction']['solution'] is not None
+        assert isinstance(
+            test_value['state']['interaction']['solution']['correct_answer'],
+            str
+        )
         self.assertNotIn(
             'ascii',
             test_value['state']['interaction']['solution']['correct_answer']
@@ -1772,9 +1784,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_solution_dict
         )
 
+        drag_and_drop_test_solution_dict = copy.deepcopy(test_solution_dict)
+        drag_and_drop_test_solution_dict['correct_answer'] = [
+            ['correct_value']
+        ]
+
         # Testing with interaction id 'DragAndDropSortInput'.
         test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
-        test_value['state']['interaction']['solution'] = test_solution_dict
+        test_value['state']['interaction']['solution'] = (
+            drag_and_drop_test_solution_dict
+        )
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': [
@@ -1867,7 +1886,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             test_value['state']['interaction']['solution'],
-            test_solution_dict
+            drag_and_drop_test_solution_dict
         )
 
     def test_question_state_dict_conversion_from_v42_to_v43(self) -> None:
@@ -2137,6 +2156,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         default_outcome_dict = test_value['state']['interaction']['default_outcome'] # pylint: disable=line-too-long
         outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome'] # pylint: disable=line-too-long
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome_dict is not None
         self.assertIn('dest_if_really_stuck', default_outcome_dict)
         self.assertEqual(default_outcome_dict['dest_if_really_stuck'], None)
 

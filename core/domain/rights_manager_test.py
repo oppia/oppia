@@ -176,7 +176,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_ownership_of_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
@@ -189,7 +189,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_newly_created_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -227,7 +227,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_inviting_collaborator_to_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
@@ -259,7 +259,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_inviting_voice_artist_to_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
@@ -300,7 +300,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_inviting_playtester_to_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
@@ -332,7 +332,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_user_with_rights_to_edit_any_public_activity(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
@@ -352,7 +352,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_user_with_rights_to_delete_any_public_activity(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
@@ -374,7 +374,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(Exception, 'No activity_rights exists'):
             rights_manager.assign_role_for_exploration(
@@ -383,7 +383,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_setting_rights_of_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
@@ -420,7 +420,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_publishing_and_unpublishing_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='A title', category='A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
@@ -447,14 +447,14 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='A title', category='A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        learner_progress_services.mark_exploration_as_completed(  # type: ignore[no-untyped-call]
+        learner_progress_services.mark_exploration_as_completed(
             self.user_id_f, self.EXP_ID)
 
         self.assertEqual(
-            learner_progress_services.get_all_completed_exp_ids(  # type: ignore[no-untyped-call]
+            learner_progress_services.get_all_completed_exp_ids(
                 self.user_id_f),
             [self.EXP_ID]
         )
@@ -462,7 +462,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.unpublish_exploration(self.user_moderator, self.EXP_ID)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
-            learner_progress_services.get_all_completed_exp_ids(  # type: ignore[no-untyped-call]
+            learner_progress_services.get_all_completed_exp_ids(
                 self.user_id_f),
             []
         )
@@ -472,13 +472,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='A title', category='A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        learner_progress_services.mark_exploration_as_incomplete(  # type: ignore[no-untyped-call]
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id_e, self.EXP_ID, 'state', 1)
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_exp_ids(  # type: ignore[no-untyped-call]
+            learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id_e),
             [self.EXP_ID]
         )
@@ -486,7 +486,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.unpublish_exploration(self.user_moderator, self.EXP_ID)
         self.process_and_flush_pending_tasks()
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_exp_ids(  # type: ignore[no-untyped-call]
+            learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id_e),
             []
         )
@@ -494,7 +494,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_can_only_delete_unpublished_explorations(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='A title', category='A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_delete_activity(
@@ -515,7 +515,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_changing_viewability_of_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='A title', category='A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(rights_manager.check_can_access_activity(
@@ -546,7 +546,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_reassign_higher_role_to_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
@@ -564,7 +564,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_reassign_lower_role_to_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
@@ -582,7 +582,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_check_exploration_rights(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
@@ -626,7 +626,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_owner_cannot_be_reassigned_as_owner(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(Exception, 'This user already owns this'):
             rights_manager.assign_role_for_exploration(
@@ -635,7 +635,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_assign_viewer_to_role_owner(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
@@ -652,7 +652,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_owner_cannot_assign_voice_artist(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         with self.assertRaisesRegex(Exception, 'Could not assign new role.'):
@@ -662,7 +662,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_voiceover_admin_can_modify_voice_artist_role(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         rights_manager.assign_role_for_exploration(
@@ -681,7 +681,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(
             Exception, 'Could not assign voice artist to private activity.'
@@ -694,7 +694,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         rights_manager.assign_role_for_exploration(
@@ -713,7 +713,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_owner_cannot_assign_voice_artist_to_core_role(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         rights_manager.assign_role_for_exploration(
@@ -729,7 +729,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_voice_artist_cannot_be_reassigned_as_voice_artist(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         rights_manager.assign_role_for_exploration(
@@ -744,7 +744,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_viewer_cannot_be_reassigned_as_viewer(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
@@ -760,7 +760,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
@@ -772,7 +772,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_cannot_assign_invalid_role(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(Exception, 'Invalid role: invalid_role'):
             rights_manager.assign_role_for_exploration(
@@ -782,7 +782,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(
             Exception, 'No activity_rights exists for the given activity_id'
@@ -792,7 +792,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_deassign_without_rights_fails(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(
             Exception, 'Could not deassign role'):
@@ -801,7 +801,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_deassign_viewer_is_successful(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_VIEWER)
@@ -815,7 +815,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_deassign_editor_is_successful(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_EDITOR)
@@ -831,7 +831,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_EDITOR)
@@ -846,7 +846,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_deassign_owner_is_successful(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_OWNER)
@@ -860,7 +860,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     def test_deassign_non_existent_fails(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegex(
             Exception, 'This user does not have any role in'):
@@ -880,7 +880,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         # Creating new exploration.
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
         snapshots_data = (
             exp_models.ExplorationRightsModel.get_snapshots_metadata(

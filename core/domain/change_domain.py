@@ -33,6 +33,7 @@ if MYPY: # pragma: no cover
     from core.domain import param_domain
     from core.domain import platform_parameter_domain
     from core.domain import question_domain
+    from core.domain import skill_domain
     from core.domain import state_domain
 
     # After importing modules under the `if MYPY` clause they are not
@@ -48,13 +49,14 @@ if MYPY: # pragma: no cover
         bool,
         float,
         int,
-        float,
         None,
         List[str],
         Dict[str, Any],
         List[Dict[str, Any]],
         List[param_domain.ParamChangeDict],
         List[state_domain.AnswerGroupDict],
+        List[state_domain.HintDict],
+        List[skill_domain.WorkedExampleDict],
         List[platform_parameter_domain.PlatformParameterRuleDict],
         question_domain.QuestionDict,
         state_domain.AnswerGroupDict,

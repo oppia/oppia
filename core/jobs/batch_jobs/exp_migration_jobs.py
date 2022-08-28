@@ -84,7 +84,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 if exp_services.get_story_id_linked_to_exploration(
                         exp_id) is not None:
-                    exp_services.validate_exploration_for_story( # type: ignore[no-untyped-call]
+                    exp_services.validate_exploration_for_story(
                         exploration, True)
 
         except Exception as e:
@@ -163,7 +163,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         exp_rights = rights_manager.get_activity_rights_from_model(
             exp_rights_model, constants.ACTIVITY_TYPE_EXPLORATION)
-        exp_summary = exp_services.update_exploration_summary( # type: ignore[no-untyped-call]
+        exp_summary = exp_services.update_exploration_summary(
             migrated_exp,
             exp_rights,
             exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
@@ -171,7 +171,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
         exp_summary.version += 1
         updated_exp_summary_model: exp_models.ExpSummaryModel = (
-            exp_services.populate_exp_summary_model_fields( # type: ignore[no-untyped-call]
+            exp_services.populate_exp_summary_model_fields(
                 exp_summary_model, exp_summary
             )
         )
@@ -202,7 +202,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             the datastore.
         """
         updated_exp_model = (
-            exp_services.populate_exp_model_fields( # type: ignore[no-untyped-call]
+            exp_services.populate_exp_model_fields(
                 exp_model, migrated_exp))
 
         commit_message = (

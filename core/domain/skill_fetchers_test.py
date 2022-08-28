@@ -284,7 +284,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                 'new_value': 'bn'
             })
         ]
-        skill_services.update_skill(  # type: ignore[no-untyped-call]
+        skill_services.update_skill(
             self.USER_ID, self.skill_id, changelist, 'update language code')
 
         skill = skill_fetchers.get_skill_by_id(self.skill_id, version=1)

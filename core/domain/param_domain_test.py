@@ -54,7 +54,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
         # Ensure that this object class exists.
         for obj_type in feconf.SUPPORTED_OBJ_TYPES:
-            object_registry.Registry.get_object_class_by_type(obj_type)  # type: ignore[no-untyped-call]
+            object_registry.Registry.get_object_class_by_type(obj_type)
 
     def test_param_change_validation(self) -> None:
         """Test validation of parameter changes."""

@@ -133,7 +133,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         # Test adding a single topic_id to learn.
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), [])
-        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
@@ -145,13 +145,13 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [])
 
-        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
@@ -160,9 +160,9 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
     def test_adding_exisiting_topic_is_not_added_again(self) -> None:
         # Test adding the topic_id if it is already in
         # learner_goals.topic_id.
-        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
-        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
@@ -171,17 +171,17 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception,
             'The topic id Topic_id_1 is already present in the learner goals'):
-            learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+            learner_progress_services.validate_and_add_topic_to_learn_goal(
                 self.viewer_id, self.TOPIC_ID_1)
 
     def test_completed_topic_is_not_added_to_learner_goals(self) -> None:
-        learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-        learner_progress_services.mark_topic_as_learnt(  # type: ignore[no-untyped-call]
+        learner_progress_services.mark_topic_as_learnt(
             self.viewer_id, self.TOPIC_ID_2)
 
         # Test that the topic added to the in the learnt list doesn't get
@@ -195,7 +195,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         topic_ids = ['SAMPLE_TOPIC_ID_%s' % index for index in (
             range(0, MAX_CURRENT_GOALS_COUNT))]
         for topic_id in topic_ids:
-            learner_progress_services.validate_and_add_topic_to_learn_goal(  # type: ignore[no-untyped-call]
+            learner_progress_services.validate_and_add_topic_to_learn_goal(
                 self.viewer_id, topic_id)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), topic_ids)

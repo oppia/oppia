@@ -33,6 +33,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -2171,6 +2172,67 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_audit_model.old_username, 'oldUsername')
         self.assertEqual(user_audit_model.new_username, 'newUsername')
 
+    def test_raises_error_if_none_destination_is_provided_for_checkpoint(
+        self
+    ) -> None:
+        state = state_domain.State.create_default_state('state_1')
+        state_answer_group: List[state_domain.AnswerGroup] = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    None, None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_id('TextInput')
+        state.update_interaction_answer_groups(state_answer_group)
+        states = {'Introduction': state}
+
+        with self.assertRaisesRegex(
+            Exception,
+            'States with a null destination can never be a checkpoint.'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
+
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_answer_groups(state_answer_group)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
+        state.interaction.default_outcome.dest = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'States with a null destination can never be a checkpoint'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
+
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
@@ -2339,7 +2401,7 @@ title: Title
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
         self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -2373,7 +2435,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # Second checkpoint reached.
@@ -2416,7 +2478,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             False)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # First checkpoint reached again.
@@ -2443,7 +2505,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 4.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2499,7 +2561,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 2.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2570,7 +2632,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test all owners and editors of exploration after publication have
@@ -2582,7 +2644,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2620,7 +2682,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that commit to unpublished exploration does not update
         # contribution time.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.admin_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2647,7 +2709,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -2658,7 +2720,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that after an exploration is published, all contributors have
         # updated first contribution time.
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -2672,7 +2734,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.EXP_ID, self.admin_id, end_state_name='End')
         rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test that contribution time is not given to an editor that has not
@@ -2686,7 +2748,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
 
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.owner, self.EXP_ID)
         rights_manager.unpublish_exploration(self.owner, self.EXP_ID)
 
@@ -2704,7 +2766,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
@@ -3160,7 +3222,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3171,7 +3233,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(editor_settings.last_edited_an_exploration)
 
     def test_last_exp_edit_time_gets_updated(self) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3196,7 +3258,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(previous_last_edited_an_exploration)
 
         # The editor edits the exploration 13 hours after it was created.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',

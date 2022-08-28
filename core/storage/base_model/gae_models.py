@@ -57,7 +57,7 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
 
 MYPY = False
 if MYPY: # pragma: no cover
-    # Here, change domain is imported only for type checking.
+    # Here, 'change_domain' is imported only for type checking.
     from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
@@ -218,6 +218,18 @@ class BaseModel(datastore_services.Model):
         """
         raise NotImplementedError(
             'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The apply_deletion_policy() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
     @classmethod
