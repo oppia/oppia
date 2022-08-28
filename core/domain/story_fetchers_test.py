@@ -303,3 +303,47 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             Exception, 'Story with id story_id_2 does not exist.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1)
+
+    def test_get_learner_group_syllabus_story_summaries(self) -> None:
+        story_summaries = (
+            story_fetchers.get_learner_group_syllabus_story_summaries(
+                [self.story_id]))
+
+        self.assertEqual(len(story_summaries), 1)
+        self.assertEqual(story_summaries[0]['id'], self.story_id)
+        self.assertEqual(story_summaries[0]['title'], 'Title')
+        self.assertEqual(story_summaries[0]['description'], 'Description')
+        self.assertEqual(story_summaries[0]['node_titles'], ['Title 1'])
+        self.assertEqual(story_summaries[0]['thumbnail_bg_color'], None)
+        self.assertEqual(story_summaries[0]['thumbnail_filename'], None)
+        self.assertEqual(story_summaries[0]['topic_name'], 'Topic')
+
+    def test_get_user_progress_in_story_chapters(self) -> None:
+        exp_id_1 = 'expid1'
+        self.save_new_valid_exploration(exp_id_1, self.USER_ID)
+
+        learner_id = 'learner1'
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'old_value': None,
+                'new_value': exp_id_1
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.story_id, change_list,
+            'Added node.')
+
+        user_services.update_learner_checkpoint_progress(
+            learner_id, exp_id_1, 'Introduction', 1)
+
+        user_progress = story_fetchers.get_user_progress_in_story_chapters(
+            learner_id, [self.story_id])
+
+        self.assertEqual(len(user_progress), 1)
+        self.assertEqual(user_progress[0]['exploration_id'], exp_id_1)
+        self.assertEqual(user_progress[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(user_progress[0]['total_checkpoints_count'], 1)

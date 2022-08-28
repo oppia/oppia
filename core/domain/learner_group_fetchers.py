@@ -87,14 +87,14 @@ def get_learner_groups_of_facilitator(
     ]
 
 
-def can_multi_students_share_progress(
+def can_multi_learners_share_progress(
     user_ids: List[str], group_id: str
 ) -> List[bool]:
     """Returns the progress sharing permissions of the given users in the given
     group.
 
     Args:
-        user_ids: list(str). The user ids of the students of the group.
+        user_ids: list(str). The user ids of the learners of the group.
         group_id: str. The id of the learner group.
 
     Returns:

@@ -969,8 +969,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             title='sample title',
             description='sample description',
             facilitator_user_ids=[self.USER_ID_1],
-            student_user_ids=['user_id_2'],
-            invited_student_user_ids=['user_id_3'],
+            learner_user_ids=['user_id_2'],
+            invited_learner_user_ids=['user_id_3'],
             subtopic_page_ids=['subtopic_id_1', 'subtopic_id_2'],
             story_ids=['skill_id_1', 'skill_id_2']
         )
