@@ -1200,6 +1200,10 @@ def _compute_summary_of_collection(
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
+
+    Raises:
+        Exception. No data available for when the collection was last_updated.
+        Exception. No data available for when the collection was created.
     """
     collection_rights = collection_models.CollectionRightsModel.get_by_id(
         collection.id)
@@ -1216,9 +1220,16 @@ def _compute_summary_of_collection(
     collection_model_created_on = collection.created_on
     collection_model_node_count = len(collection.nodes)
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert collection_model_last_updated is not None
-    assert collection_model_created_on is not None
+    if collection_model_last_updated is None:
+        raise Exception(
+            'No data available for when the collection was last_updated.'
+        )
+
+    if collection_model_created_on is None:
+        raise Exception(
+            'No data available for when the collection was created.'
+        )
+
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
         collection.objective, collection.language_code, collection.tags,

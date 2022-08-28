@@ -3,7 +3,7 @@
     <span *ngIf="editabilityService.isEditable()">
       <span *ngIf="!stateNameService.isStateNameEditorShown()" (click)="openStateNameEditor()" class="oppia-editable-section">
         <strong class="oppia-state-name-text e2e-test-state-name-text">{{stateEditorService.getActiveStateName()}}</strong>
-        <button *ngIf="editabilityService.isEditable()" class="material-icons oppia-editor-edit-icon oppia-autofocus"
+        <button *ngIf="editabilityService.isEditable()" class="fas fa-pen oppia-editor-edit-icon oppia-autofocus"
                 title="Edit State Name">&#xE254;
         </button>
       </span>

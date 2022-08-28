@@ -19,8 +19,8 @@
         </tr>
       </table>
     </div>
-    <button class="btn-lg" (click)="resetPreview()">
-      <i class="material-icons oppia-reload-icon">&#xE5D5;</i>
+    <button class="btn-lg" ng-click="$ctrl.resetPreview()">
+      <i class="fas fa-redo oppia-reload-icon"></i>
       <span class="oppia-restart-text">Restart From Beginning</span>
     </button>
   </div>
@@ -94,6 +94,7 @@
   }
 
   .oppia-reload-icon {
+    font-size: 18px;
     margin-bottom: 2px;
   }
 
