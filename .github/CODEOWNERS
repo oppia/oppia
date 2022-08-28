@@ -543,6 +543,7 @@
 /core/templates/pages/admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/moderator-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/blog-admin-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/classroom-admin-page/ @oppia/lace-frontend-reviewers
 
 
 # Release team.

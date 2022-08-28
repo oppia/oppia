@@ -679,7 +679,16 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot generate dummy explorations in production.')
 
     def _generate_dummy_classroom(self):
+        """Generate and loads the database with a classroom.
+
+        Raises:
+            Exception. Cannot generate dummy classroom in production.
+            Exception. User does not have enough rights to generate data.
+        """
         if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
             logging.info(
                 '[ADMIN] %s generated dummy classroom.' % self.user_id)
             new_classroom_id = classroom_config_services.get_new_classroom_id()
