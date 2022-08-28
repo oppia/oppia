@@ -1569,10 +1569,10 @@ class LearnerGroupsUser:
         Attributes:
             user_id: str. The user id.
             invited_to_learner_groups_ids: list(str). List of learner group ids
-                that the user has been invited to join as student.
+                that the user has been invited to join as learner.
             learner_groups_user_details:
                 list(LearnerGroupUserDetails). List of user details of
-                all learner groups that the user is student of.
+                all learner groups that the user is learner of.
             learner_groups_user_details_schema_version: int. The version
                 of the learner groups user details schema blob.
         """
@@ -1616,5 +1616,5 @@ class LearnerGroupsUser:
                     self.invited_to_learner_groups_ids):
                 raise utils.ValidationError(
                     'Learner cannot be invited to join learner group '
-                    '%s since they are already its student.' % (
+                    '%s since they are already its learner.' % (
                         learner_group_details.group_id))
