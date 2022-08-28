@@ -342,7 +342,7 @@ def apply_change_list(
                 if (update_story_contents_property_cmd.property_name ==
                         story_domain.INITIAL_NODE_ID):
                     # Here we use cast because in this 'if clause' we are
-                    # updating the initial_node_id of StoryContents, and 
+                    # updating the initial_node_id of StoryContents, and
                     # initial_node_id can only be of type string. So, to
                     # rule out all other property types for MyPy type
                     # checking, we used cast here.
