@@ -2744,9 +2744,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for rule_spec in answer_group['rule_specs']:
                     for param_name, value in rule_spec['inputs'].items():
                         interaction_id = interaction['id']
-                        # Ruling out the possibility of None for mypy type
-                        # checking.
-                        assert interaction_id is not None
                         param_type = (
                             interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
                                 interaction_id

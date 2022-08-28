@@ -1155,12 +1155,18 @@ def compute_summary_of_skill(
 
     Raises:
         Exception. No data available for when the skill was last_updated.
+        Exception. No data available for when the skill was created.
     """
     skill_model_misconception_count = len(skill.misconceptions)
     skill_model_worked_examples_count = len(
         skill.skill_contents.worked_examples)
 
-    if skill.created_on is None or skill.last_updated is None:
+    if skill.created_on is None:
+        raise Exception(
+            'No data available for when the skill was created.'
+        )
+
+    if skill.last_updated is None:
         raise Exception(
             'No data available for when the skill was last_updated.'
         )

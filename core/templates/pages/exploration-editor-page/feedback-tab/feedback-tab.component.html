@@ -28,7 +28,7 @@
       <div class="col-lg-8 col-md-8 col-sm-8">
         <span class="oppia-back-arrow">
           <button type="button" class="btn btn-secondary btn-sm e2e-test-oppia-feedback-back-button" ng-click="$ctrl.onBackButtonClicked()">
-            <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
+            <i class="fas fa-angle-left oppia-back-arrow-icon oppia-vcenter" title="Return to list of feedback threads"></i>
           </button>
         </span>
         <span class="oppia-thread-text" ng-show="!$ctrl.activeThread.isSuggestionThread()">Feedback Thread: <[$ctrl.activeThread.subject]></span>
@@ -115,7 +115,7 @@
                     ng-disabled="$ctrl.messageSendingInProgress">
             </select>
             <div class="oppia-icon-container" ng-if="!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable')">
-              <i class="material-icons">&#xE88F;</i>
+              <i class="fas fa-info-circle"></i>
               <span>Please specify a reason for setting the status to <[$ctrl.getHumanReadableStatus($ctrl.tmpMessage.status)]>.</span>
             </div>
           </span>
@@ -149,6 +149,9 @@
   .activeThreadView {
     margin-top: 10px;
     word-wrap: break-word;
+  }
+  .oppia-back-arrow-icon {
+    font-size: 19px;
   }
   feedback-tab .oppia-thread-button {
     margin-top: 15px;

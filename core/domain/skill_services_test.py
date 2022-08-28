@@ -144,7 +144,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'No data available for when the skill was last_updated'
+            'No data available for when the skill was created.'
+        ):
+            skill_services.compute_summary_of_skill(skill)
+
+    def test_raises_error_when_the_skill_provided_with_no_last_updated_data(
+        self
+    ) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        skill.last_updated = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No data available for when the skill was last_updated.'
         ):
             skill_services.compute_summary_of_skill(skill)
 
