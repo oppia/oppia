@@ -70,7 +70,7 @@
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
               <span (click)="deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();"
                     class="link-off-icon">
-                <i class="material-icons">link_off</i>
+                <i class="fas fa-unlink"></i>
               </span>
             </div>
             <div class="question-interaction-id">
@@ -80,11 +80,11 @@
         </div>
       </div>
       <div class="page-navigation-arrows" *ngIf="questionSummariesForOneSkill.length > 0">
-        <i class="material-icons md-18"
+        <i class="fas fa-arrow-left md-18"
            *ngIf="getCurrentPageNumber() !== 0"
-           (click)="goToPreviousPage()">&#xE5C4;
+           (click)="goToPreviousPage()">
         </i> Page {{getCurrentPageNumber() + 1}}
-        <i class="material-icons md-18" *ngIf="!isLastPage()" (click)="goToNextPage()">&#xE5C8;</i>
+        <i class="fas fa-arrow-right md-18" *ngIf="!isLastPage()" (click)="goToNextPage()"></i>
       </div>
     </div>
   </mat-card>

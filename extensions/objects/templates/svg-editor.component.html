@@ -274,18 +274,16 @@
       </div>
       <div class="input-tag" *ngIf="objectIsSelected">
         Layer number:{{ layerNum }}
-        <i class="material-icons layer-info" placement="bottom"
+        <i class="fas fa-question-circle layer-info" placement="bottom"
            ngbTooltip="This denotes the layer in which the currently selected shape is present. Layer 1 is the bottom layer.">
-          &#xE887;
         </i>
       </div>
     </div>
   </div>
   <div *ngIf="isDiagramSaved()">
     <div class="diagram-editor-saved-image-container e2e-test-saved-diagram-container">
-      <i class="material-icons diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
-         title="Continue editing the diagram">
-        &#xE254;
+      <i class="fas fa-pen diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
+         title="Continue editing the diagram">s
       </i>
       <img [src]="data.savedSvgUrl" [ngStyle]="svgContainerStyle">
     </div>
@@ -444,7 +442,7 @@
   }
 
   .svg-editor .svg-editor .horizontal-toolbar .layer-info {
-    font-size: 19px;
+    font-size: 16px;
   }
 
   .svg-editor .svg-editor .vertical-toolbar {

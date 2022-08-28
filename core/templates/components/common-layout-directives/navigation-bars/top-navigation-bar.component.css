@@ -374,8 +374,8 @@ oppia-top-navigation-bar .oppia-launch-icon {
   color: #009688;
   font-size: 22px;
 }
-oppia-top-navigation-bar .oppia-user-avatar-icon {
-  margin-top: -1px;
+.oppia-user-avatar-icon {
+  font-size: 36px;
 }
 oppia-top-navigation-bar .oppia-admin-text {
   right: 4px;

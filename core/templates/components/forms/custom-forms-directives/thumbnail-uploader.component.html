@@ -6,8 +6,7 @@
            (click)="showEditThumbnailModal()"
            aria-label="upload or edit thumbnail">
       </div>
-      <i class="material-icons oppia-editor-edit-icon oppia-pencil-icon">
-        &#xE254;
+      <i class="fas fa-pen oppia-editor-edit-icon oppia-pencil-icon">
       </i>
       <img [hidden]="!hidePlaceholder" [src]="placeholderImageUrl" align="center" class="oppia-thumbnail-placeholder" alt="">
       <oppia-thumbnail-display *ngIf="editableThumbnailDataUrl"

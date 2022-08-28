@@ -14,7 +14,7 @@
       <div *ngIf="uploadedImage">
         <div class="oppia-thumbnail-picture-crop-area e2e-test-photo-crop">
           <button class="btn btn-secondary oppia-thumbnail-picture-reset-button" (click)="reset()">
-            <i class="material-icons oppia-vcenter">&#xE14C;</i>
+            <i class="fas fa-times oppia-vcenter"></i>
           </button>
           <img id="croppable-image" [src]="uploadedImage" #croppableImage alt="">
         </div>
@@ -49,9 +49,10 @@
   }
 
   .oppia-thumbnail-picture-reset-button {
+    font-size: 16px;
     position: absolute;
-    right: -50px;
-    top: 0;
+    right: -37px;
+    top: -1px;
   }
 
   .oppia-form-error-text {

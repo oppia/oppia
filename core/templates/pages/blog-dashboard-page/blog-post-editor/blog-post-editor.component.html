@@ -13,18 +13,18 @@
            [ngClass]="{'hovered-image': showEditImageIcon}"
            aria-label="Blog Post thumbnail">
       <div *ngIf="!thumbnailDataUrl" class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
-        <mat-icon class="mx-auto">insert_photo</mat-icon>
+        <i class="fas fa-image blog-post-no-thumbnail-icon"></i>
         <span class="mat-card-title">{{ 'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate }}</span>
       </div>
       <div *ngIf="showEditImageIcon && thumbnailDataUrl"
            class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
-        <mat-icon class="mx-auto">insert_photo</mat-icon>
+        <i class="fas fa-image blog-post-no-thumbnail-icon"></i>
         <span class="mat-card-title edit-thumbnail-text">{{ 'I18N_BLOG_POST_EDITOR_EDIT_THUMBNAIL_TEXT' | translate }}</span>
       </div>
     </div>
     <div class="row preview-button-div" *ngIf="!windowIsNarrow" >
       <button mat-icon-button (click)="showPreview()" class="preview-button mr-4 e2e-test-blog-card-preview-button">
-        <mat-icon>remove_red_eye</mat-icon>
+        <i class="fas fa-eye"></i>
         <h5 class="mt-2">{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h5>
       </button>
     </div>
@@ -402,6 +402,10 @@
     height: 15.625vw;
     margin: -16px -16px 16px -16px;
     width: calc(100% + 32px);
+  }
+
+  .blog-post-no-thumbnail-icon {
+    font-size: 40px;
   }
 
   @media(max-width: 920px) {

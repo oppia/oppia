@@ -40,10 +40,10 @@
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
-              <mat-icon [ngClass]="{'view-active': activeView === 'gridView'}">grid_view</mat-icon>
+              <i [ngClass]="{'view-active': activeView === 'gridView'}" class="fas fa-border-all blog-dashboard-grid-list-icon"></i>
             </button>
             <button mat-icon-button (click)="activeView = 'listView'" class="e2e-test-list-view-button">
-              <mat-icon [ngClass]="{'view-active': activeView === 'listView'}">view_list</mat-icon>
+              <i [ngClass]="{'view-active': activeView === 'listView'}" class="fas fa-list blog-dashboard-grid-list-icon"></i>
             </button>
           </div>
           <div class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table" *ngIf="activeView === 'gridView'">
@@ -72,10 +72,10 @@
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
             <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
-              <mat-icon [ngClass]="{'view-active': activeView === 'gridView'}">grid_view</mat-icon>
+              <i [ngClass]="{'view-active': activeView === 'gridView'}" class="fas fa-border-all blog-dashboard-grid-list-icon"></i>
             </button>
             <button mat-icon-button (click)="activeView = 'listView'" class="e2e-test-list-view-button">
-              <mat-icon [ngClass]="{'view-active': activeView === 'listView'}">view_list</mat-icon>
+              <i [ngClass]="{'view-active': activeView === 'listView'}" class="fas fa-list blog-dashboard-grid-list-icon"></i>
             </button>
           </div>
           <div class="blog-dashboard-tiles-container e2e-test-published-blog-post-table" *ngIf="activeView === 'gridView'">
@@ -214,6 +214,10 @@
 
   .blog-tiles-list {
     cursor: pointer;
+  }
+
+  .blog-dashboard-grid-list-icon {
+    font-size: 20px;
   }
 
   :host /deep/ .mat-tab-label {

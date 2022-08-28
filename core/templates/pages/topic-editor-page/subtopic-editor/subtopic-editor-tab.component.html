@@ -162,7 +162,7 @@
                  dnd-drop="$ctrl.onRearrangeMoveSkillFinish($index)"
                  dnd-draggable="skillSummary"
                  class="skill-list-item">
-              <span class="material-icons draggable-icon-indicator">drag_indicator</span>
+              <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
               <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
                  ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
                 <[skillSummary.getDescription()]>
