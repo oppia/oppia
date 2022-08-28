@@ -32,20 +32,36 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from typing import Dict, List, Union
+from typing_extensions import Final
 
-(skill_models, suggestion_models, question_models) = models.Registry.import_models( # pylint: disable=line-too-long
-    [models.Names.SKILL, models.Names.SUGGESTION, models.Names.QUESTION])
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import question_models
+    from mypy_imports import skill_models
+
+(skill_models, question_models) = models.Registry.import_models([
+    models.Names.skill, models.Names.question
+])
+
+SuggestionChangeDictType = Dict[
+    str,
+    Union[
+        str,
+        Dict[str, Union[state_domain.StateDict, int, str, List[str]]],
+        float
+    ]
+]
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill services module."""
 
-    SKILL_ID = None
-    USER_ID = 'user'
-    MISCONCEPTION_ID_1 = 1
-    MISCONCEPTION_ID_2 = 2
+    USER_ID: Final = 'user'
+    MISCONCEPTION_ID_1: Final = 1
+    MISCONCEPTION_ID_2: Final = 2
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
@@ -93,9 +109,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_contents,
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
-    def test_apply_change_list_with_invalid_property_name(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_apply_change_list_with_invalid_property_name(self) -> None:
         class MockSkillChange:
-            def __init__(self, cmd, property_name):
+            def __init__(self, cmd: str, property_name: str) -> None:
                 self.cmd = cmd
                 self.property_name = property_name
 
@@ -105,17 +124,42 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(Exception, 'Invalid change dict.'):
             skill_services.apply_change_list(
-                self.SKILL_ID, invalid_skill_change_list, self.user_id_a)
+                self.SKILL_ID, invalid_skill_change_list, self.user_id_a)  # type: ignore[arg-type]
 
-    def test_compute_summary(self):
-        skill_summary = skill_services.compute_summary_of_skill(self.skill)
+    def test_compute_summary(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        skill_summary = skill_services.compute_summary_of_skill(skill)
 
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
         self.assertEqual(skill_summary.worked_examples_count, 1)
 
-    def test_get_image_filenames_from_skill(self):
+    def test_raises_error_when_the_skill_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        skill.created_on = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No data available for when the skill was created.'
+        ):
+            skill_services.compute_summary_of_skill(skill)
+
+    def test_raises_error_when_the_skill_provided_with_no_last_updated_data(
+        self
+    ) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        skill.last_updated = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No data available for when the skill was last_updated.'
+        ):
+            skill_services.compute_summary_of_skill(skill)
+
+    def test_get_image_filenames_from_skill(self) -> None:
         explanation_html = (
             'Explanation with image: <oppia-noninteractive-image '
             'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
@@ -148,13 +192,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
         self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
 
-    def test_get_new_skill_id(self):
+    def test_get_new_skill_id(self) -> None:
         new_skill_id = skill_services.get_new_skill_id()
 
         self.assertEqual(len(new_skill_id), 12)
         self.assertEqual(skill_models.SkillModel.get_by_id(new_skill_id), None)
 
-    def test_get_descriptions_of_skills(self):
+    def test_get_descriptions_of_skills(self) -> None:
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
@@ -203,12 +247,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(deleted_skill_ids, ['skill_id_2'])
         self.assertEqual(
             skill_descriptions, {
-                'skill_id_1': 'Description 1',
-                'skill_id_2': None
+                'skill_id_1': 'Description 1'
             }
         )
 
-    def test_get_rubrics_of_linked_skills(self):
+    def test_get_rubrics_of_linked_skills(self) -> None:
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
@@ -272,13 +315,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             }
         )
 
-    def test_get_skill_from_model(self):
+    def test_get_skill_from_model(self) -> None:
         skill_model = skill_models.SkillModel.get(self.SKILL_ID)
         skill = skill_fetchers.get_skill_from_model(skill_model)
 
         self.assertEqual(skill.to_dict(), self.skill.to_dict())
 
-    def test_get_skill_summary_from_model(self):
+    def test_get_skill_summary_from_model(self) -> None:
         skill_summary_model = skill_models.SkillSummaryModel.get(self.SKILL_ID)
         skill_summary = skill_services.get_skill_summary_from_model(
             skill_summary_model)
@@ -288,7 +331,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
         self.assertEqual(skill_summary.worked_examples_count, 1)
 
-    def test_get_all_skill_summaries(self):
+    def test_get_all_skill_summaries(self) -> None:
         skill_summaries = skill_services.get_all_skill_summaries()
 
         self.assertEqual(len(skill_summaries), 1)
@@ -297,28 +340,30 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].misconception_count, 1)
         self.assertEqual(skill_summaries[0].worked_examples_count, 1)
 
-    def test_commit_log_entry(self):
+    def test_commit_log_entry(self) -> None:
         skill_commit_log_entry = (
             skill_models.SkillCommitLogEntryModel.get_commit(self.SKILL_ID, 1)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert skill_commit_log_entry is not None
         self.assertEqual(skill_commit_log_entry.commit_type, 'create')
         self.assertEqual(skill_commit_log_entry.skill_id, self.SKILL_ID)
         self.assertEqual(skill_commit_log_entry.user_id, self.USER_ID)
 
-    def test_get_skill_summary_by_id(self):
+    def test_get_skill_summary_by_id(self) -> None:
         skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
 
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
 
-    def test_get_filtered_skill_summaries(self):
+    def test_get_filtered_skill_summaries(self) -> None:
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None, None, None))
+                self.num_queries_to_fetch, None, None, [], None, None))
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
@@ -328,13 +373,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                1, None, 'english', None, None, None))
+                1, None, 'english', [], None, None))
 
         self.assertEqual(len(augmented_skill_summaries), 0)
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None,
+                self.num_queries_to_fetch, None, None, [],
                 'Oldest Created', None))
 
         self.assertEqual(len(augmented_skill_summaries), 2)
@@ -343,7 +388,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None,
+                self.num_queries_to_fetch, None, None, [],
                 'Most Recently Updated', None))
 
         self.assertEqual(len(augmented_skill_summaries), 2)
@@ -352,14 +397,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None,
+                self.num_queries_to_fetch, None, None, [],
                 'Least Recently Updated', None))
 
         self.assertEqual(len(augmented_skill_summaries), 2)
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID)
         self.assertEqual(augmented_skill_summaries[1].id, self.SKILL_ID2)
 
-    def test_cursor_behaves_correctly_when_fetching_skills_in_batches(self):
+    def test_cursor_behaves_correctly_when_fetching_skills_in_batches(
+        self
+    ) -> None:
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=[])
@@ -369,26 +416,26 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                1, None, None, None, None, None))
+                1, None, None, [], None, None))
         self.assertEqual(len(augmented_skill_summaries), 2)
         self.assertIsInstance(next_cursor, str)
         self.assertTrue(more)
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None, None, next_cursor))
+                self.num_queries_to_fetch, None, None, [], None, next_cursor))
         self.assertEqual(len(augmented_skill_summaries), 1)
         self.assertIsNone(next_cursor)
         self.assertFalse(more)
 
-    def test_filter_skills_by_status_all(self):
+    def test_filter_skills_by_status_all(self) -> None:
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None,
+                self.num_queries_to_fetch, None, None, [],
                 None, None))
         self.assertEqual(len(augmented_skill_summaries), 2)
         self.assertEqual(next_cursor, None)
@@ -396,20 +443,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, 'All', None, None,
+                self.num_queries_to_fetch, 'All', None, [],
                 None, None))
         self.assertEqual(len(augmented_skill_summaries), 2)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-    def test_filter_skills_by_status_assigned(self):
+    def test_filter_skills_by_status_assigned(self) -> None:
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, 'Assigned', None, None, None, None))
+                self.num_queries_to_fetch, 'Assigned', None, [], None, None))
         self.assertEqual(len(augmented_skill_summaries), 0)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
@@ -427,29 +474,29 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, 'Assigned', None,
-                None, None, None))
+                [], None, None))
         self.assertEqual(augmented_skill_summaries[0].topic_names, ['topic1'])
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-    def test_filter_skills_by_status_unassigned(self):
+    def test_filter_skills_by_status_unassigned(self) -> None:
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Description2',
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, 'Unassigned', None, None,
+                self.num_queries_to_fetch, 'Unassigned', None, [],
                 None, None))
         self.assertEqual(len(augmented_skill_summaries), 2)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-    def test_filter_skills_by_classroom_name(self):
+    def test_filter_skills_by_classroom_name(self) -> None:
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, 'english', None, None, None))
+                self.num_queries_to_fetch, None, 'english', [], None, None))
         self.assertEqual(len(augmented_skill_summaries), 0)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
@@ -480,7 +527,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, 'math', None,
+                self.num_queries_to_fetch, None, 'math', [],
                 None, None))
         self.assertEqual(augmented_skill_summaries[0].topic_names, ['topic1'])
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
@@ -489,7 +536,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-    def test_filter_skills_by_keywords(self):
+    def test_filter_skills_by_keywords(self) -> None:
         self.save_new_skill(
             self.SKILL_ID2, self.USER_ID, description='Alpha',
             misconceptions=None,
@@ -503,7 +550,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
-                self.num_queries_to_fetch, None, None, None, None, None))
+                self.num_queries_to_fetch, None, None, [], None, None))
 
         self.assertEqual(len(augmented_skill_summaries), 3)
         self.assertEqual(next_cursor, None)
@@ -560,7 +607,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
-    def test_get_all_topic_assignments_for_skill(self):
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'invalid_status', None,
+                ['alp', 'bet'], None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 0)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
+    def test_get_all_topic_assignments_for_skill(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -604,7 +660,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_assignments[1].topic_version, 1)
         self.assertEqual(topic_assignments[1].subtopic_id, 1)
 
-    def test_remove_skill_from_all_topics(self):
+    def test_remove_skill_from_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -638,7 +694,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         self.assertEqual(len(topic_assignments_dict), 0)
 
-    def test_successfully_replace_skill_id_in_all_topics(self):
+    def test_successfully_replace_skill_id_in_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -676,7 +732,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_all_topic_assignments_for_skill('new_skill_id'))
         self.assertEqual(len(topic_assignments_dict), 2)
 
-    def test_failure_replace_skill_id_in_all_topics(self):
+    def test_failure_replace_skill_id_in_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
@@ -694,7 +750,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.replace_skill_id_in_all_topics(
                 self.USER_ID, self.SKILL_ID, 'new_skill_id')
 
-    def test_update_skill(self):
+    def test_update_skill(self) -> None:
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
@@ -760,7 +816,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 '<p>New Explanation 1</p>', '<p>New Explanation 2</p>'])
         self.assertEqual(skill.rubrics[1].explanations, ['<p>Explanation</p>'])
 
-    def test_merge_skill(self):
+    def test_merge_skill(self) -> None:
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -785,7 +841,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.superseding_skill_id, 'TestSkillId')
         self.assertEqual(skill.all_questions_merged, False)
 
-    def test_set_merge_complete_for_skill(self):
+    def test_set_merge_complete_for_skill(self) -> None:
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -809,7 +865,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.all_questions_merged, True)
 
-    def test_get_merged_skill_ids(self):
+    def test_get_merged_skill_ids(self) -> None:
         skill_ids = skill_services.get_merged_skill_ids()
         self.assertEqual(len(skill_ids), 0)
         changelist = [
@@ -828,7 +884,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(skill_ids), 1)
         self.assertEqual(skill_ids[0], self.SKILL_ID)
 
-    def test_delete_skill(self):
+    def test_delete_skill(self) -> None:
         skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
         self.assertEqual(
             skill_fetchers.get_skill_by_id(self.SKILL_ID, strict=False), None)
@@ -836,7 +892,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
 
-    def test_delete_skill_marked_deleted(self):
+    def test_delete_skill_marked_deleted(self) -> None:
         skill_models.SkillModel.delete_multi(
             [self.SKILL_ID], self.USER_ID, '', force_deletion=False)
         skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
@@ -850,13 +906,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
 
-    def test_delete_skill_model_with_deleted_summary_model(self):
+    def test_delete_skill_model_with_deleted_summary_model(self) -> None:
         skill_summary_model = (
             skill_models.SkillSummaryModel.get(self.SKILL_ID))
         skill_summary_model.delete()
-        skill_summary_model = (
+        skill_summary_model_with_none = (
             skill_models.SkillSummaryModel.get(self.SKILL_ID, False))
-        self.assertIsNone(skill_summary_model)
+        self.assertIsNone(skill_summary_model_with_none)
 
         skill_services.delete_skill(
             self.USER_ID, self.SKILL_ID, force_deletion=True)
@@ -866,8 +922,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
 
-    def test_delete_skill_model_with_linked_suggestion(self):
-        suggestion_change = {
+    def test_delete_skill_model_with_linked_suggestion(self) -> None:
+        suggestion_change: SuggestionChangeDictType = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -900,7 +956,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.auto_reject_question_suggestions_for_skill_id(
                 self.SKILL_ID)
 
-    def test_cannot_update_skill_with_no_commit_message(self):
+    def test_cannot_update_skill_with_no_commit_message(self) -> None:
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -915,7 +971,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, '')
 
-    def test_cannot_update_skill_with_empty_changelist(self):
+    def test_cannot_update_skill_with_empty_changelist(self) -> None:
         with self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
@@ -923,7 +979,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, [], 'No changes made.')
 
-    def test_mismatch_of_skill_versions(self):
+    def test_mismatch_of_skill_versions(self) -> None:
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -952,7 +1008,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Change language code.')
 
-    def test_normal_user_cannot_update_skill_property(self):
+    def test_normal_user_cannot_update_skill_property(self) -> None:
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -970,7 +1026,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id_a, self.SKILL_ID, changelist,
                 'Change description.')
 
-    def test_update_skill_property(self):
+    def test_update_skill_property(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         old_description = 'Description'
         new_description = 'New description'
@@ -996,7 +1052,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.description, new_description)
 
-    def test_update_skill_explanation(self):
+    def test_update_skill_explanation(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         old_explanation = {'content_id': '1', 'html': '<p>Explanation</p>'}
         new_explanation = {'content_id': '1', 'html': '<p>New explanation</p>'}
@@ -1020,7 +1076,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.skill_contents.explanation.to_dict(), new_explanation)
 
-    def test_update_skill_worked_examples(self):
+    def test_update_skill_worked_examples(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         old_worked_example = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
@@ -1054,7 +1110,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.skill_contents.worked_examples[0].to_dict(),
             new_worked_example)
 
-    def test_delete_skill_misconception(self):
+    def test_delete_skill_misconception(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
         self.assertEqual(len(skill.misconceptions), 1)
@@ -1073,7 +1129,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(skill.misconceptions, [])
 
-    def test_does_skill_with_description_exist(self):
+    def test_does_skill_with_description_exist(self) -> None:
         self.assertEqual(
             skill_services.does_skill_with_description_exist('Description'),
             True
@@ -1083,7 +1139,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             False
         )
 
-    def test_update_skill_misconception_notes(self):
+    def test_update_skill_misconception_notes(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
         self.assertEqual(len(skill.misconceptions), 1)
@@ -1111,7 +1167,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.misconceptions[0].notes, '<p>new description</p>')
 
-    def test_update_skill_misconception_feedback(self):
+    def test_update_skill_misconception_feedback(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
         self.assertEqual(len(skill.misconceptions), 1)
@@ -1140,9 +1196,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.misconceptions[0].feedback, '<p>new feedback</p>')
 
-    def test_skill_has_associated_questions(self):
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
+    def test_skill_has_associated_questions(self) -> None:
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
 
         # Testing that no question is linked to a skill.
         self.assertEqual(
@@ -1168,7 +1224,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             True
         )
 
-    def test_update_skill_schema(self):
+    def test_update_skill_schema(self) -> None:
         orig_skill_dict = (
             skill_fetchers.get_skill_by_id(self.SKILL_ID).to_dict())
 
@@ -1189,14 +1245,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_skill_dict['version'], 2)
 
         # Delete version and check that the two dicts are the same.
-        del orig_skill_dict['version']
-        del new_skill_dict['version']
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        del orig_skill_dict['version']  # type: ignore[misc]
+        del new_skill_dict['version']  # type: ignore[misc]
         self.assertEqual(orig_skill_dict, new_skill_dict)
 
-    def test_cannot_update_skill_with_invalid_change_list(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_cannot_update_skill_with_invalid_change_list(self) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *args):
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
@@ -1206,7 +1266,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(
-                self.USER_ID, self.SKILL_ID, 'invalid_change_list',
+                self.USER_ID, self.SKILL_ID, 'invalid_change_list',  # type: ignore[arg-type]
                 'commit message')
 
         self.assertEqual(len(observed_log_messages), 1)
@@ -1214,12 +1274,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages[0], 'object has no'
             ' attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
-    def test_cannot_update_misconception_name_with_invalid_id(self):
+    def test_cannot_update_misconception_name_with_invalid_id(self) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (
                 skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-            'misconception_id': 'invalid_id',
+            'misconception_id': 0,
             'old_value': 'test name',
             'new_value': 'Name'
         })]
@@ -1231,12 +1291,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'Updated misconception name.')
 
     def test_cannot_update_misconception_must_be_addressed_with_invalid_id(
-            self):
+        self
+    ) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (
                 skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED),
-            'misconception_id': 'invalid_id',
+            'misconception_id': 0,
             'old_value': False,
             'new_value': True
         })]
@@ -1247,7 +1308,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception must_be_addressed.')
 
-    def test_cannot_add_already_existing_prerequisite_skill(self):
+    def test_cannot_add_already_existing_prerequisite_skill(self) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
             'skill_id': 'skill_id_1'
@@ -1258,7 +1319,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Added prereq skill.')
 
-    def test_cannot_delete_non_existent_prerequisite_skill(self):
+    def test_cannot_delete_non_existent_prerequisite_skill(self) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
             'skill_id': 'skill_id_5'
@@ -1269,7 +1330,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Removed prereq skill.')
 
-    def test_cannot_add_rubric_with_invalid_difficulty(self):
+    def test_cannot_add_rubric_with_invalid_difficulty(self) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_RUBRICS,
             'difficulty': 'invalid_difficulty',
@@ -1282,10 +1343,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Added rubric.')
 
-    def test_cannot_delete_misconception_with_invalid_id(self):
+    def test_cannot_delete_misconception_with_invalid_id(self) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-            'misconception_id': 'invalid_id'
+            'misconception_id': 0
         })]
 
         with self.assertRaisesRegex(
@@ -1293,12 +1354,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, 'Delete misconception')
 
-    def test_cannot_update_misconception_notes_with_invalid_id(self):
+    def test_cannot_update_misconception_notes_with_invalid_id(self) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (
                 skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES),
-            'misconception_id': 'invalid_id',
+            'misconception_id': 0,
             'old_value': 'description',
             'new_value': 'new description'
         })]
@@ -1309,12 +1370,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception notes.')
 
-    def test_cannot_update_misconception_feedback_with_invalid_id(self):
+    def test_cannot_update_misconception_feedback_with_invalid_id(self) -> None:
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (
                 skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK),
-            'misconception_id': 'invalid_id',
+            'misconception_id': 0,
             'old_value': 'default_feedback',
             'new_value': 'new feedback'
         })]
@@ -1325,7 +1386,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.SKILL_ID, changelist,
                 'Updated misconception feedback.')
 
-    def test_get_untriaged_skill_summaries(self):
+    def test_get_untriaged_skill_summaries(self) -> None:
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_ids_assigned_to_some_topic = (
             topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
@@ -1348,7 +1409,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             untriaged_skill_summary_dicts,
             expected_untriaged_skill_summary_dicts)
 
-    def test_get_categorized_skill_ids_and_descriptions(self):
+    def test_get_categorized_skill_ids_and_descriptions(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -1393,12 +1454,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill mastery services module."""
 
-    SKILL_IDS = []
-    USER_ID = 'user'
-    DEGREE_OF_MASTERY_1 = 0.0
-    DEGREE_OF_MASTERY_2 = 0.5
+    USER_ID: Final = 'user'
+    DEGREE_OF_MASTERY_1: Final = 0.0
+    DEGREE_OF_MASTERY_2: Final = 0.5
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
@@ -1409,7 +1469,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
 
-    def test_get_user_skill_mastery(self):
+    def test_get_user_skill_mastery(self) -> None:
         degree_of_mastery = skill_services.get_user_skill_mastery(
             self.USER_ID, self.SKILL_ID_1)
 
@@ -1420,7 +1480,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(degree_of_mastery, None)
 
-    def test_get_multi_user_skill_mastery(self):
+    def test_get_multi_user_skill_mastery(self) -> None:
         degree_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
 
@@ -1431,7 +1491,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
                 self.SKILL_ID_3: None
             })
 
-    def test_create_multi_user_skill_mastery(self):
+    def test_create_multi_user_skill_mastery(self) -> None:
         skill_id_4 = skill_services.get_new_skill_id()
         skill_id_5 = skill_services.get_new_skill_id()
         skill_services.create_multi_user_skill_mastery(
@@ -1443,7 +1503,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
-    def test_get_sorted_skill_ids(self):
+    def test_get_sorted_skill_ids(self) -> None:
         degrees_of_masteries = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
         with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 2):
@@ -1460,7 +1520,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             self.SKILL_ID_3, self.SKILL_ID_1, self.SKILL_ID_2]
         self.assertEqual(sorted_skill_ids, expected_sorted_skill_ids)
 
-    def test_filter_skills_by_mastery(self):
+    def test_filter_skills_by_mastery(self) -> None:
         with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 2):
             arranged_filtered_skill_ids = (
                 skill_services.filter_skills_by_mastery(
@@ -1495,7 +1555,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
 
 class SkillMigrationTests(test_utils.GenericTestBase):
 
-    def test_migrate_skill_contents_to_latest_schema(self):
+    def test_migrate_skill_contents_to_latest_schema(self) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -1510,7 +1570,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
 
-        written_translations_dict = {
+        written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content1': {
                     'en': {
@@ -1542,7 +1602,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 }
             }
         }
-        worked_example_dict = {
+        worked_example_dict: skill_domain.WorkedExampleDict = {
             'question': {
                 'content_id': 'question1',
                 'html': ''
@@ -1618,7 +1678,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             skill.skill_contents.worked_examples[0].to_dict(),
             worked_example_dict_math)
 
-    def test_migrate_misconceptions_to_latest_schema(self):
+    def test_migrate_misconceptions_to_latest_schema(self) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -1680,7 +1740,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.misconceptions[0].feedback, expected_html_content)
 
-    def test_migrate_rubrics_to_latest_schema(self):
+    def test_migrate_rubrics_to_latest_schema(self) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })

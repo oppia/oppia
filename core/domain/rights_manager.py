@@ -160,7 +160,7 @@ def _update_exploration_summary(
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
-    exp_services.regenerate_exploration_and_contributors_summaries(  # type: ignore[no-untyped-call]
+    exp_services.regenerate_exploration_and_contributors_summaries(
         activity_rights.id)
 
 

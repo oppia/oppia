@@ -434,7 +434,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -548,7 +548,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'data_format': 'html'
             }),
         ]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', change_list, 'commit message')
 
         # get_translation_opportunities should no longer return the opportunity
@@ -566,7 +566,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'content_id': 'content',
             'language_code': 'hi'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', translation_needs_update_change_list,
             'commit message')
         translation_opportunities, _, _ = (
@@ -634,7 +634,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             })
         ]
 
-        skill_services.update_skill(  # type: ignore[no-untyped-call]
+        skill_services.update_skill(
             self.admin_id, self.SKILL_ID, changelist,
             'Updated misconception name.')
 
@@ -661,7 +661,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
 
-        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)  # type: ignore[no-untyped-call]
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))

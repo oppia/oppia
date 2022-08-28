@@ -543,7 +543,10 @@ class SuggestionEditStateContent(BaseSuggestion):
             commit_message: str. The commit message.
         """
         change_list = self.get_change_list_for_accepting_suggestion()
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        # Before calling this accept method we are already checking if user
+        # with 'final_reviewer_id' exists or not.
+        assert self.final_reviewer_id is not None
+        exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
 
@@ -767,18 +770,21 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
+        # Before calling this accept method we are already checking if user
+        # with 'final_reviewer_id' exists or not.
+        assert self.final_reviewer_id is not None
         if (
                 hasattr(self.change, 'data_format') and
-                state_domain.WrittenTranslation.is_data_format_list(  # type: ignore[no-untyped-call]
+                state_domain.WrittenTranslation.is_data_format_list(
                     self.change.data_format)
         ):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 self.final_reviewer_id, self.target_id, [self.change],
                 commit_message, is_suggestion=True)
             return
 
         self._copy_new_images_to_target_entity_storage()
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
             commit_message, is_suggestion=True)
 

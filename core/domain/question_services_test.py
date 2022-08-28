@@ -704,6 +704,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         ):
             question_services.compute_summary_of_question(question)
 
+    def test_raises_error_when_the_question_provided_with_no_created_on_data(
+        self
+    ) -> None:
+
+        question = question_services.get_question_by_id(self.question_id)
+        question.created_on = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No data available for when the question was last_updated'
+        ):
+            question_services.compute_summary_of_question(question)
+
     def test_get_skills_of_question(self) -> None:
         # If the question id doesnt exist at all, it returns an empty list.
         with self.assertRaisesRegex(
@@ -1066,7 +1079,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'misconception_id': 4,
             })
         ]
-        skill_services.update_skill(  # type: ignore[no-untyped-call]
+        skill_services.update_skill(
             self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
         self.process_and_flush_pending_tasks()
@@ -1355,7 +1368,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'SetInput'
             },
             'param_changes': [],
@@ -1382,6 +1395,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         cust_args = question.question_state_data.interaction.customization_args
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            cust_args['buttonText'].value,
+            state_domain.SubtitledUnicode
+        )
         self.assertEqual(
             cust_args['buttonText'].value.unicode_str,
             'Add item')
@@ -1448,7 +1466,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -1546,7 +1564,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -2154,7 +2172,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'PencilCodeEditor'
             },
             'param_changes': [],
@@ -2223,7 +2241,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -2295,7 +2313,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -2400,7 +2418,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'TextInput'
             },
             'next_content_id_index': 2,
@@ -2503,7 +2521,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'AlgebraicExpressionInput'
             },
             'next_content_id_index': 3,
@@ -2592,7 +2610,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'NumericExpressionInput'
             },
             'next_content_id_index': 3,
@@ -2620,6 +2638,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         cust_args = question.question_state_data.interaction.customization_args
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            cust_args['placeholder'].value,
+            state_domain.SubtitledUnicode
+        )
         self.assertEqual(
             cust_args['placeholder'].value.unicode_str,
             'Type an expression here, using only numbers.')
@@ -2687,7 +2710,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'TextInput'
             },
             'next_content_id_index': 4,
@@ -2788,7 +2811,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'SetInput'
             },
             'next_content_id_index': 4,
@@ -3141,7 +3164,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'NumericExpressionInput'
             },
             'next_content_id_index': 3,
@@ -3233,7 +3256,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'TextInput'
             },
             'next_content_id_index': 4,
@@ -3322,7 +3345,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'NumericInput'
             },
             'next_content_id_index': 4,
@@ -3459,7 +3482,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'AlgebraicExpressionInput'
             },
             'next_content_id_index': 4,

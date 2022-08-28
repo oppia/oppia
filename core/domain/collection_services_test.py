@@ -2110,6 +2110,42 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self._check_contributors_summary(
             self.COLLECTION_0_ID, {self.albert_id: 1})
 
+    def test_raises_error_when_collection_provided_with_no_last_updated_data(
+        self
+    ) -> None:
+        self.save_new_valid_collection('test_id', self.albert_id)
+        collection = collection_services.get_collection_by_id('test_id')
+        collection.last_updated = None
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No data available for when the collection was last_updated.'
+            ):
+                collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
+                    'test_id'
+                )
+
+    def test_raises_error_when_collection_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        self.save_new_valid_collection('test_id', self.albert_id)
+        collection = collection_services.get_collection_by_id('test_id')
+        collection.created_on = None
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No data available for when the collection was created.'
+            ):
+                collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
+                    'test_id'
+                )
+
 
 class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
 
