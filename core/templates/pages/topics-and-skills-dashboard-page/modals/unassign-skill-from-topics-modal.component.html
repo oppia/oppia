@@ -40,9 +40,9 @@
        class="topic-name-checkbox e2e-test-unassign-topic-label">
     <label>
       <input type="checkbox"
-             class="topic-name e2e-test-unassign-topic"
+             class="e2e-test-unassign-topic"
              (click)="selectedTopicToUnassign(eligibleTopicNameToTopicAssignment.key)">
-      {{ eligibleTopicNameToTopicAssignment.key }}
+      <span class="topic-name">{{ eligibleTopicNameToTopicAssignment.key }}</span>
     </label>
   </div>
 </div>
@@ -65,8 +65,8 @@
     margin-left: 20px;
     margin-top: 5px;
   }
-  .unassign-skill-from-topics-modal .topic-name {
-    font-weight: bold;
+  .topic-name {
+    margin-left: 10px;
   }
   .loading-spinner {
     margin-left: 45%;
