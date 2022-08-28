@@ -27,7 +27,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Union
 from typing_extensions import Final, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -206,6 +206,119 @@ class SkillChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class CreateNewSkillCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class AddSkillMisconceptionCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_ADD_SKILL_MISCONCEPTION command.
+    """
+
+    new_misconception_dict: MisconceptionDict
+
+
+class DeleteSkillMisconceptionCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_DELETE_SKILL_MISCONCEPTION command.
+    """
+
+    misconception_id: int
+
+
+class AddPrerequisiteSkillCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_ADD_PREREQUISITE_SKILL command.
+    """
+
+    skill_id: str
+
+
+class DeletePrerequisiteSkillCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_DELETE_PREREQUISITE_SKILL command.
+    """
+
+    skill_id: str
+
+
+class UpdateRubricsCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_UPDATE_RUBRICS command.
+    """
+
+    difficulty: str
+    explanations: List[str]
+
+
+class UpdateSkillMisconceptionPropertyCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command.
+    """
+
+    misconception_id: int
+    property_name: str
+    new_value: Union[str, bool]
+    old_value: Union[str, bool]
+
+
+class UpdateSkillPropertyCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: Union[str, bool, List[str]]
+    old_value: Union[str, bool, List[str]]
+
+
+class UpdateSkillContentsPropertyCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_UPDATE_SKILL_CONTENTS_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: Union[
+        state_domain.SubtitledHtmlDict,
+        List[WorkedExampleDict]
+    ]
+    old_value: Union[
+        state_domain.SubtitledHtmlDict,
+        List[WorkedExampleDict]
+    ]
+
+
+class MigrateContentsSchemaToLatestVersionCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class MigrateMisconceptionsSchemaToLatestVersionCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class MigrateRubricsSchemaToLatestVersionCmd(SkillChange):
+    """class representing the SkillChange's
+    CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
 
 
 class MisconceptionDict(TypedDict):

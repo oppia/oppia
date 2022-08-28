@@ -30,7 +30,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, Union, overload
+from typing import Dict, List, Optional, Tuple, Union, cast, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -629,31 +629,55 @@ def apply_change_list(
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
-                if (change.property_name ==
+                # Here we use cast because we are narrowing down the type from
+                # QuestionChange to a specific change command.
+                update_question_property_cmd = cast(
+                    question_domain.UpdateQuestionPropertyCmd,
+                    change
+                )
+                if (update_question_property_cmd.property_name ==
                         question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
-                    question.update_language_code(change.new_value)
-                elif (change.property_name ==
+                    # Here we use cast because in this 'if clause' we are
+                    # updating the language_code of a question which can only
+                    # be of type string. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    language_code = cast(
+                        str,
+                        update_question_property_cmd.new_value
+                    )
+                    question.update_language_code(language_code)
+                elif (update_question_property_cmd.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, dict)
-                    state_dict: state_domain.StateDict = change.new_value
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the state_data of a question which can only
+                    # be of type StateDict. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    state_dict = cast(
+                        state_domain.StateDict,
+                        update_question_property_cmd.new_value
+                    )
                     state_domain_object = state_domain.State.from_dict(
                         state_dict)
                     question.update_question_state_data(state_domain_object)
-                elif (change.property_name ==
+                elif (update_question_property_cmd.property_name ==
                       question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    linked_skill_ids: List[str] = change.new_value
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the linked_skill_ids of a question which can only
+                    # be of type List[str]. So, to rule out all other property
+                    # types for MyPy type checking, we used cast here.
+                    linked_skill_ids = cast(
+                        List[str], update_question_property_cmd.new_value
+                    )
                     question.update_linked_skill_ids(linked_skill_ids)
-                elif (change.property_name ==
+                elif (update_question_property_cmd.property_name ==
                       question_property_inapplicable_skill_misconception_ids):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    skill_misconception_ids: List[str] = change.new_value
+                    # Here we use cast because in this 'elif clause' we are
+                    # updating the skill_misconception_ids of a question which
+                    # can only be of type List[str]. So, to rule out all other
+                    # property types for MyPy type checking, we used cast here.
+                    skill_misconception_ids = cast(
+                        List[str], update_question_property_cmd.new_value
+                    )
                     question.update_inapplicable_skill_misconception_ids(
                         skill_misconception_ids)
 

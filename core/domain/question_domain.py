@@ -124,6 +124,48 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
+AllowedUpdateQuestionPropertyCmdTypes = Union[
+    str, List[str], state_domain.StateDict
+]
+
+
+class CreateNewQuestionCmd(QuestionChange):
+    """class representing the QuestionChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class UpdateQuestionPropertyCmd(QuestionChange):
+    """class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: AllowedUpdateQuestionPropertyCmdTypes
+    old_value: AllowedUpdateQuestionPropertyCmdTypes
+
+
+class CreateNewFullySpecifiedQuestionCmd(QuestionChange):
+    """class representing the QuestionChange's
+    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
+    """
+
+    question_dict: QuestionDict
+    skill_id: str
+    topic_name: str
+
+
+class MigrateStateSchemaToLatestVersion(QuestionChange):
+    """class representing the QuestionChange's
+    CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
 class QuestionSuggestionChange(change_domain.BaseChange):
     """Domain object for changes made to question suggestion object.
 
@@ -143,6 +185,16 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'deprecated_values': {}
         }
     ]
+
+
+class CreateNewFullySpecifiedQuestionSuggestionCmd(QuestionSuggestionChange):
+    """class representing the QuestionSuggestionChange's
+    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
+    """
+
+    question_dict: QuestionDict
+    skill_id: str
+    topic_name: str
 
 
 class QuestionDict(TypedDict):

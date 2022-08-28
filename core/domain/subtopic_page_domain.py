@@ -24,7 +24,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Union
 from typing_extensions import Final, TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -77,6 +77,33 @@ class SubtopicPageChange(change_domain.BaseChange):
         'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
         'deprecated_values': {}
     }]
+
+
+AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
+    state_domain.SubtitledHtml,
+    state_domain.RecordedVoiceovers,
+    state_domain.WrittenTranslations
+]
+
+
+class CreateNewSubtopicPageCmd(SubtopicPageChange):
+    """class representing the SubtopicPageChange's
+    CMD_CREATE_NEW command.
+    """
+
+    topic_id: str
+    subtopic_id: str
+
+
+class UpdateSubtopicPagePropertyCmd(SubtopicPageChange):
+    """class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command.
+    """
+
+    subtopic_id: str
+    property_name: str
+    new_value: AllowedUpdateSubtopicPagePropertyCmdTypes
+    old_value: AllowedUpdateSubtopicPagePropertyCmdTypes
 
 
 class SubtopicPageContentsDict(TypedDict):
