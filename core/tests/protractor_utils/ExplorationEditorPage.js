@@ -69,7 +69,7 @@ var ExplorationEditorPage = function() {
   var modalContentElement = element(by.css('.modal-content'));
   var sharePublishModalElement = element(
     by.css('.e2e-test-share-publish-modal'));
-  var selectionRenderedElement = element(
+  var explorationCategoryDropdown = element(
     by.css('.e2e-test-exploration-category-dropdown'));
   var promptModalElement = element(
     by.css('.e2e-test-save-prompt-modal'));
@@ -237,7 +237,7 @@ var ExplorationEditorPage = function() {
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
     var explorationCategory = await action.getText(
-      'Selection Rendered Element', selectionRenderedElement);
+      'Exploration Category Dropdown Element', explorationCategoryDropdown);
     var explorationLanguage = await action.getText(
       'Exploration Language Selector Element',
       expLanguageSelectorElement);
