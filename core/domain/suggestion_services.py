@@ -1014,7 +1014,7 @@ def get_suggestions_with_translatable_explorations(
         # corresponding exploration.
         # For more details, see https://github.com/oppia/oppia/issues/14339.
         if suggestion.change.state_name in exploration.states:
-            content_id_exists = exploration.states[  # type: ignore[no-untyped-call]
+            content_id_exists = exploration.states[
                 suggestion.change.state_name].has_content_id(
                     suggestion.change.content_id)
         return content_id_exists and exploration.edits_allowed
