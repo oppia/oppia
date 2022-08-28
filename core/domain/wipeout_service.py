@@ -588,7 +588,7 @@ def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to which to save the entity mappings.
-        entity_category: models.Names The category of the models that
+        entity_category: models.Names. The category of the models that
             contain the entity IDs.
         entity_ids: list(str). List of entity IDs for which to generate new
             pseudonymous user IDs. The IDs are of entities (e.g. models in
@@ -618,7 +618,7 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to which to save the entity mappings.
-        entity_category: models.Names The category of the models that
+        entity_category: models.Names. The category of the models that
             contain the entity IDs.
         entity_ids: list(str). The IDs for which to generate the mappings.
     """
@@ -638,7 +638,7 @@ def _delete_models(user_id, module_name):
 
     Args:
         user_id: str. The id of the user to be deleted.
-        module_name: models.Names The name of the module containing the models
+        module_name: models.Names. The name of the module containing the models
             that are being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes([module_name]):
@@ -658,7 +658,7 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to collect the entity IDs.
-        activity_category: models.Names The category of the models that are
+        activity_category: models.Names. The category of the models that are
             that contain the entity IDs.
         snapshot_metadata_model_classes: list(class). The snapshot metadata
             model classes that contain the entity IDs.
@@ -799,7 +799,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to pseudonymize the models.
-        activity_category: models.Names The category of the models that are
+        activity_category: models.Names. The category of the models that are
             being pseudonymized.
         snapshot_model_class: class. The metadata model class that is being
             pseudonymized.
@@ -888,7 +888,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
-        activity_category: models.Names The category of the models that are
+        activity_category: models.Names. The category of the models that are
             being pseudonymized.
         snapshot_metadata_model_class:
             CollectionSnapshotMetadataModel|ExplorationSnapshotMetadataModel.
