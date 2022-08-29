@@ -718,7 +718,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             filter_obj.filter_field for filter_obj in filter_options]
 
         filter_field_names = (
-            app_feedback_report_constants.FILTER_FIELD_NAMES)
+            app_feedback_report_constants.FilterFieldNames)
         for filter_obj in filter_options:
             self.assertTrue(filter_obj.filter_field in filter_fields)
             if filter_obj.filter_field == (

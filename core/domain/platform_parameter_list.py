@@ -44,7 +44,7 @@ class ParamNames(enum.Enum):
 
 Registry.create_feature_flag(
     ParamNames.DUMMY_FEATURE,
-    'This is a dummy feature FLAG.',
+    'This is a dummy feature flag.',
     platform_parameter_domain.FeatureStages.DEV,
 )
 
