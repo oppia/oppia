@@ -40,22 +40,6 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
-    blogDashboard: [
-      'protractor_desktop/blogDashboard.js'
-    ],
-
-    classroomPage: [
-      'protractor_desktop/classroomPage.js'
-    ],
-
-    classroomPageFileUploadFeatures: [
-      'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
-
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
@@ -104,45 +88,13 @@ var suites = {
       'protractor/libraryFlow.js'
     ],
 
-    navigation: [
-      'protractor_desktop/navigation.js'
-    ],
-
     playVoiceovers: [
       'protractor_desktop/playVoiceovers.js'
-    ],
-
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
     ],
 
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
     ],
-
-    topicAndStoryEditor: [
-      'protractor_desktop/topicAndStoryEditor.js'
-    ],
-
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
-    ],
-
-    topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
-    ],
-
-    skillEditor: [
-      'protractor_desktop/skillEditor.js'
-    ],
-
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
-    wipeout: [
-      'protractor_desktop/wipeout.js',
-    ]
   };
 
 // A reference configuration file.
@@ -335,8 +287,7 @@ exports.config = {
           }
         },
       });
-    }
-    else {
+    } else {
       console.log(
         'Videos will not be recorded for this suite either because videos' +
         ' have been disabled for it (using environment variables) or' +

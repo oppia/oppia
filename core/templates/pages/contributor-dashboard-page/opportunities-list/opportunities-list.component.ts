@@ -48,6 +48,8 @@ export class OpportunitiesListComponent {
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
 
+  @Input() showOpportunityButton: boolean = true;
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );
@@ -93,13 +95,19 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.filter((opportunity) => {
             return opportunityIds.indexOf(opportunity.id) < 0;
           });
-          this.visibleOpportunities = this.opportunities.slice(
-            0, this.OPPORTUNITIES_PAGE_SIZE);
-          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-            this.opportunities,
-            this.OPPORTUNITIES_PAGE_SIZE,
-            this.activePageNumber,
-            this.more);
+          const currentIndex = (
+            this.activePageNumber * this.OPPORTUNITIES_PAGE_SIZE);
+          if (currentIndex > this.opportunities.length) {
+            // The active page number is no longer valid. Navigate to the
+            // current last page.
+            const lastPage = Math.floor(
+              this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE) + 1;
+            this.gotoPage(lastPage);
+          } else {
+            // Navigate to the active page before opportunities were removed,
+            // i.e. when reviewers accept/reject suggestions.
+            this.gotoPage(this.activePageNumber);
+          }
         }));
   }
 
@@ -142,17 +150,22 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
+          this.loadingOpportunityData = false;
           this.userIsOnLastPage = this.calculateUserIsOnLastPage(
             this.opportunities,
             this.OPPORTUNITIES_PAGE_SIZE,
             pageNumber,
             this.more);
-          this.loadingOpportunityData = false;
         });
     } else {
       this.visibleOpportunities = this.opportunities.slice(
         startIndex, endIndex);
     }
+    this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+      this.opportunities,
+      this.OPPORTUNITIES_PAGE_SIZE,
+      pageNumber,
+      this.more);
     this.activePageNumber = pageNumber;
   }
 

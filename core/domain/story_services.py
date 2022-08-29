@@ -31,6 +31,7 @@ from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import learner_group_services
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -39,9 +40,16 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
+from typing import List, Sequence, Tuple
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import story_models
+    from mypy_imports import user_models
+
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
-transaction_services = models.Registry.import_transaction_services()
 
 
 def get_new_story_id() -> str:
@@ -53,7 +61,12 @@ def get_new_story_id() -> str:
     return story_models.StoryModel.get_new_id('')
 
 
-def _create_story(committer_id, story, commit_message, commit_cmds):
+def _create_story(
+    committer_id: str,
+    story: story_domain.Story,
+    commit_message: str,
+    commit_cmds: List[story_domain.StoryChange]
+) -> None:
     """Creates a new story.
 
     Args:
@@ -85,7 +98,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
     create_story_summary(story.id)
 
 
-def save_new_story(committer_id, story):
+def save_new_story(committer_id: str, story: story_domain.Story) -> None:
     """Saves a new story.
 
     Args:
@@ -102,7 +115,9 @@ def save_new_story(committer_id, story):
 
 
 # Repository SAVE and DELETE methods.
-def apply_change_list(story_id, change_list):
+def apply_change_list(
+    story_id: str, change_list: List[story_domain.StoryChange]
+) -> Tuple[story_domain.Story, List[str], List[str]]:
     """Applies a changelist to a story and returns the result.
 
     Args:
@@ -155,14 +170,23 @@ def apply_change_list(story_id, change_list):
                         change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
                     story.update_node_acquired_skill_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
                     story.update_node_prerequisite_skill_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
                     story.update_node_destination_node_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
@@ -199,6 +223,10 @@ def apply_change_list(story_id, change_list):
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
                 if change.property_name == story_domain.NODE:
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.old_value, int)
+                    assert isinstance(change.new_value, int)
                     story.rearrange_node_in_story(
                         change.old_value, change.new_value)
             elif (
@@ -226,7 +254,7 @@ def apply_change_list(story_id, change_list):
         raise e
 
 
-def does_story_exist_with_url_fragment(url_fragment):
+def does_story_exist_with_url_fragment(url_fragment: str) -> bool:
     """Checks if the url fragment for the story exists.
 
     Args:
@@ -240,8 +268,9 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 
 def validate_prerequisite_skills_in_story_contents(
-    skill_ids_in_corresponding_topic, story_contents
-):
+    skill_ids_in_corresponding_topic: List[str],
+    story_contents: story_domain.StoryContents
+) -> None:
     """Validates the prerequisites skills in the story contents.
 
     Args:
@@ -253,6 +282,7 @@ def validate_prerequisite_skills_in_story_contents(
         ValidationError. Expected prerequisite skills to have been acquired in
             previous nodes.
         ValidationError. Expected story to not contain loops.
+        Exception. Initial node id should not be none.
     """
     if len(story_contents.nodes) == 0:
         return
@@ -261,6 +291,8 @@ def validate_prerequisite_skills_in_story_contents(
     # structure.
     nodes_queue = []
     is_node_visited = [False] * len(story_contents.nodes)
+    # Ruling out the possibility of None for mypy type checking.
+    assert story_contents.initial_node_id is not None
     starting_node_index = story_contents.get_node_index(
         story_contents.initial_node_id)
     nodes_queue.append(story_contents.nodes[starting_node_index].id)
@@ -314,7 +346,9 @@ def validate_prerequisite_skills_in_story_contents(
             nodes_queue.append(node_id)
 
 
-def validate_explorations_for_story(exp_ids, strict):
+def validate_explorations_for_story(
+    exp_ids: List[str], strict: bool
+) -> List[str]:
     """Validates the explorations in the given story and checks whether they
     are compatible with the mobile app and ready for publishing.
 
@@ -410,7 +444,9 @@ def validate_explorations_for_story(exp_ids, strict):
     return validation_error_messages
 
 
-def populate_story_model_fields(story_model, story):
+def populate_story_model_fields(
+    story_model: story_models.StoryModel, story: story_domain.Story
+) -> story_models.StoryModel:
     """Populate story model with the data from story object.
 
     Args:
@@ -439,8 +475,12 @@ def populate_story_model_fields(story_model, story):
 
 
 def _save_story(
-    committer_id, story, commit_message, change_list, story_is_published
-):
+    committer_id: str,
+    story: story_domain.Story,
+    commit_message: str,
+    change_list: List[story_domain.StoryChange],
+    story_is_published: bool
+) -> None:
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -505,7 +545,7 @@ def _save_story(
     story.version += 1
 
 
-def is_story_published_and_present_in_topic(story):
+def is_story_published_and_present_in_topic(story: story_domain.Story) -> bool:
     """Returns whether a story is published. Raises an exception if the story
     is not present in the corresponding topic's story references.
 
@@ -543,7 +583,11 @@ def is_story_published_and_present_in_topic(story):
 
 
 def update_story(
-        committer_id, story_id, change_list, commit_message):
+    committer_id: str,
+    story_id: str,
+    change_list: List[story_domain.StoryChange],
+    commit_message: str
+) -> None:
     """Updates a story. Commits changes.
 
     # NOTE: This function should not be called on its own. Access it
@@ -555,7 +599,7 @@ def update_story(
         story_id: str. The story id.
         change_list: list(StoryChange). These changes are applied in sequence to
             produce the resulting story.
-        commit_message: str or None. A description of changes made to the
+        commit_message: str. A description of changes made to the
             story.
 
     Raises:
@@ -570,11 +614,11 @@ def update_story(
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
     story_is_published = is_story_published_and_present_in_topic(new_story)
-    exploration_context_models_to_be_deleted = (
+    exploration_context_models_to_be_deleted_with_none = (
         exp_models.ExplorationContextModel.get_multi(
             exp_ids_removed_from_story))
     exploration_context_models_to_be_deleted = [
-        model for model in exploration_context_models_to_be_deleted
+        model for model in exploration_context_models_to_be_deleted_with_none
         if model is not None]
     exploration_context_models_collisions_list = (
         exp_models.ExplorationContextModel.get_multi(
@@ -612,7 +656,9 @@ def update_story(
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 
-def delete_story(committer_id, story_id, force_deletion=False):
+def delete_story(
+    committer_id: str, story_id: str, force_deletion: bool = False
+) -> None:
     """Deletes the story with the given story_id.
 
     Args:
@@ -639,13 +685,15 @@ def delete_story(committer_id, story_id, force_deletion=False):
         suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
             exp_ids)
 
-    exploration_context_models = (
+    exploration_context_models: Sequence[
+        exp_models.ExplorationContextModel
+    ] = (
         exp_models.ExplorationContextModel.get_all().filter(
             exp_models.ExplorationContextModel.story_id == story_id
         ).fetch()
     )
     exp_models.ExplorationContextModel.delete_multi(
-        exploration_context_models
+        list(exploration_context_models)
     )
 
     # This must come after the story is retrieved. Otherwise the memcache
@@ -661,8 +709,11 @@ def delete_story(committer_id, story_id, force_deletion=False):
     opportunity_services.delete_exp_opportunities_corresponding_to_story(
         story_id)
 
+    # Delete references of the story from all related learner groups.
+    learner_group_services.remove_story_reference_from_learner_groups(story_id)
 
-def delete_story_summary(story_id):
+
+def delete_story_summary(story_id: str) -> None:
     """Delete a story summary model.
 
     Args:
@@ -673,7 +724,9 @@ def delete_story_summary(story_id):
     story_models.StorySummaryModel.get(story_id).delete()
 
 
-def compute_summary_of_story(story):
+def compute_summary_of_story(
+    story: story_domain.Story
+) -> story_domain.StorySummary:
     """Create a StorySummary domain object for a given Story domain
     object and return it.
 
@@ -682,9 +735,17 @@ def compute_summary_of_story(story):
 
     Returns:
         StorySummary. The computed summary for the given story.
+
+    Raises:
+        Exception. No data available for when the story was last_updated on.
     """
     story_model_node_titles = [
         node.title for node in story.story_contents.nodes]
+
+    if story.created_on is None or story.last_updated is None:
+        raise Exception(
+            'No data available for when the story was last_updated on.'
+        )
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
         story.version, story_model_node_titles, story.thumbnail_bg_color,
@@ -695,7 +756,7 @@ def compute_summary_of_story(story):
     return story_summary
 
 
-def create_story_summary(story_id):
+def create_story_summary(story_id: str) -> None:
     """Creates and stores a summary of the given story.
 
     Args:
@@ -706,7 +767,10 @@ def create_story_summary(story_id):
     save_story_summary(story_summary)
 
 
-def populate_story_summary_model_fields(story_summary_model, story_summary):
+def populate_story_summary_model_fields(
+    story_summary_model: story_models.StorySummaryModel,
+    story_summary: story_domain.StorySummary
+) -> story_models.StorySummaryModel:
     """Populate story summary model with the data from story summary object.
 
     Args:
@@ -741,7 +805,7 @@ def populate_story_summary_model_fields(story_summary_model, story_summary):
     return story_summary_model
 
 
-def save_story_summary(story_summary):
+def save_story_summary(story_summary: story_domain.StorySummary) -> None:
     """Save a story summary domain object as a StorySummaryModel
     entity in the datastore.
 
@@ -758,7 +822,9 @@ def save_story_summary(story_summary):
     story_summary_model.put()
 
 
-def record_completed_node_in_story_context(user_id, story_id, node_id):
+def record_completed_node_in_story_context(
+    user_id: str, story_id: str, node_id: str
+) -> None:
     """Records a node by a given user in a given story
     context as having been played.
 

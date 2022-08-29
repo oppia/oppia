@@ -384,6 +384,54 @@ describe('Context service', () => {
       });
   });
 
+  describe('behavior in the edit learner group page', () => {
+    beforeEach(() => {
+      windowRef = new MockWindowRef();
+      TestBed.configureTestingModule({
+        providers: [
+          UrlInterpolationService,
+          { provide: WindowRef, useValue: windowRef },
+        ],
+      });
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the learner group id', () => {
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/edit-learner-group/groupId');
+      expect(ecs.getLearnerGroupId()).toBe('groupId');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/edit-learner-group/groupId');
+      expect(ecs.getPageContext()).toBe('learner_group_editor');
+    });
+
+    it('should retrieve the learner group id cached before', () => {
+      windowRef.nativeWindow.location.pathname = '/edit-learner-group/groupId1';
+      expect(ecs.getLearnerGroupId()).toBe('groupId1');
+      windowRef.nativeWindow.location.pathname = '/edit-learner-group/groupId2';
+      expect(ecs.getLearnerGroupId()).toBe('groupId1');
+    });
+  });
+
+  describe('behavior in the learner group viewer page', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/learner-groups/groupId');
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the learner group id', () => {
+      expect(ecs.getLearnerGroupId()).toBe('groupId');
+    });
+  });
+
   describe('behavior in different pages', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
@@ -441,6 +489,14 @@ describe('Context service', () => {
         expect(() => ecs.getExplorationId()).toThrowError(
           'ContextService should not be used outside the ' +
           'context of an exploration or a question.');
+      }
+    );
+
+    it('should throw an error when trying to retrieve the learner group id',
+      () => {
+        expect(() => ecs.getLearnerGroupId()).toThrowError(
+          'ContextService should not be used outside the ' +
+          'context of a learner group.');
       }
     );
 

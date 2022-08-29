@@ -1,0 +1,22 @@
+# NOTE TO DEVELOPERS: If you make changes to this file, please run
+#
+#    python -m scripts.install_python_dev_dependencies
+#
+# to update `requirements_dev.txt` and your current Python environment.
+Pillow==9.0.1
+PyGithub==1.55
+certifi==2021.10.8
+coverage==6.1.2
+esprima==4.0.1
+future==0.18.2
+grpcio==1.41.1
+isort==5.10.1
+protobuf==3.13.0
+psutil==5.8.0
+pycodestyle==2.8.0
+pylint==2.11.1
+git+https://github.com/oppia/pylint-quotes.git
+pyyaml==6.0
+six==1.16.0
+typing-extensions==4.0.1
+webtest==3.0.0

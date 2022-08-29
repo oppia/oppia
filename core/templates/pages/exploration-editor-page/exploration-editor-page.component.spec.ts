@@ -92,6 +92,7 @@ describe('Exploration editor page component', function() {
   var gds = null;
   var pts = null;
   var rs = null;
+  let autosaveInfoModalsService = null;
   var sas = null;
   var sers = null;
   var ses = null;
@@ -199,7 +200,7 @@ describe('Exploration editor page component', function() {
     rights: {},
     email_preferences: {},
     draft_changes: [{}, {}, {}],
-    is_version_of_draft_valid: null,
+    is_version_of_draft_valid: false,
     show_state_editor_tutorial_on_load: true,
     show_state_translation_tutorial_on_load: true
   };
@@ -298,6 +299,7 @@ describe('Exploration editor page component', function() {
     stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataBackendApiService');
     userService = $injector.get('UserService');
+    autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     ueps = $injector.get('UserExplorationPermissionsService');
     focusManagerService = $injector.get('FocusManagerService');
 
@@ -332,6 +334,9 @@ describe('Exploration editor page component', function() {
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
       spyOnProperty(rs, 'onRefreshTranslationTab')
         .and.returnValue(mockRefreshTranslationTabEventEmitter);
+      spyOn(autosaveInfoModalsService, 'showVersionMismatchModal').and.stub();
+      spyOn(cls, 'getChangeList').and.stub();
+      spyOn($rootScope, '$applyAsync').and.stub();
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue($q.resolve(new UserInfo(
           ['USER_ROLE'], true, true, false, false, false, null, null, null,
@@ -342,6 +347,7 @@ describe('Exploration editor page component', function() {
         mockOpenTranslationTutorialEmitter);
 
       explorationData.is_version_of_draft_valid = false;
+      explorationData.draft_changes = ['data1', 'data2'];
 
       ctrl.$onInit();
     });
@@ -422,6 +428,9 @@ describe('Exploration editor page component', function() {
         mockOpenTranslationTutorialEmitter.emit();
         expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
         expect(rs.navigateToTranslationTab).toHaveBeenCalled();
+
+        flush();
+        discardPeriodicTasks();
       }));
 
     it('should mark exploration as editable and translatable',
@@ -473,16 +482,6 @@ describe('Exploration editor page component', function() {
       expect(ses.setActiveStateName).toHaveBeenCalledWith(
         'Introduction');
     });
-
-    it('should load change list by draft changes successfully',
-      () => {
-        const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
-
-        $scope.$apply();
-
-        expect(loadSpy).toHaveBeenCalledWith(
-          explorationData.draft_changes);
-      });
 
     it('should navigate to main tab', fakeAsync(() => {
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
@@ -602,6 +601,7 @@ describe('Exploration editor page component', function() {
       spyOn(as, 'addInfoMessage');
       spyOn(as, 'addSuccessMessage');
       explorationData.is_version_of_draft_valid = false;
+      explorationData.draft_changes = ['data1', 'data2'];
 
       ctrl.$onInit();
     });
@@ -666,6 +666,7 @@ describe('Exploration editor page component', function() {
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
         mockInitExplorationPageEmitter);
       explorationData.is_version_of_draft_valid = true;
+      explorationData.draft_changes = ['data1', 'data2'];
 
       ctrl.$onInit();
     });
@@ -738,6 +739,8 @@ describe('Exploration editor page component', function() {
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
       spyOn(ics, 'startCheckingConnection');
+      spyOn(cls, 'loadAutosavedChangeList');
+      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(true);
       var successCallback = jasmine.createSpy('success');
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
       mockInitExplorationPageEmitter.emit(successCallback);
@@ -753,6 +756,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       tick();
 
+      expect(cls.loadAutosavedChangeList).toHaveBeenCalled();
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
       expect(successCallback).toHaveBeenCalled();
     }));
@@ -844,6 +848,7 @@ describe('Exploration editor page component', function() {
         mockEnterEditorForTheFirstTime);
 
       explorationData.is_version_of_draft_valid = true;
+      explorationData.draft_changes = ['data1', 'data2'];
     });
 
     afterEach(() => {

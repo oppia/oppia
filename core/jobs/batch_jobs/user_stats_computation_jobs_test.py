@@ -26,6 +26,9 @@ from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+from typing_extensions import Final
+
 MYPY = False
 if MYPY:
     from mypy_imports import user_models
@@ -35,10 +38,16 @@ if MYPY:
 
 class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
+    JOB_CLASS: Type[
+        user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
+    ] = user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
 
-    VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
-    VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    VALID_USER_ID_1: Final = 'uid_%s' % (
+        'a' * feconf.USER_ID_RANDOM_PART_LENGTH
+    )
+    VALID_USER_ID_2: Final = 'uid_%s' % (
+        'b' * feconf.USER_ID_RANDOM_PART_LENGTH
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -49,7 +58,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_updates_existing_stats_model_when_no_values_are_provided(
-            self
+        self
     ) -> None:
         user_settings_model = self.create_model(
             user_models.UserSettingsModel,
@@ -92,7 +101,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([user_settings_model, user_stats_model])
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
@@ -108,7 +117,7 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(new_user_stats_model.weekly_creator_stats_list, [])
 
     def test_updates_existing_stats_model_when_values_are_provided(
-            self
+        self
     ) -> None:
         user_settings_model = self.create_model(
             user_models.UserSettingsModel,

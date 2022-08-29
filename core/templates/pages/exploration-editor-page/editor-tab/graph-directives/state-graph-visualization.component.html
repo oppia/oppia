@@ -1,0 +1,187 @@
+<!-- NOTE TO DEVELOPERS: The svg defs needed for this directive are
+included at the bottom of exploration-editor-page.mainpage.html. In order for
+the elements to render properly in Firefox, there cannot be multiple defs
+with the same id on the page. -->
+<div [ngStyle]="{'height': getGraphHeightInPixels()}">
+  <button *ngIf="maximize"
+          (click)="sendOnMaximizeFunction()"
+          class="btn btn-secondary btn-sm oppia-graph-resize-button">
+    <i title="Expand Map" class="fas fa-expand-arrows-alt oppia-material-icons"></i>
+  </button>
+
+  <svg class="oppia-graph-viz" width="100%" height="100%">
+    <g>
+      <rect #MainScreen id="pannableRect" class="pannable-rect" *ngIf="allowPanning"
+            [attr.width]="'100%'" [attr.height]="'100%'">
+      </rect>
+      <g>
+        <g [attr.transform]="overallTransformStr" width="100%" height="100%">
+          <g class="pannable-child" [attr.transform]="innerTransformStr">
+            <g class="widthLocation" *ngFor="let link of augmentedLinks">
+              <path class="link e2e-test-link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style">
+              </path>
+            </g>
+
+            <g class="node e2e-test-node" *ngFor="let node of nodeList">
+              <rect [attr.rx]="2" [attr.ry]="2" [attr.height]="node.height" [attr.width]="node.width"
+                    class="e2e-test-node-background {{node.nodeClass}}"
+                    [attr.x]="node.x0" [attr.y]="node.y0"
+                    [ngClass]="{'clickable': canNavigateToNode(node.id)}"
+                    [attr.style]="node.style"
+                    (click)="sendOnClickFunctionData(node.id)"
+                    [attr.aria-label]="'Switch to ' + getNodeTitle(node) + 'Card'">
+              </rect>
+              <title>{{getNodeTitle(node)}}</title>
+              <text text-anchor="middle" [attr.x]="node.xLabel" [attr.y]="node.yLabel">
+                <tspan *ngIf="isCheckpoint(node.id)" alignment-baseline="central">&#11088;</tspan>
+                <tspan class="e2e-test-node-label">
+                  <tspan alignment-baseline="central">{{getTruncatedLabel(node.label) + ' '}}</tspan>
+                  <tspan [attr.x]="node.xLabel" dy="1em" class="oppia-box-fill">{{getTruncatedLabel(node.secondaryLabel)}}</tspan>
+                </tspan>
+              </text>
+              <g *ngIf="getNodeErrorMessage(node.label) && (showWarningSign || showTranslationWarnings)"
+                 ngbTooltip="{{getNodeErrorMessage(node.label)}}"
+                 placement="top">
+                <rect (click)="sendOnClickFunctionData(node.id)" class="oppia-graph-warning-message clickable oppia-error-message-fill"
+                      width="22" height="22"
+                      [attr.x]="node.x0" [attr.y]="node.y0 - 8"
+                      [attr.transform]="getHighlightTransform(node.x0, node.y0)"
+                      [attr.style]="'fill: yellow; z-index: 10000;'"
+                      [attr.aria-label]="getNodeErrorMessage(node.label)">
+                </rect>
+                <text fill="firebrick" text-anchor="middle" [attr.x]="node.x0 + 11"
+                      [attr.y]="node.y0 + 9"
+                      class="oppia-highlight-text"
+                      [attr.transform]="getHighlightTextTransform(node.x0, node.y0)">
+                  ⚠
+                </text>
+              </g>
+              <g *ngIf="isEditable && node.canDelete" class="e2e-test-delete-node">
+                <rect height="15" width="15" opacity="0" stroke-width="0"
+                      [attr.x]="node.x0 + node.width" [attr.y]="node.y0"
+                      transform="translate(0, -15)"
+                      class="clickable oppia-node-delete"
+                      (click)="onNodeDeletionClick(node.id)"
+                      [attr.aria-label]="'Delete' + getNodeTitle(node) + 'card'">
+                </rect>
+                <text [attr.dx]="node.x0 + node.width" [attr.dy]="node.y0" text-anchor="right">
+                  x
+                </text>
+              </g>
+            </g>
+          </g>
+
+          <g *ngIf="opacityMap">
+            <rect width="210" height="70" [attr.x]="GRAPH_WIDTH - 250" y="10" class="oppia-rectangle">
+            </rect>
+
+            <rect width="190" height="20" [attr.x]="GRAPH_WIDTH - 240" y="20"
+                  class="legend-bar">
+            </rect>
+
+            <text [attr.x]="GRAPH_WIDTH - 200" y="60">
+              {{ opacityMap.legend }}
+            </text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .clickable.oppia-error-message-fill {
+    fill: yellow;
+    z-index: 10000
+  }
+
+  .oppia-graph-viz {
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 5;
+  }
+
+  .oppia-graph-viz .pannable-rect {
+    cursor: move;
+    fill: none;
+    fill-opacity: 0;
+    height: 100%;
+    pointer-events: all;
+    width: 100%;
+  }
+  .oppia-graph-viz path.link {
+    fill: none;
+    stroke: rgb(179, 179, 179);
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz text {
+    font: 12px sans-serif;
+    pointer-events: none;
+  }
+  .oppia-graph-viz text.shadow {
+    stroke: #fff;
+    stroke-opacity: .8;
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz .node rect {
+    fill: #fff;
+    pointer-events: all;
+    stroke: rgb(0, 0, 0);
+    -moz-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+  .oppia-graph-resize-button .oppia-material-icons {
+    font-size: larger;
+  }
+  .oppia-graph-viz .oppia-box-fill {
+    fill: gray;
+  }
+  .oppia-graph-viz .clickable.oppia-error-message-fill {
+    fill: yellow;
+  }
+  .oppia-graph-viz .oppia-highlight-text {
+    font-size: 22px;
+    font-weight: bold;
+  }
+  .oppia-graph-viz .clickable.oppia-node-delete {
+    cursor: pointer;
+    fill: pink;
+  }
+  .oppia-graph-viz .oppia-rectangle {
+    fill: transparent;
+    stroke: black;
+  }
+  .oppia-graph-viz .node rect.terminal-node {
+    fill: green; /* terminal nodes are green to signify them */
+  }
+  .oppia-graph-viz .node rect.bad-node {
+    fill: #f35f55;
+  }
+  .oppia-graph-viz .node rect.current-node:hover,
+  .oppia-graph-viz .node rect.init-node:hover,
+  .oppia-graph-viz .node rect.terminal-node:hover,
+  .oppia-graph-viz .node rect.bad-node:hover,
+  .oppia-graph-viz .node rect.normal-node:hover {
+    fill: #c8c4c4;
+  }
+  .oppia-graph-viz .clickable {
+    cursor: pointer;
+  }
+  .oppia-graph-viz .legend-bar {
+    fill: url('#nodegradient');
+    stroke: black;
+    stroke-width: 0.5;
+  }
+
+  .oppia-graph-resize-button {
+    border: 0;
+    padding: 9px 10px 6px 10px;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    z-index: 99;
+  }
+</style>

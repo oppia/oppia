@@ -1,7 +1,7 @@
 <div class="h-100">
   <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
   <div *ngIf="rules">
-    <strong>
+    <strong class="oppia-answer-group-heading">
       If the learner's answer...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
@@ -74,10 +74,8 @@
 <style>
   .oppia-rule-header {
     color: rgb(120, 120, 120);
-    overflow: hidden;
     padding-left: 0;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .oppia-multiple-choice-rule p {
@@ -136,4 +134,17 @@
   .oppia-answer-rule-block {
     border-bottom: 1px solid #ccc;
   }
+
+  @media screen and (max-width: 700px) {
+  .oppia-editor-card-section {
+      padding: 20px 10px;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .oppia-answer-group-heading {
+      font-size: 18px;
+    }
+  }
+
 </style>

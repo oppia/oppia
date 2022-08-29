@@ -27,21 +27,19 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockStoryEditorNavigationService {
-  activeTab: 'story_preview';
-  getActiveTab: () => string;
-  getChapterId: () => 'node_1';
-  getChapterIndex: () => null;
-  navigateToStoryEditor: () => {
-    return;
-  };
+  activeTab!: 'story_preview';
+  getActiveTab!: () => string;
+  getChapterId!: () => 'node_1';
+  getChapterIndex!: () => null;
+  navigateToStoryEditor!: () => {};
 }
 describe('Story Preview tab', () => {
   let component: StoryPreviewTabComponent;
   let fixture: ComponentFixture<StoryPreviewTabComponent>;
-  let story: Story = null;
-  let storyInitializedEventEmitter: EventEmitter<void> = null;
-  let storyReinitializedEventEmitter: EventEmitter<void> = null;
-  let storyObjectFactory = null;
+  let story: Story;
+  let storyInitializedEventEmitter: EventEmitter<void>;
+  let storyReinitializedEventEmitter: EventEmitter<void>;
+  let storyObjectFactory: StoryObjectFactory;
   let storyEditorStateService: StoryEditorStateService;
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -69,35 +67,43 @@ describe('Story Preview tab', () => {
       title: 'Story title',
       description: 'Story Description',
       notes: '<p>Notes/p>',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
       story_contents: {
         initial_node_id: 'node_1',
-        next_node_id: 'node_3',
-        nodes: [{
-          id: 'node_1',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
-          outline: 'Outline',
-          exploration_id: 'exp_1',
-          outline_is_finalized: false,
-          thumbnail_filename: 'img.png',
-          thumbnail_bg_color: '#a33f40'
-        }, {
-          id: 'node_2',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
-          outline: 'Outline',
-          exploration_id: 'exp_2',
-          outline_is_finalized: false,
-          thumbnail_filename: 'img2.png',
-          thumbnail_bg_color: '#a33f40'
-        }],
+        nodes: [
+          {
+            id: 'node_1',
+            title: 'Title 1',
+            description: 'Description 1',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: 'exp_1',
+            outline_is_finalized: false,
+            thumbnail_filename: 'img.png',
+            thumbnail_bg_color: '#a33f40'
+          }, {
+            id: 'node_2',
+            title: 'Title 2',
+            description: 'Description 2',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: 'exp_2',
+            outline_is_finalized: false,
+            thumbnail_filename: 'img2.png',
+            thumbnail_bg_color: '#a33f40'
+          }],
+        next_node_id: 'node_3'
       },
       language_code: 'en',
-      story_contents_schema_version: '1',
-      version: '1',
-      corresponding_topic_id: 'topic_id'
+      thumbnail_filename: 'fileName',
+      thumbnail_bg_color: 'blue',
+      url_fragment: 'url',
+      meta_tag_content: 'meta'
     });
 
     storyInitializedEventEmitter = new EventEmitter();

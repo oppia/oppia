@@ -23,6 +23,8 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
+var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('./SkillEditorPage');
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -207,6 +209,53 @@ var createAndPublishTwoCardExploration = async function(
   await publishExploration();
 };
 
+var createAndPublishExplorationWithAdditionalCheckpoints = async function(
+    title, category, objective, language, welcomeModalIsShown,
+    correctnessFeedbackIsEnabled) {
+  await createExploration(welcomeModalIsShown);
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));
+  await explorationEditorMainTab.setInteraction('Continue');
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('second card', true, null);
+  await explorationEditorMainTab.moveToState('second card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 2'), true);
+  await explorationEditorMainTab.enableCheckpointForCurrentState();
+  await explorationEditorMainTab.setInteraction('Continue');
+  responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('third card', true, null);
+  await explorationEditorMainTab.moveToState('third card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 3'), true);
+  await explorationEditorMainTab.enableCheckpointForCurrentState();
+  await explorationEditorMainTab.setInteraction('Continue');
+  responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('fourth card', true, null);
+  await explorationEditorMainTab.moveToState('fourth card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 4'), true);
+  await explorationEditorMainTab.setInteraction('EndExploration');
+
+  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  await explorationEditorPage.navigateToSettingsTab();
+  await explorationEditorSettingsTab.setTitle(title);
+  await explorationEditorSettingsTab.setCategory(category);
+  await explorationEditorSettingsTab.setObjective(objective);
+  if (language) {
+    await explorationEditorSettingsTab.setLanguage(language);
+  }
+  if (!correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.disableCorrectnessFeedback();
+  }
+  await explorationEditorPage.saveChanges();
+  await publishExploration();
+};
+
 // ---- Role management (state editor settings tab) ----
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
@@ -224,11 +273,11 @@ var _addExplorationRole = async function(roleName, username) {
 };
 
 var addExplorationManager = async function(username) {
-  await _addExplorationRole('Manager', username);
+  await _addExplorationRole('Manager (can edit permissions)', username);
 };
 
 var addExplorationCollaborator = async function(username) {
-  await _addExplorationRole('Collaborator', username);
+  await _addExplorationRole('Collaborator (can make changes)', username);
 };
 
 var addExplorationVoiceArtist = async function(username) {
@@ -247,6 +296,18 @@ var addExplorationPlaytester = async function(username) {
   await _addExplorationRole('Playtester', username);
 };
 
+// Here, roleName is the server-side form of the name (e.g. 'owner').
+var _getExplorationRoles = async function(roleName) {
+  var explorationRoleNameLocator = '.e2e-test-role-' + roleName + '-name';
+  return await $$(explorationRoleNameLocator).map(async function(elem) {
+    return await elem.getText();
+  });
+};
+
+var getExplorationManagers = async function() {
+  return await _getExplorationRoles('owner');
+};
+
 var createSkillAndAssignTopic = async function(
     skillDescription, material, topicName) {
   var topicsAndSkillsDashboardPage = (
@@ -257,7 +318,6 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.get();
   await topicsAndSkillsDashboardPage.navigateToSkillsTab();
   await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
-  await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
   await topicsAndSkillsDashboardPage.assignSkillToTopic(
     skillDescription, topicName);
 };
@@ -344,6 +404,8 @@ exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
+exports.createAndPublishExplorationWithAdditionalCheckpoints = (
+  createAndPublishExplorationWithAdditionalCheckpoints);
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
 exports.isExplorationCommunityOwned = isExplorationCommunityOwned;
@@ -354,6 +416,7 @@ exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
 exports.addExplorationVoiceArtist = addExplorationVoiceArtist;
 exports.addExplorationPlaytester = addExplorationPlaytester;
+exports.getExplorationManagers = getExplorationManagers;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;

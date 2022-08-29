@@ -25,14 +25,13 @@ import re
 import subprocess
 import tarfile
 import tempfile
-import urllib.request as urlrequest
 import zipfile
 
 from core import utils
 from core.tests import test_utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 from . import install_third_party
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
@@ -43,7 +42,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     """Test the methods for installing third party."""
 
     def setUp(self):
-        super(InstallThirdPartyTests, self).setUp()
+        super().setUp()
         self.check_function_calls = {
             'remove_is_called': False,
             'rename_is_called': False,
@@ -75,7 +74,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         self.extract_swap = self.swap(
             zipfile.ZipFile, 'extractall', mock_extractall)
 
@@ -105,7 +104,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         with self.dir_exists_swap, exists_swap, url_retrieve_swap:
             install_third_party.download_files(
                 'source_url', 'target_dir', ['file1', 'file2'])
@@ -311,14 +310,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'download_files_is_called': False,
             'download_and_unzip_files_is_called': False,
             'download_and_untar_files_is_called': False,
-            'install_backend_python_libs_is_called': False
+            'install_python_prod_dependencies_is_called': False
         }
         expected_check_function_calls = {
             'validate_dependencies_is_called': True,
             'download_files_is_called': True,
             'download_and_unzip_files_is_called': True,
             'download_and_untar_files_is_called': True,
-            'install_backend_python_libs_is_called': True
+            'install_python_prod_dependencies_is_called': True
         }
         def mock_return_json(unused_filepath):
             return {
@@ -367,8 +366,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 unused_source_url, unused_target_parent_dir,
                 unused_tar_root_name, unused_target_root_name):
             check_function_calls['download_and_untar_files_is_called'] = True
-        def mock_install_backend_python_libs():
-            check_function_calls['install_backend_python_libs_is_called'] = True
+        def mock_install_python_prod_dependencies():
+            check_function_calls[
+                'install_python_prod_dependencies_is_called'] = True
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         validate_swap = self.swap(
@@ -384,12 +384,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         untar_files_swap = self.swap(
             install_third_party, 'download_and_untar_files',
             mock_download_and_untar_files)
-        mock_install_backend_python_libs_swap = self.swap(
-            install_backend_python_libs, 'main',
-            mock_install_backend_python_libs)
+        mock_install_python_prod_dependencies_swap = self.swap(
+            install_python_prod_dependencies, 'main',
+            mock_install_python_prod_dependencies)
 
         with validate_swap, return_json_swap, download_files_swap, (
-            mock_install_backend_python_libs_swap):
+            mock_install_python_prod_dependencies_swap):
             with unzip_files_swap, untar_files_swap:
                 install_third_party.main(args=[])
         self.assertEqual(check_function_calls, expected_check_function_calls)

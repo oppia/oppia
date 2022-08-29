@@ -25,7 +25,7 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var StoryEditorPage = function() {
   var EDITOR_URL_PREFIX = '/story_editor/';
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var backToStoryEditorButton = $('.e2e-test-back-to-story-editor-button');
   var returnToTopicButton = $('.e2e-test-return-to-topic-button');
   var saveStoryButton = $('.e2e-test-save-story-button');
   var commitMessageField = $('.e2e-test-commit-message-input');
@@ -33,60 +33,102 @@ var StoryEditorPage = function() {
   var createChapterButton = $('.e2e-test-add-chapter-button');
   var newChapterTitleField = $('.e2e-test-new-chapter-title-field');
   var newChapterExplorationField = $('.e2e-test-chapter-exploration-input');
+  var notesEditor = $('.e2e-test-story-notes-rte');
+  var openStoryNotesEditorButton = $(
+    '.e2e-test-open-story-notes-editor-button');
   var confirmChapterCreationButton = $(
     '.e2e-test-confirm-chapter-creation-button');
   var publishStoryButton = $('.e2e-test-publish-story-button');
   var unpublishStoryButton = $('.e2e-test-unpublish-story-button');
-  var backToStoryEditorButton = $('.e2e-test-back-to-story-editor-button');
+  var saveStoryNotesEditorButton = $('.e2e-test-save-story-notes-button');
+  var storyDescriptionField = $('.e2e-test-story-description-field');
+  var storyNotes = $('.e2e-test-story-notes');
   var storyMetaTagContentField = $('.e2e-test-story-meta-tag-content-field');
   var storyMetaTagContentLabel = $('.e2e-test-story-meta-tag-content-label');
+  var storyTitleField = $('.e2e-test-story-title-field');
+  var thumbnailContainer = $('.e2e-test-thumbnail-container');
+  var chapterEditOption = $('.e2e-test-edit-options');
+  var chapterEditOptionsSelector = function() {
+    return $$('.e2e-test-edit-options');
+  };
+  var deleteChapterButton = $('.e2e-test-delete-chapter-button');
+  var confirmDeleteChapterButton = $('.e2e-test-confirm-delete-chapter-button');
+  var cancelChapterCreationButton = $(
+    '.e2e-test-cancel-chapter-creation-button');
 
   /*
    * CHAPTER
    */
+  var addPrerequisiteSkillButton = $('.e2e-test-add-prerequisite-skill');
+  var addAcquiredSkillButton = $('.e2e-test-add-acquired-skill');
+  var selectSkillModalHeader = $('.e2e-test-skill-select-header');
+  var skillNameInputField = $('.e2e-test-skill-name-input');
+  var skillSaveButton = $('.e2e-test-confirm-skill-selection-button');
+  var skillListItem = $('.e2e-test-skills-list-item');
+  var skillListItemsSelector = function() {
+    return $$('.e2e-test-skills-list-item');
+  };
+  var deletePrerequisiteSkillButtonSelector = function() {
+    return $$('.e2e-test-remove-prerequisite-skill');
+  };
+  var deleteAcquiredSkillButtonSelector = function() {
+    return $$('.e2e-test-remove-acquired-skill');
+  };
+  var nextChapterCard = $('.e2e-test-next-chapter-card');
+  var warningIndicator = $('.e2e-test-warning-indicator');
+  var warningTextElement = $('.e2e-test-warnings-text');
+  var warningTextElementsSelector = function() {
+    return $$('.e2e-test-warnings-text');
+  };
+  var chapterTitle = $('.e2e-test-chapter-title');
   var chapterTitlesSelector = function() {
     return $$('.e2e-test-chapter-title');
   };
+  var discardOption = $('.e2e-test-show-discard-option');
+  var discardChangesButton = $('.e2e-test-discard-story-changes');
+  var explorationAlreadyPresentMsg = $('.e2e-test-invalid-exp-id');
+  var explorationIdInput = $('.e2e-test-exploration-id-input');
+  var explorationIdSaveButton = $('.e2e-test-exploration-id-save-button');
+  var nextChapterCard = $('.e2e-test-next-chapter-card');
   var nodeDescriptionInputField = $('.e2e-test-add-chapter-description');
   var nodeOutlineEditor = $('.e2e-test-add-chapter-outline');
   var nodeOutlineFinalizeCheckbox = $('.e2e-test-finalize-outline');
+  var nodeOutlineEditorRteContentSelector = function() {
+    return $$('.e2e-test-rte');
+  };
   var nodeOutlineSaveButton = $('.e2e-test-node-outline-save-button');
   var createChapterThumbnailButton = $(
     '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
+  var storyThumbnailImageElement = $(
+    '.e2e-test-story-thumbnail .e2e-test-custom-photo');
+  var storyThumbnailButton = $(
+    '.e2e-test-story-thumbnail .e2e-test-photo-button');
+  var chapterThumbnailImageElement = $(
+    '.e2e-test-story-node-thumbnail .e2e-test-custom-photo');
+  var chapterThumbnailButton = $(
+    '.e2e-test-story-node-thumbnail .e2e-test-photo-button');
 
   this.get = async function(storyId) {
     await browser.url(EDITOR_URL_PREFIX + storyId);
     await waitFor.pageToFullyLoad();
   };
 
-  this.returnToTopic = async function() {
-    await general.scrollToTop();
-    await action.click('Return to topic button', returnToTopicButton);
-    await waitFor.pageToFullyLoad();
+  this.getStoryThumbnailSource = async function() {
+    return await workflow.getImageSource(storyThumbnailImageElement);
   };
 
-  this.updateMetaTagContent = async function(newMetaTagContent) {
-    await action.setValue(
-      'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
-    await action.click('Meta Tag Content label', storyMetaTagContentLabel);
+  this.getChapterThumbnailSource = async function() {
+    return await workflow.getImageSource(chapterThumbnailImageElement);
   };
 
-  this.saveStory = async function(commitMessage) {
-    await action.click('Save Story Button', saveStoryButton);
-    await waitFor.visibilityOf(
-      commitMessageField, 'Commit message modal takes too long to appear.');
-    await commitMessageField.setValue(commitMessage);
+  this.submitStoryThumbnail = async function(imgPath, resetExistingImage) {
+    return await workflow.submitImage(
+      storyThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
+  };
 
-    await action.click('Close Save Modal button', closeSaveModalButton);
-    await waitFor.invisibilityOf(
-      closeSaveModalButton,
-      'Commit message modal takes too long to disappear.');
-    await waitFor.pageToFullyLoad();
-    // Wait for the "Save Draft" button to be reset.
-    await waitFor.visibilityOf(
-      saveStoryButton, 'Save Story Button taking too long to appear.');
-    await waitFor.textToBePresentInElement(
-      saveStoryButton, 'Save Draft', 'Story could not be saved.');
+  this.submitChapterThumbnail = async function(imgPath, resetExistingImage) {
+    return await workflow.submitImage(
+      chapterThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
   };
 
   this.publishStory = async function() {
@@ -99,6 +141,17 @@ var StoryEditorPage = function() {
     await waitFor.invisibilityOf(
       closeSaveModalButton,
       'Unpublish message modal takes too long to disappear.');
+  };
+
+  this.deleteChapterWithIndex = async function(index) {
+    await waitFor.visibilityOf(
+      chapterEditOption,
+      'Chapter list taking too long to appear.');
+    var chapterEditOptions = await chapterEditOptionsSelector();
+    await action.click('Chapter edit options', chapterEditOptions[index]);
+    await action.click('Delete chapter button', deleteChapterButton);
+    await action.click(
+      'Confirm delete chapter button', confirmDeleteChapterButton);
   };
 
   this.createNewChapter = async function(title, explorationId, imgPath) {
@@ -115,6 +168,17 @@ var StoryEditorPage = function() {
     await action.click(
       'Confirm chapter creation button', confirmChapterCreationButton);
     await general.scrollToTop();
+  };
+
+  this.cancelChapterCreation = async function() {
+    await action.click(
+      'Cancel chapter creation button', cancelChapterCreationButton);
+  };
+
+  this.discardStoryChanges = async function() {
+    await action.click('Show discard option button', discardOption);
+    await action.click('Discard changes button', discardChangesButton);
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
@@ -149,11 +213,143 @@ var StoryEditorPage = function() {
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
 
-  this.expectNumberOfChaptersToBe = async function(count) {
-    var chapterTitles = await chapterTitlesSelector();
-    expect(await chapterTitles.length).toEqual(count);
+  this.expectChaptersListToBe = async function(chapters) {
+    await this.expectNumberOfChaptersToBe(chapters.length);
+    for (var i = 0; i < chapters.length; i++) {
+      var chapterTitles = await chapterTitlesSelector();
+      expect(await chapterTitles[i].getText()).toEqual(chapters[i]);
+    }
   };
 
+  this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
+    await waitFor.visibilityOf(
+      chapterTitle,
+      'Chapter titles taking too long to appear.');
+    var chapterTitles = await chapterTitlesSelector();
+    var matchFound = false;
+    for (var i = 0; i < chapterTitles.length; i++) {
+      if (await chapterTitles[i].getText() === chapter1) {
+        matchFound = true;
+        break;
+      }
+    }
+    expect(matchFound).toBe(true);
+    var toMove = chapterTitles[i];
+
+    matchFound = false;
+    for (var i = 0; i < chapterTitles.length; i++) {
+      if (await chapterTitles[i].getText() === chapter2) {
+        matchFound = true;
+        break;
+      }
+    }
+    expect(matchFound).toBe(true);
+    var target = chapterTitles[i];
+    await general.dragAndDrop(toMove, target);
+  });
+
+  this.expectDestinationToBe = async function(chapterName) {
+    var pattern = '\s*' + chapterName + '\s*';
+    return expect(await nextChapterCard.getText()).toMatch(pattern);
+  };
+
+  this.expectNumberOfChaptersToBe = async function(count) {
+    var chapterTitles = await chapterTitlesSelector();
+    expect(chapterTitles.length).toEqual(count);
+  };
+
+  this.expectNotesToBe = async function(richTextInstructions) {
+    await forms.expectRichText(storyNotes).toMatch(richTextInstructions);
+  };
+
+  this.expectTitleToBe = async function(title) {
+    await waitFor.visibilityOf(
+      storyTitleField, 'Story Title Field takes too long to appear');
+    var storyTitleValue = await storyTitleField.getValue();
+    expect(storyTitleValue).toEqual(title);
+  };
+
+  this.expectDescriptionToBe = async function(description) {
+    await waitFor.visibilityOf(
+      storyDescriptionField,
+      'Story Description Field takes too long to appear');
+    var storyDescriptionValue = await storyDescriptionField.getValue();
+    expect(storyDescriptionValue).toEqual(description);
+  };
+
+  this.changeStoryTitle = async function(storyTitle) {
+    await waitFor.visibilityOf(
+      storyTitleField, 'Story Title Field taking too long to appear.');
+    await action.clear('Story Title Field', storyTitleField);
+    await action.setValue('Story Title Field', storyTitleField, storyTitle);
+  };
+
+  this.returnToTopic = async function() {
+    await general.scrollToTop();
+    await action.click('Return to topic button', returnToTopicButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.changeStoryDescription = async function(storyDescription) {
+    await waitFor.visibilityOf(
+      storyDescriptionField,
+      'Story Description Field taking too long to appear.');
+    await action.clear('Story Description Field', storyDescriptionField);
+    await action.setValue(
+      'Story Description Filed', storyDescriptionField, storyDescription);
+  };
+
+  this.changeStoryNotes = async function(richTextInstructions) {
+    await action.click(
+      'Open Story Editor Notes Button', openStoryNotesEditorButton);
+    var storyNotesEditor = await forms.RichTextEditor(
+      notesEditor);
+    await storyNotesEditor.clear();
+    await richTextInstructions(storyNotesEditor);
+    await action.click(
+      'Save Story Notes Editor Button', saveStoryNotesEditorButton);
+  };
+
+  this.saveStory = async function(commitMessage) {
+    await action.click('Save Story Button', saveStoryButton);
+    await waitFor.visibilityOf(
+      commitMessageField, 'Commit message modal takes too long to appear.');
+    await commitMessageField.setValue(commitMessage);
+
+    await action.click('Close Save Modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton,
+      'Commit message modal takes too long to disappear.');
+    await waitFor.pageToFullyLoad();
+    // Wait for the "Save Draft" button to be reset.
+    await waitFor.visibilityOf(
+      saveStoryButton, 'Save Story Button taking too long to appear.');
+    await waitFor.textToBePresentInElement(
+      saveStoryButton, 'Save Draft', 'Story could not be saved.');
+  };
+
+  this.expectSaveStoryDisabled = async function() {
+    await waitFor.visibilityOf(
+      saveStoryButton, 'Save story button taking too long to appear');
+    var saveStoryButtonValue = await action.getAttribute(
+      'Save Story Button', saveStoryButton, 'disabled');
+    return expect(saveStoryButtonValue).toEqual('true');
+  };
+
+  this.setChapterExplorationId = async function(explorationId) {
+    await waitFor.visibilityOf(
+      explorationIdInput,
+      'ExplorationIdInput takes too long to be visible'
+    );
+
+    await action.setValue(
+      'Exploration Id Input', explorationIdInput, explorationId);
+    await waitFor.elementToBeClickable(
+      explorationIdSaveButton,
+      'ExplorationIdSaveButton takes too long to be clickable'
+    );
+    await action.click('Exploration Id Save button', explorationIdSaveButton);
+  };
 
   this.changeNodeDescription = async function(nodeDescription) {
     // Function scrollToTop is added to prevent nodeDescriptionInputField from
@@ -162,8 +358,34 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible');
-    await nodeDescriptionInputField.clearValue();
-    await nodeDescriptionInputField.setValue(nodeDescription);
+    await action.clear(
+      'Node Description Input', nodeDescriptionInputField);
+    await action.setValue(
+      'Node Description Input', nodeDescriptionInputField, nodeDescription);
+  };
+
+  this.expectNodeDescription = async function(nodeDescription) {
+    await waitFor.visibilityOf(
+      nodeDescriptionInputField,
+      'NodeDescriptionInputField takes too long to be visible'
+    );
+    let desc = await browser.execute(() => {
+      return document.getElementsByClassName(
+        'e2e-test-add-chapter-description')[0].value;
+    });
+    await expect(desc).toMatch(nodeDescription);
+  };
+
+  this.expectChapterExplorationIdToBe = async function(id) {
+    await waitFor.visibilityOf(
+      explorationIdInput,
+      'explorationIdInput takes too long to be visible'
+    );
+    let explorationId = await browser.execute(() => {
+      return document.getElementsByClassName(
+        'e2e-test-exploration-id-input')[0].value;
+    });
+    await expect(explorationId).toEqual(id);
   };
 
   this.changeNodeOutline = async function(richTextInstructions) {
@@ -176,6 +398,130 @@ var StoryEditorPage = function() {
     await action.click('Chapter node editor', nodeOutlineEditor);
     await action.click('Node outline save button', nodeOutlineSaveButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
+  };
+
+  this.navigateToChapterByIndex = async function(index) {
+    // Function scrollToTop is added to prevent chapterTitles from being hidden
+    // by the navbar.
+    await general.scrollToTop();
+    var chapterTitles = await chapterTitlesSelector();
+    var chapterTitleButton = chapterTitles[index];
+    await action.click('Chapter Title Button', chapterTitleButton);
+  };
+
+  this.expectNodeOutlineToMatch = async function(nodeOutline) {
+    var nodeOutlineEditorRteContent = (
+      await nodeOutlineEditorRteContentSelector());
+    var outlineEditorRteContentText = (
+      await nodeOutlineEditorRteContent[0].getText());
+    expect(outlineEditorRteContentText).toEqual(nodeOutline);
+  };
+
+  this.expectExplorationIdAlreadyExistWarning = async function() {
+    var warningText = await action.getText(
+      'Exploration Already Present Message', explorationAlreadyPresentMsg);
+    expect(warningText).toEqual(
+      'The given exploration already exists in the story.');
+  };
+
+  this.getSelectSkillModal = async function() {
+    await waitFor.visibilityOf(
+      selectSkillModalHeader,
+      'selectSkillModalHeader takes too long to be visible.');
+    return {
+      _searchSkillByName: async function(name) {
+        await waitFor.visibilityOf(
+          skillNameInputField,
+          'skillNameInputField takes too long to be visible');
+        await action.setValue(
+          'Skill Name Input Field', skillNameInputField, name);
+        await action.click('Skill Name Input field', skillNameInputField);
+      },
+
+      _selectSkillBasedOnIndex: async function(index) {
+        await waitFor.visibilityOf(skillListItem);
+        var skillListItems = await skillListItemsSelector();
+        var selectedSkill = skillListItems[index];
+        await action.click('Selected Skill', selectedSkill);
+      },
+
+      selectSkill: async function(name) {
+        await this._searchSkillByName(name);
+        await this._selectSkillBasedOnIndex(0);
+        await waitFor.pageToFullyLoad();
+        await action.click('Skill Save Button', skillSaveButton);
+      },
+    };
+  };
+
+  this.addAcquiredSkill = async function(skillName) {
+    await action.click(
+      'addAcquiredSkillButton', addAcquiredSkillButton);
+    var selectSkillModal = await this.getSelectSkillModal();
+    await selectSkillModal.selectSkill(skillName);
+  };
+
+  this.addPrerequisiteSkill = async function(skillName) {
+    await action.click(
+      'addPrerequisiteSkillButton', addPrerequisiteSkillButton);
+    var selectSkillModal = await this.getSelectSkillModal();
+    await selectSkillModal.selectSkill(skillName);
+  };
+
+  this.deleteAcquiredSkillByIndex = async function(index) {
+    var deleteAcquiredSkillButton = await deleteAcquiredSkillButtonSelector();
+    var deleteButton = deleteAcquiredSkillButton[index];
+    await action.click('Delete Acquired Skill Button', deleteButton);
+  };
+
+  this.deletePrerequisiteSkillByIndex = async function(index) {
+    var deletePrerequisiteSkillButton = (
+      await deletePrerequisiteSkillButtonSelector());
+    var deleteButton = deletePrerequisiteSkillButton[index];
+    await action.click('Delete Prerequisite Skill Button', deleteButton);
+  };
+
+  this.updateMetaTagContent = async function(newMetaTagContent) {
+    await action.setValue(
+      'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
+    await action.click('Meta Tag Content label', storyMetaTagContentLabel);
+  };
+
+  this.expectAcquiredSkillDescriptionCardCount = async function(number) {
+    let count = await browser.execute(() => {
+      return document.getElementsByClassName(
+        'e2e-test-acquired-skill-description-card').length;
+    });
+    await expect(count).toEqual(number);
+  };
+
+  this.expectPrerequisiteSkillDescriptionCardCount = async function(number) {
+    let count = await browser.execute(() => {
+      return document.getElementsByClassName(
+        'e2e-test-prerequisite-skill-description-card').length;
+    });
+    await expect(count).toEqual(number);
+  };
+
+  this.expectWarningInIndicator = async function(warning) {
+    await waitFor.visibilityOf(
+      warningIndicator, 'Warning Indicator taking too long to appear.');
+    await warningIndicator.moveTo();
+    await waitFor.visibilityOf(
+      warningTextElement,
+      'Warning Text Elements taking too long to appear');
+    var warningTextElements = await warningTextElementsSelector();
+    var warningElemCount = warningTextElements.length;
+    var matchFound = false;
+    for (var i = 0; i < warningElemCount; i++) {
+      var text = await action.getText(
+        'Warning Text', warningTextElements[i]);
+      if (warning.test(text)) {
+        matchFound = true;
+        break;
+      }
+    }
+    expect(matchFound).toBe(true);
   };
 };
 

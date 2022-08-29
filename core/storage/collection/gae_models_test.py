@@ -62,7 +62,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
 
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
@@ -72,7 +72,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
         collection_model = collection_models.CollectionModel.get_by_id('id')
         snapshot_dict = collection_model.compute_snapshot()
         snapshot_dict['nodes'] = ['node0', 'node1']
@@ -149,7 +149,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_6_NEW = 'id_6_new'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
@@ -364,7 +364,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_COMMITTER = 'id_4'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelRevertUnitTest, self).setUp()
+        super().setUp()
         self.collection_model = collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -529,7 +529,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_get_all_non_private_commits_with_invalid_max_age(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
             # TODO(#13528): Remove this test after the backend is fully
@@ -581,7 +581,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_3_NEW = 'id_3_new'
 
     def setUp(self) -> None:
-        super(CollectionSummaryModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',

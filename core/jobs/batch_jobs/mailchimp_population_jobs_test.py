@@ -27,23 +27,35 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 from mailchimp3 import mailchimpclient
-from typing import Dict, List
+
+from typing import Dict, List, Mapping, Type, Union
+from typing_extensions import Final, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import config_models
     from mypy_imports import user_models
 
-(config_models, user_models) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.user])
+(config_models, user_models) = models.Registry.import_models([
+    models.NAMES.config, models.NAMES.user
+])
+
+
+class MailChimpListsDataDict(TypedDict):
+    """Dictionary representation for data argument of update_members method."""
+
+    members: List[Dict[str, str]]
+    update_existing: bool
 
 
 class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = mailchimp_population_jobs.MailchimpPopulateJob
+    JOB_CLASS: Type[
+        mailchimp_population_jobs.MailchimpPopulateJob
+    ] = mailchimp_population_jobs.MailchimpPopulateJob
 
-    USER_ID_PREFIX = 'user_id_'
-    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    USER_ID_PREFIX: Final = 'user_id_'
+    DATETIME: Final = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
     class MockMailchimpClass:
         """Class to mock Mailchimp class."""
@@ -52,13 +64,13 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
             """Class to mock Mailchimp lists object."""
 
             def __init__(self) -> None:
-                self.parent_emails = []
+                self.parent_emails: List[str] = []
 
             def update_members(
                 self,
                 _audience_id: str,
-                data: List[Dict[str, str]]
-            ) -> None:
+                data: MailChimpListsDataDict
+            ) -> Mapping[str, Union[List[str], List[Dict[str, str]]]]:
                 """Mocks the update_members function of the mailchimp api.
 
                 Args:
@@ -79,13 +91,17 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
                 self.parent_emails = emails
 
                 if 'invalid_email' in emails:
-                    return {
+                    updated_members: List[str] = []
+                    invalid_email_dict: Dict[
+                        str, Union[List[str], List[Dict[str, str]]]
+                    ] = {
                         'new_members': emails[1:],
-                        'updated_members': [],
+                        'updated_members': updated_members,
                         'errors': [{
                             'email_address': 'invalid_email'
                         }]
                     }
+                    return invalid_email_dict
 
                 # Mocking a request issue by throwing an exception for this
                 # particular case.
@@ -95,10 +111,11 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
                         'detail': 'Server Issue'
                     })
 
-                return {
+                valid_email_dict: Dict[str, List[str]] = {
                     'new_members': emails,
                     'updated_members': []
                 }
+                return valid_email_dict
 
         def __init__(self) -> None:
             self.lists = self.MailchimpLists()
@@ -246,10 +263,12 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
 
 class MockMailchimpPopulateJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = mailchimp_population_jobs.MockMailchimpPopulateJob
+    JOB_CLASS: Type[
+        mailchimp_population_jobs.MockMailchimpPopulateJob
+    ] = mailchimp_population_jobs.MockMailchimpPopulateJob
 
-    USER_ID_PREFIX = 'user_id_'
-    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    USER_ID_PREFIX: Final = 'user_id_'
+    DATETIME: Final = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
     def setUp(self) -> None:
         super().setUp()

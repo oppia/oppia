@@ -29,6 +29,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
@@ -41,6 +42,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
+import { CheckpointCelebrationModalComponent } from './checkpoint-celebration-modal/checkpoint-celebration-modal.component';
 import { BackgroundBannerModule } from './common-layout-directives/common-elements/background-banner.module';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
@@ -138,6 +140,16 @@ import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/edit
 import { AnswerGroupEditor } from './state-directives/answer-group-editor/answer-group-editor.component';
 import { StateResponsesComponent } from './state-editor/state-responses-editor/state-responses.component';
 import { StateEditorComponent } from './state-editor/state-editor.component';
+import { QuestionEditorComponent } from './question-directives/question-editor/question-editor.component';
+import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
+import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
+import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
+import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
+import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
+import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
+import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
+import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -151,6 +163,7 @@ import { AuthService } from 'services/auth.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
@@ -175,9 +188,11 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
+    NgbModalModule
   ],
 
   providers: [
@@ -220,6 +235,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     PracticeTabComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
+    CheckpointCelebrationModalComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
@@ -264,7 +280,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
-    AddHintModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
@@ -274,6 +289,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
+    AddOutcomeModalComponent,
     ReviewMaterialEditorComponent,
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
@@ -293,7 +309,16 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
     StateResponsesComponent,
-    StateEditorComponent
+    StateEditorComponent,
+    QuestionEditorComponent,
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent,
+    QuestionsListComponent,
+    SkillMasteryModalComponent,
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent,
+    QuestionSuggestionEditorModalComponent,
+    QuestionSuggestionReviewModalComponent
   ],
 
   entryComponents: [
@@ -340,10 +365,12 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
+    CheckpointCelebrationModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
+    AddOutcomeModalComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
@@ -369,6 +396,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TagMisconceptionModalComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
@@ -381,9 +409,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
-    AddHintModalComponent,
-    ReviewMaterialEditorComponent,
-    TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
@@ -401,7 +426,16 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
     StateResponsesComponent,
-    StateEditorComponent
+    StateEditorComponent,
+    QuestionEditorComponent,
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent,
+    QuestionsListComponent,
+    SkillMasteryModalComponent,
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent,
+    QuestionSuggestionEditorModalComponent,
+    QuestionSuggestionReviewModalComponent
   ],
 
   exports: [
@@ -449,6 +483,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FeedbackPopupComponent,
+    CheckpointCelebrationModalComponent,
     LearnerAnswerInfoCard,
     MultiSelectionFieldComponent,
     FilteredChoicesFieldComponent,
@@ -494,6 +529,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
     AddOrUpdateSolutionModalComponent,
+    AddOutcomeModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
@@ -518,7 +554,16 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
     StateResponsesComponent,
-    StateEditorComponent
+    StateEditorComponent,
+    QuestionEditorComponent,
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent,
+    QuestionsListComponent,
+    SkillMasteryModalComponent,
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent,
+    QuestionSuggestionEditorModalComponent,
+    QuestionSuggestionReviewModalComponent
   ],
 })
 

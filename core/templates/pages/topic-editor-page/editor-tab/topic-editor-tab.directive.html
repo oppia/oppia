@@ -229,7 +229,7 @@
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
                 <span class="clickable-item" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
-                  <span class="material-icons draggable-icon-indicator">drag_indicator</span>
+                  <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
                   <span class="e2e-test-subtopic"><[subtopic.getTitle()]></span>
                 </span>
                 <div class="subtopic-edit-options-container edit-options-container">
@@ -685,7 +685,7 @@
 
     .topic-editor .entity-count,
     .topic-editor .draggable-icon-indicator {
-      display: none;
+      padding-right: 5px;
     }
 
     .topic-editor .subtopic-skill-card-container {
@@ -741,6 +741,7 @@
 
     .topic-editor .topic-info-container {
       margin-top: 0;
+      padding-bottom: 50px;
       width: 100%;
     }
 

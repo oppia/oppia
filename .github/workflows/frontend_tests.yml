@@ -14,9 +14,16 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-22.04]
     steps:
       - uses: actions/checkout@v2
+      - name: Describe filesystem
+        run: |
+          pwd
+          ls /home/runner/work
+          ls /home/runner/work/oppia
+          ls /home/runner/work/oppia/oppia
+          echo $GITHUB_WORKSPACE
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
@@ -38,6 +45,12 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
+      - name: Uploading fronted coverage reports as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: frontend-coverage
+          path: /home/runner/work/oppia/karma_coverage_reports
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

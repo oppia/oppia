@@ -56,6 +56,7 @@ import os
 import random
 import re
 import socket
+import string
 import subprocess
 import sys
 import threading
@@ -71,12 +72,6 @@ from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-COVERAGE_DIR = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION)
-COVERAGE_MODULE_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
 COVERAGE_EXCLUSION_LIST_PATH = os.path.join(
     os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt')
 
@@ -175,11 +170,11 @@ class TestingTaskSpec:
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                sys.executable, COVERAGE_MODULE_PATH, 'run',
-                TEST_RUNNER_PATH, test_target_flag
+                sys.executable, '-m', 'coverage', 'run',
+                '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
-            rand = random.Random(os.urandom(8)).randint(0, 999999)
-            data_file = '.coverage.%s.%s.%06d' % (
+            rand = ''.join(random.choices(string.ascii_lowercase, k=16))
+            data_file = '.coverage.%s.%s.%s' % (
                 socket.gethostname(), os.getpid(), rand)
             env['COVERAGE_FILE'] = data_file
             concurrent_task_utils.log('Coverage data for %s is in %s' % (
@@ -187,7 +182,19 @@ class TestingTaskSpec:
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        result = run_shell_cmd(exc_list, env=env)
+        try:
+            result = run_shell_cmd(exc_list, env=env)
+        except Exception as e:
+            # Occasionally, tests fail spuriously because of an issue in grpc
+            # (see e.g. https://github.com/oppia/oppia/runs/7462764522) that
+            # causes a random polling error to be surfaced. Since this doesn't
+            # represent a 'real' test failure, we do a single extra run if we
+            # see that.
+            if 'ev_epollex_linux.cc' in str(e):
+                result = run_shell_cmd(exc_list, env=env)
+            else:
+                raise e
+
         messages = [result]
 
         if self.generate_coverage_report:
@@ -288,12 +295,16 @@ def _check_shards_match_tests(include_load_tests=True):
     shard_modules_set = set(shard_modules)
     shard_extra = shard_modules_set - test_modules_set
     if shard_extra:
-        return 'Modules {} in shards not found. See {}.'.format(
-            shard_extra, SHARDS_WIKI_LINK)
+        return (
+            'Modules {} are in the backend test shards but missing from the '
+            'filesystem. See {}.'
+        ).format(shard_extra, SHARDS_WIKI_LINK)
     test_extra = test_modules_set - shard_modules_set
     assert test_extra
-    return 'Modules {} not in shards. See {}.'.format(
-        test_extra, SHARDS_WIKI_LINK)
+    return (
+        'Modules {} are present on the filesystem but are not listed in the '
+        'backend test shards. See {}.'
+    ).format(test_extra, SHARDS_WIKI_LINK)
 
 
 def _load_coverage_exclusion_list(path):
@@ -331,20 +342,6 @@ def main(args=None):
         sys.path.insert(1, directory)
 
     common.fix_third_party_imports()
-
-    if parsed_args.generate_coverage_report:
-        print(
-            'Checking whether coverage is installed in %s'
-            % common.OPPIA_TOOLS_DIR
-        )
-        if not os.path.exists(
-                os.path.join(
-                    common.OPPIA_TOOLS_DIR,
-                    'coverage-%s' % common.COVERAGE_VERSION
-                )
-        ):
-            raise Exception(
-                'Coverage is not installed, please run the start script.')
 
     test_specs_provided = sum([
         1 if argument else 0
@@ -526,7 +523,7 @@ def main(args=None):
             incomplete_coverage)
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
+        subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = _check_coverage(True)
         print(report_stdout)
 
@@ -559,7 +556,7 @@ def _check_coverage(
     """
     if combine:
         combine_process = subprocess.run(
-            [sys.executable, COVERAGE_MODULE_PATH, 'combine'],
+            [sys.executable, '-m', 'coverage', 'combine'],
             capture_output=True, encoding='utf-8', check=False)
         no_combine = combine_process.stdout.strip() == 'No data to combine'
         if (combine_process.returncode and not no_combine):
@@ -568,7 +565,7 @@ def _check_coverage(
                 '\n%s' % combine_process)
 
     cmd = [
-        sys.executable, COVERAGE_MODULE_PATH, 'report',
+        sys.executable, '-m', 'coverage', 'report',
          '--omit="%s*","third_party/*","/usr/share/*"'
          % common.OPPIA_TOOLS_DIR, '--show-missing']
     if include:
@@ -592,7 +589,7 @@ def _check_coverage(
         )
     else:
         coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
             process.stdout)
         coverage = float(coverage_result.group('total'))
 

@@ -1446,14 +1446,12 @@ class ExplorationIssuesModel(base_models.BaseModel):
         instance_id = cls.get_entity_id(exp_id, exp_version)
         return cls.get(instance_id, strict=False)
 
-    # TODO(#13523): Change 'unresolved_issues' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
             cls,
             exp_id: str,
             exp_version: int,
-            unresolved_issues: List[Dict[str, Any]]
+            unresolved_issues: List[stats_domain.ExplorationIssueDict]
     ) -> str:
         """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
@@ -1562,7 +1560,7 @@ class PlaythroughModel(base_models.BaseModel):
             'The id generator for PlaythroughModel is producing too many '
             'collisions.')
 
-    # TODO(#13523): Change 'issue_customization_args' and 'actions' to
+    # TODO(#13523): Change 'issue_customization_args' to
     # TypedDict/Domain Object to remove Any used below.
     @classmethod
     def create(
@@ -1571,7 +1569,7 @@ class PlaythroughModel(base_models.BaseModel):
             exp_version: int,
             issue_type: str,
             issue_customization_args: Dict[str, Any],
-            actions: List[Dict[str, Any]]
+            actions: List[stats_domain.LearnerActionDict]
     ) -> str:
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
@@ -1740,7 +1738,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             state_reference=state_reference,
             interaction_id=interaction_id,
             learner_answer_info_list=[
-                learner_answer_info.to_dict() # type: ignore[no-untyped-call]
+                learner_answer_info.to_dict()
                 for learner_answer_info in learner_answer_info_list
             ],
             learner_answer_info_schema_version=(

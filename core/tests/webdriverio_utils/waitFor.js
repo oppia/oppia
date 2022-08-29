@@ -32,7 +32,8 @@ var alertToBePresent = async() => {
     await until.alertIsPresent(),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'Alert box took too long to appear.'
+      timeoutMsg: 'Alert box took too long to appear.\n' +
+      new Error().stack + '\n'
     });
 };
 
@@ -52,12 +53,10 @@ var urlToBe = async function(url) {
  * @param {string} errorMessage - Error message when element is not clickable.
  */
 var elementToBeClickable = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.elementToBeClickable(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForClickable({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -66,25 +65,24 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.invisibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    reverse: true,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
  * Consider adding this method after each browser.url() call.
  */
 var pageToFullyLoad = async function() {
-  var loadingMessage = $('.e2e-test-loading-fullpage');
-  await browser.waitUntil(
-    await until.invisibilityOf(loadingMessage),
-    {
-      timeout: 15000,
-      timeoutMsg: 'Page takes more than 15 secs to load'
-    });
+  var loadingMessage = await $('.e2e-test-loading-fullpage');
+  await loadingMessage.waitForDisplayed({
+    timeout: 15000,
+    reverse: true,
+    timeoutMsg: 'Pages takes more than 15 sec to load\n' +
+    new Error().stack + '\n'
+  });
 };
 
 /**
@@ -98,7 +96,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
     await until.textToBePresentInElement(element, text),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
+      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
     });
 };
 
@@ -108,12 +106,10 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.presenceOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForExist({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -122,12 +118,10 @@ var presenceOf = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.visibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -145,7 +139,26 @@ var elementAttributeToBe = async function(
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
+};
+
+var rightTransistionToComplete = async function(
+    element, errorMessage
+) {
+  await browser.waitUntil(async function() {
+    var firstValue = await element.getLocation('x');
+    // We need to pause the browser before getting the next
+    // location of element to make sure the elements provide equal
+    // location points only when they stopped moving.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(1000);
+    var secondValue = await element.getLocation('x');
+    return await firstValue === secondValue;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -161,7 +174,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -174,8 +187,21 @@ var urlRedirection = async function(url) {
     await until.urlIs(url),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'URL redirection took too long'
+      timeoutMsg: 'URL redirection took too long\n' + new Error().stack + '\n'
     });
+};
+
+var numberOfElementsToBe = async function(
+    elementSelector, elementName, number) {
+  await browser.waitUntil(async function() {
+    var element = await $$(elementSelector);
+    return element.length === number;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
+    new Error().stack + '\n'
+  });
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
@@ -194,19 +220,13 @@ var invisibilityOfLoadingMessage = async function(errorMessage) {
 };
 
 var visibilityOfSuccessToast = async function(errorMessage) {
-  var toastSuccessElement = $('.toast-success');
+  var toastSuccessElement = await $('.toast-success');
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
-var fadeInToComplete = async function(element, errorMessage) {
-  await visibilityOf(element, 'Editor taking too long to appear');
-  await browser.waitUntil(async function() {
-    return (await element.getCSSProperty('opacity')).value === 1;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
-  });
+var invisibilityOfSuccessToast = async function(errorMessage) {
+  var toastSuccessElement = await $('.toast-success');
+  await invisibilityOf(toastSuccessElement, errorMessage);
 };
 
 var modalPopupToAppear = async function() {
@@ -224,7 +244,7 @@ var fileToBeDownloaded = async function(filename) {
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: 'File was not downloaded!'
+    timeoutMsg: 'File was not downloaded!\n' + new Error().stack + '\n'
   });
 };
 
@@ -259,13 +279,15 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
+exports.rightTransistionToComplete = rightTransistionToComplete;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
-exports.fadeInToComplete = fadeInToComplete;
+exports.invisibilityOfSuccessToast = invisibilityOfSuccessToast;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
+exports.numberOfElementsToBe = numberOfElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;

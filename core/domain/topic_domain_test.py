@@ -35,7 +35,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     topic_id = 'topic_id'
 
     def setUp(self) -> None:
-        super(TopicDomainUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
@@ -46,9 +46,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
@@ -78,7 +79,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'version': 0,
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
-            'page_title_fragment_for_web': 'fragm'
+            'page_title_fragment_for_web': 'fragm',
+            'skill_ids_for_diagnostic_test': []
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -107,7 +109,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'url_fragment': 'dummy-subtopic-url'}])
 
     def test_get_subtopic_index_fail_with_invalid_subtopic_id(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The subtopic with id -2 does not exist.'
         ):
             self.topic.get_subtopic_index(-2)
@@ -116,7 +118,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         story_reference = (
             topic_domain.StoryReference.create_default_story_reference(
                 '#6*5&A0%'))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid story ID:'
         ):
             story_reference.validate()
@@ -134,7 +136,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
             canonical_story_ids, ['story_id', 'story_id_2'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The story_id story_id_5 is not present in the canonical'
             ' story references list of the topic.'):
             self.topic.delete_canonical_story('story_id_5')
@@ -146,26 +148,26 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_1')
         ]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(10, 0)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(-1, 0)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(0, 10)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_canonical_story(0, -1)
 
     def test_rearrange_canonical_story_fail_with_identical_index_values(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index and to_index values to be '
                        'different.'):
             self.topic.rearrange_canonical_story(1, 1)
@@ -206,26 +208,26 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_rearrange_skill_in_subtopic_fail_with_out_of_bound_indexes(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, 10, 1)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, -1, 0)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, 0, 10)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_skill_in_subtopic(1, 0, -10)
 
     def test_rearrange_skill_in_subtopic_fail_with_identical_index_values(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index and to_index values to be '
                        'different.'):
             self.topic.rearrange_skill_in_subtopic(1, 1, 1)
@@ -260,24 +262,24 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_ids[2], 'skill_id_3')
 
     def test_rearrange_subtopic_fail_with_out_of_bound_indexes(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(10, 1)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(-1, 0)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(0, 10)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.topic.rearrange_subtopic(0, -10)
 
     def test_rearrange_subtopic_fail_with_identical_index_values(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected from_index and to_index values to be '
                        'different.'):
             self.topic.rearrange_subtopic(1, 1)
@@ -344,7 +346,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             canonical_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The story_id story_id_2 is already present in the '
             'canonical story references list of the topic.'):
             self.topic.add_canonical_story('story_id_2')
@@ -362,7 +364,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         additional_story_ids = self.topic.get_additional_story_ids()
         self.assertEqual(
             additional_story_ids, ['story_id', 'story_id_2'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The story_id story_id_5 is not present in the additional'
             ' story references list of the topic.'):
@@ -380,7 +382,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             additional_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The story_id story_id_2 is already present in the '
             'additional story references list of the topic.'):
             self.topic.add_additional_story('story_id_2')
@@ -393,7 +395,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_error_substring: str
     ) -> None:
         """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.topic.validate()
 
@@ -402,7 +404,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_error_substring: str
     ) -> None:
         """Checks that the topic passes prepublish validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.topic.validate(strict=True)
 
@@ -412,7 +414,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         topic_id: str
     ) -> None:
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
@@ -422,7 +424,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         name: str
     ) -> None:
         """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_name(name)
 
@@ -432,7 +434,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         thumbnail_filename: str
     ) -> None:
         """Checks that topic passes validation for thumbnail filename."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_thumbnail_filename(
                 thumbnail_filename)
@@ -443,7 +445,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         thumbnail_filename: str
     ) -> None:
         """Checks that subtopic passes validation for thumbnail filename."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             topic_domain.Subtopic.require_valid_thumbnail_filename(
                 thumbnail_filename)
@@ -478,6 +480,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.subtopics[0].skill_ids = []
+        self.topic.skill_ids_for_diagnostic_test = []
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
 
@@ -524,7 +527,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_topic_thumbnail_filename_in_strict_mode(self) -> None:
         self.topic.thumbnail_bg_color = None
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected thumbnail filename to be a string, received None.'):
             self.topic.validate(strict=True)
@@ -599,7 +602,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.topic.url_fragment = ''
         validation_message = 'Topic URL Fragment field should not be empty.'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic.validate()
 
@@ -610,7 +613,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (
                 url_fragment_char_limit, self.topic.url_fragment))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic.validate()
 
@@ -688,7 +691,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 1, 'Title2', ['skill_id_2'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-title-two'))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
             self.topic.add_uncategorized_skill_id('skill_id_1')
@@ -697,7 +700,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_remove_uncategorized_skill_id(self) -> None:
         self.topic.uncategorized_skill_ids = ['skill_id_5']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The skill id skill_id_3 is not present in the topic'):
             self.topic.remove_uncategorized_skill_id('skill_id_3')
@@ -714,7 +717,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         self.topic.uncategorized_skill_ids = ['skill_id_1']
         self.topic.subtopics[0].skill_ids = ['skill_id_2']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Skill id skill_id_3 is not an uncategorized skill id'):
             self.topic.move_skill_id_to_subtopic(None, 1, 'skill_id_3')
@@ -734,7 +737,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_create_topic_rights_change_class_with_invalid_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Command invalid cmd is not allowed'):
             topic_domain.TopicRightsChange({
                 'cmd': 'invalid cmd'
@@ -743,7 +746,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_create_topic_rights_change_class_with_invalid_changelist(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Missing cmd key in change dict'):
             topic_domain.TopicRightsChange({})
 
@@ -774,7 +777,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
         self.topic.uncategorized_skill_ids = ['skill_id1']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The skill id skill_id1 is already an uncategorized skill.'):
             self.topic.add_uncategorized_skill_id('skill_id1')
@@ -813,7 +816,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 2, 'Another title', ['skill_id_1'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
@@ -835,21 +838,72 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Topic.deserialize(
                 self.topic.serialize()).to_dict())
 
+    def test_skill_ids_for_diagnostic_test_update(self) -> None:
+        """Checks the update method for the skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        self.topic.subtopics[0].skill_ids = []
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+        self.topic.update_skill_ids_for_diagnostic_test([])
+        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
+
+    def test_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Checks the validation of skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        self.topic.update_skill_ids_for_diagnostic_test(['test_skill_id'])
+        error_msg = (
+            'The skill_ids {\'test_skill_id\'} are selected for the '
+            'diagnostic test but they are not associated with the topic.')
+        self._assert_validation_error(error_msg)
+
+    def test_max_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Validates maximum length for the skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        skill_ids = ['skill_1', 'skill_2', 'skill_3', 'skill_4']
+        self.topic.subtopics[0].skill_ids = skill_ids
+        self.topic.skill_ids_for_diagnostic_test = skill_ids
+        error_msg = (
+            'The skill_ids_for_diagnostic_test field should contain at most 3 '
+            'skill_ids.')
+        self._assert_validation_error(error_msg)
+
+    def test_removing_uncatgorized_skill_removes_diagnostic_test_skill_if_any(
+        self
+    ) -> None:
+        """Validates the skill id removal from uncategorized skills must also
+        remove from the diagnostic tests if any.
+        """
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+
+        self.topic.remove_skill_id_from_subtopic(1, 'skill_id_1')
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+        self.assertEqual(self.topic.uncategorized_skill_ids, ['skill_id_1'])
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+
+        self.topic.remove_uncategorized_skill_id('skill_id_1')
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
+
 
 class TopicChangeTests(test_utils.GenericTestBase):
 
     def test_topic_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             topic_domain.TopicChange({'invalid': 'data'})
 
     def test_topic_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             topic_domain.TopicChange({'cmd': 'invalid'})
 
     def test_topic_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
@@ -859,7 +913,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_extra_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             topic_domain.TopicChange({
@@ -871,7 +925,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_invalid_topic_property(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_topic_property: '
                 'invalid is not allowed')):
@@ -883,7 +937,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_change_object_with_invalid_subtopic_property(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_property: '
                 'invalid is not allowed')):
@@ -898,7 +952,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_topic_change_object_with_invalid_subtopic_page_property(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_subtopic_page_property: '
                 'invalid is not allowed')):
@@ -1067,19 +1121,19 @@ class TopicChangeTests(test_utils.GenericTestBase):
 class TopicRightsChangeTests(test_utils.GenericTestBase):
 
     def test_topic_rights_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             topic_domain.TopicRightsChange({'invalid': 'data'})
 
     def test_topic_change_rights_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             topic_domain.TopicRightsChange({'cmd': 'invalid'})
 
     def test_topic_rights_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_role, old_role')):
@@ -1091,7 +1145,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
     def test_topic_rights_change_object_with_extra_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             topic_domain.TopicRightsChange({
@@ -1100,7 +1154,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_topic_rights_change_object_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for old_role in cmd change_role: '
                 'invalid is not allowed')):
@@ -1163,7 +1217,7 @@ class TopicRightsChangeTests(test_utils.GenericTestBase):
 class TopicSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(TopicSummaryTests, self).setUp()
+        super().setUp()
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
@@ -1203,7 +1257,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.topic_summary.validate()
 
@@ -1236,7 +1290,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.topic_summary.url_fragment = ''
         validation_message = 'Topic URL Fragment field should not be empty.'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic_summary.validate()
 
@@ -1247,7 +1301,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (
                 url_fragment_char_limit, self.topic_summary.url_fragment))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, validation_message):
             self.topic_summary.validate()
 
@@ -1313,11 +1367,11 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 class TopicRightsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(TopicRightsTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.topic_summary = topic_domain.TopicRights(
             'topic_id', [self.user_id_a], False)

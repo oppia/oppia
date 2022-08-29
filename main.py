@@ -350,6 +350,15 @@ URLS = [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
+        classroom.ClassroomAdminDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.CLASSROOM_ID_HANDLER_URL,
+        classroom.NewClassroomIdHandler),
+    get_redirect_route(
+        r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
+        classroom.ClassroomHandler),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -396,6 +405,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL,
+        learner_dashboard.LearnerCompletedChaptersCountHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
         learner_dashboard.LearnerDashboardCollectionsProgressHandler),
@@ -591,6 +603,14 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' % (
             feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL),
         reader.LearnerAnswerDetailsSubmissionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<state_name>/<version>' % (
+            feconf.STATE_VERSION_HISTORY_URL_PREFIX
+        ), reader.StateVersionHistoryHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<version>' % (
+            feconf.METADATA_VERSION_HISTORY_URL_PREFIX
+        ), reader.MetadataVersionHistoryHandler),
 
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
@@ -618,6 +638,9 @@ URLS = [
     get_redirect_route(
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
+    get_redirect_route(
+        r'/createhandler/check_revert_valid/<exploration_id>/<version>',
+        editor.ExplorationCheckRevertValidHandler),
     get_redirect_route(
         r'/createhandler/revert/<exploration_id>',
         editor.ExplorationRevertHandler),
@@ -946,11 +969,34 @@ URLS = [
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
         learner_group.FacilitatorLearnerGroupViewHandler),
     get_redirect_route(
-        r'/learner_group_search_syllabus_handler/<learner_group_id>',
+        r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
+        r'/learner_group_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSyllabusHandler),
+    get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
-        learner_group.LearnerGroupStudentProgressHandler)
+        learner_group.LearnerGroupLearnerProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
+        learner_group.FacilitatorDashboardPage),
+    get_redirect_route(
+        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
+        learner_group.CreateLearnerGroupPage),
+    get_redirect_route(
+        r'/learner_group_search_learner_handler',
+        learner_group.LearnerGroupSearchLearnerHandler),
+    get_redirect_route(
+        r'/learner_group_learners_info_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnersInfoHandler),
+    get_redirect_route(
+        r'/learner_group_learner_invitation_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnerInvitationHandler),
+    get_redirect_route(
+        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
+    get_redirect_route(
+        r'/user_progress_in_stories_chapters_handler/<username>',
+        learner_group.LearnerStoriesChaptersProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.
