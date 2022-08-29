@@ -256,6 +256,29 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               'x': 'ca_choices_68',
               'y': 'ca_choices_69'
             }
+          },
+          {
+            'rule_type': 'HasElementXAtPositionY',
+            'inputs': {
+              'x': 'ca_choices_68',
+              'y': 1
+            }
+          },
+          {
+            'rule_type': 'IsEqualToOrdering',
+            'inputs': {
+              'x': [
+                [
+                  'ca_choices_68'
+                ],
+                [
+                  'ca_choices_69'
+                ],
+                [
+                  'ca_choices_70'
+                ]
+              ]
+            }
           }
         ],
         'outcome': {
@@ -669,6 +692,18 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               'inputs': {
                 'x': 4
               }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 2
+              }
+            },
+            {
+              'rule_type': 'IsGreaterThan',
+              'inputs': {
+                'x': 3
+              }
             }
           ],
           'outcome': {
@@ -788,6 +823,25 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               'rule_type': 'Equals',
               'inputs': {
                 'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'IsGreaterThanOrEqualTo',
+              'inputs': {
+                'x': 5
+              }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 2
+              }
+            },
+            {
+              'rule_type': 'IsInclusivelyBetween',
+              'inputs': {
+                'a': 3,
+                'b': 10
               }
             }
           ],
@@ -1127,13 +1181,35 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               }
             },
             {
-              "rule_type": "IsLessThan",
-              "inputs": {
-                "f": {
-                  "isNegative": False,
-                  "wholeNumber": 0,
-                  "numerator": 5,
-                  "denominator": 2
+              'rule_type': 'IsLessThan',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 5, # type: ignore[dict-item]
+                  'denominator': 2 # type: ignore[dict-item]
+                }
+              }
+            },
+            {
+              'rule_type': 'IsGreaterThan',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 10, # type: ignore[dict-item]
+                  'denominator': 2 # type: ignore[dict-item]
+                }
+              }
+            },
+            {
+              'rule_type': 'IsExactlyEqualTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 11, # type: ignore[dict-item]
+                  'denominator': 3 # type: ignore[dict-item]
                 }
               }
             }
@@ -1159,10 +1235,10 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               'rule_type': 'HasFractionalPartExactlyEqualTo',
               'inputs': {
                 'f': {
-                  'isNegative': False,
-                  'wholeNumber': 0,
-                  'numerator': 2,
-                  'denominator': 1
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 2, # type: ignore[dict-item]
+                  'denominator': 1 # type: ignore[dict-item]
                 }
               }
             },
@@ -1173,13 +1249,53 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               }
             },
             {
-              "rule_type": "IsExactlyEqualTo",
-              "inputs": {
-                "f": {
-                  "isNegative": False,
-                  "wholeNumber": 0,
-                  "numerator": 5,
-                  "denominator": 3
+              'rule_type': 'IsExactlyEqualTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 5, # type: ignore[dict-item]
+                  'denominator': 3 # type: ignore[dict-item]
+                }
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'A valid state',
+            'feedback': {
+              'content_id': 'feedback_1',
+              'html': '<p>cvcv</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        },
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsEquivalentTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 11, # type: ignore[dict-item]
+                  'denominator': 3 # type: ignore[dict-item]
+                }
+              }
+            },
+            {
+              'rule_type': 'IsExactlyEqualTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 1, # type: ignore[dict-item]
+                  'numerator': 5, # type: ignore[dict-item]
+                  'denominator': 4 # type: ignore[dict-item]
                 }
               }
             }
@@ -1260,6 +1376,15 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
                   ]
                 }
               }
+            },
+            {
+              'rule_type': 'StartsWith',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_30',
+                  'normalizedStrSet': ['z']
+                }
+              }
             }
           ],
           'outcome': {
@@ -1302,10 +1427,19 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
                   ]
                 }
               }
+            },
+            {
+              'rule_type': 'StartsWith',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_30',
+                  'normalizedStrSet': ['z']
+                }
+              }
             }
           ],
           'outcome': {
-            'dest': 'EXP_1_STATE_5',
+            'dest': 'A valid state',
             'feedback': {
               'content_id': 'feedback_28',
               'html': ''
@@ -1755,8 +1889,9 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         self.assert_job_output_is([])
 
     def test_drag_drop_interaction(self) -> None:
-        self.put_multi([self.exp_1, self.opportunity_model_3,
-          self.public_exp_summary_1])
+        self.put_multi(
+          [self.exp_1, self.opportunity_model_3, self.public_exp_summary_1]
+        )
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 1, created on {self.YEAR_AGO_DATE}, '
@@ -1793,8 +1928,9 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         ])
 
     def test_item_interaction(self) -> None:
-        self.put_multi([self.exp_3, self.opportunity_model_4,
-          self.public_exp_summary_2])
+        self.put_multi(
+          [self.exp_3, self.opportunity_model_4, self.public_exp_summary_2]
+        )
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 3, created on {self.YEAR_AGO_DATE}, '
@@ -1823,8 +1959,9 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         ])
 
     def test_numeric_interaction(self) -> None:
-        self.put_multi([self.exp_4, self.opportunity_model_5,
-          self.public_exp_summary_3])
+        self.put_multi(
+          [self.exp_4, self.opportunity_model_5, self.public_exp_summary_3]
+        )
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 4, created on {self.YEAR_AGO_DATE}, '
@@ -1868,8 +2005,9 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         ])
 
     def test_multiple_choice_interaction(self) -> None:
-        self.put_multi([self.exp_6, self.opportunity_model_2,
-          self.public_exp_summary_4])
+        self.put_multi(
+          [self.exp_6, self.opportunity_model_2, self.public_exp_summary_4]
+        )
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 6, created on {self.YEAR_AGO_DATE}, '
@@ -1909,8 +2047,9 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         ])
 
     def test_fraction_interaction(self) -> None:
-        self.put_multi([self.exp_7, self.opportunity_model_6,
-          self.public_exp_summary_5])
+        self.put_multi(
+          [self.exp_7, self.opportunity_model_6, self.public_exp_summary_5]
+        )
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 7, created on {self.YEAR_AGO_DATE}, '
@@ -1938,9 +2077,10 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           )
         ])
 
-    def test_fraction_interaction(self) -> None:
-        self.put_multi([self.exp_8, self.opportunity_model_7,
-          self.public_exp_summary_6])
+    def test_text_interaction(self) -> None:
+        self.put_multi(
+          [self.exp_8, self.opportunity_model_7, self.public_exp_summary_6]
+        )
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 8, created on {self.YEAR_AGO_DATE}, '
