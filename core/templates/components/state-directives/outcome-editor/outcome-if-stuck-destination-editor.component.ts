@@ -28,7 +28,7 @@ import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 interface DestinationChoice {
-  id: string | null;
+  id: string;
   text: string;
 }
 

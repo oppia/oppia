@@ -41,7 +41,7 @@ class MockWindowDimensionsService {
   }
 }
 
-fdescribe('Outcome Editor Component', () => {
+describe('Outcome Editor Component', () => {
   let component: OutcomeEditorComponent;
   let fixture: ComponentFixture<OutcomeEditorComponent>;
   let externalSaveService: ExternalSaveService;
