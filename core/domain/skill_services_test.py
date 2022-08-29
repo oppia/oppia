@@ -41,7 +41,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models, question_models) = models.Registry.import_models([
-    models.Names.skill, models.Names.question
+    models.Names.SKILL, models.Names.QUESTION
 ])
 
 SuggestionChangeDictType = Dict[

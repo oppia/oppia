@@ -806,7 +806,7 @@ def _pseudonymize_config_models(
     snapshot_metadata_models, _ = (
         _collect_and_save_entity_ids_from_snapshots_and_commits(
             pending_deletion_request,
-            models.Names.config,
+            models.Names.CONFIG,
             list(snapshot_model_classes),
             None,
             None
@@ -1323,8 +1323,7 @@ def _pseudonymize_feedback_models(
     feedback_ids |= set(model.id for model in general_suggestion_models)
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.Names.feedback, list(feedback_ids))
-
+        pending_deletion_request, models.Names.FEEDBACK, list(feedback_ids))
 
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
@@ -1426,8 +1425,7 @@ def _pseudonymize_suggestion_models(
     suggestion_ids = set(model.id for model in voiceover_application_models)
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.Names.suggestion, list(suggestion_ids))
-
+        pending_deletion_request, models.Names.SUGGESTION, list(suggestion_ids))
 
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
@@ -1506,7 +1504,7 @@ def _pseudonymize_blog_post_models(
     blog_post_ids |= {model.id for model in blog_post_summary_models}
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.Names.blog, list(blog_post_ids))
+        pending_deletion_request, models.Names.BLOG, list(blog_post_ids))
 
     # We want to remove the user ID from the list of editor ids on all the
     # blog post rights models related to the user.
