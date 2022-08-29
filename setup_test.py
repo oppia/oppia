@@ -22,7 +22,6 @@ import sys
 
 from core.tests import test_utils
 
-import pkg_resources
 import setuptools
 
 from scripts import common # isort:skip pylint: disable=unused-import
@@ -49,10 +48,7 @@ class SetupTests(test_utils.GenericTestBase):
             lambda *unused_args, **unused_kwargs: dummy_file_object,
             expected_args=(('requirements.txt',),))
 
-        required_packages = [
-            str(requirement)
-            for requirement in pkg_resources.parse_requirements(packages)
-        ]
+        required_packages = packages.split('\n')[:-1]
 
         swap_setup = self.swap_with_checks(
             setuptools, 'setup', lambda **unused_kwargs: None,
