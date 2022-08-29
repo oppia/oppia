@@ -643,4 +643,20 @@ describe('MathInteractionsService', () => {
       expressionWithPlaceholders,
       'x/(x+1) + y/8', ['alpha', 'beta'])).toBeFalse();
   });
+
+  it('should correctly check for unsupported functions', function() {
+    expect(mathInteractionsService.checkUnsupportedFunctions(
+      'a + sqrt(b) + abs(3)')).toEqual([]);
+    expect(mathInteractionsService.checkUnsupportedFunctions(
+      'a + b')).toEqual([]);
+    expect(mathInteractionsService.checkUnsupportedFunctions(
+      'a + x * (y)')).toEqual([]);
+    expect(mathInteractionsService.checkUnsupportedFunctions(
+      'a*b*(c)')).toEqual([]);
+
+    expect(mathInteractionsService.checkUnsupportedFunctions(
+      'a + log(b) + abs(3)')).toEqual(['log']);
+    expect(mathInteractionsService.checkUnsupportedFunctions(
+      'a - tan(b)*cos(c)')).toEqual(['tan', 'cos']);
+  });
 });
