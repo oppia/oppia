@@ -770,7 +770,6 @@ describe('Questions List Component', () => {
 
   describe('when removing question from skill', () => {
     let questionId = 'qId';
-    let skillDescription = 'Skill Description';
 
     it('should remove question when user is in the skill editor',
       fakeAsync(() => {
