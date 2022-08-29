@@ -101,7 +101,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             ['not_a_real_id'], 'index1')
 
     def test_delete_returns_without_error_when_index_does_not_exist(
-            self
+        self
     ) -> None:
         elastic_search_services.delete_documents_from_index(
             ['doc_id'], 'nonexistent_index')
@@ -188,7 +188,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
 
     def test_search_constructs_query_with_categories_and_languages(
-            self
+        self
     ) -> None:
         correct_index_name = 'index1'
 
@@ -196,7 +196,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # because this mocks the behavior of elastic_search_services.ES.search
         # and in the type stubs the type is Any.
         def mock_search(
-                body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -242,7 +242,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_search_constructs_nonempty_query_with_categories_and_langs(
-            self
+        self
     ) -> None:
         correct_index_name = 'index1'
 
@@ -250,7 +250,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # because this mocks the behavior of elastic_search_services.ES.search
         # and in the type stubs the type is Any.
         def mock_search(
-                body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -300,7 +300,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_search_returns_the_right_number_of_docs_even_if_more_exist(
-            self
+        self
     ) -> None:
         elastic_search_services.add_documents_to_index([{
             'id': 'doc_id1',
@@ -326,7 +326,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_search_returns_without_error_when_index_does_not_exist(
-            self
+        self
     ) -> None:
         result, new_offset = elastic_search_services.search(
             'query', 'nonexistent_index', [], [])
@@ -399,7 +399,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
 
     def test_blog_post_summaries_search_constructs_query_with_tags(
-            self
+        self
     ) -> None:
         correct_index_name = 'index1'
 
@@ -453,7 +453,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_blog_post_summaries_search_constructs_nonempty_query_with_tags(
-            self
+        self
     ) -> None:
         correct_index_name = 'index1'
 
@@ -511,7 +511,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_blog_post_search_returns_the_right_num_of_docs_even_if_more_exist(
-            self
+        self
     ) -> None:
         elastic_search_services.add_documents_to_index([{
             'id': 'doc_id1',
@@ -543,7 +543,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_blog_post_search_returns_without_error_when_index_does_not_exist(
-            self
+        self
     ) -> None:
         result, new_offset = elastic_search_services.blog_post_summaries_search(
             'query', 'nonexistent_index', [])

@@ -22,9 +22,7 @@ import datetime
 import math
 
 from core import utils
-
-
-from core.domain import blog_post_search_services
+from core.domain import search_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.types import job_run_result
@@ -97,7 +95,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                                 blog_summary.published_on
                             )),
                     }],
-                    blog_post_search_services.SEARCH_INDEX_BLOG_POSTS)
+                    search_services.SEARCH_INDEX_BLOG_POSTS)
             ]
         )
 
@@ -146,7 +144,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                                 blog_summary.published_on
                             )),
                     }],
-                    blog_post_search_services.SEARCH_INDEX_BLOG_POSTS
+                    search_services.SEARCH_INDEX_BLOG_POSTS
                 ) for i in range(5)
             ]
         )
@@ -204,7 +202,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                                 blog_summary.published_on
                             )),
                     }],
-                    blog_post_search_services.SEARCH_INDEX_BLOG_POSTS
+                    search_services.SEARCH_INDEX_BLOG_POSTS
                 )
             ]
         )
@@ -263,7 +261,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             'add_documents_to_index',
             lambda _, __: None,
             expected_args=[(
-                [], blog_post_search_services.SEARCH_INDEX_BLOG_POSTS
+                [], search_services.SEARCH_INDEX_BLOG_POSTS
             )]
         )
 

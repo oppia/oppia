@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.domain import blog_domain
-from core.domain import blog_post_search_services
+from core.domain import search_services
 from core.domain import blog_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -96,7 +96,7 @@ class IndexBlogPostSummaries(beam.DoFn): # type: ignore[misc]
             or FAILURE.
         """
         try:
-            blog_post_search_services.index_blog_post_summaries(
+            search_services.index_blog_post_summaries(
                 blog_post_summaries)
             for _ in blog_post_summaries:
                 yield result.Ok()

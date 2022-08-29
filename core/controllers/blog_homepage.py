@@ -27,6 +27,8 @@ from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import user_services
 
+from typing import Any, Dict, List, Tuple
+
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 
@@ -54,7 +56,8 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
 
 
 def _get_matching_blog_card_summary_dicts(
-        query_string: str, tags: list[str], search_offset: int):
+        query_string: str, tags: list[str], search_offset: int
+    ) -> Tuple[List[Dict[str, Any]], int]:
     """Given the details of a query and a search offset, returns a list of
     matching blog card summary dicts that satisfy the query.
 

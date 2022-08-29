@@ -25,7 +25,7 @@ import math
 from core import feconf
 from core import utils
 from core.domain import blog_domain
-from core.domain import blog_post_search_services
+from core.domain import search_services
 from core.domain import blog_services
 from core.domain import user_services
 from core.platform import models
@@ -39,7 +39,7 @@ if MYPY: # pragma: no cover
 
 (blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
-blog_post_search_services = models.Registry.import_search_services()
+search_services = models.Registry.import_search_services()
 
 
 class BlogServicesUnitTests(test_utils.GenericTestBase):
@@ -584,7 +584,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index) # type: ignore[no-untyped-call]
         add_docs_swap = self.swap(
-            blog_post_search_services,
+            search_services,
             'add_documents_to_index',
             add_docs_counter)
 
@@ -638,7 +638,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index) # type: ignore[no-untyped-call]
         add_docs_swap = self.swap(
-            blog_post_search_services,
+            search_services,
             'add_documents_to_index',
             add_docs_counter)
 
@@ -949,7 +949,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             pass
 
         with self.swap(
-            blog_post_search_services, 'delete_documents_from_index',
+            search_services, 'delete_documents_from_index',
             _mock_delete_documents_from_index):
             blog_services.delete_blog_post(self.all_blog_post_ids[0])
             blog_services.delete_blog_post(self.all_blog_post_ids[1])

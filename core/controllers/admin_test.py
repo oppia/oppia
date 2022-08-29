@@ -23,7 +23,7 @@ import logging
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import blog_post_search_services
+from core.domain import search_services
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -1866,7 +1866,7 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
             'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, [])
         result_blog_posts = (
-            blog_post_search_services.search_blog_post_summaries(
+            search_services.search_blog_post_summaries(
             'Welcome', [], 2)[0]
         )
         self.assertEqual(result_blog_posts, [])

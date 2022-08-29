@@ -25,7 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_domain
-from core.domain import blog_post_search_services
+from core.domain import search_services
 from core.domain import html_cleaner
 from core.domain import role_services
 from core.domain import user_domain
@@ -45,7 +45,7 @@ if MYPY: # pragma: no cover
 MAX_ITERATIONS = 10
 
 # Name for the blog post search index.
-SEARCH_INDEX_BLOG_POSTS = blog_post_search_services.SEARCH_INDEX_BLOG_POSTS
+SEARCH_INDEX_BLOG_POSTS = search_services.SEARCH_INDEX_BLOG_POSTS
 
 
 class BlogPostChangeDict(TypedDict):
@@ -230,7 +230,7 @@ def get_blog_post_summary_models_by_ids(
         get_blog_post_summary_from_model(model)
         for model in blog_post_summary_models if model is not None
     ]
-    return (blog_post_summaries if len(blog_post_summaries) != 0 else [])
+    return blog_post_summaries
 
 
 def get_blog_post_summary_models_list_by_user_id(
@@ -518,7 +518,7 @@ def unpublish_blog_post(blog_post_id: str) -> None:
     blog_post_rights.blog_post_is_published = False
     save_blog_post_rights(blog_post_rights)
 
-    blog_post_search_services.delete_blog_post_summary_from_search_index(
+    search_services.delete_blog_post_summary_from_search_index(
         blog_post_id)
 
 
@@ -533,7 +533,7 @@ def delete_blog_post(blog_post_id: str) -> None:
     blog_models.BlogPostSummaryModel.get(blog_post_id).delete()
     blog_models.BlogPostRightsModel.get(blog_post_id).delete()
 
-    blog_post_search_services.delete_blog_post_summary_from_search_index(
+    search_services.delete_blog_post_summary_from_search_index(
         blog_post_id)
 
 
@@ -838,7 +838,7 @@ def update_blog_models_author_and_published_on_date(
     save_blog_post_rights(blog_post_rights)
 
 
-def index_blog_post_summaries_given_ids(blog_post_ids: list[str]) -> None:
+def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
     """Indexes the blog post summaries corresponding to the given blog post ids.
 
     Args:
@@ -847,15 +847,15 @@ def index_blog_post_summaries_given_ids(blog_post_ids: list[str]) -> None:
     """
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
     if len(blog_post_summaries):
-        blog_post_search_services.index_blog_post_summaries([
+        search_services.index_blog_post_summaries([
             blog_post_summary for blog_post_summary in blog_post_summaries
             if blog_post_summary is not None
         ])
 
 
 def get_blog_post_ids_matching_query(
-    query_string: str, tags: list[str], offset: int | None =None
-) -> Tuple[list[str], int | None]:
+    query_string: str, tags: List[str], offset: Optional[int]=None
+) -> Tuple[list[str], Optional[int]]:
     """Returns a list with all blog post ids matching the given search query
     string, as well as a search offset for future fetches.
 
@@ -891,11 +891,12 @@ def get_blog_post_ids_matching_query(
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = (
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE - len(
-            returned_blog_post_ids))
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE - 
+            len(returned_blog_post_ids)
+        )
 
         blog_post_ids, search_offset = (
-            blog_post_search_services.search_blog_post_summaries(
+            search_services.search_blog_post_summaries(
             query_string, tags, remaining_to_fetch, offset=search_offset))
 
         invalid_blog_post_ids = []
@@ -906,18 +907,24 @@ def get_blog_post_ids_matching_query(
             else:
                 invalid_blog_post_ids.append(blog_post_ids[ind])
 
-        if (len(returned_blog_post_ids) == (
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE)
-                or search_offset is None):
+        if (
+            (
+                len(returned_blog_post_ids) == 
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+            ) or search_offset is None
+        ):
             break
 
         logging.error(
                 'Search index contains stale blog post ids: %s' %
                 ', '.join(invalid_blog_post_ids))
 
-    if (len(returned_blog_post_ids) < (
-        feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE)
-            and search_offset is not None):
+    if (
+        (
+            len(returned_blog_post_ids) < 
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        ) and search_offset is not None
+    ):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))

@@ -359,22 +359,22 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
         default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 2)
         max_cards_limit_swap = self.swap(
             feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2)
         # Load the search results with an empty query.
-        with default_query_limit_swap, logging_swap, max_cards_limit_swap:
-            response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with default_query_limit_swap, max_cards_limit_swap:
+                response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
 
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                '2 blog post summaries were fetched to load the search/filter '
-                'by result page. You may be running up against the default '
-                'query limits.')
-            self.assertEqual(len(response_dict['summary_dicts']), 2)
-            self.assertEqual(response_dict['search_offset'], 2)
+                self.assertEqual(len(logs), 1)
+                self.assertEqual(
+                    logs[0],
+                    '2 blog post summaries were fetched to load the search/filter '
+                    'by result page. You may be running up against the default '
+                    'query limits.\nNoneType: None')
+                self.assertEqual(len(response_dict['summary_dicts']), 2)
+                self.assertEqual(response_dict['search_offset'], 2)
 
     def test_handler_with_given_query_and_tag(self):
         self.login(self.user_email)

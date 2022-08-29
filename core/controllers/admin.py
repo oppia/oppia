@@ -27,7 +27,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
-from core.domain import blog_post_search_services
+from core.domain import search_services
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -244,7 +244,7 @@ class AdminHandler(base.BaseHandler):
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
-                blog_post_search_services.clear_blog_post_summaries_search_index() # pylint: disable=line-too-long
+                search_services.clear_blog_post_summaries_search_index() # pylint: disable=line-too-long
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':
