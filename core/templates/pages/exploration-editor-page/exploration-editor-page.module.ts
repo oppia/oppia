@@ -24,6 +24,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -78,6 +79,8 @@ import { EditorNavigationComponent } from './editor-navigation/editor-navigation
 import { TeachOppiaModalComponent } from './editor-tab/templates/modal-templates/teach-oppia-modal.component';
 import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
+import { PreviewTabComponent } from './preview-tab/preview-tab.component';
+import { HistoryTabComponent } from './history-tab/history-tab.component';
 
 @NgModule({
   imports: [
@@ -91,6 +94,7 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
     MatAutocompleteModule,
     ReactiveFormsModule,
     FormsModule,
+    MatPaginatorModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -138,7 +142,9 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
     EditorNavigationComponent,
     TeachOppiaModalComponent,
     SettingsTabComponent,
-    UnresolvedAnswersOverviewComponent
+    UnresolvedAnswersOverviewComponent,
+    PreviewTabComponent,
+    HistoryTabComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -182,7 +188,9 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
     EditorNavigationComponent,
     TeachOppiaModalComponent,
     SettingsTabComponent,
-    UnresolvedAnswersOverviewComponent
+    UnresolvedAnswersOverviewComponent,
+    PreviewTabComponent,
+    HistoryTabComponent
   ],
   providers: [
     {

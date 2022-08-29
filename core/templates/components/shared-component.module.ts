@@ -356,7 +356,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent,
     OnScreenKeyboardComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
@@ -497,6 +498,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     InputResponsePairComponent,
     LazyLoadingComponent,
     ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
