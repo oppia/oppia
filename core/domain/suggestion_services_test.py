@@ -2324,6 +2324,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
+        assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
             2
@@ -2355,6 +2356,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
 
+        assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_review_stats_model.accepted_translations_count, # type: ignore[union-attr]
             2
@@ -2433,12 +2435,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
+
+        assert question_contribution_stats_model is not None
         self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,  # type: ignore[union-attr]
+            question_contribution_stats_model.submitted_questions_count,
             2
         )
         self.assertEqual(
-            question_contribution_stats_model.accepted_questions_count,  # type: ignore[union-attr]
+            question_contribution_stats_model.accepted_questions_count,
             0
         )
 
@@ -2457,6 +2461,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
 
+        assert question_review_stats_model is not None
         self.assertEqual(
             question_review_stats_model.accepted_questions_count,  # type: ignore[union-attr]
             2
@@ -2545,6 +2550,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
 
+        assert question_review_stats_model is not None
         self.assertEqual(
             question_review_stats_model.accepted_questions_count,
             2
