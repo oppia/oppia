@@ -2024,18 +2024,20 @@ def _update_translation_contribution_stats_models(
     stats_dict = {}
 
     for stat in translation_contribution_stats:
-        # Ruling out the possibility of None for mypy type checking.
-        assert stat is not None
+
         stat_id = suggestion_models.TranslationContributionStatsModel.build_id(
-            stat.language_code, stat.contributor_user_id, stat.topic_id) # type: ignore[arg-type]
+            str(stat.language_code), str(stat.contributor_user_id), str(stat.topic_id))
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
-    stats_models_to_update = (
+    stats_models_to_update_with_none = (
         suggestion_models.TranslationContributionStatsModel.get_multi(
             stats_ids))
 
-    for stats_model in stats_models_to_update:
+    stats_models_to_update: List[
+        suggestion_models.TranslationContributionStatsModel] = []
+
+    for stats_model in stats_models_to_update_with_none:
 
         # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
@@ -2056,10 +2058,11 @@ def _update_translation_contribution_stats_models(
             stat.rejected_translation_word_count)
         stats_model.contribution_dates = stat.contribution_dates
 
-    suggestion_models.TranslationContributionStatsModel.update_timestamps_multi(  # type: ignore[type-var]
+    assert stats_models_to_update is not None
+    suggestion_models.TranslationContributionStatsModel.update_timestamps_multi(
         stats_models_to_update,
         update_last_updated_time=True)
-    suggestion_models.TranslationContributionStatsModel.put_multi(  # type: ignore[type-var]
+    suggestion_models.TranslationContributionStatsModel.put_multi(
         stats_models_to_update)
 
 
@@ -2082,10 +2085,13 @@ def _update_translation_review_stats_models(
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
-    stats_models_to_update = (
+    stats_models_to_update_with_none = (
         suggestion_models.TranslationReviewStatsModel.get_multi(stats_ids))
 
-    for stats_model in stats_models_to_update:
+    stats_models_to_update: List[
+        suggestion_models.TranslationReviewStatsModel] = []
+
+    for stats_model in stats_models_to_update_with_none:
 
          # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
@@ -2103,10 +2109,10 @@ def _update_translation_review_stats_models(
         stats_model.last_contribution_date = (
             stat.last_contribution_date)
 
-    suggestion_models.TranslationReviewStatsModel.update_timestamps_multi(  # type: ignore[type-var]
+    suggestion_models.TranslationReviewStatsModel.update_timestamps_multi(
         stats_models_to_update,
         update_last_updated_time=True)
-    suggestion_models.TranslationReviewStatsModel.put_multi(  # type: ignore[type-var]
+    suggestion_models.TranslationReviewStatsModel.put_multi(
         stats_models_to_update)
 
 
@@ -2129,10 +2135,13 @@ def _update_question_contribution_stats_models(
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
-    stats_models_to_update = (
+    stats_models_to_update_with_none = (
         suggestion_models.QuestionContributionStatsModel.get_multi(stats_ids))
 
-    for stats_model in stats_models_to_update:
+    stats_models_to_update: List[
+        suggestion_models.QuestionContributionStatsModel] = []
+
+    for stats_model in stats_models_to_update_with_none:
 
          # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
@@ -2146,10 +2155,10 @@ def _update_question_contribution_stats_models(
         stats_model.first_contribution_date = stat.first_contribution_date
         stats_model.last_contribution_date = stat.last_contribution_date
 
-    suggestion_models.QuestionContributionStatsModel.update_timestamps_multi(  # type: ignore[type-var]
+    suggestion_models.QuestionContributionStatsModel.update_timestamps_multi(
         stats_models_to_update,
         update_last_updated_time=True)
-    suggestion_models.QuestionContributionStatsModel.put_multi(  # type: ignore[type-var]
+    suggestion_models.QuestionContributionStatsModel.put_multi(
         stats_models_to_update)
 
 
@@ -2172,10 +2181,13 @@ def _update_question_review_stats_models(
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
-    stats_models_to_update = (
+    stats_models_to_update_with_none = (
         suggestion_models.QuestionReviewStatsModel.get_multi(stats_ids))
 
-    for stats_model in stats_models_to_update:
+    stats_models_to_update: List[
+        suggestion_models.QuestionReviewStatsModel] = []
+
+    for stats_model in stats_models_to_update_with_none:
 
          # Ruling out the possibility of None for mypy type checking.
         assert stats_model is not None
@@ -2189,10 +2201,10 @@ def _update_question_review_stats_models(
         stats_model.first_contribution_date = stat.first_contribution_date
         stats_model.last_contribution_date = stat.last_contribution_date
 
-    suggestion_models.QuestionReviewStatsModel.update_timestamps_multi(  # type: ignore[type-var]
+    suggestion_models.QuestionReviewStatsModel.update_timestamps_multi(
         stats_models_to_update,
         update_last_updated_time=True)
-    suggestion_models.QuestionReviewStatsModel.put_multi(  # type: ignore[type-var]
+    suggestion_models.QuestionReviewStatsModel.put_multi(
         stats_models_to_update)
 
 
@@ -2254,7 +2266,7 @@ def update_translation_contribution_stats_at_submission(
         translation_contribution_stat.submitted_translations_count += 1
         translation_contribution_stat.submitted_translation_word_count += (
             content_word_count)
-        translation_contribution_stat.contribution_dates.append(    # type: ignore[attr-defined]
+        translation_contribution_stat.contribution_dates.add(
             datetime.datetime.strptime(str(
                 suggestion.last_updated.utcnow().date().isoformat()),
                 '%Y-%m-%d'

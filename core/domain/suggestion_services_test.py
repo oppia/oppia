@@ -2254,18 +2254,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count, # type: ignore[union-attr]
+            translation_contribution_stats_model.submitted_translations_count,
             2
         )
         self.assertEqual(
             (
-                translation_contribution_stats_model # type: ignore[union-attr]
+                translation_contribution_stats_model
                 .submitted_translation_word_count
             ),
             6
         )
         self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_count, # type: ignore[union-attr]
+            translation_contribution_stats_model.accepted_translations_count,
             0
         )
 
@@ -2324,18 +2324,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count, # type: ignore[union-attr]
+            translation_contribution_stats_model.submitted_translations_count,
             2
         )
         self.assertEqual(
             (
-                translation_contribution_stats_model # type: ignore[union-attr]
+                translation_contribution_stats_model
                 .submitted_translation_word_count
             ),
             6
         )
         self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_count, # type: ignore[union-attr]
+            translation_contribution_stats_model.accepted_translations_count,
             0
         )
 
@@ -2412,7 +2412,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion( # type: ignore[call-overload]
+        initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
@@ -2545,12 +2545,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            question_review_stats_model.accepted_questions_count,  # type: ignore[union-attr]
+            question_review_stats_model.accepted_questions_count,
             2
         )
         self.assertEqual(
             (
-                question_review_stats_model  # type: ignore[union-attr]
+                question_review_stats_model
                 .reviewed_questions_count
             ),
             2
