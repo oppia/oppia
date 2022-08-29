@@ -1937,7 +1937,7 @@ class ContributorMilestoneEmailInfo:
 
     Attributes:
         contributor_user_id: str. The ID of the contributor.
-        language_code: str. The language code of the suggestion.
+        language_code: str|None. The language code of the suggestion.
         contribution_type: str. The type of the contribution i.e.
             translation or question.
         contribution_sub_type: str. The sub type of the contribution

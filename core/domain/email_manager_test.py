@@ -2013,7 +2013,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.USER_EMAIL, self.USERNAME)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         user_services.update_email_preferences(
             self.user_id, True, False, False, False)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
