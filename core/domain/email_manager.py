@@ -1991,6 +1991,10 @@ def send_mail_to_notify_contributor_ranking_achievement(
     email_body = ''
     if contributor_ranking_email_info.contribution_type == (
         feconf.CONTRIBUTION_TYPE_TRANSLATION):
+        # Ruling out the possibility of None for mypy type checking. It is
+        # obvious that for the contribution_type CONTRIBUTION_TYPE_TRANSLATION
+        # the language_code will not be None.
+        assert contributor_ranking_email_info.language_code is not None
         language = utils.get_supported_audio_language_description(
             contributor_ranking_email_info.language_code)
         email_body = email_template['email_body_template'] % (
