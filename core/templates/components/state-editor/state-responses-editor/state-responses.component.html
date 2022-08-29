@@ -26,8 +26,8 @@
                  [ngClass]="{'active': activeAnswerGroupIndex === index}"
                  class="oppia-sortable-rule-block oppia-prevent-selection">
 
-              <span class="oppia-rule-sort-handle" *ngIf="answerGroups.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
-                <span *ngIf="editabilityService.isEditable()" class="material-icons draggable-icon-indicator">drag_indicator</span>
+              <span class="oppia-rule-sort-handle" *ngIf="answerGroups?.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
+                <span *ngIf="editabilityService.isEditable()" class="fas fa-grip-vertical draggable-icon-indicator"></span>
               </span>
 
               <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
