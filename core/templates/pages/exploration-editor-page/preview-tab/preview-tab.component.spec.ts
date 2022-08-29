@@ -247,6 +247,7 @@ describe('Preview Tab Component', () => {
         result: Promise.reject()
       } as NgbModalRef);
 
+      component.loadPreviewState('', '');
       component.showSetParamsModal(null, () => {});
       tick();
       tick();
