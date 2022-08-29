@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script helps develop for the contributor dashboard. When "contributor
-dashboard debug" flag is enabled, the start script will call
-"populate_debug_data" function, whcih does the following:
-    1. Create an admin user with username "a" and assign curriculum,
+"""This script helps develop for the contributor dashboard. When the
+"contributor dashboard debug" flag is enabled, the start script will call the
+"populate_debug_data" function, which does the following:
+    1. Create an admin user with the username "a" and assign curriculum,
     translation, and question admin rights to "a".
-    2. Create a non-admin user with username "b" and give the user "submit
+    2. Create a non-admin user with the username "b" and give the user "submit
     question" rights.
     3. Populate sample lessons for translations. This is achieved by reproducing
     the "Load dummy new structures data" admin action.
@@ -62,7 +62,8 @@ CLASSROOM_URL_FRAGMENT = 'math'
 
 
 class ContributorDashboardDebugInitializer():
-    """Client-side requests to help develop for the contributor dashboard.
+    """Contains functions that populate sample data by sending requests to the
+    development server.
 
     Attributes:
         session: object(Session). The requests.Session object to send requests
