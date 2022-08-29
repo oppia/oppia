@@ -814,8 +814,8 @@ def populate_exp_summary_model_fields(
 def update_states_version_history(
     states_version_history: Dict[str, state_domain.StateVersionHistory],
     change_list: List[exp_domain.ExplorationChange],
-    old_states_dict: Dict[str, dict],
-    new_states_dict: Dict[str, dict],
+    old_states_dict: Dict[str, state_domain.StateDict],
+    new_states_dict: Dict[str, state_domain.StateDict],
     current_version: int,
     committer_id: str
 ) -> Dict[str, state_domain.StateVersionHistory]:

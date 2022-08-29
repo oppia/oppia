@@ -426,19 +426,19 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
                     try:
                         new_states_vh = (
-                            exp_services.update_states_version_history( # type: ignore[no-untyped-call]
+                            exp_services.update_states_version_history(
                                 old_states_vh, change_list, old_states_dict,
                                 new_states_dict, version, committer_id
                             )
                         )
                         new_metadata_vh = (
-                            exp_services.update_metadata_version_history( # type: ignore[no-untyped-call]
+                            exp_services.update_metadata_version_history(
                                 old_metadata_vh, change_list, old_metadata_dict,
                                 new_metadata_dict, version, committer_id
                             )
                         )
                         new_committer_ids = (
-                            exp_services.get_updated_committer_ids( # type: ignore[no-untyped-call]
+                            exp_services.get_updated_committer_ids(
                                 new_states_vh,
                                 new_metadata_vh.last_edited_committer_id
                             )
@@ -493,7 +493,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             except Exception:
                 return None
 
-    def get_exploration_from_model(self, exploration_model):
+    def get_exploration_from_model(
+        self, exploration_model: exp_models.ExplorationModel
+    ) -> Optional[exp_domain.Exploration]:
         """Gets Exploration object from model."""
         try:
             exploration = exp_fetchers.get_exploration_from_model(
@@ -800,7 +802,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         """
         exp_vlatest = model_group['exp_models_vlatest'][0]
 
-        all_explorations: List[exp_domain.Exploration] = (
+        all_explorations: List[Optional[exp_domain.Exploration]] = (
             [None] * exp_vlatest.version
         )
         for exploration in model_group['all_exp_models']:
@@ -997,14 +999,14 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     new_metadata_dict = curr_exp.get_metadata().to_dict()
 
                     expected_state_vh = (
-                        exp_services.update_states_version_history( # type: ignore[no-untyped-call]
+                        exp_services.update_states_version_history(
                             copy.deepcopy(verified_state_vh[-1]),
                             change_list, old_states_dict,
                             new_states_dict, version, committer_id
                         )
                     )
                     expected_metadata_vh = (
-                        exp_services.update_metadata_version_history( # type: ignore[no-untyped-call]
+                        exp_services.update_metadata_version_history(
                             copy.deepcopy(verified_metadata_vh[-1]),
                             change_list, old_metadata_dict,
                             new_metadata_dict, version, committer_id
@@ -1033,7 +1035,9 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
 
         return (exp_id, verified)
 
-    def get_exploration_from_model(self, exploration_model):
+    def get_exploration_from_model(
+        self, exploration_model: exp_models.ExplorationModel
+    ) -> Optional[exp_domain.Exploration]:
         """Gets Exploration object from model."""
         try:
             exploration = exp_fetchers.get_exploration_from_model(
