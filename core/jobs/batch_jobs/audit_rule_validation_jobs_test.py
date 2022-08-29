@@ -265,7 +265,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             }
           },
           {
-            'rule_type': 'IsEqualToOrdering',
+            'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
             'inputs': {
               'x': [
                 [
@@ -276,6 +276,22 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
                 ],
                 [
                   'ca_choices_70'
+                ]
+              ]
+            }
+          },
+          {
+            'rule_type': 'IsEqualToOrdering',
+            'inputs': {
+              'x': [
+                [
+                  'ca_choices_70'
+                ],
+                [
+                  'ca_choices_68'
+                ],
+                [
+                  'ca_choices_69'
                 ]
               ]
             }
@@ -843,6 +859,20 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
                 'a': 3,
                 'b': 10
               }
+            },
+            {
+              'rule_type': 'IsWithinTolerance',
+              'inputs': {
+                'x': 2,
+                'tol': 0
+              }
+            },
+            {
+              'rule_type': 'IsWithinTolerance',
+              'inputs': {
+                'x': 2,
+                'tol': 1
+              }
             }
           ],
           'outcome': {
@@ -1301,6 +1331,156 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             }
           ],
           'outcome': {
+            'dest': 'EXP_7_STATE_1',
+            'feedback': {
+              'content_id': 'feedback_1',
+              'html': '<p>cvcv</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_7_STATE_1',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>df</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    EXP_7_STATE_2 = state_domain.State.create_default_state(
+        'EXP_7_STATE_2', is_initial_state=True).to_dict()
+
+    EXP_7_STATE_2['interaction'] = {
+      'id': 'FractionInput',
+      'customization_args': {
+        'requireSimplestForm': {
+          'value': False
+        },
+        'allowImproperFraction': {
+          'value': True
+        },
+        'allowNonzeroIntegerPart': {
+          'value': True
+        },
+        'customPlaceholder': {
+          'value': {
+            'content_id': 'ca_customPlaceholder_0',
+            'unicode_str': ''
+          }
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'HasDenominatorEqualTo',
+              'inputs': {
+                'x': 1
+              }
+            },
+            {
+              'rule_type': 'HasDenominatorEqualTo',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'IsLessThan',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 5, # type: ignore[dict-item]
+                  'denominator': 2 # type: ignore[dict-item]
+                }
+              }
+            },
+            {
+              'rule_type': 'IsGreaterThan',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 10, # type: ignore[dict-item]
+                  'denominator': 2 # type: ignore[dict-item]
+                }
+              }
+            },
+            {
+              'rule_type': 'IsExactlyEqualTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 11, # type: ignore[dict-item]
+                  'denominator': 3 # type: ignore[dict-item]
+                }
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_7_STATE_2',
+            'feedback': {
+              'content_id': 'feedback_1',
+              'html': '<p>cvcv</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        },
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'HasFractionalPartExactlyEqualTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 2, # type: ignore[dict-item]
+                  'denominator': 1 # type: ignore[dict-item]
+                }
+              }
+            },
+            {
+              'rule_type': 'HasDenominatorEqualTo',
+              'inputs': {
+                'x': 10
+              }
+            },
+            {
+              'rule_type': 'IsExactlyEqualTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False, # type: ignore[dict-item]
+                  'wholeNumber': 0, # type: ignore[dict-item]
+                  'numerator': 5, # type: ignore[dict-item]
+                  'denominator': 3 # type: ignore[dict-item]
+                }
+              }
+            }
+          ],
+          'outcome': {
             'dest': 'A valid state',
             'feedback': {
               'content_id': 'feedback_1',
@@ -1417,6 +1597,17 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               }
             },
             {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_26',
+                  'normalizedStrSet': [
+                    'helloooo'
+                  ]
+                }
+              }
+            },
+            {
               'rule_type': 'StartsWith',
               'inputs': {
                 'x': {
@@ -1456,6 +1647,113 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       ],
       'default_outcome': {
         'dest': 'EXP_8_STATE_1',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>fd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    EXP_8_STATE_2 = state_domain.State.create_default_state(
+      'EXP_8_STATE_2', is_initial_state=False).to_dict()
+
+    EXP_8_STATE_2['interaction'] = {
+      'id': 'TextInput',
+      'customization_args': {
+        'placeholder': {
+          'value': {
+            'content_id': 'ca_placeholder_23',
+            'unicode_str': ''
+          }
+        },
+        'rows': {
+          'value': 9
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Contains',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_27',
+                  'normalizedStrSet': [
+                    'hello',
+                    'abc',
+                    'def'
+                  ]
+                }
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_8_STATE_1',
+            'feedback': {
+              'content_id': 'feedback_24',
+              'html': ''
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        },
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_29',
+                  'normalizedStrSet': [
+                    'exciting',
+                    'developer'
+                  ]
+                }
+              }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_26',
+                  'normalizedStrSet': [
+                    'helloooo'
+                  ]
+                }
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'A valid state',
+            'feedback': {
+              'content_id': 'feedback_28',
+              'html': ''
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_8_STATE_2',
         'feedback': {
           'content_id': 'default_outcome',
           'html': '<p>fd</p>'
@@ -1625,7 +1923,8 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
             states={
-              'EXP_7_STATE_1': self.EXP_7_STATE_1
+              'EXP_7_STATE_1': self.EXP_7_STATE_1,
+              'EXP_7_STATE_2': self.EXP_7_STATE_2
             }
         )
 
@@ -1646,7 +1945,8 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
             states={
-              'EXP_8_STATE_1': self.EXP_8_STATE_1
+              'EXP_8_STATE_1': self.EXP_8_STATE_1,
+              'EXP_8_STATE_2': self.EXP_8_STATE_2
             }
         )
 

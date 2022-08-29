@@ -168,12 +168,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         ele_element = ele['element']
                         rule_choice = rule_spec.inputs['x'][ele_position - 1]
 
-                        if len(rule_choice) > 1:
-                            for choice in rule_choice:
-                                if choice == ele_element:
-                                    invalid_rules.append(rule_spec)
-                        else:
-                            if rule_choice[0] == ele_element:
+                        for choice in rule_choice:
+                            if choice == ele_element:
                                 invalid_rules.append(rule_spec)
                     # `==` should come before == +/- 1 if they are off by
                     # at most 1 value.
@@ -454,13 +450,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
     @staticmethod
     def _is_enclosed_by(
-        range_compare_to: RangeVariable,
+        range_compare_of: RangeVariable,
         range_compare_with: RangeVariable
     ) -> bool:
         """Checks whether the ranges of rules enclosed or not
 
         Args:
-            range_compare_to: dict[str, Any]. To keep track of each rule's
+            range_compare_of: dict[str, Any]. To keep track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive, It represents the variable for
                 which we have to check the range.
@@ -474,31 +470,31 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         """
         if (
             range_compare_with['lower_bound'] is None or
-            range_compare_to['lower_bound'] is None or
+            range_compare_of['lower_bound'] is None or
             range_compare_with['upper_bound'] is None or
-            range_compare_to['upper_bound'] is None
+            range_compare_of['upper_bound'] is None
         ):
             return False
         lb_satisfied = (
-            range_compare_with['lower_bound'] < range_compare_to[
+            range_compare_with['lower_bound'] < range_compare_of[
                 'lower_bound'] or
             (
-                range_compare_with['lower_bound'] == range_compare_to[
+                range_compare_with['lower_bound'] == range_compare_of[
                     'lower_bound'] and
                 (
-                    not range_compare_to['lb_inclusive'] or
+                    not range_compare_of['lb_inclusive'] or
                     range_compare_with['lb_inclusive']
                 )
             )
         )
         ub_satisfied = (
-            range_compare_with['upper_bound'] > range_compare_to[
+            range_compare_with['upper_bound'] > range_compare_of[
                 'upper_bound'] or
             (
-                range_compare_with['upper_bound'] == range_compare_to[
+                range_compare_with['upper_bound'] == range_compare_of[
                     'upper_bound'] and
                 (
-                    not range_compare_to['ub_inclusive'] or
+                    not range_compare_of['ub_inclusive'] or
                     range_compare_with['ub_inclusive']
                 )
             )
