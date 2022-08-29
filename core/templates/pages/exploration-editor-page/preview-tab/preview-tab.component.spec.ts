@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for previewTab.
  */
 
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -249,7 +249,9 @@ describe('Preview Tab Component', () => {
 
       component.showSetParamsModal(null, () => {});
       tick();
+      tick();
       flush();
+      flushMicrotasks();
 
       expect(ngbModal.open).toHaveBeenCalled();
     }));
