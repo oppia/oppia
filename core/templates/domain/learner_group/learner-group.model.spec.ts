@@ -27,8 +27,8 @@ describe('Learner Group Object', () => {
       title: 'sampleTitle',
       description: 'sampleDescription',
       facilitator_usernames: ['username1'],
-      student_usernames: [],
-      invited_student_usernames: ['sampleUsername'],
+      learner_usernames: [],
+      invited_learner_usernames: ['sampleUsername'],
       subtopic_page_ids: ['sampleSubtopicPageId'],
       story_ids: []
     };
@@ -44,13 +44,13 @@ describe('Learner Group Object', () => {
     sampleLearnerGroupData.title = '';
     sampleLearnerGroupData.description = '';
     sampleLearnerGroupData.removeFacilitator('username1');
-    sampleLearnerGroupData.addStudent('sampleUsername');
+    sampleLearnerGroupData.addLearner('sampleUsername');
 
     expect(sampleLearnerGroupData.validate(false)).toEqual([
       'Learner Group title should not be empty.',
       'Learner Group description should not be empty.',
       'Learner Group should have at least one facilitator.',
-      'Students can not be invited to join the same group again.'
+      'Learners can not be invited to join the same group again.'
     ]);
   });
 
@@ -63,7 +63,7 @@ describe('Learner Group Object', () => {
     sampleLearnerGroupData.title = '';
     sampleLearnerGroupData.description = '';
     sampleLearnerGroupData.removeFacilitator('username1');
-    sampleLearnerGroupData.addStudent('sampleUsername2');
+    sampleLearnerGroupData.addLearner('sampleUsername2');
     sampleLearnerGroupData.removeSubtopicPageId('sampleSubtopicPageId');
 
     expect(sampleLearnerGroupData.validate(true)).toEqual([
@@ -71,7 +71,7 @@ describe('Learner Group Object', () => {
       'Learner Group description should not be empty.',
       'Learner Group should have at least one facilitator.',
       'Learner Group should have at least one syllabus item.',
-      'Learner Group cannot have any students while creation.'
+      'Learner Group cannot have any learners while creation.'
     ]);
   });
 
@@ -80,22 +80,22 @@ describe('Learner Group Object', () => {
     sampleLearnerGroupData.description = 'description1';
     sampleLearnerGroupData.addFacilitator('username2');
     sampleLearnerGroupData.removeFacilitator('username1');
-    sampleLearnerGroupData.addStudent('username2');
-    sampleLearnerGroupData.addStudent('username3');
-    sampleLearnerGroupData.removeStudent('username2');
-    sampleLearnerGroupData.inviteStudent('username4');
+    sampleLearnerGroupData.addLearner('username2');
+    sampleLearnerGroupData.addLearner('username3');
+    sampleLearnerGroupData.removeLearner('username2');
+    sampleLearnerGroupData.inviteLearners(['username4']);
     sampleLearnerGroupData.revokeInvitation('sampleUsername');
-    sampleLearnerGroupData.addSubtopicPageId('subtopicPageId1');
+    sampleLearnerGroupData.addSubtopicPageIds(['subtopicPageId1']);
     sampleLearnerGroupData.removeSubtopicPageId('sampleSubtopicPageId');
-    sampleLearnerGroupData.addStoryId('storyId1');
-    sampleLearnerGroupData.addStoryId('storyId2');
+    sampleLearnerGroupData.addStoryIds(['storyId1']);
+    sampleLearnerGroupData.addStoryIds(['storyId2']);
     sampleLearnerGroupData.removeStoryId('storyId1');
 
     expect(sampleLearnerGroupData.title).toEqual('title1');
     expect(sampleLearnerGroupData.description).toEqual('description1');
     expect(sampleLearnerGroupData.facilitatorUsernames).toEqual(['username2']);
-    expect(sampleLearnerGroupData.studentUsernames).toEqual(['username3']);
-    expect(sampleLearnerGroupData.invitedStudentUsernames).toEqual(
+    expect(sampleLearnerGroupData.learnerUsernames).toEqual(['username3']);
+    expect(sampleLearnerGroupData.invitedLearnerUsernames).toEqual(
       ['username4']);
     expect(sampleLearnerGroupData.subtopicPageIds).toEqual(
       ['subtopicPageId1']);
