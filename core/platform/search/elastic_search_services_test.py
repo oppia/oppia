@@ -461,7 +461,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # because this mocks the behavior of elastic_search_services.ES.search
         # and in the type stubs the type is Any.
         def mock_search(
-                body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
