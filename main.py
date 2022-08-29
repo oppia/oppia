@@ -516,9 +516,9 @@ URLS = [
     get_redirect_route(
         '/checkpoints_feature_status_handler',
         reader.CheckpointsFeatureStatusHandler),
-    # get_redirect_route(
-    #     r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
-    #     reader.ExplorationPage),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
+        reader.ExplorationPage),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
         reader.ExplorationEmbedPage),
@@ -990,7 +990,6 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
 
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend((
-    get_redirect_route(r'/explore/<exploration_id>', oppia_root.OppiaRootPage),
     get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
     get_redirect_route(
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
