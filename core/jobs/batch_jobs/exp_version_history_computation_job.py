@@ -451,7 +451,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
 
-                        # Additional Log:
+                        # Additional Log.
                         for state_name in new_exploration.states:
                             if state_name not in (
                                 new_vh_model.state_version_history
