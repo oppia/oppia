@@ -2026,7 +2026,8 @@ def _update_translation_contribution_stats_models(
     for stat in translation_contribution_stats:
 
         stat_id = suggestion_models.TranslationContributionStatsModel.build_id(
-            str(stat.language_code), str(stat.contributor_user_id), str(stat.topic_id))
+            str(stat.language_code), str(stat.contributor_user_id),
+            str(stat.topic_id))
         stats_ids.append(stat_id)
         stats_dict[stat_id] = stat
 
