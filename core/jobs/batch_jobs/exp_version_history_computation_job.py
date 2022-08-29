@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import copy
+import logging
 
 from core import feconf
 from core.domain import exp_domain
@@ -455,7 +456,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             if state_name not in (
                                 new_vh_model.state_version_history
                             ):
-                                print(
+                                logging.info(
                                     'State name %s was not found in the '
                                     'version history model for version %d' % (
                                         state_name, version

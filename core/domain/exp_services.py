@@ -700,8 +700,8 @@ def update_states_version_history(
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
     prev_version = current_version - 1
 
-    print('Deleted state names: %s' % (exp_versions_diff.deleted_state_names))
-    print('Renamed states: %s' % (exp_versions_diff.old_to_new_state_names))
+    logging.info('Deleted state names: %s' % (exp_versions_diff.deleted_state_names))
+    logging.info('Renamed states: %s' % (exp_versions_diff.old_to_new_state_names))
 
     # Firstly, delete the states from the state version history which were
     # deleted during this commit.
