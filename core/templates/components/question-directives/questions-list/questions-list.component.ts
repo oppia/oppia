@@ -291,8 +291,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     });
   }
 
-  removeQuestionFromSkill(
-      questionId: string, skillDescription: string): void {
+  removeQuestionFromSkill(questionId: string): void {
     let modalRef: NgbModalRef = this.ngbModal.
       open(RemoveQuestionSkillLinkModalComponent, {
         backdrop: 'static'

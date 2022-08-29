@@ -1470,7 +1470,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(owner_id, topic)
+        topic_services.save_new_topic(owner_id, topic)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             skill_services.get_topic_names_with_given_skill_in_diagnostic_test(

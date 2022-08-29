@@ -68,7 +68,7 @@
                                          [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
-              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();"
+              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId());$event.stopPropagation();"
                     class="link-off-icon">
                 <i class="fas fa-unlink"></i>
               </span>
