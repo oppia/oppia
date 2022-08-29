@@ -149,7 +149,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             migrated_story_model.story_contents, self.latest_contents)
 
-    def test_broken_skill_is_not_migrated(self) -> None:
+    def test_broken_story_is_not_migrated(self) -> None:
         story_model = self.create_model(
             story_models.StoryModel,
             id=self.STORY_1_ID,
@@ -214,7 +214,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
         self.assertEqual(migrated_story_model.version, 2)
 
-    def test_migrated_skill_is_not_migrated(self) -> None:
+    def test_migrated_story_is_not_migrated(self) -> None:
         story_model = self.create_model(
             story_models.StoryModel,
             id=self.STORY_1_ID,
@@ -339,7 +339,7 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(stdout='STORY MIGRATED SUCCESS: 1'),
         ])
 
-    def test_broken_skill_is_not_migrated(self) -> None:
+    def test_broken_story_is_not_migrated(self) -> None:
         story_model = self.create_model(
             story_models.StoryModel,
             id=self.STORY_1_ID,
@@ -369,7 +369,7 @@ class AuditStoryMigrationJobTests(job_test_utils.JobTestBase):
         migrated_story_model = story_models.StoryModel.get(self.STORY_1_ID)
         self.assertEqual(migrated_story_model.version, 1)
 
-    def test_migrated_skill_is_not_migrated(self) -> None:
+    def test_migrated_story_is_not_migrated(self) -> None:
         story_model = self.create_model(
             story_models.StoryModel,
             id=self.STORY_1_ID,
