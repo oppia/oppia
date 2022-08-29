@@ -1,0 +1,175 @@
+<!-- NOTE TO DEVELOPERS: The svg defs needed for this directive are
+included at the bottom of exploration-editor-page.mainpage.html. In order for
+the elements to render properly in Firefox, there cannot be multiple defs
+with the same id on the page. -->
+
+<style>
+  .oppia-graph-viz .pannable-rect {
+    cursor: move;
+    fill: none;
+    fill-opacity: 0;
+    pointer-events: all;
+  }
+  .oppia-graph-viz path.link {
+    fill: none;
+    stroke: rgb(179, 179, 179);
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz text {
+    font: 12px sans-serif;
+    pointer-events: none;
+  }
+  .oppia-graph-viz text.shadow {
+    stroke: #fff;
+    stroke-opacity: .8;
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz .node rect {
+    fill: #fff;
+    pointer-events: all;
+    stroke: rgb(0, 0, 0);
+    -moz-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+  .oppia-graph-resize-button .oppia-material-icons {
+    color: #a9a9a9;
+    font-size: larger;
+  }
+  .oppia-graph-viz .oppia-box-fill {
+    fill: gray;
+  }
+  .oppia-graph-viz .clickable.oppia-error-message-fill {
+    fill: yellow;
+  }
+  .oppia-graph-viz .oppia-highlight-text {
+    font-size: 22px;
+    font-weight: bold;
+  }
+  .oppia-graph-viz .clickable.oppia-node-delete {
+    cursor: pointer;
+    fill: pink;
+  }
+  .oppia-graph-viz .oppia-rectangle {
+    fill: transparent;
+    stroke: black;
+  }
+  .oppia-graph-viz .node rect.terminal-node {
+    fill: green; /* terminal nodes are green to signify them */
+  }
+  .oppia-graph-viz .node rect.bad-node {
+    fill: #f35f55;
+  }
+  .oppia-graph-viz .node rect.current-node:hover,
+  .oppia-graph-viz .node rect.init-node:hover,
+  .oppia-graph-viz .node rect.terminal-node:hover,
+  .oppia-graph-viz .node rect.bad-node:hover,
+  .oppia-graph-viz .node rect.normal-node:hover {
+    fill: #c8c4c4;
+  }
+  .oppia-graph-viz .clickable {
+    cursor: pointer;
+  }
+  .oppia-graph-viz .legend-bar {
+    fill: url('#nodegradient');
+    stroke: black;
+    stroke-width: 0.5;
+  }
+
+  .oppia-state-graph-container .oppia-graph-resize-button {
+    border: 0;
+    padding: 9px 10px 6px 10px;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+  }
+</style>
+
+<div ng-style="{'height': getGraphHeightInPixels() + 'px'}" ng-show="graphLoaded">
+  <button ng-if="!!onMaximizeFunction" ng-click="onMaximizeFunction()"
+          class="btn btn-secondary btn-sm oppia-graph-resize-button">
+    <i title="Expand Map" class="fas fa-expand-arrows-alt oppia-material-icons"></i>
+  </button>
+
+  <svg class="oppia-graph-viz" width="100%" height="100%">
+    <g>
+      <g ng-attr-transform="<[overallTransformStr]>">
+        <rect class="pannable-rect" ng-if="allowPanning"
+              ng-attr-width="<[VIEWPORT_WIDTH]>" ng-attr-height="<[VIEWPORT_HEIGHT]>"
+              ng-attr-x="<[VIEWPORT_X]>" ng-attr-y="<[VIEWPORT_Y]>">
+        </rect>
+
+        <g>
+          <g class="pannable-child" ng-attr-transform="<[innerTransformStr]>">
+            <g ng-repeat="link in augmentedLinks">
+              <path class="link protractor-test-link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
+              </path>
+            </g>
+
+            <g class="node protractor-test-node" ng-repeat="node in nodeList">
+              <rect rx="2" ry="2" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
+                    class="protractor-test-node-background <[node.nodeClass]>"
+                    ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
+                    ng-class="{'clickable': canNavigateToNode(node.id)}"
+                    ng-attr-style="<[node.style]>"
+                    ng-click="onClickFunction(node.id)"
+                    aria-label="Switch to <[getNodeTitle(node)]> Card">
+              </rect>
+              <title><[getNodeTitle(node)]></title>
+              <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>">
+                <tspan ng-if="isCheckpoint(node.id)" alignment-baseline="central">&#11088;</tspan>
+                <tspan class="protractor-test-node-label">
+                  <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
+                  <tspan ng-attr-x="<[node.xLabel]>" dy="1em" class="oppia-box-fill"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
+                </tspan>
+              </text>
+              <g ng-if="getNodeErrorMessage(node.label) && (showWarningSign || showTranslationWarnings)">
+                <rect ng-click="onClickFunction(node.id)" class="clickable oppia-error-message-fill"
+                      width="22" height="22"
+                      ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0 - 8]>"
+                      ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>"
+                      uib-tooltip="<[getNodeErrorMessage(node.label)]>"
+                      tooltip-placement="top" tooltip-animation="true"
+                      tooltip-append-to-body="true"
+                      aria-label="<[getNodeErrorMessage(node.label)]>">
+                </rect>
+                <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
+                      ng-attr-y="<[node.y0 + 9]>"
+                      class="oppia-highlight-text"
+                      ng-attr-transform="<[getHighlightTextTransform(node.x0, node.y0)]>">
+                  ⚠
+                </text>
+              </g>
+              <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
+                <rect height="15" width="15" opacity="0" stroke-width="0"
+                      ng-attr-x="<[node.x0 + node.width]>" ng-attr-y="<[node.y0]>"
+                      transform="translate(0, -15)"
+                      class="clickable oppia-node-delete"
+                      ng-click="onNodeDeletionClick(node.id)"
+                      aria-label="Delete <[getNodeTitle(node)]> card">
+                </rect>
+                <text ng-attr-dx="<[node.x0 + node.width]>" ng-attr-dy="<[node.y0]>" text-anchor="right">
+                  x
+                </text>
+              </g>
+            </g>
+          </g>
+
+          <g ng-if="opacityMap">
+            <rect width="210" height="70" ng-attr-x="<[GRAPH_WIDTH - 250]>" y="10" class="oppia-rectangle">
+            </rect>
+
+            <rect width="190" height="20" ng-attr-x="<[GRAPH_WIDTH - 240]>" y="20"
+                  class="legend-bar">
+            </rect>
+
+            <text ng-attr-x="<[GRAPH_WIDTH - 200]>" y="60">
+              <[opacityMap.legend]>
+            </text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
