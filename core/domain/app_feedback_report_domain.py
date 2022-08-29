@@ -1115,7 +1115,7 @@ class EntryPoint:
             subtopic_id: int|None. The id for the current subtopic if the report
                 was sent during a revision session.
         """
-        self.entry_point_name = entry_point.name
+        self.entry_point_name = entry_point.value
         self.topic_id = topic_id
         self.story_id = story_id
         self.exploration_id = exploration_id
