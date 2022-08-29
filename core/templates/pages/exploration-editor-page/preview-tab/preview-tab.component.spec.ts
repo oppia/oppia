@@ -269,13 +269,13 @@ describe('Preview Tab Component', () => {
   }));
 
   it('should exmpty getManualParamChanges', () => {
-    getUnsetParametersInfo.and.returnValue([]);
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
         manualParamChanges: null,
       },
       result: Promise.resolve()
     } as NgbModalRef);
+    getUnsetParametersInfo.and.returnValue([]);
 
     component.getManualParamChanges('state').then((value) => {
       expect(value).toEqual([]);
