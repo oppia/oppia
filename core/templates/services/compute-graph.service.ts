@@ -61,9 +61,13 @@ export class ComputeGraphService {
             linkProperty: null,
             connectsDestIfStuck: false
           });
-          if (groups[h].outcome && groups[h].outcome.destIfReallyStuck) {
+          if (groups[h].outcome.destIfReallyStuck) {
             links.push({
               source: stateName,
+              // This throws "TS2322: Type 'string | null' is not assignable to type
+              // 'string'" We need to suppress this error because the value is
+              // explicitly checked above in the if condition.
+              // @ts-ignore
               target: groups[h].outcome.destIfReallyStuck,
               linkProperty: null,
               connectsDestIfStuck: true

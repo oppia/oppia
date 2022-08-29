@@ -41,7 +41,7 @@ class MockWindowDimensionsService {
   }
 }
 
-describe('Outcome Editor Component', () => {
+fdescribe('Outcome Editor Component', () => {
   let component: OutcomeEditorComponent;
   let fixture: ComponentFixture<OutcomeEditorComponent>;
   let externalSaveService: ExternalSaveService;
@@ -375,6 +375,35 @@ describe('Outcome Editor Component', () => {
       'State Name', '1', '', []);
 
     expect(component.invalidStateAfterDestinationSave()).toBeTrue();
+  });
+
+  it('should check if a destination for stuck learner forms a loop', () => {
+    let outcome = new Outcome(
+      'Me Llamo',
+      'Hola',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    component.outcome = outcome;
+    spyOn(stateEditorService, 'getActiveStateName')
+      .and.returnValue('Hola');
+
+    expect(component.isSelfLoopDestStuck(outcome)).toBeTrue();
+
+    outcome = new Outcome(
+      'Ma Llamo',
+      'Me Llmao',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    component.outcome = outcome;
+    expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
   });
 
   it('should open feedback editor if it is editable', () => {

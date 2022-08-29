@@ -105,7 +105,7 @@ export const AppConstants = {
 
   // Flag to toggle the support for a new state to direct the learners
   // to, when they get stuck.
-  DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
+  DEST_IF_REALLY_STUCK_FEAT_ENABLED: true,
 
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,
