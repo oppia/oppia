@@ -59,7 +59,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
      name: 'ParamChange3'
    }];
  }
-fdescribe('Exploration Warnings Service', () => {
+describe('Exploration Warnings Service', () => {
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationWarningsService: ExplorationWarningsService;
   let explorationStatesService: ExplorationStatesService;
@@ -2267,7 +2267,8 @@ fdescribe('Exploration Warnings Service', () => {
       State6: [
         'Placeholder text must be a string.',
         'Number of rows must be integral.',
-        'Learner should not be directed back by more than 3 cards in the lesson.',
+        'Learner should not be directed back by more than 3 cards' +
+        ' in the lesson.',
         'Checkpoints must not be assigned to cards that can be bypassed.'
       ],
       State7: [
@@ -2280,5 +2281,4 @@ fdescribe('Exploration Warnings Service', () => {
       ]
     });
   });
-
 });
