@@ -610,7 +610,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -1499,7 +1499,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
