@@ -2253,6 +2253,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
+        assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
             2
