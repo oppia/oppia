@@ -1950,7 +1950,7 @@ class ContributorMilestoneEmailInfo:
         contributor_user_id: str,
         contribution_type: str,
         contribution_subtype: str,
-        language_code: str,
+        language_code: Optional[str],
         rank_name: str
     ) -> None:
         self.contributor_user_id = contributor_user_id
