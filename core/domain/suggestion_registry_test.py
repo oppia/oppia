@@ -21,6 +21,7 @@ import os
 
 from core import feconf
 from core import utils
+from core.domain import change_domain
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -36,8 +37,8 @@ from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Optional, Union
-from typing_extensions import Final
+from typing import Any, Dict, Optional, Union, cast
+from typing_extensions import Final, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -64,7 +65,7 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
         self.base_suggestion = MockInvalidSuggestion()
 
     def test_base_class_accept_raises_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement accept.'):
             self.base_suggestion.accept('test_message')
@@ -72,42 +73,42 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
     def test_base_class_get_change_list_for_accepting_suggestion_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement '
             'get_change_list_for_accepting_suggestion.'):
             self.base_suggestion.get_change_list_for_accepting_suggestion()
 
     def test_base_class_pre_accept_validate_raises_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' pre_accept_validate.'):
             self.base_suggestion.pre_accept_validate()
 
     def test_base_class_populate_old_value_of_change_raises_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' populate_old_value_of_change.'):
             self.base_suggestion.populate_old_value_of_change()
 
     def test_base_class_pre_update_validate_raises_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' pre_update_validate.'):
             self.base_suggestion.pre_update_validate({})
 
     def test_base_class_get_all_html_content_strings(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' get_all_html_content_strings.'):
             self.base_suggestion.get_all_html_content_strings()
 
     def test_base_class_get_target_entity_html_strings(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' get_target_entity_html_strings.'):
@@ -117,12 +118,30 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
         def conversion_fn(_: str) -> str:
             """Temporary function."""
             return 'abcd'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' convert_html_in_suggestion_change.'):
             self.base_suggestion.convert_html_in_suggestion_change(
                 conversion_fn)
+
+
+class SuggestionEditStateContentDict(TypedDict):
+    """Dictionary representing the SuggestionEditStateContent object."""
+
+    suggestion_id: str
+    suggestion_type: str
+    target_type: str
+    target_id: str
+    target_version_at_submission: int
+    status: str
+    author_name: str
+    final_reviewer_id: Optional[str]
+    change: Dict[str, change_domain.AcceptableChangeDictTypes]
+    score_category: str
+    language_code: Optional[str]
+    last_updated: float
+    edited_by_reviewer: bool
 
 
 class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
@@ -137,10 +156,10 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
-        self.suggestion_dict = {
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.suggestion_dict: SuggestionEditStateContentDict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
@@ -221,7 +240,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected suggestion_type to be among allowed choices'
         ):
@@ -241,7 +260,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected target_type to be among allowed choices'
         ):
@@ -264,7 +283,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             suggestion.validate()
@@ -286,7 +305,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected target_version_at_submission to be an int'
         ):
@@ -306,7 +325,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected status to be among allowed choices'
         ):
             suggestion.validate()
@@ -328,7 +347,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected author_id to be a string'
         ):
             suggestion.validate()
@@ -350,7 +369,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected author_id to be in a valid user ID format'
         ):
@@ -373,7 +392,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
         ):
             suggestion.validate()
@@ -395,7 +414,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected final_reviewer_id to be in a valid user ID format'
         ):
@@ -418,7 +437,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected score_category to be a string'
         ):
             suggestion.validate()
@@ -437,7 +456,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
@@ -445,7 +464,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
@@ -466,7 +485,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the first part of score_category to be among allowed'
             ' choices'
@@ -490,7 +509,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change = {}  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to be an ExplorationChange'
         ):
             suggestion.validate()
@@ -509,7 +528,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'question.score_sub_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the first part of score_category to be content'
         ):
@@ -528,7 +547,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected cmd to be edit_state_property'
         ):
             suggestion.validate()
@@ -552,7 +571,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         # change and throwing `"ExplorationChange" has no attribute
         # "property_name"` error. Thus to avoid the error, we used ignore here.
         suggestion.change.property_name = 'invalid_property'  # type: ignore[attr-defined]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected property_name to be content'
         ):
             suggestion.validate()
@@ -573,7 +592,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.language_code = 'wrong_language_code'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language_code to be None, received wrong_language_code'
         ):
@@ -591,7 +610,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -608,7 +627,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.pre_accept_validate()
 
         suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
         ):
@@ -657,7 +676,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': 'new suggestion content',
             'old_value': None
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: new_value, '
             'old_value, property_name'
@@ -682,7 +701,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': 'new suggestion content',
             'old_value': None
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change property_name must be equal to content'
         ):
@@ -706,7 +725,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': 'new suggestion content',
             'old_value': None
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change state_name must be equal to state_1'
         ):
@@ -741,7 +760,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': new_content,
             'old_value': None
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The new html must not match the old html'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
@@ -757,7 +776,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change cmd must be equal to edit_state_property'
         ):
@@ -896,10 +915,10 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
-        self.suggestion_dict = {
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
@@ -940,7 +959,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'Introduction'
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change cmd must be equal to %s' % (
                 exp_domain.CMD_ADD_WRITTEN_TRANSLATION)
@@ -967,7 +986,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change state_name must be equal to Introduction'
         ):
@@ -993,7 +1012,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The language code must be equal to hi'
         ):
@@ -1019,7 +1038,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change content_html must be equal to <p>This is a ' +
             'content.</p>'
@@ -1085,7 +1104,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected suggestion_type to be among allowed choices'
         ):
@@ -1105,7 +1124,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected target_type to be among allowed choices'
         ):
@@ -1128,7 +1147,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             suggestion.validate()
@@ -1150,7 +1169,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected target_version_at_submission to be an int'
         ):
@@ -1170,7 +1189,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected status to be among allowed choices'
         ):
             suggestion.validate()
@@ -1192,7 +1211,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected author_id to be a string'
         ):
             suggestion.validate()
@@ -1211,7 +1230,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected author_id to be in a valid user ID format.'
         ):
@@ -1234,7 +1253,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
         ):
             suggestion.validate()
@@ -1253,7 +1272,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected final_reviewer_id to be in a valid user ID format'
         ):
@@ -1276,7 +1295,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected score_category to be a string'
         ):
             suggestion.validate()
@@ -1295,7 +1314,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
@@ -1303,7 +1322,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
@@ -1324,7 +1343,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the first part of score_category to be among allowed'
             ' choices'
@@ -1348,7 +1367,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change = {}  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to be an ExplorationChange'
         ):
             suggestion.validate()
@@ -1367,7 +1386,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'question.score_sub_type'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the first part of score_category to be translation'
         ):
@@ -1387,7 +1406,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected cmd to be add_written_translation'
         ):
             suggestion.validate()
@@ -1411,7 +1430,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.language_code = 'wrong_language_code'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language_code to be %s, '
             'received wrong_language_code' % expected_language_code
@@ -1437,7 +1456,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.language_code = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'language_code cannot be None'
         ):
             suggestion.validate()
@@ -1463,7 +1482,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         # of change and throwing `"ExplorationChange" has no attribute
         # "language_code"` error. Thus to avoid the error, we used ignore here.
         suggestion.change.language_code = 'invalid_code'  # type: ignore[attr-defined]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid_code'
         ):
             suggestion.validate()
@@ -1480,7 +1499,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -1506,7 +1525,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.pre_accept_validate()
 
         suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
         ):
@@ -1693,10 +1712,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
-        self.suggestion_dict = {
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',
             'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
             'target_type': feconf.ENTITY_TYPE_SKILL,
@@ -1785,7 +1804,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.score_category = 'content.score_sub_type'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the first part of score_category to be "question"'
         ):
@@ -1810,7 +1829,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change = 'invalid_change'  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected change to be an instance of QuestionSuggestionChange'
         ):
@@ -1832,7 +1851,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change.cmd = None
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain cmd'
         ):
             suggestion.validate()
@@ -1853,7 +1872,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change.cmd = 'invalid_cmd'
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected cmd to be create_new_fully_specified_question'
         ):
@@ -1880,7 +1899,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # error. Thus to avoid the error, we used ignore here.
         suggestion.change.question_dict = None  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain question_dict'
         ):
             suggestion.validate()
@@ -1936,7 +1955,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # error. Thus to avoid the error, we used ignore here.
         suggestion.change.skill_difficulty = None  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain skill_difficulty'
         ):
             suggestion.validate()
@@ -1960,7 +1979,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # "skill_id"` error. Thus to avoid the error, we used ignore here.
         suggestion.change.skill_difficulty = 0.4  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected change skill_difficulty to be one of '
         ):
@@ -1979,7 +1998,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, description='description')  # type: ignore[no-untyped-call]
+        self.save_new_skill(skill_id, self.author_id, description='description')
         # Here, change is of type QuestionSuggestionChange and all attributes
         # on QuestionSuggestionChange are created dynamically except cmd, so due
         # this MyPy is unable to recognize `skill_id` as an attribute of change
@@ -1991,7 +2010,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change.skill_id = None  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain skill_id'
         ):
             suggestion.pre_accept_validate()
@@ -2009,7 +2028,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, description='description')  # type: ignore[no-untyped-call]
+        self.save_new_skill(skill_id, self.author_id, description='description')
         # Here, change is of type QuestionSuggestionChange and all attributes
         # on QuestionSuggestionChange are created dynamically except cmd, so due
         # this MyPy is unable to recognize `skill_id` as an attribute of change
@@ -2021,7 +2040,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The skill with the given id doesn\'t exist.'
         ):
             suggestion.pre_accept_validate()
@@ -2081,7 +2100,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # error. Thus to avoid the error, we used ignore here.
         suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The skill with the given id doesn\'t exist.'
         ):
@@ -2105,7 +2124,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'new_value': 'bn',
             'old_value': 'en'
         }
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change cmd must be equal to '
             'create_new_fully_specified_question'
@@ -2137,7 +2156,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_id': 'skill_2'
         }
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change skill_id must be equal to skill_1'
         ):
@@ -2177,7 +2196,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'At least one of the new skill_difficulty or question_dict '
             'should be changed.'):
@@ -2287,7 +2306,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected author_id to be a string'):
             suggestion.validate()
 
@@ -2305,7 +2324,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected author_id to be in a valid user ID format.'):
             suggestion.validate()
@@ -2327,7 +2346,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected final_reviewer_id to be a string'):
             suggestion.validate()
 
@@ -2345,7 +2364,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected final_reviewer_id to be in a valid user ID format'):
             suggestion.validate()
@@ -2362,13 +2381,21 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
+        # Here, the value of `question_dict` key is of Union type so to narrow
+        # down the type to QuestionDict we used assert here.
+        assert isinstance(
+            expected_suggestion_dict['change']['question_dict'], dict
+        )
         expected_question_dict = (
-            expected_suggestion_dict['change']['question_dict']
+            cast(
+                question_domain.QuestionDict,
+                expected_suggestion_dict['change']['question_dict']
+            )
         )
         suggestion.validate()
 
         expected_question_dict['language_code'] = 'wrong_language_code'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected question language_code.wrong_language_code. to be same '
             'as suggestion language_code.en.'
@@ -2394,7 +2421,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.language_code = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language_code to be en, received None'):
             suggestion.validate()
@@ -2516,7 +2543,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'classifier_model_id': None
         }
 
-        suggestion_dict = {
+        suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',
             'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
             'target_type': feconf.ENTITY_TYPE_SKILL,
@@ -2540,7 +2567,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'score_category': 'question.skill1',
             'language_code': 'en',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
             suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
@@ -2576,9 +2604,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         fs_services.save_original_and_compressed_versions_of_image(
             'img.svg', image_context, 'skill1',
             raw_image, 'image', False)
-        self.save_new_skill('skill1', self.author_id, description='description')  # type: ignore[no-untyped-call]
+        self.save_new_skill('skill1', self.author_id, description='description')
 
-        suggestion_dict = {
+        suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',
             'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
             'target_type': feconf.ENTITY_TYPE_SKILL,
@@ -2602,7 +2630,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'score_category': 'question.skill1',
             'language_code': 'en',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
             suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
@@ -2729,7 +2758,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'next_content_id_index': 2
         }
-        suggestion_dict = {
+        suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',
             'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
             'target_type': feconf.ENTITY_TYPE_SKILL,
@@ -2753,9 +2782,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'score_category': 'question.skill1',
             'language_code': 'en',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill1', self.author_id, description='description')
         suggestion = suggestion_registry.SuggestionAddQuestion(
             suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
@@ -2834,7 +2864,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.assertEqual(
             change['question_dict']['question_state_data_schema_version'], 23)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected state schema version to be in between 25'
         ):
@@ -2860,20 +2890,20 @@ class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
         self.base_voiceover_application = MockInvalidVoiceoverApplication()
 
     def test_base_class_init_raises_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseVoiceoverApplication should implement '
             '__init__.'):
             suggestion_registry.BaseVoiceoverApplication()
 
     def test_base_class_accept_raises_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseVoiceoverApplication should implement accept.'):
             self.base_voiceover_application.accept('abcd')
 
     def test_base_class_reject_raises_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of BaseVoiceoverApplication should implement reject.'):
             self.base_voiceover_application.reject('abcd', 'abcd')
@@ -2885,10 +2915,10 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup('author@example.com', 'author')
-        self.author_id = self.get_user_id_from_email('author@example.com')  # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email('author@example.com')
 
         self.signup('reviewer@example.com', 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')  # type: ignore[no-untyped-call]
+        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')
 
         self.voiceover_application = (
             suggestion_registry.ExplorationVoiceoverApplication(
@@ -2900,7 +2930,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.target_type = 'invalid_target'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected target_type to be among allowed choices, '
             'received invalid_target'
@@ -2914,7 +2944,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.target_id = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             self.voiceover_application.validate()
@@ -2923,7 +2953,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.status = 'invalid_status'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected status to be among allowed choices, '
             'received invalid_status'
@@ -2937,7 +2967,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.author_id = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected author_id to be a string'
         ):
             self.voiceover_application.validate()
@@ -2955,7 +2985,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.final_reviewer_id = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected final_reviewer_id to be None as the '
             'voiceover application is not yet handled.'
@@ -2972,7 +3002,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
         ):
             self.voiceover_application.validate()
@@ -2986,7 +3016,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.final_reviewer_id = 'reviewer_id'
         self.voiceover_application.status = suggestion_models.STATUS_REJECTED
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected rejection_message to be a string for a '
             'rejected application'
@@ -3003,7 +3033,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.final_reviewer_id = 'reviewer_id'
         self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
         self.voiceover_application.rejection_message = 'Invalid message'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected rejection_message to be None for the accepted '
             'voiceover application, received Invalid message'
@@ -3020,7 +3050,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.language_code = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected language_code to be a string'
         ):
             self.voiceover_application.validate()
@@ -3032,7 +3062,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.language_code = 'invalid language'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid language'
         ):
             self.voiceover_application.validate()
@@ -3047,7 +3077,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.filename = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected filename to be a string'
         ):
             self.voiceover_application.validate()
@@ -3060,7 +3090,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.content = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected content to be a string'
         ):
             self.voiceover_application.validate()
@@ -3526,7 +3556,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code, self.negative_count)
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the translation reviewer count to be non-negative for '
             '%s language code, received: %s.' % (
@@ -3546,7 +3576,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code, self.negative_count)
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the translation suggestion count to be non-negative for '
             '%s language code, received: %s.' % (
@@ -3564,7 +3594,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.negative_count
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the question reviewer count to be non-negative, '
             'received: %s.' % (
@@ -3582,7 +3612,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.negative_count
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the question suggestion count to be non-negative, '
             'received: %s.' % (
@@ -3605,7 +3635,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code, self.non_integer_count)  # type: ignore[arg-type]
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the translation reviewer count to be an integer for '
             '%s language code, received: %s.' % (
@@ -3628,7 +3658,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code, self.non_integer_count)  # type: ignore[arg-type]
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the translation suggestion count to be an integer for '
             '%s language code, received: %s.' % (
@@ -3649,7 +3679,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.non_integer_count  # type: ignore[assignment]
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the question reviewer count to be an integer, '
             'received: %s.' % (
@@ -3670,7 +3700,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.non_integer_count  # type: ignore[assignment]
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected the question suggestion count to be an integer, '
             'received: %s.' % (
@@ -3690,7 +3720,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.invalid_language_code, 1)
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid language code for the translation reviewer counts: '
             '%s.' % self.invalid_language_code
@@ -3709,7 +3739,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.invalid_language_code, 1)
         )
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid language code for the translation suggestion counts: '
             '%s.' % self.invalid_language_code

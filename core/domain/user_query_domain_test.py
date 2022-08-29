@@ -56,7 +56,7 @@ class UserQueryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL) # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.user_query_params = user_query_domain.UserQueryParams(
             inactive_in_last_n_days=20
         )
@@ -75,14 +75,14 @@ class UserQueryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.user_query.submitter_id = 'aaabbc'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected submitter ID to be a valid user ID'
         ):
             self.user_query.validate()
 
     def test_validate_query_with_invalid_status_raises(self) -> None:
         self.user_query.status = 'a'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid status: a'
         ):
             self.user_query.validate()
@@ -91,7 +91,7 @@ class UserQueryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.user_query.user_ids = ['aaa']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected user ID in user_ids to be a valid user ID'
         ):

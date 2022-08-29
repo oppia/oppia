@@ -32,7 +32,7 @@ import { CreateLearnerGroupPageComponent } from
 import { LearnerGroupDetailsComponent } from
   './learner-group-details.component';
 import { AddSyllabusItemsComponent } from './add-syllabus-items.component';
-import { InviteStudentsComponent } from './invite-students.component';
+import { InviteLearnersComponent } from './invite-learners.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
@@ -53,13 +53,13 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     CreateLearnerGroupPageComponent,
     LearnerGroupDetailsComponent,
     AddSyllabusItemsComponent,
-    InviteStudentsComponent
+    InviteLearnersComponent
   ],
   entryComponents: [
     CreateLearnerGroupPageComponent,
     LearnerGroupDetailsComponent,
     AddSyllabusItemsComponent,
-    InviteStudentsComponent
+    InviteLearnersComponent
   ],
   providers: [
     {

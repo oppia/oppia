@@ -25,6 +25,7 @@ from core import feconf
 from core import schema_utils
 from core import utils
 from core.constants import constants
+from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
@@ -34,7 +35,9 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
-from typing import Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import (
+    Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
+)
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -2303,7 +2306,9 @@ def send_not_mergeable_change_list_to_admin_for_review(
     exp_id: str,
     frontend_version: int,
     backend_version: int,
-    change_list_dict: Dict[str, str]
+    change_list_dict: Sequence[
+        Mapping[str, change_domain.AcceptableChangeDictTypes]
+    ]
 ) -> None:
     """Sends an email to the admin to review the not mergeable change list
     to improve the functionality in future if possible.

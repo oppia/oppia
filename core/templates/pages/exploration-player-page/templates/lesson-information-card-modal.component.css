@@ -37,6 +37,7 @@
 .oppia-close-popover-button {
   outline: none;
   padding: 0;
+  position: absolute;
   right: 0;
   top: 0;
 }
@@ -280,6 +281,12 @@
   text-align: center;
   width: 25px;
   z-index: 0;
+}
+
+.oppia-lesson-info-card .checkpoint-message-text {
+  font-weight: 800;
+  margin-top: 20px;
+  text-align: center;
 }
 
 .oppia-lesson-info-card .save-progress-btn-container {
