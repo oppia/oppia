@@ -354,7 +354,8 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'Review')
 }
 
-CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION: Dict[str, Dict[str, str]] = {
+CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION: Dict[
+    str, Dict[str, Dict[str, str]]] = {
     feconf.CONTRIBUTION_TYPE_TRANSLATION: {
         feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE: {
             'email_body_template': (
