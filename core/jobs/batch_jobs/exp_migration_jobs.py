@@ -546,7 +546,7 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
                 if exp_services.get_story_id_linked_to_exploration(
                     exp_id
                 ) is not None:
-                    exp_services.validate_exploration_for_story( # type: ignore[no-untyped-call]
+                    exp_services.validate_exploration_for_story(
                         exploration, True)
 
         except Exception as e:
