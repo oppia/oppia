@@ -932,7 +932,7 @@ export class ConversationSkinComponent {
                     topic_url_fragment: topicUrlFragment,
                     classroom_url_fragment: classroomUrlFragment,
                     story_url_fragment: storyUrlFragment
-                  });
+                  }) as unknown as Location;
             }
             this.learnerDashboardBackendApiService
               .fetchLearnerCompletedChaptersCountDataAsync().then(

@@ -20,7 +20,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient, HttpXhrBackend } from '@angular/common/http';
+import { HttpClient, HttpXhrBackend,
+  // eslint-disable-next-line camelcase, oppia/disallow-flags
+  ɵangular_packages_common_http_http_d
+} from '@angular/common/http';
 
 
 import { AdminBackendApiService } from
@@ -495,15 +498,9 @@ import { SolutionVerificationService } from
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { QuestionValidationService } from './question-validation.service';
 import { MathInteractionsService } from './math-interactions.service';
-import { XhrFactory } from '@angular/common';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
-}
-export class BrowserXhr implements XhrFactory {
-  build(): XMLHttpRequest {
-    return new XMLHttpRequest();
-  }
 }
 @Injectable({
   providedIn: 'root'
@@ -642,8 +639,8 @@ export class UpgradedServices {
       new WrittenTranslationObjectFactory();
     upgradedServices['baseInteractionValidationService'] =
       new baseInteractionValidationService();
-    upgradedServices['BrowserXhr'] =
-      new BrowserXhr();
+    upgradedServices['ɵangular_packages_common_http_http_d'] =
+      new ɵangular_packages_common_http_http_d();
 
     // Topological level: 1.
     upgradedServices['AlgebraicExpressionInputValidationService'] =
@@ -694,7 +691,7 @@ export class UpgradedServices {
     upgradedServices['HtmlEscaperService'] = new HtmlEscaperService(
       upgradedServices['LoggerService']);
     upgradedServices['HttpXhrBackend'] = new HttpXhrBackend(
-      upgradedServices['BrowserXhr']);
+      upgradedServices['ɵangular_packages_common_http_http_d']);
     upgradedServices['ImageClickInputValidationService'] =
       new ImageClickInputValidationService(
         upgradedServices['baseInteractionValidationService']);

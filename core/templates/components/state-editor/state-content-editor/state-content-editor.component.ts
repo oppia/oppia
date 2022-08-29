@@ -62,7 +62,7 @@ export class StateContentEditorComponent implements OnInit {
     private contextService: ContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private externalSaveService: ExternalSaveService,
-    protected stateContentService: StateContentService,
+    public stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
     private editabilityService: EditabilityService
   ) {}

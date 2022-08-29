@@ -417,7 +417,7 @@ def managed_webpack_compiler(
         compiler_args.insert(1, '--max-old-space-size=%d' % max_old_space_size)
     if watch_mode:
         compiler_args.extend(['--color', '--watch', '--progress'])
-
+    print(compiler_args)
     with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.

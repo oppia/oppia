@@ -176,7 +176,7 @@ export class RatingsAndRecommendationsComponent {
   signIn(): void {
     this.userService.getLoginUrlAsync().then((loginUrl) => {
       if (loginUrl) {
-        this.windowRef.nativeWindow.location = loginUrl;
+        this.windowRef.nativeWindow.location = loginUrl as unknown as Location;
       } else {
         this.windowRef.nativeWindow.location.reload();
       }

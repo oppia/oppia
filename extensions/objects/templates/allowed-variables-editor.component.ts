@@ -63,7 +63,8 @@ export class AllowedVariablesEditorComponent implements OnInit {
 
   alwaysEditable = true;
   lettersAreLowercase = true;
-  currentTab: typeof this.latinTab | typeof this.greekTab = this.latinTab;
+  // eslint-disable-next-line max-len
+  currentTab: typeof AppConstants.CUSTOM_LETTERS_LATIN_TAB | typeof AppConstants.CUSTOM_LETTERS_GREEK_TAB = this.latinTab;
 
   constructor(
     private guppyInitializationService: GuppyInitializationService,

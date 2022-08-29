@@ -72,6 +72,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   @Output() updateLearnerGroupSubtopics:
     EventEmitter<LearnerGroupSubtopicSummary[]> = new EventEmitter();
 
+  enableDropup = false;
   storySummaries: StorySummary[] = [];
   subtopicSummaries: LearnerGroupSubtopicSummary[] = [];
   searchBarPlaceholder!: string;
@@ -183,6 +184,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         this.selectionDetails[itemsType].summary
       );
     }
+  }
+
+  onMenuKeypress(...args: unknown[]): void {
+    return;
   }
 
   searchDropdownCategories(): SearchDropDownItems[] {

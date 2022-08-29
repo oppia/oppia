@@ -3,14 +3,14 @@
     <span translate="I18N_ADD_SYLLABUS_DESCRIPTION_TEXT"></span>
   </div>
   <div class="added-syllabus-container">
-    <div class="added-syllabus-item-card" *ngFor="let storySummary of syllabusStorySummaries; trackBy: index">
+    <div class="added-syllabus-item-card" *ngFor="let storySummary of syllabusStorySummaries">
       <div class="syllabus-item-image" [ngStyle]="{'background-color': storySummary.getThumbnailBgColor()}">
         <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
       </div>
       <div class="syllabus-item-title">{{ storySummary.getTitle() }}</div>
       <span class="remove-syllabus" (click)="removeStoryFromSyllabus(storySummary.getId())"></span>
     </div>
-    <div class="added-syllabus-item-card" *ngFor="let subtopicSummary of syllabusSubtopicSummaries; trackBy: index">
+    <div class="added-syllabus-item-card" *ngFor="let subtopicSummary of syllabusSubtopicSummaries">
       <div class="syllabus-item-image" [ngStyle]="{'background-color': subtopicSummary.thumbnailBgColor}">
         <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">
       </div>
@@ -54,7 +54,7 @@
         <ul ngbDropdownMenu
             class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
             role="menu">
-          <ng-container *ngFor="let item of selectionDetails.types.masterList; trackBy: index">
+          <ng-container *ngFor="let item of selectionDetails.types.masterList">
             <li ngbDropdownItem>
               <a (click)="toggleSelection('types', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
@@ -89,7 +89,7 @@
         <ul ngbDropdownMenu
             class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
             role="menu">
-          <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
+          <ng-container *ngFor="let item of selectionDetails.categories.masterList">
             <li ngbDropdownItem>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
@@ -123,7 +123,7 @@
         </button>
         <ul ngbDropdownMenu class="oppia-search-bar-dropdown-menu-section dropdown-menu"
             role="menu">
-          <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList trackBy: index">
+          <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
             <li ngbDropdownItem>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
@@ -146,7 +146,7 @@
   </div>
   <div class="filtered-syllabus-items-container">
     <div *ngIf="!isSearchInProgress() && storySummaries.length > 0">
-      <div class="syllabus-item-card" *ngFor="let storySummary of storySummaries; trackBy: index">
+      <div class="syllabus-item-card" *ngFor="let storySummary of storySummaries">
         <div class="syllabus-item-image-title-container">
           <div class="syllabus-item-image" [ngStyle]="{'background-color': storySummary.getThumbnailBgColor()}">
             <img class="thumbnail-image syllabus-item-image" [src]="getStoryThumbnailUrl(storySummary)">
@@ -174,7 +174,7 @@
       </div>
     </div>
     <div *ngIf="!isSearchInProgress() && subtopicSummaries.length > 0">
-      <div class="syllabus-item-card" *ngFor="let subtopicSummary of subtopicSummaries; trackBy: index">
+      <div class="syllabus-item-card" *ngFor="let subtopicSummary of subtopicSummaries">
         <div class="syllabus-item-image-title-container">
           <div class="syllabus-item-image" [ngStyle]="{'background-color': subtopicSummary.thumbnailBgColor}">
             <img class="thumbnail-image syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummary)">

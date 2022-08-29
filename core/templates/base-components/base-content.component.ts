@@ -31,9 +31,7 @@ import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { NavigationEnd, Router } from '@angular/router';
-
 import './base-content.component.css';
-
 
 @Component({
   selector: 'oppia-base-content',

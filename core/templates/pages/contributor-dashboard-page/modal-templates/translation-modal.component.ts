@@ -131,7 +131,7 @@ export class TranslationModalComponent {
   ];
 
   constructor(
-    protected readonly activeModal: NgbActiveModal,
+    public readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
     private readonly contextService: ContextService,

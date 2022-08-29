@@ -17,7 +17,7 @@
  */
 
 const loaderUtils = require('loader-utils');
-const path = require('path');
+var path = require('path');
 
 const objExtend = function(args, obj) {
   args = Array.prototype.slice.call(args);

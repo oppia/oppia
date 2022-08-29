@@ -18,14 +18,12 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-
 import './social-buttons.component.css';
 
 
 @Component({
   selector: 'oppia-social-buttons',
-  templateUrl: './social-buttons.component.html',
-  styleUrls: []
+  templateUrl: './social-buttons.component.html'
 })
 export class SocialButtonsComponent {}
 

@@ -58,7 +58,7 @@ export class StateSkillEditorComponent implements OnInit {
     private storyEditorStateService: StoryEditorStateService,
     private alertsService: AlertsService,
     private windowDimensionsService: WindowDimensionsService,
-    protected stateLinkedSkillIdService: StateLinkedSkillIdService,
+    public stateLinkedSkillIdService: StateLinkedSkillIdService,
     private urlInterpolationService: UrlInterpolationService,
     private ngbModal: NgbModal,
     private skillBackendApiService: SkillBackendApiService,

@@ -52,7 +52,7 @@ export class SolutionEditor implements OnInit {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
-    protected stateSolutionService: StateSolutionService,
+    public stateSolutionService: StateSolutionService,
   ) {}
 
   getAnswerHtml(): string {

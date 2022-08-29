@@ -8,7 +8,7 @@
   <p>
     <span *ngIf="!isTopicPublished">(Optional)</span>
     Please enter a brief description of what you have changed:
-    <textarea rows="3" cols="50" [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" (focus)="saveChangesModalOpened" class="e2e-test-commit-message-input" autofocus></textarea>
+    <textarea rows="3" cols="50" [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" class="e2e-test-commit-message-input" autofocus></textarea>
   </p>
 </div>
 <div class="modal-footer">
