@@ -19,12 +19,24 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
-import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { ExplorationMetadata, ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StateObjectsDict, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
+import { ExplorationDiffService, StateData, StateLink } from 'pages/exploration-editor-page/services/exploration-diff.service';
 import { VersionTreeService } from './version-tree.service';
+
+interface CompareVersionData {
+  nodes: StateData;
+  links: StateLink[];
+  finalStateIds: string[];
+  v1InitStateId: number;
+  v2InitStateId: number;
+  v1States: StateObjectsDict;
+  v2States: StateObjectsDict;
+  v1Metadata: ExplorationMetadata;
+  v2Metadata: ExplorationMetadata;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -97,7 +109,7 @@ export class CompareVersionsService {
    * Should be called after this.versionTreeService.init() is called.
    * Should satisfy v1 < v2.
    */
-  getDiffGraphData(v1: number, v2: number): object {
+  getDiffGraphData(v1: number, v2: number): Promise<CompareVersionData> {
     if (v1 > v2) {
       throw new Error('Tried to compare v1 > v2.');
     }

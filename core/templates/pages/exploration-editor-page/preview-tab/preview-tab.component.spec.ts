@@ -46,15 +46,14 @@ class MockNgbModalRef {
 }
 
 class MockNgbModal {
-  open() {
+  open(): object {
     return {
       result: Promise.resolve()
     };
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Preview Tab Component', () => {
+describe('Preview Tab Component', () => {
   let component: PreviewTabComponent;
   let fixture: ComponentFixture<PreviewTabComponent>;
   let ngbModal: NgbModal;
