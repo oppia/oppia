@@ -233,7 +233,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         for state_name, state in states_dict.items():
             if state.interaction.id != 'DragAndDropSortInput':
                 continue
-            multi_item_value = (
+            multi_item_value = bool(
                 state.interaction.customization_args
                 ['allowMultipleItemsInSamePosition'].value
             )
@@ -292,7 +292,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             if state.interaction.id != 'Continue':
                 continue
             text_value = (
-                state.interaction.customization_args
+                state.interaction.customization_args # type: ignore[union-attr]
                 ['buttonText'].value.unicode_str
             )
             if len(text_value) > 20:
@@ -375,7 +375,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
             _, invalid_choices_content_ids = (
                 ExpAuditRuleChecksJob.
-                _get_invalid_choices_indexes(choices)
+                _get_invalid_choices_indexes(choices) # type: ignore[arg-type]
             )
 
             invalid_ans_groups = []
@@ -1045,7 +1045,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 state.interaction.customization_args['choices'].value)
             invalid_choices_index, _ = (
                 ExpAuditRuleChecksJob.
-                _get_invalid_choices_indexes(choices)
+                _get_invalid_choices_indexes(choices) # type: ignore[arg-type]
             )
 
             invalid_ans_groups = []
