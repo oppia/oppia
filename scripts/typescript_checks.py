@@ -392,7 +392,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.ts',
-    'core/templates/pages/exploration-player-page/exploration-player-page.import.ts',
     'core/templates/pages/exploration-player-page/layout-directives/content-language-selector.component.spec.ts',
     'core/templates/pages/exploration-player-page/layout-directives/content-language-selector.component.ts',
     'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts',
