@@ -364,7 +364,7 @@ class BlogPostSummaryDomainSearchDict(TypedDict):
     id: str
     title: str
     tags: List[str]
-    author_username: str | None
+    author_username: Optional[str]
     rank: int
 
 

@@ -887,7 +887,7 @@ def get_blog_post_ids_matching_query(
             search_offset: int. Search offset for future fetches.
     """
     returned_blog_post_ids: list[str] = []
-    search_offset: int | None = offset
+    search_offset: Optional[int] = offset
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = (
