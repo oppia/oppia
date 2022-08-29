@@ -635,7 +635,7 @@ def _generate_entity_to_pseudonymized_ids_mapping(
 
 def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    entity_category: models.NAMES,
+    entity_category: models.Names,
     entity_ids: List[str]
 ) -> None:
     """Generate mapping from entity IDs to a single pseudonymized user ID.
@@ -663,7 +663,7 @@ def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
 
 def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    entity_category: models.NAMES,
+    entity_category: models.Names,
     entity_ids: List[str]
 ) -> None:
     """Save the entity mappings for some entity category into the pending
@@ -687,7 +687,7 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         save_pending_deletion_requests([pending_deletion_request])
 
 
-def _delete_models(user_id: str, module_name: models.NAMES) -> None:
+def _delete_models(user_id: str, module_name: models.Names) -> None:
     """Delete all the models from the given module, for a given user.
 
     Args:
@@ -706,7 +706,7 @@ def _delete_models(user_id: str, module_name: models.NAMES) -> None:
 # because we do not have commit_log_model classes for config_model classes.
 def _collect_and_save_entity_ids_from_snapshots_and_commits(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    activity_category: models.NAMES,
+    activity_category: models.Names,
     snapshot_metadata_model_classes: List[
         Type[base_models.BaseSnapshotMetadataModel]
     ],
@@ -858,7 +858,7 @@ def _pseudonymize_config_models(
 
 def _pseudonymize_activity_models_without_associated_rights_models(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    activity_category: models.NAMES,
+    activity_category: models.Names,
     snapshot_model_class: Type[base_models.BaseSnapshotMetadataModel],
     commit_log_model_class: Type[base_models.BaseCommitLogEntryModel],
     commit_log_model_field_name: str
@@ -954,7 +954,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
 
 def _pseudonymize_activity_models_with_associated_rights_models(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
-    activity_category: models.NAMES,
+    activity_category: models.Names,
     snapshot_metadata_model_class: Type[base_models.BaseSnapshotMetadataModel],
     rights_snapshot_metadata_model_class: Type[
         base_models.BaseSnapshotMetadataModel
