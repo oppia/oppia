@@ -141,10 +141,10 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
         return exp_recommendation_model
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
     """DoFn to compute similarities between exploration."""
 

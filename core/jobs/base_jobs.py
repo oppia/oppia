@@ -75,6 +75,9 @@ class JobMetaclass(type):
 
     _JOB_REGISTRY: Dict[str, Type[JobBase]] = {}
 
+    # Here we use type Any because argument 'namespace' can accept methods,
+    # functions, and attributes of a class and these can be of any type. So,
+    # to allow every method, function, and attribute, we used Any here.
     def __new__(
             cls: Type[JobMetaclass],
             name: str,
@@ -115,6 +118,10 @@ class JobMetaclass(type):
 
         job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
 
+        # Here we use cast because the return value of '__new__' method
+        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
+        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
+        # cast here.
         if name == 'JobBase':
             return cast(JobMetaclass, job_cls)
 
@@ -128,6 +135,10 @@ class JobMetaclass(type):
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
+        # Here we use cast because the return value of '__new__' method
+        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
+        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
+        # cast here.
         return cast(JobMetaclass, job_cls)
 
     @classmethod

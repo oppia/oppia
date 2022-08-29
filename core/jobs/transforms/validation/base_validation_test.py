@@ -345,9 +345,8 @@ class MockValidateModelDomainObjectInstancesWithInvalid(
         """
         return MockDomainObject()
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's _get_domain_object_validation_type
-    # method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's _get_domain_object_validation_type method.
     def _get_domain_object_validation_type(  # type: ignore[override]
         self, _: base_models.BaseModel
     ) -> str:
@@ -537,7 +536,7 @@ class MockValidateCommitCmdsSchema(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with super class's process() method.
     def process(  # type: ignore[override]
         self, input_model: base_models.BaseModel
@@ -553,8 +552,8 @@ class MockValidateCommitCmdsSchemaChangeDomain(
     base_validation.BaseValidateCommitCmdsSchema[base_models.BaseModel]
 ):
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's `_get_change_domain_class()` method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's `_get_change_domain_class()` method.
     def _get_change_domain_class(self, _: base_models.BaseModel) -> None:  # type: ignore[override]
         """Method defined for testing purpose."""
         pass

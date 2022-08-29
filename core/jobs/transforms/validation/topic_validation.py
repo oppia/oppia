@@ -37,10 +37,10 @@ if MYPY: # pragma: no cover
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-# TODO(#15613): Due to incomplete typing of apache_beam library and absences
-# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
-# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
-# ignore here.
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(topic_models.TopicModel)
 class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate canonical name matching with lower case name."""
@@ -122,8 +122,8 @@ class ValidateTopicCommitLogEntryModel(
     """Overrides _get_change_domain_class for TopicCommitLogEntryModel.
     """
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with super class's _get_change_domain_class() method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with super class's _get_change_domain_class() method.
     def _get_change_domain_class(  # type: ignore[override]
         self, input_model: topic_models.TopicCommitLogEntryModel
     ) -> Optional[
