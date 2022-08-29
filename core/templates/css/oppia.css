@@ -1420,11 +1420,19 @@ span.sort-explorations-select .sort-order {
   }
 }
 
-.oppia-save-publish-loading.oppia-save-publish-button-icon {
+.oppia-save-publish-loading {
   font-size: 30px;
   font-style: normal;
   letter-spacing: -4px;
   line-height: 14px;
+  text-align: center;
+}
+
+.oppia-save-publish-button-icon {
+  font-size: 16px;
+  font-style: normal;
+  letter-spacing: 2px;
+  line-height: 19px;
   text-align: center;
 }
 
@@ -1822,7 +1830,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-editor-edit-icon {
-  font-size: 16px;
+  font-size: 12px;
   opacity: 0.2;
   position: absolute;
   right: -22px;
@@ -2451,6 +2459,7 @@ div#ng-curtain {
 
 .oppia-navbar-back-button {
   color: white;
+  font-size: 20px;
   padding: 6px;
 }
 

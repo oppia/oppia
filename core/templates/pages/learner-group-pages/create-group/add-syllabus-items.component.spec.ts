@@ -59,23 +59,6 @@ class MockTranslateService {
 }
 
 class MockNavigationService {
-  KEYBOARD_EVENT_TO_KEY_CODES = {
-    enter: {
-      shiftKeyIsPressed: false,
-      keyCode: 13
-    },
-    tab: {
-      shiftKeyIsPressed: false,
-      keyCode: 9
-    },
-    shiftTab: {
-      shiftKeyIsPressed: true,
-      keyCode: 9
-    }
-  };
-
-  onMenuKeypress(): void {}
-
   openSubmenu(evt: KeyboardEvent, menuName: string): void {}
 
   ACTION_OPEN: string = 'open';
@@ -435,18 +418,18 @@ describe('AddSyllabusItemsComponent', () => {
     expect(component.syllabusSubtopicSummaries).toEqual([]);
   });
 
-  it('should check if a subtopic is part of the syllabus', () => {
+  it('should check if a subtopic is part of the added syllabus', () => {
     component.syllabusSubtopicPageIds = ['topicId1:1', 'topicId2:3'];
 
-    expect(component.isSubtopicPartOfSyllabus('topicId1:1')).toBe(true);
-    expect(component.isSubtopicPartOfSyllabus('topicId2:3')).toBe(true);
-    expect(component.isSubtopicPartOfSyllabus('topicId3:4')).toBe(false);
+    expect(component.isSubtopicPartOfAddedSyllabus('topicId1:1')).toBe(true);
+    expect(component.isSubtopicPartOfAddedSyllabus('topicId2:3')).toBe(true);
+    expect(component.isSubtopicPartOfAddedSyllabus('topicId3:4')).toBe(false);
   });
 
-  it('should check if a story is part of the syllabus', () => {
+  it('should check if a story is part of the added syllabus', () => {
     component.syllabusStoryIds = ['story_id_0'];
 
-    expect(component.isStoryPartOfSyllabus('story_id_0')).toBe(true);
-    expect(component.isStoryPartOfSyllabus('story_id_1')).toBe(false);
+    expect(component.isStoryPartOfAddedSyllabus('story_id_0')).toBe(true);
+    expect(component.isStoryPartOfAddedSyllabus('story_id_1')).toBe(false);
   });
 });

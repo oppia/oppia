@@ -24,6 +24,8 @@ import json
 from core import schema_utils
 from core.constants import constants
 
+from typing import Any, Dict
+
 
 class BaseObject:
     """Base object class.
@@ -59,6 +61,21 @@ class BaseObject:
             TypeError. The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.get_schema())
+
+    # Here we used Any type because get_schema() returns a schema dictionary and
+    # values in a schema dictionary can be of type str, List, Dict and other
+    # types too.
+    @classmethod
+    def get_schema(cls) -> Dict[str, Any]:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_schema() method is missing from the derived class. It '
+            'should be implemented in the derived class.')
 
 
 class Boolean(BaseObject):
