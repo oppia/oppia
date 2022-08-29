@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import math
-
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -273,8 +271,8 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
 
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.blog_post_a = blog_services.create_new_blog_post(self.user_id_a)
         self.blog_post_b = blog_services.create_new_blog_post(self.user_id_b)
@@ -359,7 +357,7 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 index, search_services.SEARCH_INDEX_BLOG_POSTS)
 
-        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)  # type: ignore[no-untyped-call]
+        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
         delete_docs_swap = self.swap(
             gae_search_services, 'delete_documents_from_index',
@@ -389,4 +387,3 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
         result = search_services.search_blog_post_summaries(
             'title', [], 2)[0]
         self.assertEqual(result, [self.blog_post_b_id])
-

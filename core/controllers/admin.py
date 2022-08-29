@@ -27,7 +27,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
-from core.domain import search_services
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain

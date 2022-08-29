@@ -23,7 +23,6 @@ import logging
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import search_services
 from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain

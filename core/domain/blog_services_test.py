@@ -25,8 +25,8 @@ import math
 from core import feconf
 from core import utils
 from core.domain import blog_domain
-from core.domain import search_services
 from core.domain import blog_services
+from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -582,7 +582,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(tags.sort(), expected_blog_post_tags.sort())
             return ids
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index) # type: ignore[no-untyped-call]
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
             search_services,
             'add_documents_to_index',
@@ -636,7 +636,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(index, blog_services.SEARCH_INDEX_BLOG_POSTS)
             actual_docs.extend(docs)
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index) # type: ignore[no-untyped-call]
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
             search_services,
             'add_documents_to_index',
@@ -703,8 +703,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         # Setup the blog posts to fit into different tags groups.
         # Also, ensure 2 of them have similar titles and are written by 2

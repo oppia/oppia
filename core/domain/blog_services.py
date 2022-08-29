@@ -25,9 +25,9 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_domain
-from core.domain import search_services
 from core.domain import html_cleaner
 from core.domain import role_services
+from core.domain import search_services
 from core.domain import user_domain
 from core.platform import models
 
@@ -891,7 +891,7 @@ def get_blog_post_ids_matching_query(
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = (
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE - 
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE -
             len(returned_blog_post_ids)
         )
 
@@ -909,7 +909,7 @@ def get_blog_post_ids_matching_query(
 
         if (
             (
-                len(returned_blog_post_ids) == 
+                len(returned_blog_post_ids) ==
                 feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
             ) or search_offset is None
         ):
@@ -921,7 +921,7 @@ def get_blog_post_ids_matching_query(
 
     if (
         (
-            len(returned_blog_post_ids) < 
+            len(returned_blog_post_ids) <
             feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
         ) and search_offset is not None
     ):

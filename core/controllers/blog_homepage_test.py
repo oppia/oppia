@@ -370,9 +370,9 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
                 self.assertEqual(len(logs), 1)
                 self.assertEqual(
                     logs[0],
-                    '2 blog post summaries were fetched to load the search/filter '
-                    'by result page. You may be running up against the default '
-                    'query limits.\nNoneType: None')
+                    '2 blog post summaries were fetched to load the search'
+                    '/filter by result page. You may be running up against the '
+                    'default query limits.\nNoneType: None')
                 self.assertEqual(len(response_dict['summary_dicts']), 2)
                 self.assertEqual(response_dict['search_offset'], 2)
 

@@ -49,7 +49,6 @@ def _fetch_response_from_elastic_search(
     query_definition: Dict[str, Any],
     index_name: str,
     offset: int,
-    num_docs_to_fetch: int,
     size: int,
     ids_only: bool
 ) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[int]]:
@@ -61,13 +60,9 @@ def _fetch_response_from_elastic_search(
     This function also creates the index if it does not exist yet.
 
     Args:
-        query_string: str. The terms that the user is searching for.
+        query_definition: dict(str, any). The Query DSL object.
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
-        tags: list(str). The list of tags to query for. If it is
-            empty, no tag filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
-            of these tags.
         offset: int|None. The offset into the index. Pass this in to start at
             the 'offset' when searching through a list of results of max length
             'size'. Leave as None to start at the beginning.
@@ -86,6 +81,9 @@ def _fetch_response_from_elastic_search(
                 section of the results. Returns None if there are no more
                 results.
     """
+    # Fetch (size + 1) results in order to decide whether a "next
+    # page" offset needs to be returned.
+    num_docs_to_fetch = size + 1
     try:
         response = ES.search(
             body=query_definition, index=index_name,
@@ -115,6 +113,7 @@ def _fetch_response_from_elastic_search(
         # attribute '_id' which contains the document id.
         result_docs = [doc['_source'] for doc in matched_search_docs]
     return result_docs, resulting_offset
+
 
 def _create_index(index_name: str) -> None:
     """Creates a new index.
@@ -264,12 +263,12 @@ def search(
     if offset is None:
         offset = 0
 
-    # Convert the query into a Query DSL object. See
+    # Convert the query into a . See
     # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
     # for more details about Query DSL.
-    # In the type annotation below Dict[str, Any] is used for query_definiton
-    # because the query_definition is a dictionary having values of various
-    # types.
+    # In the type annotation below Dict[str, Any] is usQuery DSL objected for
+    # query_definiton because the query_definition is a dictionary having values
+    # of various types.
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
@@ -305,14 +304,11 @@ def search(
             {'match': {'language_code': language_code_string}}
         )
 
-    # Fetch (size + 1) results in order to decide whether a "next
-    # page" offset needs to be returned.
-    num_docs_to_fetch = size + 1
-
     result_docs, resulting_offset = _fetch_response_from_elastic_search(
-        query_definition, index_name, offset, num_docs_to_fetch, size, ids_only)
+        query_definition, index_name, offset, size, ids_only)
 
     return result_docs, resulting_offset
+
 
 # In the type annotation below Dict[str, Any] is used in return type because
 # it returns the list of documents and document dictionaries can have
@@ -390,11 +386,8 @@ def blog_post_summaries_search(
             query_definition['query']['bool']['filter'].append(
                 {'match': {'tags': tag}}
             )
-    # Fetch (size + 1) results in order to decide whether a "next
-    # page" offset needs to be returned.
-    num_docs_to_fetch = size + 1
 
     result_docs, resulting_offset = _fetch_response_from_elastic_search(
-        query_definition, index_name, offset, num_docs_to_fetch, size, ids_only)
+        query_definition, index_name, offset, size, ids_only)
 
     return result_docs, resulting_offset
