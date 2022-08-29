@@ -80,9 +80,9 @@ class SubtopicPageChange(change_domain.BaseChange):
 
 
 AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
-    state_domain.SubtitledHtml,
-    state_domain.RecordedVoiceovers,
-    state_domain.WrittenTranslations
+    state_domain.SubtitledHtmlDict,
+    state_domain.RecordedVoiceoversDict,
+    state_domain.WrittenTranslationsDict
 ]
 
 

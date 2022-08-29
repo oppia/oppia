@@ -31,7 +31,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 
-from typing import List, Optional
+from typing import List, Optional, Union
 from typing_extensions import TypedDict
 
 # The fs_services module is required in one of the migration
@@ -292,6 +292,184 @@ class TopicChange(change_domain.BaseChange):
     }]
 
 
+class CreateNewTopicCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_CREATE_NEW command.
+    """
+
+    name: str
+
+
+class AddSubtopicCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_ADD_SUBTOPIC command.
+    """
+
+    title: str
+    subtopic_id: str
+    url_fragment: str
+
+
+class DeleteSubtopicCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_DELETE_SUBTOPIC command.
+    """
+
+    subtopic_id: str
+
+
+class AddCanonicalStoryCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_ADD_CANONICAL_STORY command.
+    """
+
+    story_id: str
+
+
+class DeleteCanonicalStoryCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_DELETE_CANONICAL_STORY command.
+    """
+
+    story_id: str
+
+
+class RearrangeCanonicalStoryCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_REARRANGE_CANONICAL_STORY command.
+    """
+
+    from_index: int
+    to_index: int
+
+
+class AddAdditionalStoryCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_ADD_ADDITIONAL_STORY command.
+    """
+
+    story_id: str
+
+
+class DeleteAdditionalStoryCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_DELETE_ADDITIONAL_STORY command.
+    """
+
+    story_id: str
+
+
+class PublishStoryCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_PUBLISH_STORY command.
+    """
+
+    story_id: str
+
+
+class UnpublishStoryCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_UNPUBLISH_STORY command.
+    """
+
+    story_id: str
+
+
+class AddUncategorizedSkillIdCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_ADD_UNCATEGORIZED_SKILL_ID command.
+    """
+
+    new_uncategorized_skill_id: str
+
+
+class RemoveUncategorizedSkillIdCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_REMOVE_UNCATEGORIZED_SKILL_ID command.
+    """
+
+    uncategorized_skill_id: str
+
+
+class MoveSkillIdToSubtopicCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_MOVE_SKILL_ID_TO_SUBTOPIC command.
+    """
+
+    old_subtopic_id: str
+    new_subtopic_id: str
+    skill_id: str
+
+
+class RearrangeSkillInSubtopicCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_REARRANGE_SKILL_IN_SUBTOPIC command.
+    """
+
+    subtopic_id: str
+    from_index: int
+    to_index: int
+
+
+class RearrangeSubtopicCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_REARRANGE_SUBTOPIC command.
+    """
+
+    from_index: int
+    to_index: int
+
+
+class RemoveSkillIdFromSubtopicCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC command.
+    """
+
+    subtopic_id: str
+    skill_id: str
+
+
+class UpdateSubtopicPropertyCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_UPDATE_SUBTOPIC_PROPERTY command.
+    """
+
+    subtopic_id: str
+    property_name: str
+    new_value: str
+    old_value: str
+
+
+class UpdateSubtopicPagePropertyCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command.
+    """
+
+    subtopic_id: int
+    property_name: str
+    new_value: subtopic_page_domain.AllowedUpdateSubtopicPagePropertyCmdTypes
+    old_value: subtopic_page_domain.AllowedUpdateSubtopicPagePropertyCmdTypes
+
+
+class UpdateTopicPropertyCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: Union[str, List[str], bool, List[StoryReference]]
+    old_value: Union[str, List[str], bool, List[StoryReference]]
+
+
+class MigrateSubtopicSchemaToLatestVersionCmd(TopicChange):
+    """class representing the TopicChange's
+    CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: int
+    to_version: int
+
+
 class TopicRightsChange(change_domain.BaseChange):
     """Domain object for changes made to a topic rights object.
 
@@ -303,6 +481,56 @@ class TopicRightsChange(change_domain.BaseChange):
     """
 
     ALLOWED_COMMANDS = feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
+
+
+class CreateNewTopicRightsCmd(TopicRightsChange):
+    """class representing the TopicRightsChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class ChangeRoleTopicRightsCmd(TopicRightsChange):
+    """class representing the TopicRightsChange's
+    CMD_CHANGE_ROLE command.
+    """
+
+    assignee_id: str
+    new_value: str
+    old_value: str
+
+
+class RemoveManagerRoleCmd(TopicRightsChange):
+    """class representing the TopicRightsChange's
+    CMD_REMOVE_MANAGER_ROLE command.
+    """
+
+    removed_user_id: str
+
+
+class PublishTopicCmd(TopicRightsChange):
+    """class representing the TopicRightsChange's
+    CMD_PUBLISH_TOPIC command.
+    """
+
+    pass
+
+
+class UnpublishTopicCmd(TopicRightsChange):
+    """class representing the TopicRightsChange's
+    CMD_UNPUBLISH_TOPIC command.
+    """
+
+    pass
+
+
+class DeleteCommitTopicRightsCmd(TopicRightsChange):
+    """class representing the TopicRightsChange's
+    CMD_DELETE_COMMIT command.
+    """
+
+    pass
 
 
 class StoryReferenceDict(TypedDict):

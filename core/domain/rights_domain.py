@@ -330,6 +330,76 @@ class ExplorationRightsChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
 
 
+class CreateNewExplorationRightsCmd(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class ChangeRoleExplorationRightsCmd(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_CHANGE_ROLE command.
+    """
+
+    assignee_id: str
+    old_role: str
+    new_role: str
+
+
+class RemoveRoleExplorationRightsCmd(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_REMOVE_ROLE command.
+    """
+
+    removed_user_id: str
+    old_role: str
+
+
+class ChangePrivateViewabilityExplorationRightsCmd(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_CHANGE_PRIVATE_VIEWABILITY command.
+    """
+
+    old_viewable_if_private: bool
+    new_viewable_if_private: bool
+
+
+class ReleaseOwnershipExplorationRightsCmd(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_RELEASE_OWNERSHIP command.
+    """
+
+    pass
+
+
+class UpdateFirstPublishedMsecExplorationRightsCmd(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_UPDATE_FIRST_PUBLISHED_MSEC command.
+    """
+
+    old_first_published_msec: float
+    new_first_published_msec: float
+
+
+class DeleteCommitExplorationRightsCmd(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_DELETE_COMMIT command.
+    """
+
+    pass
+
+
+class ChangeExplorationStatus(ExplorationRightsChange):
+    """class representing the ExplorationRightsChange's
+    CMD_CHANGE_EXPLORATION_STATUS command.
+    """
+
+    old_status: str
+    new_Status: str
+
+
 class CollectionRightsChange(change_domain.BaseChange):
     """Domain object class for an collection rights change.
 
@@ -347,3 +417,73 @@ class CollectionRightsChange(change_domain.BaseChange):
     """
 
     ALLOWED_COMMANDS = feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+
+
+class CreateNewCollectionRightsCmd(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class ChangeRoleCollectionRightsCmd(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_CHANGE_ROLE command.
+    """
+
+    assignee_id: str
+    old_role: str
+    new_role: str
+
+
+class RemoveRoleCollectionRightsCmd(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_REMOVE_ROLE command.
+    """
+
+    removed_user_id: str
+    old_role: str
+
+
+class ChangePrivateViewabilityCollectionRightsCmd(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_CHANGE_PRIVATE_VIEWABILITY command.
+    """
+
+    old_viewable_if_private: str
+    new_viewable_if_private: str
+
+
+class ReleaseOwnershipCollectionRightsCmd(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_RELEASE_OWNERSHIP command.
+    """
+
+    pass
+
+
+class UpdateFirstPublishedMsecCollectionRightsCmd(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_UPDATE_FIRST_PUBLISHED_MSEC command.
+    """
+
+    old_first_published_msec: float
+    new_first_published_msec: float
+
+
+class DeleteCommitCollectionRightsCmd(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_DELETE_COMMIT command.
+    """
+
+    pass
+
+
+class ChangeCollectionStatus(CollectionRightsChange):
+    """class representing the CollectionRightsChange's
+    CMD_CHANGE_EXPLORATION_STATUS command.
+    """
+
+    old_status: str
+    new_Status: str
