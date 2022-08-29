@@ -60,7 +60,10 @@ export class CompareVersionsService {
      * number, and false if changes are compared in decreasing version number.
      */
   _getCombinedChangeList(
-      v1: number, v2: number, directionForwards: boolean): ExplorationChange[] {
+      v1: number,
+      v2: number,
+      directionForwards: boolean
+  ): ExplorationChange[] {
     let _treeParents = this.versionTreeService.getVersionTree();
 
     // Stores the path of version numbers from v1 to v2.
@@ -109,7 +112,10 @@ export class CompareVersionsService {
    * Should be called after this.versionTreeService.init() is called.
    * Should satisfy v1 < v2.
    */
-  getDiffGraphData(v1: number, v2: number): Promise<CompareVersionData> {
+  getDiffGraphData(
+      v1: number,
+      v2: number
+  ): Promise<CompareVersionData> {
     if (v1 > v2) {
       throw new Error('Tried to compare v1 > v2.');
     }
@@ -171,4 +177,5 @@ export class CompareVersionsService {
 }
 
 angular.module('oppia').factory(
-  'CompareVersionsService', downgradeInjectable(CompareVersionsService));
+  'CompareVersionsService',
+  downgradeInjectable(CompareVersionsService));
