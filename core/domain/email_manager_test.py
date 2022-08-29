@@ -2004,7 +2004,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
 
 
 class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
-    """Test that correct email is sent while notifying contributor
+    """Test that correct email is sent when notifying contributor
     achievements."""
 
     USERNAME: Final = 'user'
@@ -2032,6 +2032,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
 
         messages = self._get_sent_email_messages(
             self.USER_EMAIL)
+
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_user_can_not_receive_emails(self) -> None:
@@ -2063,7 +2064,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             '<a href="http://localhost:8181/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Best wishes and we hope you can continue to contribute!<br><br>'
-            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+            'The Oppia Contributor Dashboard Team')
 
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
@@ -2103,14 +2104,14 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi user,<br><br>'
             'This is to let you know that you have successfully achieved the '
-            'Initial Contributor rank for submitting  practice questions. Your '
+            'Initial Contributor rank for submitting practice questions. Your '
             'efforts help Oppia grow better every day and support students '
             'around the world.<br><br>'
             'You can check all the achievements you earned in the '
             '<a href="http://localhost:8181/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Best wishes and we hope you can continue to contribute!<br><br>'
-            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+            'The Oppia Contributor Dashboard Team')
 
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
@@ -2157,7 +2158,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             '<a href="http://localhost:8181/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Best wishes and we hope you can continue to contribute!<br><br>'
-            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+            'The Oppia Contributor Dashboard Team')
 
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
@@ -2204,7 +2205,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             '<a href="http://localhost:8181/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Best wishes and we hope you can continue to contribute!<br><br>'
-            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+            'The Oppia Contributor Dashboard Team')
 
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
@@ -2251,7 +2252,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             '<a href="http://localhost:8181/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Best wishes and we hope you can continue to contribute!<br><br>'
-            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+            'The Oppia Contributor Dashboard Team')
 
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
@@ -2298,7 +2299,7 @@ class NotifyContributionAchievementEmailTests(test_utils.EmailTestBase):
             '<a href="http://localhost:8181/contributor-dashboard">'
             'Contributor Dashboard</a>.<br><br>'
             'Best wishes and we hope you can continue to contribute!<br><br>'
-            'Best wishes,<br>The Oppia Contributor Dashboard Team')
+            'The Oppia Contributor Dashboard Team')
 
         contributor_ranking_email_info = (
             suggestion_registry.ContributorMilestoneEmailInfo(
