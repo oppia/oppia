@@ -59,33 +59,31 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'Missing cmd key in change dict',
-            callableObj=question_domain.QuestionChange,
-            change_dict={}
-        )
+            'Missing cmd key in change dict'
+        ):
+            question_domain.QuestionChange({})
 
     def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'Command wrong is not allowed',
-            callableObj=question_domain.QuestionChange,
-            change_dict={'cmd': 'wrong', }
-        )
+            'Command wrong is not allowed'
+        ):
+            question_domain.QuestionChange({'cmd': 'wrong'})
 
     def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'The following required attributes are present: new_value',
-            callableObj=question_domain.QuestionChange,
-            change_dict={
+            'The following required attributes are missing: new_value'
+        ):
+            question_domain.QuestionChange({
                 'cmd': 'update_question_property',
                 'property_name': 'question_state_data',
                 'old_value': 'old_value'
@@ -96,29 +94,31 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'The following extra attributes are present: invalid',
-            callableObj=question_domain.QuestionChange,
-            change_dict={'cmd': 'create_new', 'invalid': 'invalid'}
-        )
+            'The following extra attributes are present: invalid'
+        ):
+            question_domain.QuestionChange(
+                {'cmd': 'create_new', 'invalid': 'invalid'}
+            )
 
     def test_update_question_property_with_wrong_property_name(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            utils.ValidationError, (
-                'Value for property_name in cmd update_question_property: '
-                'wrong is not allowed'),
-            callableObj=question_domain.QuestionChange,
-            change_dict={
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Value for property_name in cmd update_question_property: '
+            'wrong is not allowed'
+        ):
+            question_domain.QuestionChange(
+                {
                 'cmd': 'update_question_property',
                 'property_name': 'wrong',
                 'new_value': 'new_value',
                 'old_value': 'old_value'
-            }
-        )
+                }
+            )
 
     def test_create_new(self) -> None:
         """Test to verify __init__ method of the Question Change object
@@ -218,54 +218,57 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'Missing cmd key in change dict',
-            callableObj=question_domain.QuestionSuggestionChange,
-            change_dict={}
-        )
+            'Missing cmd key in change dict'
+        ):
+            question_domain.QuestionSuggestionChange({})
 
     def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'Command wrong is not allowed',
-            callableObj=question_domain.QuestionSuggestionChange,
-            change_dict={'cmd': 'wrong', }
-        )
+            'Command wrong is not allowed'
+        ):
+            question_domain.QuestionSuggestionChange(
+                {'cmd': 'wrong', }
+            )
 
     def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with missing attributes in cmd.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'The following required attributes are present: new_value',
-            callableObj=question_domain.QuestionSuggestionChange,
-            change_dict={
+            'The following required attributes are missing: skill_difficulty,'
+            ' skill_id'
+        ):
+            question_domain.QuestionSuggestionChange(
+                {
                 'cmd': 'create_new_fully_specified_question',
                 'question_dict': 'question_dict',
-            }
-        )
+                }
+            )
 
     def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
-            'The following extra attributes are present: invalid',
-            callableObj=question_domain.QuestionSuggestionChange,
-            change_dict={
+            'The following extra attributes are present: invalid'
+        ):
+            question_domain.QuestionSuggestionChange(
+                {
                 'cmd': 'create_new_fully_specified_question',
                 'question_dict': 'question_dict',
                 'skill_id': 'skill_1',
                 'skill_difficulty': '0.3',
                 'invalid': 'invalid'
-            }
-        )
+                }
+            )
 
     def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
@@ -330,7 +333,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring
         ):
             self.question.validate()
@@ -350,6 +353,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         state.interaction.hints = []
         self._assert_question_domain_validation_error(
             'Expected the question to have at least one hint')
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.dest = 'abc'
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination as None.')
@@ -357,7 +362,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
-        state.interaction.default_outcome.dest = None  # type: ignore[assignment]
+        state.interaction.default_outcome.dest = None
         state.interaction.default_outcome.dest_if_really_stuck = 'pqr'
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination for the '
@@ -371,6 +376,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         strict as True for interaction with answer group.
         """
         state = self.question.question_state_data
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.labelled_as_correct = False
         rule_spec_input_test_dict: Dict[str, Union[str, List[str]]] = {
             'contentId': 'rule_input_4',
@@ -830,6 +837,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_data['interaction']['default_outcome'] is not None
         question_data['content']['html'] = '<br/>'
         question_data['interaction']['default_outcome'][
             'feedback']['html'] = '<br/>'
@@ -839,6 +848,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'state_schema_version': 33
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert test_value['state']['interaction']['default_outcome'] is not None
         self.assertEqual(
             test_value['state']['content']['html'], '<br/>')
         self.assertEqual(
@@ -978,6 +989,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         # Ruling out the possibility of None for mypy type checking.
         assert test_value['state']['interaction']['solution'] is not None
+        assert isinstance(
+            test_value['state']['interaction']['solution']['correct_answer'],
+            str
+        )
         self.assertNotIn(
             'ascii',
             test_value['state']['interaction']['solution']['correct_answer']
@@ -1769,9 +1784,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_solution_dict
         )
 
+        drag_and_drop_test_solution_dict = copy.deepcopy(test_solution_dict)
+        drag_and_drop_test_solution_dict['correct_answer'] = [
+            ['correct_value']
+        ]
+
         # Testing with interaction id 'DragAndDropSortInput'.
         test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
-        test_value['state']['interaction']['solution'] = test_solution_dict
+        test_value['state']['interaction']['solution'] = (
+            drag_and_drop_test_solution_dict
+        )
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': [
@@ -1864,7 +1886,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             test_value['state']['interaction']['solution'],
-            test_solution_dict
+            drag_and_drop_test_solution_dict
         )
 
     def test_question_state_dict_conversion_from_v42_to_v43(self) -> None:
@@ -2094,7 +2116,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 self.dummy_entity_translations)
         ]
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translatable_contents,
             [
                 'Enter text here',
@@ -2134,6 +2156,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         default_outcome_dict = test_value['state']['interaction']['default_outcome'] # pylint: disable=line-too-long
         outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome'] # pylint: disable=line-too-long
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome_dict is not None
         self.assertIn('dest_if_really_stuck', default_outcome_dict)
         self.assertEqual(default_outcome_dict['dest_if_really_stuck'], None)
 
@@ -2198,7 +2222,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_with_invalid_id(self) -> None:
         self.observed_object.id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
@@ -2207,7 +2231,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_with_invalid_interaction_id(self) -> None:
         self.observed_object.interaction_id = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected interaction id to be a string, received 1'):
             self.observed_object.validate()
@@ -2217,7 +2241,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_with_invalid_question_content(self) -> None:
         self.observed_object.question_content = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
@@ -2227,7 +2251,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_with_invalid_created_on(self) -> None:
         self.observed_object.created_on = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected created on to be a datetime, received 1'):
             self.observed_object.validate()
@@ -2237,7 +2261,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_with_invalid_last_updated(self) -> None:
         self.observed_object.last_updated = 1  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
@@ -2250,7 +2274,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         misconception_ids value is an invalid list.
         """
         self.observed_object.misconception_ids = ['Test', 1]  # type: ignore[list-item]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             re.escape(
                 'Expected misconception ids to be a list of strings, '
@@ -2265,7 +2289,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         misconception_ids value is an invalid type.
         """
         self.observed_object.misconception_ids = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected misconception ids to be a list of strings, '
             'received 123'):

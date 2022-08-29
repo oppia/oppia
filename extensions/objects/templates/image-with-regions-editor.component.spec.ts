@@ -27,6 +27,7 @@ import { AppConstants } from 'app.constants';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('ImageWithRegionsEditorComponent', () => {
   let component: ImageWithRegionsEditorComponent;
@@ -36,6 +37,13 @@ describe('ImageWithRegionsEditorComponent', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let svgSanitizerService: SvgSanitizerService;
+
+  class MockWindowRef {
+    nativeWindow = {
+      scrollX: 0,
+      scrollY: 0
+    };
+  }
 
   class MockImageObject {
     source = null;
@@ -59,7 +67,13 @@ describe('ImageWithRegionsEditorComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ImageWithRegionsEditorComponent],
-      providers: [ContextService],
+      providers: [
+        ContextService,
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
@@ -1459,6 +1473,9 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   it('should get the preview URL when the image save destination is ' +
   'server', () => {
+    spyOn(contextService, 'getEntityId').and.returnValue('exp_id');
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.EXPLORATION);
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     spyOn(assetsBackendApiService, 'getImageUrlForPreview');
@@ -1470,6 +1487,8 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   it('should get the preview URL when the image save destination is ' +
   'local storage and image is non SVG', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.QUESTION);
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -1486,6 +1505,8 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   it('should get the preview URL when the image save destination is ' +
   'local storage and image is an SVG', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue(
+      AppConstants.ENTITY_TYPE.QUESTION);
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);

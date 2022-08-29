@@ -21,13 +21,10 @@ import datetime
 
 from core import feconf
 from core import utils
+from core.domain import state_domain
 
-from typing import Dict, List, Union
+from typing import Dict, List
 from typing_extensions import TypedDict
-
-TrainingDataType = Union[
-    Dict[str, Union[int, List[str]]], List[Dict[str, Union[int, List[str]]]]
-]
 
 
 class ClassifierTrainingJobDict(TypedDict):
@@ -41,7 +38,7 @@ class ClassifierTrainingJobDict(TypedDict):
     next_scheduled_check_time: datetime.datetime
     state_name: str
     status: str
-    training_data: TrainingDataType
+    training_data: List[state_domain.TrainingDataDict]
     algorithm_version: int
 
 
@@ -103,7 +100,7 @@ class ClassifierTrainingJob:
         next_scheduled_check_time: datetime.datetime,
         state_name: str,
         status: str,
-        training_data: TrainingDataType,
+        training_data: List[state_domain.TrainingDataDict],
         algorithm_version: int
     ) -> None:
         """Constructs a ClassifierTrainingJob domain object.
@@ -233,7 +230,7 @@ class ClassifierTrainingJob:
         return self._status
 
     @property
-    def training_data(self) -> TrainingDataType:
+    def training_data(self) -> List[state_domain.TrainingDataDict]:
         """Returns the training data used for training the classifier.
 
         Returns:
