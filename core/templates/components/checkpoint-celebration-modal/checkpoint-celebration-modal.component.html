@@ -87,7 +87,7 @@
     </div>
   </div>
   <div *ngIf="!shouldDisplayFullScaleMessage"
-       class="minified-message-container"
+       class="minified-message-container e2e-test-congratulatory-checkpoint-message-box"
        [ngClass]="{'tooltip-display-transition': miniMessageTooltipIsShown, 'tooltip-dismissal-transition': !miniMessageTooltipIsShown && miniMessageTooltipIsDismissed}">
     <p>
       {{ currentCheckpointPosition }}/{{ totalNumberOfCheckpoints }}

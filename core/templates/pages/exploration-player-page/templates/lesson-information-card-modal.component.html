@@ -38,7 +38,7 @@
           </div>
         </div>
         <p *ngIf="translatedCongratulatoryCheckpointMessage"
-           class="checkpoint-message-text">
+           class="checkpoint-message-text e2e-test-lesson-info-modal-checkpoint-message">
           {{ translatedCongratulatoryCheckpointMessage }}
         </p>
         <div class="save-progress-btn-container">
@@ -161,7 +161,7 @@
     </div>
   </div>
 </mat-card>
-<button type="button" class="oppia-close-popover-button" (click)="cancel()">
+<button type="button" class="oppia-close-popover-button e2e-test-close-lesson-info-modal-button" (click)="cancel()">
   <i class="material-icons md-18">&#xE5CD;</i>
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>

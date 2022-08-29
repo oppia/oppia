@@ -101,6 +101,7 @@ _PARSER.add_argument(
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'blogDashboard',
+    'checkpointFeatures',
     'classroomPage',
     'classroomPageFileUploadFeatures',
     'collections',
