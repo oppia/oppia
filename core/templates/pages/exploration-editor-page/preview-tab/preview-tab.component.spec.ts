@@ -248,11 +248,13 @@ describe('Preview Tab Component', () => {
       } as NgbModalRef);
 
       component.showSetParamsModal(null, () => {});
+      tick();
+      flush();
 
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-  it('should getManualParamChanges', () => {
+  it('should getManualParamChanges', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {
         manualParamChanges: null,
@@ -260,10 +262,11 @@ describe('Preview Tab Component', () => {
       result: Promise.resolve()
     } as NgbModalRef);
     component.getManualParamChanges('state');
-
+    tick();
+    flush();
 
     expect(ngbModal.open).toHaveBeenCalled();
-  });
+  }));
 
   it('should exmpty getManualParamChanges', () => {
     getUnsetParametersInfo.and.returnValue([]);
@@ -294,6 +297,7 @@ describe('Preview Tab Component', () => {
     // modal.
     component.resetPreview();
     tick(300);
+    flush();
 
     expect(component.loadPreviewState).toHaveBeenCalled();
   }));

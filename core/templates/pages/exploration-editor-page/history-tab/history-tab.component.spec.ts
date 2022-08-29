@@ -230,7 +230,7 @@ describe('History tab component', () => {
     }, 2);
 
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      Promise.resolve({}));
+      Promise.resolve(null));
 
     component.compareSelectedVersions();
     component.changeCompareVersion();
@@ -279,7 +279,7 @@ describe('History tab component', () => {
     }, 2);
 
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      Promise.resolve({}));
+      Promise.resolve(null));
     component.compareSelectedVersions();
     component.changeCompareVersion();
 
@@ -499,7 +499,7 @@ describe('History tab component', () => {
   it('should find the versions to compare', fakeAsync(() => {
     spyOn(component, 'getVersionHeader').and.stub();
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      Promise.resolve({}));
+      Promise.resolve(null));
 
     component.selectedVersionsArray = [1, 4];
     component.compareVersionMetadata = {};
