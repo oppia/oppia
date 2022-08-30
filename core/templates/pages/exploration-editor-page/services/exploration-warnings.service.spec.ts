@@ -1722,7 +1722,7 @@ describe('Exploration Warnings Service', () => {
     });
   });
 
-  fit('should show warnings if learner is directed more than 3 cards' +
+  it('should show warnings if learner is directed more than 3 cards' +
      ' back in the exploration', () => {
     explorationStatesService.init({
       Hola: {
@@ -2161,21 +2161,21 @@ describe('Exploration Warnings Service', () => {
               },
             }
           }, {
-              rule_specs: [],
-              training_data: [],
-              tagged_skill_misconception_id: null,
-              outcome: {
-                labelled_as_correct: true,
-                param_changes: null,
-                refresher_exploration_id: null,
-                missing_prerequisite_skill_id: null,
-                dest: 'Hola',
-                dest_if_really_stuck: null,
-                feedback: {
-                  content_id: 'feedback_2',
-                  html: ''
-                },
-              }
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+            outcome: {
+              labelled_as_correct: true,
+              param_changes: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest: 'Hola',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+            }
           }],
           default_outcome: null,
           customization_args: {
