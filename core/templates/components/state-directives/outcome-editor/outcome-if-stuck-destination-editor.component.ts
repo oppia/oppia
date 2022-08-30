@@ -28,7 +28,7 @@ import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 interface DestinationChoice {
-  id: string;
+  id: string | null;
   text: string;
 }
 
@@ -53,7 +53,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   destinationChoices: DestinationChoice[] = [];
   maxLen!: number;
   outcomeNewStateName!: string;
-  currentStateName!: string;
+  currentStateName: string | null = null;
   directiveSubscriptions: Subscription = new Subscription();
 
   MAX_STATE_NAME_LENGTH: number = (
@@ -103,11 +103,8 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   updateOptionNames(): void {
     // The setTimeout is being used here to update the view.
     setTimeout(() => {
-      let activeStateName = this.stateEditorService.getActiveStateName();
-      if (activeStateName === null) {
-        throw new Error('Active state name is null');
-      }
-      this.currentStateName = activeStateName;
+      this.currentStateName = this.stateEditorService.getActiveStateName();
+      let questionModeEnabled = this.stateEditorService.isInQuestionMode();
       // This is a list of objects, each with an ID and name. These
       // represent all states, as well as an option to create a
       // new state.
@@ -171,10 +168,12 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
         }
       }
 
-      this.destinationChoices.push({
-        id: this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
-        text: 'A New Card Called...'
-      });
+      if (!questionModeEnabled) {
+        this.destinationChoices.push({
+          id: this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
+          text: 'A New Card Called...'
+        });
+      }
     // This value of 10ms is arbitrary, it has no significance.
     }, 10);
   }
