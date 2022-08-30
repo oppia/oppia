@@ -40,12 +40,10 @@ var AdminPage = function() {
   var featureFlagElement = $('.e2e-test-feature-flag');
   var featureNameLocator = '.e2e-test-feature-name';
   var featuresTab = $('.e2e-test-admin-features-tab');
-  var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var progressSpinner = $('.e2e-test-progress-spinner');
   var reloadCollectionButtonsSelector = function() {
     return $$('.e2e-test-reload-collection-button');
   };
-  var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var roleDropdown = $('.e2e-test-role-method');
   var roleEditorContainer = $('.e2e-test-roles-editor-card-container');
   var rolesResultRowsElement = $('.e2e-test-roles-result-rows');
@@ -55,7 +53,6 @@ var AdminPage = function() {
   var roleSelector = $('.e2e-test-new-role-selector');
   var roleValueOption = $('.e2e-test-role-value');
   var saveAllConfigs = $('.e2e-test-save-all-configs');
-  var saveButtonLocator = '.e2e-test-save-button';
   var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
   var statusMessage = $('.e2e-test-status-message');
   var userRoleItemsSelector = function() {
@@ -196,29 +193,25 @@ var AdminPage = function() {
     return null;
   };
 
-  this.removeAllRulesOfFeature = async function(featureElement) {
-    while (!await featureElement.$(noRuleIndicatorLocator).isExisting()) {
-      await action.click(
-        'Remove feature rule button',
-        featureElement
-          .$(removeRuleButtonLocator)
-      );
-    }
-  };
-
-  this.saveChangeOfFeature = async function(featureElement) {
-    await action.click(
-      'Save feature button',
-      featureElement
-        .$(saveButtonLocator)
-    );
-
-    await general.acceptAlert();
-    await waitFor.visibilityOf(statusMessage);
-  };
-
-  // Remove this method after the end_chapter_celebration feature flag
+  // Remove this method after the checkpoint_celebration feature flag
   // is deprecated.
+  this.getCheckpointCelebrationFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'checkpoint_celebration') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
+  // This function is meant to be used to enable a feature gated behind
+  // a feature flag in prod mode, which is the server environment the E2E
+  // tests are run in.
   this.enableFeatureForProd = async function(featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
 

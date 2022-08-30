@@ -513,7 +513,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID_1, self.EXPLORATION_IDS[0],
             [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -969,8 +969,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             title='sample title',
             description='sample description',
             facilitator_user_ids=[self.USER_ID_1],
-            student_user_ids=['user_id_2'],
-            invited_student_user_ids=['user_id_3'],
+            learner_user_ids=['user_id_2'],
+            invited_learner_user_ids=['user_id_3'],
             subtopic_page_ids=['subtopic_id_1', 'subtopic_id_2'],
             story_ids=['skill_id_1', 'skill_id_2']
         )

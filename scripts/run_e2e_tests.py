@@ -106,6 +106,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'additionalPlayerFeatures',
     'adminPage',
     'blogDashboard',
+    'checkpointFeatures',
     'classroomPage',
     'classroomPageFileUploadFeatures',
     'collections',
