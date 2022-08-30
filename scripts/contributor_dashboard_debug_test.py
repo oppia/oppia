@@ -59,9 +59,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.signup(self.tested_email, self.tested_username)
         self.add_user_role(
             self.SUPER_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
-        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME]) # type: ignore
+        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME])
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
+        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token()
 
         self.request_swap = self.swap(
             self.contributor_dashboard_debug.session,
@@ -130,18 +130,18 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             self.contributor_dashboard_debug._sign_up_new_user(email, username) # pylint: disable=protected-access
 
         self.assertIsNotNone(self.firebase_sdk_stub.get_user_by_email(email))
-        self.assertEqual(
-            user_services.get_user_settings_from_email(email).username, # type: ignore
-            username)
+        user_settings = user_services.get_user_settings_from_email(email)
+        assert user_settings is not None
+        self.assertEqual(user_settings.username, username)
 
     def mock_firebase_auth_create_user(self, **kwargs: Any) -> Any:
         """Mock for firebase_auth.create_user()."""
         email = kwargs['email']
-        auth_id = self.get_auth_id_from_email(email) # type: ignore
+        auth_id = self.get_auth_id_from_email(email)
         self.firebase_sdk_stub.create_user(auth_id, email)
 
     def test_sign_in(self) -> None:
-        auth_id = self.get_auth_id_from_email(self.tested_email) # type: ignore
+        auth_id = self.get_auth_id_from_email(self.tested_email)
         token_id = self.firebase_sdk_stub.create_user(
             auth_id, email=self.tested_email)
         sign_in_swap = self.swap_to_always_return(
@@ -161,9 +161,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         with self.request_swap:
             csrf_token = self.contributor_dashboard_debug._get_csrf_token() # pylint: disable=protected-access
 
-        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL) # type: ignore
+        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
         self.assertTrue(
-            base.CsrfTokenManager.is_csrf_token_valid(admin_id, csrf_token)) # type: ignore
+            base.CsrfTokenManager.is_csrf_token_valid(admin_id, csrf_token)) # type: ignore[no-untyped-call]
 
     def test_assign_admin_roles(self) -> None:
         roles = [
@@ -178,9 +178,10 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def _assert_user_roles(self, username: str, roles: List[str]) -> None:
         """Asserts that the user has the given roles."""
+        user_settings = user_services.get_user_settings_from_username(username)
+        assert user_settings is not None
         self.assertEqual(
-            user_services.get_user_settings_from_username(username).roles, # type: ignore
-            [feconf.ROLE_ID_FULL_USER] + roles)
+            user_settings.roles, [feconf.ROLE_ID_FULL_USER] + roles)
 
     def test_add_submit_question_rights(self) -> None:
         with self.request_swap:
@@ -192,7 +193,8 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
     def _assert_can_submit_question_suggestions(self, username: str) -> None:
         """Asserts that the user can submit question suggestions."""
         user_id = user_services.get_user_id_from_username(username)
-        self.assertTrue(user_services.can_submit_question_suggestions(user_id)) # type: ignore
+        assert user_id is not None
+        self.assertTrue(user_services.can_submit_question_suggestions(user_id))
 
     def test_generate_sample_new_structures_data(self) -> None:
         with self.request_swap:
@@ -207,13 +209,13 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 2)
 
-        story_id = (
-            topic_fetchers.get_topic_by_name( # type: ignore
-                'Dummy Topic 1').canonical_story_references[0].story_id)
+        topic = topic_fetchers.get_topic_by_name('Dummy Topic 1')
+        assert topic is not None
+        story_id = topic.canonical_story_references[0].story_id
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
 
-        skill_summaries = skill_services.get_all_skill_summaries() # type: ignore
+        skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
 
         questions, _ = (
@@ -229,7 +231,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 3)
 
     def test_add_topics_to_classroom(self) -> None:
-        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL) # type: ignore
+        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
         classroom_name = 'math'
         classroom_url_fragment = 'math'
         topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -240,8 +242,8 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         topic_2 = topic_domain.Topic.create_default_topic(
             topic_id_2, 'Empty Topic', 'empty-topic', 'description',
             'fragm')
-        topic_services.save_new_topic(admin_id, topic_1) # type: ignore
-        topic_services.save_new_topic(admin_id, topic_2) # type: ignore
+        topic_services.save_new_topic(admin_id, topic_1) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(admin_id, topic_2) # type: ignore[no-untyped-call]
 
         with self.request_swap:
             self.contributor_dashboard_debug._add_topics_to_classroom( # pylint: disable=protected-access
@@ -255,7 +257,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, classroom_name))
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         for topic_summary in topic_summaries:
-            topic_summary_dict = topic_summary.to_dict()
-            topic_summary_dict['is_published'] = False # type: ignore
+            topic_summary_dict = dict(topic_summary.to_dict())
+            topic_summary_dict['is_published'] = False
             self.assertIn(
                 topic_summary_dict, classroom_dict['topic_summary_dicts'])
