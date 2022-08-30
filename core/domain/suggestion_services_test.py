@@ -2160,7 +2160,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats.question_review_stats[0].contributor_user_id, 'user_id')
 
-    def _publish_valid_topic(self, topic, uncategorized_skill_ids): # type: ignore[no-untyped-def]
+    def _publish_valid_topic(
+        self, topic: topic_domain.Topic, uncategorized_skill_ids: List[str]):
         """Saves and publishes a valid topic with linked skills and subtopic.
 
         Args:
@@ -2218,7 +2219,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
         skill_id_0 = 'skill_id_0'
         skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
 
         self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
             self.owner_id, self.admin_id, 'story_id_0', topic_id, '0')
@@ -2288,7 +2289,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
         skill_id_0 = 'skill_id_0'
         skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
 
         self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
             self.owner_id, self.admin_id, 'story_id_01', topic_id, '0')
@@ -2356,14 +2357,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
 
-        assert translation_contribution_stats_model is not None
+        assert translation_review_stats_model is not None
         self.assertEqual(
-            translation_review_stats_model.accepted_translations_count, # type: ignore[union-attr]
+            translation_review_stats_model.accepted_translations_count,
             2
         )
         self.assertEqual(
             (
-                translation_review_stats_model # type: ignore[union-attr]
+                translation_review_stats_model
                 .reviewed_translation_word_count
             ),
             6
@@ -2415,7 +2416,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(
+        initial_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
@@ -2463,12 +2464,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         assert question_review_stats_model is not None
         self.assertEqual(
-            question_review_stats_model.accepted_questions_count,  # type: ignore[union-attr]
+            question_review_stats_model.accepted_questions_count,
             2
         )
         self.assertEqual(
             (
-                question_review_stats_model  # type: ignore[union-attr]
+                question_review_stats_model
                 .reviewed_questions_count
             ),
             2
