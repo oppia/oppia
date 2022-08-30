@@ -32,7 +32,14 @@ class PracticeSessionsPage(base.BaseHandler):
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
+        'GET': {
+            'selected_subtopic_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        }
     }
 
     @acl_decorators.can_access_topic_viewer_page
@@ -40,6 +47,34 @@ class PracticeSessionsPage(base.BaseHandler):
         """Handles GET requests."""
 
         self.render_template('practice-session-page.mainpage.html')
+
+    def handle_exception(self, exception, unused_debug_mode):
+        """Handles exceptions raised by this handler.
+
+        Args:
+            exception: Exception. The exception raised by the handler.
+            unused_debug_mode: bool. Whether the app is running in debug mode.
+        """
+        if isinstance(exception, self.InvalidInputException):
+            selected_subtopic_ids = (
+                self.normalized_request.get('selected_subtopic_ids'))
+
+            if not selected_subtopic_ids:
+                (
+                    _,
+                    _,
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    _,
+                    _
+                ) = self.request.path.split('/')
+                self.redirect(
+                    '/learn/%s/%s/practice' % (
+                        classroom_url_fragment, topic_url_fragment
+                    )
+                )
+                return
+        super().handle_exception(exception, unused_debug_mode)
 
 
 class PracticeSessionsPageDataHandler(base.BaseHandler):
