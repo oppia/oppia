@@ -56,24 +56,20 @@ class PracticeSessionsPage(base.BaseHandler):
             unused_debug_mode: bool. Whether the app is running in debug mode.
         """
         if isinstance(exception, self.InvalidInputException):
-            selected_subtopic_ids = (
-                self.normalized_request.get('selected_subtopic_ids'))
-
-            if not selected_subtopic_ids:
-                (
-                    _,
-                    _,
-                    classroom_url_fragment,
-                    topic_url_fragment,
-                    _,
-                    _
-                ) = self.request.path.split('/')
-                self.redirect(
-                    '/learn/%s/%s/practice' % (
-                        classroom_url_fragment, topic_url_fragment
-                    )
+            (
+                _,
+                _,
+                classroom_url_fragment,
+                topic_url_fragment,
+                _,
+                _
+            ) = self.request.path.split('/')
+            self.redirect(
+                '/learn/%s/%s/practice' % (
+                    classroom_url_fragment, topic_url_fragment
                 )
-                return
+            )
+            return
         super().handle_exception(exception, unused_debug_mode)
 
 

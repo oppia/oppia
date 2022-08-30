@@ -17,19 +17,22 @@
  */
 
 import { DebugElement, SimpleChanges } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { OppiaRteParserService } from 'services/oppia-rte-parser.service';
 import { RichTextComponentsModule } from './rich-text-components.module';
 import { RteOutputDisplayComponent } from './rte-output-display.component';
 
 describe('RTE display component', () => {
   let fixture: ComponentFixture<RteOutputDisplayComponent>;
   let component: RteOutputDisplayComponent;
+  let rteParserService: OppiaRteParserService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [RichTextComponentsModule]
     }).compileComponents();
+    rteParserService = TestBed.inject(OppiaRteParserService);
     fixture = TestBed.createComponent(RteOutputDisplayComponent);
     component = fixture.componentInstance;
   }));
@@ -77,4 +80,36 @@ describe('RTE display component', () => {
     // eslint-disable-next-line oppia/no-inner-html
     expect(link.innerHTML.replace(/\s/g, '')).toEqual('Oppia');
   });
+
+  it('should report errors when parsing', fakeAsync(() => {
+    spyOn(rteParserService, 'constructFromDomParser').and.throwError('error');
+    let rteString = (
+      '<p>Hi<em>Hello</em>Hello</p>' +
+      '<pre> Hello </pre>' +
+      '<oppia-noninteractive-link ' +
+      'url-with-value="&quot;https://oppia.org&quot;" ' +
+      'text-with-value="&quot;Oppia&quot;">' +
+      '</oppia-noninteractive-link>');
+
+    expect(() => {
+      // eslint-disable-next-line oppia/no-inner-html
+      let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
+      expect(html).toBe('');
+
+      fixture.detectChanges();
+      let changes: SimpleChanges = {
+        rteString: {
+          previousValue: '',
+          currentValue: rteString,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      };
+      component.rteString = rteString;
+      component.ngOnChanges(changes);
+      component.ngAfterViewInit();
+      fixture.detectChanges();
+      tick(1);
+    }).toThrowError();
+  }));
 });
