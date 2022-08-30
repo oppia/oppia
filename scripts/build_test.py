@@ -1189,7 +1189,7 @@ class BuildTests(test_utils.GenericTestBase):
             max_old_space_size: int
         ) -> Iterator[scripts_test_utils.PopenStub]:
             self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
-            self.assertEqual(max_old_space_size, 6144)
+            self.assertEqual(max_old_space_size, 8192)
             yield scripts_test_utils.PopenStub()
 
         def mock_get_file_count(unused_path: str) -> int:
@@ -1213,7 +1213,7 @@ class BuildTests(test_utils.GenericTestBase):
             config_path: str, max_old_space_size: int
         ) -> Iterator[scripts_test_utils.PopenStub]:
             self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
-            self.assertEqual(max_old_space_size, 6144)
+            self.assertEqual(max_old_space_size, 8192)
             yield scripts_test_utils.PopenStub()
 
         def mock_get_file_count(unused_path: str) -> int:
