@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,20 +19,18 @@
  * refresher explorations, state parameters, etc.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
-var action = require('../protractor_utils/action.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
 
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
-
-var lostChangesModal = element(by.css('.e2e-test-lost-changes-modal'));
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
@@ -69,16 +67,14 @@ describe('Full exploration editor', function() {
 
       await workflow.createExploration(true);
 
-      var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
-      var stateEditButton = element(
-        by.css('.e2e-test-edit-content-pencil-button'));
+      var postTutorialPopover = $('.ng-joyride .popover-content');
+      var stateEditButton = $('.e2e-test-edit-content-pencil-button');
       await waitFor.invisibilityOf(
         postTutorialPopover, 'Post-tutorial popover does not disappear.');
       await action.click('State Edit Button', stateEditButton);
-      var stateEditorTag = element(
-        by.css('.e2e-test-state-content-editor'));
-      var stateContentEditor = stateEditorTag.element(
-        by.css('.e2e-test-state-content-editor'));
+      var stateEditorTag = $('.e2e-test-state-content-editor');
+      var stateContentEditor = stateEditorTag.$(
+        '.e2e-test-state-content-editor');
       await waitFor.visibilityOf(
         stateContentEditor,
         'stateContentEditor taking too long to appear to set content');
@@ -86,24 +82,22 @@ describe('Full exploration editor', function() {
 
       var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
 
-      var heightMessage = element(
-        by.css('.e2e-test-card-height-limit-warning'));
+      var heightMessage = $('.e2e-test-card-height-limit-warning');
       await richTextEditor.appendPlainText(content);
-      expect(await heightMessage.isPresent()).toBe(false);
+      expect(await heightMessage.isExisting()).toBe(false);
 
       await richTextEditor.appendPlainText('\n\n\nline5');
       await waitFor.visibilityOf(
         heightMessage, 'Card height limit message not displayed');
 
       await richTextEditor.appendPlainText('\b\b\b\b\b\b\b\b');
-      expect(await heightMessage.isPresent()).toBe(false);
+      expect(await heightMessage.isExisting()).toBe(false);
 
       await richTextEditor.appendPlainText('\n\n\nline5');
       await waitFor.visibilityOf(
         heightMessage, 'Card height limit message not displayed');
 
-      var hideHeightWarningIcon = element(
-        by.css('.e2e-test-hide-card-height-warning-icon'));
+      var hideHeightWarningIcon = $('.e2e-test-hide-card-height-warning-icon');
       await action.click('Hide Height Warning icon', hideHeightWarningIcon);
       await waitFor.invisibilityOf(
         heightMessage, 'Height message taking too long to disappear.');
@@ -174,23 +168,23 @@ describe('Full exploration editor', function() {
     await explorationEditorSettingsTab.setObjective('do some stuff here');
     await explorationEditorPage.navigateToMainTab();
     var explorationId = await general.getExplorationIdFromEditor();
-    expect(await browser.getCurrentUrl()).toEqual(
+    expect(await browser.getUrl()).toEqual(
       general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
       explorationId + '#/gui/second');
-    await browser.navigate().back();
-    expect(await browser.getCurrentUrl()).toEqual(
+    await browser.back();
+    expect(await browser.getUrl()).toEqual(
       general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
       explorationId + '#/settings');
-    await browser.navigate().back();
-    expect(await browser.getCurrentUrl()).toEqual(
+    await browser.back();
+    expect(await browser.getUrl()).toEqual(
       general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
       explorationId + '#/gui/second');
 
     // Refreshing to prevent stale elements after backing from previous page.
-    await browser.driver.navigate().refresh();
+    await browser.refresh();
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendItalicText('Welcome');
-    });
+    }, true);
     await explorationEditorMainTab.expectContentToMatch(
       async function(richTextChecker) {
         await richTextChecker.readItalicText('Welcome');
@@ -310,7 +304,7 @@ describe('Full exploration editor', function() {
       await libraryPage.findExploration('Testing multiple rules');
       await libraryPage.playExploration('Testing multiple rules');
       var explorationId = await general.getExplorationIdFromPlayer();
-      await browser.get(
+      await browser.url(
         general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId);
       await explorationEditorMainTab.exitTutorial();
       // Verify nothing can change with this user.
@@ -416,7 +410,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
       await users.logout();
 
@@ -435,7 +429,8 @@ describe('Full exploration editor', function() {
       await users.login('user9@editor.com');
       await general.openEditor(explorationId, false);
       await waitFor.pageToFullyLoad();
-      expect(await lostChangesModal.isPresent()).toBe(false);
+      var lostChangesModal = $('.e2e-test-lost-changes-modal');
+      expect(await lostChangesModal.isExisting()).toBe(false);
       await explorationEditorPage.saveChanges();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {

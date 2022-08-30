@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,20 +19,20 @@
  * oppia's feedback and customization_args.
  */
 
-var action = require('../protractor_utils/action.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
+  require('../webdriverio_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Enable correctness feedback and set correctness', function() {
   var explorationEditorPage = null;
@@ -222,7 +222,7 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.moveToState('Second');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
@@ -440,10 +440,9 @@ describe('Core exploration functionality', function() {
     // this interaction does not have any customization options. To dismiss
     // this modal, user clicks 'Okay' implying that he/she has got the message.
     await explorationEditorMainTab.setInteraction('NumberWithUnits');
-    var testInteractionButton = element(by.css('.e2e-test-interaction'));
+    var testInteractionButton = $('.e2e-test-interaction');
     await action.click('Test Interaction Button', testInteractionButton);
-    var okayBtn = element(
-      by.css('.e2e-test-close-no-customization-modal'));
+    var okayBtn = $('.e2e-test-close-no-customization-modal');
     await action.click('Close \'No customization modal\' button', okayBtn);
 
     // Continue input has customization options. Therefore, on re-clicking, a
@@ -453,8 +452,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.deleteInteraction();
     await explorationEditorMainTab.setInteraction('Continue');
     await action.click('Test interaction button', testInteractionButton);
-    var saveInteractionBtn = element(
-      by.css('.e2e-test-save-interaction'));
+    var saveInteractionBtn = $('.e2e-test-save-interaction');
     await action.click('Save interaction button', saveInteractionBtn);
   });
 
@@ -523,10 +521,10 @@ describe('Core exploration functionality', function() {
 
     // Color grey when there is no warning, red when there is a warning.
     await explorationEditorSettingsTab.expectWarningsColorToBe(
-      'rgba(115, 115, 115, 1)');
+      'rgba(115,115,115,1)');
     await explorationEditorSettingsTab.setObjective('short goal');
     await explorationEditorSettingsTab.expectWarningsColorToBe(
-      'rgba(169, 68, 66, 1)');
+      'rgba(169,68,66,1)');
   });
 
   it('should be able to select category from the dropdown menu',

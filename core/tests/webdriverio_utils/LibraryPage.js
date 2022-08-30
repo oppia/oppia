@@ -30,6 +30,7 @@ var LibraryPage = function() {
   var allExplorationSummaryTileSelector = function() {
     return $$('.e2e-test-exp-summary-tile');
   };
+  var explorationObjective = $('.e2e-test-exp-summary-tile-objective');
   var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var expSummaryTileTitleLocator = '.e2e-test-exp-summary-tile-title';
   var mainHeader = $('.e2e-test-library-main-header');

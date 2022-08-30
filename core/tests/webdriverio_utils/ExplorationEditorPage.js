@@ -211,14 +211,14 @@ var ExplorationEditorPage = function() {
       expLanguageSelectorElement.$('option:checked'));
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
-    var expTitleValue = await action.getAttribute(
-      'Exploration Title', expTitle, 'value');
+    var expTitleValue = await action.getValue(
+      'Exploration Title', expTitle);
     expect(expTitleValue).toMatch(title);
     expect(explorationCategory).toMatch(category);
-    var expObjectiveValue = await action.getAttribute(
-      'Exploration Objective', expObjective, 'value');
+    var expObjectiveValue = await action.getValue(
+      'Exploration Objective', expObjective);
     expect(expObjectiveValue).toMatch(objective);
-    expect(explorationLanguage).toMatch(language);
+    expect(explorationLanguage).toBe(language);
     var expTagsSelectionChoiceElements = (
       await expTagsSelectionChoiceElementsSelector());
     for (var i = 0; i < expTagsSelectionChoiceElements.length; i++) {
@@ -356,6 +356,10 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
+    // Wait for the appearing and disappearing action to get completed after
+    // the main tab button is clicked.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
   };
 
   this.navigateToPreviewTab = async function() {

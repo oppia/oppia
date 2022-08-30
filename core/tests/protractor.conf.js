@@ -20,29 +20,6 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
-
-    additionalEditorFeatures: [
-      'protractor_desktop/additionalEditorFeatures.js'
-    ],
-
-    additionalEditorFeaturesModals: [
-      'protractor_desktop/additionalEditorFeaturesModals.js'
-    ],
-
-    additionalPlayerFeatures: [
-      'protractor_desktop/additionalPlayerFeatures.js'
-    ],
-
-    adminPage: [
-      'protractor_desktop/adminTabFeatures.js'
-    ],
-
-    coreEditorAndPlayerFeatures: [
-      'protractor_desktop/coreEditorAndPlayerFeatures.js'
-    ],
 
     embedding: [
       'protractor_desktop/embedding.js'
