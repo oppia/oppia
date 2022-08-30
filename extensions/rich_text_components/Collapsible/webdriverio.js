@@ -32,20 +32,11 @@ var expectComponentDetailsToMatch = async function(
     elem, heading, contentInstructions) {
   var headerElement = elem.$(
     '.e2e-test-collapsible-heading');
-  console.log(2)
-  console.log(await headerElement.getText())
-  console.log(heading)
-  await browser.debug();
   expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   await headerElement.click();
   const collapsibleElem = elem.$(
     '.e2e-test-collapsible-content');
-  console.log(3)
-  console.log(contentInstructions)
-  console.log(await elem.$(
-    '.e2e-test-collapsible-content'))
-  await browser.debug();
   await forms.expectRichText(collapsibleElem).toMatch(contentInstructions);
 };
 

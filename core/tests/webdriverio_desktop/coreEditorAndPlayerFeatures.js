@@ -222,7 +222,7 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.moveToState('Second');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
@@ -309,7 +309,7 @@ describe('Core exploration functionality', function() {
 
   it('should display plain text content', async function() {
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('plain text'));
+      await forms.toRichText('plain text'), true);
     await explorationEditorMainTab.setInteraction('Continue', 'click here');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -340,7 +340,7 @@ describe('Core exploration functionality', function() {
         await richTextEditor.appendPlainText(' ');
         await richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
         await richTextEditor.appendUnorderedList(['an entry', 'another entry']);
-      });
+      }, true);
       await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
         await forms.toRichText('option A'),
         await forms.toRichText('option B'),
@@ -370,7 +370,7 @@ describe('Core exploration functionality', function() {
   it('should obey numeric interaction rules and display feedback',
     async function() {
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('some content'));
+        await forms.toRichText('some content'), true);
       await explorationEditorMainTab.setInteraction('NumericInput');
       await explorationEditorMainTab.addResponse(
         'NumericInput', async function(richTextEditor) {
@@ -418,7 +418,7 @@ describe('Core exploration functionality', function() {
   it('should skip the customization modal for interactions having no ' +
       'customization options', async function() {
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('some content'));
+      await forms.toRichText('some content'), true);
 
     // NumberWithUnits input does not have any customization arguments.
     // Therefore the customization modal and the save interaction button do
@@ -433,7 +433,7 @@ describe('Core exploration functionality', function() {
   it('should open appropriate modal on re-clicking an interaction to ' +
      'customize it', async function() {
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('some content'));
+      await forms.toRichText('some content'), true);
 
     // NumberWithUnits input does not have any customization arguments.
     // Therefore, on re-clicking, a modal opens up informing the user that
@@ -460,7 +460,7 @@ describe('Core exploration functionality', function() {
     ' instructions and newly created state', async function() {
     // Verify exploration's text content.
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Happiness Checker'));
+      await forms.toRichText('Happiness Checker'), true);
     await explorationEditorMainTab.expectContentToMatch(
       await forms.toRichText('Happiness Checker'));
     // Verify interaction's details.

@@ -203,7 +203,8 @@ var NumberWithUnitsEditor = function(elem) {
 var ParameterNameEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.selectByVisibleText(text);
+      var parameterSelector = await elem.$('<select>');
+      await parameterSelector.selectByVisibleText(text);
     }
   };
 };

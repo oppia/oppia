@@ -283,7 +283,7 @@ var RichTextEditor = async function(elem) {
         await action.addValue(
           'First RTE Element',
           rteElements[0],
-          'PageDown');
+          'ArrowDown');
       }
 
       // Ensure that the cursor is at the end of the RTE.
@@ -666,8 +666,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         '().scrollTop(' + String(scrollTo) + ');');
       var lineHeight = await elem.$(
         codeMirrorLineNumberLocator).getAttribute('clientHeight');
+      await scrollBarWebElement.scrollIntoView();
       var currentScrollTop = await browser.execute(
-        'return arguments[0].scrollTop;', scrollBarWebElement);
+        'return arguments[0].scrollIntoView;', scrollBarWebElement);
       if (currentScrollTop === prevScrollTop) {
         break;
       } else {
@@ -683,7 +684,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
         var lineDivElements = await elem.$$('./div');
-        var lineDivElement = await lineDivElements[i];
+        var lineDivElement = lineDivElements[i];
         var lineContentElements = await elem.$$('.CodeMirror-line');
         var lineElement = await lineContentElements[i];
         var isHighlighted = await lineDivElement.$(
