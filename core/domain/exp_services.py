@@ -567,7 +567,7 @@ def apply_change_list(
                     # condition forces change to have type
                     # EditExpStatePropertyInteractionAnswerGroupsCmd.
                     edit_interaction_answer_group_cmd = cast(
-                        exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
+                        exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,  # pylint: disable=line-too-long
                         change
                     )
                     answer_groups = (
@@ -586,7 +586,7 @@ def apply_change_list(
                         # condition forces change to have type
                         # EditExpStatePropertyInteractionDefaultOutcomeCmd.
                         edit_interaction_default_outcome_cmd = cast(
-                            exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,
+                            exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,  # pylint: disable=line-too-long
                             change
                         )
                         new_outcome = state_domain.Outcome.from_dict(
@@ -908,7 +908,7 @@ def apply_change_list(
                     # condition forces change to have type
                     # EditExplorationPropertyCorrectnessFeedbackEnabledCmd.
                     edit_correctness_feedback_enabled_cmd = cast(
-                        exp_domain.EditExplorationPropertyCorrectnessFeedbackEnabledCmd,
+                        exp_domain.EditExplorationPropertyCorrectnessFeedbackEnabledCmd,  # pylint: disable=line-too-long
                         change
                     )
                     exploration.update_correctness_feedback_enabled(
