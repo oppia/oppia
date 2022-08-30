@@ -62,7 +62,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration('id', exploration)
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
@@ -76,7 +76,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration('id', exploration)
         exp_model = exp_models.ExplorationModel.get_by_id('id')
         snapshot_dict = exp_model.compute_snapshot()
         snapshot_dict['skill_tags'] = ['tag1', 'tag2']
@@ -562,7 +562,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'max_age must be a datetime.timedelta instance or None.'
         ):
             # TODO(#13528): Remove this test after the backend is fully
@@ -1070,7 +1070,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             exp_models.TransientCheckpointUrlModel)
 
         # Test get_new_progress_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New id generator is producing too many collisions.'
         ):

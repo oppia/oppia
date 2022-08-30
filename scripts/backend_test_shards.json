@@ -157,6 +157,9 @@
         "extensions.issues.CyclicStateTransitions.CyclicStateTransitions_test",
         "extensions.issues.EarlyQuit.EarlyQuit_test",
         "extensions.visualizations.models_test",
+        "scripts.run_lighthouse_tests_test",
+        "scripts.start_test",
+        "setup_test",
         "scripts.check_overall_backend_test_coverage_test"
     ],
     "3": [
