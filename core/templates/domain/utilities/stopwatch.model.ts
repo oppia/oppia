@@ -43,7 +43,7 @@ export class Stopwatch {
       return 0;
     }
     if (this.startTime > this._getCurrentTime()) {
-      this.log.error("Start time was set incorrectly.");
+      this.log.error('Start time was set incorrectly.');
       return 0;
     }
     return (this._getCurrentTime() - this.startTime) / 1000;
