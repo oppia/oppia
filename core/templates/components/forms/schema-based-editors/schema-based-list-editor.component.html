@@ -16,7 +16,7 @@
     height: auto;
     margin: 4px 0;
   }
-  .schema-based-list-editor .oppia-new-tab-button-container .oppia-btn-nodisplay {
+  .schema-based-list-editor .oppia-new-tab-button-container .oppia-btn-no-display {
     display: none;
   }
 </style>
@@ -53,7 +53,7 @@
 
     <div class="oppia-new-tab-button-container">
       <button
-              class="{{ (!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 'btn btn-secondary btn-sm ml-0 e2e-test-add-list-entry' : 'oppia-btn-nodisplay' }}"
+              class="{{ (!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 'btn btn-secondary btn-sm ml-0 e2e-test-add-list-entry' : 'oppia-btn-no-display' }}"
               *ngIf="!len && (maxListLength === null || localValue && localValue.length < maxListLength)"
               type="button" (click)="addElement()" [disabled]="disabled">
         {{ addElementText | translate }}
