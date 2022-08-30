@@ -157,8 +157,25 @@ var AdminPage = function() {
     return null;
   };
 
-  // Remove this method after the end_chapter_celebration feature flag
+  // Remove this method after the checkpoint_celebration feature flag
   // is deprecated.
+  this.getCheckpointCelebrationFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'checkpoint_celebration') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
+  // This function is meant to be used to enable a feature gated behind
+  // a feature flag in prod mode, which is the server environment the E2E
+  // tests are run in.
   this.enableFeatureForProd = async function(featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
 

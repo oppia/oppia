@@ -40,6 +40,7 @@ TOTAL_E2E_SUITES = [
     'additionalPlayerFeatures',
     'adminPage',
     'blogDashboard',
+    'checkpointFeatures',
     'classroomPage',
     'classroomPageFileUploadFeatures',
     'collections',

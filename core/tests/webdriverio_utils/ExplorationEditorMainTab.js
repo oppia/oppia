@@ -101,6 +101,8 @@ var ExplorationEditorMainTab = function() {
   var addSolutionButton = $('.e2e-test-oppia-add-solution-button');
   var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
   var cancelOutcomeDestButton = $('.e2e-test-cancel-outcome-dest');
+  var checkpointSelectionCheckbox = $(
+    '.e2e-test-checkpoint-selection-checkbox');
   var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
   var confirmDeleteInteractionButton = $(
     '.e2e-test-confirm-delete-interaction');
@@ -576,6 +578,10 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
+  };
+
+  this.enableCheckpointForCurrentState = async function() {
+    await action.click('Checkpoint checkbox', checkpointSelectionCheckbox);
   };
 
   // This function should not usually be invoked directly; please consider

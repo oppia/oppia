@@ -104,8 +104,8 @@
                 <label class="form-heading">Notes</label>
                 <div ng-if="!notesEditorIsShown">
                   <div ng-click="openNotesEditor()" class="oppia-editable-section e2e-test-open-story-notes-editor-button">
-                    <i class="material-icons oppia-editor-edit-icon float-right"
-                       title="Edit Story Notes">&#xE254;
+                    <i class="fas fa-pen oppia-editor-edit-icon float-right story-editor-notes-edit-icon"
+                       title="Edit Story Notes">
                     </i>
                     <div class="oppia-state-content-display oppia-transition-200 oppia-prevent-selection"
                          title="Story notes">
@@ -423,6 +423,9 @@
   }
   .chapter-list-card-header i {
     display: none;
+  }
+  .story-editor-notes-edit-icon {
+    padding-top: 4px;
   }
   @media screen and (max-width: 1150px) {
     story-editor .content-container {
