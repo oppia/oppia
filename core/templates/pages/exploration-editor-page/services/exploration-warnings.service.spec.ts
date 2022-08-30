@@ -1722,7 +1722,7 @@ describe('Exploration Warnings Service', () => {
     });
   });
 
-  it('should show warnings if learner is directed more than 3 cards' +
+  fit('should show warnings if learner is directed more than 3 cards' +
      ' back in the exploration', () => {
     explorationStatesService.init({
       Hola: {
@@ -2273,7 +2273,7 @@ describe('Exploration Warnings Service', () => {
       ],
       State7: [
         'Placeholder text must be a string.',
-        'Number of rows must be integral.',
+        'Number of rows must be integral.'
       ],
       End: [
         'Please make sure end exploration interactions do not ' +
