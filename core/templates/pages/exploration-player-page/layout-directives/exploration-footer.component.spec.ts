@@ -48,6 +48,19 @@ import { UserService } from 'services/user.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+
+class MockCheckpointCelebrationUtilityService {
+  private _openLessonInformationModalEmitter = new EventEmitter<void>();
+
+  getOpenLessonInformationModalEmitter(): EventEmitter<void> {
+    return this._openLessonInformationModalEmitter;
+  }
+
+  openLessonInformationModal(): void {
+    this._openLessonInformationModalEmitter.emit();
+  }
+}
 
 class MockWindowRef {
   nativeWindow = {
@@ -100,6 +113,8 @@ describe('ExplorationFooterComponent', () => {
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
+  let checkpointCelebrationUtilityService:
+    CheckpointCelebrationUtilityService;
 
   const sampleExpInfo = {
     category: 'dummy_category',
@@ -142,6 +157,10 @@ describe('ExplorationFooterComponent', () => {
         LoggerService,
         UrlInterpolationService,
         {
+          provide: CheckpointCelebrationUtilityService,
+          useClass: MockCheckpointCelebrationUtilityService
+        },
+        {
           provide: WindowRef,
           useClass: MockWindowRef
         }
@@ -175,6 +194,8 @@ describe('ExplorationFooterComponent', () => {
       AudioTranslationLanguageService);
     userService = TestBed.inject(UserService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    checkpointCelebrationUtilityService = TestBed.inject(
+      CheckpointCelebrationUtilityService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -192,6 +213,9 @@ describe('ExplorationFooterComponent', () => {
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
       mockResizeEventEmitter);
     spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'subscribe');
+    spyOn(
+      checkpointCelebrationUtilityService
+        .getOpenLessonInformationModalEmitter(), 'subscribe');
     spyOn(component, 'getCheckpointCount').and.returnValue(Promise.resolve());
     spyOn(component, 'showProgressReminderModal');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
@@ -1165,6 +1189,24 @@ describe('ExplorationFooterComponent', () => {
     mockResizeEventEmitter.emit();
 
     expect(component.windowIsNarrow).toBeFalse();
+  });
+
+  it('should open lesson info modal if emitter emits', () => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(
+      checkpointCelebrationUtilityService
+        .getOpenLessonInformationModalEmitter(), 'subscribe')
+      .and.callThrough();
+    spyOn(component, 'showInformationCard');
+
+    component.ngOnInit();
+    checkpointCelebrationUtilityService.openLessonInformationModal();
+
+    expect(
+      checkpointCelebrationUtilityService
+        .getOpenLessonInformationModalEmitter().subscribe).toHaveBeenCalled();
+    expect(component.showInformationCard).toHaveBeenCalled();
   });
 
   it('should not display author names when exploration is in question' +
