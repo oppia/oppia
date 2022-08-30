@@ -99,6 +99,10 @@ class ContributorDashboardDebugInitializer():
         """Sign up a new user based on email and username. The password is
         generated automatically from email.
         """
+        # In development mode, to save developers and end-to-end test authors
+        # the trouble of providing passwords, passwords are generated through
+        # the md5 hash of email addresses in frontend codes. This script also 
+        # uses the md5 hash so that the created users can sign in from login UI.
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
         # The FIREBASE_AUTH_EMULATOR_HOST environment variable is set to connect
