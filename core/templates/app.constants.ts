@@ -72,7 +72,7 @@ export const AppConstants = {
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
     INVALID_REDIRECTION: 'Learner should not be directed back by more' +
-      ' than 3 cards in the lesson.'
+      ' than MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards in the lesson.'
   },
 
   CHECKPOINT_ERROR_MESSAGES: {

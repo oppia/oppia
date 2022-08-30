@@ -51,6 +51,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
 
+var Deque = require('collections/deque');
 interface _getStatesAndAnswerGroupsWithEmptyClassifiersResult {
   groupIndexes: number[];
   stateName: string;
@@ -538,11 +539,7 @@ export class ExplorationWarningsService {
       sourceStateName, destStateName, links);
     // Raise validation error if the creator redirects the learner
     // back by more than MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards.
-    if (distance > AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION) {
-      return false;
-    } else {
-      return true;
-    }
+    return distance <= AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION;
   }
 
   getDistanceToDestState(
