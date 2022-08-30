@@ -60,7 +60,7 @@
     <div class="oppia-collapse-content"
          *ngIf="isContentOverflowing"
          (click)="toggleExpansionState(0)">
-      {{ isContentExpanded ? "View Less" : "View All" }}
+      {{ isContentExpanded ? textWhenExpanded : textWhenContracted }}
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
       <div class="e2e-test-state-translation-editor">
@@ -96,7 +96,7 @@
         <div class="oppia-collapse-content"
              (click)="toggleExpansionState(1)"
              *ngIf="isTranslationOverflowing">
-          {{ isTranslationExpanded ? "View Less" : "View More" }}
+          {{ isTranslationExpanded ? textWhenExpanded : textWhenContracted }}
         </div>
       </div>
     </div>

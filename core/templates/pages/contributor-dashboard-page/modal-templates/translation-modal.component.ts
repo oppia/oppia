@@ -135,6 +135,8 @@ export class TranslationModalComponent {
   isTranslationExpanded: boolean = true;
   isContentOverflowing: boolean = false;
   isTranslationOverflowing: boolean = false;
+  textWhenExpanded: string = 'View Less';
+  textWhenContracted: string = 'View More';
   // The value of cutoff must be equal to 'max-height' - 1 set
   // in the class '.oppia-contracted' in 'translation-modal.component.html'.
   cutoff_height: number = 29;

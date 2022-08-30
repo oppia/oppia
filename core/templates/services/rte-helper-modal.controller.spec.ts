@@ -383,7 +383,7 @@ describe('Rte Helper Modal Controller', function() {
     }));
 
     it('should detect whether the default RTE component is used', ()=>{
-      expect($scope.isDefaultRTEComponent).toBeTrue();
+      expect($scope.defaultRTEComponent).toBeTrue();
     });
 
     it('should close modal and remove the tag', function() {
