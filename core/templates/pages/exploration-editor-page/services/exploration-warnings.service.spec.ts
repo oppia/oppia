@@ -59,7 +59,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
      name: 'ParamChange3'
    }];
  }
-fdescribe('Exploration Warnings Service', () => {
+describe('Exploration Warnings Service', () => {
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationWarningsService: ExplorationWarningsService;
   let explorationStatesService: ExplorationStatesService;
