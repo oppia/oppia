@@ -44,7 +44,7 @@ from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Sequence,
     Set, Tuple, Union, cast
 )
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -496,7 +496,7 @@ class EditExpStatePropertyParamChangesCmd(ExplorationChange):
     STATE_PROPERTY_PARAM_CHANGES as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['param_changes']
     state_name: str
     new_value: List[param_domain.ParamChangeDict]
     old_value: List[param_domain.ParamChangeDict]
@@ -508,7 +508,7 @@ class EditExpStatePropertyContentCmd(ExplorationChange):
     STATE_PROPERTY_CONTENT as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['content']
     state_name: str
     new_value: state_domain.SubtitledHtmlDict
     old_value: state_domain.SubtitledHtmlDict
@@ -520,7 +520,7 @@ class EditExpStatePropertySolicitAnswerDetailsCmd(ExplorationChange):
     STATE_PROPERTY_SOLICIT_ANSWER_DETAILS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['solicit_answer_details']
     state_name: str
     new_value: bool
     old_value: bool
@@ -532,7 +532,7 @@ class EditExpStatePropertyCardIsCheckpointCmd(ExplorationChange):
     STATE_PROPERTY_CARD_IS_CHECKPOINT as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['card_is_checkpoint']
     state_name: str
     new_value: bool
     old_value: bool
@@ -544,7 +544,7 @@ class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
     STATE_PROPERTY_RECORDED_VOICEOVERS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['recorded_voiceovers']
     state_name: str
     new_value: state_domain.RecordedVoiceoversDict
     old_value: state_domain.RecordedVoiceoversDict
@@ -556,7 +556,7 @@ class EditExpStatePropertyWrittenTranslationsCmd(ExplorationChange):
     STATE_PROPERTY_WRITTEN_TRANSLATIONS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['written_translations']
     state_name: str
     new_value: state_domain.WrittenTranslationsDict
     old_value: state_domain.WrittenTranslationsDict
@@ -568,7 +568,7 @@ class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_ID as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['widget_id']
     state_name: str
     new_value: str
     old_value: str
@@ -580,7 +580,7 @@ class EditExpStatePropertyNextContentIdIndexCmd(ExplorationChange):
     STATE_PROPERTY_NEXT_CONTENT_ID_INDEX as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['next_content_id_index']
     state_name: str
     new_value: int
     old_value: int
@@ -592,7 +592,7 @@ class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
     STATE_PROPERTY_LINKED_SKILL_ID as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['linked_skill_id']
     state_name: str
     new_value: str
     old_value: str
@@ -604,7 +604,7 @@ class EditExpStatePropertyInteractionCustArgsCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_CUST_ARGS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['widget_customization_args']
     state_name: str
     new_value: state_domain.CustomizationArgsDictType
     old_value: state_domain.CustomizationArgsDictType
@@ -616,7 +616,7 @@ class EditExpStatePropertyInteractionStickyCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_STICKY as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['widget_sticky']
     state_name: str
     new_value: bool
     old_value: bool
@@ -628,7 +628,7 @@ class EditExpStatePropertyInteractionHandlersCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_HANDLERS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['widget_handlers']
     state_name: str
     new_value: List[state_domain.AnswerGroupDict]
     old_value: List[state_domain.AnswerGroupDict]
@@ -640,7 +640,7 @@ class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_ANSWER_GROUPS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['answer_groups']
     state_name: str
     new_value: List[state_domain.AnswerGroupDict]
     old_value: List[state_domain.AnswerGroupDict]
@@ -652,7 +652,7 @@ class EditExpStatePropertyInteractionDefaultOutcomeCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['default_outcome']
     state_name: str
     new_value: state_domain.OutcomeDict
     old_value: state_domain.OutcomeDict
@@ -664,7 +664,7 @@ class EditExpStatePropertyInteractionHintsCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_HINTS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['hints']
     state_name: str
     new_value: List[state_domain.HintDict]
     old_value: List[state_domain.HintDict]
@@ -676,7 +676,7 @@ class EditExpStatePropertyInteractionSolutionCmd(ExplorationChange):
     STATE_PROPERTY_INTERACTION_SOLUTION as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['solution']
     state_name: str
     new_value: state_domain.SolutionDict
     old_value: state_domain.SolutionDict
@@ -688,7 +688,7 @@ class EditExpStatePropertyUnclassifiedAnswersCmd(ExplorationChange):
     STATE_PROPERTY_UNCLASSIFIED_ANSWERS as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['confirmed_unclassified_answers']
     state_name: str
     new_value: List[state_domain.AnswerGroup]
     old_value: List[state_domain.AnswerGroup]
@@ -700,7 +700,7 @@ class EditExplorationPropertyTitleCmd(ExplorationChange):
     'title' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['title']
     new_value: str
     old_value: str
 
@@ -711,7 +711,7 @@ class EditExplorationPropertyCategoryCmd(ExplorationChange):
     'category' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['category']
     new_value: str
     old_value: str
 
@@ -722,7 +722,7 @@ class EditExplorationPropertyObjectiveCmd(ExplorationChange):
     'objective' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['objective']
     new_value: str
     old_value: str
 
@@ -733,7 +733,7 @@ class EditExplorationPropertyLanguageCodeCmd(ExplorationChange):
     'language_code' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['language_code']
     new_value: str
     old_value: str
 
@@ -744,7 +744,7 @@ class EditExplorationPropertyTagsCmd(ExplorationChange):
     'tags' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['tags']
     new_value: List[str]
     old_value: List[str]
 
@@ -755,7 +755,7 @@ class EditExplorationPropertyBlurbCmd(ExplorationChange):
     'blurb' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['blurb']
     new_value: str
     old_value: str
 
@@ -766,7 +766,7 @@ class EditExplorationPropertyAuthorNotesCmd(ExplorationChange):
     'author_notes' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['author_notes']
     new_value: str
     old_value: str
 
@@ -777,7 +777,7 @@ class EditExplorationPropertyParamSpecsCmd(ExplorationChange):
     'param_specs' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['param_specs']
     new_value: Dict[str, param_domain.ParamSpecDict]
     old_value: Dict[str, param_domain.ParamSpecDict]
 
@@ -788,7 +788,7 @@ class EditExplorationPropertyParamChangesCmd(ExplorationChange):
     'param_changes' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['param_changes']
     new_value: List[param_domain.ParamChangeDict]
     old_value: List[param_domain.ParamChangeDict]
 
@@ -799,7 +799,7 @@ class EditExplorationPropertyInitStateNameCmd(ExplorationChange):
     'init_state_name' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['init_state_name']
     new_value: str
     old_value: str
 
@@ -810,7 +810,7 @@ class EditExplorationPropertyAutoTtsEnabledCmd(ExplorationChange):
     'auto_tts_enabled' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['auto_tts_enabled']
     new_value: bool
     old_value: bool
 
@@ -821,7 +821,7 @@ class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
     'correctness_feedback_enabled' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['correctness_feedback_enabled']
     new_value: bool
     old_value: bool
 
@@ -832,7 +832,7 @@ class EditExplorationPropertyEditsAllowedCmd(ExplorationChange):
     'edits_allowed' as allowed value.
     """
 
-    property_name: str
+    property_name: Literal['edits_allowed']
     new_value: bool
     old_value: bool
 

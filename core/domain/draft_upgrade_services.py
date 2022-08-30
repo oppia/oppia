@@ -160,9 +160,8 @@ class DraftUpgradeUtil:
                   exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 # Only customization args with the key 'choices' have HTML
                 # content in them.
-                # Here we use cast because this 'elif'
-                # condition forces change to have type
-                # EditExpStatePropertyInteractionCustArgsCmd.
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyInteractionCustArgsCmd.
                 edit_interaction_cust_args_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
                     change
@@ -180,9 +179,8 @@ class DraftUpgradeUtil:
                                 conversion_fn(value))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                # Here we use cast because this 'elif'
-                # condition forces change to have type
-                # EditExpStatePropertyWrittenTranslationsCmd.
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyWrittenTranslationsCmd.
                 edit_written_translations_dict_cmd = cast(
                     exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
                     change
@@ -209,9 +207,8 @@ class DraftUpgradeUtil:
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   new_value is not None):
-                # Here we use cast because this 'elif'
-                # condition forces change to have type
-                # EditExpStatePropertyInteractionDefaultOutcomeCmd.
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyInteractionDefaultOutcomeCmd.
                 edit_interaction_default_outcome_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,
                     change
@@ -224,9 +221,8 @@ class DraftUpgradeUtil:
                 )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                # Here we use cast because this 'elif'
-                # condition forces change to have type
-                # EditExpStatePropertyInteractionHintsCmd.
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyInteractionHintsCmd.
                 edit_interaction_hints_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionHintsCmd,
                     change
@@ -239,9 +235,8 @@ class DraftUpgradeUtil:
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
                   new_value is not None):
-                # Here we use cast because this 'elif'
-                # condition forces change to have type
-                # EditExpStatePropertyInteractionSolutionCmd.
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyInteractionSolutionCmd.
                 edit_interaction_solution_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionSolutionCmd,
                     change
@@ -280,9 +275,8 @@ class DraftUpgradeUtil:
                 html_field_types_to_rule_specs = (
                     rules_registry.Registry.get_html_field_types_to_rule_specs(
                         state_schema_version=41))
-                # Here we use cast because this 'elif'
-                # condition forces change to have type
-                # EditExpStatePropertyInteractionSolutionCmd.
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyInteractionSolutionCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change
@@ -670,11 +664,8 @@ class DraftUpgradeUtil:
         for change in draft_change_list:
             if (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                # Here we use cast because in this 'if clause' we are
-                # updating the interaction's answer_groups of a State
-                # which can only be of type AnswerGroupDict. So, to
-                # rule out all other property types for MyPy type checking,
-                # we used cast here.
+                # Here we use cast because this 'if' condition forces change to
+                # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change
@@ -852,11 +843,8 @@ class DraftUpgradeUtil:
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-                # Here we use cast because in this 'if clause' we are
-                # updating the recorded_voiceovers of a State which can
-                # only be of type RecordedVoiceoversDict. So, to rule out
-                # all other property types for MyPy type checking, we used
-                # cast here.
+                # Here we use cast because this 'if' condition forces change to
+                # have type EditExpStatePropertyRecordedVoiceoversCmd.
                 edit_recorded_voiceovers_cmd = cast(
                     exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
                     change
@@ -901,28 +889,29 @@ class DraftUpgradeUtil:
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                # Here we use cast because in this 'if clause' we are
-                # updating the interaction's answer_groups of a State
-                # which can only be of type AnswerGroupDict. So, to rule
-                # out all other property types for MyPy type checking,
-                # we used cast here.
+                # Here we use cast because this 'if' condition forces change to
+                # have type EditExpStatePropertyInteractionAnswerGroupsCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change
                 )
-                answer_groups = edit_interaction_answer_groups_cmd.new_value
-                answer_group_dict: state_domain.AnswerGroupDict = {
-                        'rule_specs': answer_groups['rule_specs'],
-                        'outcome': answer_groups['outcome'],
-                        'training_data': answer_groups['training_data'],
+                new_answer_groups_dicts = (
+                    edit_interaction_answer_groups_cmd.new_value
+                )
+                answer_group_dicts: List[state_domain.AnswerGroupDict] = []
+                for answer_group_dict in new_answer_groups_dicts:
+                    answer_group_dicts.append({
+                        'rule_specs': answer_group_dict['rule_specs'],
+                        'outcome': answer_group_dict['outcome'],
+                        'training_data': answer_group_dict['training_data'],
                         'tagged_skill_misconception_id': None
-                }
+                    })
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
                     'state_name': change.state_name,
-                    'new_value': answer_group_dict
+                    'new_value': answer_group_dicts
                 })
         return draft_change_list
 
@@ -963,8 +952,8 @@ class DraftUpgradeUtil:
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED):  # pylint: disable=line-too-long
                 # Here we use cast because in this 'if clause' we are
-                # updating the recorded_voiceovers of a State which can
-                # only be of type Dict[str, Dict[str, state_domain.VoiceoverDict
+                # updating the voiceovers_mapping of a draft_change_list
+                # which can only be of type Dict[str, Dict[str, VoiceoverDict
                 # ]]. So, to rule out all other property types for MyPy
                 # type checking, we used cast here.
                 voiceovers_dict = cast(
