@@ -64,7 +64,7 @@ class QuestionsListHandler(base.BaseHandler):
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
         try:
-            offset = int(self.normalized_request.get('offset'))
+            offset = (self.normalized_request.get('offset'))
         except Exception as e:
             raise self.InvalidInputException('Invalid offset') from e
 
