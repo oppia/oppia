@@ -46,13 +46,14 @@ from typing import Any, Dict, List
 FIREBASE_AUTH_EMULATOR_HOST = 'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT
 os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = FIREBASE_AUTH_EMULATOR_HOST
 FIREBASE_SIGN_IN_URL = (
-    'http://' + FIREBASE_AUTH_EMULATOR_HOST +
-    '/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword')
+    'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
+    % FIREBASE_AUTH_EMULATOR_HOST)
 
 SUPER_ADMIN_EMAIL = feconf.ADMIN_EMAIL_ADDRESS
 SUPER_ADMIN_USERNAME = 'a'
-SUPER_ADMIN_ROLES = [feconf.ROLE_ID_CURRICULUM_ADMIN,
-        feconf.ROLE_ID_TRANSLATION_ADMIN, feconf.ROLE_ID_QUESTION_ADMIN]
+SUPER_ADMIN_ROLES = [
+    feconf.ROLE_ID_CURRICULUM_ADMIN, feconf.ROLE_ID_TRANSLATION_ADMIN,
+    feconf.ROLE_ID_QUESTION_ADMIN]
 
 CONTRIBUTOR_EMAIL = 'contributor@example.com'
 CONTRIBUTOR_USERNAME = 'b'
@@ -130,7 +131,8 @@ class ContributorDashboardDebugInitializer():
         self._make_request('GET', '/session_begin', headers=headers)
 
     def _sign_in_with_email_and_password(
-            self, email: str, password: str) -> Any:
+        self, email: str, password: str
+    ) -> Any:
         """Signs in with email and password, and returns the token id."""
         token_id = requests.post(
             FIREBASE_SIGN_IN_URL,
@@ -190,8 +192,9 @@ class ContributorDashboardDebugInitializer():
             'GET', '/topics_and_skills_dashboard/data')
         topic_summary_dicts = json.loads(
             response.text[len(feconf.XSSI_PREFIX):])['topic_summary_dicts']
-        topic_ids = [topic_summary_dict['id']
-                        for topic_summary_dict in topic_summary_dicts]
+        topic_ids = [
+            topic_summary_dict['id'] for topic_summary_dict in
+            topic_summary_dicts]
 
         params = {
             'payload': json.dumps({

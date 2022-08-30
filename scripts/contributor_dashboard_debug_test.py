@@ -79,7 +79,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         url: str,
         params: Dict[str, Any] | None = None,
         headers: Dict[str, Any] | None = None
-        ) -> Any:
+    ) -> Any:
         """Returns a mock response for the given request."""
         if method == 'GET':
             return self.testapp.get(url, params=params, headers=headers)
@@ -98,7 +98,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             self.mock_login_as_admin)
 
         with self.request_swap, sign_up_swap, begin_session_swap, (
-                init_app_swap) as init_app_counter:
+            init_app_swap) as init_app_counter:
             self.contributor_dashboard_debug.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
@@ -126,7 +126,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             base, 'load_template', test_utils.mock_load_template)
 
         with self.request_swap, create_user_swap, begin_session_swap, (
-                load_template_swap):
+            load_template_swap):
             self.contributor_dashboard_debug._sign_up_new_user(email, username) # pylint: disable=protected-access
 
         self.assertIsNotNone(self.firebase_sdk_stub.get_user_by_email(email))
@@ -145,11 +145,11 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         token_id = self.firebase_sdk_stub.create_user(
             auth_id, email=self.tested_email)
         sign_in_swap = self.swap_to_always_return(
-                self.contributor_dashboard_debug,
-                '_sign_in_with_email_and_password',
-                token_id)
+            self.contributor_dashboard_debug,
+            '_sign_in_with_email_and_password',
+            token_id)
         establish_session_swap = self.swap_with_call_counter(
-                    auth_services, 'establish_auth_session')
+            auth_services, 'establish_auth_session')
 
         with sign_in_swap, self.request_swap, establish_session_swap as (
             establish_session_counter):
@@ -166,8 +166,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             base.CsrfTokenManager.is_csrf_token_valid(admin_id, csrf_token)) # type: ignore
 
     def test_assign_admin_roles(self) -> None:
-        roles = [feconf.ROLE_ID_CURRICULUM_ADMIN,
-            feconf.ROLE_ID_TRANSLATION_ADMIN, feconf.ROLE_ID_QUESTION_ADMIN]
+        roles = [
+            feconf.ROLE_ID_CURRICULUM_ADMIN, feconf.ROLE_ID_TRANSLATION_ADMIN,
+            feconf.ROLE_ID_QUESTION_ADMIN]
 
         with self.request_swap:
             self.contributor_dashboard_debug._assign_admin_roles( # pylint: disable=protected-access

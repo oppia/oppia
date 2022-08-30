@@ -185,12 +185,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             port=PORT_NUMBER_FOR_GAE_SERVER))
 
         if parsed_args.contributor_dashboard_debug:
-            debug_requests = (
-                contributor_dashboard_debug.ContributorDashboardDebugInitializer
-                (
-                base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
-            ))
-            debug_requests.populate_debug_data()
+            initializer = (
+                contributor_dashboard_debug
+                .ContributorDashboardDebugInitializer(
+                    base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER)
+            )
+            initializer.populate_debug_data()
 
         managed_web_browser = (
             None if parsed_args.no_browser else
