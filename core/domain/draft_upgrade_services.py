@@ -253,10 +253,10 @@ class DraftUpgradeUtil:
                 # is allowed to have HTML in the solution correct answer
                 # The typecheckings below can be avoided once #9413 is fixed.
                 if new_value['correct_answer']:
-                    # Here we use cast because Solution's correct_answer
-                    # can be of various type but following the implementation
-                    # we are assured that correct_answer is always going to
-                    # be of type List[List[str]].
+                    # Here we use cast because Solution's correct_answer can be
+                    # of various types but following the implementation we are
+                    # assured that the correct_answer is always going to be of
+                    # type List[List[str]].
                     correct_answer = cast(
                         List[List[str]], new_value['correct_answer']
                     )
@@ -276,7 +276,7 @@ class DraftUpgradeUtil:
                     rules_registry.Registry.get_html_field_types_to_rule_specs(
                         state_schema_version=41))
                 # Here we use cast because this 'elif' condition forces change
-                # to have type EditExpStatePropertyInteractionSolutionCmd.
+                # to have type EditExpStatePropertyInteractionAnswerGroupsCmd.
                 edit_interaction_answer_groups_cmd = cast(
                     exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,
                     change

@@ -551,12 +551,12 @@ def apply_change_list(
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyInteractionCustArgsCmd.
-                    edit_interaction_cust_arg_cms = cast(
+                    edit_interaction_cust_arg_cmd = cast(
                         exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
                         change
                     )
                     state.update_interaction_customization_args(
-                        edit_interaction_cust_arg_cms.new_value)
+                        edit_interaction_cust_arg_cmd.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
@@ -763,52 +763,49 @@ def apply_change_list(
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
                 # Here we use cast because we are narrowing down the type from
                 # ExplorationChange to a specific change command.
-                written_translation_as_needing_update = cast(
+                written_translation_as_needing_update_cmd = cast(
                     exp_domain.MarkWrittenTranslationAsNeedingUpdateCmd,
                     change
                 )
                 exploration.states[
-                    written_translation_as_needing_update.state_name
+                    written_translation_as_needing_update_cmd.state_name
                 ].mark_written_translation_as_needing_update(
-                    written_translation_as_needing_update.content_id,
-                    written_translation_as_needing_update.language_code
+                    written_translation_as_needing_update_cmd.content_id,
+                    written_translation_as_needing_update_cmd.language_code
                 )
             elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
                 # Here we use cast because we are narrowing down the type from
                 # ExplorationChange to a specific change command.
-                written_translations_as_needing_update = cast(
+                written_translations_as_needing_update_cmd = cast(
                     exp_domain.MarkWrittenTranslationsAsNeedingUpdateCmd,
                     change
                 )
                 exploration.states[
-                    written_translations_as_needing_update.state_name
+                    written_translations_as_needing_update_cmd.state_name
                 ].mark_written_translations_as_needing_update(
-                    written_translations_as_needing_update.content_id
+                    written_translations_as_needing_update_cmd.content_id
                 )
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
-                    # Here we use cast because this 'if'
-                    # condition forces change to have type
-                    # EditExplorationPropertyTitleCmd.
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExplorationPropertyTitleCmd.
                     edit_title_cmd = cast(
                         exp_domain.EditExplorationPropertyTitleCmd,
                         change
                     )
                     exploration.update_title(edit_title_cmd.new_value)
                 elif change.property_name == 'category':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyCategoryCmd.
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyCategoryCmd.
                     edit_category_cmd = cast(
                         exp_domain.EditExplorationPropertyCategoryCmd,
                         change
                     )
                     exploration.update_category(edit_category_cmd.new_value)
                 elif change.property_name == 'objective':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyObjectiveCmd.
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyObjectiveCmd.
                     edit_objective_cmd = cast(
                         exp_domain.EditExplorationPropertyObjectiveCmd,
                         change
@@ -826,27 +823,24 @@ def apply_change_list(
                         edit_language_code_cmd.new_value
                     )
                 elif change.property_name == 'tags':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyTagsCmd.
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyTagsCmd.
                     edit_tags_cmd = cast(
                         exp_domain.EditExplorationPropertyTagsCmd,
                         change
                     )
                     exploration.update_tags(edit_tags_cmd.new_value)
                 elif change.property_name == 'blurb':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyBlurbCmd.
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyBlurbCmd.
                     edit_blurb_cmd = cast(
                         exp_domain.EditExplorationPropertyBlurbCmd,
                         change
                     )
                     exploration.update_blurb(edit_blurb_cmd.new_value)
                 elif change.property_name == 'author_notes':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyAuthorNotesCmd.
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyAuthorNotesCmd.
                     edit_author_notes_cmd = cast(
                         exp_domain.EditExplorationPropertyAuthorNotesCmd,
                         change
@@ -855,9 +849,8 @@ def apply_change_list(
                         edit_author_notes_cmd.new_value
                     )
                 elif change.property_name == 'param_specs':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyParamSpecsCmd.
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyParamSpecsCmd.
                     edit_param_specs_cmd = cast(
                         exp_domain.EditExplorationPropertyParamSpecsCmd,
                         change
