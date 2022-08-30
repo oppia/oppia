@@ -338,13 +338,13 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
     def test_can_see_subscriptions(self):
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        response = self.get_json(feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 0)
 
         # Subscribe to user.
         subscription_services.subscribe_to_creator(
             self.viewer_id, self.owner_id)
-        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        response = self.get_json(feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 1)
         self.assertEqual(
             response['subscription_list'][0]['creator_username'],
@@ -353,7 +353,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         # Unsubscribe from user.
         subscription_services.unsubscribe_from_creator(
             self.viewer_id, self.owner_id)
-        response = self.get_json(feconf.PREFERENCES_DATA_URL)
+        response = self.get_json(feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 0)
         self.logout()
 
@@ -364,9 +364,8 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(test_utils.check_image_png_or_webp(
             user_settings.profile_picture_data_url))
         self.put_json(
-            feconf.PREFERENCES_DATA_URL,
+            feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL,
             {
-                'update_type': 'profile_picture_data_url',
                 'data': 'new_profile_picture_data_url'},
             csrf_token=csrf_token)
         user_settings = user_services.get_user_settings(self.owner_id)
