@@ -92,23 +92,23 @@ export class ClassroomAdminPageComponent implements OnInit {
       });
   }
 
-  updateClassroomName(): void {
-    this.updatedClassroomDict.name = this.classroomName;
+  updateClassroomName(newClasroomName: string): void {
+    this.updatedClassroomDict.name = newClasroomName;
     this.classroomDataIsChanged = true;
   }
 
-  updateUrlFragment(): void {
-    this.updatedClassroomDict.urlFragment = this.urlFragment;
+  updateUrlFragment(newUrlFragment: string): void {
+    this.updatedClassroomDict.urlFragment = newUrlFragment;
     this.classroomDataIsChanged = true;
   }
 
-  updateCourseDetails(): void {
-    this.updatedClassroomDict.courseDetails = this.courseDetails;
+  updateCourseDetails(newClassroomDetails: string): void {
+    this.updatedClassroomDict.courseDetails = newClassroomDetails;
     this.classroomDataIsChanged = true;
   }
 
-  updateTopicListIntro(): void {
-    this.updatedClassroomDict.topicListIntro = this.topicListIntro;
+  updateTopicListIntro(newTopicListIntro: string): void {
+    this.updatedClassroomDict.topicListIntro = newTopicListIntro;
     this.classroomDataIsChanged = true;
   }
 
