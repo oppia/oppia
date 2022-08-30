@@ -30,6 +30,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import os
@@ -41,10 +42,9 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 
 import requests
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterator, List
 
 FIREBASE_AUTH_EMULATOR_HOST = 'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT
-os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = FIREBASE_AUTH_EMULATOR_HOST
 FIREBASE_SIGN_IN_URL = (
     'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
     % FIREBASE_AUTH_EMULATOR_HOST)
@@ -101,8 +101,13 @@ class ContributorDashboardDebugInitializer():
         """
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
-        # Create a new user in firebase.
-        firebase_auth.create_user(email=email, password=password) # type: ignore
+        # The FIREBASE_AUTH_EMULATOR_HOST environment variable is set to connect
+        # with the Firebase Authentication emulator.
+        with self._set_environ(
+            'FIREBASE_AUTH_EMULATOR_HOST', FIREBASE_AUTH_EMULATOR_HOST
+        ):
+            # Create a new user in Firebase.
+            firebase_auth.create_user(email=email, password=password) # type: ignore
 
         # Sign up the new user in Oppia and set its username.
         self._sign_in(email)
@@ -120,6 +125,20 @@ class ContributorDashboardDebugInitializer():
         # End current session, i.e. log out.
         self._make_request('GET', '/session_end')
         self.csrf_token = ''
+
+    @contextlib.contextmanager
+    def _set_environ(self, env_name: str, value: str) -> Iterator[None]:
+        """Temporarily set the environment variable 'env_name' to 'value' while
+        inside the ``with`` block."""
+        old_value = os.environ.get(env_name)
+        os.environ[env_name] = value
+        try:
+            yield
+        finally:
+            if old_value is None:
+                del os.environ[env_name]
+            else:
+                os.environ[env_name] = old_value
 
     def _sign_in(self, email: str) -> None:
         """Begins a session with the given email, i.e. log in with the email."""
