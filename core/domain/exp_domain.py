@@ -448,7 +448,7 @@ class ExplorationChange(change_domain.BaseChange):
 
 
 class CreateNewExplorationCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_CREATE_NEW command.
     """
 
@@ -457,7 +457,7 @@ class CreateNewExplorationCmd(ExplorationChange):
 
 
 class AddExplorationStateCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_ADD_STATE command.
     """
 
@@ -465,7 +465,7 @@ class AddExplorationStateCmd(ExplorationChange):
 
 
 class DeleteExplorationStateCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_DELETE_STATE command.
     """
 
@@ -473,7 +473,7 @@ class DeleteExplorationStateCmd(ExplorationChange):
 
 
 class RenameExplorationStateCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_RENAME_STATE command.
     """
 
@@ -482,7 +482,7 @@ class RenameExplorationStateCmd(ExplorationChange):
 
 
 class AddWrittenTranslationCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_ADD_WRITTEN_TRANSLATION command.
     """
 
@@ -495,7 +495,7 @@ class AddWrittenTranslationCmd(ExplorationChange):
 
 
 class MarkWrittenTranslationAsNeedingUpdateCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE command.
     """
 
@@ -505,7 +505,7 @@ class MarkWrittenTranslationAsNeedingUpdateCmd(ExplorationChange):
 
 
 class MarkWrittenTranslationsAsNeedingUpdateCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE command.
     """
 
@@ -514,7 +514,7 @@ class MarkWrittenTranslationsAsNeedingUpdateCmd(ExplorationChange):
 
 
 class EditExplorationStatePropertyCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_EDIT_STATE_PROPERTY command.
     """
 
@@ -525,7 +525,7 @@ class EditExplorationStatePropertyCmd(ExplorationChange):
 
 
 class EditExplorationPropertyCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_EDIT_EXPLORATION_PROPERTY command.
     """
 
@@ -535,7 +535,7 @@ class EditExplorationPropertyCmd(ExplorationChange):
 
 
 class MigrateStatesSchemaToLatestVersionCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION command.
     """
 
@@ -544,7 +544,7 @@ class MigrateStatesSchemaToLatestVersionCmd(ExplorationChange):
 
 
 class RevertExplorationCmd(ExplorationChange):
-    """class representing the ExplorationChange's
+    """Class representing the ExplorationChange's
     CMD_REVERT_COMMIT command.
     """
 

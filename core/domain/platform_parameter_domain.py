@@ -101,7 +101,7 @@ class PlatformParameterChange(change_domain.BaseChange):
 
 
 class EditRulesPlatformParameterCmd(PlatformParameterChange):
-    """class representing the PlatformParameterChange's
+    """Class representing the PlatformParameterChange's
     CMD_EDIT_RULES command.
     """
 

@@ -87,7 +87,7 @@ AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
 
 
 class CreateNewSubtopicPageCmd(SubtopicPageChange):
-    """class representing the SubtopicPageChange's
+    """Class representing the SubtopicPageChange's
     CMD_CREATE_NEW command.
     """
 
@@ -96,7 +96,7 @@ class CreateNewSubtopicPageCmd(SubtopicPageChange):
 
 
 class UpdateSubtopicPagePropertyCmd(SubtopicPageChange):
-    """class representing the SubtopicPageChange's
+    """Class representing the SubtopicPageChange's
     CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command.
     """
 

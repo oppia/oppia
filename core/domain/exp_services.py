@@ -508,7 +508,7 @@ def apply_change_list(
                         edit_state_property_cmd.new_value
                     )
                     state.update_param_changes(list(map(
-                            to_param_domain, param_changes)))
+                        to_param_domain, param_changes)))
                 elif (
                         edit_state_property_cmd.property_name ==
                         exp_domain.STATE_PROPERTY_CONTENT

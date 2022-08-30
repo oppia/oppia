@@ -192,7 +192,7 @@ class CollectionChange(change_domain.BaseChange):
 
 
 class CreateNewCollectionCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_CREATE_NEW command.
     """
 
@@ -201,7 +201,7 @@ class CreateNewCollectionCmd(CollectionChange):
 
 
 class AddCollectionNodeCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_ADD_COLLECTION_NODE command.
     """
 
@@ -209,7 +209,7 @@ class AddCollectionNodeCmd(CollectionChange):
 
 
 class DeleteCollectionNodeCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_DELETE_COLLECTION_NODE command.
     """
 
@@ -217,7 +217,7 @@ class DeleteCollectionNodeCmd(CollectionChange):
 
 
 class SwapCollectionNodesCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_SWAP_COLLECTION_NODES command.
     """
 
@@ -226,7 +226,7 @@ class SwapCollectionNodesCmd(CollectionChange):
 
 
 class EditCollectionPropertyCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_EDIT_COLLECTION_PROPERTY command.
     """
 
@@ -236,7 +236,7 @@ class EditCollectionPropertyCmd(CollectionChange):
 
 
 class EditCollectionNodePropertyCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_EDIT_COLLECTION_NODE_PROPERTY command.
     """
 
@@ -247,7 +247,7 @@ class EditCollectionNodePropertyCmd(CollectionChange):
 
 
 class MigrateSchemaToLatestVersionCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
     """
 
@@ -256,7 +256,7 @@ class MigrateSchemaToLatestVersionCmd(CollectionChange):
 
 
 class AddCollectionSkillCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_ADD_COLLECTION_SKILL command.
     """
 
@@ -264,7 +264,7 @@ class AddCollectionSkillCmd(CollectionChange):
 
 
 class DeleteCollectionSkillCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_DELETE_COLLECTION_SKILL command.
     """
 
@@ -272,7 +272,7 @@ class DeleteCollectionSkillCmd(CollectionChange):
 
 
 class AddQuestionIdToSkillCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_ADD_QUESTION_ID_TO_SKILL command.
     """
 
@@ -281,7 +281,7 @@ class AddQuestionIdToSkillCmd(CollectionChange):
 
 
 class RemoveQuestionIdFromSkillCmd(CollectionChange):
-    """class representing the CollectionChange's
+    """Class representing the CollectionChange's
     CMD_ADD_QUESTION_ID_TO_SKILL command.
     """
 

@@ -293,7 +293,7 @@ class TopicChange(change_domain.BaseChange):
 
 
 class CreateNewTopicCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_CREATE_NEW command.
     """
 
@@ -301,7 +301,7 @@ class CreateNewTopicCmd(TopicChange):
 
 
 class AddSubtopicCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_ADD_SUBTOPIC command.
     """
 
@@ -311,7 +311,7 @@ class AddSubtopicCmd(TopicChange):
 
 
 class DeleteSubtopicCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_DELETE_SUBTOPIC command.
     """
 
@@ -319,7 +319,7 @@ class DeleteSubtopicCmd(TopicChange):
 
 
 class AddCanonicalStoryCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_ADD_CANONICAL_STORY command.
     """
 
@@ -327,7 +327,7 @@ class AddCanonicalStoryCmd(TopicChange):
 
 
 class DeleteCanonicalStoryCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_DELETE_CANONICAL_STORY command.
     """
 
@@ -335,7 +335,7 @@ class DeleteCanonicalStoryCmd(TopicChange):
 
 
 class RearrangeCanonicalStoryCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_REARRANGE_CANONICAL_STORY command.
     """
 
@@ -344,7 +344,7 @@ class RearrangeCanonicalStoryCmd(TopicChange):
 
 
 class AddAdditionalStoryCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_ADD_ADDITIONAL_STORY command.
     """
 
@@ -352,7 +352,7 @@ class AddAdditionalStoryCmd(TopicChange):
 
 
 class DeleteAdditionalStoryCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_DELETE_ADDITIONAL_STORY command.
     """
 
@@ -360,7 +360,7 @@ class DeleteAdditionalStoryCmd(TopicChange):
 
 
 class PublishStoryCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_PUBLISH_STORY command.
     """
 
@@ -368,7 +368,7 @@ class PublishStoryCmd(TopicChange):
 
 
 class UnpublishStoryCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_UNPUBLISH_STORY command.
     """
 
@@ -376,7 +376,7 @@ class UnpublishStoryCmd(TopicChange):
 
 
 class AddUncategorizedSkillIdCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_ADD_UNCATEGORIZED_SKILL_ID command.
     """
 
@@ -384,7 +384,7 @@ class AddUncategorizedSkillIdCmd(TopicChange):
 
 
 class RemoveUncategorizedSkillIdCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_REMOVE_UNCATEGORIZED_SKILL_ID command.
     """
 
@@ -392,7 +392,7 @@ class RemoveUncategorizedSkillIdCmd(TopicChange):
 
 
 class MoveSkillIdToSubtopicCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_MOVE_SKILL_ID_TO_SUBTOPIC command.
     """
 
@@ -402,7 +402,7 @@ class MoveSkillIdToSubtopicCmd(TopicChange):
 
 
 class RearrangeSkillInSubtopicCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_REARRANGE_SKILL_IN_SUBTOPIC command.
     """
 
@@ -412,7 +412,7 @@ class RearrangeSkillInSubtopicCmd(TopicChange):
 
 
 class RearrangeSubtopicCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_REARRANGE_SUBTOPIC command.
     """
 
@@ -421,7 +421,7 @@ class RearrangeSubtopicCmd(TopicChange):
 
 
 class RemoveSkillIdFromSubtopicCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC command.
     """
 
@@ -430,7 +430,7 @@ class RemoveSkillIdFromSubtopicCmd(TopicChange):
 
 
 class UpdateSubtopicPropertyCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_UPDATE_SUBTOPIC_PROPERTY command.
     """
 
@@ -441,7 +441,7 @@ class UpdateSubtopicPropertyCmd(TopicChange):
 
 
 class UpdateSubtopicPagePropertyCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command.
     """
 
@@ -452,7 +452,7 @@ class UpdateSubtopicPagePropertyCmd(TopicChange):
 
 
 class UpdateTopicPropertyCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_UPDATE_TOPIC_PROPERTY command.
     """
 
@@ -462,7 +462,7 @@ class UpdateTopicPropertyCmd(TopicChange):
 
 
 class MigrateSubtopicSchemaToLatestVersionCmd(TopicChange):
-    """class representing the TopicChange's
+    """Class representing the TopicChange's
     CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION command.
     """
 
@@ -484,7 +484,7 @@ class TopicRightsChange(change_domain.BaseChange):
 
 
 class CreateNewTopicRightsCmd(TopicRightsChange):
-    """class representing the TopicRightsChange's
+    """Class representing the TopicRightsChange's
     CMD_CREATE_NEW command.
     """
 
@@ -492,7 +492,7 @@ class CreateNewTopicRightsCmd(TopicRightsChange):
 
 
 class ChangeRoleTopicRightsCmd(TopicRightsChange):
-    """class representing the TopicRightsChange's
+    """Class representing the TopicRightsChange's
     CMD_CHANGE_ROLE command.
     """
 
@@ -502,7 +502,7 @@ class ChangeRoleTopicRightsCmd(TopicRightsChange):
 
 
 class RemoveManagerRoleCmd(TopicRightsChange):
-    """class representing the TopicRightsChange's
+    """Class representing the TopicRightsChange's
     CMD_REMOVE_MANAGER_ROLE command.
     """
 
@@ -510,7 +510,7 @@ class RemoveManagerRoleCmd(TopicRightsChange):
 
 
 class PublishTopicCmd(TopicRightsChange):
-    """class representing the TopicRightsChange's
+    """Class representing the TopicRightsChange's
     CMD_PUBLISH_TOPIC command.
     """
 
@@ -518,7 +518,7 @@ class PublishTopicCmd(TopicRightsChange):
 
 
 class UnpublishTopicCmd(TopicRightsChange):
-    """class representing the TopicRightsChange's
+    """Class representing the TopicRightsChange's
     CMD_UNPUBLISH_TOPIC command.
     """
 
@@ -526,7 +526,7 @@ class UnpublishTopicCmd(TopicRightsChange):
 
 
 class DeleteCommitTopicRightsCmd(TopicRightsChange):
-    """class representing the TopicRightsChange's
+    """Class representing the TopicRightsChange's
     CMD_DELETE_COMMIT command.
     """
 

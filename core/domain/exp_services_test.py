@@ -5764,24 +5764,24 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         exp_services.save_new_exploration('Test_user', exploration)
 
         state_solution_dict: state_domain.SolutionDict = {
-                'answer_is_exclusive': True,
-                'correct_answer': [
-                    '<p>state customization arg html 1</p>',
-                    '<p>state customization arg html 2</p>',
-                    '<p>state customization arg html 3</p>',
-                    '<p>state customization arg html 4</p>'
-                ],
-                'explanation': {
-                    'content_id': 'solution',
-                    'html': '<p>This is solution for state1</p>'
-                }
+            'answer_is_exclusive': True,
+            'correct_answer': [
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
+            ],
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is solution for state1</p>'
             }
+        }
         change_list = exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Home',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                'new_value': state_solution_dict,
-            })
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Home',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+            'new_value': state_solution_dict,
+        })
         with self.assertRaisesRegex(
             Exception,
             'solution cannot exist with None interaction id.'

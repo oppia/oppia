@@ -331,7 +331,7 @@ class ExplorationRightsChange(change_domain.BaseChange):
 
 
 class CreateNewExplorationRightsCmd(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_CREATE_NEW command.
     """
 
@@ -339,7 +339,7 @@ class CreateNewExplorationRightsCmd(ExplorationRightsChange):
 
 
 class ChangeRoleExplorationRightsCmd(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_CHANGE_ROLE command.
     """
 
@@ -349,7 +349,7 @@ class ChangeRoleExplorationRightsCmd(ExplorationRightsChange):
 
 
 class RemoveRoleExplorationRightsCmd(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_REMOVE_ROLE command.
     """
 
@@ -358,7 +358,7 @@ class RemoveRoleExplorationRightsCmd(ExplorationRightsChange):
 
 
 class ChangePrivateViewabilityExplorationRightsCmd(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_CHANGE_PRIVATE_VIEWABILITY command.
     """
 
@@ -367,7 +367,7 @@ class ChangePrivateViewabilityExplorationRightsCmd(ExplorationRightsChange):
 
 
 class ReleaseOwnershipExplorationRightsCmd(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_RELEASE_OWNERSHIP command.
     """
 
@@ -375,7 +375,7 @@ class ReleaseOwnershipExplorationRightsCmd(ExplorationRightsChange):
 
 
 class UpdateFirstPublishedMsecExplorationRightsCmd(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_UPDATE_FIRST_PUBLISHED_MSEC command.
     """
 
@@ -384,7 +384,7 @@ class UpdateFirstPublishedMsecExplorationRightsCmd(ExplorationRightsChange):
 
 
 class DeleteCommitExplorationRightsCmd(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_DELETE_COMMIT command.
     """
 
@@ -392,7 +392,7 @@ class DeleteCommitExplorationRightsCmd(ExplorationRightsChange):
 
 
 class ChangeExplorationStatus(ExplorationRightsChange):
-    """class representing the ExplorationRightsChange's
+    """Class representing the ExplorationRightsChange's
     CMD_CHANGE_EXPLORATION_STATUS command.
     """
 
@@ -420,7 +420,7 @@ class CollectionRightsChange(change_domain.BaseChange):
 
 
 class CreateNewCollectionRightsCmd(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_CREATE_NEW command.
     """
 
@@ -428,7 +428,7 @@ class CreateNewCollectionRightsCmd(CollectionRightsChange):
 
 
 class ChangeRoleCollectionRightsCmd(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_CHANGE_ROLE command.
     """
 
@@ -438,7 +438,7 @@ class ChangeRoleCollectionRightsCmd(CollectionRightsChange):
 
 
 class RemoveRoleCollectionRightsCmd(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_REMOVE_ROLE command.
     """
 
@@ -447,7 +447,7 @@ class RemoveRoleCollectionRightsCmd(CollectionRightsChange):
 
 
 class ChangePrivateViewabilityCollectionRightsCmd(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_CHANGE_PRIVATE_VIEWABILITY command.
     """
 
@@ -456,7 +456,7 @@ class ChangePrivateViewabilityCollectionRightsCmd(CollectionRightsChange):
 
 
 class ReleaseOwnershipCollectionRightsCmd(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_RELEASE_OWNERSHIP command.
     """
 
@@ -464,7 +464,7 @@ class ReleaseOwnershipCollectionRightsCmd(CollectionRightsChange):
 
 
 class UpdateFirstPublishedMsecCollectionRightsCmd(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_UPDATE_FIRST_PUBLISHED_MSEC command.
     """
 
@@ -473,7 +473,7 @@ class UpdateFirstPublishedMsecCollectionRightsCmd(CollectionRightsChange):
 
 
 class DeleteCommitCollectionRightsCmd(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_DELETE_COMMIT command.
     """
 
@@ -481,7 +481,7 @@ class DeleteCommitCollectionRightsCmd(CollectionRightsChange):
 
 
 class ChangeCollectionStatus(CollectionRightsChange):
-    """class representing the CollectionRightsChange's
+    """Class representing the CollectionRightsChange's
     CMD_CHANGE_EXPLORATION_STATUS command.
     """
 

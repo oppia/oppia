@@ -198,7 +198,7 @@ class StoryChange(change_domain.BaseChange):
 
 
 class CreateNewStoryCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_CREATE_NEW command.
     """
 
@@ -206,7 +206,7 @@ class CreateNewStoryCmd(StoryChange):
 
 
 class MigrateSchemaToLatestVersionCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
     """
 
@@ -215,7 +215,7 @@ class MigrateSchemaToLatestVersionCmd(StoryChange):
 
 
 class UpdateStoryNodeOutlineStatusCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_UPDATE_STORY_NODE_OUTLINE_STATUS command.
     """
 
@@ -225,7 +225,7 @@ class UpdateStoryNodeOutlineStatusCmd(StoryChange):
 
 
 class DeleteStoryNodeCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_DELETE_STORY_NODE command.
     """
 
@@ -233,7 +233,7 @@ class DeleteStoryNodeCmd(StoryChange):
 
 
 class AddStoryNodeCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_ADD_STORY_NODE command.
     """
 
@@ -242,7 +242,7 @@ class AddStoryNodeCmd(StoryChange):
 
 
 class UpdateStoryContentsPropertyCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_UPDATE_STORY_CONTENTS_PROPERTY command.
     """
 
@@ -252,7 +252,7 @@ class UpdateStoryContentsPropertyCmd(StoryChange):
 
 
 class UpdateStoryNodePropertyCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_UPDATE_STORY_NODE_PROPERTY command.
     """
 
@@ -263,7 +263,7 @@ class UpdateStoryNodePropertyCmd(StoryChange):
 
 
 class UpdateStoryPropertyCmd(StoryChange):
-    """class representing the StoryChange's
+    """Class representing the StoryChange's
     CMD_UPDATE_STORY_PROPERTY command.
     """
 

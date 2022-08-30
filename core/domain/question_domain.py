@@ -130,7 +130,7 @@ AllowedUpdateQuestionPropertyCmdTypes = Union[
 
 
 class CreateNewQuestionCmd(QuestionChange):
-    """class representing the QuestionChange's
+    """Class representing the QuestionChange's
     CMD_CREATE_NEW command.
     """
 
@@ -138,7 +138,7 @@ class CreateNewQuestionCmd(QuestionChange):
 
 
 class UpdateQuestionPropertyCmd(QuestionChange):
-    """class representing the QuestionChange's
+    """Class representing the QuestionChange's
     CMD_UPDATE_QUESTION_PROPERTY command.
     """
 
@@ -148,7 +148,7 @@ class UpdateQuestionPropertyCmd(QuestionChange):
 
 
 class CreateNewFullySpecifiedQuestionCmd(QuestionChange):
-    """class representing the QuestionChange's
+    """Class representing the QuestionChange's
     CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
     """
 
@@ -158,7 +158,7 @@ class CreateNewFullySpecifiedQuestionCmd(QuestionChange):
 
 
 class MigrateStateSchemaToLatestVersion(QuestionChange):
-    """class representing the QuestionChange's
+    """Class representing the QuestionChange's
     CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION command.
     """
 
@@ -188,7 +188,7 @@ class QuestionSuggestionChange(change_domain.BaseChange):
 
 
 class CreateNewFullySpecifiedQuestionSuggestionCmd(QuestionSuggestionChange):
-    """class representing the QuestionSuggestionChange's
+    """Class representing the QuestionSuggestionChange's
     CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
     """
 

@@ -209,7 +209,7 @@ class SkillChange(change_domain.BaseChange):
 
 
 class CreateNewSkillCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_CREATE_NEW command.
     """
 
@@ -217,7 +217,7 @@ class CreateNewSkillCmd(SkillChange):
 
 
 class AddSkillMisconceptionCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_ADD_SKILL_MISCONCEPTION command.
     """
 
@@ -225,7 +225,7 @@ class AddSkillMisconceptionCmd(SkillChange):
 
 
 class DeleteSkillMisconceptionCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_DELETE_SKILL_MISCONCEPTION command.
     """
 
@@ -233,7 +233,7 @@ class DeleteSkillMisconceptionCmd(SkillChange):
 
 
 class AddPrerequisiteSkillCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_ADD_PREREQUISITE_SKILL command.
     """
 
@@ -241,7 +241,7 @@ class AddPrerequisiteSkillCmd(SkillChange):
 
 
 class DeletePrerequisiteSkillCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_DELETE_PREREQUISITE_SKILL command.
     """
 
@@ -249,7 +249,7 @@ class DeletePrerequisiteSkillCmd(SkillChange):
 
 
 class UpdateRubricsCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_UPDATE_RUBRICS command.
     """
 
@@ -258,7 +258,7 @@ class UpdateRubricsCmd(SkillChange):
 
 
 class UpdateSkillMisconceptionPropertyCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command.
     """
 
@@ -269,7 +269,7 @@ class UpdateSkillMisconceptionPropertyCmd(SkillChange):
 
 
 class UpdateSkillPropertyCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_UPDATE_SKILL_PROPERTY command.
     """
 
@@ -279,7 +279,7 @@ class UpdateSkillPropertyCmd(SkillChange):
 
 
 class UpdateSkillContentsPropertyCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_UPDATE_SKILL_CONTENTS_PROPERTY command.
     """
 
@@ -295,7 +295,7 @@ class UpdateSkillContentsPropertyCmd(SkillChange):
 
 
 class MigrateContentsSchemaToLatestVersionCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION command.
     """
 
@@ -304,7 +304,7 @@ class MigrateContentsSchemaToLatestVersionCmd(SkillChange):
 
 
 class MigrateMisconceptionsSchemaToLatestVersionCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION command.
     """
 
@@ -313,7 +313,7 @@ class MigrateMisconceptionsSchemaToLatestVersionCmd(SkillChange):
 
 
 class MigrateRubricsSchemaToLatestVersionCmd(SkillChange):
-    """class representing the SkillChange's
+    """Class representing the SkillChange's
     CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION command.
     """
 
