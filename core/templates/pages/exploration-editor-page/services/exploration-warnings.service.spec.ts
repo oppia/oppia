@@ -59,7 +59,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
      name: 'ParamChange3'
    }];
  }
-describe('Exploration Warnings Service', () => {
+fdescribe('Exploration Warnings Service', () => {
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationWarningsService: ExplorationWarningsService;
   let explorationStatesService: ExplorationStatesService;
@@ -2036,7 +2036,7 @@ describe('Exploration Warnings Service', () => {
               param_changes: null,
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
-              dest: 'State7',
+              dest: 'End',
               dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
@@ -2131,7 +2131,7 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: null,
         linked_skill_id: null,
         next_content_id_index: null,
-        card_is_checkpoint: true,
+        card_is_checkpoint: false,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -2160,6 +2160,22 @@ describe('Exploration Warnings Service', () => {
                 html: ''
               },
             }
+          }, {
+              rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: null,
+              outcome: {
+                labelled_as_correct: true,
+                param_changes: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+                dest: 'Hola',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              }
           }],
           default_outcome: null,
           customization_args: {
@@ -2273,7 +2289,9 @@ describe('Exploration Warnings Service', () => {
       ],
       State7: [
         'Placeholder text must be a string.',
-        'Number of rows must be integral.'
+        'Number of rows must be integral.',
+        'Learner should not be directed back by more than 3 cards' +
+        ' in the lesson.',
       ],
       End: [
         'Please make sure end exploration interactions do not ' +
