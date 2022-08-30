@@ -30,7 +30,6 @@ if MYPY: # pragma: no cover
     # Modules imported under the `if MYPY` clause is imported only for
     # type checking purposes and they are not expected to be executed
     # at runtime.
-    from core.domain import exp_domain
     from core.domain import param_domain
     from core.domain import platform_parameter_domain
     from core.domain import question_domain
@@ -58,8 +57,8 @@ if MYPY: # pragma: no cover
         List[state_domain.AnswerGroupDict],
         List[state_domain.HintDict],
         List[skill_domain.WorkedExampleDict],
+        state_domain.WrittenTranslationsDict,
         List[platform_parameter_domain.PlatformParameterRuleDict],
-        exp_domain.AllowedEditStatePropertyCmdTypes,
         question_domain.QuestionDict,
         state_domain.AnswerGroupDict,
         state_domain.SubtitledHtmlDict,

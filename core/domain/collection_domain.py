@@ -33,8 +33,8 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, List, Optional, Union
-from typing_extensions import Final, TypedDict
+from typing import Dict, List, Optional
+from typing_extensions import Final, Literal, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -225,14 +225,59 @@ class SwapCollectionNodesCmd(CollectionChange):
     second_index: int
 
 
-class EditCollectionPropertyCmd(CollectionChange):
+class EditCollectionPropertyTitleCmd(CollectionChange):
     """Class representing the CollectionChange's
-    CMD_EDIT_COLLECTION_PROPERTY command.
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_TITLE as allowed value.
     """
 
-    property_name: str
-    new_value: Union[str, List[str]]
-    old_value: Union[str, List[str]]
+    property_name: Literal['title']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyCategoryCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_CATEGORY as allowed value.
+    """
+
+    property_name: Literal['category']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyObjectiveCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_OBJECTIVE as allowed value.
+    """
+
+    property_name: Literal['objective']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyLanguageCodeCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyTagsCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_TAGS as allowed value.
+    """
+
+    property_name: Literal['tags']
+    new_value: List[str]
+    old_value: List[str]
 
 
 class EditCollectionNodePropertyCmd(CollectionChange):
