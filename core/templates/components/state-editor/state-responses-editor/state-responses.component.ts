@@ -23,7 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
 import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -396,7 +396,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveTaggedMisconception(misconceptionId: string, skillId: string): void {
+  saveTaggedMisconception(taggedMisconception: TaggedMisconception): void {
+    const { skillId, misconceptionId } = taggedMisconception;
     this.responsesService.updateActiveAnswerGroup({
       taggedSkillMisconceptionId: skillId + '-' + misconceptionId
     } as AnswerGroup, (newAnswerGroups) => {
