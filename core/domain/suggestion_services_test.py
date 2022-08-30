@@ -2161,7 +2161,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             stats.question_review_stats[0].contributor_user_id, 'user_id')
 
     def _publish_valid_topic(
-        self, topic: topic_domain.Topic, uncategorized_skill_ids: List[str]):
+        self, topic: topic_domain.Topic,
+        uncategorized_skill_ids: List[str]) -> None:
         """Saves and publishes a valid topic with linked skills and subtopic.
 
         Args:
