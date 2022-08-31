@@ -34,7 +34,7 @@ var ExplorationEditorSettingsTab = function() {
   var explorationSummaryTile = $('.e2e-test-exploration-summary-tile');
   var explorationTitleInput = $('.e2e-test-exploration-title-input');
   var initialStateSelect = $('.e2e-test-initial-state-select');
-  var initialStateSelector = '.e2e-test-initial-state-select';
+  var initialStateSelector = $('.e2e-test-initial-state-select');
   var neutralElement = $('.e2e-test-settings-container');
 
   /*
