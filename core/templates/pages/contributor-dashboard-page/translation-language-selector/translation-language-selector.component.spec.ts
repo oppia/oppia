@@ -267,13 +267,16 @@ describe('Translation language selector', () => {
     component.ngOnInit();
 
     expect(component.dropdownShown).toBe(false);
+    expect(component.filteredOptions).toBe(component.options);
 
+    // Open the dropdown.
     component.toggleDropdown();
 
     expect(component.dropdownShown).toBe(true);
     expect(component.optionsFilter).toBe('');
     expect(component.filteredOptions).toBe(component.options);
 
+    // Close the dropdown.
     component.toggleDropdown();
 
     expect(component.dropdownShown).toBe(false);
