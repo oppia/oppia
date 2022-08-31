@@ -31,8 +31,8 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 
-from typing import List, Optional, Union
-from typing_extensions import TypedDict
+from typing import List, Optional
+from typing_extensions import Literal, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
@@ -306,7 +306,7 @@ class AddSubtopicCmd(TopicChange):
     """
 
     title: str
-    subtopic_id: str
+    subtopic_id: int
     url_fragment: str
 
 
@@ -315,7 +315,7 @@ class DeleteSubtopicCmd(TopicChange):
     CMD_DELETE_SUBTOPIC command.
     """
 
-    subtopic_id: str
+    subtopic_id: int
 
 
 class AddCanonicalStoryCmd(TopicChange):
@@ -396,8 +396,8 @@ class MoveSkillIdToSubtopicCmd(TopicChange):
     CMD_MOVE_SKILL_ID_TO_SUBTOPIC command.
     """
 
-    old_subtopic_id: str
-    new_subtopic_id: str
+    old_subtopic_id: int
+    new_subtopic_id: int
     skill_id: str
 
 
@@ -406,7 +406,7 @@ class RearrangeSkillInSubtopicCmd(TopicChange):
     CMD_REARRANGE_SKILL_IN_SUBTOPIC command.
     """
 
-    subtopic_id: str
+    subtopic_id: int
     from_index: int
     to_index: int
 
@@ -425,7 +425,7 @@ class RemoveSkillIdFromSubtopicCmd(TopicChange):
     CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC command.
     """
 
-    subtopic_id: str
+    subtopic_id: int
     skill_id: str
 
 
@@ -434,31 +434,160 @@ class UpdateSubtopicPropertyCmd(TopicChange):
     CMD_UPDATE_SUBTOPIC_PROPERTY command.
     """
 
-    subtopic_id: str
+    subtopic_id: int
     property_name: str
     new_value: str
     old_value: str
 
 
-class UpdateSubtopicPagePropertyCmd(TopicChange):
+class UpdateTopicPropertyNameCmd(TopicChange):
     """Class representing the TopicChange's
-    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command.
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_NAME as allowed value.
     """
 
-    subtopic_id: int
-    property_name: str
-    new_value: subtopic_page_domain.AllowedUpdateSubtopicPagePropertyCmdTypes
-    old_value: subtopic_page_domain.AllowedUpdateSubtopicPagePropertyCmdTypes
+    property_name: Literal['name']
+    new_value: str
+    old_value: str
 
 
-class UpdateTopicPropertyCmd(TopicChange):
+class UpdateTopicPropertyAbbreviatedNameCmd(TopicChange):
     """Class representing the TopicChange's
-    CMD_UPDATE_TOPIC_PROPERTY command.
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_ABBREVIATED_NAME as allowed value.
     """
 
-    property_name: str
-    new_value: Union[str, List[str], bool, List[StoryReference]]
-    old_value: Union[str, List[str], bool, List[StoryReference]]
+    property_name: Literal['abbreviated_name']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyDescriptionCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_DESCRIPTION as allowed value.
+    """
+
+    property_name: Literal['description']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyCanonicalStoryReferencesCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES
+    as allowed value.
+    """
+
+    property_name: Literal['canonical_story_references']
+    new_value: List[StoryReference]
+    old_value: List[StoryReference]
+
+
+class UpdateTopicPropertyAdditionalStoryReferencesCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES
+    as allowed value.
+    """
+
+    property_name: Literal['additional_story_references']
+    new_value: List[StoryReference]
+    old_value: List[StoryReference]
+
+
+class UpdateTopicPropertyLanguageCodeCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyThumbnailFilenameCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_THUMBNAIL_FILENAME as
+    allowed value.
+    """
+
+    property_name: Literal['thumbnail_filename']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyThumbnailBGColorCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_THUMBNAIL_BG_COLOR as
+    allowed value.
+    """
+
+    property_name: Literal['thumbnail_bg_color']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyUrlFragmentCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_URL_FRAGMENT as allowed value.
+    """
+
+    property_name: Literal['url_fragment']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyMetaTagContentCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_META_TAG_CONTENT as allowed value.
+    """
+
+    property_name: Literal['meta_tag_content']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertyPracticeTabIsDisplayedCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED
+    as allowed value.
+    """
+
+    property_name: Literal['practice_tab_is_displayed']
+    new_value: bool
+    old_value: bool
+
+
+class UpdateTopicPropertyTitleFragmentForWebCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB
+    as allowed value.
+    """
+
+    property_name: Literal['page_title_fragment_for_web']
+    new_value: str
+    old_value: str
+
+
+class UpdateTopicPropertySkillIdsForDiagnosticTestCmd(TopicChange):
+    """Class representing the TopicChange's
+    CMD_UPDATE_TOPIC_PROPERTY command with
+    TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+    as allowed value.
+    """
+
+    property_name: Literal['skill_ids_for_diagnostic_test']
+    new_value: List[str]
+    old_value: List[str]
 
 
 class MigrateSubtopicSchemaToLatestVersionCmd(TopicChange):

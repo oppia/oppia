@@ -38,7 +38,7 @@ from extensions import domain
 from pylatexenc import latex2text
 
 from typing import Dict, List, Optional, Set, Union
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -124,11 +124,6 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
-AllowedUpdateQuestionPropertyCmdTypes = Union[
-    str, List[str], state_domain.StateDict
-]
-
-
 class CreateNewQuestionCmd(QuestionChange):
     """Class representing the QuestionChange's
     CMD_CREATE_NEW command.
@@ -137,14 +132,49 @@ class CreateNewQuestionCmd(QuestionChange):
     pass
 
 
-class UpdateQuestionPropertyCmd(QuestionChange):
+class UpdateQuestionPropertyQuestionStateDataCmd(QuestionChange):
     """Class representing the QuestionChange's
-    CMD_UPDATE_QUESTION_PROPERTY command.
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_QUESTION_STATE_DATA as allowed value.
     """
 
-    property_name: str
-    new_value: AllowedUpdateQuestionPropertyCmdTypes
-    old_value: AllowedUpdateQuestionPropertyCmdTypes
+    property_name: Literal['question_state_data']
+    new_value: state_domain.StateDict
+    old_value: state_domain.StateDict
+
+
+class UpdateQuestionPropertyLanguageCodeCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class UpdateQuestionPropertyLinkedSkillIdsCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_LINKED_SKILL_IDS as allowed value.
+    """
+
+    property_name: Literal['linked_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateQuestionPropertySkillMisconceptionIdsCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
+    as allowed value.
+    """
+
+    property_name: Literal['inapplicable_skill_misconception_ids']
+    new_value: List[str]
+    old_value: List[str]
 
 
 class CreateNewFullySpecifiedQuestionCmd(QuestionChange):

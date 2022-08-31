@@ -175,117 +175,119 @@ def apply_change_list(
                         update_story_node_outline_status.node_id
                     )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
-                # Here we use cast because we are narrowing down the type from
-                # StoryChange to a specific change command.
-                update_story_node_property = cast(
-                    story_domain.UpdateStoryNodePropertyCmd,
-                    change
-                )
-                if (update_story_node_property.property_name ==
+                if (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
-                    # Here we use cast because in this 'if clause' we are
-                    # updating the outline of a StoryNode which can only be
-                    # of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    outline = cast(str, update_story_node_property.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateStoryNodePropertyOutlineCmd.
+                    update_node_outline_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyOutlineCmd,
+                        change
+                    )
                     story.update_node_outline(
-                        update_story_node_property.node_id, outline
+                        update_node_outline_cmd.node_id,
+                        update_node_outline_cmd.new_value
                     )
-                elif (update_story_node_property.property_name ==
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_TITLE):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the title of a StoryNode which can only be
-                    # of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    title = cast(str, update_story_node_property.new_value)
-                    story.update_node_title(
-                        update_story_node_property.node_id, title
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateStoryNodePropertyTitleCmd.
+                    update_node_title_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyTitleCmd,
+                        change
                     )
-                elif (update_story_node_property.property_name ==
+                    story.update_node_title(
+                        update_node_title_cmd.node_id,
+                        update_node_title_cmd.new_value
+                    )
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the description of a StoryNode which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    description = cast(
-                        str, update_story_node_property.new_value
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateStoryNodePropertyDescriptionCmd.
+                    update_node_description_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyDescriptionCmd,
+                        change
                     )
                     story.update_node_description(
-                        update_story_node_property.node_id, description
+                        update_node_description_cmd.node_id,
+                        update_node_description_cmd.new_value
                     )
-                elif (update_story_node_property.property_name ==
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the 'thumbnail_filename' of a StoryNode which
-                    # can only be of type string. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    thumbnail_filename = cast(
-                        str, update_story_node_property.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyThumbnailFilenameCmd.
+                    update_node_thumbnail_filename_cmd = cast(
+                       story_domain.UpdateStoryNodePropertyThumbnailFilenameCmd,
+                       change
                     )
                     story.update_node_thumbnail_filename(
-                        update_story_node_property.node_id, thumbnail_filename
+                        update_node_thumbnail_filename_cmd.node_id,
+                        update_node_thumbnail_filename_cmd.new_value
                     )
-                elif (update_story_node_property.property_name ==
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the 'thumbnail_bg_color' of a StoryNode which
-                    # can only be of type string. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    thumbnail_bg_color = cast(
-                        str, update_story_node_property.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyThumbnailBGColorCmd.
+                    update_node_thumbnail_bg_color = cast(
+                        story_domain.UpdateStoryNodePropertyThumbnailBGColorCmd,
+                        change
                     )
                     story.update_node_thumbnail_bg_color(
-                        update_story_node_property.node_id, thumbnail_bg_color
+                        update_node_thumbnail_bg_color.node_id,
+                        update_node_thumbnail_bg_color.new_value
                     )
-                elif (update_story_node_property.property_name ==
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the acquired_skill_ids of a StoryNode which
-                    # can only be of type List[str]. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    acquired_skill_ids = cast(
-                        List[str], update_story_node_property.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyAcquiredSkillIdsCmd.
+                    update_node_acquired_skill_ids_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyAcquiredSkillIdsCmd,
+                        change
                     )
                     story.update_node_acquired_skill_ids(
-                        update_story_node_property.node_id, acquired_skill_ids
+                        update_node_acquired_skill_ids_cmd.node_id,
+                        update_node_acquired_skill_ids_cmd.new_value
                     )
-                elif (update_story_node_property.property_name ==
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the prerequisite_skill_ids of a StoryNode which
-                    # can only be of type List[str]. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    prerequisite_skill_ids = cast(
-                        List[str], update_story_node_property.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyPrerequisiteSkillIdsCmd.
+                    update_prerequisite_skill_ids_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyPrerequisiteSkillIdsCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     story.update_node_prerequisite_skill_ids(
-                        update_story_node_property.node_id,
-                        prerequisite_skill_ids
+                        update_prerequisite_skill_ids_cmd.node_id,
+                        update_prerequisite_skill_ids_cmd.new_value
                     )
-                elif (update_story_node_property.property_name ==
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the destination_node_ids of a StoryNode which
-                    # can only be of type List[str]. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    destination_node_ids = cast(
-                        List[str], update_story_node_property.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyDestinationNodeIdsCmd.
+                    update_node_destination_node_ids_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyDestinationNodeIdsCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     story.update_node_destination_node_ids(
-                        update_story_node_property.node_id,
-                        destination_node_ids
+                        update_node_destination_node_ids_cmd.node_id,
+                        update_node_destination_node_ids_cmd.new_value
                     )
-                elif (update_story_node_property.property_name ==
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
-                    # Here we use cast because in this 'elif clause' we
-                    # are updating the exploration_id of a StoryNode which
-                    # can only be of type string. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    exploration_id = cast(
-                        str, update_story_node_property.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyExplorationIdCmd.
+                    update_node_exploration_id_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyExplorationIdCmd,
+                        change
                     )
                     story.update_node_exploration_id(
-                        update_story_node_property.node_id, exploration_id
+                        update_node_exploration_id_cmd.node_id,
+                        update_node_exploration_id_cmd.new_value
                     )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
@@ -333,41 +335,27 @@ def apply_change_list(
                         update_story_property_cmd.new_value
                     )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
-                # Here we use cast because we are narrowing down the type from
-                # StoryChange to a specific change command.
-                update_story_contents_property_cmd = cast(
-                    story_domain.UpdateStoryContentsPropertyCmd,
-                    change
-                )
-                if (update_story_contents_property_cmd.property_name ==
+                if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
-                    # Here we use cast because in this 'if clause' we are
-                    # updating the initial_node_id of StoryContents, and
-                    # initial_node_id can only be of type string. So, to
-                    # rule out all other property types for MyPy type
-                    # checking, we used cast here.
-                    initial_node = cast(
-                        str, update_story_contents_property_cmd.new_value
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateStoryContentsPropertyInitialNodeIdCmd.
+                    update_initial_node_id_cmd = cast(
+                       story_domain.UpdateStoryContentsPropertyInitialNodeIdCmd,
+                       change
                     )
-                    story.update_initial_node(initial_node)
-                if (
-                    update_story_contents_property_cmd.property_name ==
-                    story_domain.NODE
-                ):
-                    # Here we use cast because in this 'if clause' we are
-                    # rearranging the nodes of a StoryContent with the help
-                    # of indexes, and these indexes can only be of type int.
-                    # So, to rule out all other property types for MyPy type
-                    # checking, we used cast here.
-                    old_value = cast(
-                        int,
-                        update_story_contents_property_cmd.old_value
+                    story.update_initial_node(
+                        update_initial_node_id_cmd.new_value
                     )
-                    new_value = cast(
-                        int,
-                        update_story_contents_property_cmd.new_value
+                if change.property_name == story_domain.NODE:
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateStoryContentsPropertyNodeCmd.
+                    update_node_cmd = cast(
+                        story_domain.UpdateStoryContentsPropertyNodeCmd,
+                        change
                     )
-                    story.rearrange_node_in_story(old_value, new_value)
+                    story.rearrange_node_in_story(
+                        update_node_cmd.old_value, update_node_cmd.new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):

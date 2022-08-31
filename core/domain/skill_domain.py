@@ -27,8 +27,8 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import Callable, Dict, List, Optional, Union
-from typing_extensions import Final, TypedDict
+from typing import Callable, Dict, List, Optional
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -257,41 +257,134 @@ class UpdateRubricsCmd(SkillChange):
     explanations: List[str]
 
 
-class UpdateSkillMisconceptionPropertyCmd(SkillChange):
+class UpdateSkillMisconceptionPropertyNameCmd(SkillChange):
     """Class representing the SkillChange's
-    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command.
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_NAME as allowed value.
     """
 
     misconception_id: int
-    property_name: str
-    new_value: Union[str, bool]
-    old_value: Union[str, bool]
+    property_name: Literal['name']
+    new_value: str
+    old_value: str
 
 
-class UpdateSkillPropertyCmd(SkillChange):
+class UpdateSkillMisconceptionPropertyNotesCmd(SkillChange):
     """Class representing the SkillChange's
-    CMD_UPDATE_SKILL_PROPERTY command.
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_NOTES as allowed value.
     """
 
-    property_name: str
-    new_value: Union[str, bool, List[str]]
-    old_value: Union[str, bool, List[str]]
+    misconception_id: int
+    property_name: Literal['notes']
+    new_value: str
+    old_value: str
 
 
-class UpdateSkillContentsPropertyCmd(SkillChange):
+class UpdateSkillMisconceptionPropertyFeedbackCmd(SkillChange):
     """Class representing the SkillChange's
-    CMD_UPDATE_SKILL_CONTENTS_PROPERTY command.
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK as allowed value.
     """
 
-    property_name: str
-    new_value: Union[
-        state_domain.SubtitledHtmlDict,
-        List[WorkedExampleDict]
-    ]
-    old_value: Union[
-        state_domain.SubtitledHtmlDict,
-        List[WorkedExampleDict]
-    ]
+    misconception_id: int
+    property_name: Literal['feedback']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillMisconceptionPropertyMustBeAddressedCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY command with
+    SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED as allowed value.
+    """
+
+    misconception_id: int
+    property_name: Literal['must_be_addressed']
+    new_value: bool
+    old_value: bool
+
+
+class UpdateSkillPropertyDescriptionCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_DESCRIPTION as allowed value.
+    """
+
+    property_name: Literal['description']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillPropertyLanguageCodeCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillPropertySupersedingSkillIdCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_SUPERSEDING_SKILL_ID as
+    allowed value.
+    """
+
+    property_name: Literal['superseding_skill_id']
+    new_value: str
+    old_value: str
+
+
+class UpdateSkillPropertyAllQuestionsMergedCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_ALL_QUESTIONS_MERGED as
+    allowed value.
+    """
+
+    property_name: Literal['all_questions_merged']
+    new_value: bool
+    old_value: bool
+
+
+class UpdateSkillPropertyPrerequisiteSkillIdsCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_PROPERTY command with
+    SKILL_PROPERTY_PREREQUISITE_SKILL_IDS as
+    allowed value.
+    """
+
+    property_name: Literal['prerequisite_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateSkillContentsPropertyExplanationCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_CONTENTS_PROPERTY command
+    with SKILL_CONTENTS_PROPERTY_EXPLANATION as
+    allowed value.
+    """
+
+    property_name: Literal['explanation']
+    new_value: state_domain.SubtitledHtmlDict
+    old_value: state_domain.SubtitledHtmlDict
+
+
+class UpdateSkillContentsPropertyWorkedExamplesCmd(SkillChange):
+    """Class representing the SkillChange's
+    CMD_UPDATE_SKILL_CONTENTS_PROPERTY command
+    with SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES
+    as allowed value.
+    """
+
+    property_name: Literal['worked_examples']
+    new_value: List[WorkedExampleDict]
+    old_value: List[WorkedExampleDict]
 
 
 class MigrateContentsSchemaToLatestVersionCmd(SkillChange):

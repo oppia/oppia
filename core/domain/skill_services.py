@@ -725,97 +725,87 @@ def apply_change_list(
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
-                # Here we use cast because we are narrowing down the type from
-                # SkillChange to a specific change command.
-                update_skill_property_cmd = cast(
-                    skill_domain.UpdateSkillPropertyCmd,
-                    change
-                )
-                if (update_skill_property_cmd.property_name ==
+                if (change.property_name ==
                         skill_domain.SKILL_PROPERTY_DESCRIPTION):
                     if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (
                             user.actions):
                         raise Exception(
                             'The user does not have enough rights to edit the '
                             'skill description.')
-                    # Here we use cast because in this 'if clause' we are
-                    # updating the description of a skill which can only be
-                    # of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    skill_description = cast(
-                        str, update_skill_property_cmd.new_value
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateSkillPropertyDescriptionCmd.
+                    update_description_cmd = cast(
+                        skill_domain.UpdateSkillPropertyDescriptionCmd,
+                        change
                     )
-                    skill.update_description(skill_description)
+                    skill.update_description(update_description_cmd.new_value)
                     (
                         opportunity_services
                         .update_skill_opportunity_skill_description(
-                            skill.id, skill_description
-                        )
-                    )
-                elif (update_skill_property_cmd.property_name ==
+                            skill.id, update_description_cmd.new_value))
+                elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the language_code of a skill which can only be
-                    # of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    language_code = cast(
-                        str, update_skill_property_cmd.new_value
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateSkillPropertyLanguageCodeCmd.
+                    update_language_code_cmd = cast(
+                        skill_domain.UpdateSkillPropertyLanguageCodeCmd,
+                        change
                     )
-                    skill.update_language_code(language_code)
-                elif (update_skill_property_cmd.property_name ==
+                    skill.update_language_code(
+                        update_language_code_cmd.new_value
+                    )
+                elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the superseding_skill_id of a skill which can
-                    # only be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    skill_id = cast(str, update_skill_property_cmd.new_value)
-                    skill.update_superseding_skill_id(skill_id)
-                elif (update_skill_property_cmd.property_name ==
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillPropertySupersedingSkillIdCmd.
+                    update_superseding_skill_id_cmd = cast(
+                        skill_domain.UpdateSkillPropertySupersedingSkillIdCmd,
+                        change
+                    )
+                    skill.update_superseding_skill_id(
+                        update_superseding_skill_id_cmd.new_value
+                    )
+                elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the all_questions_merged flag of a skill which
-                    # can only be of type bool. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    all_questions_are_merged = cast(
-                        bool, update_skill_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillPropertyAllQuestionsMergedCmd.
+                    update_all_questions_merged_cmd = cast(
+                        skill_domain.UpdateSkillPropertyAllQuestionsMergedCmd,
+                        change
                     )
                     skill.record_that_all_questions_are_merged(
-                        all_questions_are_merged
+                        update_all_questions_merged_cmd.new_value
                     )
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
-                # Here we use cast because we are narrowing down the type from
-                # SkillChange to a specific change command.
-                update_skill_content_property_cmd = cast(
-                    skill_domain.UpdateSkillContentsPropertyCmd,
-                    change
-                )
-                if (update_skill_content_property_cmd.property_name ==
+                if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
-                    # Here we use cast because in this 'if clause' we are
-                    # updating the explanation of a skill which can only be
-                    # of type SubtitledHtml. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    subtiteldhtml_dict = cast(
-                        state_domain.SubtitledHtmlDict,
-                        update_skill_content_property_cmd.new_value
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateSkillContentsPropertyExplanationCmd.
+                    update_explanation_cmd = cast(
+                        skill_domain.UpdateSkillContentsPropertyExplanationCmd,
+                        change
                     )
                     explanation = (
-                        state_domain.SubtitledHtml.from_dict(subtiteldhtml_dict)
+                        state_domain.SubtitledHtml.from_dict(
+                            update_explanation_cmd.new_value
+                        )
                     )
                     explanation.validate()
                     skill.update_explanation(explanation)
-                elif (update_skill_content_property_cmd.property_name ==
+                elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    worked_examples_list: List[skill_domain.WorkedExample] = []
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the worked_examples of a skill which can only be
-                    # of type List[WorkedExample]. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    worked_example_dicts = cast(
-                        List[skill_domain.WorkedExampleDict],
-                        update_skill_content_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillContentsPropertyWorkedExamplesCmd.
+                    update_worked_examples_cmd = cast(
+                        skill_domain.UpdateSkillContentsPropertyWorkedExamplesCmd,  # pylint: disable=line-too-long
+                        change
                     )
-                    for worked_example in worked_example_dicts:
+                    worked_examples_list: List[skill_domain.WorkedExample] = []
+                    for worked_example in update_worked_examples_cmd.new_value:
                         worked_examples_list.append(
                             skill_domain.WorkedExample.from_dict(worked_example)
                         )
@@ -873,66 +863,57 @@ def apply_change_list(
                 )
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
-                # Here we use cast because we are narrowing down the type from
-                # SkillChange to a specific change command.
-                update_skill_misconception_property_cmd = cast(
-                    skill_domain.UpdateSkillMisconceptionPropertyCmd,
-                    change
-                )
-                if (update_skill_misconception_property_cmd.property_name ==
+                if (change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
-                    # Here we use cast because in this 'if clause' we are
-                    # updating the misconception_name of a skill which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    misconception_name = cast(
-                        str, update_skill_misconception_property_cmd.new_value
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyNameCmd.
+                    update_property_name_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyNameCmd,
+                        change
                     )
                     skill.update_misconception_name(
-                       update_skill_misconception_property_cmd.misconception_id,
-                       misconception_name
+                        update_property_name_cmd.misconception_id,
+                        update_property_name_cmd.new_value
                     )
-                elif (update_skill_misconception_property_cmd.property_name ==
+                elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the misconception_notes of a skill which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    misconception_notes = cast(
-                        str,
-                        update_skill_misconception_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyNotesCmd.
+                    update_property_notes_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyNotesCmd,
+                        change
                     )
                     skill.update_misconception_notes(
-                       update_skill_misconception_property_cmd.misconception_id,
-                       misconception_notes
+                        update_property_notes_cmd.misconception_id,
+                        update_property_notes_cmd.new_value
                     )
-                elif (update_skill_misconception_property_cmd.property_name ==
+                elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the misconception_feedback of a skill which can
-                    # only be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    misconception_feedback = cast(
-                        str, update_skill_misconception_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyFeedbackCmd.
+                    update_property_feedback_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyFeedbackCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     skill.update_misconception_feedback(
-                       update_skill_misconception_property_cmd.misconception_id,
-                       misconception_feedback
+                        update_property_feedback_cmd.misconception_id,
+                        update_property_feedback_cmd.new_value
                     )
-                elif (update_skill_misconception_property_cmd.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the 'misconception_must_be_addressed' flag of a
-                    # skill which can only be of type bool. So, to rule out all
-                    # other property types for MyPy type checking, we used cast
-                    # here.
-                    misconception_must_be_addressed = cast(
-                        bool,
-                        update_skill_misconception_property_cmd.new_value
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED):  # pylint: disable=line-too-long
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyMustBeAddressedCmd.
+                    update_property_must_be_addressed_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyMustBeAddressedCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     skill.update_misconception_must_be_addressed(
-                       update_skill_misconception_property_cmd.misconception_id,
-                       misconception_must_be_addressed
+                        update_property_must_be_addressed_cmd.misconception_id,
+                        update_property_must_be_addressed_cmd.new_value
                     )
                 else:
                     raise Exception('Invalid change dict.')

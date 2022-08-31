@@ -25,7 +25,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 
 from typing import Callable, List, Optional, Union
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
@@ -92,7 +92,7 @@ class CreateNewSubtopicPageCmd(SubtopicPageChange):
     """
 
     topic_id: str
-    subtopic_id: str
+    subtopic_id: int
 
 
 class UpdateSubtopicPagePropertyCmd(SubtopicPageChange):
@@ -100,10 +100,49 @@ class UpdateSubtopicPagePropertyCmd(SubtopicPageChange):
     CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command.
     """
 
-    subtopic_id: str
+    subtopic_id: int
     property_name: str
     new_value: AllowedUpdateSubtopicPagePropertyCmdTypes
     old_value: AllowedUpdateSubtopicPagePropertyCmdTypes
+
+
+class UpdateSubtopicPagePropertyPageContentsHtmlCmd(SubtopicPageChange):
+    """Class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command with
+    SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML as
+    allowed value.
+    """
+
+    subtopic_id: int
+    property_name: Literal['page_contents_html']
+    new_value: state_domain.SubtitledHtmlDict
+    old_value: state_domain.SubtitledHtmlDict
+
+
+class UpdateSubtopicPagePropertyPageContentsAudioCmd(SubtopicPageChange):
+    """Class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command with
+    SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO as
+    allowed value.
+    """
+
+    subtopic_id: int
+    property_name: Literal['page_contents_audio']
+    new_value: state_domain.RecordedVoiceoversDict
+    old_value: state_domain.RecordedVoiceoversDict
+
+
+class UpdateSubtopicPagePropertyPageWrittenTranslationsCmd(SubtopicPageChange):
+    """Class representing the SubtopicPageChange's
+    CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY command with
+    SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS
+    as allowed value.
+    """
+
+    subtopic_id: int
+    property_name: Literal['page_written_translations']
+    new_value: state_domain.WrittenTranslationsDict
+    old_value: state_domain.WrittenTranslationsDict
 
 
 class SubtopicPageContentsDict(TypedDict):

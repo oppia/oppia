@@ -41,7 +41,7 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -189,7 +189,7 @@ def apply_change_list(topic_id, change_list):
             # Here we use cast because we are narrowing down the type from
             # TopicChange to a specific change command.
             update_subtopic_page_property_cmd = cast(
-                topic_domain.UpdateSubtopicPagePropertyCmd,
+                subtopic_page_domain.UpdateSubtopicPagePropertyCmd,
                 change
             )
             if (
@@ -237,7 +237,7 @@ def apply_change_list(topic_id, change_list):
                         'topic_id': topic_id,
                         'subtopic_id': add_subtopic_cmd.subtopic_id
                     }))
-                newly_created_subtopic_ids.append(change.subtopic_id)
+                newly_created_subtopic_ids.append(add_subtopic_cmd.subtopic_id)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
@@ -252,7 +252,7 @@ def apply_change_list(topic_id, change_list):
                     raise Exception(
                         'The incoming changelist had simultaneous'
                         ' creation and deletion of subtopics.')
-                deleted_subtopic_ids.append(change.subtopic_id)
+                deleted_subtopic_ids.append(delete_subtopic_cmd.subtopic_id)
             elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
@@ -359,196 +359,174 @@ def apply_change_list(topic_id, change_list):
                     remove_skill_id_from_subtopic_cmd.skill_id
                 )
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                update_topic_property_cmd = cast(
-                    topic_domain.UpdateTopicPropertyCmd, change
-                )
-                if (update_topic_property_cmd.property_name ==
+                if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
-                    # Here we use cast because in this 'if clause' we are
-                    # updating the title of a Topic which can only be
-                    # of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    name = cast(str, update_topic_property_cmd.new_value)
-                    topic.update_name(name)
-                elif (update_topic_property_cmd.property_name ==
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateTopicPropertyNameCmd.
+                    update_topic_name_cmd = cast(
+                        topic_domain.UpdateTopicPropertyNameCmd,
+                        change
+                    )
+                    topic.update_name(update_topic_name_cmd.new_value)
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the abbreviated_name of a Topic which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    abbreviated_name = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateTopicPropertyAbbreviatedNameCmd.
+                    update_abbreviated_name_cmd = cast(
+                        topic_domain.UpdateTopicPropertyAbbreviatedNameCmd,
+                        change
                     )
                     topic.update_abbreviated_name(
-                        abbreviated_name
+                        update_abbreviated_name_cmd.new_value
                     )
-                elif (update_topic_property_cmd.property_name ==
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_URL_FRAGMENT):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the url_fragment of a Topic which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    url_fragment = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateTopicPropertyUrlFragmentCmd.
+                    update_url_fragment_cmd = cast(
+                        topic_domain.UpdateTopicPropertyUrlFragmentCmd,
+                        change
                     )
-                    topic.update_url_fragment(
-                        url_fragment
-                    )
-                elif (update_topic_property_cmd.property_name ==
+                    topic.update_url_fragment(update_url_fragment_cmd.new_value)
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the description of a Topic which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    description = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateTopicPropertyDescriptionCmd.
+                    update_topic_description_cmd = cast(
+                        topic_domain.UpdateTopicPropertyDescriptionCmd,
+                        change
                     )
                     topic.update_description(
-                        description
+                        update_topic_description_cmd.new_value
                     )
-                elif (update_topic_property_cmd.property_name ==
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the language_code of a Topic which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    language_code = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateTopicPropertyLanguageCodeCmd.
+                    update_topic_language_code_cmd = cast(
+                        topic_domain.UpdateTopicPropertyLanguageCodeCmd,
+                        change
                     )
                     topic.update_language_code(
-                        language_code
+                        update_topic_language_code_cmd.new_value
                     )
-                elif (update_topic_property_cmd.property_name ==
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the thumbnail_filename of a Topic which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    thumbnail_filename = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateTopicPropertyThumbnailFilenameCmd.
+                    update_topic_thumbnail_filename_cmd = cast(
+                        topic_domain.UpdateTopicPropertyThumbnailFilenameCmd,
+                        change
                     )
-                    update_thumbnail_filename(topic, thumbnail_filename)
-                elif (update_topic_property_cmd.property_name ==
+                    update_thumbnail_filename(
+                        topic, update_topic_thumbnail_filename_cmd.new_value
+                    )
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the thumbnail_bg_color of a Topic which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    thumbnail_bg_color = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateTopicPropertyThumbnailBGColorCmd.
+                    update_topic_thumbnail_bg_color_cmd = cast(
+                        topic_domain.UpdateTopicPropertyThumbnailBGColorCmd,
+                        change
                     )
-                    topic.update_thumbnail_bg_color(thumbnail_bg_color)
-                elif (update_topic_property_cmd.property_name ==
+                    topic.update_thumbnail_bg_color(
+                        update_topic_thumbnail_bg_color_cmd.new_value
+                    )
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the meta_tag_content of a Topic which can only
-                    # be of type string. So, to rule out all other property
-                    # types for MyPy type checking, we used cast here.
-                    meta_tag_content = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateTopicPropertyMetaTagContentCmd.
+                    update_topic_meta_tag_content_cmd = cast(
+                        topic_domain.UpdateTopicPropertyMetaTagContentCmd,
+                        change
                     )
-                    topic.update_meta_tag_content(meta_tag_content)
-                elif (update_topic_property_cmd.property_name ==
+                    topic.update_meta_tag_content(
+                        update_topic_meta_tag_content_cmd.new_value
+                    )
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the 'practice_tab_is_displayed' flag of a Topic
-                    # which can only be of type bool. So, to rule out all other
-                    # property types for MyPy type checking, we used cast here.
-                    practice_tab_is_displayed = cast(
-                        bool, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateTopicPropertyPracticeTabIsDisplayedCmd.
+                    update_practice_tab_is_displayed_cmd = cast(
+                        topic_domain.UpdateTopicPropertyPracticeTabIsDisplayedCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     topic.update_practice_tab_is_displayed(
-                        practice_tab_is_displayed
+                        update_practice_tab_is_displayed_cmd.new_value
                     )
-                elif (update_topic_property_cmd.property_name ==
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the page_title_fragment_for_web of a Topic
-                    # which can only be of type string. So, to rule out all
-                    # other property types for MyPy type checking, we used
-                    # cast here.
-                    page_title_fragment_for_web = cast(
-                        str, update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateTopicPropertyTitleFragmentForWebCmd.
+                    update_title_fragment_for_web_cmd = cast(
+                        topic_domain.UpdateTopicPropertyTitleFragmentForWebCmd,
+                        change
                     )
                     topic.update_page_title_fragment_for_web(
-                        page_title_fragment_for_web
+                        update_title_fragment_for_web_cmd.new_value
                     )
-                elif (update_topic_property_cmd.property_name ==
+                elif (change.property_name ==
                       topic_domain
                       .TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the skill_ids_for_diagnostic_test of a Topic
-                    # which can only be of type List[str]. So, to rule out
-                    # all other property types for MyPy type checking, we
-                    # used cast here.
-                    skill_ids_for_diagnostic_test = cast(
-                        List[str], update_topic_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateTopicPropertySkillIdsForDiagnosticTestCmd.
+                    update_skill_ids_for_diagnostic_test_cmd = cast(
+                        topic_domain.UpdateTopicPropertySkillIdsForDiagnosticTestCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     topic.update_skill_ids_for_diagnostic_test(
-                        skill_ids_for_diagnostic_test
+                        update_skill_ids_for_diagnostic_test_cmd.new_value
                     )
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                update_subtopic_page_property_cmd = cast(
-                    topic_domain.UpdateSubtopicPagePropertyCmd, change
-                )
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, update_subtopic_page_property_cmd.subtopic_id
-                    )
-                )
-                if (
-                    (modified_subtopic_pages[subtopic_page_id] is None) or
-                    (
-                        update_subtopic_page_property_cmd.subtopic_id in
-                        deleted_subtopic_ids
-                    )
-                ):
+                        topic_id, change.subtopic_id))
+                if ((modified_subtopic_pages[subtopic_page_id] is None) or
+                        (change.subtopic_id in deleted_subtopic_ids)):
                     raise Exception(
                         'The subtopic with id %s doesn\'t exist' % (
-                            update_subtopic_page_property_cmd.subtopic_id
-                        )
-                    )
+                            change.subtopic_id))
 
-                if (update_subtopic_page_property_cmd.property_name ==
+                if (change.property_name ==
                         subtopic_page_domain.
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
-                    # Here we use cast because in this 'if clause' we are
-                    # updating the page_contents_html of a subtopic_page and
-                    # for that we need SubtitledHtmlDict. So, to narrow down
-                    # the type of new_value to SubtitledHtmlDict, we used
-                    # cast here.
-                    page_contents_html_dict = cast(
-                        state_domain.SubtitledHtmlDict,
-                        update_subtopic_page_property_cmd.new_value
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateSubtopicPagePropertyPageContentsHtmlCmd.
+                    update_subtopic_page_contents_html_cmd = cast(
+                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     page_contents = state_domain.SubtitledHtml.from_dict(
-                        page_contents_html_dict)
+                        update_subtopic_page_contents_html_cmd.new_value)
                     page_contents.validate()
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
                             page_contents)
 
-                elif (update_subtopic_page_property_cmd.property_name ==
+                elif (change.property_name ==
                       subtopic_page_domain.
                       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
-                    # Here we use cast because in this 'elif clause' we are
-                    # updating the page_contents_audio of a subtopic_page and
-                    # for that we need RecordedVoiceoversDict. So, to narrow
-                    # down the type of new_value to RecordedVoiceoversDict, we
-                    # used cast here.
-                    page_contents_audio_dict = cast(
-                        state_domain.RecordedVoiceoversDict,
-                        update_subtopic_page_property_cmd.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSubtopicPagePropertyPageContentsAudioCmd.
+                    update_subtopic_page_contents_audio_cmd = cast(
+                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,  # pylint: disable=line-too-long
+                        change
                     )
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_audio(
                             state_domain.RecordedVoiceovers.from_dict(
-                                page_contents_audio_dict))
+                               update_subtopic_page_contents_audio_cmd.new_value
+                            )
+                        )
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
