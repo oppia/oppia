@@ -243,7 +243,7 @@ class AdminHandler(base.BaseHandler):
             elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
-                search_services.clear_blog_post_summaries_search_index() # pylint: disable=line-too-long
+                search_services.clear_blog_post_summaries_search_index()
             elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
             elif action == 'generate_dummy_new_skill_data':

@@ -659,7 +659,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 rank = 0
             initial_blog_post_doc = {
                 'id': blog_post.id,
-                'author_username': 'A',
                 'rank': rank,
                 'tags': old_blog_post_tag,
                 'title': old_blog_post_title
@@ -683,7 +682,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 rank = 0
             updated_blog_post_doc = {
                 'id': blog_post.id,
-                'author_username': 'A',
                 'rank': rank,
                 'tags': new_blog_post_tags,
                 'title': new_blog_post_title
@@ -888,7 +886,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Ensure the maximum number of blog posts that can fit on the search
         # results page is maintained by the summaries function.
         with self.swap(
-            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2):
+            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2
+            ):
             # Need to load 3 pages to find all of the blog posts. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all blog posts are returned. We validate the correct
@@ -940,7 +939,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         max_iterations_swap = self.swap(blog_services, 'MAX_ITERATIONS', 1)
 
         def _mock_delete_documents_from_index(
-        unused_doc_ids: List[str], unused_index: int
+            unused_doc_ids: List[str], unused_index: int
         ) -> None:
             """Mocks delete_documents_from_index() so that the blog post is
             not deleted from the document on deleting the blog post. This is
@@ -949,7 +948,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             pass
 
         with self.swap(
-            search_services, 'delete_documents_from_index',
+            search_services,
+            'delete_documents_from_index',
             _mock_delete_documents_from_index):
             blog_services.delete_blog_post(self.all_blog_post_ids[0])
             blog_services.delete_blog_post(self.all_blog_post_ids[1])

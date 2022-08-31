@@ -1865,8 +1865,7 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
             'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, [])
         result_blog_posts = (
-            search_services.search_blog_post_summaries(
-            'Welcome', [], 2)[0]
+            search_services.search_blog_post_summaries('Welcome', [], 2)[0]
         )
         self.assertEqual(result_blog_posts, [])
 

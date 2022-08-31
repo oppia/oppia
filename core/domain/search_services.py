@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands for operating on the search status of activities and blog."""
+"""Commands for operating on the search status of activities and blog posts."""
 
 from __future__ import annotations
 
@@ -26,10 +26,9 @@ from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import user_services
 from core.platform import models
 
-from typing import List, Optional, Tuple, Union, cast
+from typing import List, Optional, Tuple, cast
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -364,7 +363,6 @@ class BlogPostSummaryDomainSearchDict(TypedDict):
     id: str
     title: str
     tags: List[str]
-    author_username: Optional[str]
     rank: int
 
 
@@ -395,7 +393,7 @@ def index_blog_post_summaries(
 
 def _blog_post_summary_to_search_dict(
     blog_post_summary: blog_domain.BlogPostSummary
-) -> Union[BlogPostSummaryDomainSearchDict, None]:
+) -> Optional[BlogPostSummaryDomainSearchDict]:
     """Updates the dict to be returned, whether the given blog post summary is
     to be indexed for further queries or not.
 
@@ -410,13 +408,10 @@ def _blog_post_summary_to_search_dict(
         not blog_post_summary.deleted and
         blog_post_summary.published_on is not None
     ):
-        author_settings = (
-            user_services.get_user_settings(blog_post_summary.author_id))
         doc: BlogPostSummaryDomainSearchDict = {
             'id': blog_post_summary.id,
             'title': blog_post_summary.title,
             'tags': blog_post_summary.tags,
-            'author_username': author_settings.username,
             'rank': math.floor(
                 utils.get_time_in_millisecs(blog_post_summary.published_on))
         }
@@ -459,7 +454,6 @@ def search_blog_post_summaries(
         Tuple[List[str], Optional[int]],
         platform_search_services.blog_post_summaries_search(
             query,
-            SEARCH_INDEX_BLOG_POSTS,
             tags,
             offset=offset,
             size=size,
@@ -484,7 +478,9 @@ def delete_blog_post_summary_from_search_index(blog_post_id: str) -> None:
 
 
 def clear_blog_post_summaries_search_index() -> None:
-    """WARNING: This runs in-request, and may therefore fail if there are too
+    """Clears the blog post search index.
+
+    WARNING: This runs in-request, and may therefore fail if there are too
     many entries in the index.
     """
     platform_search_services.clear_index(SEARCH_INDEX_BLOG_POSTS)

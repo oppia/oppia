@@ -593,11 +593,24 @@ class ElasticSearchStub:
         terms = body['query']['bool']['must']
 
         for f in filters:
+            # For processing 'doc[k] in v', doc[k] can only be of type string if
+            # v is a string.
             if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
                 for k, v in f['match'].items():
+                    # Tags field in blog post doc in blog post search index is
+                    # of type list(str) under which the blog post can be
+                    # classified. 'v' is a single tag which if present in the
+                    # tags field list, the doc should be returned. Therefore,
+                    # we check using 'v in doc[k]'.
                     result_docs = [doc for doc in result_docs if v in doc[k]]
             else:
                 for k, v in f['match'].items():
+                    # In explorations and collections, doc[k] is a single
+                    # language or category to which the exploration/collection
+                    # belong. Whereas v is a string of all the languages/
+                    # catgories (separated by space eg. 'en hi') belonging
+                    # to which the docs should be returned. Therefore, we check
+                    # using 'doc[k] in v'.
                     result_docs = [doc for doc in result_docs if doc[k] in v]
 
         if terms:

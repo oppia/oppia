@@ -21,6 +21,7 @@ API.
 from __future__ import annotations
 
 from core import feconf
+from core.domain import search_services
 
 import elasticsearch
 
@@ -226,7 +227,8 @@ def search(
         size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
         ids_only: bool = False
 ) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[int]]:
-    """Searches for documents matching the given query in the given index.
+    """Searches for documents (explorations or collections) matching the given
+    query in the given index.
 
     This function also creates the index if it does not exist yet.
 
@@ -263,12 +265,12 @@ def search(
     if offset is None:
         offset = 0
 
-    # Convert the query into a . See
+    # Convert the query into a Query DSL object. See
     # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
     # for more details about Query DSL.
-    # In the type annotation below Dict[str, Any] is usQuery DSL objected for
-    # query_definiton because the query_definition is a dictionary having values
-    # of various types.
+    # In the type annotation below Dict[str, Any] is used for query_definiton
+    # because the query_definition is a dictionary having values of various
+    # types.
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
@@ -317,24 +319,23 @@ def search(
 # The type of 'body' here is 'Any'.
 # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
 def blog_post_summaries_search(
-        query_string: str,
-        index_name: str,
-        tags: List[str],
-        offset: Optional[int] = None,
-        size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
-        ids_only: bool = False
+    query_string: str,
+    tags: List[str],
+    offset: Optional[int] = None,
+    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
+    ids_only: bool = False
 ) -> Tuple[Union[List[Dict[str, Any]], List[str]], Optional[int]]:
-    """Searches for documents matching the given query in the given index.
+    """Searches for blog post summary documents matching the given query in the
+    blog post search index.
     NOTE: We cannot search through more than 10,000 results from a search by
-    paginating using size and offset. If the number of items to search through
-    is greater that 10,000, use the elasticsearch scroll API instead.
+    paginating using size and offset.
 
-    This function also creates the index if it does not exist yet.
+    This function also creates the blog post search index if it does not exist
+    yet.
 
     Args:
-        query_string: str. The terms that the user is searching for.
-        index_name: str. The name of the index. Use '_all' or empty string to
-            perform the operation on all indices.
+        query_string: str. The terms that the user is searching for in the
+            blog posts.
         tags: list(str). The list of tags to query for. If it is
             empty, no tag filter is applied to the results. If it is not
             empty, then a result is considered valid if it matches at least one
@@ -387,6 +388,7 @@ def blog_post_summaries_search(
                 {'match': {'tags': tag}}
             )
 
+    index_name = search_services.SEARCH_INDEX_BLOG_POSTS
     result_docs, resulting_offset = _fetch_response_from_elastic_search(
         query_definition, index_name, offset, size, ids_only)
 

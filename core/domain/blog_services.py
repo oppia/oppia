@@ -225,12 +225,10 @@ def get_blog_post_summary_models_by_ids(
     """
     blog_post_summary_models = blog_models.BlogPostSummaryModel.get_multi(
         blog_post_ids)
-    blog_post_summaries = []
-    blog_post_summaries = [
+    return [
         get_blog_post_summary_from_model(model)
         for model in blog_post_summary_models if model is not None
     ]
-    return blog_post_summaries
 
 
 def get_blog_post_summary_models_list_by_user_id(
@@ -846,7 +844,7 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
             indexed.
     """
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
-    if len(blog_post_summaries):
+    if len(blog_post_summaries) > 0:
         search_services.index_blog_post_summaries([
             blog_post_summary for blog_post_summary in blog_post_summaries
             if blog_post_summary is not None
@@ -855,7 +853,7 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
 
 def get_blog_post_ids_matching_query(
     query_string: str, tags: List[str], offset: Optional[int]=None
-) -> Tuple[list[str], Optional[int]]:
+) -> Tuple[List[str], Optional[int]]:
     """Returns a list with all blog post ids matching the given search query
     string, as well as a search offset for future fetches.
 
@@ -875,8 +873,8 @@ def get_blog_post_ids_matching_query(
             the query are returned.
 
     Returns:
-        2-tuple of (returned_blog_post_ids, search_offset). Where:
-            returned_blog_post_ids : list(str). A list with all
+        2-tuple of (valid_blog_post_ids, search_offset). Where:
+            valid_blog_post_ids : list(str). A list with all
                 blog post ids matching the given search query string,
                 as well as a search offset for future fetches.
                 The list contains exactly
@@ -886,13 +884,13 @@ def get_blog_post_ids_matching_query(
                 not occur, an error will be logged.)
             search_offset: int. Search offset for future fetches.
     """
-    returned_blog_post_ids: list[str] = []
+    valid_blog_post_ids: List[str] = []
     search_offset: Optional[int] = offset
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = (
             feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE -
-            len(returned_blog_post_ids)
+            len(valid_blog_post_ids)
         )
 
         blog_post_ids, search_offset = (
@@ -903,29 +901,30 @@ def get_blog_post_ids_matching_query(
         for ind, model in enumerate(
                 blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)):
             if model is not None:
-                returned_blog_post_ids.append(blog_post_ids[ind])
+                valid_blog_post_ids.append(blog_post_ids[ind])
             else:
                 invalid_blog_post_ids.append(blog_post_ids[ind])
 
         if (
             (
-                len(returned_blog_post_ids) ==
+                len(valid_blog_post_ids) ==
                 feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
             ) or search_offset is None
         ):
             break
 
-        logging.error(
+        if len(invalid_blog_post_ids) > 0:
+            logging.error(
                 'Search index contains stale blog post ids: %s' %
                 ', '.join(invalid_blog_post_ids))
 
     if (
         (
-            len(returned_blog_post_ids) <
+            len(valid_blog_post_ids) <
             feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
         ) and search_offset is not None
     ):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
-    return (returned_blog_post_ids, search_offset)
+    return (valid_blog_post_ids, search_offset)

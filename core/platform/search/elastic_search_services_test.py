@@ -17,6 +17,7 @@
 """Tests for the python elastic search wrapper."""
 
 from __future__ import annotations
+from core.domain import search_services
 
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
@@ -334,7 +335,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_offset, None)
 
     def test_blog_post_summaries_search_returns_ids_only(self) -> None:
-        correct_index_name = 'index1'
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
         elastic_search_services.add_documents_to_index([{
             'id': 1,
             'source': {
@@ -351,14 +352,14 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         result, new_offset = (
             elastic_search_services.blog_post_summaries_search(
-                '', correct_index_name, [], offset=0, size=50, ids_only=True
+                '', [], offset=0, size=50, ids_only=True
             )
         )
         self.assertEqual(result, [1, 12])
         self.assertIsNone(new_offset)
 
     def test_blog_post_summaries_search_returns_full_response(self) -> None:
-        correct_index_name = 'index1'
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
         elastic_search_services.add_documents_to_index([{
             'id': 1,
             'source': {
@@ -374,7 +375,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         }], correct_index_name)
 
         result, new_offset = elastic_search_services.blog_post_summaries_search(
-            '', correct_index_name, [], offset=0, size=50, ids_only=False)
+            '', [], offset=0, size=50, ids_only=False)
         self.assertEqual(result, [{
             'id': 1,
             'source': {
@@ -394,14 +395,14 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         result, new_offset = elastic_search_services.blog_post_summaries_search(
-            '', 'index', [], offset=0, size=50, ids_only=False)
+            '', [], offset=0, size=50, ids_only=False)
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
 
     def test_blog_post_summaries_search_constructs_query_with_tags(
         self
     ) -> None:
-        correct_index_name = 'index1'
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
 
         # In the type annotation below Dict[str, Any] is used for body
         # because this mocks the behavior of elastic_search_services.ES.search
@@ -448,14 +449,17 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.blog_post_summaries_search(
-                    '', correct_index_name, ['tag1', 'tag2']))
+                    '',
+                    ['tag1', 'tag2']
+                )
+            )
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
     def test_blog_post_summaries_search_constructs_nonempty_query_with_tags(
         self
     ) -> None:
-        correct_index_name = 'index1'
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
 
         # In the type annotation below Dict[str, Any] is used for body
         # because this mocks the behavior of elastic_search_services.ES.search
@@ -506,7 +510,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.blog_post_summaries_search(
-                    'query', correct_index_name, ['tag1', 'tag2']))
+                    'query', ['tag1', 'tag2']
+                )
+            )
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
@@ -519,10 +525,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         }, {
             'id': 'doc_id2',
             'title': 'hello blog'
-        }], 'index')
+        }], search_services.SEARCH_INDEX_BLOG_POSTS)
         results, new_offset = (
             elastic_search_services.blog_post_summaries_search(
-                'blog', 'index', [], size=1
+                'blog', [], size=1
             )
         )
         self.assertEqual(len(results), 1)
@@ -533,7 +539,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         results, new_offset = (
             elastic_search_services.blog_post_summaries_search(
-                'blog', 'index', [], offset=1, size=1
+                'blog', [], offset=1, size=1
             )
         )
         self.assertEqual(len(results), 1)
@@ -545,7 +551,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
     def test_blog_post_search_returns_without_error_when_index_does_not_exist(
         self
     ) -> None:
+        # We perform search without adding any document to index. Therefore blog
+        # post search index doesn't exist.
         result, new_offset = elastic_search_services.blog_post_summaries_search(
-            'query', 'nonexistent_index', [])
+            'query', []
+        )
         self.assertEqual(result, [])
         self.assertEqual(new_offset, None)

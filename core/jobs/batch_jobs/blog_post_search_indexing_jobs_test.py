@@ -35,10 +35,8 @@ MYPY = False
 if MYPY:
     from mypy_imports import blog_models
     from mypy_imports import search_services as platform_search_services
-    from mypy_imports import user_models
 
-(blog_models, user_models) = models.Registry.import_models([
-    models.NAMES.blog, models.NAMES.user])
+(blog_models,) = models.Registry.import_models([models.NAMES.blog])
 
 platform_search_services = models.Registry.import_search_services()
 
@@ -71,13 +69,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             published_on=datetime.datetime.utcnow(),
         )
         blog_summary.update_timestamps()
-
-        user_settings_model = self.create_model(
-            user_models.UserSettingsModel,
-            id=self.USER_ID_1, email='a@a.com', username=self.USERNAME)
-        user_settings_model.update_timestamps()
-
-        self.put_multi([user_settings_model, blog_summary])
+        blog_summary.put()
 
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,
@@ -89,7 +81,6 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                         'id': 'abcd',
                         'title': 'title',
                         'tags': ['tag1', 'tag2'],
-                        'author_username': self.USERNAME,
                         'rank': math.floor(
                             utils.get_time_in_millisecs(
                                 blog_summary.published_on
@@ -122,12 +113,6 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             blog_summary.update_timestamps()
             blog_summary.put()
 
-        user_settings_model = self.create_model(
-            user_models.UserSettingsModel,
-            id=self.USER_ID_1, email='a@a.com', username=self.USERNAME)
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
-
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
@@ -138,7 +123,6 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                         'id': 'abcd%s' % i,
                         'title': 'title',
                         'tags': ['tag1', 'tag2'],
-                        'author_username': self.USERNAME,
                         'rank': math.floor(
                             utils.get_time_in_millisecs(
                                 blog_summary.published_on
@@ -172,13 +156,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             published_on=datetime.datetime.utcnow(),
         )
         blog_summary.update_timestamps()
-
-        user_settings_model = self.create_model(
-            user_models.UserSettingsModel,
-            id=self.USER_ID_1, email='a@a.com', username=self.USERNAME)
-        user_settings_model.update_timestamps()
-
-        self.put_multi([user_settings_model, blog_summary])
+        blog_summary.put()
 
         def add_docs_to_index_mock(
                 unused_documents: Dict[str, Union[int, str, List[str]]],
@@ -196,7 +174,6 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                         'id': 'abcd',
                         'title': 'title',
                         'tags': ['tag1', 'tag2'],
-                        'author_username': self.USERNAME,
                         'rank': math.floor(
                             utils.get_time_in_millisecs(
                                 blog_summary.published_on

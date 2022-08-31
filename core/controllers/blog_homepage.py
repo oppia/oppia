@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import logging
-import string
 
 from core import feconf
 from core import utils
@@ -55,9 +54,12 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
     return summary_dicts
 
 
+# Here we are using Dict[str, Any] for the return value
+# `blog_post_summary_dicts` since we have to return a list with each element
+# being domain object converted to a dictionary in the tuple.
 def _get_matching_blog_card_summary_dicts(
-        query_string: str, tags: list[str], search_offset: int
-    ) -> Tuple[List[Dict[str, Any]], int]:
+    query_string: str, tags: list[str], search_offset: int
+) -> Tuple[List[Dict[str, Any]], int]:
     """Given the details of a query and a search offset, returns a list of
     matching blog card summary dicts that satisfy the query.
 
@@ -255,20 +257,14 @@ class BlogPostSearchHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        query_string = utils.unescape_encoded_uri_component(
-            self.normalized_request.get('q'))
-        # Remove all punctuation from the query string, and replace it with
-        # spaces. See http://stackoverflow.com/a/266162 and
-        # http://stackoverflow.com/a/11693937
-        remove_punctuation_map = dict(
-            (ord(char), None) for char in string.punctuation)
-        query_string = query_string.translate(remove_punctuation_map)
+        query_string = utils.get_formatted_query_string(
+            self.normalized_request.get('q')
+        )
 
         # If there is a tags parameter, it should be in the following form:
         #     tags=("GSOC" OR "Math")
         tags_string = self.normalized_request.get('tags')
-        tags = (
-            tags_string[2:-2].split('" OR "') if tags_string else [])
+        tags = utils.convert_filter_parameter_string_into_list(tags_string)
 
         search_offset = self.normalized_request.get('offset')
 

@@ -309,7 +309,6 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
 
         def mock_search(
             query_string: str,
-            index: str,
             tags: List[str],
             offset: Optional[int] = None,
             size: int = 20,
@@ -317,8 +316,6 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
             retries: int = 3
         ) -> Tuple[List[str], Optional[int]]:
             self.assertEqual(query_string, expected_query_string)
-            self.assertEqual(
-                index, search_services.SEARCH_INDEX_BLOG_POSTS)
             self.assertEqual(tags, [])
             self.assertEqual(offset, expected_offset)
             self.assertEqual(size, expected_size)
