@@ -2283,15 +2283,15 @@ describe('Exploration Warnings Service', () => {
       State6: [
         'Placeholder text must be a string.',
         'Number of rows must be integral.',
-        'Learner should not be directed back by more than 3 cards' +
-        ' in the lesson.',
+        'Learner should not be directed back by more than' +
+        ' MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards in the lesson.',
         'Checkpoints must not be assigned to cards that can be bypassed.'
       ],
       State7: [
         'Placeholder text must be a string.',
         'Number of rows must be integral.',
-        'Learner should not be directed back by more than 3 cards' +
-        ' in the lesson.',
+        'Learner should not be directed back by more than' +
+        ' MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards in the lesson.'
       ],
       End: [
         'Please make sure end exploration interactions do not ' +

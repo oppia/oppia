@@ -51,7 +51,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
 
-var Dequeue = require('dequeue')
+var Dequeue = require('dequeue');
 interface _getStatesAndAnswerGroupsWithEmptyClassifiersResult {
   groupIndexes: number[];
   stateName: string;
@@ -547,7 +547,6 @@ export class ExplorationWarningsService {
   ): number {
     let distance = -1;
     let stateFound = false;
-    // let queue: string[] = [];
     let deque = new Dequeue();
     let seen: Record<string, boolean> = {};
     seen[sourceStateName] = true;
