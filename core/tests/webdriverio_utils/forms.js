@@ -666,9 +666,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         '().scrollTop(' + String(scrollTo) + ');');
       var lineHeight = await elem.$(
         codeMirrorLineNumberLocator).getAttribute('clientHeight');
-      await scrollBarWebElement.scrollIntoView();
-      var currentScrollTop = await browser.execute(
-        'return arguments[0].scrollIntoView;', scrollBarWebElement);
+      var currentScrollTop = await scrollBarWebElement.scrollIntoView();
       if (currentScrollTop === prevScrollTop) {
         break;
       } else {
@@ -678,7 +676,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       var lineNumberElements = await elem.$$('.CodeMirror-linenumber');
       var totalCount = lineNumberElements.length;
       for (var i = 0; i < totalCount; i++) {
-        var lineNumberElement = await lineNumberElements[i];
+        var lineNumberElement = lineNumberElements[i];
+        await waitFor.elementToBeClickable(lineNumberElement);
         var lineNumber = await lineNumberElement.getText();
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
@@ -686,7 +685,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineDivElements = await elem.$$('./div');
         var lineDivElement = lineDivElements[i];
         var lineContentElements = await elem.$$('.CodeMirror-line');
-        var lineElement = await lineContentElements[i];
+        var lineElement = lineContentElements[i];
         var isHighlighted = await lineDivElement.$(
           codeMirrorLineBackgroundLocator).isExisting();
         var text = await lineElement.getText();
