@@ -621,7 +621,7 @@ describe('States Object Factory', () => {
           answer_groups: [{
             outcome: {
               dest: 'third state',
-              dest_if_really_stuck: null,
+              dest_if_really_stuck: 'third state',
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -637,7 +637,7 @@ describe('States Object Factory', () => {
           }],
           default_outcome: {
             dest: 'third state',
-            dest_if_really_stuck: null,
+            dest_if_really_stuck: 'third state',
             feedback: {
               content_id: 'default_outcome',
               html: ''

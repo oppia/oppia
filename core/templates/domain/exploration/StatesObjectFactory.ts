@@ -99,7 +99,7 @@ export class States {
           groups[i].outcome.dest = otherStateName;
         }
         if (groups[i].outcome.destIfReallyStuck === deleteStateName) {
-          groups[i].outcome.destIfReallyStuck = null;
+          groups[i].outcome.destIfReallyStuck = otherStateName;
         }
       }
       if (interaction.defaultOutcome) {
@@ -107,7 +107,7 @@ export class States {
           interaction.defaultOutcome.dest = otherStateName;
         }
         if (interaction.defaultOutcome.destIfReallyStuck === deleteStateName) {
-          interaction.defaultOutcome.destIfReallyStuck = null;
+          interaction.defaultOutcome.destIfReallyStuck = otherStateName;
         }
       }
     }

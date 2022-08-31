@@ -1899,7 +1899,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if outcome.dest == state_name:
                     outcome.dest = other_state_name
                 if outcome.dest_if_really_stuck == state_name:
-                    outcome.dest_if_really_stuck = None
+                    outcome.dest_if_really_stuck = other_state_name
 
         del self.states[state_name]
 
