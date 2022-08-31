@@ -138,9 +138,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     });
   }
 
-  deleteClassroom(event: Event, classroomId: string): void {
-    event.stopPropagation();
-
+  deleteClassroom(classroomId: string): void {
     let modalRef: NgbModalRef = this.ngbModal.
       open(DeleteClassroomConfirmModalComponent, {
         backdrop: 'static'
@@ -194,7 +192,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       Object.values(this.classroomIdToClassroomName)
     );
     modalRef.result.then((classroomDict) => {
-      this.classroomIdToClassroomName[classroomDict.classroom_id] = (
+      this.classroomIdToClassroomName[classroomDict.classroomId] = (
         classroomDict.name);
     }, () => {
       // Note to developers:

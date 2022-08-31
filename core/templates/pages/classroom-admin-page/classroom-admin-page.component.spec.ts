@@ -17,16 +17,12 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { componentFactoryName } from '@angular/compiler';
-import { ComponentRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { ClassroomAdminPageComponent } from 'pages/classroom-admin-page/classroom-admin-page.component';
-import { completion } from 'yargs';
-import { ClassroomBackendApiService, ClassroomBackendDict, ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
-import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
+import { ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
 
 
 class MockNgbModal {
@@ -42,7 +38,6 @@ describe('Classroom Admin Page component ', () => {
   let fixture: ComponentFixture<ClassroomAdminPageComponent>;
 
   let classroomBackendApiService: ClassroomBackendApiService;
-  let adminTaskManagerService: AdminTaskManagerService;
   let ngbModal: NgbModal;
 
   beforeEach(() => {
@@ -54,7 +49,6 @@ describe('Classroom Admin Page component ', () => {
       declarations: [ClassroomAdminPageComponent],
       providers: [
         ClassroomBackendApiService,
-        AdminTaskManagerService,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -68,7 +62,6 @@ describe('Classroom Admin Page component ', () => {
 
   beforeEach(() => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
-    adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
     ngbModal = TestBed.inject(NgbModal);
   });
 
@@ -84,7 +77,7 @@ describe('Classroom Admin Page component ', () => {
           topicListIntro: '',
           topicIdToPrerequisiteTopicIds: {}
         }
-      }
+      };
       spyOn(classroomBackendApiService, 'getClassroomDataAsync')
         .and.returnValue(Promise.resolve(response));
 
@@ -101,283 +94,414 @@ describe('Classroom Admin Page component ', () => {
   it(
     'should close classroom details when already in view mode',
     fakeAsync(() => {
-        let response = {
-            classroomDict: {
-              classroomId: 'classroomId',
-              name: 'math',
-              urlFragment: 'math',
-              courseDetails: '',
-              topicListIntro: '',
-              topicIdToPrerequisiteTopicIds: {}
-            }
-          }
-        spyOn(classroomBackendApiService, 'getClassroomDataAsync')
-          .and.returnValue(Promise.resolve(response));
-        component.classroomId = 'classroomId';
-        component.classroomViewerMode = true;
-        component.classroomDetailsIsShown = true;
+      let response = {
+        classroomDict: {
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {}
+        }
+      };
+      spyOn(classroomBackendApiService, 'getClassroomDataAsync')
+        .and.returnValue(Promise.resolve(response));
+      component.classroomId = 'classroomId';
+      component.classroomViewerMode = true;
+      component.classroomDetailsIsShown = true;
 
-        component.getClassroomData('classroomId');
-        tick();
+      component.getClassroomData('classroomId');
+      tick();
 
-        expect(component.classroomDetailsIsShown).toBeFalse();
-        expect(component.classroomViewerMode).toBeFalse();
+      expect(component.classroomDetailsIsShown).toBeFalse();
+      expect(component.classroomViewerMode).toBeFalse();
     }));
 
-    it(
-      'should not close classroom details while editing classroom properties',
-      fakeAsync(() => {
-        let response = {
-            classroomDict: {
-              classroomId: 'classroomId',
-              name: 'math',
-              urlFragment: 'math',
-              courseDetails: '',
-              topicListIntro: '',
-              topicIdToPrerequisiteTopicIds: {}
-            }
-          }
-        spyOn(classroomBackendApiService, 'getClassroomDataAsync')
-          .and.returnValue(Promise.resolve(response));
-
-        component.classroomId = 'classroomId';
-        component.classroomEditorMode = true;
-        component.classroomDetailsIsShown = true;
-
-        component.getClassroomData('classroomId');
-        tick();
-
-        expect(component.classroomDetailsIsShown).toBeTrue();
-        expect(component.classroomEditorMode).toBeTrue();
-      }));
-
-    it(
-      'should get classroom ID to classroom name and update classroom count',
-      fakeAsync(() => {
-        let response = {
-            mathClassroomId: 'math',
-            physicsClassroomId: 'physics'
-        };
-        spyOn(
-            classroomBackendApiService,
-            'getAllClassroomIdToClassroomNameDictAsync'
-        ).and.returnValue(Promise.resolve(response));
-
-        expect(component.pageIsInitialized).toBeFalse();
-        component.getAllClassroomIdToClassroomName();
-
-        expect(component.pageIsInitialized).toBeTrue();
-        expect(component.classroomIdToClassroomName).toEqual(response);
-        expect(component.classroomCount).toEqual(2);
-      }));
-
-    it('should be able to update the classroom name', () => {
-        let response = {
-            classroomDict: {
-              classroomId: 'classroomId',
-              name: 'math',
-              urlFragment: 'math',
-              courseDetails: '',
-              topicListIntro: '',
-              topicIdToPrerequisiteTopicIds: {}
-            }
+  it(
+    'should not close classroom details while editing classroom properties',
+    fakeAsync(() => {
+      let response = {
+        classroomDict: {
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {}
         }
-        component.updatedClassroomDict = response.classroomDict;
-        component.classroomDataIsChanged = false;
+      };
+      spyOn(classroomBackendApiService, 'getClassroomDataAsync')
+        .and.returnValue(Promise.resolve(response));
 
-        component.updateClassroomName('Discrete maths');
-
-        expect(component.updatedClassroomDict.name).toEqual('Discrete maths');
-        expect(component.classroomDataIsChanged).toBeTrue();
-    });
-
-    it('should be able to update the classroom url fragment', () => {
-        let response = {
-            classroomDict: {
-              classroomId: 'classroomId',
-              name: 'math',
-              urlFragment: 'math',
-              courseDetails: '',
-              topicListIntro: '',
-              topicIdToPrerequisiteTopicIds: {}
-            }
-        }
-        component.updatedClassroomDict = response.classroomDict;
-        component.classroomDataIsChanged = false;
-
-        component.updateUrlFragment('newMathUrl');
-
-        expect(component.updatedClassroomDict.urlFragment).toEqual(
-            'newMathUrl');
-        expect(component.classroomDataIsChanged).toBeTrue();
-    });
-
-    it('should be able to update the classroom url fragment', () => {
-        let response = {
-            classroomDict: {
-              classroomId: 'classroomId',
-              name: 'math',
-              urlFragment: 'math',
-              courseDetails: '',
-              topicListIntro: '',
-              topicIdToPrerequisiteTopicIds: {}
-            }
-        }
-        component.updatedClassroomDict = response.classroomDict;
-        component.classroomDataIsChanged = false;
-
-        component.updateCourseDetails(
-            'Oppia\'s curated maths lesson.');
-
-        expect(component.updatedClassroomDict.courseDetails).toEqual(
-            'Oppia\'s curated maths lesson.');
-        expect(component.classroomDataIsChanged).toBeTrue();
-    });
-
-    it('should be able to update the classroom url fragment', () => {
-        let response = {
-            classroomDict: {
-              classroomId: 'classroomId',
-              name: 'math',
-              urlFragment: 'math',
-              courseDetails: '',
-              topicListIntro: '',
-              topicIdToPrerequisiteTopicIds: {}
-            }
-        }
-        component.updatedClassroomDict = response.classroomDict;
-        component.classroomDataIsChanged = false;
-
-        component.updateTopicListIntro(
-            'Start from the basics with our first topic.');
-
-        expect(component.updatedClassroomDict.topicListIntro).toEqual(
-            'Start from the basics with our first topic.');
-        expect(component.classroomDataIsChanged).toBeTrue();
-    });
-
-    it('should be able to convert classroom dict to the backend form', () => {
-        let classroomDict =  {
-            classroomId: 'classroomId',
-            name: 'math',
-            urlFragment: 'math',
-            courseDetails: 'Oppia\'s curated maths lesson.',
-            topicListIntro: 'Start from the basics with our first topic.',
-            topicIdToPrerequisiteTopicIds: {}
-        }
-
-        let classroomBackendDict = {
-            classroom_id: 'classroomId',
-            name: 'math',
-            url_fragment: 'math',
-            course_details: 'Oppia\'s curated maths lesson.',
-            topic_list_intro: 'Start from the basics with our first topic.',
-            topic_id_to_prerequisite_topic_ids: {}
-        }
-
-        expect(component.convertClassroomDictToBackendForm(
-            classroomDict)).toEqual(classroomBackendDict);
-    });
-
-    it(
-      'should be able to close classroom viewer and open classroom editor',
-      () => {
-        component.classroomViewerMode = true;
-        component.classroomEditorMode = false;
-
-        component.openClassroomConfigEditor();
-
-        expect(component.classroomViewerMode).toBeFalse();
-        expect(component.classroomEditorMode).toBeTrue();
-    });
-
-    it('should be able to save classroom data', fakeAsync(() => {
-      component.classroomViewerMode = false;
+      component.classroomId = 'classroomId';
       component.classroomEditorMode = true;
+      component.classroomDetailsIsShown = true;
+
+      component.getClassroomData('classroomId');
+      tick();
+
+      expect(component.classroomDetailsIsShown).toBeTrue();
+      expect(component.classroomEditorMode).toBeTrue();
+    }));
+
+  it(
+    'should get classroom ID to classroom name and update classroom count',
+    fakeAsync(() => {
+      let response = {
+        mathClassroomId: 'math',
+        physicsClassroomId: 'physics'
+      };
+      spyOn(
+        classroomBackendApiService,
+        'getAllClassroomIdToClassroomNameDictAsync'
+      ).and.returnValue(Promise.resolve(response));
+
+      expect(component.pageIsInitialized).toBeFalse();
+
+      component.getAllClassroomIdToClassroomName();
+      tick();
+
+      expect(component.pageIsInitialized).toBeTrue();
+      expect(component.classroomIdToClassroomName).toEqual(response);
+      expect(component.classroomCount).toEqual(2);
+    }));
+
+  it('should be able to update the classroom name', () => {
+    let response = {
+      classroomDict: {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: {}
+      }
+    };
+    component.updatedClassroomDict = response.classroomDict;
+    component.classroomDataIsChanged = false;
+
+    component.updateClassroomName('Discrete maths');
+
+    expect(component.updatedClassroomDict.name).toEqual('Discrete maths');
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
+  it('should be able to update the classroom url fragment', () => {
+    let response = {
+      classroomDict: {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: {}
+      }
+    };
+    component.updatedClassroomDict = response.classroomDict;
+    component.classroomDataIsChanged = false;
+
+    component.updateUrlFragment('newMathUrl');
+
+    expect(component.updatedClassroomDict.urlFragment).toEqual('newMathUrl');
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
+  it('should be able to update the classroom url fragment', () => {
+    let response = {
+      classroomDict: {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: {}
+      }
+    };
+    component.updatedClassroomDict = response.classroomDict;
+    component.classroomDataIsChanged = false;
+
+    component.updateCourseDetails('Oppia\'s curated maths lesson.');
+
+    expect(component.updatedClassroomDict.courseDetails).toEqual(
+      'Oppia\'s curated maths lesson.');
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
+  it('should be able to update the classroom url fragment', () => {
+    let response = {
+      classroomDict: {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: {}
+      }
+    };
+    component.updatedClassroomDict = response.classroomDict;
+    component.classroomDataIsChanged = false;
+
+    component.updateTopicListIntro(
+      'Start from the basics with our first topic.');
+
+    expect(component.updatedClassroomDict.topicListIntro).toEqual(
+      'Start from the basics with our first topic.');
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
+  it('should be able to convert classroom dict to the backend form', () => {
+    let classroomDict = {
+      classroomId: 'classroomId',
+      name: 'math',
+      urlFragment: 'math',
+      courseDetails: 'Oppia\'s curated maths lesson.',
+      topicListIntro: 'Start from the basics with our first topic.',
+      topicIdToPrerequisiteTopicIds: {}
+    };
+
+    let classroomBackendDict = {
+      classroom_id: 'classroomId',
+      name: 'math',
+      url_fragment: 'math',
+      course_details: 'Oppia\'s curated maths lesson.',
+      topic_list_intro: 'Start from the basics with our first topic.',
+      topic_id_to_prerequisite_topic_ids: {}
+    };
+
+    expect(component.convertClassroomDictToBackendForm(
+      classroomDict)).toEqual(classroomBackendDict);
+  });
+
+  it(
+    'should be able to close classroom viewer and open classroom editor',
+    () => {
+      component.classroomViewerMode = true;
+      component.classroomEditorMode = false;
+
+      component.openClassroomConfigEditor();
+
+      expect(component.classroomViewerMode).toBeFalse();
+      expect(component.classroomEditorMode).toBeTrue();
+    });
+
+  it('should be able to save classroom data', fakeAsync(() => {
+    component.classroomViewerMode = false;
+    component.classroomEditorMode = true;
+    component.classroomDataIsChanged = true;
+    component.classroomIdToClassroomName = {};
+    let classroomDict = {
+      classroomId: 'classroomId',
+      name: 'math',
+      urlFragment: 'math',
+      courseDetails: 'Oppia\'s curated maths lesson.',
+      topicListIntro: 'Start from the basics with our first topic.',
+      topicIdToPrerequisiteTopicIds: {}
+    };
+    component.updatedClassroomDict = classroomDict;
+
+    spyOn(
+      classroomBackendApiService,
+      'updateClassroomDataAsync'
+    ).and.returnValue(Promise.resolve());
+
+    component.saveClassroomData('classroomId');
+    tick();
+
+    expect(component.classroomViewerMode).toBeTrue();
+    expect(component.classroomEditorMode).toBeFalse();
+    expect(component.classroomDataIsChanged).toBeFalse();
+    expect(component.selectedClassroomDict).toEqual(classroomDict);
+  }));
+
+  it(
+    'should present a confirmation modal before exiting editor mode if ' +
+    'any classroom propeties are already modified', fakeAsync(() => {
       component.classroomDataIsChanged = true;
-      let classroomDict =  {
+      component.classroomEditorMode = true;
+      component.classroomViewerMode = false;
+      component.selectedClassroomDict = {
         classroomId: 'classroomId',
         name: 'math',
         urlFragment: 'math',
         courseDetails: 'Oppia\'s curated maths lesson.',
         topicListIntro: 'Start from the basics with our first topic.',
         topicIdToPrerequisiteTopicIds: {}
-      }
-      component.updatedClassroomDict = classroomDict;
+      };
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.resolve()
+        } as NgbModalRef
+      );
 
-      spyOn(
-        classroomBackendApiService,
-        'updateClassroomDataAsync'
-      ).and.returnValue(Promise.resolve());
-
-      component.saveClassroomData('classroomId');
+      component.closeClassroomConfigEditor();
       tick();
 
-      expect(component.classroomViewerMode).toBeTrue();
+      expect(ngbModal.open).toHaveBeenCalled();
       expect(component.classroomEditorMode).toBeFalse();
+      expect(component.classroomViewerMode).toBeTrue();
       expect(component.classroomDataIsChanged).toBeFalse();
-      expect(component.selectedClassroomDict).toEqual(classroomDict);
+    }));
+  it(
+    'should be able to cancel the exit editor modal and continue editing',
+    () => {
+      component.classroomDataIsChanged = true;
+      component.classroomEditorMode = true;
+      component.classroomViewerMode = false;
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+
+      component.closeClassroomConfigEditor();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.classroomDataIsChanged).toBeTrue();
+      expect(component.classroomEditorMode).toBeTrue();
+      expect(component.classroomViewerMode).toBeFalse();
+    });
+
+  it(
+    'should not present a confirmation modal if none of the classroom ' +
+    'properties were updated', () => {
+      component.classroomDataIsChanged = false;
+      component.classroomEditorMode = true;
+      component.classroomViewerMode = false;
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.resolve()
+        } as NgbModalRef
+      );
+
+      component.closeClassroomConfigEditor();
+
+      expect(ngbModal.open).not.toHaveBeenCalled();
+      expect(component.classroomEditorMode).toBeFalse();
+      expect(component.classroomViewerMode).toBeTrue();
+    });
+
+  it('should be able to delete classroom', fakeAsync(() => {
+    component.classroomIdToClassroomName = {
+      mathClassroomId: 'math',
+      chemistryClassroomId: 'chemistry',
+      physicsClassroomId: 'physics'
+    };
+    let expectedClassroom = {
+      chemistryClassroomId: 'chemistry',
+      physicsClassroomId: 'physics'
+    };
+    component.classroomCount = 3;
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: {},
+        result: Promise.resolve()
+      } as NgbModalRef
+    );
+    spyOn(classroomBackendApiService, 'deleteClassroomAsync')
+      .and.returnValue(Promise.resolve());
+
+    component.deleteClassroom('mathClassroomId');
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.classroomIdToClassroomName).toEqual(expectedClassroom);
+    expect(component.classroomCount).toEqual(2);
+  }));
+
+  it(
+    'should be able to cancel modal for not deleting the classroom',
+    fakeAsync(() => {
+      component.classroomIdToClassroomName = {
+        mathClassroomId: 'math',
+        chemistryClassroomId: 'chemistry',
+        physicsClassroomId: 'physics'
+      };
+      let expectedClassroomIdToName = {
+        mathClassroomId: 'math',
+        chemistryClassroomId: 'chemistry',
+        physicsClassroomId: 'physics'
+      };
+      component.classroomCount = 3;
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+      spyOn(classroomBackendApiService, 'deleteClassroomAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.deleteClassroom('mathClassroomId');
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.classroomIdToClassroomName).toEqual(
+        expectedClassroomIdToName);
+      expect(component.classroomCount).toEqual(3);
     }));
 
-    it(
-      'should present a confirmation modal before exiting editor mode if ' +
-      'any classroom propeties are already modified', () => {
-        component.classroomDataIsChanged = true;
-        component.classroomEditorMode = true;
-        component.classroomViewerMode = false;
-        spyOn(ngbModal, 'open').and.returnValue(
-          {
-            componentInstance: {},
-            result: Promise.resolve()
-          } as NgbModalRef
-        );
+  it('should be able to create new classroom', fakeAsync(() => {
+    component.classroomIdToClassroomName = {
+      mathClassroomId: 'math',
+      chemistryClassroomId: 'chemistry'
+    };
+    let expectedClassroomIdToName = {
+      mathClassroomId: 'math',
+      chemistryClassroomId: 'chemistry',
+      physicsClassroomId: 'physics'
+    };
+    let classroomDict = {
+      classroomId: 'physicsClassroomId',
+      name: 'physics',
+      urlFragment: '',
+      courseDetails: '',
+      topicListIntro: '',
+      topicIdToPrerequisiteTopicIds: {}
+    };
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: {
+          existingClassroomNames: ['math', 'chemistry']
+        },
+        result: Promise.resolve(classroomDict)
+      } as NgbModalRef
+    );
 
-        component.closeClassroomConfigEditor();
+    component.createNewClassroom();
+    tick();
 
-        expect(ngbModal.open).toHaveBeenCalled();
-        expect(component.classroomEditorMode).toBeFalse();
-        expect(component.classroomViewerMode).toBeTrue();
-        expect(component.classroomDataIsChanged).toBeFalse();
-      });
-    it(
-      'should be able to cancel the exit editor modal and continue editing',
-      () => {
-        component.classroomDataIsChanged = true;
-        component.classroomEditorMode = true;
-        component.classroomViewerMode = false;
-        spyOn(ngbModal, 'open').and.returnValue(
-          {
-            componentInstance: {},
-            result: Promise.reject()
-          } as NgbModalRef
-        );
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.classroomIdToClassroomName).toEqual(
+      expectedClassroomIdToName);
+  }));
 
-        component.closeClassroomConfigEditor();
+  it('should be able to cancel create classsroom modal', fakeAsync(() => {
+    component.classroomIdToClassroomName = {
+      mathClassroomId: 'math',
+      chemistryClassroomId: 'chemistry'
+    };
+    let expectedClassroomIdToName = {
+      mathClassroomId: 'math',
+      chemistryClassroomId: 'chemistry'
+    };
 
-        expect(ngbModal.open).toHaveBeenCalled();
-        expect(component.classroomDataIsChanged).toBeTrue();
-        expect(component.classroomEditorMode).toBeTrue();
-        expect(component.classroomViewerMode).toBeFalse();
-      });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: {
+          existingClassroomNames: ['math', 'chemistry']
+        },
+        result: Promise.reject()
+      } as NgbModalRef
+    );
 
-    it(
-      'should not present a confirmation modal if none of the classroom ' +
-      'properties were updated', () => {
-        component.classroomDataIsChanged = false;
-        component.classroomEditorMode = true;
-        component.classroomViewerMode = false;
-        spyOn(ngbModal, 'open').and.returnValue(
-          {
-            componentInstance: {},
-            result: Promise.reject()
-          } as NgbModalRef
-        );
+    component.createNewClassroom();
+    tick();
 
-        component.closeClassroomConfigEditor();
-
-        expect(ngbModal.open).not.toHaveBeenCalled();
-        expect(component.classroomEditorMode).toBeFalse();
-        expect(component.classroomViewerMode).toBeTrue();
-      });
-
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.classroomIdToClassroomName).toEqual(
+      expectedClassroomIdToName);
+  }));
 });
