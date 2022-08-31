@@ -18,6 +18,8 @@
 
 import commonConstants from 'assets/constants';
 
+let MAX_CARD_COUNT_FOR_VALID_REDIRECTION = 3;
+
 export const AppConstants = {
   ...commonConstants,
   DEFAULT_TRANSLATIONS: {
@@ -71,8 +73,8 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
-    INVALID_REDIRECTION: 'Learner should not be directed back by more' +
-      ' than MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards in the lesson.'
+    INVALID_REDIRECTION: `Learner should not be directed back by more` +
+      ` than ${MAX_CARD_COUNT_FOR_VALID_REDIRECTION} cards in the lesson.`
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
