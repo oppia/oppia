@@ -36,11 +36,11 @@ describe('Exploration history', function() {
   var explorationEditorSettingsTab = null;
 
   // Constants for colors of nodes in history graph.
-  var COLOR_ADDED = 'rgb(78, 162, 78)';
-  var COLOR_DELETED = 'rgb(220, 20, 60)';
-  var COLOR_CHANGED = 'rgb(30, 144, 255)';
-  var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
-  var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
+  var COLOR_ADDED = 'rgb(78,162,78)';
+  var COLOR_DELETED = 'rgb(220,20,60)';
+  var COLOR_CHANGED = 'rgb(30,144,255)';
+  var COLOR_UNCHANGED = 'rgb(245,245,220)';
+  var COLOR_RENAMED_UNCHANGED = 'rgb(255,215,0)';
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -629,7 +629,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 51\n' +
+      'states_schema_version: 52\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -647,7 +647,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 51\n' +
+      'states_schema_version: 52\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +

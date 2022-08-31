@@ -676,6 +676,12 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         prevScrollTop = currentScrollTop;
       }
 
+      var numberOfElements = Object.keys(compareDict).length;
+      await waitFor.numberOfElementsToBe(
+        elem,
+        'Line Number Elements',
+        numberOfElements,
+        '.CodeMirror-linenumber');
       var lineNumberElements = await elem.$$('.CodeMirror-linenumber');
       var totalCount = lineNumberElements.length;
       for (var i = 0; i < totalCount; i++) {

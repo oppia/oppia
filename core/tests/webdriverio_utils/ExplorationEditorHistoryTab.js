@@ -172,11 +172,11 @@ var ExplorationEditorHistoryTab = function() {
           historyGraph, 'History graph takes too long to be visible.');
         var stateNodes = historyGraph.$$('.e2e-test-node');
         var states = await stateNodes.map(async function(stateElement) {
-          await waitFor.visibilityOf(stateNodeLabel(
+          await waitFor.visibilityOf(await stateNodeLabel(
             stateElement), 'State Node Label taking too long to appear');
           var label = await stateNodeLabel(stateElement).getText();
-          var color = await stateNodeBackground(stateElement).getCSSProperty(
-            'fill').value;
+          var color = (await stateNodeBackground(
+            stateElement).getCSSProperty('fill')).value;
           return {
             label: label,
             color: color
@@ -207,7 +207,7 @@ var ExplorationEditorHistoryTab = function() {
         var deletedCount = 0;
         var historyGraphLink = historyGraph.$$('.e2e-test-link');
         await historyGraphLink.map(async function(link) {
-          var linkColor = await link.getCSSProperty('stroke').value;
+          var linkColor = (await link.getCSSProperty('stroke')).value;
           totalCount++;
           if (linkColor === COLOR_ADDED) {
             addedCount++;
