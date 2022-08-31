@@ -630,24 +630,25 @@ def get_exploration_opportunity_summaries_by_ids(
 
 
 def get_exploration_opportunity_summary_by_id(
-    id: str
+    opportunity_id: str
 ) -> Optional[opportunity_domain.ExplorationOpportunitySummary]:
     """Returns an ExplorationOpportunitySummary object corresponding to the
     opportunity id.
 
     Args:
-        id: str. An opportunity id.
+        opportunity_id: str. An opportunity id.
 
     Returns:
         ExplorationOpportunitySummary|None. An ExplorationOpportunitySummary
         domain object corresponding to the opportunity id if exist else None.
     """
     exp_opportunity_summary_model = (
-        opportunity_models.ExplorationOpportunitySummaryModel.get(id))
+        opportunity_models.ExplorationOpportunitySummaryModel.get(
+            opportunity_id))
     opportunity = None
     if exp_opportunity_summary_model is not None:
-            opportunity = (get_exploration_opportunity_summary_from_model(
-                    exp_opportunity_summary_model))
+        opportunity = (get_exploration_opportunity_summary_from_model(
+                exp_opportunity_summary_model))
     return opportunity
 
 

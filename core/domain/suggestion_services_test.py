@@ -2596,7 +2596,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
         self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_without_reviewer_edits_count,
+            (
+                translation_contribution_stats_model
+                .accepted_translations_without_reviewer_edits_count
+            ),
             0
         )
 
@@ -2656,7 +2659,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_without_reviewer_edits_count,
+            (
+                translation_contribution_stats_model
+                .accepted_translations_without_reviewer_edits_count
+            ),
             1
         )
 
@@ -2888,7 +2894,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             question_contribution_stats_model.accepted_questions_count,
             2
         )
-        
+
     def test_update_question_stats_when_suggestion_is_rejected(
         self) -> None:
         # This test case will check stats of the reviewer and the submitter

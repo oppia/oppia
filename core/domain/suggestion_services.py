@@ -2032,9 +2032,12 @@ def _update_translation_contribution_stats_models(
 
     for stat in translation_contribution_stats:
 
-        stat_id = suggestion_models.TranslationContributionStatsModel.construct_id(
-            str(stat.language_code), str(stat.contributor_user_id),
-            str(stat.topic_id))
+        stat_id = (
+            suggestion_models.TranslationContributionStatsModel.construct_id(
+                str(stat.language_code),
+                str(stat.contributor_user_id),
+                str(stat.topic_id))
+        )
         stats_dict[stat_id] = stat
 
     stats_ids = stats_dict.keys()
@@ -2289,9 +2292,10 @@ def update_translation_contribution_stats_at_submission(
         translation_contribution_stat = (
             create_translation_contribution_stats_from_model(
                 translation_contribution_stat_model))
-        
+
         get_incremental_translation_contribution_stats(
-            translation_contribution_stat, content_word_count, suggestion.last_updated)
+            translation_contribution_stat, content_word_count,
+            suggestion.last_updated)
 
         _update_translation_contribution_stats_models(
             [translation_contribution_stat])
@@ -2464,16 +2468,15 @@ def update_question_contribution_stats_at_submission(
                     suggestion.last_updated)
             )
             continue
-        else:
-            question_contribution_stat = (
-                _create_question_contribution_stats_from_model(
-                    question_contribution_stat_model))
+        question_contribution_stat = (
+            _create_question_contribution_stats_from_model(
+                question_contribution_stat_model))
 
-            get_incremental_question_contribution_stats(
-                question_contribution_stat, suggestion.last_updated)
+        get_incremental_question_contribution_stats(
+            question_contribution_stat, suggestion.last_updated)
 
-            _update_question_contribution_stats_models(
-                [question_contribution_stat])
+        _update_question_contribution_stats_models(
+            [question_contribution_stat])
 
 
 def update_question_contribution_stats_at_review(
@@ -2514,20 +2517,19 @@ def update_question_contribution_stats_at_review(
                     suggestion.last_updated)
             )
             continue
-        else:
-            question_contribution_stat = (
-                _create_question_contribution_stats_from_model(
-                    question_contribution_stat_model))
+        question_contribution_stat = (
+            _create_question_contribution_stats_from_model(
+                question_contribution_stat_model))
 
-            suggestion_is_accepted = (
-                suggestion.status == suggestion_models.STATUS_ACCEPTED)
+        suggestion_is_accepted = (
+            suggestion.status == suggestion_models.STATUS_ACCEPTED)
 
-            get_incremental_question_contribution_stats_at_review(
-                question_contribution_stat, suggestion_is_accepted,
-                suggestion.edited_by_reviewer)
+        get_incremental_question_contribution_stats_at_review(
+            question_contribution_stat, suggestion_is_accepted,
+            suggestion.edited_by_reviewer)
 
-            _update_question_contribution_stats_models(
-                [question_contribution_stat])
+        _update_question_contribution_stats_models(
+            [question_contribution_stat])
 
 
 def update_question_review_stats(
@@ -2571,16 +2573,15 @@ def update_question_review_stats(
                     suggestion.last_updated)
             )
             continue
-        else:
-            question_review_stat = (
-                _create_question_review_stats_from_model(
-                    question_review_stat_model))
+        question_review_stat = (
+            _create_question_review_stats_from_model(
+                question_review_stat_model))
 
-            get_incremental_question_review_stats(
-                question_review_stat, suggestion.last_updated, is_accepted,
-                suggestion.edited_by_reviewer)
+        get_incremental_question_review_stats(
+            question_review_stat, suggestion.last_updated, is_accepted,
+            suggestion.edited_by_reviewer)
 
-            _update_question_review_stats_models([question_review_stat])
+        _update_question_review_stats_models([question_review_stat])
 
     update_question_contribution_stats_at_review(
         suggestion, suggestion.author_id, target_id)
@@ -2620,7 +2621,6 @@ def get_incremental_translation_contribution_stats_at_review(
         translation_contribution_stat: TranslationContributionStats. The stats
             object to update.
         content_word_count: int. The number of words in the translation.
-        last_contribution_date: datetime. The last updated date.
         is_accepted: bool. A flag that indicates whether the suggestion is
             accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
@@ -2630,9 +2630,10 @@ def get_incremental_translation_contribution_stats_at_review(
         translation_contribution_stat
         .accepted_translations_count
     ) += int(is_accepted)
-    (translation_contribution_stat
-    .accepted_translations_without_reviewer_edits_count) += int(
-        edited_by_reviewer)
+    (
+        translation_contribution_stat
+        .accepted_translations_without_reviewer_edits_count
+    ) += int(edited_by_reviewer)
     translation_contribution_stat.accepted_translation_word_count += (
         content_word_count) * int(is_accepted)
     translation_contribution_stat.rejected_translations_count += int(
@@ -2665,8 +2666,10 @@ def get_incremental_translation_review_stats(
         content_word_count)
     translation_review_stat.accepted_translations_count += int(
         is_accepted)
-    (translation_review_stat
-    .accepted_translations_with_reviewer_edits_count) += int(edited_by_reviewer)
+    (
+        translation_review_stat
+        .accepted_translations_with_reviewer_edits_count
+    ) += int(edited_by_reviewer)
     translation_review_stat.last_contribution_date = get_contribution_date(
         last_contribution_date)
 
@@ -2696,18 +2699,18 @@ def get_incremental_question_contribution_stats_at_review(
     """Updates QuestionContributionStats object.
 
     Args:
-        translation_contribution_stat: TranslationContributionStats. The stats
+        question_contribution_stat: QuestionContTranributionStats. The stats
             object to update.
-        last_contribution_date: datetime. The last updated date.
         is_accepted: bool. A flag that indicates whether the suggestion is
             accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
     question_contribution_stat.accepted_questions_count += int(is_accepted)
-    (question_contribution_stat
-     .accepted_questions_without_reviewer_edits_count) += int(
-         edited_by_reviewer)
+    (
+        question_contribution_stat
+        .accepted_questions_without_reviewer_edits_count
+    ) += int(edited_by_reviewer)
 
 
 def get_incremental_question_review_stats(
@@ -2719,11 +2722,12 @@ def get_incremental_question_review_stats(
     """Updates QuestionReviewStats object.
 
     Args:
-        translation_review_stat: QuestionReviewStats. The stats
-            object to update.
+        question_review_stat: QuestionReviewStats. The stats object to update.
         last_contribution_date: datetime. The last updated date.
         is_accepted: bool. A flag that indicates whether the suggestion is
             accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
     """
     question_review_stat.reviewed_questions_count += 1
     question_review_stat.accepted_questions_count += int(
