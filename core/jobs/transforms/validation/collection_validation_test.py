@@ -230,7 +230,7 @@ class ValidateCollectionSnapshotMetadataModelTests(
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_collection_summary_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CollectionSummaryModel', 'id'),
             ['CollectionModel', 'CollectionRightsModel'])

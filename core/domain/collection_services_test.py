@@ -78,13 +78,13 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
@@ -239,7 +239,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                 'category': 'category',
             }])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d collection schemas at '
             'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
@@ -305,7 +305,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         apply_change_list_swap = self.swap(
             collection_services, 'apply_change_list', lambda _, __: collection)
 
-        with apply_change_list_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with apply_change_list_swap, self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save collection'):
@@ -326,7 +326,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             'collection_id')
         collection_model.version = 0
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 0 of collection '
             'from version 1. Please reload the page and try again.'):
@@ -398,7 +398,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
     def test_get_multiple_collections_by_id_with_invalid_collection_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Couldn\'t find collections with the following ids'):
             collection_services.get_multiple_collections_by_id(
                 ['collection_id_1', 'collection_id_2'])
@@ -475,7 +475,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
         self.save_new_valid_collection('collection_id', self.owner_id)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Command invalid command is not allowed'), logging_swap:
             collection_services.update_collection(
                 self.owner_id, 'collection_id', [{
@@ -577,7 +577,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
                 'Fake', self.COL_ID_0), self.EXP_ID_0)
 
         # There should be an exception if the collection does not exist.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id Fake not found'):
             collection_services.get_next_exploration_id_to_complete_by_user(
@@ -759,7 +759,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         self
     ) -> None:
         system_user = user_services.get_system_user()
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No collection summary model exists for the given id:'
             ' Invalid_collection_id'
@@ -903,7 +903,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
     def test_retrieval_of_collection(self) -> None:
         """Test the get_collection_by_id() method."""
-        with self.assertRaisesRegex(Exception, 'Entity .* not found'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Entity .* not found'):
             collection_services.get_collection_by_id('fake_eid')
 
         collection = self.save_new_default_collection(
@@ -913,7 +913,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.id, retrieved_collection.id)
         self.assertEqual(collection.title, retrieved_collection.title)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id fake_collection'
             ' not found'):
@@ -941,7 +941,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         self.assertNotIn('doesnt_exist', result)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Couldn\'t find collections with the following ids:\ndoesnt_exist'):
             collection_services.get_multiple_collections_by_id(
@@ -957,7 +957,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_0_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id A_collection_0_id '
             'not found'):
@@ -1017,12 +1017,12 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collections(
             self.owner_id, [self.COLLECTION_0_ID, self.COLLECTION_1_ID])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id A_collection_0_id '
             'not found'):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id A_collection_1_id '
             'not found'):
@@ -1101,7 +1101,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_0_ID, force_deletion=True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id A_collection_0_id'
             ' not found'):
@@ -1127,12 +1127,12 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.owner_id,
             [self.COLLECTION_0_ID, self.COLLECTION_1_ID],
             force_deletion=True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id A_collection_0_id'
             ' not found'):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id A_collection_1_id '
             'not found'):
@@ -1164,7 +1164,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_0_ID, force_deletion=True)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class CollectionModel with id A_collection_0_id '
             'not found'):
@@ -1351,7 +1351,7 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             collection_models.CollectionModel.get_collection_count(), 0)
 
     def test_load_demo_with_invalid_collection_id_raises_error(self) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid demo collection id'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid demo collection id'):
             collection_services.load_demo('invalid_collection_id')
 
     def test_demo_file_path_ends_with_yaml(self) -> None:
@@ -1400,7 +1400,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
     def test_add_node_with_non_existent_exploration(self) -> None:
         non_existent_exp_id = 'non_existent_exploration_id'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected collection to only reference valid explorations'):
             collection_services.update_collection(
@@ -1421,7 +1421,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertTrue(
             rights_manager.is_collection_public(self.COLLECTION_0_ID))
         self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
             'collection'):
@@ -1571,7 +1571,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.tags, ['test'])
 
         # Verify that error will be thrown when duplicate tags are introduced.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected tags to be unique, but found duplicates'):
             collection_services.update_collection(
@@ -1642,7 +1642,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
         """Check published collections demand commit messages."""
         rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Collection is public so expected a commit message but '
             'received none.'
@@ -1680,7 +1680,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
     def test_get_collection_snapshots_metadata(self) -> None:
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
-        second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)  # type: ignore[no-untyped-call]
+        second_committer_id = self.get_user_id_from_email(self.SECOND_EMAIL)
 
         exp_id = 'exp_id0'
         v1_collection = self.save_new_valid_collection(
@@ -1765,7 +1765,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             snapshots_metadata[1]['created_on_ms'])
 
         # Using the old version of the collection should raise an error.
-        with self.assertRaisesRegex(Exception, 'version 1, which is too old'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'version 1, which is too old'):
             collection_services._save_collection(  # pylint: disable=protected-access
                 second_committer_id, v1_collection, '',
                 _get_collection_change_list('title', ''))
@@ -1860,7 +1860,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         # Perform an invalid action: delete an exploration that does not exist.
         # This should not create a new version.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'is not part of this collection'
             ):
             collection.delete_node('invalid_exploration_id')
@@ -1920,7 +1920,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
                 set(categories), set(expected_collection_categories))
             return ids
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)  # type: ignore[no-untyped-call]
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
             gae_search_services,
             'add_documents_to_index',
@@ -1960,8 +1960,8 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         super().setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
     def test_is_editable_by(self) -> None:
         self.save_new_default_collection(self.COLLECTION_0_ID, self.owner_id)
@@ -2025,7 +2025,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID)
         # Ruling out the possibility of None for mypy type checking.
         assert collection_summary is not None
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             collection_summary.contributor_ids,
             [self.albert_id, self.bob_id])
 
@@ -2109,6 +2109,42 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
 
         self._check_contributors_summary(
             self.COLLECTION_0_ID, {self.albert_id: 1})
+
+    def test_raises_error_when_collection_provided_with_no_last_updated_data(
+        self
+    ) -> None:
+        self.save_new_valid_collection('test_id', self.albert_id)
+        collection = collection_services.get_collection_by_id('test_id')
+        collection.last_updated = None
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No data available for when the collection was last_updated.'
+            ):
+                collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
+                    'test_id'
+                )
+
+    def test_raises_error_when_collection_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        self.save_new_valid_collection('test_id', self.albert_id)
+        collection = collection_services.get_collection_by_id('test_id')
+        collection.created_on = None
+
+        with self.swap_to_always_return(
+            collection_services, 'get_collection_by_id', collection
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No data available for when the collection was created.'
+            ):
+                collection_services.regenerate_collection_and_contributors_summaries(  # pylint: disable=line-too-long
+                    'test_id'
+                )
 
 
 class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):

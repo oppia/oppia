@@ -44,6 +44,7 @@ def main() -> None:
             'Failed to calculate coverage because subprocess failed. ' +
             '\nOUTPUT: %s\nERROR: %s' % (process.stdout, process.stderr)
         )
+    print(process.stdout)
     coverage_result = re.search(
         r'TOTAL\s+(\d+)\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
         process.stdout)

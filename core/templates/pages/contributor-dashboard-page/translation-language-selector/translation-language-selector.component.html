@@ -10,8 +10,7 @@
     <span class="oppia-language-selector-label e2e-test-language-selector-selected">
       {{languageSelection}}
     </span>
-    <span class="material-icons oppia-translation-language-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-      arrow_drop_down
+    <span class="fas fa-caret-down oppia-translation-language-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
     </span>
   </div>
 
@@ -78,6 +77,7 @@
   .oppia-translation-language-selector-inner-container-arrow {
     color: #009688;
     cursor: pointer;
+    padding-top: 3px;
   }
 
   .oppia-translation-language-selector-dropdown-options-container {
