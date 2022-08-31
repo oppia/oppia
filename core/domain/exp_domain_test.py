@@ -5790,8 +5790,14 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.delete_state(exploration.init_state_name)
 
         exploration.add_states(['second state'])
-        exploration.delete_state('second state')
 
+        interaction = exploration.states['first state'].interaction
+        default_outcome_for_first_state = interaction.default_outcome
+        default_outcome_for_first_state.dest_if_really_stuck = 'second state'
+
+        exploration.delete_state('second state')
+        self.assertEqual(
+            default_outcome_for_first_state.dest_if_really_stuck, 'first state')
         with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
 
