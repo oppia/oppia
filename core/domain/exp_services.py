@@ -1550,12 +1550,12 @@ def update_exploration(
 
     for change in change_list:
         if change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
-            content_ids_corresponding_translations_to_remove.append(
+            content_ids_corresponding_translations_to_mark_needs_update.append(
                 change.content_id)
             continue
 
         if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
-            content_ids_corresponding_translations_to_mark_needs_update.append(
+            content_ids_corresponding_translations_to_remove.append(
                 change.content_id)
 
     _save_exploration(
@@ -1567,7 +1567,7 @@ def update_exploration(
     taskqueue_services.defer(
         taskqueue_services.FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
-        updated_exploration.version,
+        updated_exploration.version - 1,
         content_ids_corresponding_translations_to_remove,
         content_ids_corresponding_translations_to_mark_needs_update,
         updated_exploration.get_content_count()

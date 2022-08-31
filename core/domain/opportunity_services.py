@@ -276,7 +276,8 @@ def _create_exploration_opportunities(
         exploration_opportunity_summary_list)
 
 
-def update_opportunity_with_updated_exploration(exp_id: str) -> None:
+def update_opportunity_with_updated_exploration(
+        exp_id: str, content_count: int, translation_counts) -> None:
     """Updates the opportunities models with the changes made in the
     exploration.
 
@@ -285,17 +286,12 @@ def update_opportunity_with_updated_exploration(exp_id: str) -> None:
             model.
     """
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    content_count = updated_exploration.get_content_count()
-    translation_counts = translation_services.get_translation_counts(
-        feconf.TranslatableEntityType.EXPLORATION,
-        updated_exploration.id,
-        updated_exploration.version
-    )
-    # TODO(#13903): Find a way to reduce runtime of computing the complete
-    # languages.
-    complete_translation_language_list = (
-        translation_services.get_languages_with_complete_translation(
-            updated_exploration))
+
+    complete_translation_language_list = []
+    for language_code, translation_count in translation_counts:
+        if translation_count == content_count:
+            complete_translation_language_list.append(language_code)
+
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
     exploration_opportunity_summary = (
         get_exploration_opportunity_summary_from_model(model))

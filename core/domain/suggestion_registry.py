@@ -770,7 +770,8 @@ class SuggestionTranslateContent(BaseSuggestion):
 
         translated_content = translation_domain.TranslatedContent(
             self.change.translation_html,
-            self.change.data_format,
+            translation_domain.TranslatableContentFormat(
+                self.change.data_format),
             needs_update=False
         )
 

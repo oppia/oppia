@@ -93,8 +93,10 @@ export class Exploration extends BaseTranslatableObject {
     this.logger = loggerService;
     this.urlInterpolationService = urlInterpolationService;
     this.nextContentIdIndex = nextContentIdIndex;
+  }
 
-    this._translatableObjects = Object.values(this.states.getStateObjects());
+  getTranslatableObjects(): BaseTranslatableObject[] {
+    return Object.values(this.states.getStateObjects());
   }
 
   // ---- Instance methods ----

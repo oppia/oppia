@@ -109,7 +109,7 @@ def add_new_translation(
     entity_translation.validate()
 
     model = translation_models.EntityTranslationsModel.create_new(
-        entity_type,
+        entity_type.value,
         entity_id,
         entity_version,
         language_code,
@@ -126,48 +126,41 @@ def update_translation_related_change(
     content_ids_corresponding_translations_to_mark_needs_update,
     content_count
 ):
-    old_translation_models = (
-        translation_models.EntityTranslationsModel.get_all_for_entity(
+    old_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
             feconf.TranslatableEntityType.EXPLORATION,
             exploration_id,
-            exploration_version)
-    )
+            exploration_version
+        ))
+
     # Create new_translation_models with updated id and entity version.
     new_translation_models = []
     translation_counts = {}
-    for entity_translation_model in old_translation_models:
-        new_translation_model = (
+    for entity_translation in old_translations:
+        entity_translation.remove_translations(
+            content_ids_corresponding_translations_to_remove)
+        entity_translation.mark_translations_needs_update(
+            content_ids_corresponding_translations_to_mark_needs_update)
+
+        translation_counts[entity_translation.language_code] = (
+            entity_translation.get_translation_count())
+
+        new_translation_models.append(
             translation_models.EntityTranslationsModel.create_new(
-                entity_translation_model.entity_type,
-                entity_translation_model.entity_id,
-                entity_translation_model.exploration_version + 1,
-                entity_translation_model.language_code,
-                entity_translation_model.translations
+                entity_translation.entity_type,
+                entity_translation.entity_id,
+                entity_translation.entity_version + 1,
+                entity_translation.language_code,
+                entity_translation.to_dict()['translations']
             )
         )
-        translation_counts[new_translation_model.language_code] = (
-            len(new_translation_model.translation))
-        for content_id in content_ids_corresponding_translations_to_remove:
-            if content_id in new_translation_model.translation:
-                del new_translation_model.translations[change.content_id]
-                translation_counts[new_translation_model.language_code] -= 1
-
-        for content_id in (
-                content_ids_corresponding_translations_to_mark_needs_update):
-            if content_id in new_translation_model.translation:
-                new_translation_model.translations[
-                    change.content_id].needs_update = True
-                translation_counts[new_translation_model.language_code] -= 1
-
-
-        new_translation_models.append(new_translation_model)
 
     translation_models.EntityTranslationsModel.put_multi(
         new_translation_models)
     if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
         opportunity_services.update_opportunity_with_updated_exploration(
-            exploration_id)
+            exploration_id, content_count, translation_counts)
 
 
 def get_languages_with_complete_translation(exploration):
@@ -263,4 +256,3 @@ def get_translatable_text(exploration, language_code):
                     entity_translations))
 
         return state_names_to_content_id_mapping
-

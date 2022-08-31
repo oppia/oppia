@@ -77,8 +77,10 @@ export class Solution extends BaseTranslatableObject {
     this.answerIsExclusive = answerIsExclusive;
     this.correctAnswer = correctAnswer;
     this.explanation = explanation;
+  }
 
-    this._translatableFields = [this.explanation];
+  getTranslatableFields(): SubtitledHtml[] {
+    return [this.explanation];
   }
 
   toBackendDict(): SolutionBackendDict {

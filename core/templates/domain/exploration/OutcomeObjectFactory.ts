@@ -61,8 +61,10 @@ export class Outcome extends BaseTranslatableObject {
     this.paramChanges = paramChanges;
     this.refresherExplorationId = refresherExplorationId;
     this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
+  }
 
-    this._translatableFields = [this.feedback];
+  getTranslatableFields(): SubtitledHtml[] {
+    return [this.feedback]
   }
 
   setDestination(newValue: string): void {

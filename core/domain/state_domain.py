@@ -3460,6 +3460,13 @@ class State(translation_domain.BaseTranslatableObject):
                     for key, value_class in rules_variables[rule_type]:
                         if value_class not in OBJECT_CONTENT_IDS_REPLACERS:
                             continue
+
+                        # INVALID_CONTENT_ID doesn't corresponds to any existing
+                        # content in the state.
+                        # Such Ids cannot be replaced with any new id.
+                        if input[key] == feconf.INVALID_CONTENT_ID:
+                            continue
+
                         input[key] = OBJECT_CONTENT_IDS_REPLACERS[value_class](
                             input[key], old_to_new_content_id)
 

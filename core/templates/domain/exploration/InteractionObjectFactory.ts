@@ -110,18 +110,24 @@ export class Interaction extends BaseTranslatableObject {
     this.id = id;
     this.solution = solution;
 
-    this._translatableFields = Interaction.getCustomizationArgContents(
-      this.customizationArgs);
-    this._translatableObjects = [
+  }
+
+  getTranslatableFields(): (SubtitledUnicode | SubtitledHtml)[] {
+    return Interaction.getCustomizationArgContents(this.customizationArgs);
+  }
+
+  getTranslatableObjects(): BaseTranslatableObject[] {
+    let translatableObjects: BaseTranslatableObject[] = [
       ...this.answerGroups, ...this.hints];
 
     if (this.defaultOutcome) {
-      this._translatableObjects.push(this.defaultOutcome);
+      translatableObjects.push(this.defaultOutcome);
     }
 
     if (this.solution) {
-      this._translatableObjects.push(this.solution);
+      translatableObjects.push(this.solution);
     }
+    return translatableObjects;
   }
 
   setId(newValue: string): void {

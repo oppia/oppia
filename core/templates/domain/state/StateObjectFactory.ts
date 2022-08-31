@@ -79,9 +79,14 @@ export class State extends BaseTranslatableObject {
     this.recordedVoiceovers = recordedVoiceovers;
     this.solicitAnswerDetails = solicitAnswerDetails;
     this.cardIsCheckpoint = cardIsCheckpoint;
+  }
 
-    this._translatableFields = [this.content];
-    this._translatableObjects = [this.interaction];
+  getTranslatableFields(): SubtitledHtml[] {
+    return [this.content];
+  }
+
+  getTranslatableObjects(): BaseTranslatableObject[] {
+    return [this.interaction];
   }
 
   setName(newName: string): void {

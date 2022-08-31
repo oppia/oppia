@@ -483,6 +483,29 @@ class EntityTranslation:
         self.translations[content_id] = TranslatedContent(
             content_value, content_format, needs_update)
 
+    def get_translation_count(self):
+        """"""
+        count = 0
+        for translated_content in self.translations.values():
+            if not translated_content.needs_update:
+                count += 1
+
+        return count
+
+    def remove_translations(self, content_ids):
+        """
+        """
+        for content_id in content_ids:
+            if content_id in self.translations:
+                del self.translations[content_id]
+
+    def mark_translations_needs_update(self, content_ids):
+        """
+        """
+        for content_id in content_ids:
+            if content_id in self.translations:
+                self.translations[content_id].needs_update = True
+
 
     @classmethod
     def create_empty(

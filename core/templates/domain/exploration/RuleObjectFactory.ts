@@ -50,16 +50,21 @@ export class Rule extends BaseTranslatableObject {
     this.type = type;
     this.inputs = inputs;
     this.inputTypes = inputTypes;
+  }
 
+  getTranslatableFields(): any {
+    let translatableFields = [];
     Object.keys(this.inputs).forEach(inputName => {
       const ruleInput = this.inputs[inputName];
       // All rules input types which are translatable are subclasses of
       // BaseTranslatableObject having dict structure with contentId
       // as a key.
       if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-        this._translatableFields.push(ruleInput);
+        translatableFields.push(ruleInput);
       }
     });
+
+    return translatableFields;
   }
 
   toBackendDict(): RuleBackendDict {

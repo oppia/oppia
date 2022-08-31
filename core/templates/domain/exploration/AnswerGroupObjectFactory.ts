@@ -52,8 +52,10 @@ export class AnswerGroup extends BaseTranslatableObject {
     this.outcome = outcome;
     this.trainingData = trainingData;
     this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
+  }
 
-    this._translatableObjects = [this.outcome, ...this.rules];
+  getTranslatableObjects(): BaseTranslatableObject[] {
+    return [this.outcome, ...this.rules];
   }
 
   toBackendDict(): AnswerGroupBackendDict {

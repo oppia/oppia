@@ -55,9 +55,11 @@ import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
 import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 interface ContentsMapping {
-  [contentId: string]: SubtitledHtml;
+  [contentId: string]: SubtitledHtml | SubtitledUnicode;
 }
 
 @Injectable({
@@ -176,7 +178,6 @@ export class ExplorationStatesService {
         answerGroup => {
           contents = contents.concat(answerGroup.getAllContents());
         });
-
       return contents;
     },
     default_outcome: (defaultOutcome) => {
@@ -206,8 +207,7 @@ export class ExplorationStatesService {
   }
 
   _verifyChangesInitialContents(
-      backendName: string,
-      value: StatePropertyValues): void {
+      backendName: string, value: StatePropertyValues): void {
     let contents: SubtitledHtml[];
 
     if (backendName === 'content') {
@@ -222,10 +222,12 @@ export class ExplorationStatesService {
       if (!this.initalContentsMapping.hasOwnProperty(content.contentId)) {
         continue;
       }
-      let intialContent = this.initalContentsMapping[content.contentId];
 
-      if (content.html === intialContent.html) {
-        return;
+      let intialContent = this.initalContentsMapping[content.contentId];
+      if (
+          JSON.stringify(BaseTranslatableObject.getContentValue(content)) ===
+        JSON.stringify(BaseTranslatableObject.getContentValue(intialContent))) {
+        continue;
       }
 
       const modalRef = this.ngbModal.open(
@@ -240,6 +242,7 @@ export class ExplorationStatesService {
           windowClass: 'forced-modal-stack'
         });
       modalRef.componentInstance.contentId = content.contentId;
+      this.initalContentsMapping[content.contentId] = content;
     }
   }
 
@@ -379,7 +382,6 @@ export class ExplorationStatesService {
       oldBackendValue = (
         this.convertToBackendRepresentation(oldValue, backendName));
     }
-
     if (!isEqual(oldValue, newValue)) {
       this.changeListService.editStateProperty(
         stateName, backendName, newBackendValue, oldBackendValue);

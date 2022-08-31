@@ -328,14 +328,15 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             stories = [
                 stories_dict[story_id] for story_id in existing_story_ids
             ]
-            for story in stories:
-                for exp_id in story.story_contents.get_all_linked_exp_ids():
-                    exploration_opportunity_summary_list.append(
-                        opportunity_services.create_exp_opportunity_summary(
-                            topic, story, exps_dict[exp_id]))
 
             exploration_opportunity_summary_model_list = []
             with datastore_services.get_ndb_context():
+                for story in stories:
+                    for exp_id in story.story_contents.get_all_linked_exp_ids():
+                        exploration_opportunity_summary_list.append(
+                            opportunity_services.create_exp_opportunity_summary(
+                                topic, story, exps_dict[exp_id]))
+
                 for opportunity in exploration_opportunity_summary_list:
                     model = (
                         opportunity_models.ExplorationOpportunitySummaryModel(
