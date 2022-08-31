@@ -62,7 +62,7 @@ CLASSROOM_NAME = 'math'
 CLASSROOM_URL_FRAGMENT = 'math'
 
 
-class ContributorDashboardDebugInitializer():
+class ContributorDashboardDebugInitializer:
     """Contains functions that populate sample data by sending requests to the
     development server.
 
@@ -101,7 +101,7 @@ class ContributorDashboardDebugInitializer():
         """
         # In development mode, to save developers and end-to-end test authors
         # the trouble of providing passwords, passwords are generated through
-        # the md5 hash of email addresses in frontend codes. This script also 
+        # the md5 hash of email addresses in frontend codes. This script also
         # uses the md5 hash so that the created users can sign in from login UI.
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
@@ -133,7 +133,8 @@ class ContributorDashboardDebugInitializer():
     @contextlib.contextmanager
     def _set_environ(self, env_name: str, value: str) -> Iterator[None]:
         """Temporarily set the environment variable 'env_name' to 'value' while
-        inside the ``with`` block."""
+        inside the ``with`` block.
+        """
         old_value = os.environ.get(env_name)
         os.environ[env_name] = value
         try:
