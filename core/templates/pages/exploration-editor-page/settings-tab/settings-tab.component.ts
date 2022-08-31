@@ -88,6 +88,7 @@ export class SettingsTabComponent
   permissionsCardIsShown: boolean;
   feedbackCardIsShown: boolean;
   controlsCardIsShown: boolean;
+  voiceArtistsCardIsShown: boolean;
   EXPLORATION_TITLE_INPUT_FOCUS_LABEL: string;
   ROLES = [{
     name: 'Manager (can edit permissions)',
@@ -409,6 +410,8 @@ export class SettingsTabComponent
       this.feedbackCardIsShown = !this.feedbackCardIsShown;
     } else if (card === 'controls') {
       this.controlsCardIsShown = !this.controlsCardIsShown;
+    } else if (card === 'voice_artists') {
+      this.voiceArtistsCardIsShown = !this.voiceArtistsCardIsShown;
     }
   }
 
@@ -688,6 +691,8 @@ export class SettingsTabComponent
       !this.windowDimensionsService.isWindowNarrow());
     this.feedbackCardIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.controlsCardIsShown = !this.windowDimensionsService.isWindowNarrow();
+    this.voiceArtistsCardIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
 
     this.TAG_REGEX = AppConstants.TAG_REGEX;
     this.canDelete = false;

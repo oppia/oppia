@@ -968,6 +968,7 @@ describe('Settings Tab Component', () => {
     tick();
     expect(component.feedbackCardIsShown).toEqual(false);
 
+    component.toggleCards('voice_artists');
     component.toggleCards('controls');
     tick();
     expect(component.controlsCardIsShown).toEqual(false);

@@ -373,7 +373,7 @@ var createQuestion = async function() {
   await skillEditorPage.moveToQuestionsTab();
   await skillEditorPage.clickCreateQuestionButton();
   await explorationEditorMainTab.setContent(
-    await forms.toRichText('Question 1'));
+    await forms.toRichText('Question 1'), true);
   await explorationEditorMainTab.setInteraction(
     'TextInput', 'Placeholder', 5);
   await explorationEditorMainTab.addResponse(

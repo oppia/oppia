@@ -394,18 +394,18 @@
   <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames?.length > 0 && !explorationRightsService.isCloned()"
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
-      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('roles')">
+      <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
         <h3>Voice Artists</h3>
         <i class="fa fa-caret-down"
-           *ngIf="!rolesCardIsShown"
+           *ngIf="!voiceArtistsCardIsShown"
            aria-hidden="true">
         </i>
         <i class="fa fa-caret-up"
-           *ngIf="rolesCardIsShown"
+           *ngIf="voiceArtistsCardIsShown"
            aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="rolesCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content" *ngIf="voiceArtistsCardIsShown">
         <div>
           <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message" *ngIf="!explorationRightsService.voiceArtistNames?.length">
             No voice artists are assigned to this exploration.

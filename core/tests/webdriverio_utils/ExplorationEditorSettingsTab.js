@@ -157,8 +157,10 @@ var ExplorationEditorSettingsTab = function() {
   this.expectFirstStateToBe = async function(firstState) {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    expect(await initialStateSelect.$('option:checked').getText()).
-      toEqual(firstState);
+    await waitFor.textToBePresentInElement(
+      initialStateSelect.$('option:checked'),
+      firstState,
+      `Initial state is not set as ${firstState}`);
   };
 
   this.expectLanguageToBe = async function(language) {
@@ -173,14 +175,14 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationObjectiveInput,
       'Objective input takes too long to be visible.');
-    expect(await explorationObjectiveInput.getAttribute('value')).
+    expect(await explorationObjectiveInput.getValue()).
       toEqual(objective);
   };
 
   this.expectTitleToBe = async function(title) {
     await waitFor.presenceOf(
       explorationTitleInput, 'Title input takes too long to be visible.');
-    expect(await explorationTitleInput.getAttribute('value')).
+    expect(await explorationTitleInput.getValue()).
       toEqual(title);
   };
 
@@ -188,7 +190,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationObjectiveWarning,
       'Objective warning takes too long to be visible.');
-    expect(await explorationObjectiveWarning.getCSSProperty('color')).
+    expect((await explorationObjectiveWarning.getCSSProperty('color')).value).
       toEqual(color);
   };
 };

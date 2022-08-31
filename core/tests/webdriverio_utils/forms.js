@@ -199,13 +199,13 @@ var RichTextEditor = async function(elem) {
   await rteElements[0].click();
 
   var _appendContentText = async function(text) {
-    await rteElements[0].setValue(text);
+    await rteElements[0].addValue(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
-      elem.$('.' + buttonName),
+      elem.$(buttonName),
       'Toolbar button takes too long to be clickable.');
-    await elem.$('.' + buttonName).click();
+    await elem.$(buttonName).click();
   };
   var _clearContent = async function() {
     expect(
@@ -226,37 +226,37 @@ var RichTextEditor = async function(elem) {
       await _appendContentText(text);
     },
     appendBoldText: async function(text) {
-      await _clickToolbarButton('cke_button__bold');
+      await _clickToolbarButton('.cke_button__bold');
       await _appendContentText(text);
-      await _clickToolbarButton('cke_button__bold');
+      await _clickToolbarButton('.cke_button__bold');
     },
     appendItalicText: async function(text) {
-      await _clickToolbarButton('cke_button__italic');
+      await _clickToolbarButton('.cke_button__italic');
       await _appendContentText(text);
-      await _clickToolbarButton('cke_button__italic');
+      await _clickToolbarButton('.cke_button__italic');
     },
     appendOrderedList: async function(textArray) {
       await _appendContentText('\n');
-      await _clickToolbarButton('cke_button__numberedlist');
+      await _clickToolbarButton('.cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
         await _appendContentText(textArray[i] + '\n');
       }
-      await _clickToolbarButton('cke_button__numberedlist');
+      await _clickToolbarButton('.cke_button__numberedlist');
     },
     appendUnorderedList: async function(textArray) {
       await _appendContentText('\n');
-      await _clickToolbarButton('cke_button__bulletedlist');
+      await _clickToolbarButton('.cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
         await _appendContentText(textArray[i] + '\n');
       }
-      await _clickToolbarButton('cke_button__bulletedlist');
+      await _clickToolbarButton('.cke_button__bulletedlist');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: async function(componentName) {
       await _clickToolbarButton(
-        'cke_button__oppia' + componentName.toLowerCase());
+        '.cke_button__oppia' + componentName.toLowerCase());
 
       var modalDialogElements = await modalDialogElementsSelector();
       var modalDialogLength = modalDialogElements.length;
@@ -552,7 +552,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     // Remove comments introduced by angular for bindings using replace.
     expect(
       (
-        await arrayOfElems[arrayPointer].getAttribute('innerHTML')
+        await arrayOfElems[arrayPointer].getHTML(false)
       ).replace(/<!--[^>]*-->/g, '').trim()
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
