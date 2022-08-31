@@ -1116,7 +1116,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         """Creates a new TranslationContributionStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             language_code, contributor_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1137,7 +1137,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def build_id(
+    def construct_id(
         language_code: str, contributor_user_id: str, topic_id: str
     ) -> str:
         """Builds a unique ID for a TranslationContributionStatsModel
@@ -1172,7 +1172,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             TranslationContributionStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             language_code, contributor_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1357,7 +1357,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
         """Creates a new TranslationReviewStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             language_code, reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1377,7 +1377,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def build_id(
+    def construct_id(
         language_code: str, reviewer_user_id: str, topic_id: str
     ) -> str:
         """Builds a unique ID for a TranslationReviewStatsModel
@@ -1412,7 +1412,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             TranslationReviewStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             language_code, reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1578,7 +1578,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
         """Creates a new QuestionContributionStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             contributor_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1595,7 +1595,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def build_id(
+    def construct_id(
         contributor_user_id: str, topic_id: str
     ) -> str:
         """Builds a unique ID for a QuestionContributionStatsModel
@@ -1629,7 +1629,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
             QuestionContributionStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             contributor_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
@@ -1784,7 +1784,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         """Creates a new QuestionReviewStatsModel instance and returns
         its ID.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
@@ -1801,7 +1801,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def build_id(
+    def construct_id(
         reviewer_user_id: str, topic_id: str
     ) -> str:
         """Builds a unique ID for a QuestionReviewStatsModel
@@ -1835,7 +1835,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             QuestionReviewStatsModel, or None if no such model
             instance exists.
         """
-        entity_id = cls.build_id(
+        entity_id = cls.construct_id(
             reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
