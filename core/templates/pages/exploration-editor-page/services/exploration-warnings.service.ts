@@ -51,7 +51,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
 
-var Deque = require('collections/deque');
+var Dequeue = require('dequeue')
 interface _getStatesAndAnswerGroupsWithEmptyClassifiersResult {
   groupIndexes: number[];
   stateName: string;
@@ -547,28 +547,29 @@ export class ExplorationWarningsService {
   ): number {
     let distance = -1;
     let stateFound = false;
-    let queue: string[] = [];
+    // let queue: string[] = [];
+    let deque = new Dequeue();
     let seen: Record<string, boolean> = {};
     seen[sourceStateName] = true;
-    queue.push(sourceStateName);
-    while (queue.length > 0 && !stateFound) {
-      let queueSize = queue.length;
+    deque.push(sourceStateName);
+    while (deque.length > 0 && !stateFound) {
+      let dequeSize = deque.length;
       distance++;
-      while (queueSize > 0) {
+      while (dequeSize > 0) {
         // '.shift()' here can return an undefined value, but we're already
         // checking for queue.length > 0, so this is safe.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        let currStateName = queue.shift()!;
+        let currStateName = deque.shift()!;
         if (currStateName === destStateName) {
           stateFound = true;
         }
-        queueSize--;
+        dequeSize--;
         for (let e = 0; e < links.length; e++) {
           let edge = links[e];
           let dest = edge.target;
           if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
             seen[dest] = true;
-            queue.push(dest);
+            deque.push(dest);
           }
         }
       }
