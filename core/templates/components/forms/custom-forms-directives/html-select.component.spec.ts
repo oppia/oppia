@@ -60,6 +60,8 @@ describe('HTML Select Component', () => {
     component.selection = 1;
     component.selectionAsString = '2';
 
+    component.updatedSelection();
+
     expect(component.selection).toBe(2);
   });
 });

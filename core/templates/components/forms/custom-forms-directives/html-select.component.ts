@@ -32,18 +32,25 @@ export class HtmlSelectComponent implements OnInit {
   @Output() onSelectionChange = new EventEmitter();
 
   ngOnInit(): void {
+    // Selection is coverted to string because in angular material dropdown,
+    // the value should be string otherwise default element
+    // is not going to be selected.
     this.selectionAsString = String(this.selection);
+
     if (this.selection === null || this.selection === undefined) {
       this.selection = Number(this.options[0].id);
     }
   }
 
   updatedSelection(): void {
-    if (typeof this.options[0].id === typeof '') {
+    // This logic have been used here to convert selectionAsString type
+    // to its original type.
+    if (typeof this.options[0].id === 'string') {
       this.selection = String(this.selectionAsString);
     } else {
       this.selection = Number(this.selectionAsString);
     }
+
     this.onSelectionChange.emit(this.selection);
   }
 }
