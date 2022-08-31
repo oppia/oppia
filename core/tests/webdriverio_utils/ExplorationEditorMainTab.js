@@ -102,6 +102,8 @@ var ExplorationEditorMainTab = function() {
   var addSolutionButton = $('.e2e-test-oppia-add-solution-button');
   var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
   var cancelOutcomeDestButton = $('.e2e-test-cancel-outcome-dest');
+  var checkpointSelectionCheckbox = $(
+    '.e2e-test-checkpoint-selection-checkbox');
   var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
   var confirmDeleteInteractionButton = $(
     '.e2e-test-confirm-delete-interaction');
@@ -579,6 +581,10 @@ var ExplorationEditorMainTab = function() {
     await customizeInteraction.apply(null, arguments);
   };
 
+  this.enableCheckpointForCurrentState = async function() {
+    await action.click('Checkpoint checkbox', checkpointSelectionCheckbox);
+  };
+
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
   var createNewInteraction = async function(interactionId) {
@@ -817,12 +823,12 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var nodeStateElement = await explorationGraph.$(
+    var nodeElement = await explorationGraph.$(
       `.e2e-test-node*=${stateName}`);
     await waitFor.visibilityOf(
-      nodeStateElement,
+      nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    var deleteNode = await nodeStateElement.$(deleteNodeLocator);
+    var deleteNode = await nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
@@ -884,11 +890,12 @@ var ExplorationEditorMainTab = function() {
       '.e2e-test-state-name-submit');
     await action.click('State Name Submit button', stateNameSubmitButton);
 
-    // Wait for state name container to completely disappear
-    // and re-appear again.
+    // We need to use browser.pause() in order to wait for the state name
+    // container to disappear as webdriverio checks for its presence even before
+    // it disappears.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2000);
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       stateNameContainer, 'State Name Container takes too long to appear');
     await waitFor.textToBePresentInElement(
       stateNameContainer, name,

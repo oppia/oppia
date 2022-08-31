@@ -75,8 +75,8 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.visibilityOf(
       initialStateSelect,
       'Initial state select takes too long to be visible.');
-    await waitFor.numberOfChainedElementsToBe(
-      initialStateSelector, '<option>', 'Options', 3);
+    await waitFor.numberOfElementsToBe(
+      initialStateSelector, 'Options', 3, '<option>',);
     var options = await initialStateSelect.$$('<option>')
       .map(async function(elem) {
         await waitFor.visibilityOf(

@@ -67,7 +67,6 @@ var getValue = async function(elementName, element) {
   return await element.getValue();
 };
 
-
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await waitFor.visibilityOf(
     selectorElement,
