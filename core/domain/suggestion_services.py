@@ -2042,9 +2042,13 @@ def _update_translation_contribution_stats_models(
 
     stats_ids = stats_dict.keys()
 
+    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
+    # function requires Sequence[Optional[str]]. Hence we will have to ignore
+    # type check for the following statement because making stats_id  to match
+    # Sequence[Optional[str]] will not be efficient.
     stats_models_to_update_with_none = (
         suggestion_models.TranslationContributionStatsModel.get_multi(
-            stats_ids))
+            stats_ids))  # type: ignore[arg-type]
 
     stats_models_to_update: List[
         suggestion_models.TranslationContributionStatsModel] = []
@@ -2099,8 +2103,12 @@ def _update_translation_review_stats_models(
 
     stats_ids = stats_dict.keys()
 
+    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
+    # function requires Sequence[Optional[str]]. Hence we will have to ignore
+    # type check for the following statement because making stats_id  to match
+    # Sequence[Optional[str]] will not be efficient.
     stats_models_to_update_with_none = (
-        suggestion_models.TranslationReviewStatsModel.get_multi(stats_ids))
+        suggestion_models.TranslationReviewStatsModel.get_multi(stats_ids))  # type: ignore[arg-type]
 
     stats_models_to_update: List[
         suggestion_models.TranslationReviewStatsModel] = []
@@ -2151,8 +2159,12 @@ def _update_question_contribution_stats_models(
 
     stats_ids = stats_dict.keys()
 
+    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
+    # function requires Sequence[Optional[str]]. Hence we will have to ignore
+    # type check for the following statement because making stats_id  to match
+    # Sequence[Optional[str]] will not be efficient.
     stats_models_to_update_with_none = (
-        suggestion_models.QuestionContributionStatsModel.get_multi(stats_ids))
+        suggestion_models.QuestionContributionStatsModel.get_multi(stats_ids))  # type: ignore[arg-type]
 
     stats_models_to_update: List[
         suggestion_models.QuestionContributionStatsModel] = []
@@ -2199,8 +2211,12 @@ def _update_question_review_stats_models(
 
     stats_ids = stats_dict.keys()
 
+    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
+    # function requires Sequence[Optional[str]]. Hence we will have to ignore
+    # type check for the following statement because making stats_id  to match
+    # Sequence[Optional[str]] will not be efficient.
     stats_models_to_update_with_none = (
-        suggestion_models.QuestionReviewStatsModel.get_multi(stats_ids))
+        suggestion_models.QuestionReviewStatsModel.get_multi(stats_ids))  # type: ignore[arg-type]
 
     stats_models_to_update: List[
         suggestion_models.QuestionReviewStatsModel] = []
@@ -2227,14 +2243,14 @@ def _update_question_review_stats_models(
         stats_models_to_update)
 
 
-def get_contribution_date(date: datetime) -> str:
+def get_contribution_date(date: datetime.datetime) -> datetime.date:
     """Gets the string value of the given date.
 
     Args:
-        date: datetime. Date that needs to converted into a string.
+        date: datetime.datetime. Date that needs to converted into a string.
 
     Returns:
-        str. The string object of the given date.
+        datetime.date. The formatted object of the given date.
     """
     return datetime.datetime.strptime(str(
                 date.utcnow().date().isoformat()),
@@ -2591,7 +2607,7 @@ def get_incremental_translation_contribution_stats(
     translation_contribution_stat: (
         suggestion_registry.TranslationContributionStats),
     content_word_count: int,
-    last_contribution_date: datetime
+    last_contribution_date: datetime.datetime
 ) -> None:
     """Updates TranslationContributionStats object.
 
@@ -2599,12 +2615,12 @@ def get_incremental_translation_contribution_stats(
         translation_contribution_stat: TranslationContributionStats. The stats
             object to update.
         content_word_count: int. The number of words in the translation.
-        last_contribution_date: datetime. The last updated date.
+        last_contribution_date: datetime.datetime. The last updated date.
     """
     translation_contribution_stat.submitted_translations_count += 1
     translation_contribution_stat.submitted_translation_word_count += (
         content_word_count)
-    translation_contribution_stat.contribution_dates.append(
+    translation_contribution_stat.contribution_dates.append(  # type: ignore[attr-defined]
         get_contribution_date(last_contribution_date))
 
 
@@ -2645,7 +2661,7 @@ def get_incremental_translation_contribution_stats_at_review(
 def get_incremental_translation_review_stats(
     translation_review_stat: suggestion_registry.TranslationReviewStats,
     content_word_count: int,
-    last_contribution_date: datetime,
+    last_contribution_date: datetime.datetime,
     is_accepted: bool,
     edited_by_reviewer: bool
 ) -> None:
@@ -2655,7 +2671,7 @@ def get_incremental_translation_review_stats(
         translation_review_stat: TranslationReviewStats. The stats
             object to update.
         content_word_count: int. The number of words in the translation.
-        last_contribution_date: datetime. The last updated date.
+        last_contribution_date: datetime.datetime. The last updated date.
         is_accepted: bool. A flag that indicates whether the suggestion is
             accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
@@ -2676,14 +2692,14 @@ def get_incremental_translation_review_stats(
 
 def get_incremental_question_contribution_stats(
     question_contribution_stat: suggestion_registry.QuestionContributionStats,
-    last_contribution_date: datetime
+    last_contribution_date: datetime.datetime
 ) -> None:
     """Updates QuestionContributionStats object.
 
     Args:
         question_contribution_stat: QuestionContributionStats. The stats
             object to update.
-        last_contribution_date: datetime. The last updated date.
+        last_contribution_date: datetime.datetime. The last updated date.
     """
     question_contribution_stat.submitted_questions_count += 1
     question_contribution_stat.last_contribution_date = get_contribution_date(
@@ -2692,14 +2708,14 @@ def get_incremental_question_contribution_stats(
 
 def get_incremental_question_contribution_stats_at_review(
     question_contribution_stat: (
-        suggestion_registry.QuestionContTranributionStats),
+        suggestion_registry.QuestionContributionStats),
     is_accepted: bool,
     edited_by_reviewer: bool
 ) -> None:
     """Updates QuestionContributionStats object.
 
     Args:
-        question_contribution_stat: QuestionContTranributionStats. The stats
+        question_contribution_stat: QuestionContributionStats. The stats
             object to update.
         is_accepted: bool. A flag that indicates whether the suggestion is
             accepted.
@@ -2715,7 +2731,7 @@ def get_incremental_question_contribution_stats_at_review(
 
 def get_incremental_question_review_stats(
     question_review_stat: suggestion_registry.QuestionReviewStats,
-    last_contribution_date: datetime,
+    last_contribution_date: datetime.datetime,
     is_accepted: bool,
     edited_by_reviewer: bool
 ) -> None:
@@ -2723,7 +2739,7 @@ def get_incremental_question_review_stats(
 
     Args:
         question_review_stat: QuestionReviewStats. The stats object to update.
-        last_contribution_date: datetime. The last updated date.
+        last_contribution_date: datetime.datetime. The last updated date.
         is_accepted: bool. A flag that indicates whether the suggestion is
             accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
