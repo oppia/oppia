@@ -2723,7 +2723,8 @@ def get_incremental_question_contribution_stats_at_review(
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
-    question_contribution_stat.accepted_questions_count += int(suggestion_is_accepted)
+    question_contribution_stat.accepted_questions_count += int(
+        suggestion_is_accepted)
     (
         question_contribution_stat
         .accepted_questions_without_reviewer_edits_count
