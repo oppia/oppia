@@ -49,6 +49,17 @@ describe('HTML Select Component', () => {
 
     component.updatedSelection();
 
+    expect(component.selection).toBe('2');
+  });
+
+  it('should update selection when id is number', () => {
+    component.options = [
+      { id: 1, val: 'string' },
+      { id: 2, val: 'string' }];
+
+    component.selection = 1;
+    component.selectionAsString = '2';
+
     expect(component.selection).toBe(2);
   });
 });

@@ -26,7 +26,7 @@ export class HtmlSelectComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() options!: { id: string; val: string }[];
+  @Input() options!: { id: string | number; val: string }[];
   @Input() selection!: number | string;
   selectionAsString!: string;
   @Output() onSelectionChange = new EventEmitter();
