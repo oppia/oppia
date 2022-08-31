@@ -41,7 +41,7 @@ import './base-content.component.css';
 })
 export class BaseContentComponent {
   loadingMessage: string = '';
-  mobileNavOptionsAreShown: boolean = false;
+  mobileNavOptionsAreShown: boolean = true;
   iframed: boolean = false;
   DEV_MODE = AppConstants.DEV_MODE;
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
