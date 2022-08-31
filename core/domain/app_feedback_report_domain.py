@@ -1160,7 +1160,7 @@ class EntryPoint:
         Raises:
             ValidationError. The name is not valid for the type.
         """
-        expected_name = expected_entry_point.name
+        expected_name = expected_entry_point.value
         if actual_name is None:
             raise utils.ValidationError('No entry point name supplied.')
         if not isinstance(actual_name, str):

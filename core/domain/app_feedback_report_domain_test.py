@@ -286,7 +286,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         for category in app_feedback_report_constants.ALLOWED_CATEGORIES:
             self.assertEqual(
                 feedback_report.get_category_from_string(
-                    category.name), category)
+                    category.value), category)
 
     def test_get_category_from_string_with_invalid_string_raises_error(
             self) -> None:
