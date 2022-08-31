@@ -2405,7 +2405,7 @@ def update_translation_review_stats(
             reviewed_translations_count=1,
             reviewed_translation_word_count=content_word_count,
             accepted_translations_count=int(is_accepted),
-            accepted_translations_with_reviewer_edits_count= int(
+            accepted_translations_with_reviewer_edits_count=int(
                 suggestion.edited_by_reviewer),
             accepted_translation_word_count=content_word_count * int(
                 is_accepted),
@@ -2565,7 +2565,7 @@ def update_question_review_stats(
                 topic_id=topic_id,
                 reviewed_questions_count=1,
                 accepted_questions_count=int(is_accepted),
-                accepted_questions_with_reviewer_edits_count= int(
+                accepted_questions_with_reviewer_edits_count=int(
                     suggestion.edited_by_reviewer),
                 first_contribution_date=get_contribution_date(
                     suggestion.last_updated),
