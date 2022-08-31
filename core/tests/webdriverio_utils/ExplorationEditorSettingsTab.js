@@ -74,7 +74,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
     await action.click('State Dropdown element', initialStateSelect);
 
