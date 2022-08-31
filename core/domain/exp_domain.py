@@ -511,7 +511,7 @@ class EditExpStatePropertyContentCmd(ExplorationChange):
     property_name: Literal['content']
     state_name: str
     new_value: state_domain.SubtitledHtmlDict
-    old_value: state_domain.SubtitledHtmlDict
+    old_value: Optional[state_domain.SubtitledHtmlDict]
 
 
 class EditExpStatePropertySolicitAnswerDetailsCmd(ExplorationChange):

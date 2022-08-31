@@ -1061,12 +1061,16 @@ def update_skill(
         deleted_skill_misconception_ids: List[str] = []
         for change in change_list:
             if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.misconception_id, int)
+                # Here we use cast because we are narrowing down the type of
+                # 'change' from SkillChange to a specific change command
+                # DeleteSkillMisconceptionCmd.
+                delete_skill_misconception_cmd = cast(
+                    skill_domain.DeleteSkillMisconceptionCmd,
+                    change
+                )
                 deleted_skill_misconception_ids.append(
                     skill.generate_skill_misconception_id(
-                        change.misconception_id
+                        delete_skill_misconception_cmd.misconception_id
                     )
                 )
         taskqueue_services.defer(
