@@ -285,13 +285,22 @@ describe('Translation language selector', () => {
   it('should filter language options based on the filter text', () => {
     component.ngOnInit();
 
-    expect(component.filteredOptions.length).toBeGreaterThan(1);
+    // Expect the full list of languages to be contained. Adding just 3 here as
+    // the list of languages may grow overtime.
+    expect(component.filteredOptions).toContain(
+      {id: 'en', description: 'English'});
+    expect(component.filteredOptions).toContain(
+      {id: 'es', description: 'español (Spanish)'});
+    expect(component.filteredOptions).toContain(
+      {id: 'fr', description: 'français (French)'});
+
 
     component.optionsFilter = 'sp';
     component.filterOptions();
     fixture.detectChanges();
 
-    expect(component.filteredOptions.length).toBe(1);
-    expect(component.filteredOptions[0].id).toBe('es');
+    // Expect it to contain Spanish but not any of the other languages.
+    expect(component.filteredOptions).toEqual(
+      [{id: 'es', description: 'español (Spanish)'}]);
   });
 });
