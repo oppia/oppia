@@ -2052,7 +2052,6 @@ def _update_translation_contribution_stats_models(
 
     stats_models_to_update: List[
         suggestion_models.TranslationContributionStatsModel] = []
-
     for stats_model in stats_models_to_update_with_none:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
@@ -2112,7 +2111,6 @@ def _update_translation_review_stats_models(
 
     stats_models_to_update: List[
         suggestion_models.TranslationReviewStatsModel] = []
-
     for stats_model in stats_models_to_update_with_none:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
@@ -2168,7 +2166,6 @@ def _update_question_contribution_stats_models(
 
     stats_models_to_update: List[
         suggestion_models.QuestionContributionStatsModel] = []
-
     for stats_model in stats_models_to_update_with_none:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
@@ -2220,7 +2217,6 @@ def _update_question_review_stats_models(
 
     stats_models_to_update: List[
         suggestion_models.QuestionReviewStatsModel] = []
-
     for stats_model in stats_models_to_update_with_none:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
@@ -2381,7 +2377,7 @@ def update_translation_contribution_stats_at_review(
 
 def update_translation_review_stats(
     suggestion: suggestion_registry.BaseSuggestion,
-    user_id: str, target_id: str, is_accepted: bool
+    user_id: str, target_id: str, suggestion_is_accepted: bool
 ) -> None:
     """Creates/updates TranslationReviewStatsModel model for given translation
     reviewer when a translation is reviewed.
@@ -2391,7 +2387,7 @@ def update_translation_review_stats(
             reviewed.
         user_id: str. The ID of the corresponding reviewer.
         target_id: str. The ID of the target entity being suggested to.
-        is_accepted: bool. Indicates whether the suggestion is
+        suggestion_is_accepted: bool. Indicates whether the suggestion is
             accepted.
     """
     topic_id = ''
@@ -2420,11 +2416,11 @@ def update_translation_review_stats(
             topic_id=topic_id,
             reviewed_translations_count=1,
             reviewed_translation_word_count=content_word_count,
-            accepted_translations_count=int(is_accepted),
+            accepted_translations_count=int(suggestion_is_accepted),
             accepted_translations_with_reviewer_edits_count=int(
                 suggestion.edited_by_reviewer),
             accepted_translation_word_count=content_word_count * int(
-                is_accepted),
+                suggestion_is_accepted),
             first_contribution_date=get_contribution_date(
                 suggestion.last_updated),
             last_contribution_date=get_contribution_date(
@@ -2437,7 +2433,8 @@ def update_translation_review_stats(
 
         get_incremental_translation_review_stats(
             translation_review_stat, content_word_count,
-            suggestion.last_updated, is_accepted, suggestion.edited_by_reviewer
+            suggestion.last_updated, suggestion_is_accepted,
+            suggestion.edited_by_reviewer
         )
 
         _update_translation_review_stats_models([translation_review_stat])
@@ -2484,6 +2481,7 @@ def update_question_contribution_stats_at_submission(
                     suggestion.last_updated)
             )
             continue
+
         question_contribution_stat = (
             _create_question_contribution_stats_from_model(
                 question_contribution_stat_model))
@@ -2533,6 +2531,7 @@ def update_question_contribution_stats_at_review(
                     suggestion.last_updated)
             )
             continue
+
         question_contribution_stat = (
             _create_question_contribution_stats_from_model(
                 question_contribution_stat_model))
@@ -2550,7 +2549,7 @@ def update_question_contribution_stats_at_review(
 
 def update_question_review_stats(
     suggestion: suggestion_registry.BaseSuggestion,
-    user_id: str, target_id: str, is_accepted: bool
+    user_id: str, target_id: str, suggestion_is_accepted: bool
 ) -> None:
     """Creates/updates QuestionReviewStatsModel model for given question
     reviewer when a question is sreviewed.
@@ -2560,8 +2559,8 @@ def update_question_review_stats(
             reviewed.
         user_id: str. The ID of the corresponding reviewer.
         target_id: str. The ID of the target entity being suggested to.
-        is_accepted: bool. Indicates whether whether the suggestion is
-            accepted.
+        suggestion_is_accepted: bool. Indicates whether whether the suggestion
+            is accepted.
     """
     topic_ids = [
         topic.topic_id
@@ -2580,7 +2579,7 @@ def update_question_review_stats(
                 reviewer_user_id=user_id,
                 topic_id=topic_id,
                 reviewed_questions_count=1,
-                accepted_questions_count=int(is_accepted),
+                accepted_questions_count=int(suggestion_is_accepted),
                 accepted_questions_with_reviewer_edits_count=int(
                     suggestion.edited_by_reviewer),
                 first_contribution_date=get_contribution_date(
@@ -2589,12 +2588,14 @@ def update_question_review_stats(
                     suggestion.last_updated)
             )
             continue
+
         question_review_stat = (
             _create_question_review_stats_from_model(
                 question_review_stat_model))
 
         get_incremental_question_review_stats(
-            question_review_stat, suggestion.last_updated, is_accepted,
+            question_review_stat, suggestion.last_updated,
+            suggestion_is_accepted,
             suggestion.edited_by_reviewer)
 
         _update_question_review_stats_models([question_review_stat])
@@ -2628,7 +2629,7 @@ def get_incremental_translation_contribution_stats_at_review(
     translation_contribution_stat: (
         suggestion_registry.TranslationContributionStats),
     content_word_count: int,
-    is_accepted: bool,
+    suggestion_is_accepted: bool,
     edited_by_reviewer: bool
 ) -> None:
     """Updates TranslationContributionStats object.
@@ -2637,32 +2638,32 @@ def get_incremental_translation_contribution_stats_at_review(
         translation_contribution_stat: TranslationContributionStats. The stats
             object to update.
         content_word_count: int. The number of words in the translation.
-        is_accepted: bool. A flag that indicates whether the suggestion is
-            accepted.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
     (
         translation_contribution_stat
         .accepted_translations_count
-    ) += int(is_accepted)
+    ) += int(suggestion_is_accepted)
     (
         translation_contribution_stat
         .accepted_translations_without_reviewer_edits_count
     ) += int(edited_by_reviewer)
     translation_contribution_stat.accepted_translation_word_count += (
-        content_word_count) * int(is_accepted)
+        content_word_count) * int(suggestion_is_accepted)
     translation_contribution_stat.rejected_translations_count += int(
-        not is_accepted)
+        not suggestion_is_accepted)
     translation_contribution_stat.rejected_translation_word_count += (
-        content_word_count * int(not is_accepted))
+        content_word_count * int(not suggestion_is_accepted))
 
 
 def get_incremental_translation_review_stats(
     translation_review_stat: suggestion_registry.TranslationReviewStats,
     content_word_count: int,
     last_contribution_date: datetime.datetime,
-    is_accepted: bool,
+    suggestion_is_accepted: bool,
     edited_by_reviewer: bool
 ) -> None:
     """Updates TranslationReviewStats object.
@@ -2672,8 +2673,8 @@ def get_incremental_translation_review_stats(
             object to update.
         content_word_count: int. The number of words in the translation.
         last_contribution_date: datetime.datetime. The last updated date.
-        is_accepted: bool. A flag that indicates whether the suggestion is
-            accepted.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
@@ -2681,7 +2682,7 @@ def get_incremental_translation_review_stats(
     translation_review_stat.reviewed_translation_word_count += (
         content_word_count)
     translation_review_stat.accepted_translations_count += int(
-        is_accepted)
+        suggestion_is_accepted)
     (
         translation_review_stat
         .accepted_translations_with_reviewer_edits_count
@@ -2709,7 +2710,7 @@ def get_incremental_question_contribution_stats(
 def get_incremental_question_contribution_stats_at_review(
     question_contribution_stat: (
         suggestion_registry.QuestionContributionStats),
-    is_accepted: bool,
+    suggestion_is_accepted: bool,
     edited_by_reviewer: bool
 ) -> None:
     """Updates QuestionContributionStats object.
@@ -2717,12 +2718,12 @@ def get_incremental_question_contribution_stats_at_review(
     Args:
         question_contribution_stat: QuestionContributionStats. The stats
             object to update.
-        is_accepted: bool. A flag that indicates whether the suggestion is
-            accepted.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
-    question_contribution_stat.accepted_questions_count += int(is_accepted)
+    question_contribution_stat.accepted_questions_count += int(suggestion_is_accepted)
     (
         question_contribution_stat
         .accepted_questions_without_reviewer_edits_count
@@ -2732,7 +2733,7 @@ def get_incremental_question_contribution_stats_at_review(
 def get_incremental_question_review_stats(
     question_review_stat: suggestion_registry.QuestionReviewStats,
     last_contribution_date: datetime.datetime,
-    is_accepted: bool,
+    suggestion_is_accepted: bool,
     edited_by_reviewer: bool
 ) -> None:
     """Updates QuestionReviewStats object.
@@ -2740,14 +2741,14 @@ def get_incremental_question_review_stats(
     Args:
         question_review_stat: QuestionReviewStats. The stats object to update.
         last_contribution_date: datetime.datetime. The last updated date.
-        is_accepted: bool. A flag that indicates whether the suggestion is
-            accepted.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
     question_review_stat.reviewed_questions_count += 1
     question_review_stat.accepted_questions_count += int(
-        is_accepted)
+        suggestion_is_accepted)
     question_review_stat.accepted_questions_with_reviewer_edits_count += int(
         edited_by_reviewer)
     question_review_stat.last_contribution_date = get_contribution_date(
