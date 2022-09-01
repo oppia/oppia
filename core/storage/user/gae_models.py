@@ -1643,21 +1643,24 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-        cls, user_ids: List[str], exploration_id: str
+        cls, user_id_exp_id_combinations: List[Tuple[str, str]]
     ) -> List[Optional[ExplorationUserDataModel]]:
-        """Gets the ExplorationUserDataModel for the given user and exploration
-         ids.
+        """Gets all ExplorationUserDataModels for the given pairs of user ids
+        and exploration ids.
 
         Args:
-            user_ids: list(str). A list of user_ids.
-            exploration_id: str. The id of the exploration.
+            user_id_exp_id_combinations: list(tuple(str, str)). A list of
+                combinations of user_id and exploration_id pairs for which
+                ExplorationUserDataModels are to be fetched.
 
         Returns:
             list(ExplorationUserDataModel|None). The ExplorationUserDataModel
-            instance which matches with the given user_ids and exploration_id.
+            instance which matches with the given user_ids and exploration_ids.
         """
         instance_ids = [
-            cls._generate_id(user_id, exploration_id) for user_id in user_ids]
+            cls._generate_id(user_id, exploration_id)
+            for (user_id, exploration_id) in user_id_exp_id_combinations
+        ]
 
         return super(ExplorationUserDataModel, cls).get_multi(instance_ids)
 
@@ -3046,7 +3049,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # List of learner group ids which the student has been invited to join.
+    # List of learner group ids which the learner has been invited to join.
     invited_to_learner_groups_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
@@ -3148,7 +3151,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
             if learner_grp_usr_model is None:
                 continue
 
-            # If the user has been invited to join the group as student, delete
+            # If the user has been invited to join the group as learner, delete
             # the group id from the invited_to_learner_groups_ids list.
             if (
                 group_id in learner_grp_usr_model.invited_to_learner_groups_ids
@@ -3156,8 +3159,8 @@ class LearnerGroupsUserModel(base_models.BaseModel):
                 learner_grp_usr_model.invited_to_learner_groups_ids.remove(
                     group_id)
 
-            # If the user is a student of the group, delete the corresponding
-            # learner group details of the student stored in
+            # If the user is a learner of the group, delete the corresponding
+            # learner group details of the learner stored in
             # learner_groups_user_details field.
             updated_details = []
 

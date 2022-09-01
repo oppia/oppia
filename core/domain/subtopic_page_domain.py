@@ -135,7 +135,7 @@ class SubtopicPageContents:
         """
         content_id = feconf.DEFAULT_SUBTOPIC_PAGE_CONTENT_ID
         return cls(
-            state_domain.SubtitledHtml.create_default_subtitled_html(  # type: ignore[no-untyped-call]
+            state_domain.SubtitledHtml.create_default_subtitled_html(
                 content_id),
             state_domain.RecordedVoiceovers.from_dict(
                 {'voiceovers_mapping': {content_id: {}}}),
@@ -290,7 +290,7 @@ class SubtopicPage:
             dict. The converted subtopic_page_contents_dict.
         """
         subtopic_page_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.  # type: ignore[no-untyped-call]
+            state_domain.WrittenTranslations.
             convert_html_in_written_translations(
                 subtopic_page_contents_dict['written_translations'],
                 conversion_fn))

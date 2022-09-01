@@ -70,9 +70,9 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL) # type: ignore[no-untyped-call]
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.moderator = user_services.get_user_actions_info(self.moderator_id)
@@ -116,7 +116,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-        with self.assertRaisesRegex(Exception, 'should not have duplicates'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'should not have duplicates'):
             activity_services.update_featured_activity_references([
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_exploration_reference(self.EXP_ID_0)])
@@ -135,7 +135,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting an unfeatured activity does not affect the featured list.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1) # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0),
@@ -146,7 +146,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0)])
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0) # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
@@ -165,7 +165,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
             activity_services.get_featured_activity_references(),
             exploration_references)
 
-        exp_services.delete_explorations( # type: ignore[no-untyped-call]
+        exp_services.delete_explorations(
             self.owner_id, [self.EXP_ID_0, self.EXP_ID_1])
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
@@ -237,7 +237,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration_123 = self._create_exploration_reference('123')
-        with self.assertRaisesRegex(Exception, 'Invalid activity reference'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid activity reference'):
             activity_services.split_by_type([
                 exploration_123,
                 activity_domain.ActivityReference('invalid_type', 'bbb')

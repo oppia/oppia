@@ -506,7 +506,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story title')
         self.assertEqual(opportunity_model.chapter_title, 'node title')
         self.assertEqual(opportunity_model.content_count, 1)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -591,7 +591,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story 2 title')
         self.assertEqual(opportunity_model.chapter_title, 'node 2 title')
         self.assertEqual(opportunity_model.content_count, 2)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -671,7 +671,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story title')
         self.assertEqual(opportunity_model.chapter_title, 'node title')
         self.assertEqual(opportunity_model.content_count, 1)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -848,7 +848,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story 2 title')
         self.assertEqual(opportunity_model.chapter_title, 'node 2 title')
         self.assertEqual(opportunity_model.content_count, 2)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})

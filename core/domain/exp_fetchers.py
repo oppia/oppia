@@ -255,7 +255,7 @@ def get_exploration_summary_by_id(
 
 
 def get_exploration_summaries_from_models(
-    exp_summary_models: List[exp_models.ExpSummaryModel]
+    exp_summary_models: Sequence[exp_models.ExpSummaryModel]
 ) -> Dict[str, exp_domain.ExplorationSummary]:
     """Returns a dict with ExplorationSummary domain objects as values,
     keyed by their exploration id.

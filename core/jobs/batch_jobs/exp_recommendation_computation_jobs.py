@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import recommendations_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -59,16 +61,18 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
             the Elastic Search.
         """
 
-        exp_summary_models = (
+        exp_summary_objects = (
             self.pipeline
             | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+            | 'Convert ExpSummaryModels to domain objects' >> beam.Map(
+                exp_fetchers.get_exploration_summary_from_model)
         )
 
-        exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
+        exp_summary_iter = beam.pvalue.AsIter(exp_summary_objects)
 
         exp_recommendations_models = (
-            exp_summary_models
+            exp_summary_objects
             | 'Compute similarity' >> beam.ParDo(
                 ComputeSimilarity(), exp_summary_iter)
             | 'Group similarities per exploration ID' >> beam.GroupByKey()
@@ -145,16 +149,16 @@ class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
 
     def process(
         self,
-        ref_exp_summary_model: exp_models.ExpSummaryModel,
-        compared_exp_summary_models: Iterable[exp_models.ExpSummaryModel]
+        ref_exp_summary: exp_domain.ExplorationSummary,
+        compared_exp_summaries: Iterable[exp_domain.ExplorationSummary]
     ) -> Iterable[Tuple[str, Dict[str, Union[str, float]]]]:
         """Compute similarities between exploraitons.
 
         Args:
-            ref_exp_summary_model: ExpSummaryModel. Reference exploration
+            ref_exp_summary: ExplorationSummary. Reference exploration
                 summary. We are trying to find explorations similar to this
                 reference summary.
-            compared_exp_summary_models: list(ExpSummaryModel). List of other
+            compared_exp_summaries: list(ExplorationSummary). List of other
                 explorations summaries against which we compare the reference
                 summary.
 
@@ -167,16 +171,16 @@ class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
                     the exploration.
         """
         with datastore_services.get_ndb_context():
-            for compared_exp_summary_model in compared_exp_summary_models:
-                if compared_exp_summary_model.id == ref_exp_summary_model.id:
+            for compared_exp_summary in compared_exp_summaries:
+                if compared_exp_summary.id == ref_exp_summary.id:
                     continue
                 similarity_score = recommendations_services.get_item_similarity(
-                    ref_exp_summary_model, compared_exp_summary_model
+                    ref_exp_summary, compared_exp_summary
                 )
                 if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
                     yield (
-                        ref_exp_summary_model.id, {
+                        ref_exp_summary.id, {
                             'similarity_score': similarity_score,
-                            'exp_id': compared_exp_summary_model.id
+                            'exp_id': compared_exp_summary.id
                         }
                     )

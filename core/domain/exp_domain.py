@@ -41,8 +41,8 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-        Any, Callable, Dict, Final, List, Mapping, Optional, Sequence, Set,
-        Tuple, TypedDict, cast)
+        Callable, Dict, Final, List, Mapping, Optional, Sequence, Set, Tuple,
+        TypedDict, Union, cast)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -1049,7 +1049,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             )
 
             customization_args = (
-                state_domain.InteractionInstance.  # type: ignore[no-untyped-call]
+                state_domain.InteractionInstance.
                 convert_customization_args_dict_to_customization_args(
                     idict['id'],
                     idict['customization_args']
@@ -1182,7 +1182,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError('This exploration has no states.')
         for state_name, state in self.states.items():
             self._validate_state_name(state_name)
-            state.validate(  # type: ignore[no-untyped-call]
+            state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
             # The checks below perform validation on the Outcome domain object
@@ -1216,15 +1216,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
 
-                default_outcome = state.interaction.default_outcome
-                if default_outcome.dest_if_really_stuck is not None:
+                interaction_default_outcome = state.interaction.default_outcome
+                if interaction_default_outcome.dest_if_really_stuck is not None:
                     if not isinstance(
-                        default_outcome.dest_if_really_stuck, str
+                        interaction_default_outcome.dest_if_really_stuck, str
                     ):
                         raise utils.ValidationError(
                             'Expected dest_if_really_stuck to be a '
                             'string, received %s'
-                            % default_outcome.dest_if_really_stuck)
+                            % interaction_default_outcome.dest_if_really_stuck)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -1459,9 +1459,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # we find a terminal state in an outcome, we break out
                         # of the for loop and raise a validation error.
                         all_outcomes = (
-                            curr_state.interaction.get_all_outcomes())  # type: ignore[no-untyped-call]
+                            curr_state.interaction.get_all_outcomes())
                         for outcome in all_outcomes:
                             dest_state = outcome.dest
+                            # Ruling out the possibility of None for mypy type
+                            # checking, because above we are already validating
+                            # if outcome exists then it should have destination.
+                            assert dest_state is not None
                             if self.states[dest_state].interaction.is_terminal:
                                 excluded_state_is_bypassable = True
                                 break
@@ -1562,11 +1566,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 curr_state = self.states[curr_state_name]
 
                 if not curr_state.interaction.is_terminal:
-                    all_outcomes = curr_state.interaction.get_all_outcomes()  # type: ignore[no-untyped-call]
+                    all_outcomes = curr_state.interaction.get_all_outcomes()
                     for outcome in all_outcomes:
                         dest_state = outcome.dest
-                        if (dest_state not in curr_queue and
-                                dest_state not in processed_queue):
+                        if (
+                            dest_state is not None and
+                            dest_state not in curr_queue and
+                            dest_state not in processed_queue
+                        ):
                             curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
@@ -1602,7 +1609,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if (state_name not in curr_queue
                             and state_name not in processed_queue):
                         all_outcomes = (
-                            state.interaction.get_all_outcomes())  # type: ignore[no-untyped-call]
+                            state.interaction.get_all_outcomes())
                         for outcome in all_outcomes:
                             if outcome.dest == curr_state_name:
                                 curr_queue.append(state_name)
@@ -1880,7 +1887,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
         for other_state in self.states.values():
-            other_outcomes = other_state.interaction.get_all_outcomes()  # type: ignore[no-untyped-call]
+            other_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in other_outcomes:
                 if outcome.dest == old_state_name:
                     outcome.dest = new_state_name
@@ -1905,7 +1912,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Find all destinations in the exploration which equal the deleted
         # state, and change them to loop back to their containing state.
         for other_state_name, other_state in self.states.items():
-            all_outcomes = other_state.interaction.get_all_outcomes()  # type: ignore[no-untyped-call]
+            all_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in all_outcomes:
                 if outcome.dest == state_name:
                     outcome.dest = other_state_name
@@ -1914,7 +1921,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     def get_translatable_text(
         self, language_code: str
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
         """Returns all the contents which needs translation in the given
         language.
 
@@ -1929,7 +1936,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_names_to_content_id_mapping = {}
         for state_name, state in self.states.items():
             state_names_to_content_id_mapping[state_name] = (
-                state.get_content_id_mapping_needing_translations(  # type: ignore[no-untyped-call]
+                state.get_content_id_mapping_needing_translations(
                     language_code))
 
         return state_names_to_content_id_mapping
@@ -1962,7 +1969,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         new_states = self.states
 
         for new_state_name, new_state in new_states.items():
-            if not new_state.can_undergo_classification():  # type: ignore[no-untyped-call]
+            if not new_state.can_undergo_classification():
                 continue
 
             old_state_name = new_state_name
@@ -1979,8 +1986,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         new_state_name)
                 continue
             old_state = old_states[old_state_name]
-            old_training_data = old_state.get_training_data()  # type: ignore[no-untyped-call]
-            new_training_data = new_state.get_training_data()  # type: ignore[no-untyped-call]
+            old_training_data = old_state.get_training_data()
+            new_training_data = new_state.get_training_data()
 
             # Check if the training data and interaction_id of the state in the
             # previous version of the exploration and the state in the new
@@ -2027,7 +2034,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str, int
         ] = collections.defaultdict(int)
         for state in self.states.values():
-            state_translation_counts = state.get_translation_counts()  # type: ignore[no-untyped-call]
+            state_translation_counts = state.get_translation_counts()
             for language, count in state_translation_counts.items():
                 exploration_translation_counts[language] += count
 
@@ -2046,7 +2053,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         content_count = 0
         for state in self.states.values():
-            content_count += state.get_translatable_content_count()  # type: ignore[no-untyped-call]
+            content_count += state.get_translatable_content_count()
 
         return content_count
 
@@ -2080,15 +2087,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
-        # Here, argument 'value' can accept Solution's 'correct_answer' values
-        # and 'correct_answer' can contain values of type List[Set[str]],
-        # List[str], str, int, Dict and other types too. So, to make `value`
-        # generalized for every types of values. We used Any type here.
-        def migrate_rule_inputs_and_answers(
+        # Here we use MyPy ignore because MyPy expects a return value in
+        # every condition when we define a return type but here we are
+        # returning only in if-else conditions and we are not returning
+        # when none of the condition matches which causes MyPy to throw
+        # a 'Missing return statement' error. Thus to avoid the error,
+        # we used ignore here.
+        def migrate_rule_inputs_and_answers(  # type: ignore[return]
             new_type: str,
-            value: Any,
+            value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict]
-        ) -> Any:
+        ) -> Union[List[str], str]:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -2125,16 +2134,31 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 return feconf.INVALID_CONTENT_ID
 
             if new_type == 'TranslatableHtmlContentId':
+                # Here 'TranslatableHtmlContentId' can only be of str type, thus
+                # to narrow down the type we used assert here.
+                assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes its type as
+                # recursive, like if this method returns List[str] then MyPy
+                # assumes its type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
-                    migrate_rule_inputs_and_answers(
+                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes its type as
+                # recursive, like if this method returns List[str] then MyPy
+                # assumes its type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
-                    migrate_rule_inputs_and_answers(
+                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'SetOfTranslatableHtmlContentIds', html_set, choices
                     ) for html_set in value
                 ]
@@ -2152,20 +2176,36 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # The solution type will be migrated from SetOfHtmlString to
                 # SetOfTranslatableHtmlContentIds.
                 if solution is not None:
+                    # Ruling out the possibility of any other type for MyPy type
+                    # checking because for interaction 'ItemSelectionInput',
+                    # the correct_answer is formatted as List[str] type.
+                    assert isinstance(solution['correct_answer'], list)
+                    list_of_html_contents = []
+                    for html_content in solution['correct_answer']:
+                        assert isinstance(html_content, str)
+                        list_of_html_contents.append(html_content)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
                             'SetOfTranslatableHtmlContentIds',
-                            solution['correct_answer'],
+                            list_of_html_contents,
                             choices)
                     )
             if interaction_id == 'DragAndDropSortInput':
                 # The solution type will be migrated from ListOfSetsOfHtmlString
                 # to ListOfSetsOfTranslatableHtmlContentIds.
                 if solution is not None:
+                    # Ruling out the possibility of any other type for MyPy type
+                    # checking because for interaction 'DragAndDropSortInput',
+                    # the correct_answer is formatted as List[List[str]] type.
+                    assert isinstance(solution['correct_answer'], list)
+                    list_of_html_content_list = []
+                    for html_content_list in solution['correct_answer']:
+                        assert isinstance(html_content_list, list)
+                        list_of_html_content_list.append(html_content_list)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
                             'ListOfSetsOfTranslatableHtmlContentIds',
-                            solution['correct_answer'],
+                            list_of_html_content_list,
                             choices)
                     )
 
@@ -2178,9 +2218,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # All rule inputs for ItemSelectionInput will be
                         # migrated from SetOfHtmlString to
                         # SetOfTranslatableHtmlContentIds.
+                        # Ruling out the possibility of any other type
+                        # for MyPy type checking because for interaction
+                        # 'ItemSelectionInput', the rule inputs are formatted
+                        # as List[str] type.
+                        assert isinstance(rule_inputs['x'], list)
+                        list_of_html_contents = []
+                        for html_content in rule_inputs['x']:
+                            assert isinstance(html_content, str)
+                            list_of_html_contents.append(html_content)
                         rule_inputs['x'] = migrate_rule_inputs_and_answers(
                             'SetOfTranslatableHtmlContentIds',
-                            rule_inputs['x'],
+                            list_of_html_contents,
                             choices)
                     if interaction_id == 'DragAndDropSortInput':
                         rule_types_with_list_of_sets = [
@@ -2193,9 +2242,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             # the x input will be migrated from
                             # ListOfSetsOfHtmlStrings to
                             # ListOfSetsOfTranslatableHtmlContentIds.
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
+                            # 'DragAndDropSortInput', the rule inputs are
+                            # formatted as List[List[str]] type.
+                            assert isinstance(rule_inputs['x'], list)
+                            list_of_html_content_list = []
+                            for html_content_list in rule_inputs['x']:
+                                assert isinstance(html_content_list, list)
+                                list_of_html_content_list.append(
+                                    html_content_list
+                                )
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'ListOfSetsOfTranslatableHtmlContentIds',
-                                rule_inputs['x'],
+                                list_of_html_content_list,
                                 choices)
                         elif rule_type == 'HasElementXAtPositionY':
                             # For rule type HasElementXAtPositionY,
@@ -2203,6 +2263,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId, and the y input will
                             # remain as DragAndDropPositiveInt.
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
+                            # 'HasElementXAtPositionY', the rule inputs are
+                            # formatted as str type.
+                            assert isinstance(rule_inputs['x'], str)
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'TranslatableHtmlContentId',
                                 rule_inputs['x'],
@@ -2213,10 +2278,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId.
                             for rule_input_name in ['x', 'y']:
+                                rule_input_value = rule_inputs[rule_input_name]
+                                # Ruling out the possibility of any other type
+                                # for MyPy type checking because for interaction
+                                # 'HasElementXBeforeElementY', the rule inputs
+                                # are formatted as str type.
+                                assert isinstance(rule_input_value, str)
                                 rule_inputs[rule_input_name] = (
                                     migrate_rule_inputs_and_answers(
                                         'TranslatableHtmlContentId',
-                                        rule_inputs[rule_input_name],
+                                        rule_input_value,
                                         choices))
 
         return states_dict
@@ -2322,14 +2393,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'customization_args']
             if interaction_customisation_args:
                 customisation_args = (
-                    state_domain.InteractionInstance  # type: ignore[no-untyped-call]
+                    state_domain.InteractionInstance
                     .convert_customization_args_dict_to_customization_args(
                         state_dict['interaction']['id'],
                         state_dict['interaction']['customization_args'],
                         state_schema_version=45))
                 for ca_name in customisation_args:
                     list_of_subtitled_unicode_content_ids.extend(
-                        state_domain.InteractionCustomizationArg  # type: ignore[no-untyped-call]
+                        state_domain.InteractionCustomizationArg
                         .traverse_by_schema_and_get(
                             customisation_args[ca_name].schema,
                             customisation_args[ca_name].value,
@@ -2379,7 +2450,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             interaction_customisation_args = state_dict['interaction'][
                 'customization_args']
             if interaction_customisation_args:
-                state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
+                state_domain.State.convert_html_fields_in_state(
                     state_dict,
                     html_validation_service
                     .convert_svg_diagram_tags_to_image_tags, 46)
@@ -2405,7 +2476,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             interaction_customisation_args = state_dict['interaction'][
                 'customization_args']
             if interaction_customisation_args:
-                state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
+                state_domain.State.convert_html_fields_in_state(
                     state_dict,
                     html_validation_service.fix_incorrectly_encoded_chars,
                     state_schema_version=48)
@@ -2544,9 +2615,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for rule_spec in answer_group['rule_specs']:
                     for param_name, value in rule_spec['inputs'].items():
                         interaction_id = interaction['id']
-                        # Ruling out the possibility of None for mypy type
-                        # checking.
-                        assert interaction_id is not None
                         param_type = (
                             interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
                                 interaction_id
@@ -2582,7 +2650,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             if interaction['id'] is not None:
                 customisation_args = (
-                    state_domain.InteractionInstance # type: ignore[no-untyped-call]
+                    state_domain.InteractionInstance
                     .convert_customization_args_dict_to_customization_args(
                         interaction['id'],
                         interaction['customization_args'],
@@ -3205,7 +3273,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for state in self.states.values():
             content_html = state.content.html
             interaction_html_list = (
-                state.interaction.get_all_html_content_strings())  # type: ignore[no-untyped-call]
+                state.interaction.get_all_html_content_strings())
             html_list += [content_html] + interaction_html_list
 
         return html_list
@@ -3243,7 +3311,7 @@ class ExplorationSummary:
         version: int,
         exploration_model_created_on: datetime.datetime,
         exploration_model_last_updated: datetime.datetime,
-        first_published_msec: int,
+        first_published_msec: Optional[float],
         deleted: bool = False
     ) -> None:
         """Initializes a ExplorationSummary domain object.
@@ -3281,8 +3349,9 @@ class ExplorationSummary:
                 the exploration model is created.
             exploration_model_last_updated: datetime.datetime. Date and time
                 when the exploration model was last updated.
-            first_published_msec: int. Time in milliseconds since the Epoch,
-                when the exploration was first published.
+            first_published_msec: float|None. Time in milliseconds since the
+                Epoch, when the exploration was first published, or None if
+                Exploration is not published yet.
             deleted: bool. Whether the exploration is marked as deleted.
         """
         self.id = exploration_id

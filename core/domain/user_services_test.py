@@ -33,6 +33,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -104,7 +105,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_set_and_get_username(self) -> None:
         auth_id = 'someUser'
         username = 'username'
-        with self.assertRaisesRegex(Exception, 'User not found.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.set_username(auth_id, username)
 
         user_settings = user_services.create_new_user(
@@ -131,7 +132,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'Sorry, the username \"%s\" is already taken! Please pick '
             'a different one.' % username)
 
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
             user_services.set_username(user_ids[1], username)
 
     def test_get_username_for_system_user(self) -> None:
@@ -168,7 +169,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID]))
 
     def test_get_username_for_nonexistent_user(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'User with ID \'fakeUser\' not found.'
         ):
@@ -252,7 +253,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('oppiaXyz', 'This username is not available.'),
             ('abcOppiaXyz', 'This username is not available.')]
         for username, error_msg in bad_usernames_with_expected_error_message:
-            with self.assertRaisesRegex(utils.ValidationError, error_msg):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
     # TODO(#13059): After we fully type the codebase we plan to get
@@ -272,7 +273,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.user_id = user_id
         self.modifiable_new_user_data.pin = None
         for display_alias, error_msg in bad_display_aliases_with_expected_error:
-            with self.assertRaisesRegex(utils.ValidationError, error_msg):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 self.modifiable_new_user_data.display_alias = display_alias  # type: ignore[assignment]
                 user_services.update_multiple_users_data(
                     [self.modifiable_new_user_data])
@@ -314,7 +315,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
-            with self.assertRaisesRegex(utils.ValidationError, error_msg):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(utils.ValidationError, error_msg):
                 user_services.create_new_user('auth_id', email)  # type: ignore[arg-type]
 
     def test_create_new_user_with_invalid_email_creates_no_user_models(
@@ -322,9 +323,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         bad_email = '@'
         error_msg = 'Invalid email address: @'
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
             user_services.create_new_user('auth_id', bad_email)
-        tmp_admin_user_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        tmp_admin_user_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
         user_ids_in_user_settings = [
             model.id for model in user_models.UserSettingsModel.get_all()]
         user_ids_in_user_auth_details = [
@@ -342,7 +343,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         email = 'user@example.com'
         user_id = user_services.create_new_user(auth_id, email).user_id
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'User %s already exists for auth_id %s.' % (user_id, auth_id)
         ):
@@ -516,7 +517,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_user_settings_by_auth_id_strict_for_missing_auth_id_is_none(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'User not found.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.get_user_settings_by_auth_id(
                 'auth_id_x',
                 strict=True
@@ -570,7 +571,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gravatar_url = user_services.get_gravatar_url(user_email)
 
         expected_gravatar_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',  # type: ignore[no-untyped-call]
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'gravatar_example.png')
         with utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
@@ -616,7 +617,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_default_identicon_data_url(self) -> None:
         identicon_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',  # type: ignore[no-untyped-call]
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
             'user_blue_72px.png')
         identicon_data_url = utils.convert_png_to_data_url(identicon_filepath)
         self.assertEqual(
@@ -683,7 +684,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             observed_log_messages,
             ['Updated status of email ID %s\'s bulk email '
              'preference in the service provider\'s db to False. Cannot access '
@@ -1085,7 +1086,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'someUser',
             'user@example.com').user_id
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Removing a default role is not allowed.'
         ):
@@ -1221,7 +1222,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         non_existent_user_id = 'id_x'
         error_msg = 'Parent user not found.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.get_all_profiles_auth_details_by_parent_user_id(
                 non_existent_user_id)
 
@@ -1251,7 +1252,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_roles_from_id(profile_user_id),
             [feconf.ROLE_ID_MOBILE_LEARNER])
         error_msg = 'The role of a Mobile Learner cannot be changed.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.add_user_role(
                 profile_user_id, feconf.ROLE_ID_FULL_USER)
 
@@ -1265,7 +1266,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             [feconf.ROLE_ID_FULL_USER])
         error_msg = 'Adding a %s role is not allowed.' % (
             feconf.ROLE_ID_MOBILE_LEARNER)
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.add_user_role(
                 user_id, feconf.ROLE_ID_MOBILE_LEARNER)
 
@@ -1297,7 +1298,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_roles_from_id(profile_user_id),
             [feconf.ROLE_ID_MOBILE_LEARNER])
         error_msg = 'The role of a Mobile Learner cannot be changed.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.remove_user_role(
                 profile_user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
@@ -1314,7 +1315,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(user_settings_model.banned)
 
         error_msg = 'Removing a default role is not allowed.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
 
     def test_is_user_registered_for_existing_user_id_returns_true(self) -> None:
@@ -1426,7 +1427,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         non_existent_user_id = 'id_x'
         error_msg = 'User not found'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.get_auth_details_by_user_id(
                 non_existent_user_id, strict=True)
 
@@ -1474,7 +1475,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_pin = '123'
         user_services.create_new_user(auth_id, email)
         error_msg = 'Pin must be set for a full user before creating a profile.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             self.modifiable_new_user_data.display_alias = display_alias
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
@@ -1539,7 +1540,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'parent_user_id': user_id
             }
         ]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             user_auth_details_models, expected_user_auth_output)
 
         user_settings_models = []
@@ -1569,7 +1570,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'roles': [feconf.ROLE_ID_MOBILE_LEARNER]
             }
         ]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             user_settings_models, expected_user_settings_output)
 
     def test_create_new_profile_with_nonexistent_user_raises_error(
@@ -1580,7 +1581,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         profile_pin = '123'
         display_alias = 'display_alias'
         error_msg = 'User not found.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             self.modifiable_new_user_data.display_alias = display_alias
             self.modifiable_new_user_data.pin = profile_pin
             user_services.create_new_profiles(
@@ -1603,7 +1604,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = display_alias
         user_services.update_multiple_users_data([self.modifiable_user_data])
         error_msg = 'User id cannot already exist for a new user.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             self.modifiable_new_user_data.display_alias = display_alias_2
             self.modifiable_new_user_data.pin = profile_pin
             self.modifiable_new_user_data.user_id = 'user_id'
@@ -1624,7 +1625,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = display_alias
 
         error_msg = 'Missing user ID.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.update_multiple_users_data(
                 [self.modifiable_user_data])
 
@@ -1642,7 +1643,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = display_alias
 
         error_msg = 'User not found.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.update_multiple_users_data(
                 [self.modifiable_user_data])
 
@@ -1716,7 +1717,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'parent_user_id': user_id
             }
         ]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expected_auth_details_output, user_auth_details_models)
 
         user_settings_models = []
@@ -1743,7 +1744,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'pin': '345'
             }
         ]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             expected_user_settings_output, user_settings_models)
 
     def test_mark_user_for_deletion_marks_user_settings_as_deleted(
@@ -1830,11 +1831,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.parse_date_from_string('2016-07-05'),
             {'year': 2016, 'month': 7, 'day': 5})
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''):
             user_services.parse_date_from_string('2016-13-01')
-        with self.assertRaisesRegex(ValueError, 'unconverted data remains: 2'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'unconverted data remains: 2'):
             user_services.parse_date_from_string('2016-03-32')
 
     def test_record_user_started_state_translation_tutorial(self) -> None:
@@ -1887,7 +1888,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_human_readable_user_ids_for_no_user_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'User not found.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.get_human_readable_user_ids(['unregistered_id'])
 
     def test_record_user_started_state_editor_tutorial(self) -> None:
@@ -1940,7 +1941,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(contributions)
         self.assertIsInstance(contributions, user_domain.UserContributions)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'User contributions model for user %s already exists.'
             % user_id
@@ -2021,7 +2022,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_update_user_contributions_for_invalid_user_raises_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'User contributions model for user %s does not exist.'
             % 'non_existent_user_id'
@@ -2169,6 +2170,67 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_audit_model.committer_id, committer_id)
         self.assertEqual(user_audit_model.old_username, 'oldUsername')
         self.assertEqual(user_audit_model.new_username, 'newUsername')
+
+    def test_raises_error_if_none_destination_is_provided_for_checkpoint(
+        self
+    ) -> None:
+        state = state_domain.State.create_default_state('state_1')
+        state_answer_group: List[state_domain.AnswerGroup] = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    None, None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_id('TextInput')
+        state.update_interaction_answer_groups(state_answer_group)
+        states = {'Introduction': state}
+
+        with self.assertRaisesRegex(
+            Exception,
+            'States with a null destination can never be a checkpoint.'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
+
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_answer_groups(state_answer_group)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
+        state.interaction.default_outcome.dest = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'States with a null destination can never be a checkpoint'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
 
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
@@ -2335,10 +2397,10 @@ title: Title
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
         self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -2372,7 +2434,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # Second checkpoint reached.
@@ -2415,7 +2477,7 @@ title: Title
             'New state',
             exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
             False)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, change_list, '')
 
         # First checkpoint reached again.
@@ -2442,7 +2504,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 4.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2498,7 +2560,7 @@ title: Title
 
         # Change state name of 'Introduction' state.
         # Now version of exploration becomes 2.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -2550,13 +2612,13 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         user_services.add_user_role(
             self.owner_id, feconf.ROLE_ID_COLLECTION_EDITOR)
@@ -2569,7 +2631,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test all owners and editors of exploration after publication have
@@ -2581,7 +2643,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2619,7 +2681,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that commit to unpublished exploration does not update
         # contribution time.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.admin_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
@@ -2646,7 +2708,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -2657,7 +2719,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that after an exploration is published, all contributors have
         # updated first contribution time.
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -2671,7 +2733,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.EXP_ID, self.admin_id, end_state_name='End')
         rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test that contribution time is not given to an editor that has not
@@ -2685,7 +2747,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
 
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.owner, self.EXP_ID)
         rights_manager.unpublish_exploration(self.owner, self.EXP_ID)
 
@@ -2703,7 +2765,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
-        exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        exp_services.publish_exploration_and_update_user_profiles(
             self.admin, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
@@ -2825,7 +2887,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def mock_get_current_date_as_string(self) -> str:
         return self.CURRENT_DATE_AS_STRING
@@ -2937,7 +2999,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         error_msg = (
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_services.migrate_dashboard_stats_to_latest_schema(
                 user_stats_model)
 
@@ -3001,7 +3063,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.swap(user_models.UserStatsModel, 'schema_version', 5):
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception,
                 'Sorry, we can only process v1-v%d dashboard stats schemas at'
                 ' present.' % (feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
@@ -3026,39 +3088,39 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a list'):
             user_services.update_subject_interests(self.user_id, 'not a list')  # type: ignore[arg-type]
 
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be a string'):
             user_services.update_subject_interests(self.user_id, [1, 2, 3])  # type: ignore[list-item]
 
-        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be non-empty'):
             user_services.update_subject_interests(self.user_id, ['', 'ab'])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'to consist only of lowercase alphabetic characters and spaces'
             ):
             user_services.update_subject_interests(self.user_id, ['!'])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'to consist only of lowercase alphabetic characters and spaces'
             ):
             user_services.update_subject_interests(
                 self.user_id, ['has-hyphens'])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'to consist only of lowercase alphabetic characters and spaces'
             ):
             user_services.update_subject_interests(
                 self.user_id, ['HasCapitalLetters'])
 
-        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, 'to be distinct'):
             user_services.update_subject_interests(self.user_id, ['a', 'a'])
 
         # The following cases are all valid.
@@ -3077,7 +3139,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_legacy_user(self) -> None:
         """Test the case of a user who existed in the system before the
@@ -3098,7 +3160,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # After logging in and requesting a URL, the last_logged_in property is
         # changed.
         self.login(self.VIEWER_EMAIL)
-        self.get_html_response(feconf.LIBRARY_INDEX_URL)  # type: ignore[no-untyped-call]
+        self.get_html_response(feconf.LIBRARY_INDEX_URL)
         self.assertLess(
             last_logged_in,
             user_services.get_user_settings(self.viewer_id).last_logged_in)
@@ -3118,7 +3180,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=11)
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
-            self.get_html_response(feconf.LIBRARY_INDEX_URL)  # type: ignore[no-untyped-call]
+            self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
                 user_services.get_user_settings(self.viewer_id).last_logged_in,
                 previous_last_logged_in_datetime)
@@ -3127,7 +3189,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=13)
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
-            self.get_html_response(feconf.LIBRARY_INDEX_URL)  # type: ignore[no-untyped-call]
+            self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertGreater(
                 user_services.get_user_settings(self.viewer_id).last_logged_in,
                 previous_last_logged_in_datetime)
@@ -3145,9 +3207,9 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         """Create users for creating and editing exploration."""
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
@@ -3159,7 +3221,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3170,7 +3232,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(editor_settings.last_edited_an_exploration)
 
     def test_last_exp_edit_time_gets_updated(self) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3195,7 +3257,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(previous_last_edited_an_exploration)
 
         # The editor edits the exploration 13 hours after it was created.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
@@ -3221,7 +3283,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         """Create user for creating exploration."""
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_legacy_user(self) -> None:
         """Test the case of a user who are creating exploration for first time
@@ -3300,11 +3362,11 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
-        self.reviewer_1_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_1_id = self.get_user_id_from_email(
             self.REVIEWER_1_EMAIL)
 
         self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
-        self.reviewer_2_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.reviewer_2_id = self.get_user_id_from_email(
             self.REVIEWER_2_EMAIL)
 
     def test_grant_reviewer_translation_reviewing_rights_increases_count(
@@ -3667,21 +3729,21 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
 
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
-        self.voice_artist_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
         self.signup(
             self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
         self.question_reviewer_id = (
-            self.get_user_id_from_email(self.QUESTION_REVIEWER_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.QUESTION_REVIEWER_EMAIL))
 
         self.signup(
             self.QUESTION_SUBMITTER_EMAIL, self.QUESTION_SUBMITTER_USERNAME)
         self.question_submitter_id = (
-            self.get_user_id_from_email(self.QUESTION_SUBMITTER_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.QUESTION_SUBMITTER_EMAIL))
 
     def test_assign_user_review_translation_suggestion_in_language(
         self
@@ -3784,7 +3846,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             users_contribution_rights
         ]
         self.assertEqual(len(users_contribution_rights), 2)
-        self.assertItemsEqual(reviewer_ids, expected_reviewer_ids)  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(reviewer_ids, expected_reviewer_ids)
 
     def test_get_users_contribution_rights_with_one_reviewer_user_id(
         self
@@ -3827,7 +3889,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.translator_id, 'hi')
 
         all_reviewers = user_services.get_all_reviewers_contribution_rights()
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             [reviewer.id for reviewer in all_reviewers],
             [self.voice_artist_id, self.translator_id])
 
@@ -3985,7 +4047,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_get_question_reviewer_usernames_with_lanaguge_code_raise_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected language_code to be None'):
             user_services.get_contributor_usernames(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
@@ -4011,7 +4073,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_get_contributor_usernames_with_invalid_category_raises(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid category: invalid_category'):
             user_services.get_contributor_usernames(
                 'invalid_category', language_code='hi')

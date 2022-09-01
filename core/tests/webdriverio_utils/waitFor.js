@@ -192,9 +192,10 @@ var urlRedirection = async function(url) {
 };
 
 var numberOfElementsToBe = async function(
-    elementSelector, elementName, number) {
+    elementSelector, elementName, number, childSelector = null) {
   await browser.waitUntil(async function() {
-    var element = await $$(elementSelector);
+    var element = childSelector ? await $(elementSelector).$$(
+      childSelector) : await $$(elementSelector);
     return element.length === number;
   },
   {

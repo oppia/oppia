@@ -140,7 +140,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 0)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [datetime.date.today()]
         )
@@ -233,7 +233,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 0)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [datetime.date.today()]
         )
@@ -293,7 +293,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 0)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [datetime.date.today()]
         )
@@ -365,7 +365,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 0)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [datetime.date.today()]
         )
@@ -423,7 +423,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 0)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [datetime.date.today()]
         )
@@ -504,7 +504,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 1)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 5)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             translation_stats_model.contribution_dates,
             [
                 datetime.date.today(),
