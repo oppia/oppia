@@ -113,10 +113,12 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setFirstState = async function(stateName) {
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
+    await action.click('State Dropdown element', initialStateSelect);
+
     await action.click(
       'State name option', initialStateSelectOption(stateName));
     await action.click('Neutral element', neutralElement);
@@ -150,7 +152,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationCategory,
       'Exploration category input takes too long to be visible.');
-    expect(await explorationCategory.$('option:checked').getText()).
+    expect(await $('.e2e-test-exploration-category-dropdown').getText()).
       toEqual(category);
   };
 
@@ -158,7 +160,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
     await waitFor.textToBePresentInElement(
-      initialStateSelect.$('option:checked'),
+      initialStateSelect,
       firstState,
       `Initial state is not set as ${firstState}`);
   };
@@ -166,7 +168,7 @@ var ExplorationEditorSettingsTab = function() {
   this.expectLanguageToBe = async function(language) {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    expect(await explorationLanguageInput.$('option:checked').getText()).
+    expect(await explorationLanguageInput.getText()).
       toEqual(language);
     await action.click('Neutral element', neutralElement);
   };
