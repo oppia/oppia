@@ -84,7 +84,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         rule_specs_till_now: List[state_domain.RuleSpecDict],
         ele_x_at_y_rules: List[Dict[str, int]],
         equal_ordering_one_at_incorec_posn: List[Any]
-    ) -> Tuple[bool, List[Dict[str, int]], List[Any]]:
+    ) -> bool:
         """Helper function to check if the answer group is valid or not.
         It will check if the number of invalid rules are equal to the
         number of rules present inside the answer group, which is if
@@ -107,7 +107,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             multi_item_value: bool. If multiple items at same place are
                 allowed or not.
             rule_specs_till_now: List[state_domain.RuleSpecDict]. The list of
-                rule specs till the previous answer group.
+                rule specs seen before the current answer_group.
             ele_x_at_y_rules: List[Dict[str, int]]. List of dictionary
                 containing the element as the key and its position as the
                 value in rule type HasElementXAtPositionY.
@@ -116,15 +116,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 IncorrectPosition` to check if `Equals` rule come before.
 
         Returns:
-            Tuple[bool, List[Dict[str, int]], List[Any]]. Tuple containing 3
-            values -
-            - First is a boolean which tells if the answer group is valid or
-            not
-            - Second is the List containing values for rule type
-            `HasElementXAtPositionY`
-            - Third is the list containing the rules of rule type
-            `IsEqualToOrderingWithOneItemAtIncorrectPosition` from the given
-            answer group.
+            bool. Returns True if all the rules inside the answer_group is
+            invalid.
         """
         invalid_rules = []
         for rule_spec in answer_group.rule_specs:
@@ -156,9 +149,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
             if rule_spec.rule_type == 'IsEqualToOrdering':
                 # `IsEqualToOrdering` rule should not have empty values.
-                if (
-                    len(rule_spec.inputs['x']) <= 0
-                ):
+                if len(rule_spec.inputs['x']) <= 0:
                     invalid_rules.append(rule_spec)
                 else:
                     # `==` should come before idx(a) == b if it satisfies
@@ -174,9 +165,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     # `==` should come before == +/- 1 if they are off by
                     # at most 1 value.
                     dictionary = {}
-                    for layer_idx, layer in enumerate(
-                        rule_spec.inputs['x']
-                    ):
+                    for layer_idx, layer in enumerate(rule_spec.inputs['x']):
                         for item in layer:
                             dictionary[item] = layer_idx
 
@@ -204,10 +193,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 ):
                     invalid_rules.append(rule_spec)
 
-        return (
-            len(set(invalid_rules)) == len(answer_group.rule_specs),
-            ele_x_at_y_rules, equal_ordering_one_at_incorec_posn
-        )
+        return len(set(invalid_rules)) == len(answer_group.rule_specs)
 
     @staticmethod
     def invalid_drag_drop_interactions(
@@ -240,15 +226,15 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             answer_groups = state.interaction.answer_groups
             invalid_ans_group_count = 0
             valid_dest_ans_group_count = 0
-            invalid_ans_groups = []
+            invalid_ans_group_idxs = []
             rule_specs_till_now: List[state_domain.RuleSpecDict] = []
             ele_x_at_y_rules: List[Dict[str, int]] = []
-            incorrect_position: List[Any] = []
+            equal_ordering_one_at_incorec_posn: List[Any] = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                can_delete_ans_group, ele_x_at_y_rules, incorrect_position = (
+                can_delete_ans_group = (
                     ExpAuditRuleChecksJob._filter_invalid_drag_ans_group(
                         answer_group, multi_item_value, rule_specs_till_now,
-                        ele_x_at_y_rules, incorrect_position)
+                        ele_x_at_y_rules, equal_ordering_one_at_incorec_posn)
                 )
                 for rule_spec in answer_group.rule_specs:
                     rule_specs_till_now.append(rule_spec.to_dict())
@@ -257,7 +243,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     valid_dest_ans_group_count += 1
                     if can_delete_ans_group:
                         invalid_ans_group_count += 1
-                        invalid_ans_groups.append(ans_group_idx)
+                        invalid_ans_group_idxs.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -267,7 +253,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        'ans_group_idx': invalid_ans_groups
+                        'ans_group_idx': invalid_ans_group_idxs
                     }
                 )
 
@@ -287,7 +273,6 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         Returns:
             invalid_found: bool. Returns True if the exploration is invalid.
         """
-        invalid_found = False
         for state in states_dict.values():
             if state.interaction.id != 'Continue':
                 continue
@@ -296,8 +281,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 ['buttonText'].value.unicode_str
             )
             if len(text_value) > 20:
-                invalid_found = True
-        return invalid_found
+                return True
+        return False
 
     @staticmethod
     def _get_invalid_choices_indexes(
@@ -378,7 +363,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 _get_invalid_choices_indexes(choices) # type: ignore[arg-type]
             )
 
-            invalid_ans_groups = []
+            invalid_ans_group_idxs = []
             # Mark the rules invalid whose choice has been deleted.
             answer_groups = state.interaction.answer_groups
             valid_dest_ans_group_count = 0
@@ -406,7 +391,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         len(set(invalid_rules)) == len(answer_group.rule_specs)
                     ):
                         invalid_ans_group_count += 1
-                        invalid_ans_groups.append(ans_group_idx)
+                        invalid_ans_group_idxs.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -416,7 +401,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        'ans_group_idx': invalid_ans_groups
+                        'ans_group_idx': invalid_ans_group_idxs
                     }
                 )
 
@@ -508,7 +493,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         rule_spec_till_now: List[state_domain.RuleSpecDict],
         ans_group_index: int,
         ranges: List[RangeVariable]
-    ) -> Tuple[bool, List[RangeVariable]]:
+    ) -> bool:
         """Helper function to check if the answer group is valid or not.
         It will check if the number of invalid rules are equal to the
         number of rules present inside the answer group, which is if
@@ -530,11 +515,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 track of rules ranges uptil now.
 
         Returns:
-            Tuple(bool, List[RangeVariable]). Returns tuple,
-            - First element is boolean and returns if the answer group is
-            valid or not
-            - Second element is the `ranges` variable which keeps track of
-            all the ranges of rules up till now.
+            bool. Returns True if all the rules inside the answer_group is
+            invalid
         """
         invalid_rules = []
         lower_infinity = float('-inf')
@@ -567,12 +549,9 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             if rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
                 try:
                     rule_value = float(rule_spec.inputs['x'])
-                    (
-                        ExpAuditRuleChecksJob.
-                        _set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            upper_infinity, True, False
-                        )
+                    ExpAuditRuleChecksJob._set_lower_and_upper_bounds(
+                        range_var, rule_value,
+                        upper_infinity, True, False
                     )
                 except Exception:
                     invalid_rules.append(rule_spec)
@@ -580,12 +559,9 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             if rule_spec.rule_type == 'Equals':
                 try:
                     rule_value = float(rule_spec.inputs['x'])
-                    (
-                        ExpAuditRuleChecksJob.
-                        _set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            rule_value, True, True
-                        )
+                    ExpAuditRuleChecksJob._set_lower_and_upper_bounds(
+                        range_var, rule_value,
+                        rule_value, True, True
                     )
                 except Exception:
                     invalid_rules.append(rule_spec)
@@ -593,12 +569,9 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             if rule_spec.rule_type == 'IsLessThan':
                 try:
                     rule_value = float(rule_spec.inputs['x'])
-                    (
-                        ExpAuditRuleChecksJob.
-                        _set_lower_and_upper_bounds(
-                            range_var, lower_infinity,
-                            rule_value, False, False
-                        )
+                    ExpAuditRuleChecksJob._set_lower_and_upper_bounds(
+                        range_var, lower_infinity,
+                        rule_value, False, False
                     )
                 except Exception:
                     invalid_rules.append(rule_spec)
@@ -613,7 +586,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         rule_spec_dict: state_domain.RuleSpecDict = {
                             'rule_type': 'Equals',
                             'inputs': {
-                                'x': int(rule_value_x)
+                                'x': rule_spec.inputs['x']
                             }
                         }
                         rule_spec = state_domain.RuleSpec.from_dict(
@@ -625,20 +598,14 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         else:
                             rule_spec_till_now.append(rule_spec.to_dict())
                             rule_value = float(rule_spec.inputs['x'])
-                            (
-                                ExpAuditRuleChecksJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value,
-                                    rule_value, True, True
-                                )
+                            ExpAuditRuleChecksJob._set_lower_and_upper_bounds(
+                                range_var, rule_value,
+                                rule_value, True, True
                             )
                     else:
-                        (
-                            ExpAuditRuleChecksJob.
-                            _set_lower_and_upper_bounds(
-                                range_var, rule_value_x - rule_value_tol,
-                                rule_value_x + rule_value_tol, True, True
-                            )
+                        ExpAuditRuleChecksJob._set_lower_and_upper_bounds(
+                            range_var, rule_value_x - rule_value_tol,
+                            rule_value_x + rule_value_tol, True, True
                         )
                 except Exception:
                     invalid_rules.append(rule_spec)
@@ -646,12 +613,9 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             if rule_spec.rule_type == 'IsGreaterThan':
                 try:
                     rule_value = float(rule_spec.inputs['x'])
-                    (
-                        ExpAuditRuleChecksJob.
-                        _set_lower_and_upper_bounds(
-                            range_var, rule_value,
-                            upper_infinity, False, False
-                        )
+                    ExpAuditRuleChecksJob._set_lower_and_upper_bounds(
+                        range_var, rule_value,
+                        upper_infinity, False, False
                     )
                 except Exception:
                     invalid_rules.append(rule_spec)
@@ -660,28 +624,20 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 try:
                     rule_value_a = float(rule_spec.inputs['a'])
                     rule_value_b = float(rule_spec.inputs['b'])
-                    (
-                        ExpAuditRuleChecksJob.
-                        _set_lower_and_upper_bounds(
-                            range_var, rule_value_a,
-                            rule_value_b, True, True
-                        )
+                    ExpAuditRuleChecksJob._set_lower_and_upper_bounds(
+                        range_var, rule_value_a,
+                        rule_value_b, True, True
                     )
                 except Exception:
                     invalid_rules.append(rule_spec)
 
             for range_ele in ranges:
-                if (
-                    ExpAuditRuleChecksJob.
-                    _is_enclosed_by(range_var, range_ele)
-                ):
+                if ExpAuditRuleChecksJob._is_enclosed_by(
+                    range_var, range_ele):
                     invalid_rules.append(rule_spec)
             ranges.append(range_var)
 
-        return (
-            len(set(invalid_rules)) == len(answer_group.rule_specs),
-            ranges
-        )
+        return len(set(invalid_rules)) == len(answer_group.rule_specs)
 
     @staticmethod
     def numeric_input_invalid_values(
@@ -709,11 +665,11 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             answer_groups = state.interaction.answer_groups
             invalid_ans_group_count = 0
             valid_dest_ans_group_count = 0
-            invalid_ans_groups = []
+            invalid_ans_group_idxs = []
             rule_spec_till_now: List[state_domain.RuleSpecDict] = []
             ranges: List[RangeVariable] = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                can_delete_ans_group, ranges = (
+                can_delete_ans_group = (
                     ExpAuditRuleChecksJob.
                     _filter_invalid_numeric_ans_group(
                         answer_group, rule_spec_till_now, ans_group_idx,
@@ -728,7 +684,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     valid_dest_ans_group_count += 1
                     if can_delete_ans_group:
                         invalid_ans_group_count += 1
-                        invalid_ans_groups.append(ans_group_idx)
+                        invalid_ans_group_idxs.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -738,7 +694,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        'ans_group_idx': invalid_ans_groups
+                        'ans_group_idx': invalid_ans_group_idxs
                     }
                 )
 
@@ -799,7 +755,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         ranges: List[RangeVariable],
         matched_denominator_list: List[MatchedDenominator],
         answer_groups: List[state_domain.AnswerGroup]
-    ) -> Tuple[bool, List[RangeVariable], List[MatchedDenominator]]:
+    ) -> bool:
         """Helper function to check if the answer group is valid or not.
         It will check if the number of invalid rules are equal to the
         number of rules present inside the answer group, which is if
@@ -826,13 +782,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 complete answer groups.
 
         Returns:
-            Tuple[bool, List[RangeVariable], List[MatchedDenominator]]. Returns
-            - First element is boolean which tells whether the answer group is
-            valid
-            - Second element is the list of the range variables, to keep track
-            of rules ranges uptil now
-            - Third element is the list of the denominator variables, to keep
-            track of rules denominators uptil now.
+            bool. Returns True if all the rules inside the answer_group is
+            invalid
         """
         invalid_rules = []
         lower_infinity = float('-inf')
@@ -896,15 +847,15 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     continue
 
             for range_ele in ranges:
-                if ExpAuditRuleChecksJob._is_enclosed_by(
-                    range_var, range_ele
+                earlier_rule = (
+                    answer_groups[range_ele['ans_group_index']]
+                    .rule_specs[range_ele['rule_spec_index']]
+                )
+                if ExpAuditRuleChecksJob._should_check_range_criteria(
+                    earlier_rule, rule_spec
                 ):
-                    earlier_rule = (
-                        answer_groups[range_ele['ans_group_index']]
-                        .rule_specs[range_ele['rule_spec_index']]
-                    )
-                    if ExpAuditRuleChecksJob._should_check_range_criteria(
-                        earlier_rule, rule_spec
+                    if ExpAuditRuleChecksJob._is_enclosed_by(
+                        range_var, range_ele
                     ):
                         invalid_rules.append(rule_spec)
 
@@ -922,11 +873,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             ranges.append(range_var)
             matched_denominator_list.append(matched_denominator)
 
-        return (
-            len(set(invalid_rules)) == len(answer_group.rule_specs),
-            ranges,
-            matched_denominator_list
-        )
+        return len(set(invalid_rules)) == len(answer_group.rule_specs)
 
     @staticmethod
     def fraction_input_invalid_values(
@@ -954,12 +901,12 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             answer_groups = state.interaction.answer_groups
             invalid_ans_group_count = 0
             valid_dest_ans_group_count = 0
-            invalid_ans_groups = []
+            invalid_ans_group_idxs = []
             rule_spec_till_now: List[state_domain.RuleSpecDict] = []
             ranges: List[RangeVariable] = []
             matched_denominator_list: List[MatchedDenominator] = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                can_delete_ans_group, ranges, matched_denominator_list = (
+                can_delete_ans_group = (
                     ExpAuditRuleChecksJob.
                     _filter_invalid_fraction_ans_group(
                         answer_group, rule_spec_till_now, ans_group_idx,
@@ -974,7 +921,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     valid_dest_ans_group_count += 1
                     if can_delete_ans_group:
                         invalid_ans_group_count += 1
-                        invalid_ans_groups.append(ans_group_idx)
+                        invalid_ans_group_idxs.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -984,7 +931,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        'ans_group_idx': invalid_ans_groups
+                        'ans_group_idx': invalid_ans_group_idxs
                     }
                 )
 
@@ -1048,7 +995,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 _get_invalid_choices_indexes(choices) # type: ignore[arg-type]
             )
 
-            invalid_ans_groups = []
+            invalid_ans_group_idxs = []
             # Remove rules whose choice has been deleted.
             answer_groups = state.interaction.answer_groups
             valid_dest_ans_group_count = 0
@@ -1071,7 +1018,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         len(set(invalid_rules)) == len(answer_group.rule_specs)
                     ):
                         invalid_ans_group_count += 1
-                        invalid_ans_groups.append(ans_group_idx)
+                        invalid_ans_group_idxs.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -1081,7 +1028,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        'ans_group_idx': invalid_ans_groups
+                        'ans_group_idx': invalid_ans_group_idxs
                     }
                 )
 
@@ -1115,7 +1062,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             seen_strings_contains = []
             seen_strings_startswith = []
             rule_spec_till_now = []
-            invalid_ans_groups = []
+            invalid_ans_group_idxs = []
             valid_dest_ans_group_count = 0
             invalid_ans_group_count = 0
             answer_groups = state.interaction.answer_groups
@@ -1133,34 +1080,33 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             rule_spec.inputs['x']['normalizedStrSet'])
 
                     if rule_spec.rule_type == 'StartsWith':
-                        seen_strings_startswith.append(
-                            rule_spec.inputs['x']['normalizedStrSet']
-                        )
                         # `Contains` should always come after `Equals` and
                         # `Startswith` rules.
                         rule_values = rule_spec.inputs['x']['normalizedStrSet']
-                        for contain_ele in seen_strings_contains:
-                            for item in contain_ele:
-                                for ele in rule_values:
-                                    if item in ele:
+                        seen_strings_startswith.append(rule_values)
+                        for contain_rule_ele in seen_strings_contains:
+                            for contain_rule_string in contain_rule_ele:
+                                for rule_value in rule_values:
+                                    if contain_rule_string in rule_value:
                                         invalid_rules.append(rule_spec)
 
                     if rule_spec.rule_type == 'Equals':
                         # `Contains` should always come after `Equals` and
                         # `Startswith` rules.
                         rule_values = rule_spec.inputs['x']['normalizedStrSet']
-                        for contain_ele in seen_strings_contains:
-                            for item in contain_ele:
-                                for ele in rule_values:
-                                    if item in ele:
+                        for contain_rule_ele in seen_strings_contains:
+                            for contain_rule_string in contain_rule_ele:
+                                for rule_value in rule_values:
+                                    if contain_rule_string in rule_value:
                                         invalid_rules.append(rule_spec)
 
                         # `Startswith` should always come after the `Equals`
                         # rule.
-                        for start_with_ele in seen_strings_startswith:
-                            for item in start_with_ele:
-                                for ele in rule_values:
-                                    if ele.startswith(item):
+                        for start_with_rule_ele in seen_strings_startswith:
+                            for start_with_rule_string in start_with_rule_ele:
+                                for rule_value in rule_values:
+                                    if rule_value.startswith(
+                                        start_with_rule_string):
                                         invalid_rules.append(rule_spec)
 
                 if answer_group.outcome.dest != state_name:
@@ -1170,7 +1116,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         len(set(invalid_rules)) == len(answer_group.rule_specs)
                     ):
                         invalid_ans_group_count += 1
-                        invalid_ans_groups.append(ans_group_idx)
+                        invalid_ans_group_idxs.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -1180,7 +1126,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        'ans_group_idx': invalid_ans_groups
+                        'ans_group_idx': invalid_ans_group_idxs
                     }
                 )
 
