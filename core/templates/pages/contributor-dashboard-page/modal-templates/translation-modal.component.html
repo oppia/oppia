@@ -38,7 +38,7 @@
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation"
          class="oppia-text-to-translate-container"
-         [ngClass]="isContentExpanded ? 'oppia-expanded' : 'oppia-contracted'"
+         [ngClass]="isContentExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
          #contentContainer>
       <!-- textToTranslate contains the html content of an exploration state -->
       <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
@@ -59,14 +59,14 @@
     </div>
     <div class="oppia-collapse-content"
          *ngIf="isContentOverflowing"
-         (click)="toggleExpansionState(0)">
+         (click)="toggleExpansionState('content')">
       {{ isContentExpanded ? textWhenExpanded : textWhenContracted }}
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
       <div class="e2e-test-state-translation-editor">
         <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
         <div class="oppia-editor-container"
-             [ngClass]="isTranslationExpanded ? 'oppia-expanded' : 'oppia-contracted'"
+             [ngClass]="isTranslationExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
              #translationContainer>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
                                [schema]="HTML_SCHEMA"
@@ -93,7 +93,7 @@
           </div>
         </div>
         <div class="oppia-collapse-content"
-             (click)="toggleExpansionState(1)"
+             (click)="toggleExpansionState('translation')"
              *ngIf="isTranslationOverflowing">
           {{ isTranslationExpanded ? textWhenExpanded : textWhenContracted }}
         </div>
@@ -280,12 +280,12 @@
   }
 
   @media screen and (max-width: 700px) {
-    .oppia-expanded {
+    .oppia-container-expanded {
       height: fit-content;
       max-height: none;
       overflow-y: hidden;
     }
-    .oppia-contracted {
+    .oppia-container-contracted {
       max-height: 30vh;
       overflow-y: scroll;
     }

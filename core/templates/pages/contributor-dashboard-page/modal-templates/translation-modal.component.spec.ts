@@ -143,42 +143,50 @@ describe('Translation Modal Component', () => {
 
   it('should expand the content area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
+
     // The content area is contracted by default.
     expect(component.isContentExpanded).toBeFalse();
+
     // The content area should expand when the users clicks
     // on the 'View More' button.
-    component.toggleExpansionState(0);
+    component.toggleExpansionState('content');
 
     expect(component.isContentExpanded).toBeTrue();
   });
 
   it('should contract the content area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
+
     component.isContentExpanded = true;
+
     // The content area should contract when the users clicks
     // on the 'View Less' button.
-    component.toggleExpansionState(0);
+    component.toggleExpansionState('content');
 
     expect(component.isContentExpanded).toBeFalse();
   });
 
   it('should expand the translation area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
+
     // The translation area is contracted by default.
     expect(component.isTranslationExpanded).toBeTrue();
+
     // The translation area should expand when the users clicks
     // on the 'View More' button.
-    component.toggleExpansionState(1);
+    component.toggleExpansionState('translation');
 
     expect(component.isTranslationExpanded).toBeFalse();
   });
 
   it('should contract the translation area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
+
     component.isTranslationExpanded = false;
+
     // The translation area should contract when the users clicks
     // on the 'View Less' button.
-    component.toggleExpansionState(1);
+    component.toggleExpansionState('translation');
 
     expect(component.isTranslationExpanded).toBeTrue();
   });
@@ -188,19 +196,24 @@ describe('Translation Modal Component', () => {
       // Pre-check.
       // The default values for the overflow states are false.
       expect(component.isContentOverflowing).toBeFalse();
+
       // Setup.
       component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
       component.contentContainer.nativeElement.offsetHeight = 150;
+
       // Action.
       component.computePanelOverflowState();
       tick(501);
+
       // Expectations.
       expect(component.isContentOverflowing).toBeFalse();
       // Change panel height to simulate changing of the modal data.
       component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
+
       // Action.
       component.computePanelOverflowState();
       tick(501);
+
       // Expectations.
       expect(component.isContentOverflowing).toBeTrue();
     }));
@@ -210,19 +223,24 @@ describe('Translation Modal Component', () => {
       // Pre-check.
       // The default values for the overflow states are false.
       expect(component.isTranslationOverflowing).toBeFalse();
+
       // Setup.
       spyOn(wds, 'getHeight').and.returnValue(100);
       component.translationContainer.nativeElement.offsetHeight = 25;
+
       // Action.
       component.computeTranslationEditorOverflowState();
       tick(501);
+
       // Expectations.
       expect(component.isTranslationOverflowing).toBeFalse();
       // Change panel height to simulate changing of the modal data.
       component.translationContainer.nativeElement.offsetHeight = 300;
+
       // Action.
       component.computeTranslationEditorOverflowState();
       tick(501);
+
       // Expectations.
       expect(component.isTranslationOverflowing).toBeTrue();
     }));

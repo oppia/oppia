@@ -51,8 +51,8 @@ class UiConfig {
 }
 
 enum ExpansionTabType {
-  CONTENT,
-  TRANSLATION
+  CONTENT = 'content',
+  TRANSLATION = 'translation'
 }
 
 export interface TranslationOpportunity {
@@ -111,6 +111,7 @@ export class TranslationModalComponent {
   textToTranslate: string | string[] = '';
   languageDescription: string;
   activeStatus: Status;
+  expansionTabType: ExpansionTabType;
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
@@ -137,8 +138,8 @@ export class TranslationModalComponent {
   isTranslationOverflowing: boolean = false;
   textWhenExpanded: string = 'View Less';
   textWhenContracted: string = 'View More';
-  // The value of cutoff must be equal to 'max-height' - 1 set
-  // in the class '.oppia-contracted' in 'translation-modal.component.html'.
+  // The value of cutoff must be equal to 'max-height' - 1 set in the
+  // class '.oppia-container-contracted' in 'translation-modal.component.html'.
   cutoff_height: number = 29;
   ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
     'oppia-noninteractive-image',
@@ -225,15 +226,13 @@ export class TranslationModalComponent {
   }
 
   computeTranslationEditorOverflowState(): void {
-    setTimeout(() => {
-      const windowHeight = this.wds.getHeight();
-      let heightLimit = windowHeight * (this.cutoff_height) / 100;
+    const windowHeight = this.wds.getHeight();
+    const heightLimit = windowHeight * (this.cutoff_height) / 100;
 
-      this.isTranslationOverflowing = (
-        this.translationContainer?.nativeElement.offsetHeight >=
+    this.isTranslationOverflowing = (
+      this.translationContainer?.nativeElement.offsetHeight >=
         heightLimit
-      );
-    }, 500);
+    );
   }
 
   computePanelOverflowState(): void {
@@ -292,7 +291,7 @@ export class TranslationModalComponent {
     );
   }
 
-  toggleExpansionState(tab: ExpansionTabType): void {
+  toggleExpansionState(tab: string): void {
     if (tab === ExpansionTabType.CONTENT) {
       this.isContentExpanded = !this.isContentExpanded;
     } else if (tab === ExpansionTabType.TRANSLATION) {

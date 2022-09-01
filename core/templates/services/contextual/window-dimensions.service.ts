@@ -40,9 +40,9 @@ export class WindowDimensionsService {
 
   getHeight(): number {
     return (
-      this.windowRef?.nativeWindow.innerHeight ||
-      this.windowRef?.nativeWindow.document.documentElement.clientHeight ||
-      this.windowRef?.nativeWindow.document.body.clientHeight);
+      this.windowRef.nativeWindow.innerHeight ||
+      this.windowRef.nativeWindow.document.documentElement.clientHeight ||
+      this.windowRef.nativeWindow.document.body.clientHeight);
   }
 
   isWindowNarrow(): boolean {
