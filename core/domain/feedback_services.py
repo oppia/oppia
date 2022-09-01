@@ -797,8 +797,9 @@ def get_exp_thread_summaries(
     ]
     exp_model_ids = [model.entity_id for model in exp_thread_models]
 
-    # Here, cast is used to narrow down the return type of following method from
-    # List[Optional[Model]] to List[Optional[exp_models.ExplorationModel]].
+    # Here we use cast because we are narrowing down the return type
+    # of following method from List[Optional[Model]] to List[Optional[
+    # exp_models.ExplorationModel]].
     exp_thread_user_models, exploration_models = (
         cast(
             Tuple[

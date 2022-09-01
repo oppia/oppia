@@ -48,10 +48,10 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.blog_post_a_id = self.blog_post_a.id
         self.blog_post_b_id = self.blog_post_b.id
 
-        # Dictionary of type BlogPostChangeDict should contain 'title' key but
-        # for testing purpose here we are not providing the 'title' key, which
-        # causes MyPy to throw error. Thus to silent the error, we used ignore
-        # here.
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'title' key but for testing purpose here we are not
+        # providing the 'title' key, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
         self.change_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
             'thumbnail_filename': 'test.svg',
             'content': '<p>hi<p>',
@@ -326,15 +326,19 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         assert blog_post is not None
         self.assertEqual(blog_post.to_dict(), expected_blog_post.to_dict())
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
     def test_get_blog_posy_by_invalid_url(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception,
             'Blog Post URL fragment should be a string. Recieved:'
             r'\[123\]'):
             blog_services.does_blog_post_with_url_fragment_exist([123])  # type: ignore[arg-type]
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception,
             'Blog Post URL fragment should be a string. Recieved:'

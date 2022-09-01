@@ -677,8 +677,9 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         vm_id = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
         message = 'test message'
-        # TODO(#13059): After we fully type the codebase, convert message
-        # to bytes and remove assertion from the main file for the same.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase, convert message to bytes and remove assertion from the main
+        # file for the same.
         signature = classifier_services.generate_signature(
             secret.encode('utf-8'),
             message,  # type: ignore[arg-type]

@@ -48,10 +48,11 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid entity_id received: 1'
         ):
-            # The argument `entity_id` of GcsFileSystem() can only accept
-            # string values, but here for testing purpose we are providing
-            # integer value. Thus to silent incompatible argument type MyPy
-            # error, we added an ignore statement here.
+            # Here we use MyPy ignore because the argument `entity_id` of
+            # GcsFileSystem() can only accept string values, but here for
+            # testing purpose we are providing integer value. Thus to silent
+            # incompatible argument type MyPy error, we added an ignore
+            # statement here.
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(

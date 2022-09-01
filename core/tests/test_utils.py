@@ -1958,7 +1958,13 @@ class GenericTestBase(AppEngineTestBase):
         },
     }
 
-    VERSION_27_STATE_DICT: Final = {
+    # Here we use MyPy ignore because we are defining an older version
+    # dictionary of State which do contain 'content_ids_to_audio_translations'
+    # key but we are assigning this dict to the latest version StateDict
+    # which do not contain 'content_ids_to_audio_translations' key. So,
+    # because of this MyPy to throw a error. Thus to avoid the error, we
+    # used ignore here.
+    VERSION_27_STATE_DICT: state_domain.StateDict = {  # type: ignore[typeddict-item]
         'content': {'content_id': 'content', 'html': ''},
         'param_changes': [],
         'content_ids_to_audio_translations': {

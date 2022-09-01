@@ -143,10 +143,11 @@ def get_collection_from_model(
 
     # If collection is in version 2, copy nodes data to collection contents.
     if collection_model.schema_version == 2:
-        # The expected value for `collection_contents` key is dictionary of type
-        # CollectionDict, but here due to a different schema version we are
-        # assigning a different dictionary which causes MyPy to throw an error.
-        # Thus to avoid the error, we used an ignore here.
+        # Here we use MyPy ignore because the expected value for
+        # `collection_contents` key is dictionary of type CollectionDict,
+        # but here due to a different schema version we are assigning a
+        # different dictionary which causes MyPy to throw an error. Thus
+        # to avoid the error, we used an ignore here.
         versioned_collection_contents['collection_contents'] = {  # type: ignore[typeddict-item]
             'nodes': copy.deepcopy(collection_model.nodes)
         }

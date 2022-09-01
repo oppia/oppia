@@ -27,7 +27,6 @@ from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import state_domain
 from core.domain import fs_services
 from core.domain import state_domain
 from core.platform import models
@@ -454,8 +453,8 @@ def fetch_next_job() -> Optional[classifier_domain.ClassifierTrainingJob]:
 # TODO(#15451): Add stubs for protobuf once we have enough type info regarding
 # protobuf's library. Because currently, the stubs in typeshed is not fully
 # type annotated yet and the main repository is also not type annotated yet.
-# The argument classifier_data_proto can accept instances of
-# `TextClassifierFrozenModel` class. But since we excluded
+# Here we use object because the argument classifier_data_proto can accept
+# instances of `TextClassifierFrozenModel` class. But since we excluded
 # proto_files/ from the static type annotations, this argument
 # is annotated as general object type.
 def store_classifier_data(job_id: str, classifier_data_proto: object) -> None:
