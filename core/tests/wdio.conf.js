@@ -11,6 +11,7 @@ var args = process.argv;
 // is passed as 7th argument else it is passed as 6th argument.
 // eslint-disable-next-line eqeqeq
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
+
 const drivers = {
   chrome: { version: chromeVersion },
 };
