@@ -1,358 +1,397 @@
-<div class="question-editor-container">
-  <div *ngIf="editorIsOpen" class="question-editor-parent">
-    <mat-card class="oppia-page-card oppia-mobile-collapsible-card">
-      <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
-        <h3>Difficulty</h3>
-        <i class="fa fa-caret-down"
-           *ngIf="!difficultyCardIsShown"
-           aria-hidden="true">
-        </i>
-        <i class="fa fa-caret-up"
-           *ngIf="difficultyCardIsShown"
-           aria-hidden="true">
-        </i>
-      </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="difficultyCardIsShown">
-        <div class="list-group">
-          <h4>Select Difficulty</h4>
-          <div *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let index = index" class="difficulty-selection-container">
-            <label class="list-group-item-heading">{{skillWithDifficulty.getDescription()}}</label>
-            <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
-                                                [skillWithDifficulty]="skillWithDifficulty"
-                                                (skillWithDifficultyChange)="updateSkillWithDifficulty($event, index)">
-            </oppia-question-difficulty-selector>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document2</title>
+  <script src="https://kit.fontawesome.com/c7bb85ee1f.js" crossorigin=“anonymous"></script>
+  <style>
+    mat-card.oppia-autofocus:focus {
+      outline: #000;
+      outline-width: 4px;
+    }
+
+    .oppia-editor-publish-button {
+      margin-top: 2%;
+    }
+
+    .question-data-container {
+      margin: 0;
+      max-height: 68vh;
+      min-height: 68vh;
+      overflow-y: scroll;
+      padding: 0;
+      width: 60%;
+    }
+
+    .question-editor-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin: 60px auto 0;
+      width: 70%;
+    }
+
+    .question-edit-cancel-button {
+      margin-left: 8%;
+    }
+
+    .question-edit-save-button {
+      margin-right: 8%;
+      text-align: center;
+      width: 90px;
+    }
+
+    .question-list-container,
+    .save-question-container {
+      padding: 0 20px 20px;
+    }
+
+    .create-question-container {
+      width: 35%;
+    }
+
+    .list-header {
+      border-bottom: 2px solid #000;
+      display: flex;
+      justify-content: space-between;
+      margin: 25px 0;
+    }
+
+    .question-list-item {
+      border-bottom: 1px solid #e3e3e3;
+      padding: 10px 12px;
+    }
+
+    .question-data {
+      cursor: pointer;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .create-question-header {
+      border-bottom: none;
+      margin: 0;
+    }
+
+    .question-text {
+      width: 90%;
+    }
+
+    .page-navigation-arrows {
+      float: right;
+    }
+
+    .add-question-btn {
+      background-color: #008098;
+      color: #fff;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .add-question-btn .btn.disabled,
+    .btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .question-editor-parent {
+      width: 60%;
+    }
+
+    .question-editor-open-container {
+      margin-right: -29px;
+      padding-bottom: 10px;
+      position: sticky;
+      top: 27%;
+      width: 38%;
+    }
+
+    .checklist-item {
+      display: flex;
+    }
+
+    .checklist-item-number {
+      align-items: center;
+      background-color: #fff;
+      border: 1.5px solid #419889;
+      border-radius: 50%;
+      color: #419889;
+      display: flex;
+      font-size: 12px;
+      height: 22px;
+      justify-content: center;
+      text-align: center;
+      width: 22px;
+    }
+
+    .checklist-item-number-active {
+      background-color: #419889;
+      color: #fff;
+    }
+
+    .checklist-item-separator {
+      background-color: #419889;
+      height: 20px;
+      margin: 2px 10px;
+      width: 2px;
+    }
+
+    .difficulty-selection-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .new-question-header {
+      border-bottom: 2px solid #000;
+      display: flex;
+      justify-content: space-between;
+      margin: 25px 0;
+    }
+
+    .question-skill-id {
+      background-color: #efefef;
+      margin-left: 0;
+    }
+
+    .question-skill-id:hover {
+      background-color: #e0e0e0;
+    }
+
+    .skill-description-card {
+      padding-left: 10px;
+      padding-top: 10px;
+    }
+
+    .checklist-item-text {
+      margin-left: 5px;
+    }
+
+    .btn-success[disabled] {
+      background-color: #008098;
+    }
+
+    .save-question-button-container {
+      border-top: 1px solid #000;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      padding-top: 20px;
+    }
+
+    .oppia-cross-icon {
+      color: #f00;
+    }
+
+    .linked-skills-container {
+      margin-top: 40px;
+    }
+
+    .difficulty-card-header {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .difficulty-card-header i {
+      display: none;
+    }
+
+    .question-interaction-id {
+      color: #707070;
+    }
+
+    .list-group {
+      gap: 10px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .question-editor-container {
+        margin-top: 30px;
+        width: 100%;
+      }
+
+      .question-data-container {
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 30px;
+        order: 10;
+        padding: 0;
+        width: 100%;
+      }
+
+      .create-question-container {
+        width: 100%;
+      }
+
+      .question-editor-parent {
+        width: 100%;
+      }
+
+      .create-question-header h3 {
+        margin: 0;
+      }
+
+      .create-question-container mat-card {
+        padding: 25px;
+      }
+
+      .create-question-header {
+        padding-bottom: 25px;
+      }
+
+      .questions {
+        margin-bottom: 70px;
+      }
+
+      .difficulty-card-header i {
+        display: block;
+      }
+
+      .difficulty-card-header h3 {
+        margin: 0;
+      }
+
+      .question-editor-open-container {
+        position: inherit;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <div class="question-editor-container">
+    <div *ngIf="editorIsOpen" class="question-editor-parent">
+      <mat-card class="oppia-page-card oppia-mobile-collapsible-card">
+        <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
+          <h3>Difficulty</h3>
+          <i class="fa fa-caret-down" *ngIf="!difficultyCardIsShown" aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up" *ngIf="difficultyCardIsShown" aria-hidden="true">
+          </i>
+        </div>
+        <div class="oppia-mobile-collapsible-card-content" *ngIf="difficultyCardIsShown">
+          <div class="list-group">
+            <h4>Select Difficulty</h4>
+            <div *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let index = index" class="difficulty-selection-container">
+              <label class="list-group-item-heading">{{skillWithDifficulty.getDescription()}}</label>
+              <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject" [skillWithDifficulty]="skillWithDifficulty" (skillWithDifficultyChange)="updateSkillWithDifficulty($event, index)">
+              </oppia-question-difficulty-selector>
+            </div>
           </div>
+        </div>
+      </mat-card>
+      <div *ngIf="!newQuestionIsBeingCreated" class="linked-skills-container">
+        <h4> <strong> Linked Skills </strong> </h4>
+        <mat-card class="question-skill-id" *ngFor="let skill of associatedSkillSummaries">
+          <div class="skill-description-card">
+            <span (click)="removeSkill(skill.getId())" aria-hidden="true">
+              <i class="far fa-square-full"style="color:red"></i>
+            </span>
+            <a [attr.href]="getSkillEditorUrl(skill.getId())" target="_blank" rel="noopener">
+              {{skill.getDescription()}}
+            </a>
+          </div>
+        </mat-card>
+        <button class="btn btn-success btn-sm" (click)="addSkill()">Link Another Skill</button>
+      </div>
+      <oppia-question-editor [questionId]="questionId" [misconceptionsBySkill]="misconceptionsBySkill" [questionStateData]="questionStateData" [question]="question" [userCanEditQuestion]="canEditQuestion">
+      </oppia-question-editor>
+      <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">
+        {{question.getValidationErrorMessage()}}
+      </div>
+    </div>
+    <mat-card class="question-data-container" *ngIf="!editorIsOpen">
+      <div class="question-list-container">
+        <div class="list-header">
+          <h3>Question List</h3>
+        </div>
+        <div *ngIf="questionSummariesForOneSkill.length === 0">
+          <span>
+            There are no questions in this skill.
+          </span>
+        </div>
+        <div *ngIf="questionSummariesForOneSkill.length > 0">
+          <div *ngFor="let questionSummaryForOneSkill of questionSummariesForOneSkill; let index = index" class="question-list-item e2e-test-question-list-item">
+            <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
+              (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
+              <div class="question-data">
+                <oppia-rte-output-display classStr="question-text" [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
+                </oppia-rte-output-display>
+                <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
+                <span (click)="deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();" class="link-off-icon">
+                  <i class="fas fa-unlink"></i>
+                </span>
+              </div>
+              <div class="question-interaction-id">
+                <span>{{questionSummaryForOneSkill.getQuestionSummary().getInteractionId()}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="page-navigation-arrows" *ngIf="questionSummariesForOneSkill.length > 0">
+          <i class="fas fa-arrow-left md-18" *ngIf="getCurrentPageNumber() !== 0" (click)="goToPreviousPage()">
+          </i> Page {{getCurrentPageNumber() + 1}}
+          <i class="fas fa-arrow-right md-18" *ngIf="!isLastPage()" (click)="goToNextPage()"></i>
         </div>
       </div>
     </mat-card>
-    <div *ngIf="!newQuestionIsBeingCreated" class="linked-skills-container">
-      <h4> <strong> Linked Skills </strong> </h4>
-      <mat-card class="question-skill-id" *ngFor="let skill of associatedSkillSummaries">
-        <div class="skill-description-card">
-          <span (click)="removeSkill(skill.getId())" aria-hidden="true">
-            <i class="material-icons oppia-cross-icon md-18">&#xE14C;</i>
-          </span>
-          <a [attr.href]="getSkillEditorUrl(skill.getId())" target="_blank" rel="noopener">
-            {{skill.getDescription()}}
-          </a>
-        </div>
-      </mat-card>
-      <button class="btn btn-success btn-sm" (click)="addSkill()">Link Another Skill</button>
-    </div>
-    <oppia-question-editor [questionId]="questionId"
-                           [misconceptionsBySkill]="misconceptionsBySkill"
-                           [questionStateData]="questionStateData"
-                           [question]="question"
-                           [userCanEditQuestion]="canEditQuestion">
-    </oppia-question-editor>
-    <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">
-      {{question.getValidationErrorMessage()}}
-    </div>
-  </div>
-  <mat-card class="question-data-container" *ngIf="!editorIsOpen">
-    <div class="question-list-container">
-      <div class="list-header">
-        <h3>Question List</h3>
-      </div>
-      <div *ngIf="questionSummariesForOneSkill.length === 0">
-        <span>
-          There are no questions in this skill.
-        </span>
-      </div>
-      <div *ngIf="questionSummariesForOneSkill.length > 0">
-        <div *ngFor="let questionSummaryForOneSkill of questionSummariesForOneSkill; let index = index" class="question-list-item e2e-test-question-list-item">
-          <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
-               (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
-            <div class="question-data">
-              <oppia-rte-output-display classStr="question-text"
-                                         [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
-              </oppia-rte-output-display>
-              <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
-              <span (click)="deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();"
-                    class="link-off-icon">
-                <i class="fas fa-unlink"></i>
-              </span>
-            </div>
-            <div class="question-interaction-id">
-              <span>{{questionSummaryForOneSkill.getQuestionSummary().getInteractionId()}}</span>
-            </div>
+    <mat-card class="question-data-container question-editor-open-container" *ngIf="editorIsOpen">
+      <div class="save-question-container">
+        <div>
+          <div class="list-header">
+            <h3>New Question</h3>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': linkedSkillsWithDifficulty.length}"><span>1</span></div>
+            <div class="checklist-item-text">Difficulty</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().content.html.length}">2</div>
+            <div class="checklist-item-text">Problem</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.id}">3</div>
+            <div class="checklist-item-text">Interaction</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.answerGroups.length}">4</div>
+            <div class="checklist-item-text">Answers and Responses</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.hints.length}">5</div>
+            <div class="checklist-item-text">Hints</div>
+          </div>
+          <div class="checklist-item-separator" *ngIf="showSolutionCheckpoint()"></div>
+          <div class="checklist-item" *ngIf="showSolutionCheckpoint()">
+            <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.solution}">6</div>
+            <div class="checklist-item-text">Solution</div>
           </div>
         </div>
       </div>
-      <div class="page-navigation-arrows" *ngIf="questionSummariesForOneSkill.length > 0">
-        <i class="fas fa-arrow-left md-18"
-           *ngIf="getCurrentPageNumber() !== 0"
-           (click)="goToPreviousPage()">
-        </i> Page {{getCurrentPageNumber() + 1}}
-        <i class="fas fa-arrow-right md-18" *ngIf="!isLastPage()" (click)="goToNextPage()"></i>
-      </div>
-    </div>
-  </mat-card>
-  <mat-card class="question-data-container question-editor-open-container" *ngIf="editorIsOpen">
-    <div class="save-question-container">
-      <div>
-        <div class="list-header">
-          <h3>New Question</h3>
-        </div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': linkedSkillsWithDifficulty.length}"><span>1</span></div>
-          <div class="checklist-item-text">Difficulty</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().content.html.length}">2</div>
-          <div class="checklist-item-text">Problem</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.id}">3</div>
-          <div class="checklist-item-text">Interaction</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.answerGroups.length}">4</div>
-          <div class="checklist-item-text">Answers and Responses</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.hints.length}">5</div>
-          <div class="checklist-item-text">Hints</div>
-        </div>
-        <div class="checklist-item-separator" *ngIf="showSolutionCheckpoint()"></div>
-        <div class="checklist-item" *ngIf="showSolutionCheckpoint()">
-          <div class="checklist-item-number" [ngClass]="{'checklist-item-number-active': question.getStateData().interaction.solution}">6</div>
-          <div class="checklist-item-text">Solution</div>
-        </div>
-      </div>
-    </div>
-    <div class="save-question-button-container">
-      <button class="btn question-edit-cancel-button" (click)="cancel()">CANCEL</button>
-      <button title="To Save please add: interaction, hint, solution and address all misconceptions"
-              class="btn add-question-btn question-edit-save-button e2e-test-save-question-button"
-              (click)="saveQuestion()"
-              [disabled]="!isQuestionSavable()">
-        SAVE
-      </button>
-    </div>
-  </mat-card>
-  <div class="create-question-container" *ngIf="!editorIsOpen">
-    <mat-card class="oppia-page-card">
-      <div>
-        <div class="list-header create-question-header">
-          <h3>Create a new question</h3>
-        </div>
-        <button class="btn add-question-btn e2e-test-create-question-button oppia-autofocus"
-                [disabled]="selectSkillModalIsShown && !selectedSkillId"
-                (click)="createQuestion()" focus-on="newQuestionBtn">
-          + ADD QUESTION
+      <div class="save-question-button-container">
+        <button class="btn question-edit-cancel-button" (click)="cancel()">CANCEL</button>
+        <button title="To Save please add: interaction, hint, solution and address all misconceptions" class="btn add-question-btn question-edit-save-button e2e-test-save-question-button" (click)="saveQuestion()" [disabled]="!isQuestionSavable()">
+          SAVE
         </button>
       </div>
     </mat-card>
+    <div class="create-question-container" *ngIf="!editorIsOpen">
+      <mat-card class="oppia-page-card">
+        <div>
+          <div class="list-header create-question-header">
+            <h3>Create a new question</h3>
+          </div>
+          <button class="btn add-question-btn e2e-test-create-question-button oppia-autofocus" [disabled]="selectSkillModalIsShown && !selectedSkillId" (click)="createQuestion()" focus-on="newQuestionBtn">
+            + ADD QUESTION
+          </button>
+        </div>
+      </mat-card>
+    </div>
   </div>
-</div>
-
-<style>
-  mat-card.oppia-autofocus:focus {
-    outline: #000;
-    outline-width: 4px;
-  }
-  .oppia-editor-publish-button {
-    margin-top: 2%;
-  }
-  .question-data-container {
-    margin: 0;
-    max-height: 68vh;
-    min-height: 68vh;
-    overflow-y: scroll;
-    padding: 0;
-    width: 60%;
-  }
-  .question-editor-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin: 60px auto 0;
-    width: 70%;
-  }
-  .question-edit-cancel-button {
-    margin-left: 8%;
-  }
-  .question-edit-save-button {
-    margin-right: 8%;
-    text-align: center;
-    width: 90px;
-  }
-  .question-list-container,
-  .save-question-container {
-    padding: 0 20px 20px;
-  }
-  .create-question-container {
-    width: 35%;
-  }
-  .list-header {
-    border-bottom: 2px solid #000;
-    display: flex;
-    justify-content: space-between;
-    margin: 25px 0;
-  }
-  .question-list-item {
-    border-bottom: 1px solid #e3e3e3;
-    padding: 10px 12px;
-  }
-  .question-data {
-    cursor: pointer;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  .create-question-header {
-    border-bottom: none;
-    margin: 0;
-  }
-  .question-text {
-    width: 90%;
-  }
-  .page-navigation-arrows {
-    float: right;
-  }
-  .add-question-btn {
-    background-color: #008098;
-    color: #fff;
-    font-weight: bold;
-    text-align: center;
-  }
-  .add-question-btn .btn.disabled, .btn:disabled {
-    cursor: not-allowed;
-  }
-  .question-editor-parent {
-    width: 60%;
-  }
-  .question-editor-open-container {
-    margin-right: -29px;
-    padding-bottom: 10px;
-    position: sticky;
-    top: 27%;
-    width: 38%;
-  }
-  .checklist-item {
-    display: flex;
-  }
-  .checklist-item-number {
-    align-items: center;
-    background-color: #fff;
-    border: 1.5px solid #419889;
-    border-radius: 50%;
-    color: #419889;
-    display: flex;
-    font-size: 12px;
-    height: 22px;
-    justify-content: center;
-    text-align: center;
-    width: 22px;
-  }
-  .checklist-item-number-active {
-    background-color: #419889;
-    color: #fff;
-  }
-  .checklist-item-separator {
-    background-color: #419889;
-    height: 20px;
-    margin: 2px 10px;
-    width: 2px;
-  }
-  .difficulty-selection-container {
-    display: flex;
-    flex-direction: column;
-  }
-  .new-question-header {
-    border-bottom: 2px solid #000;
-    display: flex;
-    justify-content: space-between;
-    margin: 25px 0;
-  }
-  .question-skill-id {
-    background-color: #efefef;
-    margin-left: 0;
-  }
-  .question-skill-id:hover {
-    background-color: #e0e0e0;
-  }
-  .skill-description-card {
-    padding-left: 10px;
-    padding-top: 10px;
-  }
-  .checklist-item-text {
-    margin-left: 5px;
-  }
-  .btn-success[disabled] {
-    background-color: #008098;
-  }
-  .save-question-button-container {
-    border-top: 1px solid #000;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-    padding-top: 20px;
-  }
-  .oppia-cross-icon {
-    color: #f00;
-  }
-  .linked-skills-container {
-    margin-top: 40px;
-  }
-  .difficulty-card-header {
-    display: flex;
-    justify-content: space-between;
-  }
-  .difficulty-card-header i {
-    display: none;
-  }
-  .question-interaction-id {
-    color: #707070;
-  }
-  .list-group {
-    gap: 10px;
-  }
-  @media screen and (max-width: 768px) {
-    .question-editor-container {
-      margin-top: 30px;
-      width: 100%;
-    }
-    .question-data-container {
-      margin-left: 0;
-      margin-right: 0;
-      margin-top: 30px;
-      order: 10;
-      padding: 0;
-      width: 100%;
-    }
-    .create-question-container {
-      width: 100%;
-    }
-    .question-editor-parent {
-      width: 100%;
-    }
-
-    .create-question-header h3 {
-      margin: 0;
-    }
-    .create-question-container mat-card {
-      padding: 25px;
-    }
-    .create-question-header {
-      padding-bottom: 25px;
-    }
-    .questions {
-      margin-bottom: 70px;
-    }
-    .difficulty-card-header i {
-      display: block;
-    }
-    .difficulty-card-header h3 {
-      margin: 0;
-    }
-    .question-editor-open-container {
-      position: inherit;
-    }
-  }
-</style>
+</body>
+</html>
