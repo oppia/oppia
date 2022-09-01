@@ -516,7 +516,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         Returns:
             bool. Returns True if all the rules inside the answer_group is
-            invalid
+            invalid.
         """
         invalid_rules = []
         lower_infinity = float('-inf')
@@ -783,7 +783,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         Returns:
             bool. Returns True if all the rules inside the answer_group is
-            invalid
+            invalid.
         """
         invalid_rules = []
         lower_infinity = float('-inf')
