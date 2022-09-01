@@ -291,5 +291,4 @@ exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
 exports.numberOfElementsToBe = numberOfElementsToBe;
-exports.numberOfChainedElementsToBe = numberOfChainedElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;
