@@ -694,6 +694,21 @@ class EditExpStatePropertyUnclassifiedAnswersCmd(ExplorationChange):
     old_value: List[state_domain.AnswerGroup]
 
 
+class EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd(
+    ExplorationChange
+):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
+    as allowed value.
+    """
+
+    property_name: Literal['content_ids_to_audio_translations']
+    state_name: str
+    new_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+    old_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+
+
 class EditExplorationPropertyTitleCmd(ExplorationChange):
     """Class representing the ExplorationChange's
     CMD_EDIT_EXPLORATION_PROPERTY command with

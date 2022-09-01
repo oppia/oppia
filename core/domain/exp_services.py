@@ -500,9 +500,8 @@ def apply_change_list(
                         change
                     )
                     state.update_param_changes(list(map(
-                            to_param_domain, edit_param_changes_cmd.new_value)
-                        )
-                    )
+                        to_param_domain, edit_param_changes_cmd.new_value
+                    )))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     # Here we use cast because this 'elif' condition forces
                     # change to have type EditExpStatePropertyContentCmd.
@@ -613,16 +612,16 @@ def apply_change_list(
                         exp_domain.EditExpStatePropertyInteractionHintsCmd,
                         change
                     )
-                    hint_dict_list = (
+                    hint_dicts = (
                         edit_state_interaction_hints_cmd.new_value
                     )
-                    if not isinstance(hint_dict_list, list):
+                    if not isinstance(hint_dicts, list):
                         raise Exception(
                             'Expected hints_list to be a list,'
-                            ' received %s' % hint_dict_list)
+                            ' received %s' % hint_dicts)
                     new_hints_list = [
                         state_domain.Hint.from_dict(hint_dict)
-                        for hint_dict in hint_dict_list
+                        for hint_dict in hint_dicts
                     ]
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==

@@ -27,7 +27,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Callable, Dict, List, Optional, Union, cast
+from typing import Callable, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -253,20 +253,21 @@ class DraftUpgradeUtil:
                 # is allowed to have HTML in the solution correct answer
                 # The typecheckings below can be avoided once #9413 is fixed.
                 if new_value['correct_answer']:
-                    # Here we use cast because Solution's correct_answer can be
-                    # of various types but following the implementation we are
-                    # assured that the correct_answer is always going to be of
-                    # type List[List[str]].
-                    correct_answer = cast(
-                        List[List[str]], new_value['correct_answer']
-                    )
-                    if isinstance(correct_answer, list):
+                    if isinstance(new_value['correct_answer'], list):
                         for list_index, html_list in enumerate(
-                                correct_answer):
+                                new_value['correct_answer']):
                             if isinstance(html_list, list):
                                 for answer_html_index, answer_html in enumerate(
                                         html_list):
                                     if isinstance(answer_html, str):
+                                        # Here we use cast because all
+                                        # of the above 'if' conditions
+                                        # forces 'correct_answer' to be
+                                        # of type List[List[str]].
+                                        correct_answer = cast(
+                                            List[List[str]],
+                                            new_value['correct_answer']
+                                        )
                                         correct_answer[list_index][
                                             answer_html_index] = (
                                                 conversion_fn(answer_html))
@@ -849,8 +850,10 @@ class DraftUpgradeUtil:
                     exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
                     change
                 )
-                recorded_voiceovers = edit_recorded_voiceovers_cmd.new_value
-                new_voiceovers_mapping = recorded_voiceovers[
+                recorded_voiceovers_dict = (
+                    edit_recorded_voiceovers_cmd.new_value
+                )
+                new_voiceovers_mapping = recorded_voiceovers_dict[
                     'voiceovers_mapping'
                 ]
                 # Initialize the value to migrate draft state to v31.
@@ -951,14 +954,15 @@ class DraftUpgradeUtil:
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED):  # pylint: disable=line-too-long
-                # Here we use cast because in this 'if clause' we are
-                # updating the voiceovers_mapping of a draft_change_list
-                # which can only be of type Dict[str, Dict[str, VoiceoverDict
-                # ]]. So, to rule out all other property types for MyPy
-                # type checking, we used cast here.
-                voiceovers_dict = cast(
-                    Dict[str, Dict[str, state_domain.VoiceoverDict]],
-                    change.new_value
+                # Here we use cast because this 'if'
+                # condition forces change to have type
+                # EditExpStatePropertyContentIdToAudioTranslationsDeprecatedCmd.
+                content_ids_to_audio_translations_cmd = cast(
+                    exp_domain.EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd,  # pylint: disable=line-too-long
+                    change
+                )
+                voiceovers_dict = (
+                    content_ids_to_audio_translations_cmd.new_value
                 )
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
