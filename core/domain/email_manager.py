@@ -1981,43 +1981,40 @@ def send_mail_to_notify_contributor_ranking_achievement(
         contributor_ranking_email_info.contributor_user_id
     ).can_receive_email_updates
 
-    if not can_user_receive_email:
-        logging.error('This user can not receive emails.')
-        return
+    if can_user_receive_email:
+        email_template = CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION[
+            contributor_ranking_email_info.contribution_type][
+                contributor_ranking_email_info.contribution_subtype]
+        email_body = ''
+        if contributor_ranking_email_info.contribution_type == (
+            feconf.CONTRIBUTION_TYPE_TRANSLATION):
+            # Ruling out the possibility of None for mypy type checking. It is
+            # obvious that for the contribution_type
+            # CONTRIBUTION_TYPE_TRANSLATION the language_code will not be None.
+            assert contributor_ranking_email_info.language_code is not None
+            language = utils.get_supported_audio_language_description(
+                contributor_ranking_email_info.language_code)
+            email_body = email_template['email_body_template'] % (
+                    recipient_username,
+                    contributor_ranking_email_info.rank_name,
+                    language,
+                    feconf.OPPIA_SITE_URL,
+                    feconf.CONTRIBUTOR_DASHBOARD_URL
+                )
+        else:
+            email_body = email_template['email_body_template'] % (
+                    recipient_username,
+                    contributor_ranking_email_info.rank_name,
+                    feconf.OPPIA_SITE_URL,
+                    feconf.CONTRIBUTOR_DASHBOARD_URL
+                )
 
-    email_template = CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION[
-        contributor_ranking_email_info.contribution_type][
-            contributor_ranking_email_info.contribution_subtype]
-    email_body = ''
-    if contributor_ranking_email_info.contribution_type == (
-        feconf.CONTRIBUTION_TYPE_TRANSLATION):
-        # Ruling out the possibility of None for mypy type checking. It is
-        # obvious that for the contribution_type CONTRIBUTION_TYPE_TRANSLATION
-        # the language_code will not be None.
-        assert contributor_ranking_email_info.language_code is not None
-        language = utils.get_supported_audio_language_description(
-            contributor_ranking_email_info.language_code)
-        email_body = email_template['email_body_template'] % (
-                recipient_username,
-                contributor_ranking_email_info.rank_name,
-                language,
-                feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL
-            )
-    else:
-        email_body = email_template['email_body_template'] % (
-                recipient_username,
-                contributor_ranking_email_info.rank_name,
-                feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL
-            )
-
-    _send_email(
-        contributor_ranking_email_info.contributor_user_id,
-        feconf.SYSTEM_COMMITTER_ID,
-        feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
-        email_template['email_subject'], email_body,
-        feconf.NOREPLY_EMAIL_ADDRESS)
+        _send_email(
+            contributor_ranking_email_info.contributor_user_id,
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
+            email_template['email_subject'], email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_accepted_voiceover_application_email(
