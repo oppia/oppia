@@ -529,7 +529,7 @@
 	"I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO": "La réponse doit être supérieure ou égale à zéro.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING": "Le signe moins (-) n’est permis qu’au début.",
 	"I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL": "Les décimales finales en excès ne sont pas acceptées.",
-	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Êtes-vous sûr de vouloir réinitialiser votre code ?",
+	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Êtes-vous sûr(e) de vouloir réinitialiser votre code ?",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Annuler",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Confirmation demandée",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE": "Effacer le code",
