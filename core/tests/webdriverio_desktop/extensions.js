@@ -55,7 +55,6 @@ describe('rich-text components', function() {
       await richTextEditor.addRteComponent('Link', 'https://google.com/', true);
       await richTextEditor.addRteComponent(
         'Video', 'M7lc1UVf-VE', 10, 100, false);
-      await richTextEditor.appendPlainText(' ');
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
       await richTextEditor.addRteComponent(
@@ -128,7 +127,7 @@ describe('Interactions', function() {
   });
 
   it('should pass their own test suites', async function() {
-    await users.createUser('user@interactions.com', 'userInteractions11');
+    await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
 

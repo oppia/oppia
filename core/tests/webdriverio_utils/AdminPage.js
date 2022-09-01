@@ -191,8 +191,6 @@ var AdminPage = function() {
           .$(removeRuleButtonLocator)
       );
     }
-
-    return null;
   };
 
   // Remove this method after the end_chapter_celebration feature flag
