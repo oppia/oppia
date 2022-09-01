@@ -18,7 +18,7 @@
 
 import commonConstants from 'assets/constants';
 
-let MAX_CARD_COUNT_FOR_VALID_REDIRECTION = 3;
+const MAX_CARD_COUNT_FOR_VALID_REDIRECTION = 3;
 
 export const AppConstants = {
   ...commonConstants,
@@ -73,8 +73,8 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
-    INVALID_REDIRECTION: `Learner should not be directed back by more` +
-      ` than ${MAX_CARD_COUNT_FOR_VALID_REDIRECTION} cards in the lesson.`
+    INVALID_REDIRECTION: 'Learner should not be directed back by more than' +
+      ' ' + MAX_CARD_COUNT_FOR_VALID_REDIRECTION + ' cards in the lesson.'
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
@@ -118,7 +118,7 @@ export const AppConstants = {
 
   // Maximum number of states the learner can be directed back from a state
   // by an editor in an exploration.
-  MAX_CARD_COUNT_FOR_VALID_REDIRECTION: 3,
+  MAX_CARD_COUNT_FOR_VALID_REDIRECTION: MAX_CARD_COUNT_FOR_VALID_REDIRECTION,
 
   // Do not modify these, for backwards-compatibility reasons. These strings are
   // used to identify components, to generate content ids, and to determine what
