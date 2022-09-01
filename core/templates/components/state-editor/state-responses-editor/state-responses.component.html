@@ -26,8 +26,8 @@
                  [ngClass]="{'active': activeAnswerGroupIndex === index}"
                  class="oppia-sortable-rule-block oppia-prevent-selection">
 
-              <span class="oppia-rule-sort-handle" *ngIf="answerGroups.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
-                <span *ngIf="editabilityService.isEditable()" class="material-icons draggable-icon-indicator">drag_indicator</span>
+              <span class="oppia-rule-sort-handle" *ngIf="answerGroups?.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
+                <span *ngIf="editabilityService.isEditable()" class="fas fa-grip-vertical draggable-icon-indicator"></span>
               </span>
 
               <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
@@ -155,34 +155,34 @@
           </div>
           <div class="pt-4">
             <h4 class="pl-3" *ngIf="containsOptionalMisconceptions">Optional</h4>
-            <div *ngFor="let misconception of misconceptionsBySkill | keyvalue; let index = index">
-              <div *ngFor="let misconception of misconception.skill">
+            <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue; let index = index">
+              <div *ngFor="let misconception of skillWithMisconceptions.value">
                 <div *ngIf="!misconception.isMandatory()"
                      class="misconception-list-item optional-misconception-list-item"
-                     [ngClass]="{'optional-misconception-list-no-action': isNoActionExpected(misconception.skillId + '-' + misconception.getId())}">
+                     [ngClass]="{'optional-misconception-list-no-action': isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())}">
                   <div>
                     <div>
                       {{misconception.getName()}}
-                      <span class="pl-3" *ngIf="!isNoActionExpected(misconception.skillId + '-' + misconception.getId())">⚠️</span>
+                      <span class="pl-3" *ngIf="!isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())">⚠️</span>
                     </div>
                     <div class="small text-muted" ng-bind="getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId())"></div>
                   </div>
-                  <div *ngIf="misconception.skillId + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
-                    <div *ngIf="inapplicableSkillMisconceptionIds.includes(misconception.skillId + '-' + misconception.getId())"
-                         (click)="updateOptionalMisconceptionIdStatus(misconception.skillId + '-' + misconception.getId(), true)"
+                  <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
+                    <div *ngIf="inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
+                         (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), true)"
                          (mouseleave)="setActiveEditOption(null)">
                         Mark as "Applicable"
                     </div>
-                    <div *ngIf="!inapplicableSkillMisconceptionIds.includes(misconception.skillId + '-' + misconception.getId())"
-                         (click)="updateOptionalMisconceptionIdStatus(misconception.skillId + '-' + misconception.getId(), false)"
+                    <div *ngIf="!inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
+                         (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), false)"
                          (mouseleave)="setActiveEditOption(null)">
                         Mark as "Not Applicable"
                     </div>
                   </div>
                   <div *ngIf="editabilityService.isEditable()"
-                       (click)="setActiveEditOption(misconception.skillId + '-' + misconception.getId())"
+                       (click)="setActiveEditOption(skillWithMisconceptions.key + '-' + misconception.getId())"
                        class="fas fa-ellipsis-v optional-misconception-options-button"
-                       [ngClass]="{'d-none': getOptionalSkillMisconceptionStatus(misconception.skillId + '-' + misconception.getId()) === 'Assigned'}">
+                       [ngClass]="{'d-none': getOptionalSkillMisconceptionStatus(skillWithMisconceptions.key + '-' + misconception.getId()) === 'Assigned'}">
                   </div>
                 </div>
               </div>

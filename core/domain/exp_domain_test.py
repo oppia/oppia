@@ -36,7 +36,7 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List
+from typing import Dict, List, Tuple, Union
 from typing_extensions import Final
 
 MYPY = False
@@ -238,8 +238,8 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
             assets_list)
         self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -586,31 +586,33 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.end_state = state_domain.State.create_default_state('End')
         self.set_interaction_for_state(self.end_state, 'EndExploration')
 
-        self.end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        self.end_state.update_interaction_default_outcome(None)
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
-        self.init_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
+        self.init_state.update_card_is_checkpoint(False)
         with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of first state to '
             'be True but found it to be False'):
             self.exploration.validate(strict=True)
-        self.init_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
+        self.init_state.update_card_is_checkpoint(True)
 
     def test_end_state_with_card_is_checkpoint_true_is_invalid(self) -> None:
         default_outcome = self.init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
         default_outcome.dest = self.exploration.init_state_name
-        self.init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+        self.init_state.update_interaction_default_outcome(default_outcome)
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
             'End': self.end_state
         }
-        self.end_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
+        self.end_state.update_card_is_checkpoint(True)
         with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of terminal state '
             'to be False but found it to be True'):
             self.exploration.validate(strict=True)
-        self.end_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
+        self.end_state.update_card_is_checkpoint(False)
 
     def test_init_state_checkpoint_with_end_exp_interaction_is_valid(
         self
@@ -622,9 +624,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.exploration.objective = 'Objective'
         self.exploration.title = 'Title'
         self.exploration.category = 'Category'
-        self.end_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
+        self.end_state.update_card_is_checkpoint(True)
         self.exploration.validate(strict=True)
-        self.end_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
+        self.end_state.update_card_is_checkpoint(False)
 
     def test_checkpoint_count_with_count_outside_range_is_invalid(self) -> None:
         self.exploration.init_state_name = 'Introduction'
@@ -744,9 +746,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             )
         ]
-        self.init_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        self.init_state.update_interaction_answer_groups(
             init_state_answer_groups)
-        third_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        third_state.update_interaction_answer_groups(
             third_state_answer_groups)
 
         # The exploration can be completed via third_state. Hence, making
@@ -797,15 +799,15 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        second_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        second_state.update_interaction_answer_groups(
             second_state_answer_groups)
 
         # Reset the answer group dicts of third_state.
-        third_state.update_interaction_answer_groups([])  # type: ignore[no-untyped-call]
+        third_state.update_interaction_answer_groups([])
 
         # As second_state is now connected to end_state and third_state has no
         # outcome, second_state has become non-bypassable.
-        second_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
+        second_state.update_card_is_checkpoint(True)
         self.exploration.validate()
 
         # Reset the exploration.
@@ -957,26 +959,26 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        self.init_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        self.init_state.update_interaction_answer_groups(
             init_state_answer_groups)
-        a_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        a_state.update_interaction_answer_groups(
             a_and_b_state_answer_groups)
-        b_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        b_state.update_interaction_answer_groups(
             a_and_b_state_answer_groups)
-        c_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        c_state.update_interaction_answer_groups(
             c_and_d_state_answer_groups)
-        d_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        d_state.update_interaction_answer_groups(
             c_and_d_state_answer_groups)
 
         # As a user can complete the exploration by going through c_state,
         # d_state becomes bypassable. Hence, making d_state a checkpoint raises
         # validation error.
-        d_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
+        d_state.update_card_is_checkpoint(True)
         with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
-        d_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
+        d_state.update_card_is_checkpoint(False)
 
         # Modifying the graph to make D non-bypassable.
         #                ┌────────────────┐
@@ -1020,10 +1022,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             )
         ]
-        c_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        c_state.update_interaction_answer_groups(
             c_state_answer_groups)
 
-        d_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
+        d_state.update_card_is_checkpoint(True)
         self.exploration.validate()
 
         # Modifying the graph to add another EndExploration state.
@@ -1047,7 +1049,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         new_end_state = state_domain.State.create_default_state('End 2')
         self.set_interaction_for_state(new_end_state, 'EndExploration')
-        new_end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        new_end_state.update_interaction_default_outcome(None)
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -1100,14 +1102,14 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             )
         ]
-        c_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        c_state.update_interaction_answer_groups(
             c_state_answer_groups)
 
         with self.assertRaisesRegex(
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
-        d_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
+        d_state.update_card_is_checkpoint(False)
 
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
@@ -1187,9 +1189,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid exploration.
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
         default_outcome.dest = exploration.init_state_name
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
-        init_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_default_outcome(default_outcome)
+        init_state.update_card_is_checkpoint(True)
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -1199,6 +1203,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # default outcome must point to a valid state.
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
         default_outcome.dest = exploration.init_state_name
         old_answer_groups: List[state_domain.AnswerGroupDict] = [
             {
@@ -1232,7 +1238,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
         ]
-        init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups(new_answer_groups)
 
         exploration.validate()
 
@@ -1266,7 +1272,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict(answer_groups)
             for answer_groups in old_answer_groups
         ]
-        init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
         answer_group.outcome.dest = exploration.init_state_name
@@ -1311,7 +1317,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
         ]
-        init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         old_answer_groups[0]['rule_specs'][0] = temp_rule
 
         self._assert_validation_error(
@@ -1329,16 +1335,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome = init_state.interaction.answer_groups[0].outcome
         destination = exploration.init_state_name
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
-        outcome.dest = None  # type: ignore[assignment]
+        outcome.dest = None
         self._assert_validation_error(
             exploration, 'Every outcome should have a destination.')
 
         outcome.dest = destination
 
         default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
 
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
@@ -1489,7 +1494,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
         ]
-        init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
         rule_spec.inputs = {'x': {
             'contentId': 'rule_input_Equals',
@@ -1543,14 +1548,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
         ]
-        init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
         self.set_interaction_for_state(init_state, 'TextInput')
-        init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
@@ -1568,8 +1573,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(init_state, 'TextInput')
-        init_state.update_interaction_answer_groups(answer_groups)  # type: ignore[no-untyped-call]
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups(answer_groups)
+        init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
@@ -1583,12 +1588,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
-        init_state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_solution(solution)
         self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
 
-        init_state.update_interaction_solution(None)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_solution(None)
 
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
@@ -1621,7 +1626,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             [],
             1  # type: ignore[arg-type]
         )
-        init_state.update_interaction_answer_groups([state_answer_group])  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         self._assert_validation_error(
             exploration,
@@ -1645,7 +1650,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             [],
             'invalid_tagged_skill_misconception_id'
         )
-        init_state.update_interaction_answer_groups([state_answer_group])  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         self._assert_validation_error(
             exploration,
@@ -1710,7 +1715,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'EndExploration')
-        init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
         # TODO(#13059): After we fully type the codebase we plan to get
@@ -1793,8 +1798,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[List[str]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+        assets_list: List[Tuple[str, bytes]] = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
 
@@ -1924,7 +1929,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states[  # type: ignore[no-untyped-call]
+        exploration.states[
             feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
                 written_translations)
 
@@ -1937,19 +1942,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_translation_counts(), {})
 
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_content(  # type: ignore[no-untyped-call]
+        init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': '<p>This is content</p>'
             }))
-        init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
+        init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
 
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_default_outcome(default_outcome)
 
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
@@ -1969,21 +1974,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        init_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
+        init_state.update_written_translations(written_translations)
 
         exploration.add_states(['New state'])
         new_state = exploration.states['New state']
-        new_state.update_content(  # type: ignore[no-untyped-call]
+        new_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': '<p>This is content</p>'
             }))
-        new_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
+        new_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None)
-        new_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+        new_state.update_interaction_default_outcome(default_outcome)
 
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
@@ -2003,7 +2008,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        new_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
+        new_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 4})
@@ -2014,18 +2019,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_translation_counts(), {})
 
         init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
-        init_state.update_content(  # type: ignore[no-untyped-call]
+        init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': '<p>This is content</p>'
             }))
-        init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
+        init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_default_outcome(default_outcome)
 
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
@@ -2045,7 +2050,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        init_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 1})
@@ -2057,19 +2062,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.get_translation_counts(), {})
         init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
-        init_state.update_content(  # type: ignore[no-untyped-call]
+        init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
                 'html': '<p>This is content</p>'
             }))
-        init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
+        init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
             'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
 
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_default_outcome(default_outcome)
 
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
@@ -2094,7 +2099,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        init_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {
@@ -2134,7 +2139,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             None
         )
         # Adds 1 to content count to exploration (feedback_1).
-        init_state.update_interaction_answer_groups([state_answer_group])  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         hints_list = [
             state_domain.Hint(
@@ -2142,7 +2147,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         # Adds 1 to content count to exploration (hint_1).
-        init_state.update_interaction_hints(hints_list)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_hints(hints_list)
 
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
@@ -2157,7 +2162,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         # Adds 1 to content count to exploration (solution).
-        init_state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 6)
 
@@ -2194,14 +2199,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
             )
         ]
-        init_state.update_interaction_hints(hints_list)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
             '<p>hint one</p>')
 
         hints_list[0].hint_content.html = '<p>Changed hint one</p>'
-        init_state.update_interaction_hints(hints_list)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
@@ -2217,7 +2222,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
             )
         ]
-        init_state.update_interaction_hints(hints_list)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
@@ -2385,7 +2390,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='', end_state_name='End')
         exploration.validate()
 
-        exploration.init_state.interaction.default_outcome.dest = None  # type: ignore[assignment]
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.default_outcome is not None
+        exploration.init_state.interaction.default_outcome.dest = None
         with self.assertRaisesRegex(
             Exception, 'Every outcome should have a destination.'):
             exploration.validate()
@@ -2399,6 +2406,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='', end_state_name='End')
         exploration.validate()
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.default_outcome is not None
         exploration.init_state.interaction.default_outcome.dest = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected outcome dest to be a string, received 1'):
@@ -2544,7 +2553,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], 'refresher_exploration_id', None,
         )
-        exploration.init_state.update_interaction_default_outcome(  # type: ignore[no-untyped-call]
+        exploration.init_state.update_interaction_default_outcome(
             default_outcome
         )
 
@@ -2584,7 +2593,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
-        exploration.init_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        exploration.init_state.update_interaction_answer_groups(
             [state_answer_group])
         with self.assertRaisesRegex(
             Exception,
@@ -2600,7 +2609,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['End'])
         end_state = exploration.states['End']
         self.set_interaction_for_state(end_state, 'EndExploration')
-        end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        end_state.update_interaction_default_outcome(None)
 
         with self.assertRaisesRegex(
             Exception,
@@ -2644,6 +2653,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', 'user@example.com', title='title', category='category',
             objective='objective', end_state_name='End')
         exploration.validate(strict=True)
+        # Ruling out the possibility of None for mypy type checking.
+        assert (
+            exploration.init_state.interaction.default_outcome is not None
+        )
 
         (
             exploration.init_state.interaction.default_outcome
@@ -2722,7 +2735,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_interaction_cust_args = {
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -2731,20 +2746,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rows': {'value': 1}
         }
-        state.update_next_content_id_index(3)  # type: ignore[no-untyped-call]
-        state.update_content(  # type: ignore[no-untyped-call]
+        state.update_next_content_id_index(3)
+        state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
-        state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
-        state.update_interaction_customization_args(state_interaction_cust_args)  # type: ignore[no-untyped-call]
-        state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
+        state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args(state_interaction_cust_args)
+        state.update_interaction_answer_groups(
             state_answer_group)
-        state.update_interaction_default_outcome(state_default_outcome)  # type: ignore[no-untyped-call]
-        state.update_interaction_hints(state_hint_list)  # type: ignore[no-untyped-call]
+        state.update_interaction_default_outcome(state_default_outcome)
+        state.update_interaction_hints(state_hint_list)
         # Ruling out the possibility of None for mypy type checking.
         assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
-        state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
+        state.update_interaction_solution(solution)
         translatable_contents = [
             translatable_content.content_value
             for translatable_content in
@@ -2772,7 +2787,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)
         self.exp_summary = exp_fetchers.get_exploration_summary_by_id('eid')
         self.exp_summary.editor_ids = ['editor_id']
         self.exp_summary.voice_artist_ids = ['voice_artist_id']
@@ -5830,13 +5845,13 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>Hello, this is state4</p>'
         }
-        state1.update_content(  # type: ignore[no-untyped-call]
+        state1.update_content(
             state_domain.SubtitledHtml.from_dict(content1_dict))
-        state2.update_content(  # type: ignore[no-untyped-call]
+        state2.update_content(
             state_domain.SubtitledHtml.from_dict(content2_dict))
-        state3.update_content(  # type: ignore[no-untyped-call]
+        state3.update_content(
             state_domain.SubtitledHtml.from_dict(content3_dict))
-        state4.update_content(  # type: ignore[no-untyped-call]
+        state4.update_content(
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
         self.set_interaction_for_state(state1, 'TextInput')
@@ -5844,7 +5859,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
         self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
-        customization_args_dict1 = {
+        customization_args_dict1: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -5853,7 +5870,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             },
             'rows': {'value': 1}
         }
-        customization_args_dict2 = {
+        customization_args_dict2: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {'value': [
                 {
                     'content_id': 'ca_choices_0',
@@ -5866,7 +5885,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             ]},
             'showChoicesInShuffledOrder': {'value': True}
         }
-        customization_args_dict3 = {
+        customization_args_dict3: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'choices': {'value': [
                 {
                     'content_id': 'ca_choices_0',
@@ -5884,7 +5905,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 2}
         }
-        customization_args_dict4 = {
+        customization_args_dict4: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {'value': [
                 {
                     'content_id': 'ca_choices_0',
@@ -5898,17 +5921,17 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
-        state1.update_interaction_customization_args(customization_args_dict1)  # type: ignore[no-untyped-call]
-        state2.update_interaction_customization_args(customization_args_dict2)  # type: ignore[no-untyped-call]
-        state3.update_interaction_customization_args(customization_args_dict3)  # type: ignore[no-untyped-call]
-        state4.update_interaction_customization_args(customization_args_dict4)  # type: ignore[no-untyped-call]
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state3.update_interaction_customization_args(customization_args_dict3)
+        state4.update_interaction_customization_args(customization_args_dict4)
 
         default_outcome = state_domain.Outcome(
             'state2', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], None, None
         )
-        state1.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+        state1.update_interaction_default_outcome(default_outcome)
 
         hint_list2 = [
             state_domain.Hint(
@@ -5922,7 +5945,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 )
             ),
         ]
-        state2.update_interaction_hints(hint_list2)  # type: ignore[no-untyped-call]
+        state2.update_interaction_hints(hint_list2)
 
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
@@ -5936,7 +5959,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         assert state1.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state1.interaction.id, solution_dict)
-        state1.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
+        state1.update_interaction_solution(solution)
 
         state_answer_group_list2 = [
             state_domain.AnswerGroup(
@@ -5993,8 +6016,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             [],
             None
         )]
-        state2.update_interaction_answer_groups(state_answer_group_list2)  # type: ignore[no-untyped-call]
-        state3.update_interaction_answer_groups(state_answer_group_list3)  # type: ignore[no-untyped-call]
+        state2.update_interaction_answer_groups(state_answer_group_list2)
+        state3.update_interaction_answer_groups(state_answer_group_list3)
 
         expected_html_list = [
             '',
@@ -6045,7 +6068,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'title',
             'new_value': 'First title'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
         test_dict: Dict[str, str] = {}
@@ -6098,7 +6121,7 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'old_value': test_dict
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2, 'Changed Interaction.')
 
         # Changing content of second state.
@@ -6118,15 +6141,15 @@ class ExplorationChangesMergeabilityUnitTests(
 
         # Checking that the changes can be applied when
         # changing to same version.
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Changed content of End state.')
 
@@ -6158,12 +6181,12 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         # Checking for the mergability of the fourth change list.
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
         # Checking for the mergability when working on latest version.
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -6189,7 +6212,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'content_id': 'content'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed Content.')
 
         # Changing content of the same state to check that
@@ -6209,7 +6232,7 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         # Checking for the mergability of the second change list.
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -6286,7 +6309,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'content'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -6342,7 +6365,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -6356,7 +6379,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         # Using the old change_list_3 here because they already covers
         # the changes related to interaction in first state.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_3, 'Changed Interaction')
 
         # Changes related to interaction in the second state
@@ -6439,7 +6462,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'solicit_answer_details',
             'new_value': True
         })]
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 1, change_list_4)
         self.assertEqual(changes_are_mergeable_1, True)
 
@@ -6502,7 +6525,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -6558,7 +6581,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args'
         })]
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -6642,7 +6665,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'content'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed Contents and Hints')
 
@@ -6792,7 +6815,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -6806,7 +6829,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         # Using the old change_list_2 here because they already covers
         # the changes related to customization args in first state.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Changed Interactions and Customization_args in One State')
 
@@ -6932,7 +6955,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ]
         })]
 
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 1, change_list_3)
         self.assertEqual(changes_are_mergeable_1, True)
 
@@ -7087,7 +7110,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'cmd': 'edit_state_property'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed Customization Args and related properties again')
 
@@ -7127,7 +7150,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -7208,7 +7231,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -7268,7 +7291,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'content'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -7305,7 +7328,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'dest': 'End'
             }
         })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -7499,7 +7522,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': True
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -7514,11 +7537,11 @@ class ExplorationChangesMergeabilityUnitTests(
         # Using the old change_list_2 and change_list_3 here
         # because they already covers the changes related to
         # the answer_groups in the first state.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Added Answer Group and Solution in One state')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
@@ -7633,7 +7656,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }]
         })]
 
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 2, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
@@ -7714,7 +7737,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -7902,7 +7925,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Answer Groups and related properties')
 
@@ -7966,7 +7989,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'tagged_skill_misconception_id': None
             }]
         })]
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -8055,7 +8078,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': True
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -8117,7 +8140,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'solicit_answer_details',
             'new_value': True
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
@@ -8308,7 +8331,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': False
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -8323,11 +8346,11 @@ class ExplorationChangesMergeabilityUnitTests(
         # Using the old change_list_2 and change_list_3 here
         # because they already covers the changes related to
         # the solutions in the first state.
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Added Answer Group and Solution in One state')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
@@ -8458,7 +8481,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End'
         })]
 
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 2, change_list_4)
         self.assertEqual(changes_are_mergeable_1, True)
 
@@ -8542,7 +8565,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
@@ -8727,7 +8750,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Solutions and affected properties')
 
@@ -8755,7 +8778,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -8799,7 +8822,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
@@ -8981,7 +9004,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Made changes in interaction, contents, solutions, answer_groups in both states') # pylint: disable=line-too-long
 
@@ -9070,7 +9093,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -9114,7 +9137,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
@@ -9202,7 +9225,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ],
             'state_name': 'Introduction'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changes in the hints again.')
 
@@ -9224,7 +9247,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         })]
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -9418,7 +9441,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 ]
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Made changes in interaction, contents, solutions, answer_groups in introduction state.') # pylint: disable=line-too-long
 
@@ -9484,7 +9507,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_state_name': 'End'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Made changes in solutions in introduction state and content, state_name in end state.') # pylint: disable=line-too-long
 
@@ -9572,7 +9595,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'card_is_checkpoint',
             'new_value': True
         })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -9625,7 +9648,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ]
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changes in the Exploration Properties.')
 
@@ -9668,7 +9691,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ]
         })]
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -9795,7 +9818,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -9833,7 +9856,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'training_data': []
             }]
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added answer group.')
 
@@ -9860,10 +9883,10 @@ class ExplorationChangesMergeabilityUnitTests(
             'content_id': 'default_outcome'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some translations.')
 
@@ -9919,7 +9942,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_state_name': 'Intro-Rename'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -9935,7 +9958,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'data_format': 'html'
         })]
 
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
@@ -10002,10 +10025,10 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Customization Args Placeholder in First State.')
-        changes_are_mergeable_3 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, True)
 
@@ -10167,7 +10190,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -10250,7 +10273,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_state_name': 'Intro-Rename'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added some translations.')
 
@@ -10275,7 +10298,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'content_html': 'N/A'
         })]
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -10296,7 +10319,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'content',
             'cmd': 'edit_state_property'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Changing Content in Second State.')
 
@@ -10311,7 +10334,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'add_written_translation',
             'data_format': 'html'
         })]
-        changes_are_not_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_not_mergeable_1, False)
 
@@ -10440,7 +10463,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -10452,7 +10475,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'card_is_checkpoint',
             'new_value': True
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added single unrelated change.')
 
@@ -10530,11 +10553,11 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property'
         })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some voiceovers.')
 
@@ -10573,7 +10596,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, False)
 
@@ -10603,7 +10626,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End'
         })]
 
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
@@ -10625,10 +10648,10 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Content in First State.')
-        changes_are_mergeable_3 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, True)
 
@@ -10650,11 +10673,11 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Content in Second State.')
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_4)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -10783,7 +10806,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -10862,7 +10885,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added some voiceovers.')
 
@@ -10901,7 +10924,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, False)
 
@@ -11032,7 +11055,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed various properties in both states.')
 
@@ -11052,7 +11075,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -11206,14 +11229,14 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added and deleted states.')
 
         # Checking that old changes that could be
         # merged previously can not be merged after
         # addition or deletion of state.
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -11327,13 +11350,13 @@ class ExplorationChangesMergeabilityUnitTests(
         })]
 
         # Changes are mergeable when updating the same version.
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list)
         self.assertEqual(changes_are_mergeable, True)
 
         # Changes are not mergeable when updating from version
         # more than that on the backend.
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -11469,7 +11492,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'End'
             })]
 
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, change_list,
                 'Changed various properties in both states.')
 
@@ -11620,7 +11643,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'End'
             })]
 
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, change_list_2,
                 'Added and deleted states.')
             change_list_3 = [exp_domain.ExplorationChange({
@@ -11636,7 +11659,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'property_name': 'content',
                 'cmd': 'edit_state_property'
             })]
-            changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+            changes_are_not_mergeable = exp_services.are_changes_mergeable(
                 self.EXP_0_ID, 1, change_list_3)
             self.assertEqual(changes_are_not_mergeable, False)
 
@@ -11695,7 +11718,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'property_name': 'content',
                 'cmd': 'edit_state_property'
             })]
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, change_list,
                 'Changed various properties in both states.')
 
@@ -11706,7 +11729,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'old_state_name': 'End'
             })]
 
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, change_list_2,
                 'Changed various properties in both states.')
 
@@ -11723,7 +11746,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'property_name': 'content',
                 'cmd': 'edit_state_property'
             })]
-            changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+            changes_are_not_mergeable = exp_services.are_changes_mergeable(
                 self.EXP_0_ID, 2, change_list_3)
             self.assertEqual(changes_are_not_mergeable, False)
 
@@ -11766,7 +11789,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'cmd': 'add_written_translation',
                 'data_format': 'html'
             })]
-            changes_are_not_mergeable_2 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+            changes_are_not_mergeable_2 = exp_services.are_changes_mergeable(
                 self.EXP_0_ID, 2, change_list_4)
             self.assertEqual(changes_are_not_mergeable_2, False)
 
