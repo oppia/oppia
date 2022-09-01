@@ -1,0 +1,279 @@
+[
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "6 Donn\u00e9es dangereuses",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "<ul><li><u>les <b>XSS non-persistants (reflected \nXSS)</b></u>: c'est le type de faille XSS<b> le plus connu et le plus courant</b>. Ces \nattaques se produisent lorsque les donn\u00e9es entr\u00e9es par l'utilisateur sont <b>\nimm\u00e9diatement exploit\u00e9es</b> par des scripts c\u00f4t\u00e9 serveur pour g\u00e9n\u00e9rer une page de \nr\u00e9sultat\u00a0\u00e0 l'utilisateur. Si les donn\u00e9es utilisateurs ne sont pas correctement \n\u00e9chapp\u00e9es et valid\u00e9es avant leur affichage, alors le navigateur du client peut \npotentiellement les consid\u00e9rer comme un script qu'il va ex\u00e9cuter. \n</li><li><u>les <b>XSS persistants (stored \nXSS)</b></u>: ces failles conduisent aux attaques XSS <b>les plus puissantes et les plus \ndangereuses</b>. Ce type d'attaque se produit lorsque les donn\u00e9es\u00a0entr\u00e9es par \nl'utilisateur sont <b>stock\u00e9es de mani\u00e8re permanente</b> sur le serveur, puis affich\u00e9es \nult\u00e9rieurement \u00e0 un ou des utilisateurs sans \u00e9chappement ni une \nvalidation\u00a0suffisante pr\u00e9alable. Une seule injection de code XSS peut ainsi \nimpacter de nombreux clients. Dans le cas o\u00f9 une base de donn\u00e9es est partag\u00e9e \npar plusieurs applications, une application peut \u00eatre impact\u00e9e par des donn\u00e9es \nayant transit\u00e9 vers la base de donn\u00e9es via une autre application. \n</li><li><u>les<b> XSS bas\u00e9s sur le\u00a0DOM</b>\u00a0(Document Object \nModel - <b>DOM-based XSS</b>)</u>: ce type de faille est <b>moins connu</b> mais il s'agit n\u00e9anmoins d'une faille<b> dangereuse et difficile \u00e0 d\u00e9tecter</b> (pour le hacker comme pour le programmeur). Ici le code malicieux ne transite pas \npar le serveur. Il <b>s'ex\u00e9cute directement c\u00f4t\u00e9 client via une modification du DOM</b>. Pour donner un exemple simple, le code malicieux peut \u00eatre entr\u00e9e via la commande document.write();<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "6 Donn\u00e9es dangereuses",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "<ul><li><u>les <b>XSS non-persistants (reflected \nXSS)</b></u>: c'est le type de faille XSS<b> le plus connu et le plus courant</b>. Ces \nattaques se produisent lorsque les donn\u00e9es entr\u00e9es par l'utilisateur sont <b>\nimm\u00e9diatement exploit\u00e9es</b> par des scripts c\u00f4t\u00e9 serveur pour g\u00e9n\u00e9rer une page de \nr\u00e9sultat\u00a0\u00e0 l'utilisateur. Si les donn\u00e9es utilisateurs ne sont pas correctement \n\u00e9chapp\u00e9es et valid\u00e9es avant leur affichage, alors le navigateur du client peut \npotentiellement les consid\u00e9rer comme un script qu'il va ex\u00e9cuter. \n</li><li><u>les <b>XSS persistants (stored \nXSS)</b></u>: ces failles conduisent aux attaques XSS <b>les plus puissantes et les plus \ndangereuses</b>. Ce type d'attaque se produit lorsque les donn\u00e9es\u00a0entr\u00e9es par \nl'utilisateur sont <b>stock\u00e9es de mani\u00e8re permanente</b> sur le serveur, puis affich\u00e9es \nult\u00e9rieurement \u00e0 un ou des utilisateurs sans \u00e9chappement ni une \nvalidation\u00a0suffisante pr\u00e9alable. Une seule injection de code XSS peut ainsi \nimpacter de nombreux clients. Dans le cas o\u00f9 une base de donn\u00e9es est partag\u00e9e \npar plusieurs applications, une application peut \u00eatre impact\u00e9e par des donn\u00e9es \nayant transit\u00e9 vers la base de donn\u00e9es via une autre application. \n</li><li><u>les<b> XSS bas\u00e9s sur le\u00a0DOM</b>\u00a0(Document Object \nModel - <b>DOM-based XSS</b>)</u>: ce type de faille est <b>moins connu</b> mais il s'agit n\u00e9anmoins d'une faille<b> dangereuse et difficile \u00e0 d\u00e9tecter</b> (pour le hacker comme pour le programmeur). Ici le code malicieux ne transite pas \npar le serveur. Il <b>s'ex\u00e9cute directement c\u00f4t\u00e9 client via une modification du DOM</b>. </li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "5 D\u00e9tails types de faille XSS",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "10 Outils de d\u00e9tection",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Non, \u00e7a n'est pas tout.<br><ul><li>Pour \u00e9viter le vol de cookie il est utile de param\u00e9trer l'objet <b>session</b> en for\u00e7ant l'attribut <b>&lt;http-only&gt;</b> \u00e0 la valeur <b>true</b>.</li><li>Il faut aussi \u00eatre<b> vigilant</b> sur les <b>biblioth\u00e8ques et les composants</b> que l'on utilise pour programmer. Par d\u00e9faut, la JSF Java \u00e9chappe tout ce qu'elle contient, m\u00eame le texte qui n'est pas inclu dans une balise. Par contre, les premi\u00e8res versions de la biblioth\u00e8que Primefaces contenaient de nombreuses failles XSS. Ces failles ont \u00e9t\u00e9 corrig\u00e9es au fur et \u00e0 mesure et la version 4 semble fiable. <br></li><li>De mani\u00e8re g\u00e9n\u00e9rale, il est important de faire les mises \u00e0 jour de s\u00e9curit\u00e9 des programmes utiliser et d'utiliser, dans la mesure du possible, les derni\u00e8res versions des API et biblioth\u00e8ques java.<br></li><li>Enfin, pour ce qui est du <b>DOM-based XSS</b>, c'est <b>plus compliqu\u00e9</b>. Un d\u00e9veloppeur java qui code une application Java EE en utilisant la JSF et Primefaces n'a pas vraiment la main sur ces aspects. La fin de ce tutorial contient des liens que vous pourrez suivre pour en savoir plus.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "10 Outils de d\u00e9tection",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Non, \u00e7a n'est pas tout.<br><ul><li>Pour \u00e9viter le vol de cookie il est utile de param\u00e9trer l'objet <b>session</b> en for\u00e7ant l'attribut <b>&lt;http-only&gt;</b> \u00e0 la valeur <b>true</b>.</li><li>Il faut aussi \u00eatre<b> vigilant</b> sur les <b>biblioth\u00e8ques et les composants</b> que l'on utilise pour programmer. Par d\u00e9faut, la JSF Java \u00e9chappe tout ce qu'elle contient, m\u00eame le texte qui n'est pas inclu dans une balise. Par contre, les premi\u00e8res versions de la biblioth\u00e8que Primefaces contenaient de nombreuses failles XSS. Ces failles ont \u00e9t\u00e9 corrig\u00e9es au fur et \u00e0 mesure et la version 4 semble fiable.\u00a0</li><li>Enfin, pour ce qui est du <b>DOM-based XSS</b>, c'est <b>plus compliqu\u00e9</b>. Un d\u00e9veloppeur java qui code une application Java EE en utilisant la JSF et Primefaces n'a pas vraiment la main sur ces aspects. La fin de ce tutorial contient des liens que vous pourrez suivre pour en savoir plus.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "9 Lutte (2)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "10 Outils de d\u00e9tection",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Non, \u00e7a n'est pas tout.<br><ul><li>Pour \u00e9viter le vol de cookie il est utile de param\u00e9trer l'objet <b>session</b> en for\u00e7ant l'attribut <b>&lt;http-only&gt;</b> \u00e0 la valeur <b>true</b>.</li><li>Il faut aussi \u00eatre<b> vigilant</b> sur les <b>biblioth\u00e8ques et les composants</b> que l'on utilise pour programmer. Par d\u00e9faut, la JSF Java \u00e9chappe tout ce qu'elle contient, m\u00eame le texte qui n'est pas inclu dans une balise. Par contre, les premi\u00e8res versions de la biblioth\u00e8que Primefaces contenaient de nombreuses failles XSS. Ces failles ont \u00e9t\u00e9 corrig\u00e9es au fur et \u00e0 mesure et la version 4 semble fiable. <br></li><li>De mani\u00e8re g\u00e9n\u00e9rale, il est important de <b>faire les mises \u00e0 jour de s\u00e9curit\u00e9</b> des programmes utiliser et d'utiliser, dans la mesure du possible,<b> les derni\u00e8res versions</b> des API et biblioth\u00e8ques java.<br></li><li>Enfin, pour ce qui est du <b>DOM-based XSS</b>, c'est <b>plus compliqu\u00e9</b>. Un d\u00e9veloppeur java qui code une application Java EE en utilisant la JSF et Primefaces n'a pas vraiment la main sur ces aspects. La fin de ce tutorial contient des liens que vous pourrez suivre pour en savoir plus.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "10 Outils de d\u00e9tection",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Non, \u00e7a n'est pas tout.<br><ul><li>Pour \u00e9viter le vol de cookie il est utile de param\u00e9trer l'objet <b>session</b> en for\u00e7ant l'attribut <b>&lt;http-only&gt;</b> \u00e0 la valeur <b>true</b>.</li><li>Il faut aussi \u00eatre<b> vigilant</b> sur les <b>biblioth\u00e8ques et les composants</b> que l'on utilise pour programmer. Par d\u00e9faut, la JSF Java \u00e9chappe tout ce qu'elle contient, m\u00eame le texte qui n'est pas inclu dans une balise. Par contre, les premi\u00e8res versions de la biblioth\u00e8que Primefaces contenaient de nombreuses failles XSS. Ces failles ont \u00e9t\u00e9 corrig\u00e9es au fur et \u00e0 mesure et la version 4 semble fiable. <br></li><li>De mani\u00e8re g\u00e9n\u00e9rale, il est important de faire les mises \u00e0 jour de s\u00e9curit\u00e9 des programmes utiliser et d'utiliser, dans la mesure du possible, les derni\u00e8res versions des API et biblioth\u00e8ques java.<br></li><li>Enfin, pour ce qui est du <b>DOM-based XSS</b>, c'est <b>plus compliqu\u00e9</b>. Un d\u00e9veloppeur java qui code une application Java EE en utilisant la JSF et Primefaces n'a pas vraiment la main sur ces aspects. La fin de ce tutorial contient des liens que vous pourrez suivre pour en savoir plus.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "9 Lutte (2)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "10 Outils de d\u00e9tection",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Non, \u00e7a n'est pas tout.<br><ul><li>Pour \u00e9viter le vol de cookie il est utile de param\u00e9trer l'objet <b>session</b> en for\u00e7ant l'attribut <b>&lt;http-only&gt;</b> \u00e0 la valeur <b>true</b>.</li><li>Il faut aussi \u00eatre<b> vigilant</b> sur les <b>biblioth\u00e8ques et les composants</b> que l'on utilise pour programmer. Par d\u00e9faut, la JSF Java \u00e9chappe tout ce qu'elle contient, m\u00eame le texte qui n'est pas inclu dans une balise. Par contre, les premi\u00e8res versions de la biblioth\u00e8que Primefaces contenaient de nombreuses failles XSS. Ces failles ont \u00e9t\u00e9 corrig\u00e9es au fur et \u00e0 mesure et la version 4 semble fiable. <br></li><li>De mani\u00e8re g\u00e9n\u00e9rale, il est important de <b>faire les mises \u00e0 jour de s\u00e9curit\u00e9</b> des programmes et d'utiliser, dans la mesure du possible,<b> les derni\u00e8res versions</b> des API et biblioth\u00e8ques java.<br></li><li>Enfin, pour ce qui est du <b>DOM-based XSS</b>, c'est <b>plus compliqu\u00e9</b>. Un d\u00e9veloppeur java qui code une application Java EE en utilisant la JSF et Primefaces n'a pas vraiment la main sur ces aspects. La fin de ce tutorial contient des liens que vous pourrez suivre pour en savoir plus.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "10 Outils de d\u00e9tection",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Non, \u00e7a n'est pas tout.<br><ul><li>Pour \u00e9viter le vol de cookie il est utile de param\u00e9trer l'objet <b>session</b> en for\u00e7ant l'attribut <b>&lt;http-only&gt;</b> \u00e0 la valeur <b>true</b>.</li><li>Il faut aussi \u00eatre<b> vigilant</b> sur les <b>biblioth\u00e8ques et les composants</b> que l'on utilise pour programmer. Par d\u00e9faut, la JSF Java \u00e9chappe tout ce qu'elle contient, m\u00eame le texte qui n'est pas inclu dans une balise. Par contre, les premi\u00e8res versions de la biblioth\u00e8que Primefaces contenaient de nombreuses failles XSS. Ces failles ont \u00e9t\u00e9 corrig\u00e9es au fur et \u00e0 mesure et la version 4 semble fiable. <br></li><li>De mani\u00e8re g\u00e9n\u00e9rale, il est important de <b>faire les mises \u00e0 jour de s\u00e9curit\u00e9</b> des programmes utiliser et d'utiliser, dans la mesure du possible,<b> les derni\u00e8res versions</b> des API et biblioth\u00e8ques java.<br></li><li>Enfin, pour ce qui est du <b>DOM-based XSS</b>, c'est <b>plus compliqu\u00e9</b>. Un d\u00e9veloppeur java qui code une application Java EE en utilisant la JSF et Primefaces n'a pas vraiment la main sur ces aspects. La fin de ce tutorial contient des liens que vous pourrez suivre pour en savoir plus.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "9 Lutte (2)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les tests d'intrusion (penetration test en anglais), sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). EN gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des outils d\u00e9di\u00e9s.</li><li><br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [""],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "10 Outils de d\u00e9tection",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les<b> tests d'intrusion (penetration test en anglais)</b>, sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). En gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des <b>outils d\u00e9di\u00e9s</b>.</li><li>l'<b>analyse de code</b> consiste <br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les tests d'intrusion (penetration test en anglais), sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). EN gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des outils d\u00e9di\u00e9s.</li><li><br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "10 Outils de d\u00e9tection",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les<b> tests d'intrusion (penetration test en anglais)</b>, sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). En gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des <b>outils d\u00e9di\u00e9s</b>.</li><li>l'<b>analyse directe du code</b> (white-box testing) consiste \u00e0 chercher directement dans le code les <br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les<b> tests d'intrusion (penetration test en anglais)</b>, sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). En gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des <b>outils d\u00e9di\u00e9s</b>.</li><li>l'<b>analyse de code</b> consiste <br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "10 Outils de d\u00e9tection",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les<b> tests d'intrusion (penetration test en anglais)</b>, sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). En gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des <b>outils d\u00e9di\u00e9s</b>.</li><li>l'<b>analyse directe du code</b> (white-box testing) consiste \u00e0 rechercher directement les failles XSS directement en parcourant le code. L'id\u00e9e g\u00e9n\u00e9rale est de rechercher toutes les donn\u00e9es entr\u00e9es \u00e0 un moment ou \u00e0 un autre par un utilisateur, et v\u00e9rifier que ces donn\u00e9es soient bien valid\u00e9e et \u00e9chapp\u00e9e avant leur affichage.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les<b> tests d'intrusion (penetration test en anglais)</b>, sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). En gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des <b>outils d\u00e9di\u00e9s</b>.</li><li>l'<b>analyse directe du code</b> (white-box testing) consiste \u00e0 chercher directement dans le code les <br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "10 Outils de d\u00e9tection",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les<b> tests d'intrusion (penetration test en anglais)</b>, sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). En gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des <b>outils d\u00e9di\u00e9s</b>.</li><li>l'<b>analyse directe du code</b> (white-box testing) consiste \u00e0 rechercher les failles XSS <b>directement en parcourant le code</b>. L'id\u00e9e g\u00e9n\u00e9rale est de rechercher toutes les donn\u00e9es entr\u00e9es \u00e0 un moment ou \u00e0 un autre par un utilisateur, et de v\u00e9rifier que ces donn\u00e9es soient bien valid\u00e9es et \u00e9chapp\u00e9es avant leur affichage.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "11 Quelques liens utiles",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "La d\u00e9tection des failles XSS peut se faire soit via des tests d'intrusion, soit par l'analyse du code.<br><ul><li>Les<b> tests d'intrusion (penetration test en anglais)</b>, sont souvent r\u00e9alis\u00e9 en mode black-box (le testeur ne conna\u00eet rein de l'application) ou grey-box (le testeur conna\u00eet le nom de certaines variables susceptibles de repr\u00e9senter des failles XSS). En gros le principe de ces tests est d'essayer d'injecter des scripts dans l'application. Ces tests peuvent \u00eatre fait manuellement (ce qui demande une certaine ma\u00eetrise des attaques XSS) ou automatiquement gr\u00e2ce \u00e0 des <b>outils d\u00e9di\u00e9s</b>.</li><li>l'<b>analyse directe du code</b> (white-box testing) consiste \u00e0 rechercher directement les failles XSS directement en parcourant le code. L'id\u00e9e g\u00e9n\u00e9rale est de rechercher toutes les donn\u00e9es entr\u00e9es \u00e0 un moment ou \u00e0 un autre par un utilisateur, et v\u00e9rifier que ces donn\u00e9es soient bien valid\u00e9e et \u00e9chapp\u00e9e avant leur affichage.<br></li></ul>"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "10 Outils de d\u00e9tection",
+    "property_name": "widget_handlers"
+  }
+]

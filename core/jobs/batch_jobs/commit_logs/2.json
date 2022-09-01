@@ -1,0 +1,955 @@
+[
+  {
+    "new_value": [],
+    "cmd": "edit_state_property",
+    "old_value": [
+      {
+        "customization_args": {
+          "parse_with_jinja": false,
+          "value": "[New parameter value]"
+        },
+        "name": "",
+        "generator_id": "Copier"
+      }
+    ],
+    "state_name": "(untitled state)",
+    "property_name": "param_changes"
+  },
+  {
+    "new_value": [
+      {
+        "type": "text",
+        "value": "Les failles XSS sont un vuln\u00e9rabilit\u00e9 des applications Web<br>"
+      }
+    ],
+    "cmd": "edit_state_property",
+    "old_value": [{ "type": "text", "value": "" }],
+    "state_name": "(untitled state)",
+    "property_name": "content"
+  },
+  {
+    "new_value": [
+      {
+        "type": "text",
+        "value": "Une faille XSS est une vuln\u00e9rabilit\u00e9 d'une application Web<br>"
+      }
+    ],
+    "cmd": "edit_state_property",
+    "old_value": [
+      {
+        "type": "text",
+        "value": "Les failles XSS sont un vuln\u00e9rabilit\u00e9 des applications Web<br>"
+      }
+    ],
+    "state_name": "(untitled state)",
+    "property_name": "content"
+  },
+  {
+    "new_value": "MultipleChoiceInput",
+    "cmd": "edit_state_property",
+    "old_value": "TextInput",
+    "state_name": "(untitled state)",
+    "property_name": "widget_id"
+  },
+  {
+    "new_value": {
+      "choices": {
+        "value": [
+          "Qui a peu d'impact<br>",
+          "Tr\u00e8s courante et qui a beaucoup d'impact<br>"
+        ]
+      }
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "rows": { "value": 1 },
+      "placeholder": { "value": "Type your answer here." },
+      "columns": { "value": 60 }
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_customization_args"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": []
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [""]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": []
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [""]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": []
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [""]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": []
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [""]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [""],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": ["", ""],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [""],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [""],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": ["", ""],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [""],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "cmd": "edit_state_property",
+    "old_value": {
+      "submit": [
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 0 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Attention ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !<br>"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": {
+            "rule_type": "atomic",
+            "inputs": { "x": 1 },
+            "name": "Equals",
+            "subject": "answer"
+          },
+          "param_changes": [],
+          "description": "is equal to {{x|NonnegativeInt}}",
+          "feedback": [
+            "Bravo ! Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ]
+        },
+        {
+          "dest": "(untitled state)",
+          "definition": { "rule_type": "default" },
+          "param_changes": [],
+          "feedback": [
+            "Les failles XSS sont le 3\u00e8me risque de s\u00e9curit\u00e9 applicatif le plus critique des applications web selon le classement OWASP 2013 !"
+          ],
+          "description": "Default"
+        }
+      ]
+    },
+    "state_name": "(untitled state)",
+    "property_name": "widget_handlers"
+  },
+  {
+    "new_state_name": "1",
+    "cmd": "rename_state",
+    "old_state_name": "(untitled state)"
+  }
+]

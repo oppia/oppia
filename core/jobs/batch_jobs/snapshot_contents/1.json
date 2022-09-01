@@ -1,0 +1,55 @@
+{
+  "category": "Programming",
+  "param_changes": [],
+  "title": "Les failles XSS",
+  "deleted": false,
+  "default_skin": "conversation_v1",
+  "states": {
+    "(untitled state)": {
+      "param_changes": [],
+      "interaction": {
+        "solution": null,
+        "answer_groups": [],
+        "default_outcome": {
+          "param_changes": [],
+          "feedback": { "content_id": "default_outcome", "html": "" },
+          "dest": "(untitled state)",
+          "refresher_exploration_id": null,
+          "missing_prerequisite_skill_id": null,
+          "labelled_as_correct": false
+        },
+        "customization_args": {
+          "rows": { "value": 1 },
+          "placeholder": {
+            "value": { "unicode_str": "", "content_id": "ca_placeholder_0" }
+          }
+        },
+        "confirmed_unclassified_answers": [],
+        "id": "TextInput",
+        "hints": []
+      },
+      "recorded_voiceovers": {
+        "voiceovers_mapping": {
+          "content": {},
+          "default_outcome": {},
+          "ca_placeholder_0": {}
+        }
+      },
+      "classifier_model_id": null,
+      "content": { "content_id": "content", "html": "" },
+      "written_translations": {
+        "translations_mapping": {
+          "content": {},
+          "default_outcome": {},
+          "ca_placeholder_0": {}
+        }
+      },
+      "next_content_id_index": 1,
+      "solicit_answer_details": false
+    }
+  },
+  "states_schema_version": 42,
+  "version": 1,
+  "param_specs": {},
+  "init_state_name": "(untitled state)"
+}
