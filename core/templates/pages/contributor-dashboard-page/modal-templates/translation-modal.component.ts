@@ -51,8 +51,8 @@ class UiConfig {
 }
 
 enum ExpansionTabType {
-  CONTENT = 'content',
-  TRANSLATION = 'translation'
+  CONTENT,
+  TRANSLATION
 }
 
 export interface TranslationOpportunity {
@@ -111,7 +111,8 @@ export class TranslationModalComponent {
   textToTranslate: string | string[] = '';
   languageDescription: string;
   activeStatus: Status;
-  expansionTabType: ExpansionTabType;
+  contentTab = ExpansionTabType.CONTENT;
+  translationTab = ExpansionTabType.TRANSLATION;
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
@@ -236,6 +237,9 @@ export class TranslationModalComponent {
   }
 
   computePanelOverflowState(): void {
+    // The delay of 500ms is required to allow the content to load
+    // before the overflow status is calculated. Values less than
+    // 500ms also work but they sometimes lead to unexpected results.
     setTimeout(() => {
       this.isContentOverflowing = (
         this.contentPanel?.elementRef.nativeElement.offsetHeight >
@@ -291,7 +295,7 @@ export class TranslationModalComponent {
     );
   }
 
-  toggleExpansionState(tab: string): void {
+  toggleExpansionState(tab: ExpansionTabType): void {
     if (tab === ExpansionTabType.CONTENT) {
       this.isContentExpanded = !this.isContentExpanded;
     } else if (tab === ExpansionTabType.TRANSLATION) {

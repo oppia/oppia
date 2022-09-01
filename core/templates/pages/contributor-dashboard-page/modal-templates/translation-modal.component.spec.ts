@@ -35,6 +35,11 @@ import { TranslateTextService } from '../services/translate-text.service';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
+enum ExpansionTabType {
+  CONTENT,
+  TRANSLATION
+}
+
 class MockChangeDetectorRef {
   detectChanges(): void {}
 }
@@ -143,50 +148,46 @@ describe('Translation Modal Component', () => {
 
   it('should expand the content area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
-
     // The content area is contracted by default.
     expect(component.isContentExpanded).toBeFalse();
 
     // The content area should expand when the users clicks
     // on the 'View More' button.
-    component.toggleExpansionState('content');
+    component.toggleExpansionState(ExpansionTabType.CONTENT);
 
     expect(component.isContentExpanded).toBeTrue();
   });
 
   it('should contract the content area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
-
     component.isContentExpanded = true;
 
     // The content area should contract when the users clicks
     // on the 'View Less' button.
-    component.toggleExpansionState('content');
+    component.toggleExpansionState(ExpansionTabType.CONTENT);
 
     expect(component.isContentExpanded).toBeFalse();
   });
 
   it('should expand the translation area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
-
     // The translation area is contracted by default.
     expect(component.isTranslationExpanded).toBeTrue();
 
     // The translation area should expand when the users clicks
     // on the 'View More' button.
-    component.toggleExpansionState('translation');
+    component.toggleExpansionState(ExpansionTabType.TRANSLATION);
 
     expect(component.isTranslationExpanded).toBeFalse();
   });
 
   it('should contract the translation area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
-
     component.isTranslationExpanded = false;
 
     // The translation area should contract when the users clicks
     // on the 'View Less' button.
-    component.toggleExpansionState('translation');
+    component.toggleExpansionState(ExpansionTabType.TRANSLATION);
 
     expect(component.isTranslationExpanded).toBeTrue();
   });
