@@ -334,16 +334,9 @@ var AutocompleteDropdownEditor = function(elem) {
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      var searchInputLocatorText = function(text) {
-        return $(`.e2e-test-exploration-category-selector-choice=${text}`);
-      };
 
       await action.setValue(
-        'Dropdown Element Search', $(searchInputLocator), text);
-      await action.click(
-        'Dropdown Element Select',
-        searchInputLocatorText(text)
-      );
+        'Dropdown Element Search', $(searchInputLocator), text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click(
