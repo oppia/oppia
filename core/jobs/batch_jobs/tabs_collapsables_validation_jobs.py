@@ -53,12 +53,15 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
         """
         """
         soup = bs4.BeautifulSoup(html, 'html.parser')
-        for tag in soup:
+        for tag in soup.find_all():
             if tag.name == 'oppia-noninteractive-image':
                 if 'alt-with-value' not in tag:
                     states_with_errored_values.append(
                         'alt attr not exists'
                     )
+
+                else:
+                    tag['alt-with-value'] == '&amp;quot;&amp;quot;'
 
                 if 'filepath-with-value' not in tag:
                     states_with_errored_values.append(
@@ -184,9 +187,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             states_with_errored_values = []
             html = state.content.html
             soup = bs4.BeautifulSoup(html, 'html.parser')
-            for tag in soup:
-                if tag.name != 'oppia-noninteractive-tabs':
-                    continue
+            tabs_tags = soup.find_all('oppia-noninteractive-tabs')
+            for tag in tabs_tags:
                 if 'tab_contents-with-value' not in tag:
                     states_with_errored_values.append(
                         'Not content attr in tabs'
@@ -210,6 +212,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         'errored_values': states_with_errored_values
                     }
                 )
+        print(state.name.abc)
         return errored_values
 
     @staticmethod
@@ -223,10 +226,9 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             states_with_errored_values = []
             html = state.content.html
             soup = bs4.BeautifulSoup(html, 'html.parser')
-            for tag in soup:
-                if tag.name != 'oppia-noninteractive-collapsible':
-                    continue
-
+            collapsibles_tags = soup.find_all(
+                'oppia-noninteractive-collapsible')
+            for tag in collapsibles_tags:
                 if 'content-with-value' not in tag:
                     states_with_errored_values.append(
                         'No content attr in collapsible tag'
