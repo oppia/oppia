@@ -226,7 +226,7 @@ describe('Classroom Admin Page component ', () => {
     expect(component.classroomDataIsChanged).toBeTrue();
   });
 
-  it('should be able to update the classroom url fragment', () => {
+  it('should be able to update the classroom course details', () => {
     let response = {
       classroomDict: {
         classroomId: 'classroomId',
@@ -247,7 +247,7 @@ describe('Classroom Admin Page component ', () => {
     expect(component.classroomDataIsChanged).toBeTrue();
   });
 
-  it('should be able to update the classroom url fragment', () => {
+  it('should be able to update the classroom topic list intro', () => {
     let response = {
       classroomDict: {
         classroomId: 'classroomId',
@@ -363,8 +363,8 @@ describe('Classroom Admin Page component ', () => {
       expect(component.classroomDataIsChanged).toBeFalse();
     }));
   it(
-    'should be able to cancel the exit editor modal and continue editing',
-    () => {
+    'should be able to cancel the exit editor confirmation modal and ' +
+    'continue editing', () => {
       component.classroomDataIsChanged = true;
       component.classroomEditorMode = true;
       component.classroomViewerMode = false;
@@ -474,12 +474,12 @@ describe('Classroom Admin Page component ', () => {
       physicsClassroomId: 'physics'
     };
     let classroomDict = {
-      classroomId: 'physicsClassroomId',
+      classroom_id: 'physicsClassroomId',
       name: 'physics',
-      urlFragment: '',
-      courseDetails: '',
-      topicListIntro: '',
-      topicIdToPrerequisiteTopicIds: {}
+      url_fragment: '',
+      course_details: '',
+      topic_list_intro: '',
+      topic_id_to_prerequisite_topic_ids: {}
     };
     spyOn(ngbModal, 'open').and.returnValue(
       {

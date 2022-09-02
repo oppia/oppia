@@ -1303,29 +1303,30 @@ describe('Admin backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should handle generate dummy new skill data ' +
-    'request failure', fakeAsync(() => {
-    let action = 'generate_dummy_classroom';
-    let payload = {
-      action: action,
-    };
+  it(
+    'should handle generate dummy new classroom data request failure',
+    fakeAsync(() => {
+      let action = 'generate_dummy_classroom';
+      let payload = {
+        action: action,
+      };
 
-    abas.generateDummyClassroomDataAsync()
-      .then(successHandler, failHandler);
+      abas.generateDummyClassroomDataAsync()
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush({
-      error: 'Failed to get data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush({
+        error: 'Failed to get data.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+    }));
 
   it('should reload collection', fakeAsync(() => {
     let action = 'reload_collection';

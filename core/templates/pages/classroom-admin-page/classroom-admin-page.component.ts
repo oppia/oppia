@@ -192,7 +192,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       Object.values(this.classroomIdToClassroomName)
     );
     modalRef.result.then((classroomDict) => {
-      this.classroomIdToClassroomName[classroomDict.classroomId] = (
+      this.classroomIdToClassroomName[classroomDict.classroom_id] = (
         classroomDict.name);
     }, () => {
       // Note to developers:
