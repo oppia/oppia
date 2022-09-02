@@ -143,9 +143,6 @@ var TopicsAndSkillsDashboardPage = function() {
         topicsTable, 'Topics table taking too long to appear');
       await waitFor.visibilityOf(
         topicsListItem, 'Topics list taking too long to appear');
-      var topicsListItems = await topicsListItemsSelector();
-      await waitFor.visibilityOf(
-        topicsListItems[0], 'Topics list taking too long to appear');
     }
   };
 

@@ -28,6 +28,11 @@ export interface MisconceptionSkillMap {
   [skillName: string]: Misconception[];
 }
 
+export interface TaggedMisconception {
+  skillId: string;
+  misconceptionId: number;
+}
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 

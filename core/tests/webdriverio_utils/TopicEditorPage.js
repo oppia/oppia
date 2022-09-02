@@ -264,12 +264,10 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    // The cke buttons classes are dynamically alloted and hence we cannot
-    // a class name to select a particular button. Also using chain selectors
-    // is returning a non interactable element hence we are explicitly using
-    // the dynamically alloted id of the button to select the button.
+    // The cke buttons classes are dynamically alloted so we cannot
+    // add class name starting with 'e2e' to them.
     // eslint-disable-next-line oppia/e2e-practices
-    var conceptCardButton = $('#cke_124');
+    var conceptCardButton = $('.cke_button*=Insert Concept Card Link');
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = $(
       `.e2e-test-rte-skill-selector-item=${skillName}`);

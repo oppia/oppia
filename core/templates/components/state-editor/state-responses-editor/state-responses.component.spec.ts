@@ -928,7 +928,12 @@ describe('State Responses Component', () => {
     );
     spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveTaggedMisconception('misconception1', 'skill1');
+    component.saveTaggedMisconception(
+      {
+        misconceptionId: 1,
+        skillId: 'skill1'
+      }
+    );
 
     expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
   });
