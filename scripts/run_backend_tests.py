@@ -325,6 +325,7 @@ def _load_coverage_exclusion_list(path):
 
 
 def _check_test_results(tasks, task_to_taskspec, generate_coverage_report):
+    """Run tests and parse coverage reports."""
     coverage_exclusions = _load_coverage_exclusion_list(
         COVERAGE_EXCLUSION_LIST_PATH)
 
@@ -399,7 +400,7 @@ def _check_test_results(tasks, task_to_taskspec, generate_coverage_report):
                     print(task.task_results[0].get_report()[-3])
 
         total_count += test_count
-    
+
     return total_count, total_errors, total_failures, incomplete_coverage
 
 
