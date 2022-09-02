@@ -52,6 +52,27 @@ class ClassroomPageTests(BaseClassroomControllerTests):
             '<lightweight-oppia-root></lightweight-oppia-root>', response)
 
 
+class ClassroomAdminPageTests(BaseClassroomControllerTests):
+    """Checks the access to the classroom admin page and its rendering."""
+
+    def test_classroom_admin_page_access_without_logging_in(self):
+        """Tests access to the Classroom Admin page."""
+        self.get_html_response('/classroom-admin', expected_status_int=302)
+
+    def test_classroom_admin_page_acess_without_being_curriculum_admin(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response('/classroom-admin', expected_status_int=401)
+        self.logout()
+
+    def test_classroom_admin_page_acess_as_curriculum_admin(self):
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.get_html_response('/classroom-admin')
+        self.logout()
+
+
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get(self):
