@@ -1626,7 +1626,7 @@ def create_translation_contribution_stats_from_model(
         translation_contribution_stats_model.accepted_translation_word_count,
         translation_contribution_stats_model.rejected_translations_count,
         translation_contribution_stats_model.rejected_translation_word_count,
-        translation_contribution_stats_model.contribution_dates
+        set(translation_contribution_stats_model.contribution_dates)
     )
 
 
@@ -2031,7 +2031,6 @@ def _update_translation_contribution_stats_models(
     stats_dict = {}
 
     for stat in translation_contribution_stats:
-
         stat_id = (
             suggestion_models.TranslationContributionStatsModel.construct_id(
                 str(stat.language_code),
@@ -2042,17 +2041,13 @@ def _update_translation_contribution_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
-    # function requires Sequence[Optional[str]]. Hence we will have to ignore
-    # type check for the following statement because making stats_id  to match
-    # Sequence[Optional[str]] will not be efficient.
-    stats_models_to_update_with_none = (
+    stats_models = (
         suggestion_models.TranslationContributionStatsModel.get_multi(
-            stats_ids))  # type: ignore[arg-type]
+            list(stats_ids)))
 
     stats_models_to_update: List[
         suggestion_models.TranslationContributionStatsModel] = []
-    for stats_model in stats_models_to_update_with_none:
+    for stats_model in stats_models:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
         # the possibility of None for mypy type checking.
@@ -2102,16 +2097,13 @@ def _update_translation_review_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
-    # function requires Sequence[Optional[str]]. Hence we will have to ignore
-    # type check for the following statement because making stats_id  to match
-    # Sequence[Optional[str]] will not be efficient.
-    stats_models_to_update_with_none = (
-        suggestion_models.TranslationReviewStatsModel.get_multi(stats_ids))  # type: ignore[arg-type]
+    stats_models = (
+        suggestion_models.TranslationReviewStatsModel.get_multi(list(
+            stats_ids)))
 
     stats_models_to_update: List[
         suggestion_models.TranslationReviewStatsModel] = []
-    for stats_model in stats_models_to_update_with_none:
+    for stats_model in stats_models:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
         # the possibility of None for mypy type checking.
@@ -2157,16 +2149,13 @@ def _update_question_contribution_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
-    # function requires Sequence[Optional[str]]. Hence we will have to ignore
-    # type check for the following statement because making stats_id  to match
-    # Sequence[Optional[str]] will not be efficient.
-    stats_models_to_update_with_none = (
-        suggestion_models.QuestionContributionStatsModel.get_multi(stats_ids))  # type: ignore[arg-type]
+    stats_models = (
+        suggestion_models.QuestionContributionStatsModel.get_multi(list(
+            stats_ids)))
 
     stats_models_to_update: List[
         suggestion_models.QuestionContributionStatsModel] = []
-    for stats_model in stats_models_to_update_with_none:
+    for stats_model in stats_models:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
         # the possibility of None for mypy type checking.
@@ -2208,16 +2197,13 @@ def _update_question_review_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    # stats_dict.keys() will return KeysView[str] typed data and get_multi()
-    # function requires Sequence[Optional[str]]. Hence we will have to ignore
-    # type check for the following statement because making stats_id  to match
-    # Sequence[Optional[str]] will not be efficient.
-    stats_models_to_update_with_none = (
-        suggestion_models.QuestionReviewStatsModel.get_multi(stats_ids))  # type: ignore[arg-type]
+    stats_models = (
+        suggestion_models.QuestionReviewStatsModel.get_multi(
+            list(stats_ids)))
 
     stats_models_to_update: List[
         suggestion_models.QuestionReviewStatsModel] = []
-    for stats_model in stats_models_to_update_with_none:
+    for stats_model in stats_models:
         # We can confirm that stats_model will not be None since the for loop
         # already gives the not None stats_model object. Hence we can rule out
         # the possibility of None for mypy type checking.
@@ -2239,7 +2225,7 @@ def _update_question_review_stats_models(
         stats_models_to_update)
 
 
-def get_contribution_date(date: datetime.datetime) -> datetime.date:
+def _get_contribution_date(date: datetime.datetime) -> datetime.date:
     """Gets the string value of the given date.
 
     Args:
@@ -2298,16 +2284,19 @@ def update_translation_contribution_stats_at_submission(
             accepted_translation_word_count=0,
             rejected_translations_count=0,
             rejected_translation_word_count=0,
-            contribution_dates=[get_contribution_date(suggestion.last_updated)]
+            contribution_dates=[_get_contribution_date(suggestion.last_updated)]
         )
     else:
         translation_contribution_stat = (
             create_translation_contribution_stats_from_model(
                 translation_contribution_stat_model))
 
-        get_incremental_translation_contribution_stats(
-            translation_contribution_stat, content_word_count,
-            suggestion.last_updated)
+        translation_contribution_stat.submitted_translations_count += 1
+        translation_contribution_stat.submitted_translation_word_count += (
+            content_word_count)
+        print(type(translation_contribution_stat.contribution_dates))
+        translation_contribution_stat.contribution_dates.add(
+            _get_contribution_date(suggestion.last_updated))
 
         _update_translation_contribution_stats_models(
             [translation_contribution_stat])
@@ -2357,7 +2346,7 @@ def update_translation_contribution_stats_at_review(
             accepted_translation_word_count=0,
             rejected_translations_count=0,
             rejected_translation_word_count=0,
-            contribution_dates=[get_contribution_date(suggestion.last_updated)]
+            contribution_dates=[_get_contribution_date(suggestion.last_updated)]
         )
     else:
         translation_contribution_stat = (
@@ -2421,9 +2410,9 @@ def update_translation_review_stats(
                 suggestion.edited_by_reviewer),
             accepted_translation_word_count=content_word_count * int(
                 suggestion_is_accepted),
-            first_contribution_date=get_contribution_date(
+            first_contribution_date=_get_contribution_date(
                 suggestion.last_updated),
-            last_contribution_date=get_contribution_date(
+            last_contribution_date=_get_contribution_date(
                 suggestion.last_updated)
         )
     else:
@@ -2475,9 +2464,9 @@ def update_question_contribution_stats_at_submission(
                 submitted_questions_count=1,
                 accepted_questions_count=0,
                 accepted_questions_without_reviewer_edits_count=0,
-                first_contribution_date=get_contribution_date(
+                first_contribution_date=_get_contribution_date(
                     suggestion.last_updated),
-                last_contribution_date=get_contribution_date(
+                last_contribution_date=_get_contribution_date(
                     suggestion.last_updated)
             )
             continue
@@ -2525,9 +2514,9 @@ def update_question_contribution_stats_at_review(
                 submitted_questions_count=1,
                 accepted_questions_count=0,
                 accepted_questions_without_reviewer_edits_count=0,
-                first_contribution_date=get_contribution_date(
+                first_contribution_date=_get_contribution_date(
                     suggestion.last_updated),
-                last_contribution_date=get_contribution_date(
+                last_contribution_date=_get_contribution_date(
                     suggestion.last_updated)
             )
             continue
@@ -2582,9 +2571,9 @@ def update_question_review_stats(
                 accepted_questions_count=int(suggestion_is_accepted),
                 accepted_questions_with_reviewer_edits_count=int(
                     suggestion.edited_by_reviewer),
-                first_contribution_date=get_contribution_date(
+                first_contribution_date=_get_contribution_date(
                     suggestion.last_updated),
-                last_contribution_date=get_contribution_date(
+                last_contribution_date=_get_contribution_date(
                     suggestion.last_updated)
             )
             continue
@@ -2602,27 +2591,6 @@ def update_question_review_stats(
 
     update_question_contribution_stats_at_review(
         suggestion, suggestion.author_id, target_id)
-
-
-def get_incremental_translation_contribution_stats(
-    translation_contribution_stat: (
-        suggestion_registry.TranslationContributionStats),
-    content_word_count: int,
-    last_contribution_date: datetime.datetime
-) -> None:
-    """Updates TranslationContributionStats object.
-
-    Args:
-        translation_contribution_stat: TranslationContributionStats. The stats
-            object to update.
-        content_word_count: int. The number of words in the translation.
-        last_contribution_date: datetime.datetime. The last updated date.
-    """
-    translation_contribution_stat.submitted_translations_count += 1
-    translation_contribution_stat.submitted_translation_word_count += (
-        content_word_count)
-    translation_contribution_stat.contribution_dates.append(  # type: ignore[attr-defined]
-        get_contribution_date(last_contribution_date))
 
 
 def get_incremental_translation_contribution_stats_at_review(
@@ -2687,7 +2655,7 @@ def get_incremental_translation_review_stats(
         translation_review_stat
         .accepted_translations_with_reviewer_edits_count
     ) += int(edited_by_reviewer)
-    translation_review_stat.last_contribution_date = get_contribution_date(
+    translation_review_stat.last_contribution_date = _get_contribution_date(
         last_contribution_date)
 
 
@@ -2703,7 +2671,7 @@ def get_incremental_question_contribution_stats(
         last_contribution_date: datetime.datetime. The last updated date.
     """
     question_contribution_stat.submitted_questions_count += 1
-    question_contribution_stat.last_contribution_date = get_contribution_date(
+    question_contribution_stat.last_contribution_date = _get_contribution_date(
         last_contribution_date)
 
 
@@ -2752,5 +2720,5 @@ def get_incremental_question_review_stats(
         suggestion_is_accepted)
     question_review_stat.accepted_questions_with_reviewer_edits_count += int(
         edited_by_reviewer)
-    question_review_stat.last_contribution_date = get_contribution_date(
+    question_review_stat.last_contribution_date = _get_contribution_date(
         last_contribution_date)

@@ -645,11 +645,10 @@ def get_exploration_opportunity_summary_by_id(
     exp_opportunity_summary_model = (
         opportunity_models.ExplorationOpportunitySummaryModel.get(
             opportunity_id))
-    opportunity = None
-    if exp_opportunity_summary_model is not None:
-        opportunity = (get_exploration_opportunity_summary_from_model(
-                exp_opportunity_summary_model))
-    return opportunity
+    if exp_opportunity_summary_model is None:
+        return None
+    return get_exploration_opportunity_summary_from_model(
+            exp_opportunity_summary_model)
 
 
 def get_exploration_opportunity_summaries_by_topic_id(
