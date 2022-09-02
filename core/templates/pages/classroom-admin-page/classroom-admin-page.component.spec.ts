@@ -65,6 +65,26 @@ describe('Classroom Admin Page component ', () => {
     ngbModal = TestBed.inject(NgbModal);
   });
 
+  it('should initialize the component', fakeAsync(() => {
+    let response = {
+      mathClassroomId: 'math',
+      physicsClassroomId: 'physics'
+    };
+    spyOn(
+      classroomBackendApiService,
+      'getAllClassroomIdToClassroomNameDictAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    expect(component.pageIsInitialized).toBeFalse();
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.pageIsInitialized).toBeTrue();
+    expect(component.classroomIdToClassroomName).toEqual(response);
+    expect(component.classroomCount).toEqual(2);
+  }));
+
   it(
     'should open classroom detail and update classroom properties',
     fakeAsync(() => {

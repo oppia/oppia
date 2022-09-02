@@ -29,23 +29,23 @@ import { ClassroomBackendApiService } from '../../../domain/classroom/classroom-
 })
 export class CreateNewClassroomModalComponent
   extends ConfirmOrCancelModal {
-
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
+
   existingClassroomNames: string[];
   newClassroomName: string = '';
-  newClassroomId: string;
+  newClassroomId: string = '';
   classroomNameAlreadyExist: boolean = false;
 
-  getNewClassroomId() {
+  getNewClassroomId(): void {
     this.classroomBackendApiService.getNewClassroomIdAsync().then(
-        classroomId => {
-            this.newClassroomId = classroomId
-        }
+      classroomId => {
+        this.newClassroomId = classroomId;
+      }
     );
   }
 
@@ -53,24 +53,24 @@ export class CreateNewClassroomModalComponent
     this.getNewClassroomId();
   }
 
-  createClassroom(): void {
-    if (this.existingClassroomNames.indexOf(this.newClassroomName) !== -1) {
-        this.classroomNameAlreadyExist = true;
-        return;
+  createClassroom(classroomName: string): void {
+    if (this.existingClassroomNames.indexOf(classroomName) !== -1) {
+      this.classroomNameAlreadyExist = true;
+      return;
     }
 
     let defaultClassroomDict = {
-      'classroom_id': this.newClassroomId,
-      'name': this.newClassroomName,
-      'url_fragment': '',
-      'course_details': '',
-      'topic_list_intro': '',
-      'topic_id_to_prerequisite_topic_ids': {}
+      classroom_id: this.newClassroomId,
+      name: classroomName,
+      url_fragment: '',
+      course_details: '',
+      topic_list_intro: '',
+      topic_id_to_prerequisite_topic_ids: {}
     };
 
     this.classroomBackendApiService.updateClassroomDataAsync(
-        this.newClassroomId, defaultClassroomDict).then(() => {
-            this.ngbActiveModal.close(defaultClassroomDict);
-        });
+      this.newClassroomId, defaultClassroomDict).then(() => {
+      this.ngbActiveModal.close(defaultClassroomDict);
+    });
   }
 }
