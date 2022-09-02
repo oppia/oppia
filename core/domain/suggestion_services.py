@@ -2294,7 +2294,6 @@ def update_translation_contribution_stats_at_submission(
         translation_contribution_stat.submitted_translations_count += 1
         translation_contribution_stat.submitted_translation_word_count += (
             content_word_count)
-        print(type(translation_contribution_stat.contribution_dates))
         translation_contribution_stat.contribution_dates.add(
             _get_contribution_date(suggestion.last_updated))
 
