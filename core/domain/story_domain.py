@@ -621,7 +621,7 @@ class StoryContents:
         self,
         node_id: Optional[str],
         *,
-        strict: Literal[True] = ...
+        strict: Literal[True]
     ) -> int: ...
 
     @overload
@@ -629,7 +629,7 @@ class StoryContents:
         self,
         node_id: Optional[str],
         *,
-        strict: Literal[False] = ...
+        strict: Literal[False]
     ) -> Optional[int]: ...
 
     def get_node_index(
