@@ -24,7 +24,7 @@ from core import feconf
 
 import elasticsearch
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError
@@ -64,7 +64,7 @@ def _create_index(index_name: str) -> None:
 # The type of 'body' here is Any.
 # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
 def add_documents_to_index(
-        documents: List[Dict[str, Any]], index_name: str
+    documents: Sequence[Mapping[str, Any]], index_name: str
 ) -> None:
     """Adds a document to an index. This function also creates the index if it
     does not exist yet.

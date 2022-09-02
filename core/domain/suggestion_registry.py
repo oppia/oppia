@@ -315,6 +315,9 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
 
+    # Here we use type Any because sub-classes of BaseSuggestion can have
+    # different Change classes. So, to allow every Change class we used Any
+    # type here.
     def pre_update_validate(self, change: Any) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
@@ -421,24 +424,26 @@ class SuggestionEditStateContent(BaseSuggestion):
             exp_domain.ExplorationChange(change)
         )
         self.score_category = score_category
-        # In BaseSuggestion, language_code is defined with only string type
-        # but here language_code is of Optional[str] type because language_code
-        # can accept None values as well. So, due to this conflict in types
-        # MyPy throws an `Incompatible types in assignment` error. Thus to
-        # avoid the error, we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion, language_code
+        # is defined with only string type but here language_code is of
+        # Optional[str] type because language_code can accept None values as
+        # well. So, due to this conflict in types MyPy throws an `Incompatible
+        # types in assignment` error. Thus to avoid the error, we used ignore.
         self.language_code = language_code  # type: ignore[assignment]
-        # In BaseSuggestion, last_updated is defined with only datetime type
-        # but here last_updated is of Optional[datetime] type because
-        # last_updated can accept None values as well. So, due to this conflict
-        # in types MyPy throws an `Incompatible types in assignment` error.
-        # Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion, last_updated
+        # is defined with only datetime type but here last_updated is of
+        # Optional[datetime] type because last_updated can accept None
+        # values as well. So, due to this conflict in types MyPy throws an
+        # `Incompatible types in assignment` error. Thus to avoid the error,
+        # we used ignore here.
         self.last_updated = last_updated  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
-        # In BaseSuggestion, image_context is defined as string type attribute
-        # but currently, we don't allow adding images in the "edit state
-        # content" suggestion, so the image_context is None here and due to
-        # None MyPy throws an `Incompatible types in assignment` error.
-        # Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion, image_context
+        # is defined as string type attribute but currently, we don't
+        # allow adding images in the "edit state content" suggestion,
+        # so the image_context is None here and due to None MyPy throws
+        # an `Incompatible types in assignment` error. Thus to avoid the
+        # error, we used ignore here.
         self.image_context = None  # type: ignore[assignment]
 
     def validate(self) -> None:
@@ -506,11 +511,12 @@ class SuggestionEditStateContent(BaseSuggestion):
         old_content = (
             exploration.states[self.change.state_name].content.to_dict())
 
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so because
-        # of this MyPy is unable to recognize `old_value` as an attribute
-        # of change and throws an `"ExplorationChange" has no attribute
-        # "old_value"` error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because change is of type ExplorationChange
+        # and all attributes on ExplorationChange are created dynamically except
+        # cmd, so because of this MyPy is unable to recognize `old_value` as an
+        # attribute of change and throwing `"ExplorationChange" has no
+        # attribute "old_value"` error. Thus to avoid the error, we used
+        # ignore here.
         change.old_value = old_content  # type: ignore[attr-defined]
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change.new_value, dict)
@@ -529,11 +535,12 @@ class SuggestionEditStateContent(BaseSuggestion):
             old_content = (
                 exploration.states[self.change.state_name].content.to_dict())
 
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so because
-        # of this MyPy is unable to recognize `old_value` as an attribute
-        # of change and throws an `"ExplorationChange" has no attribute
-        # "old_value"` error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because change is of type ExplorationChange
+        # and all attributes on ExplorationChange are created dynamically except
+        # cmd, so because of this MyPy is unable to recognize `old_value` as an
+        # attribute of change and throwing  `"ExplorationChange" has no
+        # attribute "old_value"` error. Thus to avoid the error, we used
+        # ignore here.
         self.change.old_value = old_content  # type: ignore[attr-defined]
 
     def accept(self, commit_message: str) -> None:
@@ -665,11 +672,12 @@ class SuggestionTranslateContent(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # In BaseSuggestion, last_updated is defined with only datetime type
-        # but here last_updated is of Optional[datetime] type, because here
-        # last_updated can accept None values as well. So, due to this conflict
-        # in types MyPy throws an `Incompatible types in assignment` error.
-        # Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion, last_updated
+        # is defined with only datetime type but here last_updated is of
+        # Optional[datetime] type because last_updated can accept None
+        # values as well. So, due to this conflict in types MyPy throwing
+        # `Incompatible types in assignment` error. Thus to avoid the error,
+        # we used ignore here.
         self.last_updated = last_updated  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
@@ -825,14 +833,20 @@ class SuggestionTranslateContent(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `content_html` and `translation_html`
+        # Here we use MyPy ignore because change is of type ExplorationChange
+        # and all attributes on ExplorationChange are created dynamically
+        # except cmd, so due this MyPy is unable to recognize `content_html`
         # as an attribute of change and throwing `"ExplorationChange" has no
         # attribute "content_html"` error. Thus to avoid the error, we used
         # ignore here.
         self.change.content_html = (  # type: ignore[attr-defined]
             conversion_fn(self.change.content_html))
+        # Here we use MyPy ignore because change is of type ExplorationChange
+        # and all attributes on ExplorationChange are created dynamically
+        # except cmd, so due this MyPy is unable to recognize `translation_html`
+        # as an attribute of change and throwing `"ExplorationChange" has
+        # no attribute "translation_html"` error. Thus to avoid the error,
+        # we used ignore here.
         self.change.translation_html = (  # type: ignore[attr-defined]
             conversion_fn(self.change.translation_html))
 
@@ -891,11 +905,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # In BaseSuggestion, last_updated is defined with only datetime type
-        # but here last_updated is of Optional[datetime] type, because here
-        # last_updated can accept None values as well. So, due to this conflict
-        # in types MyPy throws an `Incompatible types in assignment` error.
-        # Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion, last_updated
+        # is defined with only datetime type but here last_updated is of
+        # Optional[datetime] type because last_updated can accept None
+        # values as well. So, due to this conflict in types MyPy throwing
+        # `Incompatible types in assignment` error. Thus to avoid the error,
+        # we used ignore here.
         self.last_updated = last_updated  # type: ignore[assignment]
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
@@ -1035,7 +1050,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseSuggestion's method.
     def get_change_list_for_accepting_suggestion(self) -> None:  # type: ignore[override]
         pass

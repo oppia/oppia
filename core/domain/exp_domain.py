@@ -2141,24 +2141,26 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes its type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes its type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use MyPy ignore because
+                # 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes it's return
+                # type as recursive, like if this method returns List[str]
+                # then MyPy assumes it's type as List[List[str]]. So,
+                # because of this, MyPy throws an 'incompatible return type'
+                # error. Thus to avoid the error, we used ignore here.
                 return [
                     migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes its type as
-                # recursive, like if this method returns List[str] then MyPy
-                # assumes its type as List[List[str]]. So, because of this,
-                # MyPy throws an error. Thus to avoid the error, we used
-                # ignore here.
+                # Here we use MyPy ignore because
+                # 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes it's return
+                # type as recursive, like if this method returns List[str]
+                # then MyPy assumes it's type as List[List[str]]. So,
+                # because of this, MyPy throws an 'incompatible return type'
+                # error. Thus to avoid the error, we used ignore here.
                 return [
                     migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'SetOfTranslatableHtmlContentIds', html_set, choices
@@ -3016,8 +3018,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 is not specified.
             Exception. The exploration schema version is not valid.
         """
-        # Here, cast is used to narrow down the return type of dict_from_yaml()
-        # from Dict[str, Any] to VersionedExplorationDict.
+        # Here we use cast because we are narrowing down the return type of
+        # dict_from_yaml() from Dict[str, Any] to VersionedExplorationDict.
         try:
             exploration_dict = cast(
                 VersionedExplorationDict,
@@ -3124,16 +3126,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. The YAML representation of this exploration.
         """
         exp_dict = self.to_dict()
-        # The dictionary returned by `to_dict()` method is ExplorationDict
-        # and ExplorationDict does not contain `schema_version` key, but here
-        # we are defining a `schema_version` key which causes MyPy to throw
-        # error TypedDict has no key 'schema_version'. Thus to silent the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is ExplorationDict and ExplorationDict does not contain
+        # `schema_version` key, but here we are defining a `schema_version` key
+        # which causes MyPy to throw error 'TypedDict has no key schema_version'
+        # thus to silent the error, we used ignore here.
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
-        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict.
         del exp_dict['id']  # type: ignore[misc]
 
         return utils.yaml_from_dict(exp_dict)
@@ -3183,17 +3186,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # files must add a version parameter to their files with the correct
         # version of this object. The line below must then be moved to
         # to_dict().
-        # The dictionary returned by `to_dict()` method is ExplorationDict
-        # and ExplorationDict does not contain `version`, `created_on` and
-        # `last_updated` keys, but here we are defining those keys which
-        # causes MyPy to throw error TypedDict has no `version` key. Thus
-        # to silent the error, we used ignore here.
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is ExplorationDict and ExplorationDict does not contain
+        # `version` key, but here we are defining that key which causes MyPy to
+        # throw 'TypedDict has no version key' error. Thus to silent the error,
+        # we used ignore here.
         exploration_dict['version'] = self.version  # type: ignore[misc]
 
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is ExplorationDict and ExplorationDict does not contain
+        # `created_on` key, but here we are defining that key which causes MyPy
+        # to throw 'TypedDict has no created_on key' error. Thus to silent the
+        # error, we used ignore here.
         if self.created_on:
             exploration_dict['created_on'] = (  # type: ignore[misc]
                 utils.convert_naive_datetime_to_string(self.created_on))
 
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is ExplorationDict and ExplorationDict does not contain
+        # `last_updated` key, but here we are defining that key which causes
+        # MyPy to throw 'TypedDict has no last_updated key' error. Thus to
+        # silent the error, we used ignore here.
         if self.last_updated:
             exploration_dict['last_updated'] = (  # type: ignore[misc]
                 utils.convert_naive_datetime_to_string(self.last_updated))

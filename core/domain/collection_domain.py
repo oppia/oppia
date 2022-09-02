@@ -471,12 +471,13 @@ class Collection:
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        # Here, to_dict() method returns a general dictionary representation
-        # of domain object which do not contain properties like created_on and
-        # last_updated but MyPy expecting collection_dict a dictionary which
-        # contain all the properties of domain object. That's why we explicitly
-        # changing the type of collection_dict here which causes MyPy to throw
-        # error, thus to silent the error we added an ignore here.
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object which do not contain
+        # properties like created_on and last_updated but MyPy expecting
+        # collection_dict a dictionary which contains all the properties
+        # of domain object. That's why we explicitly changing the type of
+        # collection_dict here which causes MyPy to throw error, thus to
+        # silent the error we added an ignore here.
         collection_dict: SerializableCollectionDict = self.to_dict() # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
@@ -508,7 +509,8 @@ class Collection:
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
-        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
         del collection_dict['id'] # type: ignore[misc]
 
         return utils.yaml_from_dict(collection_dict)
@@ -566,11 +568,18 @@ class Collection:
         new_collection_dict = (
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
-        # CollectionDict is defined to match the current version of domain
-        # object and here in _convert_* functions, we can ignore some MyPy
-        # errors as we work with the previous versions of the domain objects.
+        # Here we use MyPy ignore because CollectionDict is defined to match
+        # the current version of domain object and here in _convert_* functions,
+        # we can ignore some MyPy errors as we work with the previous versions
+        # of the domain objects.
         collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
+        # Here we use MyPy ignore because 'next_skill_id' key is
+        # deprecated from the latest domain object and while accessing
+        # this key MyPy throw an error.
         collection_dict['next_skill_id'] = ( # type: ignore[misc]
+            # Here we use MyPy ignore because 'next_skill_id' key is
+            # deprecated from the latest domain object and while accessing
+            # this key MyPy throw an error.
             new_collection_dict['next_skill_id']) # type: ignore[misc]
 
         collection_dict['schema_version'] = 4
@@ -600,11 +609,11 @@ class Collection:
         as remove skills from the Collection model itself.
         """
 
-        # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
-        # it because we are in the convert function. In _convert_* functions,
-        # we can ignore some MyPy errors as we work with the previous versions
-        # of the domain objects.
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
         del collection_dict['skills'] # type: ignore[misc]
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
         del collection_dict['next_skill_index'] # type: ignore[misc]
 
         collection_dict['schema_version'] = 6
@@ -631,9 +640,9 @@ class Collection:
             Exception. The collection schema version is not valid.
         """
         try:
-            # The utils.dict_from_yaml() is general function which returns
-            # Dict[str, Any] and here we know that the returned value will
-            # be CollectionDict.
+            # Here we use MyPy ignore because utils.dict_from_yaml() is a
+            # general function which returns Dict[str, Any] and here we
+            # know that the returned value will be CollectionDict.
             collection_dict: CollectionDict = utils.dict_from_yaml(yaml_content) # type: ignore[assignment]
         except utils.InvalidInputException as e:
             raise utils.InvalidInputException(
@@ -732,16 +741,23 @@ class Collection:
 
         skill_names = set()
         for node in collection_contents['nodes']:
-            # CollectionNodeDict is defined to match the current version of
-            # domain object and here in _convert_* functions, we can ignore
-            # some MyPy errors as we work with the previous versions of the
-            # domain objects.
+            # Here we use MyPy ignore because CollectionNodeDict is defined
+            # to match the current version of domain object and here in
+            # _convert_* functions, we can ignore some MyPy errors as we
+            # work with the previous versions of the domain objects.
             skill_names.update(node['acquired_skills']) # type: ignore[misc]
+            # Here we use MyPy ignore because 'prerequisite_skills' key is
+            # deprecated from the latest domain object and while accessing
+            # this key MyPy throw an error.
             skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
         skill_names_to_ids = {
             name: _SKILL_ID_PREFIX + str(index)
             for index, name in enumerate(sorted(skill_names))
         }
+        # Here we use MyPy ignore because collection_contents['nodes']
+        # can accept list of CollectionNodeDicts, but here we are providing
+        # a list of older version dict of domain object instead of
+        # CollectionNodeDict, which causes MyPy to throw an error.
         collection_contents['nodes'] = [{ # type: ignore[typeddict-item]
             'exploration_id': node['exploration_id'],
             'prerequisite_skill_ids': [
@@ -752,9 +768,10 @@ class Collection:
                 for acquired_skill_name in node['acquired_skills']]
         } for node in collection_contents['nodes']]
 
-        # CollectionDict is defined to match the current version of domain
-        # object and here in _convert_* functions, we can ignore some MyPy
-        # errors as we work with the previous versions of the domain objects.
+        # Here we use MyPy ignore because CollectionDict is defined to match
+        # the current version of domain object and here in _convert_* functions,
+        # we can ignore some MyPy errors as we work with the previous versions
+        # of the domain objects.
         collection_contents['skills'] = { # type: ignore[misc]
             skill_id: {
                 'name': skill_name,
@@ -763,6 +780,9 @@ class Collection:
             for skill_name, skill_id in skill_names_to_ids.items()
         }
 
+        # Here we use MyPy ignore because 'next_skill_id' key is
+        # deprecated from the latest domain object and while accessing
+        # this key MyPy throw an error.
         collection_contents['next_skill_id'] = len(skill_names) # type: ignore[misc]
 
         return collection_contents
@@ -783,11 +803,17 @@ class Collection:
         Returns:
             dict. The updated collection_contents dict.
         """
-        # CollectionDict is defined to match the current version of domain
-        # object and here in _convert_* functions, we can ignore some MyPy
-        # errors as we work with the previous versions of the domain objects.
+        # Here we use MyPy ignore because 'next_skill_index' key is
+        # deprecated from the latest domain object and while accessing
+        # this key MyPy throw an error.
         collection_contents['next_skill_index'] = collection_contents[ # type: ignore[misc]
+            # Here we use MyPy ignore because 'next_skill_id' key is
+            # deprecated from the latest domain object and while accessing
+            # this key MyPy throw an error.
             'next_skill_id'] # type: ignore[misc]
+
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion
+        # from TypedDict.
         del collection_contents['next_skill_id'] # type: ignore[misc]
 
         return collection_contents
@@ -807,12 +833,12 @@ class Collection:
         Returns:
             dict. The updated collection_contents dict.
         """
-        # MyPy doesn't allow key deletion from TypedDict, also we are ignoring
-        # it because we are in the convert function. In _convert_* functions,
-        # we can ignore some MyPy errors as we work with the previous versions
-        # of the domain objects.
         for node in collection_contents['nodes']:
+            # Here we use MyPy ignore because MyPy doesn't allow key deletion
+            # from TypedDict.
             del node['prerequisite_skill_ids'] # type: ignore[misc]
+            # Here we use MyPy ignore because MyPy doesn't allow key deletion
+            # from TypedDict.
             del node['acquired_skill_ids'] # type: ignore[misc]
 
         return collection_contents

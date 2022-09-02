@@ -199,8 +199,12 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'Domain objects for web reports have not been implemented yet.'):
             self.web_report_obj.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_report_android_schema_version_not_an_int_validation_fails(
-            self) -> None:
+        self
+    ) -> None:
         self.android_report_obj.schema_version = 'bad_schema_version' # type: ignore[assignment]
         self._assert_validation_error(
             self.android_report_obj,
@@ -239,6 +243,9 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'The scrubbed_by user id \'%s\' is invalid.' % (
                 self.android_report_obj.scrubbed_by))
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_report_scrubber_id_is_not_string_validation_fails(self) -> None:
         self.android_report_obj.scrubbed_by = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -252,14 +259,21 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             self.android_report_obj,
             'Expected local timezone offset to be in')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_android_report_system_context_invalid_type_validation_fails(
-            self) -> None:
+        self
+    ) -> None:
         self.android_report_obj.device_system_context = {} # type: ignore[assignment]
         self._assert_validation_error(
             self.android_report_obj,
             'Expected device and system context to be of type '
             'AndroidDeviceSystemContext')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_report_platform_is_none_fails_validation(self) -> None:
         self.android_report_obj.platform = None # type: ignore[assignment]
         self._assert_validation_error(
@@ -455,8 +469,8 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             expected_dict, self.user_supplied_feedback.to_dict())
 
     def test_validation_invalid_report_type_fails(self) -> None:
-        # Using type ignore[assignment] because the we assign type string to
-        # type class report_type. This is done to test the validation of the
+        # Here we use MyPy ignore because here we assign type string to
+        # type class ReportType. This is done to test the validation of the
         # report_type.
         self.user_supplied_feedback.report_type = 'invalid_report_type' # type: ignore[assignment]
         self._assert_validation_error(
@@ -464,7 +478,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
     def test_validation_invalid_report_category_fails(self) -> None:
         self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
-        # Using type ignore[assignment] because the we assign type string to
+        # Here we use MyPy ignore because here we assign type string to
         # type class category. This is done to test the validation of the
         # category.
         self.user_supplied_feedback.category = 'invalid_category' # type: ignore[assignment]
@@ -480,12 +494,18 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             self.user_supplied_feedback,
             'Report cannot have selection options for category ')
 
+    # Here we use MyPy ignore because here we assign type None to
+    # type List[str]. This is done to test the validation of the
+    # UserSuppliedFeedback.
     def test_validation_selected_items_is_none_fails(self) -> None:
         self.user_supplied_feedback.user_feedback_selected_items = None # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback,
             'No user_feedback_selected_items supplied')
 
+    # Here we use MyPy ignore because here we assign type None to
+    # type List[str]. This is done to test the validation of the
+    # UserSuppliedFeedback.
     def test_validation_text_input_is_none_fails(self) -> None:
         self.user_supplied_feedback.report_type = REPORT_TYPE_SUGGESTION
         self.user_supplied_feedback.category = CATEGORY_SUGGESTION_OTHER
@@ -495,6 +515,9 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             self.user_supplied_feedback,
             'No user_feedback_selected_items supplied')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_invalid_selected_item_list_fails(self) -> None:
         self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
         self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
@@ -505,6 +528,9 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             self.user_supplied_feedback,
             'Invalid option 123 selected by user.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_invalid_text_input_with_only_text_input_allowed_fails(
             self) -> None:
         self.user_supplied_feedback.report_type = REPORT_TYPE_SUGGESTION
@@ -516,15 +542,15 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             'Invalid input text, must be a string')
 
     def test_report_type_is_none_fails_validation(self) -> None:
-        # Using type ignore[assignment] because the we assign type None to
-        # type class report_type. This is done to test the validation of the
-        # report_type.
+        # Here we use MyPy ignore because here we assign type None to
+        # type class ReportType. This is done to test the validation of
+        # the UserSuppliedFeedback.
         self.user_supplied_feedback.report_type = None # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback, 'No report_type supplied.')
 
     def test_report_category_is_none_fails_validation(self) -> None:
-        # Using type ignore[assignment] because the we assign type None to
+        # Here we use MyPy ignore because here we assign type None to
         # type class category. This is done to test the validation of the
         # category.
         self.user_supplied_feedback.category = None # type: ignore[assignment]
@@ -597,11 +623,17 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.device_system_context.to_dict())
 
+    # Here we use MyPy ignore because here we assign type None
+    # to type int. This is done to test the validation of
+    # AndroidDeviceSystemContext.
     def test_validation_version_name_is_none_fails(self) -> None:
         self.device_system_context.version_name = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context, 'No version name supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_version_name_is_not_a_string_fails(self) -> None:
         self.device_system_context.version_name = 1 # type: ignore[assignment]
         self._assert_validation_error(
@@ -613,11 +645,17 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             self.device_system_context,
             'The version name is not a valid string format')
 
+    # Here we use MyPy ignore because here we assign type None
+    # to type int. This is done to test the validation of the
+    # AndroidDeviceSystemContext.
     def test_validation_package_version_code_is_none_fails(self) -> None:
         self.device_system_context.package_version_code = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context, 'No package version code supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_package_version_code_is_not_an_int_fails(self) -> None:
         self.device_system_context.package_version_code = 'invalid_code' # type: ignore[assignment]
         self._assert_validation_error(
@@ -633,12 +671,18 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             'supported version is %d' % (
                 feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE))
 
+    # Here we use MyPy ignore because here we assign type None
+    # to type str. This is done to test the validation of the
+    # AndroidDeviceSystemContext.
     def test_validation_country_locale_code_is_none_fails(self) -> None:
         self.device_system_context.device_country_locale_code = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context,
             'No device country locale code supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_country_locale_code_not_a_string_fails(self) -> None:
         self.device_system_context.device_country_locale_code = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -651,12 +695,18 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             self.device_system_context,
             'device\'s country locale code is not a valid string')
 
+    # Here we use MyPy ignore because here we assign type None
+    # to type str. This is done to test the validation of the
+    # AndroidDeviceSystemContext.
     def test_validation_language_locale_code_is_none_fails(self) -> None:
         self.device_system_context.device_language_locale_code = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context,
             'No device language locale code supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_language_locale_code_not_a_string_fails(self) -> None:
         self.device_system_context.device_language_locale_code = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -669,23 +719,35 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             self.device_system_context,
             'device\'s language locale code is not a valid string')
 
+    # Here we use MyPy ignore because here we assign type None
+    # to type str. This is done to test the validation of the
+    # AndroidDeviceSystemContext.
     def test_validation_device_model_is_none_fails(self) -> None:
         self.device_system_context.device_model = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context,
             'No device model supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_device_model_not_a_string_fails(self) -> None:
         self.device_system_context.device_model = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context,
             'Android device model must be an string')
 
+    # Here we use MyPy ignore because here we assign type None
+    # to type int. This is done to test the validation of the
+    # AndroidDeviceSystemContext.
     def test_validation_sdk_version_is_none_fails(self) -> None:
         self.device_system_context.sdk_version = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context, 'No SDK version supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_sdk_version_not_an_int_fails(self) -> None:
         self.device_system_context.sdk_version = 'invalid_sdk_code' # type: ignore[assignment]
         self._assert_validation_error(
@@ -697,21 +759,33 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.device_system_context, 'Invalid SDK version')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_build_fingerprint_is_none_fails(self) -> None:
         self.device_system_context.build_fingerprint = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context, 'Build fingerprint must be a string')
 
+    # Here we use MyPy ignore because here we assigning type None
+    # to type str. This is done to test the validation of the
+    # AndroidDeviceSystemContext.
     def test_validation_build_fingerprint_not_a_string_fails(self) -> None:
         self.device_system_context.build_fingerprint = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context, 'No build fingerprint supplied.')
 
+    # Here we use MyPy ignore because here we assigning type None
+    # to type AndroidNetworkType Enum. This is done to test the
+    # validation of the AndroidDeviceSystemContext.
     def test_validation_network_type_is_none_fails(self) -> None:
         self.device_system_context.network_type = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context, 'No network type supplied.')
 
+    # Here we use MyPy ignore because here we assigning type str
+    # to type AndroidNetworkType Enum. This is done to test the
+    # validation of the AndroidDeviceSystemContext.
     def test_validation_invalid_network_type_fails(self) -> None:
         self.device_system_context.network_type = 'invaid_network_type' # type: ignore[assignment]
         self._assert_validation_error(
@@ -773,7 +847,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
             expected_dict, self.entry_point.to_dict())
 
     def test_validation_name_is_none_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type None to
+        # Here we use MyPy ignore because we assign type None to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -781,9 +855,10 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
             'No entry point name supplied.'):
             self.entry_point.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type int to
-        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -818,18 +893,17 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # Here we use MyPy ignore because we assign type None to type str.
+    # This is done to test the validation of LessonPlayerEntryPoint.
     def test_validation_name_is_none_fails(self) -> None:
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
             'No entry point name supplied.')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -864,9 +938,9 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             'Exploration with id invalid_exploration is not part of story '
             'with id')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_exploration_id_not_a_stringfails(self) -> None:
         self.entry_point.topic_id = 'valid_topic1'
         self.entry_point.story_id = 'valid_story1'
@@ -875,9 +949,9 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             self.entry_point,
             'Exploration id should be a string')
 
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_story_id_fails_on_none_value(self) -> None:
         self.entry_point.topic_id = 'valid_topic1'
         self.entry_point.story_id = None
@@ -922,16 +996,17 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
             expected_dict, self.entry_point.to_dict())
 
     def test_validation_name_is_none_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type None to
+        # Here we use MyPy ignore because we assign type None to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
             'No entry point name supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type int to
-        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.entry_point,
@@ -990,7 +1065,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
             expected_dict, self.entry_point.to_dict())
 
     def test_validation_name_is_none_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type None to
+        # Here we use MyPy ignore because we assign type None to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -998,9 +1073,10 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
             'No entry point name supplied.'):
             self.entry_point.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
-        # Using type ignore[assignment] because we assign type int to
-        # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1076,32 +1152,48 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.app_context.to_dict())
 
+    # Here we use MyPy ignore because we assign type None to
+    # type AndroidTextSize Enum. This is done to test that the
+    # validation fails.
     def test_validation_text_size_is_none_fails(self) -> None:
         self.app_context.text_size = None # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context, 'No text size supplied.')
 
+    # Here we use MyPy ignore because we assign type string to
+    # type AndroidTextSize Enum. This is done to test that the
+    # validation fails.
     def test_validation_text_size_is_invalid_fails(self) -> None:
         self.app_context.text_size = 'invalid_text_size' # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context, 'App text size should be one of')
 
+    # Here we use MyPy ignore because we assign type None to
+    # type str. This is done to test that the validation fails.
     def test_validation_text_language_code_is_none_fails(self) -> None:
         self.app_context.text_language_code = None # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context, 'No app text language code supplied.')
 
+    # Here we use MyPy ignore because we assign type None to
+    # type str. This is done to test that the validation fails.
     def test_validation_audio_language_code_is_none_fails(self) -> None:
         self.app_context.audio_language_code = None # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context, 'No app audio language code supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_text_language_code_is_not_a_string_fails(self) -> None:
         self.app_context.text_language_code = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context,
             'Expected the app\'s text language code to be a string')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_audio_language_code_is_not_a_string_fails(self) -> None:
         self.app_context.audio_language_code = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1120,29 +1212,44 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
             self.app_context,
             'The app\'s audio language code is not a valid string')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_only_allow_wifi_downloads_is_none_fails(self) -> None:
         self.app_context.only_allows_wifi_download_and_update = None # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context,
             'only_allows_wifi_download_and_update field should be a boolean')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_automatically_update_topics_is_none_fails(self) -> None:
         self.app_context.automatically_update_topics = None # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context,
             'automatically_update_topics field should be a boolean')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_account_is_profile_admin_is_none_fails(self) -> None:
         self.app_context.account_is_profile_admin = None # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context,
             'account_is_profile_admin field should be a boolean')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_event_logs_is_none_fails(self) -> None:
         self.app_context.event_logs = None # type: ignore[assignment]
         self._assert_validation_error(
             self.app_context, 'Should have an event log list')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_logcat_logs_is_none_fails(self) -> None:
         self.app_context.logcat_logs = None # type: ignore[assignment]
         self._assert_validation_error(
@@ -1220,6 +1327,9 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.ticket_obj.to_dict())
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_ticket_id_not_a_string_fails(self) -> None:
         self.ticket_obj.ticket_id = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1232,12 +1342,17 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             self.ticket_obj,
             'The ticket id %s is invalid' % 'invalid_ticket_id')
 
+    # Here we use MyPy ignore because we assign type None to
+    # type str. This is done to test that the validation fails.
     def test_validation_ticket_name_is_none_fails(self) -> None:
         self.ticket_obj.ticket_name = None  # type: ignore[assignment]
         self._assert_validation_error(
             self.ticket_obj,
             'No ticket name supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_ticket_name_is_not_a_string_fails(self) -> None:
         self.ticket_obj.ticket_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1252,12 +1367,17 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             self.ticket_obj,
             'The ticket name is too long, has %d characters' % len(long_name))
 
+    # Here we use MyPy ignore because we assign type None to
+    # type List[str]. This is done to test that the validation fails.
     def test_validation_report_ids_is_none_fails(self) -> None:
         self.ticket_obj.reports = None # type: ignore[assignment]
         self._assert_validation_error(
             self.ticket_obj,
             'No reports list supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_report_ids_not_a_list_fails(self) -> None:
         self.ticket_obj.reports = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1276,6 +1396,9 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             self.ticket_obj,
             'The Github issue number name must be a positive integer')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_github_repo_name_not_a_string_fails(self) -> None:
         self.ticket_obj.github_issue_repo_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1288,6 +1411,9 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             self.ticket_obj,
             'The Github repo %s is invalid' % 'invalid_repo_name')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_archived_is_not_boolean_fails(self) -> None:
         self.ticket_obj.archived = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1399,6 +1525,9 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
     def test_validation_on_valid_stats_does_not_fail(self) -> None:
         self.stats_obj.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_stats_id_is_not_a_string_fails(self) -> None:
         self.stats_obj.stats_id = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1409,8 +1538,12 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.stats_obj, 'The stats id %s is invalid' % 'invalid_stats_id')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_total_reports_submitted_is_not_an_int_fails(
-            self) -> None:
+        self
+    ) -> None:
         self.stats_obj.total_reports_submitted = 'wrong type' # type: ignore[assignment]
         self._assert_validation_error(
             self.stats_obj,
@@ -1424,6 +1557,9 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             'The total number of submitted reports should be a non-negative '
             'int')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_daily_param_stats_is_not_a_dict_fails(self) -> None:
         self.stats_obj.daily_param_stats = 123 # type: ignore[assignment]
         self._assert_validation_error(
@@ -1440,6 +1576,9 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             'The parameter %s is not a valid parameter to aggregate stats '
             'on' % 'invalid_stat_name')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_parameter_value_counts_objects_are_invalid_fails(
             self) -> None:
         self.stats_obj.daily_param_stats = {
@@ -1486,10 +1625,15 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, counts_obj.to_dict())
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_with_invalid_parameter_value_fails(self) -> None:
         counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
             {
                 1: 1, # type: ignore[dict-item]
+                # Here we use MyPy ignore because this wrong type is provided
+                # only for type checking.
                 2: 1 # type: ignore[dict-item]
             })
         self._assert_validation_error(
@@ -1545,7 +1689,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
             """Invalid field name."""
 
             INVALID_FILTER_FIELD = 'invalid_filter_field'
-        # Using type ignore[assignment] because we assign type
+        # Here we use MyPy ignore because we assign type
         # "InvalidFieldName" to the class filter field name.
         # This is done to make sure that the type checker does
         # not complain about the type of the filter field name.
@@ -1554,6 +1698,9 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
             self.filter,
             'The filter field should be one of ')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_filter_values_list_is_none_fails(self) -> None:
         self.filter.filter_options = None # type: ignore[assignment]
         self._assert_validation_error(
