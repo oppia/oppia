@@ -3342,6 +3342,9 @@ class State(translation_domain.BaseTranslatableObject):
             ca_specs_dict = interaction_specs[interaction_id][
                 'customization_arg_specs']
             for spec in ca_specs_dict:
+                if not spec["name"] in customisation_args:
+                    continue
+
                 customisation_arg = customisation_args[spec["name"]]
                 contents = (
                     InteractionCustomizationArg.traverse_by_schema_and_get(
