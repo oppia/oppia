@@ -26,6 +26,7 @@ export interface GraphLink {
   source: string;
   target: string;
   linkProperty: string | null;
+  connectsDestIfStuck: boolean;
 }
 
 export interface GraphNodes {
@@ -57,20 +58,41 @@ export class ComputeGraphService {
           links.push({
             source: stateName,
             target: groups[h].outcome.dest,
-            linkProperty: null
+            linkProperty: null,
+            connectsDestIfStuck: false
           });
+          if (groups[h].outcome.destIfReallyStuck) {
+            links.push({
+              source: stateName,
+              // This throws "TS2322: Type 'string | null' is not assignable
+              // to type 'string'" We need to suppress this error because the
+              // value is explicitly checked above in the if condition.
+              // @ts-ignore
+              target: groups[h].outcome.destIfReallyStuck,
+              linkProperty: null,
+              connectsDestIfStuck: true
+            });
+          }
         }
 
         if (interaction.defaultOutcome) {
           links.push({
             source: stateName,
             target: interaction.defaultOutcome.dest,
-            linkProperty: null
+            linkProperty: null,
+            connectsDestIfStuck: false
           });
+          if (interaction.defaultOutcome.destIfReallyStuck) {
+            links.push({
+              source: stateName,
+              target: interaction.defaultOutcome.destIfReallyStuck,
+              linkProperty: null,
+              connectsDestIfStuck: true
+            });
+          }
         }
       }
     });
-
     return {
       finalStateIds: finalStateIds,
       initStateId: initStateId,

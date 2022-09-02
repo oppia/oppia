@@ -75,6 +75,8 @@ export class AddAnswerGroupModalComponent
    questionModeEnabled: boolean = false;
    isInvalid: boolean = false;
    validation: boolean = false;
+   destIfStuckFeatEnabled: boolean =
+     AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED;
 
    constructor(
      private ngbActiveModal: NgbActiveModal,
@@ -148,6 +150,7 @@ export class AddAnswerGroupModalComponent
      this.populateRuleContentIdsService
        .populateNullRuleContentIds(this.tmpRule);
      this.stateEditorService.onSaveOutcomeDestDetails.emit();
+     this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
 
      this.editorFirstTimeEventsService.registerFirstSaveRuleEvent();
 

@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the outcome destination editor.
+ * @fileoverview Component for the outcome if stuck destination editor.
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
@@ -24,12 +24,11 @@ import { StateGraphLayoutService } from 'components/graph-services/graph-layout.
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 interface DestinationChoice {
-  id: string;
+  id: string | null;
   text: string;
 }
 
@@ -37,65 +36,53 @@ interface DestValidation {
   isCreatingNewState: boolean;
   value: string;
 }
+
 @Component({
-  selector: 'oppia-outcome-destination-editor',
-  templateUrl: './outcome-destination-editor.component.html'
+  selector: 'oppia-outcome-if-stuck-destination-editor',
+  templateUrl: './outcome-if-stuck-destination-editor.component.html'
 })
-export class OutcomeDestinationEditorComponent implements OnInit {
+export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
   @Output() getChanges: EventEmitter<DestValidation> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() outcome!: Outcome;
-  @Input() outcomeHasFeedback!: boolean;
   explorationAndSkillIdPattern!: RegExp;
   newStateNamePattern!: RegExp;
-  destinationChoices!: DestinationChoice[];
+  destinationChoices: DestinationChoice[] = [];
   maxLen!: number;
   outcomeNewStateName!: string;
-  currentStateName!: string;
+  currentStateName: string | null = null;
   directiveSubscriptions: Subscription = new Subscription();
-  canAddPrerequisiteSkill: boolean = false;
-  canEditRefresherExplorationId: boolean = false;
-  ENABLE_PREREQUISITE_SKILLS: boolean = (
-    AppConstants.ENABLE_PREREQUISITE_SKILLS);
-
-  EXPLORATION_AND_SKILL_ID_PATTERN: RegExp = (
-    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
 
   MAX_STATE_NAME_LENGTH: number = (
     AppConstants.MAX_STATE_NAME_LENGTH);
 
-  PLACEHOLDER_OUTCOME_DEST: string = (
-    AppConstants.PLACEHOLDER_OUTCOME_DEST);
+  PLACEHOLDER_OUTCOME_DEST_IF_STUCK: string = (
+    AppConstants.PLACEHOLDER_OUTCOME_DEST_IF_STUCK);
 
   constructor(
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private focusManagerService: FocusManagerService,
     private stateEditorService: StateEditorService,
-    private stateGraphLayoutService: StateGraphLayoutService,
-    private userService: UserService,
+    private stateGraphLayoutService: StateGraphLayoutService
   ) {}
 
-  isSelfLoop(): boolean {
-    return this.outcome.dest === this.currentStateName;
-  }
-
   updateChanges($event: string): void {
-    if ($event !== '') {
+    if ($event.length > 0) {
       this.outcomeNewStateName = $event;
+      let validation = {
+        isCreatingNewState: this.isCreatingNewState(),
+        value: $event
+      };
+      this.getChanges.emit(validation);
     }
-
-    let validation = {
-      isCreatingNewState: this.isCreatingNewState(),
-      value: $event
-    };
-    this.getChanges.emit(validation);
   }
 
-  onDestSelectorChange(): void {
-    if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
+  onDestIfStuckSelectorChange(): void {
+    if (this.outcome.destIfReallyStuck ===
+      this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
       this.focusManagerService.setFocus('newStateNameInputField');
     }
 
@@ -108,23 +95,22 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
   isCreatingNewState(): boolean {
     this.maxLen = this.MAX_STATE_NAME_LENGTH;
-    return this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST;
+    return (
+      this.outcome.destIfReallyStuck ===
+        this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK);
   }
 
   updateOptionNames(): void {
     // The setTimeout is being used here to update the view.
     setTimeout(() => {
-      let activeStateName = this.stateEditorService.getActiveStateName();
-      if (activeStateName === null) {
-        throw new Error('Active state name is null');
-      }
-      this.currentStateName = activeStateName;
+      this.currentStateName = this.stateEditorService.getActiveStateName();
+      let questionModeEnabled = this.stateEditorService.isInQuestionMode();
       // This is a list of objects, each with an ID and name. These
       // represent all states, as well as an option to create a
       // new state.
       this.destinationChoices = [{
         id: this.currentStateName,
-        text: '(try again)'
+        text: 'None'
       }];
 
       // Arrange the remaining states based on their order in the state
@@ -182,46 +168,37 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         }
       }
 
-      this.destinationChoices.push({
-        id: this.PLACEHOLDER_OUTCOME_DEST,
-        text: 'A New Card Called...'
-      });
+      if (!questionModeEnabled) {
+        this.destinationChoices.push({
+          id: this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
+          text: 'A New Card Called...'
+        });
+      }
     // This value of 10ms is arbitrary, it has no significance.
     }, 10);
   }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.stateEditorService.onSaveOutcomeDestDetails.subscribe(() => {
-        // Create new state if specified.
-        if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
-          this.editorFirstTimeEventsService
-            .registerFirstCreateSecondStateEvent();
+      this.stateEditorService.onSaveOutcomeDestIfStuckDetails.
+        subscribe(() => {
+          // Create new state if specified.
+          if (this.outcome.destIfReallyStuck ===
+                this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
+            this.editorFirstTimeEventsService
+              .registerFirstCreateSecondStateEvent();
 
-          let newStateName = this.outcomeNewStateName;
-          this.outcome.dest = newStateName;
-          this.addState.emit(newStateName);
-        }
-      }));
+            let newStateName = this.outcomeNewStateName;
+            this.outcome.destIfReallyStuck = newStateName;
+            this.addState.emit(newStateName);
+          }
+        }));
     this.updateOptionNames();
     this.directiveSubscriptions.add(
       this.stateEditorService.onStateNamesChanged.subscribe(() => {
         this.updateOptionNames();
       }));
-    this.canAddPrerequisiteSkill = (
-      this.ENABLE_PREREQUISITE_SKILLS &&
-      this.stateEditorService.isExplorationWhitelisted());
-    this.canEditRefresherExplorationId = false;
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      // We restrict editing of refresher exploration IDs to
-      // admins/moderators for now, since the feature is still in
-      // development.
-      this.canEditRefresherExplorationId = (
-        userInfo.isCurriculumAdmin() || userInfo.isModerator());
-    });
 
-    this.explorationAndSkillIdPattern = (
-      this.EXPLORATION_AND_SKILL_ID_PATTERN);
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
     this.destinationChoices = [];
   }
@@ -231,7 +208,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaOutcomeDestinationEditor',
+angular.module('oppia').directive('oppiaOutcomeIfStuckDestinationEditor',
   downgradeComponent({
-    component: OutcomeDestinationEditorComponent
+    component: OutcomeIfStuckDestinationEditorComponent
   }) as angular.IDirectiveFactory);

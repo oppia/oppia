@@ -18,7 +18,9 @@ with the same id on the page. -->
         <g [attr.transform]="overallTransformStr" width="100%" height="100%">
           <g class="pannable-child" [attr.transform]="innerTransformStr">
             <g class="widthLocation" *ngFor="let link of augmentedLinks">
-              <path class="link e2e-test-link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style">
+              <path class="link e2e-test-link" *ngIf="link.d && !link.connectsDestIfStuck" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style">
+              </path>
+              <path class="link e2e-test-link" *ngIf="link.d && link.connectsDestIfStuck" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style" stroke-dasharray="3,4">
               </path>
             </g>
 

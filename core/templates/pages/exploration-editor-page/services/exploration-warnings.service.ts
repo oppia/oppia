@@ -62,7 +62,8 @@ interface _verifyParametersResult {
 interface _getReversedLinksResult {
   source: string;
   target: string;
-  linkProperty: string;
+  linkProperty: string | null;
+  connectsDestIfStuck: boolean;
 }
 
 const INTERACTION_SERVICE_MAPPING = {
@@ -183,6 +184,7 @@ export class ExplorationWarningsService {
         source: link.target,
         target: link.source,
         linkProperty: null,
+        connectsDestIfStuck: false
       };
     });
   }

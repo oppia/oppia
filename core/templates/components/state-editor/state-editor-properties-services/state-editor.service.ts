@@ -67,6 +67,7 @@ export class StateEditorService {
     new EventEmitter<AnswerChoice[]>();
 
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
+  private _saveOutcomeDestIfStuckDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
 
@@ -348,6 +349,10 @@ export class StateEditorService {
 
   get onSaveOutcomeDestDetails(): EventEmitter<void> {
     return this._saveOutcomeDestDetailsEventEmitter;
+  }
+
+  get onSaveOutcomeDestIfStuckDetails(): EventEmitter<void> {
+    return this._saveOutcomeDestIfStuckDetailsEventEmitter;
   }
 
   get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {

@@ -69,9 +69,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       State1: 'State 1 Node'
     },
     links: [{
+      connectsDestIfStuck: false,
       linkProperty: 'added',
       source: '',
-      target: ''
+      target: '',
     }],
     initStateId: 'state_1',
     finalStateIds: []
@@ -213,7 +214,8 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       source: null,
       target: null,
       d: null,
-      style: ''
+      style: '',
+      connectsDestIfStuck: false
     }]);
 
     component.linkPropertyMapping = {

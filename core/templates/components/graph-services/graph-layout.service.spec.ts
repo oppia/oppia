@@ -241,62 +241,74 @@ describe('Graph Layout Service', () => {
     {
       source: 'State1',
       target: 'State1',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State2',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State3',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State5',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State6',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State7',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State8',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State9',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State2',
       target: 'State4',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State3',
       target: 'State4',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State9',
       target: 'State8',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State8',
       target: 'State4',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
   ];
 
@@ -304,27 +316,32 @@ describe('Graph Layout Service', () => {
     {
       source: 'State1',
       target: 'State1',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State2',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State1',
       target: 'State3',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State2',
       target: 'State4',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
     {
       source: 'State3',
       target: 'State4',
-      linkProperty: ''
+      linkProperty: '',
+      connectsDestIfStuck: false
     },
   ];
 
@@ -602,7 +619,8 @@ describe('Graph Layout Service', () => {
       {
         source: 'State1',
         target: 'State2',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       }
     ];
 
@@ -757,12 +775,14 @@ describe('Graph Layout Service', () => {
       links.push({
         source: 'State0',
         target: stateName,
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       });
       links.push({
         source: stateName,
         target: 'End',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       });
     }
 
@@ -794,57 +814,68 @@ describe('Graph Layout Service', () => {
       {
         source: 'State5',
         target: 'End',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State4',
         target: 'End',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State3',
         target: 'End',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State2',
         target: 'End',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State1',
         target: 'End',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State0',
         target: 'State1',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State0',
         target: 'State2',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State0',
         target: 'State3',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State0',
         target: 'State4',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State0',
         target: 'State5',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       },
       {
         source: 'State0',
         target: 'State0',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       }
     ];
     let initNodeId = 'State0';

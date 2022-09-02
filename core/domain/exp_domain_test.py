@@ -1253,15 +1253,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome.dest_if_really_stuck = None
 
-        # Testing the default outcome does not direct stuck learner
-        # back to the same state.
-        default_outcome.dest_if_really_stuck = exploration.init_state_name
-        self._assert_validation_error(
-            exploration, 'The destination for a stuck learner '
-            'cannot be the same state.')
-
-        default_outcome.dest_if_really_stuck = None
-
         answer_group.outcome.dest = 'DEF'
         self._assert_validation_error(
             exploration, 'destination DEF is not a valid')
@@ -1272,10 +1263,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'The destination for the stuck learner '
             'XYZ is not a valid state')
 
-        answer_group.outcome.dest_if_really_stuck = exploration.init_state_name
-        self._assert_validation_error(
-            exploration, 'The destination for a stuck learner '
-            'cannot be the same state.')
         answer_group.outcome.dest_if_really_stuck = None
 
         # Restore a valid exploration.
@@ -5818,7 +5805,16 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             exploration.delete_state(exploration.init_state_name)
 
         exploration.add_states(['second state'])
+
+        interaction = exploration.states['first state'].interaction
+
+        default_outcome_for_first_state = interaction.default_outcome
+        assert default_outcome_for_first_state is not None
+        default_outcome_for_first_state.dest_if_really_stuck = 'second state'
+
         exploration.delete_state('second state')
+        self.assertEqual(
+            default_outcome_for_first_state.dest_if_really_stuck, 'first state')
 
         with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
@@ -11179,7 +11175,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'param_changes': [],
                 'dest': 'End',
-                'dest_if_really_stuck': None,
+                'dest_if_really_stuck': 'End',
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',

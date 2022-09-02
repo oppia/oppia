@@ -293,6 +293,7 @@ describe('Responses Service', () => {
         hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
         isConfusing: jasmine.createSpy('isConfusing'),
       },
+      destIfReallyStuck: null,
       trainingData: ['This is training data text'],
       taggedSkillMisconceptionId: '',
       toBackendDict: jasmine.createSpy('toBackendDict'),
@@ -308,6 +309,8 @@ describe('Responses Service', () => {
     expectedAnswerGroup[0].outcome.feedback =
       updatedAnswerGroup.outcome.feedback;
     expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
+    expectedAnswerGroup[0].outcome.destIfReallyStuck =
+      updatedAnswerGroup.outcome.destIfReallyStuck;
     expectedAnswerGroup[0].outcome.refresherExplorationId =
       updatedAnswerGroup.outcome.refresherExplorationId;
     expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
@@ -375,6 +378,8 @@ describe('Responses Service', () => {
     expectedAnswerGroup[0].outcome.feedback =
       updatedAnswerGroup.outcome.feedback;
     expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
+    expectedAnswerGroup[0].outcome.destIfReallyStuck =
+      updatedAnswerGroup.outcome.destIfReallyStuck;
     expectedAnswerGroup[0].outcome.refresherExplorationId =
       updatedAnswerGroup.outcome.refresherExplorationId;
     expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =

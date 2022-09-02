@@ -45,6 +45,7 @@ export interface AugmentedLink {
   target: NodeData;
   d?: string;
   style?: string;
+  connectsDestIfStuck: boolean;
 }
 
 export interface NodeData {
@@ -104,7 +105,6 @@ export class StateGraphLayoutService {
   getIndentationLevels(
       adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
     var indentationLevels: number[] = [];
-
     // Recursively find and indent the longest shortcut for the segment of
     // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
     // (inclusive). It's possible that this shortcut starts from a trunk
@@ -537,7 +537,8 @@ export class StateGraphLayoutService {
     var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
         source: cloneDeep(nodeData[link.source]),
-        target: cloneDeep(nodeData[link.target])
+        target: cloneDeep(nodeData[link.target]),
+        connectsDestIfStuck: cloneDeep(link.connectsDestIfStuck)
       };
     });
 

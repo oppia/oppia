@@ -59,6 +59,7 @@
                                                [taggedSkillMisconceptionId]="answerGroup.taggedSkillMisconceptionId"
                                                (onSaveAnswerGroupFeedback)="saveActiveAnswerGroupFeedback($event)"
                                                (onSaveAnswerGroupDest)="saveActiveAnswerGroupDest($event)"
+                                               (onSaveAnswerGroupDestIfStuck)="saveActiveAnswerGroupDestIfStuck($event)"
                                                (onSaveAnswerGroupCorrectnessLabel)="saveActiveAnswerGroupCorrectnessLabel($event)"
                                                (onSaveAnswerGroupRules)="saveActiveAnswerGroupRules($event)"
                                                (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
@@ -119,6 +120,7 @@
                                                [addState]="addState"
                                                (onSaveAnswerGroupFeedback)="saveDefaultOutcomeFeedback($event)"
                                                (onSaveAnswerGroupDest)="saveDefaultOutcomeDest($event)"
+                                               (onSaveAnswerGroupDestIfStuck)="saveDefaultOutcomeDestIfStuck($event)"
                                                (onSaveAnswerGroupCorrectnessLabel)="saveDefaultOutcomeCorrectnessLabel($event)"
                                                (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                                (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendshowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">

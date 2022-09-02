@@ -50,6 +50,12 @@
                                       (getChanges)="validateChanges($event)"
                                       (addState)="updateState($event)">
     </oppia-outcome-destination-editor>
+
+    <oppia-outcome-if-stuck-destination-editor [outcome]="tmpOutcome"
+                                               *ngIf="!questionModeEnabled && destIfStuckFeatEnabled && !tmpOutcome.labelledAsCorrect"
+                                               (getChanges)="validateChanges($event)"
+                                               (addState)="updateState($event)">
+    </oppia-outcome-if-stuck-destination-editor>
   </form>
 
   <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
@@ -58,6 +64,7 @@
            [(ngModel)]="tmpOutcome.labelledAsCorrect">
     <strong>The answers in this group are correct</strong>
   </div>
+
   <oppia-question-misconception-editor *ngIf="questionModeEnabled"
                                        (saveTaggedMisconception)="updateTaggedMisconception($event)"
                                        (saveAnswerGroupFeedback)="updateAnswerGroupFeedback($event)"
