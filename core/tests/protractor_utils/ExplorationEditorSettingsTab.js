@@ -47,6 +47,8 @@ var ExplorationEditorSettingsTab = function() {
       by.cssContainingText(
         '.e2e-test-initial-state-select-element', stateName));
   };
+  var containerLocator = element(
+    by.css('.e2e-test-exploration-category-dropdown'));
   var neutralElement = element(by.css('.e2e-test-settings-container'));
 
   /*
@@ -85,7 +87,7 @@ var ExplorationEditorSettingsTab = function() {
     await action.waitForAutosave();
     await action.click(
       'Disable Correctness Feedback Button', disableCorrectnessFeedbackButton);
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
@@ -113,16 +115,14 @@ var ExplorationEditorSettingsTab = function() {
       closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setCategory = async function(category) {
-    await action.click('Neutral element', neutralElement);
     await waitFor.presenceOf(
       explorationCategory, 'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(
-        explorationCategory)
+      await forms.AutocompleteDropdownEditor(explorationCategory)
     ).setValue(category);
   };
 
@@ -169,11 +169,10 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.expectCategoryToBe = async function(category) {
-    var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
     await waitFor.presenceOf(
       explorationCategory,
       'Exploration category input takes too long to be visible.');
-    expect(await element(containerLocator).getText()).
+    expect(await containerLocator.getText()).
       toEqual(category);
   };
 
@@ -189,7 +188,6 @@ var ExplorationEditorSettingsTab = function() {
       explorationLanguageInput, 'Language input takes too long to be visible.');
     expect(await explorationLanguageInput.getText()).
       toEqual(language);
-    await action.click('Neutral element', neutralElement);
   };
 
   this.expectObjectiveToBe = async function(objective) {

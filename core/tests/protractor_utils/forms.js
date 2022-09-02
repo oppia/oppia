@@ -346,8 +346,7 @@ var AutocompleteDropdownEditor = function(elem) {
 
       await action.click(
         'Dropdown Element Select',
-        searchInputLocatorText,
-        true);
+        searchInputLocatorText);
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click(
@@ -363,7 +362,7 @@ var AutocompleteDropdownEditor = function(elem) {
       await action.sendKeys(
         'Dropdown Element',
         element(searchInputLocator),
-        protractor.Key.ENTER);
+        '\n');
     }
   };
 };
