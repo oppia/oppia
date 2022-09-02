@@ -210,11 +210,13 @@ describe('Statistics Tab Component', function() {
       links: [{
         source: 'State1',
         target: 'outcome 1',
-        linkProperty: null
+        linkProperty: null,
+        connectsDestIfStuck: false
       }, {
         source: 'State1',
         target: 'outcome 2',
-        linkProperty: null
+        linkProperty: null,
+        connectsDestIfStuck: false
       }],
       nodes: {
         State1: 'State1'

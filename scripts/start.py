@@ -201,5 +201,5 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         dev_appserver.wait()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()
