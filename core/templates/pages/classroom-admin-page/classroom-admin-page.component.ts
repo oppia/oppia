@@ -40,8 +40,8 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   classroomCount: number = 0;
   classroomIdToClassroomName: {[classroomId: string]: string} = {};
-  selectedClassroomDict: ClassroomDict;
-  updatedClassroomDict: ClassroomDict;
+  selectedClassroomDict!: ClassroomDict;
+  updatedClassroomDict!: ClassroomDict;
 
   classroomId: string = '';
   classroomName: string = '';
