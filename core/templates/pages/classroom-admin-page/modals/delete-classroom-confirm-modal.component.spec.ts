@@ -43,7 +43,6 @@ describe('Delete Classroom Confirmation Modal', () => {
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-
   });
 
   it('should create', () => {

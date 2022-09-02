@@ -38,18 +38,18 @@ export class ClassroomAdminPageComponent implements OnInit {
     private ngbModal: NgbModal,
   ) {}
 
-  classroomCount: number;
-  classroomIdToClassroomName: {[classroomId: string]: string};
+  classroomCount: number = 0;
+  classroomIdToClassroomName: {[classroomId: string]: string} = {};
   selectedClassroomDict: ClassroomDict;
   updatedClassroomDict: ClassroomDict;
 
-  classroomId: string;
-  classroomName: string;
-  urlFragment: string;
-  courseDetails: string;
-  topicListIntro: string;
-  topicIds: string[];
-  topicIdToPrerequisiteTopicIds: {[topicId: string]: string[]};
+  classroomId: string = '';
+  classroomName: string = '';
+  urlFragment: string = '';
+  courseDetails: string = '';
+  topicListIntro: string = '';
+  topicIds: string[] = [];
+  topicIdToPrerequisiteTopicIds: {[topicId: string]: string[]} = {};
 
   pageIsInitialized: boolean = false;
   classroomDataIsChanged: boolean = false;

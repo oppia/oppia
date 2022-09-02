@@ -36,7 +36,7 @@ export class CreateNewClassroomModalComponent
     super(ngbActiveModal);
   }
 
-  existingClassroomNames: string[];
+  existingClassroomNames: string[] = [];
   newClassroomName: string = '';
   newClassroomId: string = '';
   classroomNameAlreadyExist: boolean = false;

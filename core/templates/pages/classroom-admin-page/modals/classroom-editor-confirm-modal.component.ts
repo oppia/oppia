@@ -27,7 +27,6 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class ClassroomEditorConfirmModalComponent
   extends ConfirmOrCancelModal {
-
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {

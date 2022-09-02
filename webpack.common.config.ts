@@ -67,7 +67,7 @@ module.exports = {
     classroom_admin:
       commonPrefix + '/pages/classroom-admin-page/' +
       'classroom-admin-page.import.ts',
-      collection_editor:
+    collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.import.ts',
     collection_player:
