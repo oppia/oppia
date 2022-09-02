@@ -2680,7 +2680,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        suggestion_change_1 = {
+        suggestion_change_1: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2696,7 +2699,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_1,
             'skill_difficulty': 0.3
         }
-        suggestion_change_2 = {
+        suggestion_change_2: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2712,11 +2718,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
@@ -2788,7 +2794,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        suggestion_change_1 = {
+        suggestion_change_1: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2804,7 +2813,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_1,
             'skill_difficulty': 0.3
         }
-        suggestion_change_2 = {
+        suggestion_change_2: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2820,11 +2832,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
@@ -2912,7 +2924,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        suggestion_change_1 = {
+        suggestion_change_1: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2928,7 +2943,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_1,
             'skill_difficulty': 0.3
         }
-        suggestion_change_2 = {
+        suggestion_change_2: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2944,11 +2962,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
@@ -3040,7 +3058,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        suggestion_change_1 = {
+        suggestion_change_1: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -3056,7 +3077,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_1,
             'skill_difficulty': 0.3
         }
-        suggestion_change_2 = {
+        suggestion_change_2: Dict[
+            str,
+            Union[str, float, Dict[str, Union[
+                str, List[str], int, state_domain.StateDict]]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -3072,11 +3096,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
+        latest_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
