@@ -3,6 +3,7 @@
     <div>
       <h3>Classroom config properties</h3>
     </div>
+    <hr>
     <div>
       <p>
         Configure the details of a classroom.
@@ -33,7 +34,7 @@
           <button mat-button matSuffix mat-icon-button
                   aria-label="Clear"
                   *ngIf="!(classroomEditorMode && classroom.key == classroomId)"
-                  (click)="deleteClassroom($event, classroom.key)">
+                  (click)="deleteClassroom(classroom.key); $event.stopPropagation()">
             <mat-icon matListIcon>close</mat-icon>
           </button>
         </div>
@@ -56,7 +57,7 @@
             </span>
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="classroomName"
-                      (blur)="updateClassroomName()"
+                      (blur)="updateClassroomName(classroomName)"
                       rows="1"
                       class="classroom-field">
             </textarea>
@@ -71,7 +72,7 @@
             </span>
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="urlFragment"
-                      (blur)="updateUrlFragment()"
+                      (blur)="updateUrlFragment(urlFragment)"
                       rows="1"
                       class="classroom-field">
             </textarea>
@@ -86,7 +87,7 @@
             </span>
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="courseDetails"
-                      (blur)="updateCourseDetails()"
+                      (blur)="updateCourseDetails(courseDetails)"
                       rows="6"
                       class="classroom-field">
             </textarea>
@@ -101,7 +102,7 @@
             </span>
             <textarea *ngIf="classroomEditorMode"
                       [(ngModel)]="topicListIntro"
-                      (blur)="updateTopicListIntro()"
+                      (blur)="updateTopicListIntro(topicListIntro)"
                       rows="4"
                       class="classroom-field">
             </textarea>
@@ -182,6 +183,7 @@
   .add-new-classroom {
     background-color: #00376d;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
+    margin-top: 10px;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {
