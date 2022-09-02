@@ -38,16 +38,25 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
+from extensions.objects.models import objects
 
-from typing import Dict, List, Optional
-from typing_extensions import TypedDict
+from typing import (
+    Callable, Dict, List, Mapping, Optional, Sequence,
+    Set, Tuple, Union, cast
+)
+from typing_extensions import Final, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -57,41 +66,41 @@ from core.platform import models  # pylint: disable=invalid-import-from # isort:
 # TODO(bhenning): Prior to July 2015, exploration changes involving rules were
 # logged using the key 'widget_handlers'. These need to be migrated to
 # 'answer_groups' and 'default_outcome'.
-STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
-STATE_PROPERTY_CONTENT = 'content'
-STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
-STATE_PROPERTY_CARD_IS_CHECKPOINT = 'card_is_checkpoint'
-STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
-STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
-STATE_PROPERTY_INTERACTION_ID = 'widget_id'
-STATE_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
-STATE_PROPERTY_LINKED_SKILL_ID = 'linked_skill_id'
-STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
-STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
-STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
-STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
+STATE_PROPERTY_PARAM_CHANGES: Final = 'param_changes'
+STATE_PROPERTY_CONTENT: Final = 'content'
+STATE_PROPERTY_SOLICIT_ANSWER_DETAILS: Final = 'solicit_answer_details'
+STATE_PROPERTY_CARD_IS_CHECKPOINT: Final = 'card_is_checkpoint'
+STATE_PROPERTY_RECORDED_VOICEOVERS: Final = 'recorded_voiceovers'
+STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
+STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
+STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
+STATE_PROPERTY_LINKED_SKILL_ID: Final = 'linked_skill_id'
+STATE_PROPERTY_INTERACTION_CUST_ARGS: Final = 'widget_customization_args'
+STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: Final = 'answer_groups'
+STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME: Final = 'default_outcome'
+STATE_PROPERTY_UNCLASSIFIED_ANSWERS: Final = (
     'confirmed_unclassified_answers')
-STATE_PROPERTY_INTERACTION_HINTS = 'hints'
-STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
+STATE_PROPERTY_INTERACTION_HINTS: Final = 'hints'
+STATE_PROPERTY_INTERACTION_SOLUTION: Final = 'solution'
 # Deprecated state properties.
-STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED = (
+STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED: Final = (
     # Deprecated in state schema v27.
     'content_ids_to_audio_translations')
 
 # These four properties are kept for legacy purposes and are not used anymore.
-STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
-STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
-GADGET_PROPERTY_VISIBILITY = 'gadget_visibility'
-GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
+STATE_PROPERTY_INTERACTION_HANDLERS: Final = 'widget_handlers'
+STATE_PROPERTY_INTERACTION_STICKY: Final = 'widget_sticky'
+GADGET_PROPERTY_VISIBILITY: Final = 'gadget_visibility'
+GADGET_PROPERTY_CUST_ARGS: Final = 'gadget_customization_args'
 
 # This takes additional 'title' and 'category' parameters.
-CMD_CREATE_NEW = 'create_new'
+CMD_CREATE_NEW: Final = 'create_new'
 # This takes an additional 'state_name' parameter.
-CMD_ADD_STATE = 'add_state'
+CMD_ADD_STATE: Final = 'add_state'
 # This takes additional 'old_state_name' and 'new_state_name' parameters.
-CMD_RENAME_STATE = 'rename_state'
+CMD_RENAME_STATE: Final = 'rename_state'
 # This takes an additional 'state_name' parameter.
-CMD_DELETE_STATE = 'delete_state'
+CMD_DELETE_STATE: Final = 'delete_state'
 # TODO(#12981): Write a one-off job to modify all existing translation
 # suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
 # CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will only use
@@ -100,23 +109,23 @@ CMD_DELETE_STATE = 'delete_state'
 # here to support old suggestions. This takes additional 'state_name',
 # 'content_id', 'language_code' and 'content_html' and 'translation_html'
 # parameters.
-DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
+DEPRECATED_CMD_ADD_TRANSLATION: Final = 'add_translation'
 # This takes additional 'state_name', 'content_id', 'language_code',
 # 'data_format', 'content_html' and 'translation_html' parameters.
-CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
+CMD_ADD_WRITTEN_TRANSLATION: Final = 'add_written_translation'
 # This takes additional 'content_id', 'language_code' and 'state_name'
 # parameters.
-CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
+CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
     'mark_written_translation_as_needing_update')
 # This takes additional 'content_id' and 'state_name' parameters.
-CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
+CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
     'mark_written_translations_as_needing_update')
 # This takes additional 'property_name' and 'new_value' parameters.
-CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
+CMD_EDIT_STATE_PROPERTY: Final = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
-CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
+CMD_EDIT_EXPLORATION_PROPERTY: Final = 'edit_exploration_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
-CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
+CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION: Final = (
     'migrate_states_schema_to_latest_version')
 
 # These are categories to which answers may be classified. These values should
@@ -124,35 +133,35 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
 # logs.
 
 # Represents answers classified using rules defined as part of an interaction.
-EXPLICIT_CLASSIFICATION = 'explicit'
+EXPLICIT_CLASSIFICATION: Final = 'explicit'
 # Represents answers which are contained within the training data of an answer
 # group.
-TRAINING_DATA_CLASSIFICATION = 'training_data_match'
+TRAINING_DATA_CLASSIFICATION: Final = 'training_data_match'
 # Represents answers which were predicted using a statistical training model
 # from training data within an answer group.
-STATISTICAL_CLASSIFICATION = 'statistical_classifier'
+STATISTICAL_CLASSIFICATION: Final = 'statistical_classifier'
 # Represents answers which led to the 'default outcome' of an interaction,
 # rather than belonging to a specific answer group.
-DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
+DEFAULT_OUTCOME_CLASSIFICATION: Final = 'default_outcome'
 
-TYPE_INVALID_EXPRESSION = 'Invalid'
-TYPE_VALID_ALGEBRAIC_EXPRESSION = 'AlgebraicExpressionInput'
-TYPE_VALID_NUMERIC_EXPRESSION = 'NumericExpressionInput'
-TYPE_VALID_MATH_EQUATION = 'MathEquationInput'
-MATH_INTERACTION_TYPES = [
+TYPE_INVALID_EXPRESSION: Final = 'Invalid'
+TYPE_VALID_ALGEBRAIC_EXPRESSION: Final = 'AlgebraicExpressionInput'
+TYPE_VALID_NUMERIC_EXPRESSION: Final = 'NumericExpressionInput'
+TYPE_VALID_MATH_EQUATION: Final = 'MathEquationInput'
+MATH_INTERACTION_TYPES: Final = [
     TYPE_VALID_ALGEBRAIC_EXPRESSION,
     TYPE_VALID_NUMERIC_EXPRESSION,
     TYPE_VALID_MATH_EQUATION
 ]
-ALGEBRAIC_MATH_INTERACTIONS = [
+ALGEBRAIC_MATH_INTERACTIONS: Final = [
     TYPE_VALID_ALGEBRAIC_EXPRESSION,
     TYPE_VALID_MATH_EQUATION
 ]
-MATH_INTERACTION_DEPRECATED_RULES = [
+MATH_INTERACTION_DEPRECATED_RULES: Final = [
     'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
 
-def clean_math_expression(math_expression):
+def clean_math_expression(math_expression: str) -> str:
     """Cleans a given math expression and formats it so that it is compatible
     with the new interactions' validators.
 
@@ -280,7 +289,7 @@ class ExplorationChange(change_domain.BaseChange):
 
     # The allowed list of state properties which can be used in
     # edit_state_property command.
-    STATE_PROPERTIES = (
+    STATE_PROPERTIES: List[str] = [
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
@@ -299,50 +308,64 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
         # Deprecated state properties.
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED)
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
+    ]
 
     # The allowed list of exploration properties which can be used in
     # edit_exploration_property command.
-    EXPLORATION_PROPERTIES = (
+    EXPLORATION_PROPERTIES: List[str] = [
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'edits_allowed')
+        'edits_allowed'
+    ]
 
-    ALLOWED_COMMANDS = [{
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['category', 'title'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_STATE,
         'required_attribute_names': ['state_name'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_DELETE_STATE,
         'required_attribute_names': ['state_name'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_RENAME_STATE,
         'required_attribute_names': ['new_state_name', 'old_state_name'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': DEPRECATED_CMD_ADD_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_ADD_WRITTEN_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html', 'data_format'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
         'required_attribute_names': [
@@ -351,12 +374,16 @@ class ExplorationChange(change_domain.BaseChange):
             'state_name'
         ],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
         'required_attribute_names': ['content_id', 'state_name'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_EDIT_STATE_PROPERTY,
         'required_attribute_names': [
@@ -372,24 +399,39 @@ class ExplorationChange(change_domain.BaseChange):
         'required_attribute_names': ['property_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': EXPLORATION_PROPERTIES}
+        'allowed_values': {'property_name': EXPLORATION_PROPERTIES},
+        'deprecated_values': {}
     }, {
         'name': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
         'required_attribute_names': ['version_number'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
 
     # TODO(#12991): Remove this once once we use the migration jobs to remove
     # the deprecated commands from the server data.
-    DEPRECATED_COMMANDS = [
+    DEPRECATED_COMMANDS: List[str] = [
         'clone', 'add_gadget', 'edit_gadget_property',
         'delete_gadget', 'rename_gadget']
+
+
+class TransientCheckpointUrlDict(TypedDict):
+    """Dictionary representing the TransientCheckpointUrl object."""
+
+    exploration_id: str
+    furthest_reached_checkpoint_state_name: str
+    furthest_reached_checkpoint_exp_version: int
+    most_recently_reached_checkpoint_state_name: str
+    most_recently_reached_checkpoint_exp_version: int
 
 
 class TransientCheckpointUrl:
@@ -399,12 +441,12 @@ class TransientCheckpointUrl:
 
     def __init__(
         self,
-        exploration_id,
-        furthest_reached_checkpoint_state_name,
-        furthest_reached_checkpoint_exp_version,
-        most_recently_reached_checkpoint_state_name,
-        most_recently_reached_checkpoint_exp_version
-    ):
+        exploration_id: str,
+        furthest_reached_checkpoint_state_name: str,
+        furthest_reached_checkpoint_exp_version: int,
+        most_recently_reached_checkpoint_state_name: str,
+        most_recently_reached_checkpoint_exp_version: int
+    ) -> None:
         """Initializes a TransientCheckpointUrl domain object.
 
         Args:
@@ -428,7 +470,7 @@ class TransientCheckpointUrl:
         self.most_recently_reached_checkpoint_exp_version = (
             most_recently_reached_checkpoint_exp_version)
 
-    def to_dict(self):
+    def to_dict(self) -> TransientCheckpointUrlDict:
         """Convert the TransientCheckpointUrl domain instance into a dictionary
         form with its keys as the attributes of this class.
 
@@ -449,7 +491,7 @@ class TransientCheckpointUrl:
                 self.most_recently_reached_checkpoint_state_name)
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates properties of the TransientCheckpointUrl object.
 
         Raises:
@@ -490,14 +532,43 @@ class TransientCheckpointUrl:
             )
 
 
+class ExplorationCommitLogEntryDict(TypedDict):
+    """Dictionary representing the ExplorationCommitLogEntry object."""
+
+    last_updated: float
+    exploration_id: str
+    commit_type: str
+    commit_message: str
+    version: int
+    post_commit_status: str
+    post_commit_community_owned: bool
+    post_commit_is_private: bool
+
+
 class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
+    # Here, Any is used because argument `commit_cmds` can accept
+    # List of dictionaries that can contain arbitrary no of keys
+    # with different types of values like int, str, List[str], Dict
+    # and other types too. So, to make the argument generalized for
+    # every dictionary we used Any type here.
     def __init__(
-            self, created_on, last_updated, user_id, exploration_id,
-            commit_type, commit_message, commit_cmds, version,
-            post_commit_status, post_commit_community_owned,
-            post_commit_is_private):
+        self,
+        created_on: datetime.datetime,
+        last_updated: datetime.datetime,
+        user_id: str,
+        exploration_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: Sequence[
+            Mapping[str, change_domain.AcceptableChangeDictTypes]
+        ],
+        version: int,
+        post_commit_status: str,
+        post_commit_community_owned: bool,
+        post_commit_is_private: bool
+    ) -> None:
         """Initializes a ExplorationCommitLogEntry domain object.
 
         Args:
@@ -536,7 +607,7 @@ class ExplorationCommitLogEntry:
         self.post_commit_community_owned = post_commit_community_owned
         self.post_commit_is_private = post_commit_is_private
 
-    def to_dict(self):
+    def to_dict(self) -> ExplorationCommitLogEntryDict:
         """Returns a dict representing this ExplorationCommitLogEntry domain
         object. This omits created_on, user_id and commit_cmds and adds username
         (derived from user_id).
@@ -558,10 +629,17 @@ class ExplorationCommitLogEntry:
         }
 
 
+class ExpVersionReferenceDict(TypedDict):
+    """Dictionary representing the ExpVersionReference object."""
+
+    exp_id: str
+    version: int
+
+
 class ExpVersionReference:
     """Value object representing an exploration ID and a version number."""
 
-    def __init__(self, exp_id, version):
+    def __init__(self, exp_id: str, version: int) -> None:
         """Initializes an ExpVersionReference domain object.
 
         Args:
@@ -572,7 +650,7 @@ class ExpVersionReference:
         self.version = version
         self.validate()
 
-    def to_dict(self):
+    def to_dict(self) -> ExpVersionReferenceDict:
         """Returns a dict representing this ExpVersionReference domain object.
 
         Returns:
@@ -583,7 +661,7 @@ class ExpVersionReference:
             'version': self.version
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates properties of the ExpVersionReference.
 
         Raises:
@@ -618,7 +696,7 @@ class ExplorationVersionsDiff:
             It doesn't include the name changes of added/deleted states.
     """
 
-    def __init__(self, change_list):
+    def __init__(self, change_list: List[ExplorationChange]) -> None:
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
@@ -627,9 +705,9 @@ class ExplorationVersionsDiff:
                 version.
         """
 
-        added_state_names = []
-        deleted_state_names = []
-        new_to_old_state_names = {}
+        added_state_names: List[str] = []
+        deleted_state_names: List[str] = []
+        new_to_old_state_names: Dict[str, str] = {}
 
         for change in change_list:
             if change.cmd == CMD_ADD_STATE:
@@ -669,7 +747,11 @@ class VersionedExplorationInteractionIdsMapping:
     in an exploration.
     """
 
-    def __init__(self, version, state_interaction_ids_dict):
+    def __init__(
+        self,
+        version: int,
+        state_interaction_ids_dict: Dict[str, str]
+    ) -> None:
         """Initialises an VersionedExplorationInteractionIdsMapping domain
         object.
 
@@ -682,8 +764,48 @@ class VersionedExplorationInteractionIdsMapping:
         self.state_interaction_ids_dict = state_interaction_ids_dict
 
 
+class ExplorationDict(TypedDict):
+    """Dictionary representing the Exploration object."""
+
+    id: str
+    title: str
+    category: str
+    objective: str
+    language_code: str
+    tags: List[str]
+    blurb: str
+    author_notes: str
+    states_schema_version: int
+    init_state_name: str
+    states: Dict[str, state_domain.StateDict]
+    param_specs: Dict[str, param_domain.ParamSpecDict]
+    param_changes: List[param_domain.ParamChangeDict]
+    auto_tts_enabled: bool
+    correctness_feedback_enabled: bool
+    edits_allowed: bool
+
+
+class VersionedExplorationDict(ExplorationDict):
+    """Dictionary representing versioned Exploration object."""
+
+    schema_version: int
+
+
+class ExplorationPlayerDict(TypedDict):
+    """Dictionary representing Exploration for learner view."""
+
+    init_state_name: str
+    param_changes: List[param_domain.ParamChangeDict]
+    param_specs: Dict[str, param_domain.ParamSpecDict]
+    states: Dict[str, state_domain.StateDict]
+    title: str
+    objective: str
+    language_code: str
+    correctness_feedback_enabled: bool
+
+
 class VersionedExplorationStatesDict(TypedDict):
-    """Dictionary representing the versioned State objects for Exploration."""
+    """Dictionary representing the versioned Exploration state."""
 
     states_schema_version: int
     states: Dict[str, state_domain.StateDict]
@@ -758,7 +880,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
 
-        self.states = {}
+        self.states: Dict[str, state_domain.State] = {}
         for (state_name, state_dict) in states_dict.items():
             self.states[state_name] = state_domain.State.from_dict(state_dict)
 
@@ -798,11 +920,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_exploration(
-            cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
-            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        cls,
+        exploration_id: str,
+        title: str = feconf.DEFAULT_EXPLORATION_TITLE,
+        init_state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
+        category: str = feconf.DEFAULT_EXPLORATION_CATEGORY,
+        objective: str = feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE
+    ) -> Exploration:
         """Returns a Exploration domain object with default values.
 
         'title', 'init_state_name', 'category', 'objective' if not provided are
@@ -840,9 +965,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def from_dict(
-            cls, exploration_dict,
-            exploration_version=0, exploration_created_on=None,
-            exploration_last_updated=None):
+        cls,
+        exploration_dict: ExplorationDict,
+        exploration_version: int = 0,
+        exploration_created_on: Optional[datetime.datetime] = None,
+        exploration_last_updated: Optional[datetime.datetime] = None
+    ) -> Exploration:
         """Return a Exploration domain object from a dict.
 
         Args:
@@ -918,7 +1046,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             solution = (
                 state_domain.Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] else None)
+                if idict['solution'] is not None and idict['id'] is not None
+                else None
+            )
 
             customization_args = (
                 state_domain.InteractionInstance.
@@ -963,7 +1093,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration
 
     @classmethod
-    def _validate_state_name(cls, name):
+    def _validate_state_name(cls, name: str) -> None:
         """Validates name string.
 
         Args:
@@ -971,7 +1101,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         utils.require_valid_name(name, 'a state name')
 
-    def validate(self, strict=False):
+    def validate(self, strict: bool = False) -> None:
         """Validates various properties of the Exploration.
 
         Args:
@@ -1088,15 +1218,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
 
-                default_outcome = state.interaction.default_outcome
-                if default_outcome.dest_if_really_stuck is not None:
+                interaction_default_outcome = state.interaction.default_outcome
+                if interaction_default_outcome.dest_if_really_stuck is not None:
                     if not isinstance(
-                        default_outcome.dest_if_really_stuck, str
+                        interaction_default_outcome.dest_if_really_stuck, str
                     ):
                         raise utils.ValidationError(
                             'Expected dest_if_really_stuck to be a '
                             'string, received %s'
-                            % default_outcome.dest_if_really_stuck)
+                            % interaction_default_outcome.dest_if_really_stuck)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -1203,11 +1333,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'is not a valid state.'
                         % default_outcome.dest_if_really_stuck)
 
-                if default_outcome.dest_if_really_stuck == state_name:
-                    raise utils.ValidationError(
-                        'The destination for a stuck learner cannot be the '
-                        'same state.')
-
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
                 if (
@@ -1234,14 +1359,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination for the stuck learner %s '
                         'is not a valid state.'
                         % group.outcome.dest_if_really_stuck)
-
-                if (
-                    group.outcome.dest_if_really_stuck is not None and
-                    group.outcome.dest_if_really_stuck == state_name
-                ):
-                    raise utils.ValidationError(
-                        'The destination for a stuck learner cannot be the '
-                        'same state.')
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
@@ -1334,6 +1451,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             curr_state.interaction.get_all_outcomes())
                         for outcome in all_outcomes:
                             dest_state = outcome.dest
+                            # Ruling out the possibility of None for mypy type
+                            # checking, because above we are already validating
+                            # if outcome exists then it should have destination.
+                            assert dest_state is not None
                             if self.states[dest_state].interaction.is_terminal:
                                 excluded_state_is_bypassable = True
                                 break
@@ -1413,7 +1534,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'Please fix the following issues before saving this '
                     'exploration: %s' % warning_str)
 
-    def _verify_all_states_reachable(self):
+    def _verify_all_states_reachable(self) -> None:
         """Verifies that all states are reachable from the initial state.
 
         Raises:
@@ -1437,8 +1558,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     all_outcomes = curr_state.interaction.get_all_outcomes()
                     for outcome in all_outcomes:
                         dest_state = outcome.dest
-                        if (dest_state not in curr_queue and
-                                dest_state not in processed_queue):
+                        if (
+                            dest_state is not None and
+                            dest_state not in curr_queue and
+                            dest_state not in processed_queue
+                        ):
                             curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
@@ -1448,7 +1572,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'The following states are not reachable from the initial '
                 'state: %s' % ', '.join(unseen_states))
 
-    def _verify_no_dead_ends(self):
+    def _verify_no_dead_ends(self) -> None:
         """Verifies that all states can reach a terminal state.
 
         Raises:
@@ -1487,7 +1611,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
 
-    def get_content_html(self, state_name, content_id):
+    def get_content_html(self, state_name: str, content_id: str) -> str:
         """Return the content for a given content id of a state.
 
         Args:
@@ -1508,7 +1632,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     # Derived attributes of an exploration.
     @property
-    def init_state(self):
+    def init_state(self) -> state_domain.State:
         """The state which forms the start of this exploration.
 
         Returns:
@@ -1517,7 +1641,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return self.states[self.init_state_name]
 
     @property
-    def param_specs_dict(self):
+    def param_specs_dict(self) -> Dict[str, param_domain.ParamSpecDict]:
         """A dict of param specs, each represented as Python dicts.
 
         Returns:
@@ -1527,7 +1651,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for (ps_name, ps_val) in self.param_specs.items()}
 
     @property
-    def param_change_dicts(self):
+    def param_change_dicts(self) -> List[param_domain.ParamChangeDict]:
         """A list of param changes, represented as JSONifiable Python dicts.
 
         Returns:
@@ -1536,7 +1660,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return [param_change.to_dict() for param_change in self.param_changes]
 
     @classmethod
-    def is_demo_exploration_id(cls, exploration_id):
+    def is_demo_exploration_id(cls, exploration_id: str) -> bool:
         """Whether the given exploration id is a demo exploration.
 
         Args:
@@ -1548,7 +1672,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_id in feconf.DEMO_EXPLORATIONS
 
     @property
-    def is_demo(self):
+    def is_demo(self) -> bool:
         """Whether the exploration is one of the demo explorations.
 
         Returns:
@@ -1556,7 +1680,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         return self.is_demo_exploration_id(self.id)
 
-    def has_state_name(self, state_name):
+    def has_state_name(self, state_name: str) -> bool:
         """Whether the exploration has a state with the given state name.
 
         Args:
@@ -1568,18 +1692,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_names = list(self.states.keys())
         return state_name in state_names
 
-    def get_interaction_id_by_state_name(self, state_name):
+    def get_interaction_id_by_state_name(
+        self, state_name: str
+    ) -> Optional[str]:
         """Returns the interaction id of the state.
 
         Args:
             state_name: str. The name of the state.
 
         Returns:
-            str or None. The ID of the interaction.
+            str|None. The ID of the interaction.
         """
         return self.states[state_name].interaction.id
 
-    def update_title(self, title):
+    def update_title(self, title: str) -> None:
         """Update the exploration title.
 
         Args:
@@ -1587,7 +1713,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.title = title
 
-    def update_category(self, category):
+    def update_category(self, category: str) -> None:
         """Update the exploration category.
 
         Args:
@@ -1595,7 +1721,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.category = category
 
-    def update_objective(self, objective):
+    def update_objective(self, objective: str) -> None:
         """Update the exploration objective.
 
         Args:
@@ -1603,7 +1729,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.objective = objective
 
-    def update_language_code(self, language_code):
+    def update_language_code(self, language_code: str) -> None:
         """Update the exploration language code.
 
         Args:
@@ -1611,7 +1737,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.language_code = language_code
 
-    def update_tags(self, tags):
+    def update_tags(self, tags: List[str]) -> None:
         """Update the tags of the exploration.
 
         Args:
@@ -1619,7 +1745,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.tags = tags
 
-    def update_blurb(self, blurb):
+    def update_blurb(self, blurb: str) -> None:
         """Update the blurb of the exploration.
 
         Args:
@@ -1627,7 +1753,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.blurb = blurb
 
-    def update_author_notes(self, author_notes):
+    def update_author_notes(self, author_notes: str) -> None:
         """Update the author notes of the exploration.
 
         Args:
@@ -1635,7 +1761,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.author_notes = author_notes
 
-    def update_param_specs(self, param_specs_dict):
+    def update_param_specs(
+        self, param_specs_dict: Dict[str, param_domain.ParamSpecDict]
+    ) -> None:
         """Update the param spec dict.
 
         Args:
@@ -1648,7 +1776,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for (ps_name, ps_val) in param_specs_dict.items()
         }
 
-    def update_param_changes(self, param_changes):
+    def update_param_changes(
+        self, param_changes: List[param_domain.ParamChange]
+    ) -> None:
         """Update the param change dict.
 
         Args:
@@ -1656,7 +1786,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.param_changes = param_changes
 
-    def update_init_state_name(self, init_state_name):
+    def update_init_state_name(self, init_state_name: str) -> None:
         """Update the name for the initial state of the exploration.
 
         Args:
@@ -1676,7 +1806,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self.states[old_init_state_name].card_is_checkpoint = False
         self.init_state.card_is_checkpoint = True
 
-    def update_auto_tts_enabled(self, auto_tts_enabled):
+    def update_auto_tts_enabled(self, auto_tts_enabled: bool) -> None:
         """Update whether automatic text-to-speech is enabled.
 
         Args:
@@ -1685,7 +1815,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.auto_tts_enabled = auto_tts_enabled
 
-    def update_correctness_feedback_enabled(self, correctness_feedback_enabled):
+    def update_correctness_feedback_enabled(
+        self, correctness_feedback_enabled: bool
+    ) -> None:
         """Update whether correctness feedback is enabled.
 
         Args:
@@ -1695,7 +1827,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
     # Methods relating to states.
-    def add_states(self, state_names):
+    def add_states(self, state_names: List[str]) -> None:
         """Adds multiple states to the exploration.
 
         Args:
@@ -1713,7 +1845,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self.states[state_name] = state_domain.State.create_default_state(
                 state_name)
 
-    def rename_state(self, old_state_name, new_state_name):
+    def rename_state(self, old_state_name: str, new_state_name: str) -> None:
         """Renames the given state.
 
         Args:
@@ -1749,7 +1881,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if outcome.dest == old_state_name:
                     outcome.dest = new_state_name
 
-    def delete_state(self, state_name):
+    def delete_state(self, state_name: str) -> None:
         """Deletes the given state.
 
         Args:
@@ -1773,10 +1905,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for outcome in all_outcomes:
                 if outcome.dest == state_name:
                     outcome.dest = other_state_name
+                if outcome and outcome.dest_if_really_stuck == state_name:
+                    outcome.dest_if_really_stuck = other_state_name
 
         del self.states[state_name]
 
-    def get_translatable_text(self, language_code):
+    def get_translatable_text(
+        self, language_code: str
+    ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
         """Returns all the contents which needs translation in the given
         language.
 
@@ -1796,7 +1932,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return state_names_to_content_id_mapping
 
-    def get_trainable_states_dict(self, old_states, exp_versions_diff):
+    def get_trainable_states_dict(
+        self,
+        old_states: Dict[str, state_domain.State],
+        exp_versions_diff: ExplorationVersionsDiff
+    ) -> Dict[str, List[str]]:
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
         In this method, the new_state_name refers to the name of the state in
@@ -1813,7 +1953,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             representing state names with changed answer groups and
             unchanged answer groups respectively.
         """
-        trainable_states_dict = {
+        trainable_states_dict: Dict[str, List[str]] = {
             'state_names_with_changed_answer_groups': [],
             'state_names_with_unchanged_answer_groups': []
         }
@@ -1856,7 +1996,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return trainable_states_dict
 
-    def get_languages_with_complete_translation(self):
+    def get_languages_with_complete_translation(self) -> List[str]:
         """Returns a list of language code in which the exploration translation
         is 100%.
 
@@ -1872,7 +2012,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return language_code_list
 
-    def get_translation_counts(self):
+    def get_translation_counts(self) -> Dict[str, int]:
         """Returns a dict representing the number of translations available in a
         language for which there exists at least one translation in the
         exploration.
@@ -1881,7 +2021,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict(str, int). A dict with language code as a key and number of
             translation available in that language as the value.
         """
-        exploration_translation_counts = collections.defaultdict(int)
+        exploration_translation_counts: Dict[
+            str, int
+        ] = collections.defaultdict(int)
         for state in self.states.values():
             state_translation_counts = state.get_translation_counts()
             for language, count in state_translation_counts.items():
@@ -1889,7 +2031,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return dict(exploration_translation_counts)
 
-    def get_content_count(self):
+    def get_content_count(self) -> int:
         """Returns the total number of distinct content fields available in the
         exploration which are user facing and can be translated into
         different languages.
@@ -1906,7 +2048,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return content_count
 
-    def get_metadata(self):
+    def get_metadata(self) -> ExplorationMetadata:
         """Gets the ExplorationMetadata domain object for the exploration."""
         return ExplorationMetadata(
             self.title, self. category, self.objective, self.language_code,
@@ -1917,7 +2059,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         )
 
     @classmethod
-    def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
+    def _convert_states_v41_dict_to_v42_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 41 to 42. Version 42 changes rule input types
         for DragAndDropSortInput and ItemSelectionInput interactions to better
         support translations. Specifically, the rule inputs will store content
@@ -1934,7 +2078,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
-        def migrate_rule_inputs_and_answers(new_type, value, choices):
+        # Here we use MyPy ignore because MyPy expects a return value in
+        # every condition when we define a return type but here we are
+        # returning only in if-else conditions and we are not returning
+        # when none of the condition matches which causes MyPy to throw
+        # a 'Missing return statement' error. Thus to avoid the error,
+        # we used ignore here.
+        def migrate_rule_inputs_and_answers(  # type: ignore[return]
+            new_type: str,
+            value: Union[List[List[str]], List[str], str],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> Union[List[str], str]:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -1952,7 +2106,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 *. The migrated rule input.
             """
 
-            def extract_content_id_from_choices(html):
+            def extract_content_id_from_choices(html: str) -> str:
                 """Given a html, find its associated content id in choices,
                 which is a list of subtitled html dicts.
 
@@ -1971,16 +2125,31 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 return feconf.INVALID_CONTENT_ID
 
             if new_type == 'TranslatableHtmlContentId':
+                # Here 'TranslatableHtmlContentId' can only be of str type, thus
+                # to narrow down the type we used assert here.
+                assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes its type as
+                # recursive, like if this method returns List[str] then MyPy
+                # assumes its type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
-                    migrate_rule_inputs_and_answers(
+                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes its type as
+                # recursive, like if this method returns List[str] then MyPy
+                # assumes its type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
-                    migrate_rule_inputs_and_answers(
+                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'SetOfTranslatableHtmlContentIds', html_set, choices
                     ) for html_set in value
                 ]
@@ -1998,20 +2167,36 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # The solution type will be migrated from SetOfHtmlString to
                 # SetOfTranslatableHtmlContentIds.
                 if solution is not None:
+                    # Ruling out the possibility of any other type for MyPy type
+                    # checking because for interaction 'ItemSelectionInput',
+                    # the correct_answer is formatted as List[str] type.
+                    assert isinstance(solution['correct_answer'], list)
+                    list_of_html_contents = []
+                    for html_content in solution['correct_answer']:
+                        assert isinstance(html_content, str)
+                        list_of_html_contents.append(html_content)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
                             'SetOfTranslatableHtmlContentIds',
-                            solution['correct_answer'],
+                            list_of_html_contents,
                             choices)
                     )
             if interaction_id == 'DragAndDropSortInput':
                 # The solution type will be migrated from ListOfSetsOfHtmlString
                 # to ListOfSetsOfTranslatableHtmlContentIds.
                 if solution is not None:
+                    # Ruling out the possibility of any other type for MyPy type
+                    # checking because for interaction 'DragAndDropSortInput',
+                    # the correct_answer is formatted as List[List[str]] type.
+                    assert isinstance(solution['correct_answer'], list)
+                    list_of_html_content_list = []
+                    for html_content_list in solution['correct_answer']:
+                        assert isinstance(html_content_list, list)
+                        list_of_html_content_list.append(html_content_list)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
                             'ListOfSetsOfTranslatableHtmlContentIds',
-                            solution['correct_answer'],
+                            list_of_html_content_list,
                             choices)
                     )
 
@@ -2024,9 +2209,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # All rule inputs for ItemSelectionInput will be
                         # migrated from SetOfHtmlString to
                         # SetOfTranslatableHtmlContentIds.
+                        # Ruling out the possibility of any other type
+                        # for MyPy type checking because for interaction
+                        # 'ItemSelectionInput', the rule inputs are formatted
+                        # as List[str] type.
+                        assert isinstance(rule_inputs['x'], list)
+                        list_of_html_contents = []
+                        for html_content in rule_inputs['x']:
+                            assert isinstance(html_content, str)
+                            list_of_html_contents.append(html_content)
                         rule_inputs['x'] = migrate_rule_inputs_and_answers(
                             'SetOfTranslatableHtmlContentIds',
-                            rule_inputs['x'],
+                            list_of_html_contents,
                             choices)
                     if interaction_id == 'DragAndDropSortInput':
                         rule_types_with_list_of_sets = [
@@ -2039,9 +2233,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             # the x input will be migrated from
                             # ListOfSetsOfHtmlStrings to
                             # ListOfSetsOfTranslatableHtmlContentIds.
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
+                            # 'DragAndDropSortInput', the rule inputs are
+                            # formatted as List[List[str]] type.
+                            assert isinstance(rule_inputs['x'], list)
+                            list_of_html_content_list = []
+                            for html_content_list in rule_inputs['x']:
+                                assert isinstance(html_content_list, list)
+                                list_of_html_content_list.append(
+                                    html_content_list
+                                )
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'ListOfSetsOfTranslatableHtmlContentIds',
-                                rule_inputs['x'],
+                                list_of_html_content_list,
                                 choices)
                         elif rule_type == 'HasElementXAtPositionY':
                             # For rule type HasElementXAtPositionY,
@@ -2049,6 +2254,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId, and the y input will
                             # remain as DragAndDropPositiveInt.
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
+                            # 'HasElementXAtPositionY', the rule inputs are
+                            # formatted as str type.
+                            assert isinstance(rule_inputs['x'], str)
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'TranslatableHtmlContentId',
                                 rule_inputs['x'],
@@ -2059,16 +2269,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId.
                             for rule_input_name in ['x', 'y']:
+                                rule_input_value = rule_inputs[rule_input_name]
+                                # Ruling out the possibility of any other type
+                                # for MyPy type checking because for interaction
+                                # 'HasElementXBeforeElementY', the rule inputs
+                                # are formatted as str type.
+                                assert isinstance(rule_input_value, str)
                                 rule_inputs[rule_input_name] = (
                                     migrate_rule_inputs_and_answers(
                                         'TranslatableHtmlContentId',
-                                        rule_inputs[rule_input_name],
+                                        rule_input_value,
                                         choices))
 
         return states_dict
 
     @classmethod
-    def _convert_states_v42_dict_to_v43_dict(cls, states_dict):
+    def _convert_states_v42_dict_to_v43_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 42 to 43. Version 43 adds a new customization
         arg to NumericExpressionInput, AlgebraicExpressionInput, and
         MathEquationInput. The customization arg will allow creators to choose
@@ -2100,7 +2318,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v43_dict_to_v44_dict(cls, states_dict, init_state_name):
+    def _convert_states_v43_dict_to_v44_dict(
+        cls,
+        states_dict: Dict[str, state_domain.StateDict],
+        init_state_name: str
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 43 to version 44. Version 44 adds
         card_is_checkpoint boolean to the state, which allows creators to
         mark a state as a checkpoint for the learners
@@ -2120,7 +2342,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v44_dict_to_v45_dict(cls, states_dict):
+    def _convert_states_v44_dict_to_v45_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 44 to 45. Version 45 contains
         linked skill id.
 
@@ -2138,7 +2362,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v45_dict_to_v46_dict(cls, states_dict):
+    def _convert_states_v45_dict_to_v46_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 45 to 46. Version 46 ensures that the written
         translations in a state containing unicode content do not contain HTML
         tags and the data_format is unicode.
@@ -2183,13 +2409,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
                                 translations_mapping[content_id][language_code])
                             written_translation['data_format'] = (
                                 schema_utils.SCHEMA_TYPE_UNICODE)
+                            # Here, we are narrowing down the type from
+                            # Union[List[str], str] to str.
+                            assert isinstance(
+                                written_translation['translation'],
+                                str
+                            )
                             written_translation['translation'] = (
                                 html_cleaner.strip_html_tags(
                                     written_translation['translation']))
         return states_dict
 
     @classmethod
-    def _convert_states_v46_dict_to_v47_dict(cls, states_dict):
+    def _convert_states_v46_dict_to_v47_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 46 to 47. Version 52 deprecates
         oppia-noninteractive-svgdiagram tag and converts existing occurences of
         it to oppia-noninteractive-image tag.
@@ -2214,7 +2448,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v47_dict_to_v48_dict(cls, states_dict):
+    def _convert_states_v47_dict_to_v48_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 47 to 48. Version 48 fixes encoding issues in
         HTML fields.
 
@@ -2238,7 +2474,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v48_dict_to_v49_dict(cls, states_dict):
+    def _convert_states_v48_dict_to_v49_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 48 to 49. Version 49 adds
         requireNonnegativeInput customization arg to NumericInput
         interaction which allows creators to set input should be greater
@@ -2266,7 +2504,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v49_dict_to_v50_dict(cls, states_dict):
+    def _convert_states_v49_dict_to_v50_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 49 to 50. Version 50 removes rules from
         explorations that use one of the following rules:
         [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
@@ -2310,7 +2550,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v50_dict_to_v51_dict(cls, states_dict):
+    def _convert_states_v50_dict_to_v51_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 50 to 51. Version 51 adds a new
         dest_if_really_stuck field to Outcome class to redirect learners
         to a state for strengthening concepts when they get really stuck.
@@ -2335,9 +2577,109 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v51_dict_to_v52_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 51 to 52. Version 52 correctly updates
+        the content IDs for translations and for voiceovers. In the 49 to 50
+        conversion we removed some interaction rules and thus also some parts of
+        the exploration that had its content IDs, but then the content IDs in
+        translations and voiceovers were not updated.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
+            content_id_list = [state_dict['content']['content_id']]
+
+            for answer_group in interaction['answer_groups']:
+                content_id_list.append(
+                    answer_group['outcome']['feedback']['content_id']
+                )
+
+                for rule_spec in answer_group['rule_specs']:
+                    for param_name, value in rule_spec['inputs'].items():
+                        interaction_id = interaction['id']
+                        param_type = (
+                            interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
+                                interaction_id
+                            ).get_rule_param_type(
+                                rule_spec['rule_type'], param_name
+                            )
+                        )
+
+                        if issubclass(
+                            param_type, objects.BaseTranslatableObject
+                        ):
+                            # We can assume that the value will be a dict,
+                            # as the param_type is BaseTranslatableObject.
+                            assert isinstance(value, dict)
+                            content_id = value['contentId']
+                            # We can assume the contentId will be str,
+                            # as the param_type is BaseTranslatableObject.
+                            assert isinstance(content_id, str)
+                            content_id_list.append(content_id)
+
+            default_outcome = interaction['default_outcome']
+            if default_outcome:
+                content_id_list.append(
+                    default_outcome['feedback']['content_id'])
+
+            for hint in interaction['hints']:
+                content_id_list.append(hint['hint_content']['content_id'])
+
+            interaction_solution = interaction['solution']
+            if interaction_solution:
+                content_id_list.append(
+                    interaction_solution['explanation']['content_id'])
+
+            if interaction['id'] is not None:
+                customisation_args = (
+                    state_domain.InteractionInstance
+                    .convert_customization_args_dict_to_customization_args(
+                        interaction['id'],
+                        interaction['customization_args'],
+                        state_schema_version=51
+                    )
+                )
+                for ca_name in customisation_args:
+                    content_id_list.extend(
+                        customisation_args[ca_name].get_content_ids()
+                    )
+
+            translations_mapping = (
+                state_dict['written_translations']['translations_mapping'])
+            new_translations_mapping = {}
+            for content_id, translation_item in translations_mapping.items():
+                if content_id in content_id_list:
+                    new_translations_mapping[content_id] = translation_item
+            state_dict['written_translations']['translations_mapping'] = (
+                new_translations_mapping)
+
+            voiceovers_mapping = (
+                state_dict['recorded_voiceovers']['voiceovers_mapping'])
+            new_voiceovers_mapping = {}
+            for content_id, voiceover_item in voiceovers_mapping.items():
+                if content_id in content_id_list:
+                    new_voiceovers_mapping[content_id] = voiceover_item
+            state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
+                new_voiceovers_mapping)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states,
-            current_states_schema_version, init_state_name):
+        cls,
+        versioned_exploration_states: VersionedExplorationStatesDict,
+        current_states_schema_version: int,
+        init_state_name: str
+    ) -> None:
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -2371,11 +2713,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 56
+    CURRENT_EXP_SCHEMA_VERSION = 57
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
-    def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
+    def _convert_v46_dict_to_v47_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v46 exploration dict into a v47 exploration dict.
         Changes rule input types for DragAndDropSortInput and ItemSelectionInput
         interactions to better support translations. Specifically, the rule
@@ -2398,7 +2742,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
+    def _convert_v47_dict_to_v48_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v47 exploration dict into a v48 exploration dict.
         Adds a new customization arg to NumericExpressionInput,
         AlgebraicExpressionInput, and MathEquationInput. The customization arg
@@ -2422,7 +2768,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v48_dict_to_v49_dict(cls, exploration_dict):
+    def _convert_v48_dict_to_v49_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v48 exploration dict into a v49 exploration dict.
         Adds card_is_checkpoint to mark a state as a checkpoint for the
         learners.
@@ -2443,7 +2791,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v49_dict_to_v50_dict(cls, exploration_dict):
+    def _convert_v49_dict_to_v50_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v49 exploration dict into a v50 exploration dict.
         Version 50 contains linked skill id to exploration state.
 
@@ -2465,7 +2815,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
+    def _convert_v50_dict_to_v51_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v50 exploration dict into a v51 exploration dict.
         Version 51 ensures that unicode written_translations are stripped of
         HTML tags and have data_format field set to unicode.
@@ -2488,7 +2840,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v51_dict_to_v52_dict(cls, exploration_dict):
+    def _convert_v51_dict_to_v52_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v51 exploration dict into a v52 exploration dict.
         Version 52 deprecates oppia-noninteractive-svgdiagram tag and converts
         existing occurences of it to oppia-noninteractive-image tag.
@@ -2511,7 +2865,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v52_dict_to_v53_dict(cls, exploration_dict):
+    def _convert_v52_dict_to_v53_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v52 exploration dict into a v53 exploration dict.
         Version 53 fixes encoding issues in HTML fields.
 
@@ -2533,7 +2889,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v53_dict_to_v54_dict(cls, exploration_dict):
+    def _convert_v53_dict_to_v54_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v53 exploration dict into a v54 exploration dict.
         Adds a new customization arg to NumericInput interaction
         which allows creators to set input greator than or equal to zero.
@@ -2555,7 +2913,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v54_dict_to_v55_dict(cls, exploration_dict):
+    def _convert_v54_dict_to_v55_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v54 exploration dict into a v55 exploration dict.
         Removes rules from explorations that use one of the following rules:
         [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
@@ -2578,7 +2938,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v55_dict_to_v56_dict(cls, exploration_dict):
+    def _convert_v55_dict_to_v56_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v55 exploration dict into a v56 exploration dict.
         Version 56 adds a new dest_if_really_stuck field to the Outcome class
         to redirect the learners to a state for strengthening concepts when
@@ -2601,7 +2963,33 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content):
+    def _convert_v56_dict_to_v57_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v56 exploration dict into a v57 exploration dict.
+        Version 57 correctly updates the content IDs for translations and
+        for voiceovers.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v56.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v57.
+        """
+        exploration_dict['schema_version'] = 57
+
+        exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 52
+
+        return exploration_dict
+
+    @classmethod
+    def _migrate_to_latest_yaml_version(
+        cls, yaml_content: str
+    ) -> VersionedExplorationDict:
         """Return the YAML content of the exploration in the latest schema
         format.
 
@@ -2609,17 +2997,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
             yaml_content: str. The YAML representation of the exploration.
 
         Returns:
-            tuple(dict, int). The dict 'exploration_dict' is the representation
-            of the Exploration and the 'initial_schema_version' is the initial
-            schema version provided in 'yaml_content'.
+            exploration_dict. The dict 'exploration_dict' is the representation
+            of the Exploration.
 
         Raises:
             InvalidInputException. The 'yaml_content' or the schema version
                 is not specified.
             Exception. The exploration schema version is not valid.
         """
+        # Here, cast is used to narrow down the return type of dict_from_yaml()
+        # from Dict[str, Any] to VersionedExplorationDict.
         try:
-            exploration_dict = utils.dict_from_yaml(yaml_content)
+            exploration_dict = cast(
+                VersionedExplorationDict,
+                utils.dict_from_yaml(yaml_content)
+            )
         except utils.InvalidInputException as e:
             raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '
@@ -2686,10 +3078,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 exploration_dict)
             exploration_schema_version = 56
 
+        if exploration_schema_version == 56:
+            exploration_dict = cls._convert_v56_dict_to_v57_dict(
+                exploration_dict)
+            exploration_schema_version = 57
+
         return exploration_dict
 
     @classmethod
-    def from_yaml(cls, exploration_id, yaml_content):
+    def from_yaml(cls, exploration_id: str, yaml_content: str) -> Exploration:
         """Creates and returns exploration from a YAML text string for YAML
         schema versions 10 and later.
 
@@ -2709,29 +3106,35 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 
-    def to_yaml(self):
+    def to_yaml(self) -> str:
         """Convert the exploration domain object into YAML string.
 
         Returns:
             str. The YAML representation of this exploration.
         """
         exp_dict = self.to_dict()
-        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION
+        # The dictionary returned by `to_dict()` method is ExplorationDict
+        # and ExplorationDict does not contain `schema_version` key, but here
+        # we are defining a `schema_version` key which causes MyPy to throw
+        # error TypedDict has no key 'schema_version'. Thus to silent the error,
+        # we used ignore here.
+        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
 
         # The ID is the only property which should not be stored within the
         # YAML representation.
-        del exp_dict['id']
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        del exp_dict['id']  # type: ignore[misc]
 
         return utils.yaml_from_dict(exp_dict)
 
-    def to_dict(self):
+    def to_dict(self) -> ExplorationDict:
         """Returns a copy of the exploration as a dictionary. It includes all
         necessary information to represent the exploration.
 
         Returns:
             dict. A dict mapping all fields of Exploration instance.
         """
-        return copy.deepcopy({
+        exploration_dict: ExplorationDict = ({
             'id': self.id,
             'title': self.title,
             'category': self.category,
@@ -2750,8 +3153,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
+        exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
+        return exploration_dict_deepcopy
 
-    def serialize(self):
+    def serialize(self) -> str:
         """Returns the object serialized as a JSON string.
 
         Returns:
@@ -2767,20 +3172,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # files must add a version parameter to their files with the correct
         # version of this object. The line below must then be moved to
         # to_dict().
-        exploration_dict['version'] = self.version
+        # The dictionary returned by `to_dict()` method is ExplorationDict
+        # and ExplorationDict does not contain `version`, `created_on` and
+        # `last_updated` keys, but here we are defining those keys which
+        # causes MyPy to throw error TypedDict has no `version` key. Thus
+        # to silent the error, we used ignore here.
+        exploration_dict['version'] = self.version  # type: ignore[misc]
 
         if self.created_on:
-            exploration_dict['created_on'] = (
+            exploration_dict['created_on'] = (  # type: ignore[misc]
                 utils.convert_naive_datetime_to_string(self.created_on))
 
         if self.last_updated:
-            exploration_dict['last_updated'] = (
+            exploration_dict['last_updated'] = (  # type: ignore[misc]
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(exploration_dict)
 
     @classmethod
-    def deserialize(cls, json_string):
+    def deserialize(cls, json_string: str) -> Exploration:
         """Returns an Exploration domain object decoded from a JSON string.
 
         Args:
@@ -2808,7 +3218,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return exploration
 
-    def to_player_dict(self):
+    def to_player_dict(self) -> ExplorationPlayerDict:
         """Returns a copy of the exploration suitable for inclusion in the
         learner view.
 
@@ -2827,8 +3237,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 - title: str. The exploration title.
                 - objective: str. The exploration objective.
                 - language_code: str. The language code of the exploration.
-                - correctness_feedback_enabled: str. Whether to show correctness
-                    feedback.
+                - correctness_feedback_enabled: bool. Whether to show
+                    correctness feedback.
         """
         return {
             'init_state_name': self.init_state_name,
@@ -2844,7 +3254,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this exploration.
 
         Returns:
@@ -2858,6 +3268,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             html_list += [content_html] + interaction_html_list
 
         return html_list
+
+
+class ExplorationSummaryMetadataDict(TypedDict):
+    """Dictionary representing the meta data for exploration summary."""
+
+    id: str
+    title: str
+    objective: str
 
 
 class ExplorationSummary:
@@ -2884,7 +3302,7 @@ class ExplorationSummary:
         version: int,
         exploration_model_created_on: datetime.datetime,
         exploration_model_last_updated: datetime.datetime,
-        first_published_msec: int,
+        first_published_msec: Optional[float],
         deleted: bool = False
     ) -> None:
         """Initializes a ExplorationSummary domain object.
@@ -2922,8 +3340,9 @@ class ExplorationSummary:
                 the exploration model is created.
             exploration_model_last_updated: datetime.datetime. Date and time
                 when the exploration model was last updated.
-            first_published_msec: int. Time in milliseconds since the Epoch,
-                when the exploration was first published.
+            first_published_msec: float|None. Time in milliseconds since the
+                Epoch, when the exploration was first published, or None if
+                Exploration is not published yet.
             deleted: bool. Whether the exploration is marked as deleted.
         """
         self.id = exploration_id
@@ -2948,7 +3367,7 @@ class ExplorationSummary:
         self.first_published_msec = first_published_msec
         self.deleted = deleted
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the ExplorationSummary.
 
         Raises:
@@ -3105,7 +3524,7 @@ class ExplorationSummary:
                 'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
-    def to_metadata_dict(self):
+    def to_metadata_dict(self) -> ExplorationSummaryMetadataDict:
         """Given an exploration summary, this method returns a dict containing
         id, title and objective of the exploration.
 
@@ -3122,15 +3541,15 @@ class ExplorationSummary:
             'objective': self.objective,
         }
 
-    def is_private(self):
+    def is_private(self) -> bool:
         """Checks whether the exploration is private.
 
         Returns:
             bool. Whether the exploration is private.
         """
-        return self.status == constants.ACTIVITY_STATUS_PRIVATE
+        return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
 
-    def is_solely_owned_by_user(self, user_id):
+    def is_solely_owned_by_user(self, user_id: str) -> bool:
         """Checks whether the exploration is solely owned by the user.
 
         Args:
@@ -3141,7 +3560,7 @@ class ExplorationSummary:
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
 
-    def does_user_have_any_role(self, user_id):
+    def does_user_have_any_role(self, user_id: str) -> bool:
         """Checks if a given user has any role within the exploration.
 
         Args:
@@ -3157,7 +3576,7 @@ class ExplorationSummary:
             user_id in self.viewer_ids
         )
 
-    def add_contribution_by_user(self, contributor_id):
+    def add_contribution_by_user(self, contributor_id: str) -> None:
         """Add a new contributor to the contributors summary.
 
         Args:
@@ -3197,10 +3616,11 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by interaction id and whose changes directly conflicts with
     # interaction id changes.
-    PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES = [
+    PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+    ]
 
     # PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List of the properties
     # in which if there are any changes then customization args
@@ -3208,10 +3628,11 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by customization args and whose changes directly conflicts with
     # cust args changes.
-    PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES = [
+    PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+    ]
 
     # PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List of the properties
     # in which if there are any changes then answer groups
@@ -3219,10 +3640,11 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by answer groups and whose changes directly conflicts with
     # answer groups changes.
-    PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES = [
+    PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS]
+        STATE_PROPERTY_INTERACTION_CUST_ARGS
+    ]
 
     # PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List of the properties
     # in which if there are any changes then solution
@@ -3230,10 +3652,11 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by solution and whose changes directly conflicts with
     # solution changes.
-    PROPERTIES_CONFLICTING_SOLUTION_CHANGES = [
+    PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS]
+        STATE_PROPERTY_INTERACTION_CUST_ARGS
+    ]
 
     # PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES: List of the properties
     # in which if there are any changes then voiceovers
@@ -3241,35 +3664,43 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by voiceovers and whose changes directly conflicts with
     # voiceovers changes.
-    PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES = [
+    PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES: List[str] = [
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS]
+        STATE_PROPERTY_INTERACTION_CUST_ARGS
+    ]
 
     # NON_CONFLICTING_PROPERTIES: List of the properties
     # in which if there are any changes then they are always mergeable.
-    NON_CONFLICTING_PROPERTIES = [
+    NON_CONFLICTING_PROPERTIES: List[str] = [
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
         STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
         STATE_PROPERTY_LINKED_SKILL_ID,
-        STATE_PROPERTY_CARD_IS_CHECKPOINT]
+        STATE_PROPERTY_CARD_IS_CHECKPOINT
+    ]
 
-    def __init__(self, composite_change_list):
+    def __init__(self, composite_change_list: List[ExplorationChange]) -> None:
 
-        self.added_state_names = []
-        self.deleted_state_names = []
-        self.new_to_old_state_names = collections.defaultdict(set)
-        self.changed_properties = collections.defaultdict(set)
-        self.changed_translations = collections.defaultdict(set)
+        self.added_state_names: List[str] = []
+        self.deleted_state_names: List[str] = []
+        self.new_to_old_state_names: Dict[str, str] = (
+            collections.defaultdict(str)
+        )
+        self.changed_properties: Dict[str, Set[str]] = (
+            collections.defaultdict(set)
+        )
+        self.changed_translations: Dict[str, Set[str]] = (
+            collections.defaultdict(set)
+        )
 
         for change in composite_change_list:
             self._parse_exp_change(change)
 
-    def _get_property_name_from_content_id(self, content_id):
+    def _get_property_name_from_content_id(self, content_id: str) -> str:
         """Returns property name from content id.
 
         Args:
@@ -3279,7 +3710,9 @@ class ExplorationChangeMergeVerifier:
             string. Name of the property of which the
             content is part of.
         """
-        property_name_to_content_id_identifier = {
+        property_name_to_content_id_identifier: Dict[
+            str, Callable[[str], bool]
+        ] = {
             STATE_PROPERTY_CONTENT: (
                 lambda content_id: content_id == 'content'),
             STATE_PROPERTY_INTERACTION_CUST_ARGS: (
@@ -3299,9 +3732,11 @@ class ExplorationChangeMergeVerifier:
         for prop_name, identifier_function in (
                 property_name_to_content_id_identifier.items()):
             if identifier_function(content_id):
-                return prop_name
+                property_name = prop_name
+                break
+        return property_name
 
-    def _parse_exp_change(self, change):
+    def _parse_exp_change(self, change: ExplorationChange) -> None:
         """This function take the change and according to the cmd
         add the property name in the lists defined above.
 
@@ -3338,7 +3773,7 @@ class ExplorationChangeMergeVerifier:
             # in changed_properties dict.
             state_name = change.state_name
             if state_name in self.new_to_old_state_names:
-                state_name = self.new_to_old_state_names.get(change.state_name)
+                state_name = self.new_to_old_state_names[change.state_name]
             self.changed_properties[state_name].add(
                 change.property_name)
         elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
@@ -3348,15 +3783,18 @@ class ExplorationChangeMergeVerifier:
             # in changed_properties dict.
             state_name = change.state_name
             if state_name in self.new_to_old_state_names:
-                state_name = self.new_to_old_state_names.get(change.state_name)
+                state_name = self.new_to_old_state_names[change.state_name]
             self.changed_translations[state_name].add(
                 changed_property)
             self.changed_properties[state_name].add(
                 STATE_PROPERTY_WRITTEN_TRANSLATIONS)
 
     def is_change_list_mergeable(
-            self, change_list,
-            exp_at_change_list_version, current_exploration):
+        self,
+        change_list: List[ExplorationChange],
+        exp_at_change_list_version: Exploration,
+        current_exploration: Exploration
+    ) -> Tuple[bool, bool]:
         """Checks whether the change list from the old version of an
         exploration can be merged on the latest version of an exploration.
 
@@ -3398,7 +3836,7 @@ class ExplorationChangeMergeVerifier:
         # states names in change_list where the key is the state name in
         # frontend version and the value is the renamed name from the
         # change list if there is any rename state change.
-        state_names_of_renamed_states = {}
+        state_names_of_renamed_states: Dict[str, str] = {}
         for change in change_list:
             change_is_mergeable = False
             if change.cmd == CMD_RENAME_STATE:
@@ -3580,15 +4018,45 @@ class ExplorationChangeMergeVerifier:
         return changes_are_mergeable, False
 
 
+class ExplorationMetadataDict(TypedDict):
+    """Dictionary representing the ExplorationMetadata object."""
+
+    title: str
+    category: str
+    objective: str
+    language_code: str
+    tags: List[str]
+    blurb: str
+    author_notes: str
+    states_schema_version: int
+    init_state_name: str
+    param_specs: Dict[str, param_domain.ParamSpecDict]
+    param_changes: List[param_domain.ParamChangeDict]
+    auto_tts_enabled: bool
+    correctness_feedback_enabled: bool
+    edits_allowed: bool
+
+
 class ExplorationMetadata:
     """Class to represent the exploration metadata properties."""
 
     def __init__(
-        self, title, category, objective, language_code, tags, blurb,
-        author_notes, states_schema_version, init_state_name, param_specs,
-        param_changes, auto_tts_enabled, correctness_feedback_enabled,
-        edits_allowed
-    ):
+        self,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        blurb: str,
+        author_notes: str,
+        states_schema_version: int,
+        init_state_name: str,
+        param_specs: Dict[str, param_domain.ParamSpec],
+        param_changes: List[param_domain.ParamChange],
+        auto_tts_enabled: bool,
+        correctness_feedback_enabled: bool,
+        edits_allowed: bool
+    ) -> None:
         """Initializes an ExplorationMetadata domain object.
 
         Args:
@@ -3628,7 +4096,7 @@ class ExplorationMetadata:
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
 
-    def to_dict(self):
+    def to_dict(self) -> ExplorationMetadataDict:
         """Gets the dict representation of ExplorationMetadata domain object.
 
         Returns:
@@ -3700,8 +4168,7 @@ class MetadataVersionHistory:
 
     @classmethod
     def from_dict(
-        cls,
-        metadata_version_history_dict: MetadataVersionHistoryDict
+        cls, metadata_version_history_dict: MetadataVersionHistoryDict
     ) -> MetadataVersionHistory:
         """Returns an MetadataVersionHistory domain object from a dict.
 

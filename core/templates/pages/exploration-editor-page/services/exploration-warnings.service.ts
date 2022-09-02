@@ -62,6 +62,8 @@ interface _verifyParametersResult {
 interface _getReversedLinksResult {
   source: string;
   target: string;
+  linkProperty: string | null;
+  connectsDestIfStuck: boolean;
 }
 
 const INTERACTION_SERVICE_MAPPING = {
@@ -181,6 +183,8 @@ export class ExplorationWarningsService {
       return {
         source: link.target,
         target: link.source,
+        linkProperty: null,
+        connectsDestIfStuck: false
       };
     });
   }
@@ -364,7 +368,7 @@ export class ExplorationWarningsService {
         _graphData.initStateId]));
     }
 
-    let initStateName: unknown = this.explorationInitStateNameService.displayed;
+    let initStateName = this.explorationInitStateNameService.displayed;
     let initState = _states.getState((initStateName) as string);
     if (initState && !initState.cardIsCheckpoint) {
       _extendStateWarnings(

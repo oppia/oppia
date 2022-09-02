@@ -49,17 +49,17 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.voice_artist_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
     def test_get_search_rank(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -71,7 +71,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank)
 
-        rights_manager.publish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank)
@@ -232,7 +232,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(ids, [self.EXP_ID])
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
 
-        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)  # type: ignore[no-untyped-call]
+        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
         delete_docs_swap = self.swap(
             gae_search_services, 'delete_documents_from_index',
@@ -250,7 +250,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(ids, [self.COLLECTION_ID])
             self.assertEqual(index, search_services.SEARCH_INDEX_COLLECTIONS)
 
-        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)  # type: ignore[no-untyped-call]
+        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
         delete_docs_swap = self.swap(
             gae_search_services, 'delete_documents_from_index',

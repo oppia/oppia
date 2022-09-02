@@ -234,6 +234,15 @@ def get_collection_by_id(
 ) -> Optional[collection_domain.Collection]: ...
 
 
+@overload
+def get_collection_by_id(
+    collection_id: str,
+    *,
+    strict: bool,
+    version: Optional[int] = None
+) -> Optional[collection_domain.Collection]: ...
+
+
 def get_collection_by_id(
     collection_id: str,
     strict: bool = True,
@@ -822,7 +831,7 @@ def validate_exps_in_collection_are_public(
             exploration.
     """
     for exploration_id in collection.exploration_ids:
-        if rights_manager.is_exploration_private(exploration_id):  # type: ignore[no-untyped-call]
+        if rights_manager.is_exploration_private(exploration_id):
             raise utils.ValidationError(
                 'Cannot reference a private exploration within a public '
                 'collection, exploration ID: %s' % exploration_id)
@@ -883,7 +892,7 @@ def _save_collection(
     # explorations.
     # TODO(bhenning): Ensure the latter is enforced above when trying to
     # publish a collection.
-    if rights_manager.is_collection_public(collection.id):  # type: ignore[no-untyped-call]
+    if rights_manager.is_collection_public(collection.id):
         validate_exps_in_collection_are_public(collection)
 
     # Collection model cannot be none as we are passing the collection as a
@@ -942,7 +951,7 @@ def _create_collection(
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an collection object will fail.
     collection.validate(strict=False)
-    rights_manager.create_new_collection_rights(collection.id, committer_id)  # type: ignore[no-untyped-call]
+    rights_manager.create_new_collection_rights(collection.id, committer_id)
     model = collection_models.CollectionModel(
         id=collection.id,
         category=collection.category,
@@ -1088,7 +1097,7 @@ def publish_collection_and_update_user_profiles(
     Raises:
         Exception. No collection summary model exists for the given id.
     """
-    rights_manager.publish_collection(committer, collection_id)  # type: ignore[no-untyped-call]
+    rights_manager.publish_collection(committer, collection_id)
     contribution_time_msec = utils.get_current_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(collection_id)
     if collection_summary is None:
@@ -1126,7 +1135,7 @@ def update_collection(
     Raises:
         ValueError. The collection is public but no commit message received.
     """
-    is_public = rights_manager.is_collection_public(collection_id)  # type: ignore[no-untyped-call]
+    is_public = rights_manager.is_collection_public(collection_id)
 
     if is_public and not commit_message:
         raise ValueError(
@@ -1139,7 +1148,7 @@ def update_collection(
     regenerate_collection_summary_with_new_contributor(
         collection.id, committer_id)
 
-    if (not rights_manager.is_collection_private(collection.id) and  # type: ignore[no-untyped-call]
+    if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())
@@ -1191,6 +1200,10 @@ def _compute_summary_of_collection(
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
+
+    Raises:
+        Exception. No data available for when the collection was last_updated.
+        Exception. No data available for when the collection was created.
     """
     collection_rights = collection_models.CollectionRightsModel.get_by_id(
         collection.id)
@@ -1207,9 +1220,16 @@ def _compute_summary_of_collection(
     collection_model_created_on = collection.created_on
     collection_model_node_count = len(collection.nodes)
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert collection_model_last_updated is not None
-    assert collection_model_created_on is not None
+    if collection_model_last_updated is None:
+        raise Exception(
+            'No data available for when the collection was last_updated.'
+        )
+
+    if collection_model_created_on is None:
+        raise Exception(
+            'No data available for when the collection was created.'
+        )
+
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
         collection.objective, collection.language_code, collection.tags,

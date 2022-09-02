@@ -69,9 +69,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       State1: 'State 1 Node'
     },
     links: [{
+      connectsDestIfStuck: false,
       linkProperty: 'added',
       source: '',
-      target: ''
+      target: '',
     }],
     initStateId: 'state_1',
     finalStateIds: []
@@ -213,7 +214,8 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       source: null,
       target: null,
       d: null,
-      style: ''
+      style: '',
+      connectsDestIfStuck: false
     }]);
 
     component.linkPropertyMapping = {
@@ -285,7 +287,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       'This is a label for node 1 Second label for node 1 ' +
         '(Warning: this state is unreachable.)');
 
-    expect(component.getNodeTitle(nodes.state_3 as unknown as NodeTitle)).toBe(
+    expect(component.getNodeTitle(nodes.state_3 as NodeTitle)).toBe(
       'This is a label for node 3 This is a secondary label for ' +
         'state_3 (Warning: there is no path from this state to the ' +
         'END state.)');

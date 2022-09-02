@@ -32,12 +32,12 @@
                        alt="User Avatar">
                 </span>
                 <span *ngIf="!profilePictureDataUrl">
-                  <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
+                  <i class="fas fa-user-circle oppia-profile-picture-icon"></i>
                 </span>
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
                 <div class="oppia-short-contributor-username-container"
-                     *ngIf="userIsLoggedIn || username?.length <= 8"
+                     *ngIf="userIsLoggedIn || username.length <= 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
@@ -46,7 +46,7 @@
                   </span>
                 </div>
                 <div class="oppia-long-contributor-username-container"
-                     *ngIf="userIsLoggedIn && username?.length > 8"
+                     *ngIf="userIsLoggedIn && username.length > 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
@@ -153,7 +153,7 @@
                      alt="User Avatar">
               </span>
               <span *ngIf="!profilePictureDataUrl">
-                <i class="material-icons oppia-profile-picture-icon collapsed-oppia-contributor-img">&#xE853;</i>
+                <i class="fas fa-user-circle oppia-profile-picture-icon collapsed-oppia-contributor-img"></i>
               </span>
             </div>
             <div class="collapsed-oppia-contributor-username-container">
@@ -430,6 +430,7 @@
     display: flex;
     flex-grow: 1;
     justify-content: start;
+    padding-left: 25px;
     width: 100%;
   }
   .oppia-opportunities-tab-customization-container {

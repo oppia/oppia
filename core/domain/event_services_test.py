@@ -54,7 +54,7 @@ class MockNumbersModel(datastore_services.Model):
 class BaseEventHandlerTests(test_utils.GenericTestBase):
 
     def test_handle_event_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'Subclasses of BaseEventHandler should implement the '
@@ -321,13 +321,13 @@ class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
         exp_id = 'exp_id'
 
         event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 1)
         self.assertEqual(thread.num_total_threads, 1)
 
         event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 2)
         self.assertEqual(thread.num_total_threads, 2)
@@ -343,7 +343,7 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
         event_services.FeedbackThreadStatusChangedEventHandler.record(
             exp_id, '', feedback_models.STATUS_CHOICES_OPEN)
 
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 1)
 
@@ -351,7 +351,7 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
         event_services.FeedbackThreadStatusChangedEventHandler.record(
             exp_id, feedback_models.STATUS_CHOICES_OPEN, '')
 
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 0)
 
@@ -400,7 +400,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
                         'undefined': {}
                     }
                 })
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
@@ -538,7 +538,7 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.exploration = (
             self.save_new_valid_exploration('exp_id', self.admin_id))
 

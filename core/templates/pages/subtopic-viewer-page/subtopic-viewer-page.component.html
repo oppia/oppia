@@ -1,6 +1,14 @@
 <background-banner></background-banner>
 <div class="oppia-subtopic-viewer-container">
   <div class="oppia-subtopic-viewer-container-card">
+    <div class="oppia-topic-title">
+      <span *ngIf="!isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitle }}
+      </span>
+      <span *ngIf="isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitleTranslationKey | translate }}
+      </span>
+    </div>
     <div class="oppia-subtopic-title">
       <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
         {{ subtopicTitle }}

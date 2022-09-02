@@ -139,7 +139,7 @@ oppia-tutor-card .conversation-skin-responses-dropdown-text {
 }
 
 oppia-tutor-card .conversation-skin-responses-dropdown-icon {
-  font-size: 20px;
+  font-size: 13px;
   margin-bottom: -2px;
   -moz-transition: all 0.2s;
   -o-transition: all 0.2s;
@@ -257,6 +257,10 @@ oppia-tutor-card .conversation-skin-oppia-completed-state-card {
 oppia-tutor-card .conversation-skin-oppia-completed-state-card .conversation-skin-oppia-feedback-content {
   color: #888;
   font-style: italic;
+}
+
+oppia-tutor-card .checkpoint-celebration-modal-container {
+  position: absolute;
 }
 
 /* When the size of the browser is reduced, and the answer submitted is

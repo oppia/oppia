@@ -73,6 +73,7 @@
   margin-top: 40px;
   overflow-y: auto;
   padding-bottom: 18vh;
+  row-gap: 24px;
 }
 
 .oppia-topic-summary-tile {
@@ -161,7 +162,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     grid-template-columns: 150px 150px 150px;
     margin-top: 5vh;
-    padding-bottom: 120px;
+    padding-bottom: 140px;
   }
 }
 

@@ -28,9 +28,11 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
+from core.domain import state_domain
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -97,6 +99,20 @@ def verify_signature(
     return True
 
 
+class JobInfoDict(TypedDict):
+    """Type for the job info dictionary."""
+
+    algorithm_id: str
+    interaction_id: str
+    exp_id: str
+    exp_version: int
+    next_scheduled_check_time: datetime.datetime
+    state_name: str
+    training_data: List[state_domain.TrainingDataDict]
+    status: str
+    algorithm_version: int
+
+
 def handle_trainable_states(
     exploration: exp_domain.Exploration,
     state_names: List[str]
@@ -109,14 +125,21 @@ def handle_trainable_states(
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
+
+    Raises:
+        Exception. No classifier algorithm found for the given interaction id.
     """
-    job_dicts_list = []
+    job_dicts_list: List[JobInfoDict] = []
     exp_id = exploration.id
     exp_version = exploration.version
     for state_name in state_names:
         state = exploration.states[state_name]
-        training_data = state.get_training_data()  # type: ignore[no-untyped-call]
+        training_data = state.get_training_data()
         interaction_id = state.interaction.id
+        if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
+            raise Exception(
+                'No classifier algorithm found for %s interaction' % (
+                    interaction_id))
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -567,6 +590,9 @@ def migrate_state_training_jobs(
             object containing exploration to training job id mapping. This
             mapping is used to figure out jobs that need to be re-submitted,
             added or removed.
+
+    Raises:
+        Exception. Interaction id does not exist for the state.
     """
     exp_id = state_training_jobs_mapping.exp_id
     exp_version = state_training_jobs_mapping.exp_version
@@ -576,6 +602,11 @@ def migrate_state_training_jobs(
         exp_id, version=exp_version)
     interaction_id = exploration.states[state_name].interaction.id
 
+    if interaction_id is None:
+        raise Exception(
+            'Interaction id does not exist for the state having state_name: %s'
+            % state_name
+        )
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
         interaction_id]['algorithm_id']
     algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
@@ -603,11 +634,11 @@ def migrate_state_training_jobs(
         set(state_training_jobs_mapping.algorithm_ids_to_job_ids.keys()))
 
     if len(algorithm_ids_to_add) > 0:
-        job_dicts = []
+        job_dicts: List[JobInfoDict] = []
 
         for algorithm_id in algorithm_ids_to_add:
             next_scheduled_check_time = datetime.datetime.utcnow()
-            training_data = exploration.states[state_name].get_training_data()  # type: ignore[no-untyped-call]
+            training_data = exploration.states[state_name].get_training_data()
 
             classifier_domain.ClassifierTrainingJob(
                 'job_id_dummy', algorithm_id, interaction_id, exp_id,

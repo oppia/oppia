@@ -45,6 +45,13 @@ var ExplorationPlayerPage = function() {
   var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
   var flaggedSuccessElement = $(
     '.e2e-test-exploration-flagged-success-message');
+  var congratulatorycheckpointMessage = $(
+    '.e2e-test-congratulatory-checkpoint-message-box');
+  var lessonInfoModalCheckpointMessage = $(
+    '.e2e-test-lesson-info-modal-checkpoint-message');
+  var lessonInfoModalCloseButton = $(
+    '.e2e-test-close-lesson-info-modal-button');
+  var lessonInfoTooltip = $('.e2e-test-close-lesson-info-tooltip');
   var gotItButton = $('.e2e-test-learner-got-it-button');
   var infoCardRating = $('.e2e-test-info-card-rating');
   var nextCardButton = $('.e2e-test-continue-to-next-card-button');
@@ -117,8 +124,8 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       radioButton, 'Radio Buttons takes too long to appear');
     var radioButtonOption = await radioButtonSelector();
-    await action.click('Radio Button', radioButtonOption)[0];
-    await action.sendKeys(
+    await action.click('Radio Button', radioButtonOption[0]);
+    await action.setValue(
       'Text Area',
       reportExplorationTextArea,
       'Reporting this exploration'
@@ -329,6 +336,36 @@ var ExplorationPlayerPage = function() {
       correctFeedbackElement,
       'Correct feedback footer takes too long to appear');
   };
+
+  this.expectCongratulatoryCheckpointMessageToAppear = async function() {
+    await waitFor.visibilityOf(
+      congratulatorycheckpointMessage,
+      'Checkpoint message takes too long to appear');
+  };
+
+  this.expectCongratulatoryCheckpointMessageToDisappear = async function() {
+    await waitFor.invisibilityOf(
+      congratulatorycheckpointMessage,
+      'Checkpoint message takes too long to disappear');
+  };
+
+  this.dismissLessonInfoTooltip = async function() {
+    await action.click('Lesson Info Tooltip', lessonInfoTooltip);
+  };
+
+  this.expectCheckpointProgressMessageToBeDisplayedOnLessonInfoModal =
+    async function() {
+      await action.click('Exploration Info Icon', explorationInfoIcon);
+      await waitFor.visibilityOf(
+        lessonInfoModalCheckpointMessage,
+        'Checkpoint message on the lesson info modal takes too long to appear');
+      expect(lessonInfoModalCheckpointMessage).toHaveText([
+        'You\'re making good progress! Keep going!',
+        'Amazing! You just completed your second checkpoint!',
+        'One more checkpoint completed, you\'re doing great!'
+      ]);
+      await action.click('Close Button', lessonInfoModalCloseButton);
+    };
 
   this.submitFeedback = async function(feedback) {
     await waitFor.elementToBeClickable(feedbackPopupLink);

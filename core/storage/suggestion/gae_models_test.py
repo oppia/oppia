@@ -24,10 +24,12 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict
+from typing import Dict, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, change domain is imported only for type checking.
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import suggestion_models
 
@@ -45,10 +47,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     topic_name = 'topic'
     target_id = 'exp1'
     target_version_at_submission = 1
-    # TODO(#13523): Use of Any here in the type annotation below will
-    # be removed when change_cmd will be changed to
-    # TypedDict/Domain Object.
-    change_cmd: Dict[str, Any] = {}
+    change_cmd: Mapping[
+        str, change_domain.AcceptableChangeDictTypes
+    ] = {}
     # Language code that would normally be derived from the change_cmd.
     translation_language_code = 'en'
     # Language code that would normally be derived from the question_dict in
@@ -172,7 +173,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_create_suggestion_fails_if_id_collides_with_existing_one(
             self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'There is already a suggestion with the given id: '
                        'exploration.exp1.thread_1'):
             suggestion_models.GeneralSuggestionModel.create(
@@ -192,7 +193,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 queries)), 5)
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
@@ -296,7 +297,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             ('target_id', self.target_id),
             ('invalid_field', 'value')
         ]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
@@ -859,7 +860,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.swap(
             feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception,
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.'):
@@ -1146,7 +1147,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_in_score_categories(
                 ['category1', 'category_invalid'], 'author_2')), 1)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Received empty list of score categories'):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
@@ -1946,5 +1947,723 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         user_data = (
             suggestion_models.TranslationContributionStatsModel
             .export_data(self.CONTRIBUTOR_USER_ID))
+
+        self.assertEqual(expected_data, user_data)
+
+
+class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the TranslationContributionStatsModel class."""
+
+    LANGUAGE_CODE = 'es'
+    REVIEWER_USER_ID = 'uid_01234567890123456789012345678912'
+    TOPIC_ID = 'topic_id'
+    REVIEWED_TRANSLATIONS_COUNT = 2
+    REVIEWED_TRANSLATION_WORD_COUNT = 100
+    ACCEPTED_TRANSLATIONS_COUNT = 1
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT = 50
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_get_returns_model_when_it_exists(self) -> None:
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        translation_review_stats_model = (
+            suggestion_models.TranslationReviewStatsModel.get(
+                self.LANGUAGE_CODE, self.REVIEWER_USER_ID, self.TOPIC_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_review_stats_model is not None
+        self.assertEqual(
+            translation_review_stats_model.language_code,
+            self.LANGUAGE_CODE
+        )
+        self.assertEqual(
+            translation_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
+        )
+        self.assertEqual(
+            translation_review_stats_model.reviewed_translations_count,
+            self.REVIEWED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .reviewed_translation_word_count
+            ),
+            self.REVIEWED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_review_stats_model.accepted_translations_count,
+            self.ACCEPTED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .accepted_translations_with_reviewer_edits_count
+            ),
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .accepted_translation_word_count
+            ),
+            self.ACCEPTED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_review_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            translation_review_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            (
+                suggestion_models.TranslationReviewStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_get_all_by_user_id(self) -> None:
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        translation_review_stats_models = (
+            suggestion_models.TranslationReviewStatsModel.get_all_by_user_id(
+                self.REVIEWER_USER_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_review_stats_models is not None
+
+        self.assertEqual(
+            len(translation_review_stats_models),
+            1
+        )
+
+        translation_review_stats_model = translation_review_stats_models[0]
+
+        self.assertEqual(
+            translation_review_stats_model.language_code,
+            self.LANGUAGE_CODE
+        )
+        self.assertEqual(
+            translation_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
+        )
+        self.assertEqual(
+            translation_review_stats_model.reviewed_translations_count,
+            self.REVIEWED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .reviewed_translation_word_count
+            ),
+            self.REVIEWED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_review_stats_model.accepted_translations_count,
+            self.ACCEPTED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .accepted_translations_with_reviewer_edits_count
+            ),
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .accepted_translation_word_count
+            ),
+            self.ACCEPTED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_review_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            translation_review_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
+    def test_apply_deletion_policy(self) -> None:
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.TranslationReviewStatsModel
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
+
+        (
+            suggestion_models.TranslationReviewStatsModel
+            .apply_deletion_policy(self.REVIEWER_USER_ID)
+        )
+
+        self.assertFalse(
+            suggestion_models.TranslationReviewStatsModel
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
+
+    def test_export_data_trivial(self) -> None:
+        user_data = (
+            suggestion_models.TranslationReviewStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        topic_id_2 = 'topic ID 2'
+        # Seed translation stats data for two different topics.
+        model_1_id = suggestion_models.TranslationReviewStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        model_2_id = suggestion_models.TranslationReviewStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=topic_id_2,
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        model_1_id_without_user_id = model_1_id.replace(
+            '.%s.' % self.REVIEWER_USER_ID, '.'
+        )
+        model_2_id_without_user_id = model_2_id.replace(
+            '.%s.' % self.REVIEWER_USER_ID, '.'
+        )
+        expected_data = {
+            model_1_id_without_user_id: {
+                'language_code': self.LANGUAGE_CODE,
+                'topic_id': self.TOPIC_ID,
+                'reviewed_translations_count': (
+                    self.REVIEWED_TRANSLATIONS_COUNT),
+                'reviewed_translation_word_count': (
+                    self.REVIEWED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            },
+            model_2_id_without_user_id: {
+                'language_code': self.LANGUAGE_CODE,
+                'topic_id': topic_id_2,
+                'reviewed_translations_count': (
+                    self.REVIEWED_TRANSLATIONS_COUNT),
+                'reviewed_translation_word_count': (
+                    self.REVIEWED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
+        }
+
+        user_data = (
+            suggestion_models.TranslationReviewStatsModel
+            .export_data(self.REVIEWER_USER_ID))
+
+        self.assertEqual(expected_data, user_data)
+
+
+class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionContributionStatsModel class."""
+
+    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
+    TOPIC_ID = 'topic_id'
+    SUBMITTED_QUESTION_COUNT = 2
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_get_returns_model_when_it_exists(self) -> None:
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_contribution_stats_model is not None
+        self.assertEqual(
+            question_contribution_stats_model.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            question_contribution_stats_model.submitted_questions_count,
+            self.SUBMITTED_QUESTION_COUNT
+        )
+        self.assertEqual(
+            question_contribution_stats_model.accepted_questions_count,
+            self.ACCEPTED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                question_contribution_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            question_contribution_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            question_contribution_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
+    def test_get_all_by_user_id(self) -> None:
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        question_contribution_stats_models = (
+            suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
+                self.CONTRIBUTOR_USER_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_contribution_stats_models is not None
+
+        self.assertEqual(
+            len(question_contribution_stats_models),
+            1
+        )
+
+        question_contribution_stats_model = question_contribution_stats_models[
+            0]
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_contribution_stats_model is not None
+        self.assertEqual(
+            question_contribution_stats_model.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            question_contribution_stats_model.submitted_questions_count,
+            self.SUBMITTED_QUESTION_COUNT
+        )
+        self.assertEqual(
+            question_contribution_stats_model.accepted_questions_count,
+            self.ACCEPTED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                question_contribution_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            question_contribution_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            question_contribution_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            (
+                suggestion_models.QuestionContributionStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self) -> None:
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.QuestionContributionStatsModel
+            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+
+        (
+            suggestion_models.QuestionContributionStatsModel
+            .apply_deletion_policy(self.CONTRIBUTOR_USER_ID)
+        )
+
+        self.assertFalse(
+            suggestion_models.QuestionContributionStatsModel
+            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+
+    def test_export_data_trivial(self) -> None:
+        user_data = (
+            suggestion_models.QuestionContributionStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        topic_id_2 = 'topic ID 2'
+        # Seed question stats data for two different topics.
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=topic_id_2,
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        model_1_id_without_user_id = self.TOPIC_ID
+        model_2_id_without_user_id = topic_id_2
+        expected_data = {
+            model_1_id_without_user_id: {
+                'topic_id': self.TOPIC_ID,
+                'submitted_questions_count': (
+                    self.SUBMITTED_QUESTION_COUNT),
+                'accepted_questions_count': (
+                    self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_without_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            },
+            model_2_id_without_user_id: {
+                'topic_id': topic_id_2,
+                'submitted_questions_count': (
+                    self.SUBMITTED_QUESTION_COUNT),
+                'accepted_questions_count': (
+                    self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_without_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
+        }
+
+        user_data = (
+            suggestion_models.QuestionContributionStatsModel
+            .export_data(self.CONTRIBUTOR_USER_ID))
+
+        self.assertEqual(expected_data, user_data)
+
+
+class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionReviewStatsModel class."""
+
+    REVIEWER_USER_ID = 'uid_01234567890123456789012345678912'
+    TOPIC_ID = 'topic_id'
+    REVIEWED_QUESTIONS_COUNT = 2
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_get_returns_model_when_it_exists(self) -> None:
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        question_review_stats_model = (
+            suggestion_models.QuestionReviewStatsModel.get(
+                self.REVIEWER_USER_ID, self.TOPIC_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_review_stats_model is not None
+        self.assertEqual(
+            question_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
+        )
+        self.assertEqual(
+            question_review_stats_model.reviewed_questions_count,
+            self.REVIEWED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            question_review_stats_model.accepted_questions_count,
+            self.ACCEPTED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                question_review_stats_model
+                .accepted_questions_with_reviewer_edits_count
+            ),
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            question_review_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            question_review_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
+    def test_get_all_by_user_id(self) -> None:
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        question_review_stats_models = (
+            suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
+                self.REVIEWER_USER_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_review_stats_models is not None
+
+        question_review_stats_model = question_review_stats_models[0]
+
+        self.assertEqual(
+            question_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
+        )
+        self.assertEqual(
+            question_review_stats_model.reviewed_questions_count,
+            self.REVIEWED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            question_review_stats_model.accepted_questions_count,
+            self.ACCEPTED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                question_review_stats_model
+                .accepted_questions_with_reviewer_edits_count
+            ),
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            question_review_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            question_review_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            (
+                suggestion_models.QuestionReviewStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self) -> None:
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.QuestionReviewStatsModel
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
+
+        (
+            suggestion_models.QuestionReviewStatsModel
+            .apply_deletion_policy(self.REVIEWER_USER_ID)
+        )
+
+        self.assertFalse(
+            suggestion_models.QuestionReviewStatsModel
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
+
+    def test_export_data_trivial(self) -> None:
+        user_data = (
+            suggestion_models.QuestionReviewStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        topic_id_2 = 'topic ID 2'
+        # Seed question stats data for two different topics.
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        suggestion_models.QuestionReviewStatsModel.create(
+            reviewer_user_id=self.REVIEWER_USER_ID,
+            topic_id=topic_id_2,
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        model_1_id_without_user_id = self.TOPIC_ID
+        model_2_id_without_user_id = topic_id_2
+        expected_data = {
+            model_1_id_without_user_id: {
+                'topic_id': self.TOPIC_ID,
+                'reviewed_questions_count': (
+                    self.REVIEWED_QUESTIONS_COUNT),
+                'accepted_questions_count': (
+                    self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_with_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            },
+            model_2_id_without_user_id: {
+                'topic_id': topic_id_2,
+                'reviewed_questions_count': (
+                    self.REVIEWED_QUESTIONS_COUNT),
+                'accepted_questions_count': (
+                    self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_with_reviewer_edits_count': (
+                    self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
+        }
+
+        user_data = (
+            suggestion_models.QuestionReviewStatsModel
+            .export_data(self.REVIEWER_USER_ID))
 
         self.assertEqual(expected_data, user_data)
