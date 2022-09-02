@@ -664,6 +664,8 @@ class StoryContents:
         Returns:
             list(StoryNode). The ordered list of nodes.
         """
+        if len(self.nodes) == 0:
+            return []
         # Ruling out the possibility of None for mypy type checking.
         assert self.initial_node_id is not None
         initial_index = self.get_node_index(self.initial_node_id)

@@ -789,7 +789,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected prerequisite skill ids and acquired skill ids '
             'to be mutually exclusive.')
 
-    def test_get_ordered_nodes(self) -> None:
+    def test_get_ordered_nodes_when_nodes_exist(self) -> None:
         self.story.story_contents.next_node_id = 'node_4'
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
@@ -852,6 +852,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(calculated_list[0].id, expected_list[0].id)
         self.assertEqual(calculated_list[1].id, expected_list[1].id)
         self.assertEqual(calculated_list[2].id, expected_list[2].id)
+
+    def test_get_ordered_nodes_when_no_nodes_exist(self) -> None:
+        self.story.story_contents.nodes = []
+        calculated_list = self.story.story_contents.get_ordered_nodes()
+        self.assertEqual(calculated_list, [])
 
     def test_get_all_linked_exp_ids(self) -> None:
         self.story.story_contents.next_node_id = 'node_4'

@@ -458,7 +458,6 @@ export class TranslationModalComponent {
             this.resetEditor();
           } else {
             this.activeWrittenTranslation = '';
-            this.resetEditor();
           }
         }, (errorReason: string) => {
           this.contextService.resetImageSaveDestination();
