@@ -55,6 +55,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Output() onSaveAnswerGroupCorrectnessLabel = new EventEmitter<Outcome>();
   @Output() onSaveNextContentIdIndex = new EventEmitter();
   @Output() onSaveAnswerGroupDest = new EventEmitter<Outcome>();
+  @Output() onSaveAnswerGroupDestIfStuck = new EventEmitter<Outcome>();
   @Output() onSaveAnswerGroupFeedback = new EventEmitter<Outcome>();
   @Output() onSaveTaggedMisconception = new EventEmitter<TaggedMisconception>();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
@@ -92,6 +93,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   sendOnSaveAnswerGroupDest(event: Outcome): void {
     this.onSaveAnswerGroupDest.emit(event);
+  }
+
+  sendOnSaveAnswerGroupDestIfStuck(event: Outcome): void {
+    this.onSaveAnswerGroupDestIfStuck.emit(event);
   }
 
   isInQuestionMode(): boolean {
