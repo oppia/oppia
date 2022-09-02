@@ -5808,35 +5808,14 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
         interaction = exploration.states['first state'].interaction
 
-        interaction.answer_groups = [state_domain.AnswerGroup(
-                state_domain.Outcome(
-                    'state1', 'second state', state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Outcome2 for state2</p>'),
-                    False, [], None, None),
-                [
-                    state_domain.RuleSpec(
-                        'Equals',
-                        {
-                            'x': 0
-                        }),
-                    state_domain.RuleSpec(
-                        'Equals',
-                        {
-                            'x': 1
-                        })
-                ],
-                [],
-                None)]
-
         default_outcome_for_first_state = interaction.default_outcome
+        assert default_outcome_for_first_state is not None
         default_outcome_for_first_state.dest_if_really_stuck = 'second state'
 
         exploration.delete_state('second state')
         self.assertEqual(
             default_outcome_for_first_state.dest_if_really_stuck, 'first state')
-        self.assertEqual(
-            interaction.answer_groups[0].outcome.dest_if_really_stuck,
-             'first state')
+
         with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
 
