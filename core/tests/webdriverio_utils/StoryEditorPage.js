@@ -57,7 +57,6 @@ var StoryEditorPage = function() {
   var cancelChapterCreationButton = $(
     '.e2e-test-cancel-chapter-creation-button');
   var saveStoryIcon = $('.e2e-test-mobile-options-base');
-  var saveDraftMobile = $('.e2e-test-mobile-save-changes');
   var storyOptionsDropdown = $('.e2e-test-mobile-changes-dropdown');
   var publishStoryMobile = $('.e2e-test-mobile-publish-button');
 
@@ -339,6 +338,12 @@ var StoryEditorPage = function() {
 
     if (width < 1000) {
       await action.click('Story Options', saveStoryIcon);
+
+      var saveDraftMobile = $(function() {
+        return document
+          .getElementByClassName('e2e-test-mobile-save-changes');
+      });
+
       await action.click('Save Draft', saveDraftMobile);
     } else {
       await action.click('Save Story Button', saveStoryButton);
