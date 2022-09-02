@@ -955,15 +955,20 @@ class Skill:
         # to_dict().
         skill_dict['version'] = self.version
 
-        # The dictionary returned by `to_dict()` method is SkillDict, and
-        # SkillDict does not contain `created_on` and `last_updated` keys.
-        # But below we are defining those keys which causes MyPy to throw
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is SkillDict, and SkillDict does not contain `created_on` key.
+        # But below we are defining that key which causes MyPy to throw
         # error `TypedDict "SkillDict" has no key 'created_on'`. Thus to
         # avoid the error, we used ignore here.
         if self.created_on:
             skill_dict['created_on'] = utils.convert_naive_datetime_to_string(  # type: ignore[misc]
                 self.created_on)
 
+        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
+        # method is SkillDict, and SkillDict does not contain last_updated key.
+        # But below we are defining that key which causes MyPy to throw
+        # error `TypedDict "SkillDict" has no key 'last_updated'`. Thus to
+        # avoid the error, we used ignore here.
         if self.last_updated:
             skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(  # type: ignore[misc]
                 self.last_updated)
@@ -1339,12 +1344,14 @@ class Skill:
         Returns:
             dict. The converted rubric_dict.
         """
-        # Here, rubric_dict is a dictionary of type RubricDict and RubricDict
-        # does not contain `explanation` key, but below we are accessing that
-        # `explanation` key which causes MyPy to throw error `TypedDict
-        # "RubricDict" has no key 'explanation'`. Thus to avoid the error,
-        # we used ignore statement here.
+        # Here we use MyPy ignore because rubric_dict is a dictionary of type
+        # RubricDict and RubricDict does not contain `explanation` key, but
+        # below we are accessing that `explanation` key which causes MyPy to
+        # throw error `TypedDict "RubricDict" has no key 'explanation'`.
+        # Thus to avoid the error, we used ignore statement here.
         explanation = rubric_dict['explanation']  # type: ignore[misc]
+        # Here we use MyPy ignore because MyPy doesn't allow key deletion from
+        # TypedDict.
         del rubric_dict['explanation']  # type: ignore[misc]
         rubric_dict['explanations'] = [explanation]
         return rubric_dict

@@ -28,7 +28,7 @@ from core.domain import app_feedback_report_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Sequence, cast
+from typing import Dict, List, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -192,10 +192,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_get_reports_returns_same_report(self) -> None:
         optional_report_models = app_feedback_report_services.get_report_models(
             [self.android_report_id])
-        report_models = cast(
-            List[app_feedback_report_models.AppFeedbackReportModel],
-            optional_report_models)
-        self.assertEqual(report_models[0].id, self.android_report_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert optional_report_models[0] is not None
+        self.assertEqual(optional_report_models[0].id, self.android_report_id)
 
     def test_get_multiple_reports_returns_all_reports(self) -> None:
         new_report_id_1 = (
@@ -227,11 +226,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         optional_report_models = app_feedback_report_services.get_report_models(
             [self.android_report_id, new_report_id_1, new_report_id_2])
-        report_models = cast(
-            List[app_feedback_report_models.AppFeedbackReportModel],
-            optional_report_models)
-        report_ids = [report_model.id for report_model in report_models]
-        self.assertEqual(len(report_models), 3)
+        report_ids = [
+            report_model.id for report_model in optional_report_models
+            if report_model is not None
+        ]
+        self.assertEqual(len(optional_report_models), 3)
         self.assertTrue(self.android_report_id in report_ids)
         self.assertTrue(new_report_id_1 in report_ids)
         self.assertTrue(new_report_id_2 in report_ids)
@@ -279,13 +278,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 'user_feedback_other_text_input'])
 
     def test_get_report_from_model_has_same_device_system_info(self) -> None:
-        device_system_context = cast(
-            app_feedback_report_domain.AndroidDeviceSystemContext,
-            self.android_report_obj.device_system_context)
-
-        self.assertTrue(isinstance(
-            device_system_context,
-            app_feedback_report_domain.AndroidDeviceSystemContext))
+        assert isinstance(
+            self.android_report_obj.device_system_context,
+            app_feedback_report_domain.AndroidDeviceSystemContext)
+        device_system_context = self.android_report_obj.device_system_context
         self.assertEqual(
             device_system_context.version_name,
             self.android_report_model.platform_version)
@@ -312,12 +308,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 'network_type'])
 
     def test_get_report_from_model_has_same_app_info(self) -> None:
-        app_context = cast(
-            app_feedback_report_domain.AndroidAppContext,
-            self.android_report_obj.app_context)
-
-        self.assertTrue(isinstance(
-            app_context, app_feedback_report_domain.AndroidAppContext))
+        assert isinstance(
+            self.android_report_obj.app_context,
+            app_feedback_report_domain.AndroidAppContext
+        )
+        app_context = self.android_report_obj.app_context
         self.assertEqual(
             app_context.entry_point.entry_point_name,
             self.android_report_model.entry_point)
@@ -371,12 +366,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         optional_scrubbed_report_models = (
             app_feedback_report_services.get_report_models(
                 [self.android_report_id]))
-        scrubbed_report_models = cast(
-            List[app_feedback_report_models.AppFeedbackReportModel],
-            optional_scrubbed_report_models)
+        # Ruling out the possibility of None for mypy type checking.
+        assert optional_scrubbed_report_models[0] is not None
         scrubbed_report_obj = (
             app_feedback_report_services.get_report_from_model(
-                scrubbed_report_models[0]))
+                optional_scrubbed_report_models[0]
+            )
+        )
 
         self.assertEqual(scrubbed_report_obj.scrubbed_by, self.user_id)
 
@@ -579,10 +575,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         report_id = report_obj.report_id
         optional_report_models = app_feedback_report_services.get_report_models(
             [report_id])
-        report_models = cast(
-            List[app_feedback_report_models.AppFeedbackReportModel],
-            optional_report_models)
-        actual_model = report_models[0]
+        # Ruling out the possibility of None for mypy type checking.
+        assert optional_report_models[0] is not None
+        actual_model = optional_report_models[0]
 
         self.assertEqual(actual_model.id, report_id)
         # Verify some of the model's fields based on input JSON.
@@ -818,7 +813,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.android_report_obj.platform,
-                cast(str, self.android_report_obj.ticket_id),
+                self.android_report_obj.ticket_id,
                 self.android_report_obj.submitted_on_timestamp.date()))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             old_stats_id, self.android_report_obj.platform, old_ticket_id,
@@ -841,7 +836,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         new_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 new_report_obj.platform,
-                cast(str, new_report_obj.ticket_id),
+                new_report_obj.ticket_id,
                 new_report_obj.submitted_on_timestamp.date()))
         new_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
@@ -876,7 +871,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.android_report_obj.platform,
-                cast(str, self.android_report_obj.ticket_id),
+                self.android_report_obj.ticket_id,
                 self.android_report_obj.submitted_on_timestamp.date()))
 
         app_feedback_report_services.reassign_ticket(
@@ -936,7 +931,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.android_report_obj.platform,
-                cast(str, self.android_report_obj.ticket_id),
+                self.android_report_obj.ticket_id,
                 self.android_report_obj.submitted_on_timestamp.date()))
 
         new_ticket_id = self._add_new_android_ticket(
@@ -998,7 +993,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.android_report_obj.platform,
-                cast(str, self.android_report_obj.ticket_id),
+                self.android_report_obj.ticket_id,
                 self.android_report_obj.submitted_on_timestamp.date()))
 
         app_feedback_report_services.reassign_ticket(

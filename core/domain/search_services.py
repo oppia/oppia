@@ -65,14 +65,8 @@ def index_exploration_summaries(
         exp_summaries: list(ExplorationSummary). List of Exp Summary domain
             objects to be indexed.
     """
-    # The argument `documents` of add_documents_to_index() is annotated
-    # with List[Dict[str, Any]] because this method can accept any kind
-    # of dictionaries, but here we are providing a strict type
-    # `List[DomainSearchDict]` which causes a conflict in type assignment
-    # and due to this MyPy throws an error. So, to silent the error, we used
-    # ignore here.
     platform_search_services.add_documents_to_index([
-        _exp_summary_to_search_dict(exp_summary)  # type: ignore[misc]
+        _exp_summary_to_search_dict(exp_summary)
         for exp_summary in exp_summaries
         if _should_index_exploration(exp_summary)
     ], SEARCH_INDEX_EXPLORATIONS)
@@ -161,14 +155,8 @@ def index_collection_summaries(
         collection_summaries: list(CollectionSummary). List of collection
             summary domain objects to be indexed.
     """
-    # The argument `documents` of add_documents_to_index() is annotated
-    # with List[Dict[str, Any]] because this method can accept any kind
-    # of dictionaries, but here we are providing a strict type
-    # `List[DomainSearchDict]` which causes a conflict in type assignment
-    # and due to this MyPy throws an error. So, to silent the error, we used
-    # ignore here.
     platform_search_services.add_documents_to_index([
-        _collection_summary_to_search_dict(collection_summary)  # type: ignore[misc]
+        _collection_summary_to_search_dict(collection_summary)
         for collection_summary in collection_summaries
         if _should_index_collection(collection_summary)
     ], SEARCH_INDEX_COLLECTIONS)
@@ -244,7 +232,7 @@ def search_explorations(
               fetch, None otherwise. If an offset is returned, it will be a
               web-safe string that can be used in URLs.
     """
-    # The return type of 'platform_search_services.search()' method is
+    # Here we use cast because the return type of 'search()' method is
     # tuple with 2 elements. For the first tuple element, it's return type
     # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
     # the type of first element is always an List[str]. So, to narrow down
@@ -311,7 +299,7 @@ def search_collections(
               otherwise. If an offset is returned, it will be a web-safe string
               that can be used in URLs.
     """
-    # The return type of 'platform_search_services.search()' method is
+    # Here we use cast because the return type of 'search()' method is
     # tuple with 2 elements. For the first tuple element, it's return type
     # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
     # the type of first element is always an List[str]. So, to narrow down

@@ -60,7 +60,8 @@ def run_beam_job(
     if job_class is None:
         # MyPy is wrong. We know job_name is not None in this branch because if
         # it were, the ValueError above would have been raised.
-        job_class = jobs_registry.get_job_class_by_name(job_name) # type: ignore[arg-type]
+        assert job_name is not None
+        job_class = jobs_registry.get_job_class_by_name(job_name)
 
     run_synchronously = constants.EMULATOR_MODE
     run_model = jobs_manager.run_job(job_class, run_synchronously)

@@ -254,15 +254,17 @@ def get_learner_collection_dict_by_id(
         next_exploration_id = collection.first_exploration_id
         completed_exp_ids = []
 
-    # Here, the return type of 'to_dict' method is CollectionDict but for
-    # implementation purpose we are assigning LearnerCollectionDict which
-    # is inherited from CollectionDict. So, due to the difference in types
-    # MyPY throws an error. Thus to avoid the error, we used ignore here.
+    # Here we use MyPy ignore because the return type of 'to_dict' method
+    # is CollectionDict but for implementation purpose we are assigning
+    # LearnerCollectionDict which is inherited from CollectionDict. So,
+    # due to the difference in types MyPy throw a error. Thus to avoid
+    # the error, we used ignore here.
     collection_dict: LearnerCollectionDict = collection.to_dict()  # type: ignore[assignment]
-    # Here, expression has type List[CollectionNodeDict] but for implementation
-    # purpose we are assigning List[LearnerCollectionNodeDict]. So, due the
-    # difference in types MyPY throws an error. Thus to avoid the error, we
-    # used ignore here.
+    # Here we use MyPy ignore because expression has type List[
+    # CollectionNodeDict] but for implementation purpose we are
+    # assigning List[LearnerCollectionNodeDict]. So, due the
+    # difference in types MyPy throw a error. Thus to avoid the
+    # error, we used ignore here.
     collection_dict['nodes'] = [
         node.to_dict() for node in collection.nodes]  # type: ignore[misc]
 

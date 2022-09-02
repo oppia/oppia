@@ -29,7 +29,7 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Any, Callable, Dict, List, overload
+from typing import Callable, Dict, List, Mapping, Union, overload
 from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False
@@ -88,6 +88,17 @@ CACHE_NAMESPACE_CONFIG: Final = 'config'
 CACHE_NAMESPACE_DEFAULT: Final = 'default'
 
 
+AllowedCacheableObjectTypes = Union[
+    str,
+    collection_domain.Collection,
+    exp_domain.Exploration,
+    skill_domain.Skill,
+    story_domain.Story,
+    topic_domain.Topic,
+    platform_parameter_domain.PlatformParameter
+]
+
+
 class DeserializationFunctionsDict(TypedDict):
     """Type for the DESERIALIZATION_FUNCTIONS."""
 
@@ -97,8 +108,8 @@ class DeserializationFunctionsDict(TypedDict):
     story: Callable[[str], story_domain.Story]
     topic: Callable[[str], topic_domain.Topic]
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
-    config: Callable[[str], dict[str, Any]]
-    default: Callable[[str], dict[str, Any]]
+    config: Callable[[str], str]
+    default: Callable[[str], str]
 
 
 class SerializationFunctionsDict(TypedDict):
@@ -110,8 +121,8 @@ class SerializationFunctionsDict(TypedDict):
     story: Callable[[story_domain.Story], str]
     topic: Callable[[topic_domain.Topic], str]
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
-    config: Callable[[dict[str, Any]], str]
-    default: Callable[[dict[str, Any]], str]
+    config: Callable[[str], str]
+    default: Callable[[str], str]
 
 
 # Type defined for arguments which can accept only keys of Dict
@@ -245,7 +256,7 @@ def get_multi(
     namespace: Literal['config'],
     sub_namespace: str | None,
     obj_ids: List[str]
-) -> Dict[str, Dict[str, Any]]: ...
+) -> Dict[str, str]: ...
 
 
 @overload
@@ -253,14 +264,14 @@ def get_multi(
     namespace: Literal['default'],
     sub_namespace: str | None,
     obj_ids: List[str]
-) -> Dict[str, Dict[str, Any]]: ...
+) -> Dict[str, str]: ...
 
 
 def get_multi(
     namespace: NamespaceType,
     sub_namespace: str | None,
     obj_ids: List[str]
-) -> Dict[str, Any]:
+) -> Mapping[str, AllowedCacheableObjectTypes]:
     """Get a dictionary of the {id, value} pairs from the memory cache.
 
     Args:
@@ -285,10 +296,7 @@ def get_multi(
         decoded (id, value) pairs retrieved from the platform caching service.
     """
 
-    # In result_dict's key-value pair, value can be any of the type from
-    # Exploration, Skill, Story, Topic, Collection, str. hence Any type has
-    # to be used here for the value type of result_dict dictionary.
-    result_dict: Dict[str, Any] = {}
+    result_dict: Dict[str, AllowedCacheableObjectTypes] = {}
     if len(obj_ids) == 0:
         return result_dict
 
@@ -375,7 +383,7 @@ def set_multi(
 def set_multi(
     namespace: NamespaceType,
     sub_namespace: str | None,
-    id_value_mapping: Dict[str, Any]
+    id_value_mapping: Mapping[str, AllowedCacheableObjectTypes]
 ) -> bool:
     """Set multiple id values at once to the cache, where the values are all
     of a specific namespace type or a Redis compatible type (more details here:
@@ -405,7 +413,13 @@ def set_multi(
 
     memory_cache_id_value_mapping = {
         _get_memcache_key(namespace, sub_namespace, obj_id):
-        SERIALIZATION_FUNCTIONS[namespace](value)
+        # Here we use MyPy ignore because 'SERIALIZATION_FUNCTIONS[namespace]'
+        # is a function which can accept arguments of type Exploration,
+        # Collection, and etc. But instead of providing them as individual type
+        # we are providing these types as a Union (AllowedCacheableObjectTypes).
+        # So, because of this MyPy throws an error. Thus to avoid the error, we
+        # used ignore here.
+        SERIALIZATION_FUNCTIONS[namespace](value)  # type: ignore[arg-type]
         for obj_id, value in id_value_mapping.items()
     }
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
