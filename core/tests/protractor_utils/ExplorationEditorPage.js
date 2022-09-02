@@ -76,6 +76,10 @@ var ExplorationEditorPage = function() {
   var explorationSaveModalElement = element(
     by.css('.e2e-test-exploration-save-modal'));
   var toastMessage = element(by.css('.e2e-test-toast-message'));
+  var languageChoiceOptionElement = function(language) {
+    return element.all(by.cssContainingText(
+      '.e2e-test-exploration-language-select-lan', language)).first();
+  };
 
   /*
    * Non-Interactive elements
@@ -182,8 +186,7 @@ var ExplorationEditorPage = function() {
       expCategoryDropdownElement,
       'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(
-        expCategoryDropdownElement)
+      await forms.AutocompleteDropdownEditor(expCategoryDropdownElement)
     ).setValue(category);
     await action.click(
       'Exploration metadata modal header',
@@ -193,12 +196,9 @@ var ExplorationEditorPage = function() {
     await action.click(
       'Exploration Language', expLanguageSelectorElementModal, true);
 
-    var LanguageChoiceOptionElement = element.all(by.cssContainingText(
-      '.e2e-test-exploration-language-select-lan', language)).first();
-
     await action.click(
       'Language input Choice takes too long to be visible. ',
-      LanguageChoiceOptionElement, true);
+      languageChoiceOptionElement(language), true);
 
     await action.click(
       'Exploration metadata modal header',

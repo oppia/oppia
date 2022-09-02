@@ -44,8 +44,11 @@ var ExplorationEditorPage = function() {
   */
   var commitMessageInput = $('.e2e-test-commit-message-input');
   var confirmPublish = $('.e2e-test-confirm-publish');
-  var expCategoryDropdownElement = $('.e2e-test-exploration-category-dropdown');
+  var expCategoryDropdownElement = $(
+    '.e2e-test-exploration-category-metadata-modal');
   var expLanguageSelectorElement = $('.e2e-test-exploration-language-select');
+  var expLanguageSelectorElementModal = $(
+    '.e2e-test-exploration-language-select-modal');
   var explorationSaveModalElement = $('.e2e-test-exploration-save-modal');
   var expTagsSelectionChoiceElementsSelector = function() {
     return $$('.select2-selection__choice');
@@ -53,11 +56,20 @@ var ExplorationEditorPage = function() {
   var expObjective = $('.e2e-test-exploration-objective-input');
   var expTags = $('.e2e-test-tags');
   var expTitle = $('.e2e-test-exploration-title-input');
+  var expTitleInPostPublishModal = $(
+    '.e2e-test-exploration-title-input-modal');
+  var expObjectiveInPostPublishModal = $(
+    '.e2e-test-exploration-objective-input-modal');
   var explorationMetadataModalHeaderElement = $(
     '.e2e-test-metadata-modal-header');
   var modalContentElement = $('.modal-content');
   var promptModalElement = $('.e2e-test-save-prompt-modal');
-  var selectionRenderedElement = $('.select2-selection__rendered');
+  var languageChoiceOptionElement = function(language) {
+    return $$(
+      `.e2e-test-exploration-language-select-lan=${language}`).first();
+  };
+  var explorationCategoryDropdown = $(
+    '.e2e-test-exploration-category-dropdown');
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
   var toastMessage = $('.e2e-test-toast-message');
 
@@ -141,13 +153,15 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
-    await action.setValue('Exploration title', expTitle, title);
+    await action.setValue(
+      'Exploration title', expTitleInPostPublishModal, title);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.setValue('Exploration objective', expObjective, objective);
+    await action.setValue(
+      'Exploration objective', expObjectiveInPostPublishModal, objective);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
@@ -164,9 +178,13 @@ var ExplorationEditorPage = function() {
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.select(
-      'Exploration Language', expLanguageSelectorElement,
-      language);
+    await action.click(
+      'Exploration Language', expLanguageSelectorElementModal);
+
+    await action.click(
+      'Language input Choice takes too long to be visible. ',
+      languageChoiceOptionElement(language));
+
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
@@ -205,10 +223,10 @@ var ExplorationEditorPage = function() {
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
     var explorationCategory = await action.getText(
-      'Selection Rendered Element', selectionRenderedElement);
+      'Exploration Category Dropdown Element', explorationCategoryDropdown);
     var explorationLanguage = await action.getText(
       'Exploration Language Selector Element',
-      expLanguageSelectorElement.$('option:checked'));
+      expLanguageSelectorElement);
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
     var expTitleValue = await action.getValue(
