@@ -27,19 +27,16 @@ export class HtmlSelectComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() options!: { id: string; val: string }[];
-  @Input() selection!: number;
-  selectionAsString!: string;
+  @Input() selection!: string;
   @Output() onSelectionChange = new EventEmitter();
 
   ngOnInit(): void {
-    this.selectionAsString = String(this.selection);
-    if (this.selection === null || this.selection === undefined) {
-      this.selection = Number(this.options[0].id);
+    if (!this.selection) {
+      this.selection = this.options[0].id;
     }
   }
 
   updatedSelection(): void {
-    this.selection = Number(this.selectionAsString);
     this.onSelectionChange.emit(this.selection);
   }
 }
