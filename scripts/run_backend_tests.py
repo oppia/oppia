@@ -428,7 +428,7 @@ def main(args=None):
             servers.managed_cloud_datastore_emulator(clear_datastore=True))
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:
-            if '_test' in parsed_args.test_target:
+            if parsed_args.test_target.endswith('_test'):
                 all_test_targets = [parsed_args.test_target]
             else:
                 print('')
@@ -586,5 +586,5 @@ def _check_coverage(
     return process.stdout, coverage
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     main()
