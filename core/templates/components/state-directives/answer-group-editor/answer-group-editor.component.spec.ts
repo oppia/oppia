@@ -154,6 +154,7 @@ describe('Answer Group Editor Component', () => {
     component.activeRuleIndex = 1;
     alertsService.addMessage('info', 'Some other message', 0);
     component.sendOnSaveAnswerGroupDest(null);
+    component.sendOnSaveAnswerGroupDestIfStuck(null);
 
     externalSaveEmitter.emit();
     tick();

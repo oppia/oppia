@@ -22,8 +22,8 @@ export interface LearnerGroupBackendDict {
   title: string;
   description: string;
   facilitator_usernames: string[];
-  student_usernames: string[];
-  invited_student_usernames: string[];
+  learner_usernames: string[];
+  invited_learner_usernames: string[];
   subtopic_page_ids: string[];
   story_ids: string[];
 }
@@ -33,8 +33,8 @@ export class LearnerGroupData {
   _title: string;
   _description: string;
   _facilitatorUsernames: string[];
-  _studentUsernames: string[];
-  _invitedStudentUsernames: string[];
+  _learnerUsernames: string[];
+  _invitedLearnerUsernames: string[];
   _subtopicPageIds: string[];
   _storyIds: string[];
 
@@ -43,8 +43,8 @@ export class LearnerGroupData {
       title: string,
       description: string,
       facilitatorUsernames: string[],
-      studentUsernames: string[],
-      invitedStudentUsernames: string[],
+      learnerUsernames: string[],
+      invitedLearnerUsernames: string[],
       subtopicPageIds: string[],
       storyIds: string[]
   ) {
@@ -52,8 +52,8 @@ export class LearnerGroupData {
     this._title = title;
     this._description = description;
     this._facilitatorUsernames = facilitatorUsernames;
-    this._studentUsernames = studentUsernames;
-    this._invitedStudentUsernames = invitedStudentUsernames;
+    this._learnerUsernames = learnerUsernames;
+    this._invitedLearnerUsernames = invitedLearnerUsernames;
     this._subtopicPageIds = subtopicPageIds;
     this._storyIds = storyIds;
   }
@@ -82,12 +82,12 @@ export class LearnerGroupData {
     return this._facilitatorUsernames;
   }
 
-  get studentUsernames(): string[] {
-    return this._studentUsernames;
+  get learnerUsernames(): string[] {
+    return this._learnerUsernames;
   }
 
-  get invitedStudentUsernames(): string[] {
-    return this._invitedStudentUsernames;
+  get invitedLearnerUsernames(): string[] {
+    return this._invitedLearnerUsernames;
   }
 
   get subtopicPageIds(): string[] {
@@ -107,26 +107,26 @@ export class LearnerGroupData {
     this._facilitatorUsernames.splice(index, 1);
   }
 
-  addStudent(studentUsername: string): void {
-    this._studentUsernames.push(studentUsername);
+  addLearner(learnerUsername: string): void {
+    this._learnerUsernames.push(learnerUsername);
   }
 
-  removeStudent(studentUsername: string): void {
-    let index = this._studentUsernames.indexOf(studentUsername);
-    this._studentUsernames.splice(index, 1);
+  removeLearner(learnerUsername: string): void {
+    let index = this._learnerUsernames.indexOf(learnerUsername);
+    this._learnerUsernames.splice(index, 1);
   }
 
-  inviteStudent(studentUsername: string): void {
-    this._invitedStudentUsernames.push(studentUsername);
+  inviteLearners(learnerUsernames: string[]): void {
+    this._invitedLearnerUsernames.push(...learnerUsernames);
   }
 
-  revokeInvitation(studentUsername: string): void {
-    let index = this._invitedStudentUsernames.indexOf(studentUsername);
-    this._invitedStudentUsernames.splice(index, 1);
+  revokeInvitation(learnerUsername: string): void {
+    let index = this._invitedLearnerUsernames.indexOf(learnerUsername);
+    this._invitedLearnerUsernames.splice(index, 1);
   }
 
-  addSubtopicPageId(subtopicPageId: string): void {
-    this._subtopicPageIds.push(subtopicPageId);
+  addSubtopicPageIds(subtopicPageIds: string[]): void {
+    this._subtopicPageIds.push(...subtopicPageIds);
   }
 
   removeSubtopicPageId(subtopicPageId: string): void {
@@ -134,8 +134,8 @@ export class LearnerGroupData {
     this._subtopicPageIds.splice(index, 1);
   }
 
-  addStoryId(storyId: string): void {
-    this._storyIds.push(storyId);
+  addStoryIds(storyIds: string[]): void {
+    this._storyIds.push(...storyIds);
   }
 
   removeStoryId(storyId: string): void {
@@ -162,17 +162,17 @@ export class LearnerGroupData {
       issues.push(
         'Learner Group should have at least one syllabus item.');
     }
-    if (creationMode && this._studentUsernames.length > 0) {
+    if (creationMode && this._learnerUsernames.length > 0) {
       issues.push(
-        'Learner Group cannot have any students while creation.');
+        'Learner Group cannot have any learners while creation.');
     }
     if (!creationMode) {
-      const commonUsernames = this.studentUsernames.filter(
-        username => this.invitedStudentUsernames.includes(username)
+      const commonUsernames = this.learnerUsernames.filter(
+        username => this.invitedLearnerUsernames.includes(username)
       );
       if (commonUsernames.length > 0) {
         issues.push(
-          'Students can not be invited to join the same group again.'
+          'Learners can not be invited to join the same group again.'
         );
       }
     }
@@ -186,8 +186,8 @@ export class LearnerGroupData {
       learnerGroupBackendDict.title,
       learnerGroupBackendDict.description,
       learnerGroupBackendDict.facilitator_usernames,
-      learnerGroupBackendDict.student_usernames,
-      learnerGroupBackendDict.invited_student_usernames,
+      learnerGroupBackendDict.learner_usernames,
+      learnerGroupBackendDict.invited_learner_usernames,
       learnerGroupBackendDict.subtopic_page_ids,
       learnerGroupBackendDict.story_ids
     );

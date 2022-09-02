@@ -25,6 +25,7 @@ from core import feconf
 from core import schema_utils
 from core import utils
 from core.constants import constants
+from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
@@ -34,7 +35,9 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
-from typing import Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import (
+    Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
+)
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -351,9 +354,10 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'Review')
 }
 
-NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
+CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION: Dict[
+    str, Dict[str, Dict[str, str]]] = {
     feconf.CONTRIBUTION_TYPE_TRANSLATION: {
-        feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE: {
+        feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE: {
             'email_body_template': (
                 'Hi %s,<br><br>'
                 'This is to let you know that you have successfully achieved '
@@ -364,13 +368,13 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
                 'Best wishes and we hope you can continue to contribute!'
                 '<br><br>'
-                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+                'The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
                 'Oppia Translator Rank Achievement!'
             )
         },
-        feconf.CONTRIBUTION_SUB_TYPE_REVIEW: {
+        feconf.CONTRIBUTION_SUBTYPE_REVIEW: {
             'email_body_template': (
                 'Hi %s,<br><br>'
                 'This is to let you know that you have successfully achieved '
@@ -381,13 +385,13 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
                 'Best wishes and we hope you can continue to contribute!'
                 '<br><br>'
-                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+                'The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
                 'Oppia Translation Reviewer Rank Achievement!'
             )
         },
-        feconf.CONTRIBUTION_SUB_TYPE_EDIT: {
+        feconf.CONTRIBUTION_SUBTYPE_EDIT: {
             'email_body_template': (
                 'Hi %s,<br><br>'
                 'This is to let you know that you have successfully achieved '
@@ -398,7 +402,7 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
                 'Best wishes and we hope you can continue to contribute!'
                 '<br><br>'
-                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+                'The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
                 'Oppia Translation Reviewer Rank Achievement!'
@@ -406,24 +410,24 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
         }
     },
     feconf.CONTRIBUTION_TYPE_QUESTION: {
-        feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE: {
+        feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE: {
             'email_body_template': (
                 'Hi %s,<br><br>'
                 'This is to let you know that you have successfully achieved '
-                'the %s rank for submitting  practice questions. Your efforts '
+                'the %s rank for submitting practice questions. Your efforts '
                 'help Oppia grow better every day and support students around '
                 'the world.<br><br>'
                 'You can check all the achievements you earned in the '
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
                 'Best wishes and we hope you can continue to contribute!'
                 '<br><br>'
-                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+                'The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
                 'Oppia Question Submitter Rank Achievement!'
             )
         },
-        feconf.CONTRIBUTION_SUB_TYPE_REVIEW: {
+        feconf.CONTRIBUTION_SUBTYPE_REVIEW: {
             'email_body_template': (
                 'Hi %s,<br><br>'
                 'This is to let you know that you have successfully '
@@ -435,13 +439,13 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
                 'Best wishes and we hope you can continue to contribute!'
                 '<br><br>'
-                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+                'The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
                 'Oppia Question Reviewer Rank Achievement!'
             )
         },
-        feconf.CONTRIBUTION_SUB_TYPE_EDIT: {
+        feconf.CONTRIBUTION_SUBTYPE_EDIT: {
             'email_body_template': (
                 'Hi %s,<br><br>'
                 'This is to let you know that you have successfully '
@@ -453,7 +457,7 @@ NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT: Dict[str, Dict[str, str]] = {
                 '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
                 'Best wishes and we hope you can continue to '
                 'contribute!<br><br>'
-                'Best wishes,<br>The Oppia Contributor Dashboard Team'
+                'The Oppia Contributor Dashboard Team'
             ),
             'email_subject': (
                 'Oppia Question Reviewer Rank Achievement!'
@@ -1977,39 +1981,40 @@ def send_mail_to_notify_contributor_ranking_achievement(
         contributor_ranking_email_info.contributor_user_id
     ).can_receive_email_updates
 
-    if not can_user_receive_email:
-        logging.error('This user can not recieve emails.')
-        return
+    if can_user_receive_email:
+        email_template = CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION[
+            contributor_ranking_email_info.contribution_type][
+                contributor_ranking_email_info.contribution_subtype]
+        email_body = ''
+        if contributor_ranking_email_info.contribution_type == (
+            feconf.CONTRIBUTION_TYPE_TRANSLATION):
+            # Ruling out the possibility of None for mypy type checking. It is
+            # obvious that for the contribution_type
+            # CONTRIBUTION_TYPE_TRANSLATION the language_code will not be None.
+            assert contributor_ranking_email_info.language_code is not None
+            language = utils.get_supported_audio_language_description(
+                contributor_ranking_email_info.language_code)
+            email_body = email_template['email_body_template'] % (
+                    recipient_username,
+                    contributor_ranking_email_info.rank_name,
+                    language,
+                    feconf.OPPIA_SITE_URL,
+                    feconf.CONTRIBUTOR_DASHBOARD_URL
+                )
+        else:
+            email_body = email_template['email_body_template'] % (
+                    recipient_username,
+                    contributor_ranking_email_info.rank_name,
+                    feconf.OPPIA_SITE_URL,
+                    feconf.CONTRIBUTOR_DASHBOARD_URL
+                )
 
-    email_template = NOTIFICATION_FOR_CONTRIBUTOR_RANKING_ACHIEVEMENT[
-        contributor_ranking_email_info.contribution_type][
-            contributor_ranking_email_info.contribution_sub_type]
-    email_body = ''
-    if contributor_ranking_email_info.contribution_type == (
-        feconf.CONTRIBUTION_TYPE_TRANSLATION):
-        language = utils.get_supported_audio_language_description(
-            contributor_ranking_email_info.language_code)
-        email_body = email_template['email_body_template'] % (
-                recipient_username,
-                contributor_ranking_email_info.rank_name,
-                language,
-                feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL
-            )
-    else:
-        email_body = email_template['email_body_template'] % (
-                recipient_username,
-                contributor_ranking_email_info.rank_name,
-                feconf.OPPIA_SITE_URL,
-                feconf.CONTRIBUTOR_DASHBOARD_URL
-            )
-
-    _send_email(
-        contributor_ranking_email_info.contributor_user_id,
-        feconf.SYSTEM_COMMITTER_ID,
-        feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
-        email_template['email_subject'], email_body,
-        feconf.NOREPLY_EMAIL_ADDRESS)
+        _send_email(
+            contributor_ranking_email_info.contributor_user_id,
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
+            email_template['email_subject'], email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_accepted_voiceover_application_email(
@@ -2303,7 +2308,9 @@ def send_not_mergeable_change_list_to_admin_for_review(
     exp_id: str,
     frontend_version: int,
     backend_version: int,
-    change_list_dict: Dict[str, str]
+    change_list_dict: Sequence[
+        Mapping[str, change_domain.AcceptableChangeDictTypes]
+    ]
 ) -> None:
     """Sends an email to the admin to review the not mergeable change list
     to improve the functionality in future if possible.
