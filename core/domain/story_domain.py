@@ -29,7 +29,7 @@ from core.constants import constants
 from core.domain import change_domain
 
 from typing import List, Optional, overload
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -302,11 +302,11 @@ class StoryNode:
         return incremented_node_id
 
     @classmethod
-    def require_valid_node_id(cls, node_id: str) -> None:
+    def require_valid_node_id(cls, node_id: Optional[str]) -> None:
         """Validates the node id for a StoryNode object.
 
         Args:
-            node_id: str. The node id to be validated.
+            node_id: str|None. The node id to be validated.
         """
         if not isinstance(node_id, str):
             raise utils.ValidationError(
@@ -568,8 +568,6 @@ class StoryContents:
                 'Expected nodes field to be a list, received %s' % self.nodes)
 
         if len(self.nodes) > 0:
-            # Ruling out the possibility of None for mypy type checking.
-            assert self.initial_node_id is not None
             StoryNode.require_valid_node_id(self.initial_node_id)
         StoryNode.require_valid_node_id(self.next_node_id)
 
@@ -615,26 +613,35 @@ class StoryContents:
     @overload
     def get_node_index(
         self,
-        node_id: str,
+        node_id: Optional[str],
     ) -> int: ...
 
     @overload
     def get_node_index(
         self,
-        node_id: str,
-        strict: bool = False
+        node_id: Optional[str],
+        *,
+        strict: Literal[True] = ...
+    ) -> int: ...
+
+    @overload
+    def get_node_index(
+        self,
+        node_id: Optional[str],
+        *,
+        strict: Literal[False] = ...
     ) -> Optional[int]: ...
 
     def get_node_index(
         self,
-        node_id: str,
+        node_id: Optional[str],
         strict: bool = True
     ) -> Optional[int]:
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str|None. The id of the node.
             strict: bool. Whether to fail noisily if no node with the given
                 node_id exists. Default is True.
 
@@ -664,8 +671,6 @@ class StoryContents:
         Returns:
             list(StoryNode). The ordered list of nodes.
         """
-        # Ruling out the possibility of None for mypy type checking.
-        assert self.initial_node_id is not None
         initial_index = self.get_node_index(self.initial_node_id)
         current_node = self.nodes[initial_index]
         ordered_nodes_list = [current_node]
