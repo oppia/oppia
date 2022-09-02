@@ -27,7 +27,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
     """Test the HTML sanitizer."""
 
     def setUp(self) -> None:
-        super(HtmlCleanerUnitTests, self).setUp()
+        super().setUp()
         self.longMessage = True
 
     def test_whitelisted_tags(self) -> None:
@@ -41,7 +41,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The filter_a method should only be used for a tags.'):
             html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 
@@ -247,7 +247,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             ';svg_filename&amp;quot;:&amp;quot;math3.svg&amp;quot;}"></oppia-n'
             'oninteractive-math>'
         ]
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             [
                 'img.svg', 'img2.svg', 'img3.svg', 'img4.svg',
                 'img5.svg', 'math1.svg', 'math2.svg', 'math3.svg'],

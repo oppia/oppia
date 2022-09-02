@@ -44,27 +44,32 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   templateUrl: './creator-dashboard-page.component.html'
 })
 export class CreatorDashboardPageComponent {
-  activeTab: string;
-  myExplorationsView: string;
-  publishText: string;
-  currentSortType: string;
-  isCurrentSortDescending: boolean;
-  currentSubscribersSortType: string;
-  isCurrentSubscriptionSortDescending: boolean;
-  canReviewActiveThread: boolean;
-  EXPLORATION_DROPDOWN_STATS;
-  canCreateCollections: boolean;
-  explorationsList: CreatorExplorationSummary[];
-  collectionsList: CollectionSummary[];
-  subscribersList: ProfileSummary[];
-  lastWeekStats: { totalPlays: number};
-  dashboardStats: CreatorDashboardStats;
-  relativeChangeInTotalPlays: number;
-  getLocaleAbbreviatedDatetimeString: (millisSinceEpoch: number) => string;
-  getHumanReadableStatus: (status: string) => string;
-  emptyDashboardImgUrl: string;
-  getAverageRating: (
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeTab!: string;
+  myExplorationsView!: string;
+  publishText!: string;
+  currentSortType!: string;
+  currentSubscribersSortType!: string;
+  EXPLORATION_DROPDOWN_STATS!: string[];
+  explorationsList!: CreatorExplorationSummary[];
+  collectionsList!: CollectionSummary[];
+  subscribersList!: ProfileSummary[];
+  // 'lastWeekStats' is null for a new creator.
+  lastWeekStats!: CreatorDashboardStats | null;
+  dashboardStats!: CreatorDashboardStats;
+  relativeChangeInTotalPlays!: number;
+  getLocaleAbbreviatedDatetimeString!: (millisSinceEpoch: number) => string;
+  getHumanReadableStatus!: (status: string) => string;
+  emptyDashboardImgUrl!: string;
+  getAverageRating!: (
     (ratingFrequencies: ExplorationRatings) => number | null);
+
+  isCurrentSortDescending: boolean = false;
+  isCurrentSubscriptionSortDescending: boolean = false;
+  canReviewActiveThread: boolean = false;
+  canCreateCollections: boolean = false;
 
   SUBSCRIPTION_SORT_BY_KEYS =
     CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS;

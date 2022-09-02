@@ -22,18 +22,24 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
+import './subtopics-list.component.css';
+
+
 @Component({
   selector: 'subtopics-list',
   templateUrl: './subtopics-list.component.html',
   styleUrls: []
 })
 export class SubtopicsListComponent implements OnInit {
-  @Input() classroomUrlFragment: string;
-  @Input() subtopicsList: Subtopic[];
-  @Input() topicId: string;
-  @Input() topicUrlFragment: string;
-  @Input() topicName: string;
-  topicNameTranslationKey: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() classroomUrlFragment!: string;
+  @Input() subtopicsList!: Subtopic[];
+  @Input() topicId!: string;
+  @Input() topicUrlFragment!: string;
+  @Input() topicName!: string;
+  topicNameTranslationKey!: string;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService
@@ -42,10 +48,6 @@ export class SubtopicsListComponent implements OnInit {
   ngOnInit(): void {
     this.topicNameTranslationKey = this.i18nLanguageCodeService
       .getTopicTranslationKey(this.topicId, TranslationKeyType.TITLE);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {

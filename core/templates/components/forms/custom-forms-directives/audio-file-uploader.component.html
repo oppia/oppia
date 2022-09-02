@@ -1,7 +1,7 @@
-<div class="oppia-audio-container protractor-test-audio-upload-container">
+<div class="oppia-audio-container e2e-test-audio-upload-container">
   <form #inputForm>
     <input type="file"
-           class="protractor-test-upload-audio-input"
+           class="e2e-test-upload-audio-input"
            (change)="this.addAudio($event)"
            #fileInput>
   </form>
@@ -16,8 +16,8 @@
     Audio translation files should be less than <b>five minutes</b> long.
   </div>
 
-  <div *ngIf="errorMessage" class="error-message protractor-test-upload-error-message">
-    <i class="material-icons">&#xE002;</i>
+  <div *ngIf="errorMessage" class="error-message e2e-test-upload-error-message">
+    <i class="fas fa-exclamation-triangle"></i>
     {{errorMessage}}
   </div>
 </div>

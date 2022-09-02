@@ -16,8 +16,8 @@
           {{stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One'}} solution is...
         </strong>
         <span>
-          <angular-html-bind-wrapper [htmlData]="getAnswerHtml()">
-          </angular-html-bind-wrapper>
+          <oppia-interaction-display [htmlData]="getAnswerHtml()">
+          </oppia-interaction-display>
         </span>
       </div>
     </div>
@@ -27,3 +27,11 @@
                                      (showMarkAllAudioAsNeedingUpdateModalIfRequired)="openMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
   </oppia-solution-explanation-editor>
 </div>
+
+<style>
+  @media screen and (max-width: 500px) {
+    .oppia-editor-edit-icon {
+      right: 3px;
+    }
+  }
+</style>

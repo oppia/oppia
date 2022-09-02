@@ -60,8 +60,11 @@ import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-te
 import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
 import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
+import { CheckRevertExplorationModalComponent } from './history-tab/modal-templates/check-revert-exploration-modal.component';
 import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
+import { ExplorationMetadataDiffModalComponent } from './modal-templates/exploration-metadata-diff-modal.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -102,10 +105,12 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     HelpModalComponent,
     ConfirmDeleteStateModalComponent,
     PreviewSetParametersModalComponent,
+    CheckRevertExplorationModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    ExplorationMetadataDiffModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -132,10 +137,12 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     HelpModalComponent,
     ConfirmDeleteStateModalComponent,
     PreviewSetParametersModalComponent,
+    CheckRevertExplorationModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
+    ExplorationMetadataDiffModalComponent
   ],
   providers: [
     {
@@ -153,6 +160,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'

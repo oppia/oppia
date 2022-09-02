@@ -1893,8 +1893,10 @@ def can_resubmit_suggestion(handler):
             UnauthorizedUserException. The user does not have credentials to
                 edit this suggestion.
         """
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if not suggestion:
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
+        if suggestion is None:
             raise self.InvalidInputException(
                 'No suggestion found with given suggestion id')
 
@@ -2192,6 +2194,44 @@ def can_access_learner_dashboard(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_access_learner_groups(handler):
+    """Decorator to check access to learner groups.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+        one can access the learner groups.
+    """
+
+    def test_can_access(self, **kwargs):
+        """Checks if the user can access the learner groups.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have
+                credentials to access the page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_LEARNER_GROUPS in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -3407,7 +3447,9 @@ def get_decorator_for_accepting_suggestion(decorator):
                     'Invalid format for suggestion_id.'
                     ' It must contain 3 parts separated by \'.\'')
 
-            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            suggestion = suggestion_services.get_suggestion_by_id(
+                suggestion_id, strict=False
+            )
 
             if suggestion is None:
                 raise self.PageNotFoundException
@@ -3680,7 +3722,9 @@ def can_update_suggestion(handler):
                 'Invalid format for suggestion_id.' +
                 ' It must contain 3 parts separated by \'.\'')
 
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
 
         if suggestion is None:
             raise self.PageNotFoundException

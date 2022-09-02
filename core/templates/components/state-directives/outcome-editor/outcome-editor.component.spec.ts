@@ -18,32 +18,56 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { of } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { OutcomeEditorComponent } from './outcome-editor.component';
+
+class MockWindowDimensionsService {
+  getResizeEvent() {
+    return of(new Event('resize'));
+  }
+
+  getWidth(): number {
+    // Screen width of iPhone 12 Pro (to simulate a mobile viewport).
+    return 390;
+  }
+}
 
 describe('Outcome Editor Component', () => {
   let component: OutcomeEditorComponent;
   let fixture: ComponentFixture<OutcomeEditorComponent>;
   let externalSaveService: ExternalSaveService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
+  let ngbModal: NgbModal;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let windowDimensionsService: MockWindowDimensionsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+      ],
       declarations: [
-        OutcomeEditorComponent
+        OutcomeEditorComponent,
+        AddOutcomeModalComponent
       ],
       providers: [
         ExternalSaveService,
         StateEditorService,
         StateInteractionIdService,
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -56,6 +80,8 @@ describe('Outcome Editor Component', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    ngbModal = TestBed.inject(NgbModal);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -67,6 +93,7 @@ describe('Outcome Editor Component', () => {
   it('should set component properties on initialization', () => {
     let outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
@@ -75,19 +102,18 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = outcome;
 
-    expect(component.canAddPrerequisiteSkill).toBeUndefined();
-    expect(component.feedbackEditorIsOpen).toBeUndefined();
-    expect(component.destinationEditorIsOpen).toBeUndefined();
-    expect(component.correctnessLabelEditorIsOpen).toBeUndefined();
+    const windowResizeSpy = spyOn(
+      windowDimensionsService, 'getResizeEvent').and.callThrough();
+
     expect(component.savedOutcome).toBeUndefined();
 
     component.ngOnInit();
+    fixture.detectChanges();
 
-    expect(component.canAddPrerequisiteSkill).toBeFalse();
-    expect(component.feedbackEditorIsOpen).toBeFalse();
-    expect(component.destinationEditorIsOpen).toBeFalse();
-    expect(component.correctnessLabelEditorIsOpen).toBeFalse();
     expect(component.savedOutcome).toEqual(outcome);
+    expect(windowResizeSpy).toHaveBeenCalled();
+    expect(component.resizeSubscription).not.toBe(undefined);
+    expect(component.onMobile).toBeTrue();
   });
 
   it('should save feedback on external save event when editFeedbackForm is' +
@@ -121,6 +147,7 @@ describe('Outcome Editor Component', () => {
     component.feedbackEditorIsOpen = true;
     component.savedOutcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       true,
       [],
@@ -129,6 +156,7 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
@@ -162,6 +190,54 @@ describe('Outcome Editor Component', () => {
     expect(component.saveThisDestination).toHaveBeenCalled();
   });
 
+  it('should save destination for the stuck learner on interaction change' +
+    ' when state is not invalid after destination save', () => {
+    let onInteractionIdChangedEmitter = new EventEmitter();
+    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
+      .and.returnValue(onInteractionIdChangedEmitter);
+    spyOn(component, 'saveThisIfStuckDestination');
+
+    component.ngOnInit();
+
+    component.destinationIfStuckEditorIsOpen = true;
+
+    onInteractionIdChangedEmitter.emit();
+
+    expect(component.saveThisIfStuckDestination).toHaveBeenCalled();
+  });
+
+  it('should cancel destination if-stuck edit correctly', () => {
+    component.ngOnInit();
+
+    // Setup. No pre-check as we are setting up values below.
+    component.destinationIfStuckEditorIsOpen = true;
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      'Stuck state',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Saved Outcome',
+      'Changed state',
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
+
+    // Action.
+    component.cancelThisIfStuckDestinationEdit();
+
+    // Post-check.
+    expect(component.destinationIfStuckEditorIsOpen).toBeFalse();
+    expect(component.outcome.destIfReallyStuck).toBe('Stuck state');
+  });
+
   it('should cancel destination edit on interaction change when edit' +
     ' destination form is not valid or state is invalid after' +
     ' destination save', () => {
@@ -176,6 +252,7 @@ describe('Outcome Editor Component', () => {
     component.destinationEditorIsOpen = true;
     component.savedOutcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       true,
       [],
@@ -184,6 +261,7 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Saved Outcome',
+      null,
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
@@ -226,9 +304,16 @@ describe('Outcome Editor Component', () => {
     expect(component.isCurrentInteractionLinear()).toBeFalse();
   });
 
+  it('should check if current interaction is linear or not', () => {
+    stateInteractionIdService.savedMemento = 'TextInput';
+
+    expect(component.isCurrentInteractionLinear()).toBeFalse();
+  });
+
   it('should check if a state is in self loop', () => {
     let outcome = new Outcome(
       'Hola',
+      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
@@ -243,6 +328,7 @@ describe('Outcome Editor Component', () => {
 
     outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       true,
       [],
@@ -291,6 +377,35 @@ describe('Outcome Editor Component', () => {
     expect(component.invalidStateAfterDestinationSave()).toBeTrue();
   });
 
+  it('should check if a destination for stuck learner forms a loop', () => {
+    let outcome = new Outcome(
+      'Me Llamo',
+      'Hola',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    component.outcome = outcome;
+    spyOn(stateEditorService, 'getActiveStateName')
+      .and.returnValue('Hola');
+
+    expect(component.isSelfLoopDestStuck(outcome)).toBeTrue();
+
+    outcome = new Outcome(
+      'Ma Llamo',
+      'Me Llmao',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    component.outcome = outcome;
+    expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
+  });
+
   it('should open feedback editor if it is editable', () => {
     component.feedbackEditorIsOpen = false;
     component.isEditable = true;
@@ -299,6 +414,36 @@ describe('Outcome Editor Component', () => {
 
     expect(component.feedbackEditorIsOpen).toBeTrue();
   });
+
+  it('should open feedback editor modal if it is editable', fakeAsync(() => {
+    const outcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        outcome: outcome
+      },
+      result: Promise.resolve({
+        outcome: outcome
+      })
+    } as NgbModalRef);
+
+    spyOn(component, 'saveThisFeedback').and.callFake(()=>{
+      component.feedbackEditorIsOpen = false;
+    });
+
+    component.isEditable = true;
+    component.openFeedbackEditorModal();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should open destination editor if it is editable', () => {
     component.destinationEditorIsOpen = false;
@@ -309,9 +454,19 @@ describe('Outcome Editor Component', () => {
     expect(component.destinationEditorIsOpen).toBeTrue();
   });
 
+  it('should open destination if-stuck editor if it is editable', () => {
+    component.destinationIfStuckEditorIsOpen = false;
+    component.isEditable = true;
+
+    component.openDestinationIfStuckEditor();
+
+    expect(component.destinationIfStuckEditorIsOpen).toBeTrue();
+  });
+
   it('should save correctness label when it is changed', () => {
     component.savedOutcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
       false,
       [],
@@ -320,6 +475,7 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p>Outcome</p>', 'Id'),
       true,
       [],
@@ -332,37 +488,10 @@ describe('Outcome Editor Component', () => {
     expect(component.savedOutcome.labelledAsCorrect).toBeTrue();
   });
 
-  it('should set destination as null when saving feedback in' +
-    ' question mode', () => {
-    component.savedOutcome = new Outcome(
-      'Saved Dest',
-      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
-      false,
-      [],
-      'ExpId',
-      'SkillId',
-    );
-    component.outcome = new Outcome(
-      'Dest',
-      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
-      true,
-      [],
-      '',
-      '',
-    );
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.saveThisFeedback(true);
-
-    expect(component.savedOutcome.dest).toBe(null);
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalledWith(['contentId']);
-  });
-
   it('should set destination when saving feedback not in question mode', () => {
     component.savedOutcome = new Outcome(
       'Dest',
+      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
       [],
@@ -371,6 +500,7 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Dest',
+      null,
       new SubtitledHtml('<p>Outcome</p>', 'contentId'),
       true,
       [],
@@ -385,10 +515,92 @@ describe('Outcome Editor Component', () => {
     expect(component.savedOutcome.dest).toBe('Hola');
   });
 
+  it('should throw error when saving feedback with invalid state name', () => {
+    component.savedOutcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      '',
+      '',
+    );
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+
+    expect(() => {
+      component.saveThisFeedback(false);
+    }).toThrowError('The active state name is null in the outcome editor.');
+  });
+
+  it('should throw error when saving feedback with invalid content id', () => {
+    component.savedOutcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', null),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Outcome</p>', null),
+      true,
+      [],
+      '',
+      '',
+    );
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+
+    expect(() => {
+      component.saveThisFeedback(true);
+    }).toThrowError('The content ID is null in the outcome editor.');
+  });
+
+  it('should emit showMarkAllAudioAsNeedingUpdateModalIfRequired', () => {
+    component.savedOutcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      'SkillId',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      '',
+      '',
+    );
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
+
+    component.saveThisFeedback(true);
+
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalledWith(['contentId']);
+  });
+
   it('should set refresher exploration ID as null on saving destination' +
     ' when state is not in self loop', () => {
     component.savedOutcome = new Outcome(
       'Saved Dest',
+      null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
       [],
@@ -397,6 +609,7 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = new Outcome(
       'Dest',
+      null,
       new SubtitledHtml('<p>Outcome</p>', 'contentId'),
       true,
       [],
@@ -412,9 +625,36 @@ describe('Outcome Editor Component', () => {
     expect(component.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
+  it('should set the dest_if_really_stuck property correctly' +
+    'when the destination for the stuck learner is saved.', () => {
+    component.savedOutcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      'Stuck state',
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
+
+    component.saveThisIfStuckDestination();
+
+    expect(component.savedOutcome.destIfReallyStuck).toBe('Stuck state');
+  });
+
   it('should check if outcome feedback exceeds 10000 characters', () => {
     component.outcome = new Outcome(
       'Dest',
+      null,
       new SubtitledHtml('a'.repeat(10000), 'contentId'),
       true,
       [],
@@ -425,6 +665,7 @@ describe('Outcome Editor Component', () => {
 
     component.outcome = new Outcome(
       'Dest',
+      null,
       new SubtitledHtml('a'.repeat(10001), 'contentId'),
       true,
       [],

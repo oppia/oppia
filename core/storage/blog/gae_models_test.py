@@ -49,7 +49,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up blog post models in datastore for use in testing."""
-        super(BlogPostModelTest, self).setUp()
+        super().setUp()
 
         self.blog_post_model = blog_models.BlogPostModel(
             id='blog_one',
@@ -107,7 +107,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         blog_post_model_cls = blog_models.BlogPostModel
 
         # Test create method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A blog post with the given blog post ID exists'
             ' already.'):
 
@@ -121,7 +121,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                     'blog_post_id', self.USER_ID)
 
         # Test generate_new_blog_post_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New blog post id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -184,7 +184,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up models in datastore for use in testing."""
-        super(BlogPostSummaryModelTest, self).setUp()
+        super().setUp()
 
         self.blog_post_summary_model_old = (
             blog_models.BlogPostSummaryModel(
@@ -272,7 +272,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
     BLOG_POST_ID_OLD: Final = 'blog_post_old_id'
 
     def setUp(self) -> None:
-        super(BlogPostRightsModelTest, self).setUp()
+        super().setUp()
         self.blog_post_rights_model = blog_models.BlogPostRightsModel(
             id=self.BLOG_POST_ID_NEW,
             editor_ids=[self.USER_ID_NEW],
@@ -456,7 +456,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         blog_post_rights_model_cls = blog_models.BlogPostRightsModel
 
         # Test create method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Blog Post ID conflict on creating new blog post rights model.'):
             #  Swap dependent method get_by_id to simulate collision every time.

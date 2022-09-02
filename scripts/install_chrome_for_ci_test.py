@@ -27,10 +27,10 @@ from typing import Iterable, List, NoReturn
 
 URL = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'
-    'google-chrome-stable_89.0.4389.90-1_amd64.deb'
+    'google-chrome-stable_102.0.5005.61-1_amd64.deb'
 )
-DOWNLOAD_VERSION = '89.0.4389.90-1'
-INSTALLED_VERSION = '89.0.4389.90'
+DOWNLOAD_VERSION = '102.0.5005.61-1'
+INSTALLED_VERSION = '102.0.5005.61'
 CHROME_DEB_FILE = 'google-chrome.deb'
 
 
@@ -69,7 +69,7 @@ class InstallChromeTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'sudo apt-get update\' returned non-zero exit '
                 'status 1'
@@ -105,7 +105,7 @@ class GetChromeVersionTests(test_utils.GenericTestBase):
             ])
 
         with run_cmd_swap:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'google-chrome --version\' returned non-zero exit '
                 'status 1'
@@ -167,7 +167,7 @@ class MainTests(test_utils.GenericTestBase):
             expected_args=[tuple()])
 
         with install_chrome_swap, get_version_swap:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 RuntimeError, (
                     'Chrome version {} should have been installed. '
                     'Version 123.0.12.45 was found instead.'

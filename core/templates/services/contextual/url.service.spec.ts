@@ -356,6 +356,17 @@ describe('Url Service', () => {
     expect(urlService.getExplorationVersionFromUrl()).toBe(null);
   });
 
+  it('should correctly retrieve unique progress ID from the URL', () => {
+    mockLocation.search = '?pid=123456';
+    expect(urlService.getPidFromUrl()).toBe('123456');
+
+    mockLocation.search = '?someparam=otherval&pid=123456';
+    expect(urlService.getPidFromUrl()).toBe('123456');
+
+    mockLocation.search = '?another=1';
+    expect(urlService.getPidFromUrl()).toBe(null);
+  });
+
   it('should correctly retrieve username from url', () => {
     mockLocation.pathname = '/profile/abcdefgijklm';
     expect(urlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');

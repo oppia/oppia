@@ -25,6 +25,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { CustomSchema } from 'services/schema-default-value.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
@@ -92,8 +93,8 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     private imageLocalStorageService: ImageLocalStorageService,
     private utilsService: UtilsService,
     private ngbModal: NgbModal,
-    private svgSanitizerService: SvgSanitizerService
-  ) {}
+    private svgSanitizerService: SvgSanitizerService,
+    private windowRef: WindowRef) {}
 
   // Calculates the dimensions of the image, assuming that the width
   // of the image is scaled down to fit the svg element if necessary.
@@ -338,11 +339,13 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // Use these two functions to get the calculated image width and
   // height.
   getImageWidth(): number {
-    return this._calculateImageDimensions().width;
+    const width = this._calculateImageDimensions().width;
+    return isNaN(width) ? 0 : width;
   }
 
   getImageHeight(): number {
-    return this._calculateImageDimensions().height;
+    const height = this._calculateImageDimensions().height;
+    return isNaN(height) ? 0 : height;
   }
 
   getPreviewUrl(imageUrl: string): string {
@@ -413,8 +416,17 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   onSvgMouseMove(evt: MouseEvent): void {
     const svgElement: SVGSVGElement = this.el.nativeElement.querySelectorAll(
       '.oppia-image-with-regions-editor-svg')[0];
-    this.mouseX = evt.pageX - svgElement.getBoundingClientRect().left;
-    this.mouseY = evt.pageY - svgElement.getBoundingClientRect().top;
+    // The method Element.getBoundingClientRect() does not provide coordinates
+    // relative to the top-left corner of the document. To fix this, the scroll
+    // coordinates are added to the left and top attributes of
+    // getBoundingClientRect().
+    // See https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect.
+    this.mouseX = evt.pageX - (
+      svgElement.getBoundingClientRect().left +
+      this.windowRef.nativeWindow.scrollX);
+    this.mouseY = evt.pageY - (
+      svgElement.getBoundingClientRect().top +
+      this.windowRef.nativeWindow.scrollY);
     if (this.userIsCurrentlyDrawing) {
       this.rectX = Math.min(this.originalMouseX, this.mouseX);
       this.rectY = Math.min(this.originalMouseY, this.mouseY);

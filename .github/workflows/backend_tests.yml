@@ -15,7 +15,7 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-22.04]
         shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +38,7 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
       - name: Install packages for optimized coverage
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: sudo apt-get install -y python-dev gcc
+        run: sudo apt-get install -y python-dev-is-python3 gcc
       - name: Install coverage and configparser
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install coverage configparser
@@ -60,7 +60,7 @@ jobs:
   check_combined_coverage:
     name: Check combined backend test coverage
     needs: run_tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -120,7 +120,7 @@ jobs:
       - name: Check coverage
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
-        run: coverage report --fail-under 100 -m
+        run: PYTHONIOENCODING=utf-8 python -m scripts.check_overall_backend_test_coverage
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification

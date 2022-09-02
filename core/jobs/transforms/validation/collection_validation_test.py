@@ -28,6 +28,11 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import collection_models
+
 (base_models, collection_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.collection])
 
@@ -35,7 +40,7 @@ import apache_beam as beam
 class ValidateCollectionSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_validate_change_domain_implemented(self):
+    def test_validate_change_domain_implemented(self) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
                 id='model_id-1',
@@ -56,7 +61,7 @@ class ValidateCollectionSnapshotMetadataModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_collection_change_object_with_missing_cmd(self):
+    def test_collection_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
                 id='123',
@@ -81,7 +86,7 @@ class ValidateCollectionSnapshotMetadataModelTests(
                 'Missing cmd key in change dict')
         ])
 
-    def test_collection_change_object_with_invalid_cmd(self):
+    def test_collection_change_object_with_invalid_cmd(self) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
                 id='123',
@@ -106,7 +111,9 @@ class ValidateCollectionSnapshotMetadataModelTests(
                 'Command invalid is not allowed')
         ])
 
-    def test_collection_change_object_with_missing_attribute_in_cmd(self):
+    def test_collection_change_object_with_missing_attribute_in_cmd(
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
                 id='123',
@@ -140,7 +147,9 @@ class ValidateCollectionSnapshotMetadataModelTests(
                 'exploration_id, new_value')
         ])
 
-    def test_collection_change_object_with_extra_attribute_in_cmd(self):
+    def test_collection_change_object_with_extra_attribute_in_cmd(
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
                 id='123',
@@ -179,7 +188,9 @@ class ValidateCollectionSnapshotMetadataModelTests(
                 'The following extra attributes are present: invalid')
         ])
 
-    def test_collection_change_object_with_invalid_collection_property(self):
+    def test_collection_change_object_with_invalid_collection_property(
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
                 id='123',
@@ -218,7 +229,7 @@ class ValidateCollectionSnapshotMetadataModelTests(
 
 class RelationshipsOfTests(test_utils.TestBase):
 
-    def test_collection_summary_model_relationships(self):
+    def test_collection_summary_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CollectionSummaryModel', 'id'),
@@ -228,7 +239,7 @@ class RelationshipsOfTests(test_utils.TestBase):
 class ValidateCollectionRightsSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_collection_rights_change_object_with_missing_cmd(self):
+    def test_collection_rights_change_object_with_missing_cmd(self) -> None:
         commit_dict = {'invalid': 'data'}
         invalid_commit_cmd_model = (
             collection_models.CollectionRightsSnapshotMetadataModel(
@@ -255,7 +266,7 @@ class ValidateCollectionRightsSnapshotMetadataModelTests(
                 'Missing cmd key in change dict')
         ])
 
-    def test_collection_rights_change_object_with_invalid_cmd(self):
+    def test_collection_rights_change_object_with_invalid_cmd(self) -> None:
         commit_dict = {'cmd': 'invalid'}
         invalid_commit_cmd_model = (
             collection_models.CollectionRightsSnapshotMetadataModel(
@@ -283,7 +294,8 @@ class ValidateCollectionRightsSnapshotMetadataModelTests(
         ])
 
     def test_collection_rights_change_object_with_missing_attribute_in_cmd(
-            self):
+        self
+    ) -> None:
         commit_dict = {
             'cmd': 'change_role',
             'assignee_id': 'assignee_id',
@@ -314,7 +326,9 @@ class ValidateCollectionRightsSnapshotMetadataModelTests(
                 'new_role, old_role')
         ])
 
-    def test_collection_rights_change_object_with_extra_attribute_in_cmd(self):
+    def test_collection_rights_change_object_with_extra_attribute_in_cmd(
+        self
+    ) -> None:
         commit_dict = {
             'cmd': 'change_private_viewability',
             'old_viewable_if_private': 'old_viewable_if_private',
@@ -346,7 +360,7 @@ class ValidateCollectionRightsSnapshotMetadataModelTests(
                 'The following extra attributes are present: invalid')
         ])
 
-    def test_collection_rights_change_object_with_invalid_role(self):
+    def test_collection_rights_change_object_with_invalid_role(self) -> None:
         commit_dict = {
             'cmd': 'change_role',
             'assignee_id': 'assignee_id',
@@ -379,7 +393,9 @@ class ValidateCollectionRightsSnapshotMetadataModelTests(
                 'invalid is not allowed')
         ])
 
-    def test_collection_rights_change_object_with_invalid_status(self):
+    def test_collection_rights_change_object_with_invalid_status(
+        self
+    ) -> None:
         commit_dict = {
             'cmd': 'change_collection_status',
             'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
@@ -415,7 +431,7 @@ class ValidateCollectionRightsSnapshotMetadataModelTests(
 class ValidateCollectionCommitLogEntryModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_validate_rights_model(self):
+    def test_validate_rights_model(self) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionCommitLogEntryModel(
                 id='rights_id123',
@@ -437,7 +453,7 @@ class ValidateCollectionCommitLogEntryModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_validate_collection_model(self):
+    def test_validate_collection_model(self) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionCommitLogEntryModel(
                 id='collection_id123',
@@ -460,7 +476,7 @@ class ValidateCollectionCommitLogEntryModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_raises_commit_cmd_none_error(self):
+    def test_raises_commit_cmd_none_error(self) -> None:
         invalid_commit_cmd_model = (
             collection_models.CollectionCommitLogEntryModel(
                 id='model_id123',

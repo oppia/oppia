@@ -32,7 +32,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicViewerControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -78,6 +78,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
                 self.story_id_2))
         self.topic.meta_tag_content = 'topic meta content'
         self.topic.page_title_fragment_for_web = 'topic page title'
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
 
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
@@ -234,7 +235,6 @@ class TopicPageDataHandlerTests(
                     self.skill_id_2: 0.5
                 },
                 'skill_descriptions': {
-                    self.skill_id_1: None,
                     self.skill_id_2: 'Skill Description 2'
                 },
                 'practice_tab_is_displayed': False
@@ -311,6 +311,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -336,8 +337,7 @@ class TopicPageDataHandlerTests(
                 self.skill_id_2: None
             },
             'skill_descriptions': {
-                self.skill_id_1: 'Skill Description 1',
-                self.skill_id_2: None
+                self.skill_id_1: 'Skill Description 1'
             },
             'practice_tab_is_displayed': True
         }
@@ -363,6 +363,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -389,7 +390,6 @@ class TopicPageDataHandlerTests(
             },
             'skill_descriptions': {
                 self.skill_id_1: 'Skill Description 1',
-                self.skill_id_2: None
             },
             'practice_tab_is_displayed': True
         }
@@ -417,6 +417,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -466,6 +467,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -517,6 +519,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):

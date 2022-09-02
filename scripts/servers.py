@@ -23,18 +23,19 @@ import re
 import shutil
 import signal
 import subprocess
-import sys
 import threading
 
 from core import feconf
 from core import utils
 from scripts import common
 
+import psutil
+
 
 @contextlib.contextmanager
 def managed_process(
         command_args, human_readable_name='Process', shell=False,
-        timeout_secs=60, **popen_kwargs):
+        timeout_secs=60, raise_on_nonzero_exit=True, **popen_kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -53,19 +54,18 @@ def managed_process(
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
+        raise_on_nonzero_exit: bool. If True, raise an Exception when the
+            managed process has a nonzero exit code. If False, no Exception is
+            raised, and it is the caller's responsibility to handle the error.
         **popen_kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
         psutil.Process. The process managed by the context manager.
 
     Raises:
-        Exception. The process exited unexpectedly.
+        Exception. The process exited unexpectedly (only raised if
+            raise_on_nonzero_exit is True).
     """
-    # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        sys.path.insert(1, common.PSUTIL_DIR)
-    import psutil
-
     get_proc_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
         if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid))
@@ -119,7 +119,10 @@ def managed_process(
         # Note that negative values indicate termination by a signal: SIGTERM,
         # SIGINT, etc. Also, exit code 143 indicates that the process received
         # a SIGTERM from the OS, and it succeeded in gracefully terminating.
-        if exit_code is not None and exit_code > 0 and exit_code != 143:
+        if (
+            exit_code is not None and exit_code > 0 and exit_code != 143
+            and raise_on_nonzero_exit
+        ):
             raise Exception(
                 'Process %s exited unexpectedly with exit code %s' %
                 (proc_name, exit_code))
@@ -448,6 +451,44 @@ def managed_webpack_compiler(
         yield proc
 
 
+def get_chrome_verison():
+    """Returns the version of Chrome installed on the system."""
+
+    # Although there are spaces between Google and Chrome in the path, we
+    # don't need to escape them for Popen (as opposed to on the terminal, in
+    # which case we would need to escape them for the command to run).
+    chrome_command = (
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        if common.is_mac_os() else 'google-chrome')
+    try:
+        output = subprocess.check_output([chrome_command, '--version'])
+    except OSError as e:
+        # For the error message on macOS, we need to add the backslashes in.
+        # This is because it is likely that a user will try to run the
+        # command on their terminal and, as mentioned above, the macOS
+        # chrome version command has spaces in the path which need to be
+        # escaped for successful terminal use.
+        raise Exception(
+            'Failed to execute "%s --version" command. This is used to '
+            'determine the chromedriver version to use. Please set the '
+            'chromedriver version manually using the '
+            '--chrome_driver_version flag. To determine the '
+            'chromedriver version to be used, please follow the '
+            'instructions mentioned in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection'
+            % chrome_command.replace(' ', r'\ ')) from e
+
+    installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
+    installed_version = '.'.join(
+        installed_version_parts.decode('utf-8').split('.')[:-1])
+    response = utils.url_open(
+        'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
+            installed_version))
+    chrome_version = response.read().decode('utf-8')
+
+    return chrome_version
+
+
 @contextlib.contextmanager
 def managed_portserver():
     """Returns context manager to start/stop the portserver gracefully.
@@ -466,15 +507,6 @@ def managed_portserver():
     Yields:
         psutil.Popen. The Popen subprocess object.
     """
-    # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        # Our unit tests already configure sys.path correctly, but the
-        # standalone scripts do not. Because of this, the following line cannot
-        # be covered. This is fine since we want to cleanup this code anyway in
-        # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: no cover
-    import psutil
-
     # Check if a socket file exists. This file can exist when previous instance
     # of the portserver did not close properly. We need to remove as otherwise
     # the portserver will fail to start.
@@ -532,39 +564,10 @@ def managed_webdriver_server(chrome_version=None):
         Exception. Space instead of '\'.
     """
     if chrome_version is None:
-        # Although there are spaces between Google and Chrome in the path, we
-        # don't need to escape them for Popen (as opposed to on the terminal, in
-        # which case we would need to escape them for the command to run).
-        chrome_command = (
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-            if common.is_mac_os() else 'google-chrome')
-        try:
-            output = subprocess.check_output([chrome_command, '--version'])
-        except OSError as e:
-            # For the error message on macOS, we need to add the backslashes in.
-            # This is because it is likely that a user will try to run the
-            # command on their terminal and, as mentioned above, the macOS
-            # chrome version command has spaces in the path which need to be
-            # escaped for successful terminal use.
-            raise Exception(
-                'Failed to execute "%s --version" command. This is used to '
-                'determine the chromedriver version to use. Please set the '
-                'chromedriver version manually using the '
-                '--chrome_driver_version flag. To determine the '
-                'chromedriver version to be used, please follow the '
-                'instructions mentioned in the following URL:\n'
-                'https://chromedriver.chromium.org/downloads/version-selection'
-                % chrome_command.replace(' ', r'\ ')) from e
-
-        installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
-        installed_version = '.'.join(
-            installed_version_parts.decode('utf-8').split('.')[:-1])
-        response = utils.url_open(
-            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
-                installed_version))
-        chrome_version = response.read().decode('utf-8')
+        chrome_version = get_chrome_verison()
 
     print('\n\nCHROME VERSION: %s' % chrome_version)
+
     subprocess.check_call([
         common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
         '--versions.chrome', chrome_version,
@@ -659,6 +662,69 @@ def managed_protractor_server(
     # constants, so there is no risk of a shell-injection attack.
     managed_protractor_proc = managed_process(
         protractor_args, human_readable_name='Protractor Server', shell=True,
-        **kwargs)
+        raise_on_nonzero_exit=False, **kwargs)
     with managed_protractor_proc as proc:
+        yield proc
+
+
+@contextlib.contextmanager
+def managed_webdriverio_server(
+        suite_name='full', dev_mode=True, debug_mode=False,
+        sharding_instances=1, chrome_version=None, **kwargs):
+    """Returns context manager to start/stop the WebdriverIO server gracefully.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run. If the value
+            is `full`, all tests will run.
+        dev_mode: bool. Whether the test is running on dev_mode.
+        debug_mode: bool. Whether to run the webdriverio tests in debugging
+            mode. Read the following instructions to learn how to run e2e
+            tests in debugging mode:
+            https://webdriver.io/docs/debugging/#the-debug-command.
+        sharding_instances: int. How many sharding instances to be running.
+        chrome_version: str|None. The version of Google Chrome to run the tests
+            on. If None, then the currently-installed version of Google Chrome
+            is used instead.
+        **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+
+    Yields:
+        psutil.Process. The webdriverio process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
+    """
+    if sharding_instances <= 0:
+        raise ValueError('Sharding instance should be larger than 0')
+
+    if chrome_version is None:
+        chrome_version = get_chrome_verison()
+
+    webdriverio_args = [
+        common.NPX_BIN_PATH,
+        # This flag ensures tests fail if the `waitFor()` calls time out.
+        '--unhandled-rejections=strict',
+        common.NODEMODULES_WDIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
+        '--suite', suite_name, chrome_version,
+        '--params.devMode=%s' % dev_mode,
+    ]
+
+    # Capabilities in wdio.conf.js are added as an array of object,
+    # so in order to set the value of maxmium instances of chrome
+    # in wdio.conf.js, we need to provide the index of the capability
+    # at which chrome is present, i.e. 0.
+    if sharding_instances > 1:
+        webdriverio_args.extend([
+           '--capabilities[0].maxInstances=%d' % sharding_instances,
+       ])
+
+    if debug_mode:
+        webdriverio_args.insert(0, 'DEBUG=true')
+
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
+    managed_webdriverio_proc = managed_process(
+        webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
+        raise_on_nonzero_exit=False, **kwargs)
+
+    with managed_webdriverio_proc as proc:
         yield proc

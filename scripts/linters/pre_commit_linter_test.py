@@ -76,14 +76,14 @@ def all_checks_passed(linter_stdout):
     Returns:
         bool. Whether all checks have passed or not.
     """
-    return 'All Checks Passed.' in linter_stdout[-1]
+    return 'All Linter Checks Passed.' in linter_stdout[-1]
 
 
 class PreCommitLinterTests(test_utils.LinterTestBase):
     """Tests for methods in pre_commit_linter module."""
 
     def setUp(self):
-        super(PreCommitLinterTests, self).setUp()
+        super().setUp()
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
         self.install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
@@ -303,7 +303,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_html_file(self):
         with self.print_swap, self.sys_swap, self.install_swap:
             pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
-        self.assert_same_list_elements('All Checks Passed.', self.linter_stdout)
+        self.assert_same_list_elements(
+            'All Linter Checks Passed.', self.linter_stdout)
 
     def test_get_changed_filepaths(self):
         def mock_check_output(unused_list):

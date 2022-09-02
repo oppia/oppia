@@ -26,7 +26,9 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StateSolutionService extends StatePropertyService<Solution> {
+export class StateSolutionService
+    // The state property is null until a solution is specified or removed.
+    extends StatePropertyService<Solution | null> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveSolution';

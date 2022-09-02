@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import utils
-from core.constants import constants
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
@@ -33,23 +32,23 @@ from typing import Sequence
 class ActivityRightsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ActivityRightsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
-        self.owner = user_services.get_user_actions_info(self.owner_id) # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL) # type: ignore[no-untyped-call]
-        self.viewer = user_services.get_user_actions_info(self.viewer_id) # type: ignore[no-untyped-call]
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.viewer = user_services.get_user_actions_info(self.viewer_id)
 
         self.exp_id = 'exp_id'
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner, self.exp_id) # type: ignore[no-untyped-call]
-        self.activity_rights = rights_manager.get_exploration_rights( # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.exp_id)
+        self.activity_rights = rights_manager.get_exploration_rights(
             self.exp_id)
 
     def test_validate_community_owned_explorations(self) -> None:
         self.activity_rights.community_owned = True
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Community-owned explorations should have no owners, '
             'editors, voice artists or viewers specified.'):
@@ -57,32 +56,32 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
         self.activity_rights.owner_ids = []
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Community-owned explorations cannot be private'):
             self.activity_rights.validate()
 
     def test_validate_private_explorations(self) -> None:
         self.activity_rights.viewer_ids = [self.viewer_id]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Public explorations should have no viewers specified.'):
             self.activity_rights.validate()
 
     def test_validate_owner_cannot_be_editor(self) -> None:
         self.activity_rights.editor_ids = [self.owner_id]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A user cannot be both an owner and an editor.'):
             self.activity_rights.validate()
 
     def test_validate_owner_cannot_be_voice_artist(self) -> None:
         self.activity_rights.voice_artist_ids = [self.owner_id]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A user cannot be both an owner and a voice artist.'):
             self.activity_rights.validate()
 
     def test_validate_owner_cannot_be_viewer(self) -> None:
         self.activity_rights.viewer_ids = [self.owner_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A user cannot be both an owner and a viewer.'):
             self.activity_rights.validate()
 
@@ -90,7 +89,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.voice_artist_ids = [self.viewer_id]
         self.activity_rights.editor_ids = [self.viewer_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A user cannot be both an editor and a voice artist.'):
             self.activity_rights.validate()
 
@@ -98,7 +97,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.viewer_ids = [self.viewer_id]
         self.activity_rights.editor_ids = [self.viewer_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A user cannot be both an editor and a viewer.'):
             self.activity_rights.validate()
 
@@ -106,74 +105,59 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.viewer_ids = [self.viewer_id]
         self.activity_rights.voice_artist_ids = [self.viewer_id]
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A user cannot be both a voice artist and a viewer.'):
             self.activity_rights.validate()
 
-    def test_update_activity_first_published_msec(self) -> None:
-        rights_manager.update_activity_first_published_msec( # type: ignore[no-untyped-call]
-            constants.ACTIVITY_TYPE_EXPLORATION, self.exp_id, 0.0)
-
-        activity_rights = rights_manager.get_exploration_rights(self.exp_id) # type: ignore[no-untyped-call]
-        self.assertEqual(activity_rights.first_published_msec, 0.0)
-
-    def test_cannot_update_activity_first_published_msec_for_invalid_activity(
-        self
-    ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
-            Exception, 'Cannot get activity rights for unknown activity type'):
-            rights_manager.update_activity_first_published_msec( # type: ignore[no-untyped-call]
-                'invalid_activity', 'activity_id', 0.0)
-
     def test_check_cannot_access_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_access_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_access_activity(
             self.owner, None))
 
     def test_check_cannot_edit_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_edit_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_edit_activity(
             self.owner, None))
 
     def test_check_cannot_voiceover_activity_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_voiceover_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_voiceover_activity(
             self.owner, None))
 
     def test_cannot_save_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_save_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_save_activity(
             self.owner, None))
 
     def test_check_cannot_delete_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_delete_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_delete_activity(
             self.owner, None))
 
     def test_check_cannot_modify_activity_roles_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_modify_core_activity_roles( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_modify_core_activity_roles(
             self.owner, None))
 
     def test_check_cannot_release_ownership_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_release_ownership( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_release_ownership(
             self.owner, None))
 
     def test_check_cannnot_publish_activity_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_publish_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_publish_activity(
             self.owner, None))
 
     def test_check_cannot_publish_activity_with_cloned_from(self) -> None:
-        self.activity_rights.cloned_from = True
-        self.assertFalse(rights_manager.check_can_publish_activity( # type: ignore[no-untyped-call]
+        self.activity_rights.cloned_from = 'abcdefg'
+        self.assertFalse(rights_manager.check_can_publish_activity(
             self.owner, self.activity_rights))
 
     def test_check_cannot_unpublish_activity_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_unpublish_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
             self.owner, None))
 
     def test_cannot_release_ownership_of_exploration_with_insufficient_rights(
@@ -187,11 +171,11 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'The ownership of this exploration cannot be released.')
 
         with logging_swap, assert_raises_regexp_context_manager:
-            rights_manager.release_ownership_of_exploration( # type: ignore[no-untyped-call]
+            rights_manager.release_ownership_of_exploration(
                 self.viewer, self.exp_id)
 
         self.assertEqual(len(observed_log_messages), 1)
@@ -204,7 +188,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.community_owned = False
         self.activity_rights.owner_ids = []
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Activity should have atleast one owner.'):
             self.activity_rights.validate()
@@ -277,21 +261,21 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.editor_ids = []
         self.activity_rights.viewer_ids = []
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already owns this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_OWNER)
 
         self.activity_rights.assign_new_role(
             '123456', rights_domain.ROLE_EDITOR)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can edit this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_EDITOR)
 
         self.activity_rights.assign_new_role(
             '123456', rights_domain.ROLE_VOICE_ARTIST)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can voiceover this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VOICE_ARTIST)
@@ -299,7 +283,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PRIVATE
         self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VIEWER)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This user already can view this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VIEWER)
@@ -310,7 +294,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         self.activity_rights.viewer_ids = []
         self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PUBLIC
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Public explorations can be viewed by anyone.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_VIEWER)
@@ -319,19 +303,19 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 
     def test_exploration_rights_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             rights_domain.ExplorationRightsChange({'invalid': 'data'})
 
     def test_exploration_rights_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             rights_domain.ExplorationRightsChange({'cmd': 'invalid'})
 
     def test_exploration_rights_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_role, old_role')):
@@ -343,7 +327,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
     def test_exploration_rights_change_object_with_extra_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             rights_domain.ExplorationRightsChange({
@@ -354,7 +338,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exploration_rights_change_object_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for new_role in cmd change_role: '
                 'invalid is not allowed')):
@@ -366,7 +350,7 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_exploration_rights_change_object_with_invalid_status(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for new_status in cmd change_exploration_status: '
                 'invalid is not allowed')):
@@ -492,19 +476,19 @@ class ExplorationRightsChangeTests(test_utils.GenericTestBase):
 class CollectionRightsChangeTests(test_utils.GenericTestBase):
 
     def test_collection_rights_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             rights_domain.CollectionRightsChange({'invalid': 'data'})
 
     def test_collection_rights_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             rights_domain.CollectionRightsChange({'cmd': 'invalid'})
 
     def test_collection_rights_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_role, old_role')):
@@ -516,7 +500,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
     def test_collection_rights_change_object_with_extra_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             rights_domain.CollectionRightsChange({
@@ -527,7 +511,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_collection_rights_change_object_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for new_role in cmd change_role: '
                 'invalid is not allowed')):
@@ -539,7 +523,7 @@ class CollectionRightsChangeTests(test_utils.GenericTestBase):
             })
 
     def test_collection_rights_change_object_with_invalid_status(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for new_status in cmd change_collection_status: '
                 'invalid is not allowed')):

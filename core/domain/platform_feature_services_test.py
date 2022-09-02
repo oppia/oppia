@@ -36,15 +36,15 @@ class ParamNames(enum.Enum):
     FEATURE_B = 'feature_b'
 
 
-ServerModes = platform_parameter_domain.ServerModes
+ServerMode = platform_parameter_domain.ServerMode
 FeatureStages = platform_parameter_domain.FeatureStages
 
 
 class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     """Test for the platform feature services."""
 
-    def setUp(self):
-        super(PlatformFeatureServiceTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -71,7 +71,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', ServerModes.DEV.value]
+                                ['=', ServerMode.DEV.value]
                             ]
                         }
                     ],
@@ -88,9 +88,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', ServerModes.DEV.value],
-                                ['=', ServerModes.TEST.value],
-                                ['=', ServerModes.PROD.value]
+                                ['=', ServerMode.DEV.value],
+                                ['=', ServerMode.TEST.value],
+                                ['=', ServerMode.PROD.value]
                             ]
                         }
                     ],
@@ -102,17 +102,24 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # Replace feature lists with mocked names.
         self.original_feature_list = feature_services.ALL_FEATURES_LIST
         self.original_feature_name_set = (
-            feature_services.ALL_FEATURES_NAMES_SET)
-        feature_services.ALL_FEATURES_LIST = param_name_enums
+            feature_services.ALL_FEATURES_NAMES_SET
+        )
+        # The expected type of 'ALL_FEATURES_LIST' is a list of 'PARAM_NAMES'
+        # Enum, but here for testing purposes we are providing a list of
+        # 'ParamNames' enums, which causes MyPy to throw an 'Incompatible types
+        # in assignment' error. Thus to avoid the error, we used ignore here.
+        feature_services.ALL_FEATURES_LIST = param_name_enums  # type: ignore[assignment]
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
-    def tearDown(self):
-        super(PlatformFeatureServiceTest, self).tearDown()
+    def tearDown(self) -> None:
+        super().tearDown()
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
 
-    def test_create_evaluation_context_for_client_returns_correct_context(self):
+    def test_create_evaluation_context_for_client_returns_correct_context(
+        self
+    ) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client(
                 {
@@ -128,7 +135,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
 
-    def test_get_all_feature_flag_dicts_returns_correct_dicts(self):
+    def test_get_all_feature_flag_dicts_returns_correct_dicts(self) -> None:
         expected_dicts = [
             self.dev_feature.to_dict(),
             self.prod_feature.to_dict(),
@@ -137,7 +144,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature_services.get_all_feature_flag_dicts(),
             expected_dicts)
 
-    def test_get_all_feature_flag_values_in_dev_returns_correct_values(self):
+    def test_get_all_feature_flag_values_in_dev_returns_correct_values(
+        self
+    ) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
@@ -152,7 +161,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     self.prod_feature.name: True,
                 })
 
-    def test_get_all_feature_flag_values_in_prod_returns_correct_values(self):
+    def test_get_all_feature_flag_values_in_prod_returns_correct_values(
+        self
+    ) -> None:
         with self.swap(constants, 'DEV_MODE', False):
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
@@ -167,29 +178,29 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     self.prod_feature.name: True,
                 })
 
-    def test_evaluate_dev_feature_for_dev_server_returns_true(self):
+    def test_evaluate_dev_feature_for_dev_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_evaluate_prod_feature_for_dev_server_returns_true(self):
+    def test_evaluate_prod_feature_for_dev_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.prod_feature.name))
 
-    def test_evaluate_dev_feature_for_prod_server_returns_false(self):
+    def test_evaluate_dev_feature_for_prod_server_returns_false(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
             self.assertFalse(
                 feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_evaluate_prod_feature_for_prod_server_returns_true(
-            self):
+    def test_evaluate_prod_feature_for_prod_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
-            self):
+        self
+    ) -> None:
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
@@ -198,7 +209,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', ServerModes.PROD.value]
+                                ['=', ServerMode.PROD.value]
                             ],
                         },
                         {
@@ -216,12 +227,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.prod_feature.name))
 
-    def test_get_feature_flag_values_with_unknown_name_raises_error(self):
+    def test_get_feature_flag_values_with_unknown_name_raises_error(
+        self
+    ) -> None:
         with self.assertRaisesRegex(
             Exception, 'Unknown feature flag'):
             feature_services.is_feature_enabled('feature_that_does_not_exist')
 
-    def test_update_feature_flag_rules_successfully_updates_rules(self):
+    def test_update_feature_flag_rules_successfully_updates_rules(self) -> None:
         feature_services.update_feature_flag_rules(
             self.dev_feature.name, self.user_id, 'test update',
             [
@@ -243,18 +256,24 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.assertFalse(
                 feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_update_feature_flag_rules_with_unknown_name_raises_error(self):
+    def test_update_feature_flag_rules_with_unknown_name_raises_error(
+        self
+    ) -> None:
         unknown_name = 'feature_that_does_not_exist'
         with self.assertRaisesRegex(
             Exception, 'Unknown feature flag: %s' % unknown_name):
             feature_services.update_feature_flag_rules(
                 unknown_name, self.user_id, 'test update',
                 [
-                    {'filters': [], 'value_when_matched': False},
+                    platform_parameter_domain.PlatformParameterRule.from_dict(
+                        {'filters': [], 'value_when_matched': False}
+                    ),
                 ]
             )
 
-    def test_update_feature_flag_rules_with_invalid_rules_raises_error(self):
+    def test_update_feature_flag_rules_with_invalid_rules_raises_error(
+        self
+    ) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'must have a server_mode filter'):
             feature_services.update_feature_flag_rules(

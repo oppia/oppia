@@ -22,7 +22,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TranslateService } from '@ngx-translate/core';
 
 import { StoryNode } from 'domain/story/story-node.model';
-import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
@@ -34,6 +34,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -49,18 +50,18 @@ class MockTranslateService {
 }
 
 describe('Story Viewer Page component', () => {
-  let httpTestingController = null;
+  let httpTestingController: HttpTestingController;
   let component: StoryViewerPageComponent;
-  let alertsService = null;
+  let alertsService: AlertsService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
-  let urlService: UrlService = null;
-  let userService: UserService = null;
-  let pageTitleService = null;
+  let urlService: UrlService;
+  let userService: UserService;
+  let pageTitleService: PageTitleService;
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
-  let _samplePlaythroughObject = null;
+  let _samplePlaythroughObject: StoryPlaythrough;
   const UserInfoObject = {
     roles: ['USER_ROLE'],
     is_moderator: false,
@@ -217,10 +218,6 @@ describe('Story Viewer Page component', () => {
     httpTestingController.verify();
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should get complete exploration url when clicking on svg element',
     () => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -261,15 +258,56 @@ describe('Story Viewer Page component', () => {
           story_title: 'Story Title 1',
           story_description: 'Story Description 1',
           topic_name: 'topic_1',
-        } as StoryPlaythroughBackendDict)));
+          meta_tag_content: 'this is a meta tag content',
+          story_id: 'id'
+        })));
 
       component.ngOnInit();
 
       expect(component.showChapters()).toBeFalse();
     });
 
+  it('should throw error if story url fragment is not present', () => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('math');
+    spyOn(
+      urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(null);
+    spyOn(
+      storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(StoryPlaythrough.createFromBackendDict({
+        story_nodes: [],
+        story_title: 'Story Title 1',
+        story_description: 'Story Description 1',
+        topic_name: 'topic_1',
+        meta_tag_content: 'this is a meta tag content',
+        story_id: 'id'
+      })));
+    let node = StoryNode.createFromIdAndTitle('1', 'Story node title');
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Story url fragment is null');
+
+    expect(() => {
+      component.getExplorationUrl(node);
+    }).toThrowError('Story url fragment is null');
+  });
+
   it('should show story\'s chapters when story has chapters',
     () => {
+      let sampleDataResults = {
+        story_id: 'qwerty',
+        story_title: 'Story title',
+        story_description: 'Story description',
+        story_nodes: [],
+        topic_name: 'Topic name',
+        meta_tag_content: 'Story meta tag content'
+      };
+      let samplePlaythroughObject =
+        StoryPlaythrough.createFromBackendDict(
+          sampleDataResults);
       component.storyPlaythroughObject = {
         id: '1',
         nodes: [],
@@ -277,23 +315,23 @@ describe('Story Viewer Page component', () => {
         description: 'description',
         topicName: 'topic_name',
         metaTagContent: 'this is meta tag content',
-        getInitialNode() {
-          return null;
+        getInitialNode(): ReadOnlyStoryNode {
+          return samplePlaythroughObject.getInitialNode();
         },
         getStoryNodeCount(): number {
           return 2;
         },
-        getStoryNodes() {
-          return null;
+        getStoryNodes(): ReadOnlyStoryNode[] {
+          return [];
         },
-        hasFinishedStory() {
-          return null;
+        hasFinishedStory(): boolean {
+          return false;
         },
         getNextPendingNodeId(): string {
-          return null;
+          return 'id';
         },
         hasStartedStory(): boolean {
-          return null;
+          return false;
         },
         getStoryId(): string {
           return this.id;
@@ -332,7 +370,7 @@ describe('Story Viewer Page component', () => {
   ' clicked', fakeAsync(() => {
     const reloadSpy = spyOn(windowRef.nativeWindow.location, 'reload');
     spyOn(userService, 'getLoginUrlAsync')
-      .and.resolveTo(null);
+      .and.resolveTo(undefined);
     component.signIn();
     flushMicrotasks();
 
@@ -462,7 +500,7 @@ describe('Story Viewer Page component', () => {
         },
         completed: true,
         thumbnail_bg_color: '#bb8b2f',
-        thumbnail_filename: null
+        thumbnail_filename: ''
       };
       var secondSampleReadOnlyStoryNodeBackendDict = {
         id: 'node_2',
@@ -500,7 +538,7 @@ describe('Story Viewer Page component', () => {
         },
         completed: false,
         thumbnail_bg_color: '#bb8b2f',
-        thumbnail_filename: null,
+        thumbnail_filename: '',
       };
 
       var storyPlaythroughBackendObject = {

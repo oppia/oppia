@@ -1,7 +1,3 @@
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/classroom-page/classroom-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/classroom-page/classroom-page.component.rtl.css">
-
 <background-banner></background-banner>
 <div class="oppia-classroom-viewer-container position-relative">
   <div class="oppia-classroom-header">
@@ -28,7 +24,7 @@
   </div>
   <div class="oppia-topic-summary-tiles" *ngIf="classroomData">
     <div *ngFor="let topicSummary of classroomData.getTopicSummaries()"
-         class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
+         class="oppia-topic-summary-tile e2e-test-topic-summary-tile">
       <oppia-topic-summary-tile [topicSummary]="topicSummary"
                                 [classroomUrlFragment]="classroomUrlFragment"
                                 [isPublished]="topicSummary.isTopicPublished()">

@@ -28,7 +28,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BasePracticeSessionsControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -56,6 +56,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
             constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'subtopic-name-two'))
         self.topic.next_subtopic_id = 3
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id1]
         self.topic.thumbnail_filename = 'Topic.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -106,6 +107,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'subtopic-name-three'))
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['non_existent_skill']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic('topic_id_3', self.admin_id)
         self.get_json(

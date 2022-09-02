@@ -3,15 +3,11 @@
     <mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
       <div class="oppia-editor-card-body">
         <div class="state-hints-header-container oppia-mobile-collapsible-card-header" (click)="toggleHintCard()">
-          <div class="state-hints-header" *ngIf="editabilityService.isEditableOutsideTutorialMode()">
+          <div class="state-hints-header">
             <h3 class="oppia-exp-hints-card-header">Hints</h3>
-            <i class="fa fa-caret-down"
-               *ngIf="!hintCardIsShown"
-               aria-hidden="true">
+            <i class="fa fa-caret-down" *ngIf="!hintCardIsShown" aria-hidden="true">
             </i>
-            <i class="fa fa-caret-up"
-               *ngIf="hintCardIsShown"
-               aria-hidden="true">
+            <i class="fa fa-caret-up" *ngIf="hintCardIsShown" aria-hidden="true">
             </i>
           </div>
         </div>
@@ -19,7 +15,7 @@
           <div class="oppia-add-hint-button-container">
             <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && editabilityService.isEditable()">
               <button type="button"
-                      class="btn btn-primary oppia-add-hint-button protractor-test-oppia-add-hint-button"
+                      class="btn btn-primary oppia-add-hint-button e2e-test-oppia-add-hint-button"
                       (click)="openAddHintModal()"
                       [disabled]="stateHintsService.displayed.length >= 5">
                 {{getHintButtonText()}}
@@ -27,10 +23,12 @@
             </div>
           </div>
           <div *ngIf="stateHintsService.displayed.length > 0">
-          <!-- An HTML element marked ui-sortable should contain only one element,
+            <!-- An HTML element marked ui-sortable should contain only one element,
           and this element should have an ng-repeat defined on it. See the
           ui-sortable documentation for more details. -->
-            <div cdkDropList (cdkDropListDropped)="drop($event)" class="nav oppia-option-list nav-stacked nav-pills">
+            <div cdkDropList
+                 (cdkDropListDropped)="drop($event)"
+                 class="nav oppia-option-list-hint nav-stacked nav-pills">
               <!-- Note that adding "track by index" here seems to mess up the final
               index in the stop() event handler. -->
               <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false"
@@ -48,7 +46,7 @@
                   </picture>
                 </span>
                 <a (click)="changeActiveHintIndex(index)"
-                   class="oppia-rule-tab protractor-test-hint-tab"
+                   class="oppia-rule-tab e2e-test-hint-tab"
                    ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
                   <oppia-response-header class="oppia-response-header-center"
                                          [defaultOutcome]="false"
@@ -61,7 +59,7 @@
                 </a>
 
                 <div *ngIf="stateHintsService.getActiveHintIndex() === index">
-                  <div class="oppia-editor-card-section protractor-test-hint-body-{{index}}">
+                  <div class="oppia-editor-card-section e2e-test-hint-body-{{index}}">
                     <oppia-hint-editor [hint]="hint"
                                        [indexPlusOne]="index + 1"
                                        (saveHint)="onSaveInlineHint()"
@@ -82,30 +80,41 @@
   .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
+
+  .oppia-rule-block {
+    width: 100%;
+  }
+
   .cdk-drag-placeholder {
     opacity: 0;
   }
+
   .cdk-drag-preview {
     border-radius: 4px;
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-                0 8px 10px 1px rgba(0, 0, 0, 0.14),
-                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+      0 8px 10px 1px rgba(0, 0, 0, 0.14),
+      0 3px 14px 2px rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
   }
+
   .oppia-add-hint-button-container {
     margin: 10px 0;
   }
+
   .oppia-editor-card-section {
     padding: 10px;
   }
+
   .oppia-exp-hints-card-header {
     font-size: 18px;
   }
+
   .oppia-hint-sort-handle {
     padding-right: 4px;
     position: absolute;
     top: 9px;
   }
+
   .oppia-sortable-hint {
     align-items: center;
     cursor: pointer;
@@ -113,12 +122,19 @@
     padding: 10px 8px;
     position: relative;
   }
-  .oppia-option-list.cdk-drop-list-dragging .oppia-sortable-hint:not(.cdk-drag-placeholder) {
+
+  .oppia-option-list-hint {
+    width: 100%;
+  }
+
+  .oppia-option-list-hint.cdk-drop-list-dragging .oppia-sortable-hint:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
+
   .state-hints-header-container {
     padding: 0 20px 0 30px;
   }
+
   .state-hints-header {
     align-content: center;
     align-items: center;
@@ -126,18 +142,32 @@
     justify-content: space-between;
     padding: 15px 0 15px;
   }
+
   .state-hints-content-container {
     padding: 15px 30px;
   }
+
   @media screen and (max-width: 768px) {
+    .state-hints-content-container {
+      margin-top: 10px;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
     .state-hints-header-container {
       padding: 0;
     }
+
     .state-hints-header {
-      padding: 18px 15px;
+      padding: 0;
     }
+
     .state-hints-header i {
       display: block;
+    }
+
+    .oppia-editor-card-with-avatar, .oppia-mobile-collapsible-card {
+      margin-top: 20px;
     }
   }
 </style>

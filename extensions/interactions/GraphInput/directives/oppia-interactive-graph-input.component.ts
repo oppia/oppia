@@ -38,17 +38,21 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
   styleUrls: []
 })
 export class InteractiveGraphInput implements OnInit, OnDestroy {
-  @Input() graphWithValue: string;
-  @Input() canAddVertexWithValue: string;
-  @Input() canDeleteVertexWithValue: string;
-  @Input() canMoveVertexWithValue: string;
-  @Input() canEditVertexLabelWithValue: string;
-  @Input() canAddEdgeWithValue: string;
-  @Input() canDeleteEdgeWithValue: string;
-  @Input() canEditEdgeWeightWithValue: string;
-  @Input() lastAnswer: null | GraphAnswer = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() graphWithValue!: string;
+  @Input() canAddVertexWithValue!: string;
+  @Input() canDeleteVertexWithValue!: string;
+  @Input() canMoveVertexWithValue!: string;
+  @Input() canEditVertexLabelWithValue!: string;
+  @Input() canAddEdgeWithValue!: string;
+  @Input() canDeleteEdgeWithValue!: string;
+  @Input() canEditEdgeWeightWithValue!: string;
+  // Last answer is null if graph is submitted for the first time.
+  @Input() lastAnswer!: GraphAnswer | null;
 
-  graph: GraphAnswer;
+  graph!: GraphAnswer;
   canAddVertex: boolean = false;
   canDeleteVertex: boolean = false;
   canMoveVertex: boolean = true;
@@ -94,15 +98,15 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
       isWeighted: false,
       isLabeled: false
     };
-    this.interactionIsActive = (this.lastAnswer === null);
+    this.interactionIsActive = this.lastAnswer === null;
 
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitGraph(), () => this.validityCheckFn());
 
-    if (this.interactionIsActive) {
-      this.resetGraph();
-    } else {
+    if (!this.interactionIsActive && this.lastAnswer !== null) {
       this.graph = this.lastAnswer;
+    } else {
+      this.resetGraph();
     }
     const {
       canAddVertex,

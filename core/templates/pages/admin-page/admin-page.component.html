@@ -2,7 +2,7 @@
 
 <div align="center"
      *ngIf="statusMessage"
-     class="oppia-status-message-container protractor-test-status-message">
+     class="oppia-status-message-container e2e-test-status-message">
   {{ statusMessage }}
 </div>
 <br>
@@ -36,7 +36,7 @@
   Dev Mode
 </div>
 
-<div *ngIf="isDummyFeatureEnabled()" class="oppia-dev-mode protractor-test-angularjs-dummy-feature-indicator">
+<div *ngIf="isDummyFeatureEnabled()" class="oppia-dev-mode e2e-test-angularjs-dummy-feature-indicator">
   AngularJS: Dummy Feature Enabled
 </div>
 
@@ -53,7 +53,7 @@
     right: 30px;
     z-index: 3000;
   }
-  .protractor-test-angularjs-dummy-feature-indicator {
+  .e2e-test-angularjs-dummy-feature-indicator {
     bottom: 50px;
   }
 </style>

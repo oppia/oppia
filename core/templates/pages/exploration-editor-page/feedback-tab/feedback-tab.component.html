@@ -27,8 +27,8 @@
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8">
         <span class="oppia-back-arrow">
-          <button type="button" class="btn btn-secondary btn-sm protractor-test-oppia-feedback-back-button" ng-click="$ctrl.onBackButtonClicked()">
-            <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
+          <button type="button" class="btn btn-secondary btn-sm e2e-test-oppia-feedback-back-button" ng-click="$ctrl.onBackButtonClicked()">
+            <i class="fas fa-angle-left oppia-back-arrow-icon oppia-vcenter" title="Return to list of feedback threads"></i>
           </button>
         </span>
         <span class="oppia-thread-text" ng-show="!$ctrl.activeThread.isSuggestionThread()">Feedback Thread: <[$ctrl.activeThread.subject]></span>
@@ -40,7 +40,7 @@
           <span ng-if="$ctrl.activeThread.stateName" class="badge badge-info">
             state: <[$ctrl.activeThread.stateName]>
           </span>
-          <span ng-class="$ctrl.getLabelClass($ctrl.activeThread.status)" class="protractor-test-oppia-feedback-status-name">
+          <span ng-class="$ctrl.getLabelClass($ctrl.activeThread.status)" class="e2e-test-oppia-feedback-status-name">
             <[$ctrl.getHumanReadableStatus($ctrl.activeThread.status)]>
           </span>
         </div>
@@ -77,9 +77,9 @@
 
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
-                  <div class="oppia-view-suggestion-button-container protractor-test-exploration-feedback"><[m.text]></div>
+                  <div class="oppia-view-suggestion-button-container e2e-test-exploration-feedback"><[m.text]></div>
                   <div ng-if="$ctrl.activeThread.isSuggestionThread() && $index == 0">
-                    <button class="btn btn-<[$ctrl.getSuggestionButtonType()]> protractor-test-view-suggestion-btn oppia-view-suggestion-btn" ng-click="$ctrl.showSuggestionModal()">
+                    <button class="btn btn-<[$ctrl.getSuggestionButtonType()]> e2e-test-view-suggestion-btn oppia-view-suggestion-btn" ng-click="$ctrl.showSuggestionModal()">
                       View Suggestion
                     </button>
                   </div>
@@ -101,7 +101,7 @@
             Add new message
             <span ng-if="$ctrl.isExplorationEditable() && !$ctrl.activeThread.isSuggestionThread()">(and/or change status)</span>
           </label>
-          <textarea class="form-control protractor-test-feedback-response-textarea oppia-autofocus" ng-model="$ctrl.tmpMessage.text"
+          <textarea class="form-control e2e-test-feedback-response-textarea oppia-autofocus" ng-model="$ctrl.tmpMessage.text"
                     id="$ctrl.tmpMessageText" rows="6"
                     ng-disabled="$ctrl.messageSendingInProgress" focus-on="tmpMessageText">
           </textarea>
@@ -110,19 +110,19 @@
         <div>
           <span ng-show="$ctrl.isExplorationEditable() && !$ctrl.activeThread.isSuggestionThread()">
             Change status (optional):
-            <select class="protractor-test-oppia-feedback-status-menu" ng-model="$ctrl.tmpMessage.status"
+            <select class="e2e-test-oppia-feedback-status-menu" ng-model="$ctrl.tmpMessage.status"
                     ng-options="choice.id as choice.text for choice in $ctrl.STATUS_CHOICES"
                     ng-disabled="$ctrl.messageSendingInProgress">
             </select>
             <div class="oppia-icon-container" ng-if="!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable')">
-              <i class="material-icons">&#xE88F;</i>
+              <i class="fas fa-info-circle"></i>
               <span>Please specify a reason for setting the status to <[$ctrl.getHumanReadableStatus($ctrl.tmpMessage.status)]>.</span>
             </div>
           </span>
         </div>
 
         <div>
-          <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn oppia-feedback-response-send-btn"
+          <button class="btn btn-success e2e-test-oppia-feedback-response-send-btn oppia-feedback-response-send-btn"
                   ng-click="$ctrl.addNewMessage($ctrl.activeThread.threadId, $ctrl.tmpMessage.text, $ctrl.tmpMessage.status)"
                   ng-disabled="$ctrl.messageSendingInProgress || (!$ctrl.tmpMessage.text && $ctrl.activeThread.status === $ctrl.tmpMessage.status) || (!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable'))">
             <span ng-if="$ctrl.messageSendingInProgress">Sending...</span>
@@ -149,6 +149,9 @@
   .activeThreadView {
     margin-top: 10px;
     word-wrap: break-word;
+  }
+  .oppia-back-arrow-icon {
+    font-size: 19px;
   }
   feedback-tab .oppia-thread-button {
     margin-top: 15px;

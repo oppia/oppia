@@ -26,10 +26,12 @@ from core.domain import classifier_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, cast
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'classifier_services' only for type checking.
+    from core.domain import classifier_services
     from mypy_imports import base_models
     from mypy_imports import classifier_models
 
@@ -234,7 +236,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_multi_jobs(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
-        job_dicts_list = []
+        job_dicts_list: List[classifier_services.JobInfoDict] = []
         job_dicts_list.append({
             'exp_id': u'1',
             'exp_version': 1,
@@ -307,7 +309,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def test_raise_exception_by_mocking_collision(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The id generator for ClassifierTrainingJobModel is '
             'producing too many collisions.'
             ):
@@ -389,7 +391,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             mapping.algorithm_ids_to_job_ids, {'algorithm_id': 'job_id4'})
 
         # Test that exception is raised when creating mapping with same id.
-        with self.assertRaisesRegex(Exception, ( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'A model with the same ID already exists.')):
             mapping_id = (
                 classifier_models.StateTrainingJobsMappingModel.create(
@@ -448,12 +450,11 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_domain.StateTrainingJobsMapping(
                 u'1', 2, 'Home', {'algorithm_id': 'job_id2'}))
 
-        state_training_jobs_mappings_model = cast(
-            List[classifier_models.StateTrainingJobsMappingModel],
-            state_training_jobs_mappings)
         mapping_ids = (
             classifier_models.StateTrainingJobsMappingModel.create_multi(
-                state_training_jobs_mappings_model))
+                state_training_jobs_mappings
+            )
+        )
         self.assertEqual(len(mapping_ids), 2)
 
         mapping1 = (

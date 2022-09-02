@@ -65,7 +65,8 @@ INVALID_NO_NEWLINE_FILEPATH = os.path.join(
 INVALID_URLOPEN_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlopen.py')
 INVALID_AUTHOR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_author.py')
-INVALID_NDB_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_ndb.py')
+INVALID_DATASTORE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_datastore.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pylint_id.py')
 INVALID_TABS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_tabs.py')
@@ -141,7 +142,7 @@ class PythonLintTests(test_utils.LinterTestBase):
 
     def test_invalid_use_of_ndb(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_NDB_FILEPATH], FILE_CACHE)
+            [INVALID_DATASTORE_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             ['Line 28: Please use datastore_services instead of ndb'],

@@ -1,4 +1,4 @@
-<div class="modal-header protractor-test-metadata-modal-header">
+<div class="modal-header e2e-test-metadata-modal-header">
   <h3>Add Some Details</h3>
 </div>
 
@@ -16,7 +16,7 @@
   </exploration-objective-editor>
   <p ng-if="requireCategoryToBeSpecified">
     <label class="font-weight-normal"> Add a category: How would you categorize your exploration?
-      <select2-dropdown class="protractor-test-exploration-category-dropdown"
+      <select2-dropdown class="e2e-test-exploration-category-dropdown"
                         item="explorationCategoryService.displayed"
                         choices="CATEGORY_LIST_FOR_SELECT2"
                         placeholder="Choose or type a new category"
@@ -28,7 +28,7 @@
   </p>
   <p ng-if="askForLanguageCheck">
     <label class="font-weight-normal"> Verify the language: Is your exploration written in this language
-      <select class="form-control protractor-test-exploration-language-select"
+      <select class="form-control e2e-test-exploration-language-select"
               ng-model="explorationLanguageCodeService.displayed"
               ng-change="saveExplorationLanguageCode()"
               ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
@@ -45,7 +45,7 @@
                         new-choice-regex="<[::TAG_REGEX]>"
                         width="100%"
                         placeholder="Skills, concepts, topics..."
-                        class="protractor-test-tags"
+                        class="e2e-test-tags"
                         on-selection-change="saveExplorationTags()">
       </select2-dropdown>
     </label>
@@ -54,5 +54,5 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-confirm-pre-publication" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
+  <button class="btn btn-success e2e-test-confirm-pre-publication" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
 </div>

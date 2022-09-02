@@ -80,7 +80,7 @@ describe('Changes in Human Readable Form Component', () => {
     let result = removeComments(html);
 
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Added state: ' + component.lostChanges[0].stateName + ' </span>' +
@@ -104,7 +104,7 @@ describe('Changes in Human Readable Form Component', () => {
     let result = removeComments(html);
 
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Renamed state: ' + component.lostChanges[0].oldStateName +
@@ -128,7 +128,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Deleted state: ' +
@@ -161,7 +161,7 @@ describe('Changes in Human Readable Form Component', () => {
 
       let result = removeComments(html);
       expect(result).toBe(
-        '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+        '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
         '<ul>' +
         '<li>' +
         '<div>' +
@@ -205,7 +205,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -244,7 +244,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -287,7 +287,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -331,7 +331,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -374,7 +374,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -419,7 +419,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -451,6 +451,7 @@ describe('Changes in Human Readable Form Component', () => {
       new_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -474,7 +475,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -506,6 +507,7 @@ describe('Changes in Human Readable Form Component', () => {
       new_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -522,6 +524,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -545,7 +548,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -578,6 +581,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -601,7 +605,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -633,6 +637,7 @@ describe('Changes in Human Readable Form Component', () => {
       new_value: (
         outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -649,7 +654,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -701,6 +706,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: (
         outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -720,7 +726,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -758,6 +764,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -781,7 +788,7 @@ describe('Changes in Human Readable Form Component', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
+      '<div class="oppia-lost-changes e2e-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +

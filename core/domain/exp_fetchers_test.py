@@ -23,9 +23,16 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -33,12 +40,12 @@ from core.tests import test_utils
 class ExplorationRetrievalTests(test_utils.GenericTestBase):
     """Test the exploration retrieval methods."""
 
-    EXP_1_ID = 'exploration_1_id'
-    EXP_2_ID = 'exploration_2_id'
-    EXP_3_ID = 'exploration_3_id'
+    EXP_1_ID: Final = 'exploration_1_id'
+    EXP_2_ID: Final = 'exploration_2_id'
+    EXP_3_ID: Final = 'exploration_3_id'
 
-    def setUp(self):
-        super(ExplorationRetrievalTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration_1 = self.save_new_default_exploration(
@@ -48,35 +55,41 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.exploration_3 = self.save_new_default_exploration(
             self.EXP_3_ID, self.owner_id, title='Cc')
 
-    def test_get_exploration_summaries_matching_ids(self):
+    def test_get_exploration_summaries_matching_ids(self) -> None:
         summaries = exp_fetchers.get_exploration_summaries_matching_ids([
             self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID, 'nonexistent'])
+        # Here, we are Ruling out the possibility of None for individual
+        # elements of the list. Because `summaries` is of List[Optional[...]]
+        # type.
+        assert summaries[0] is not None
         self.assertEqual(summaries[0].title, self.exploration_1.title)
+        assert summaries[1] is not None
         self.assertEqual(summaries[1].title, self.exploration_2.title)
+        assert summaries[2] is not None
         self.assertEqual(summaries[2].title, self.exploration_3.title)
         self.assertIsNone(summaries[3])
 
-    def test_get_exploration_summaries_subscribed_to(self):
+    def test_get_exploration_summaries_subscribed_to(self) -> None:
         summaries = exp_fetchers.get_exploration_summaries_subscribed_to(
             self.owner_id)
         self.assertEqual(summaries[0].title, self.exploration_1.title)
         self.assertEqual(summaries[1].title, self.exploration_2.title)
         self.assertEqual(summaries[2].title, self.exploration_3.title)
 
-    def test_get_new_exploration_id(self):
+    def test_get_new_exploration_id(self) -> None:
         self.assertIsNotNone(
             exp_fetchers.get_new_exploration_id()
         )
 
-    def test_get_new_unique_progress_url_id(self):
+    def test_get_new_unique_progress_url_id(self) -> None:
         self.assertIsNotNone(
             exp_fetchers.get_new_unique_progress_url_id()
         )
 
-    def test_get_exploration_summary_by_id(self):
+    def test_get_exploration_summary_by_id(self) -> None:
         fake_eid = 'fake_eid'
         fake_exp = exp_fetchers.get_exploration_summary_by_id(
-            fake_eid
+            fake_eid, strict=False
         )
         self.assertIsNone(fake_exp)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(
@@ -85,23 +98,31 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertIsNotNone(exp_summary)
         self.assertEqual(exp_summary.id, self.EXP_1_ID)
 
-    def test_get_exploration_summaries_from_models(self):
+    def test_get_exploration_summaries_from_models(self) -> None:
         exp_ids = [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID]
-        exp_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
+        exp_summary_models = []
+        exp_summary_models_with_none = exp_models.ExpSummaryModel.get_multi(
             exp_ids
         )
+        for model in exp_summary_models_with_none:
+            # Ruling out the possibility of None for mypy type checking.
+            assert model is not None
+            exp_summary_models.append(model)
+
         exp_summary_dict = (
-            exp_fetchers.get_exploration_summaries_from_models(exp_summaries)
+            exp_fetchers.get_exploration_summaries_from_models(
+                exp_summary_models
+            )
         )
         for key in exp_summary_dict:
             self.assertIn(key, exp_ids)
 
-    def test_retrieval_of_fake_exploration(self):
+    def test_retrieval_of_fake_exploration(self) -> None:
         self.assertIsNone(
-            exp_fetchers.get_exploration_by_id('fake_eid', False)
+            exp_fetchers.get_exploration_by_id('fake_eid', strict=False)
         )
 
-    def test_get_exploration_summaries_where_user_has_role(self):
+    def test_get_exploration_summaries_where_user_has_role(self) -> None:
         exp_ids = [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID]
         exp_summaries = (
             exp_fetchers.get_exploration_summaries_where_user_has_role(
@@ -111,7 +132,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         for exp_summary in exp_summaries:
             self.assertIn(exp_summary.id, exp_ids)
 
-    def test_retrieval_of_explorations(self):
+    def test_retrieval_of_explorations(self) -> None:
         """Test the get_exploration_by_id() method."""
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id('fake_eid')
@@ -127,7 +148,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             ' not found'):
             exp_fetchers.get_exploration_by_id('fake_exploration')
 
-    def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
+    def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(
+        self
+    ) -> None:
         with self.assertRaisesRegex(
             ValueError, 'The given entity_id fake_exp_id is invalid'):
             (
@@ -135,13 +158,15 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     'fake_exp_id', [1, 2, 3]))
 
-    def test_retrieval_of_exp_versions_for_invalid_state_schema_version(self):
+    def test_retrieval_of_exp_versions_for_invalid_state_schema_version(
+        self
+    ) -> None:
         error_regex = (
             'Exploration\\(id=%s, version=%s, states_schema_version=%s\\) '
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '50',
+                    '52',
                     '60'
                 )
         )
@@ -153,7 +178,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                     self.EXP_1_ID, [1])
                 )
 
-    def test_retrieval_of_multiple_exploration_versions(self):
+    def test_retrieval_of_multiple_exploration_versions(self) -> None:
         # Update exploration to version 2.
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
@@ -184,7 +209,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(explorations[1].version, 2)
         self.assertEqual(explorations[2].version, 3)
 
-    def test_version_number_errors_for_get_multiple_exploration_versions(self):
+    def test_version_number_errors_for_get_multiple_exploration_versions(
+        self
+    ) -> None:
         # Update exploration to version 2.
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
@@ -210,15 +237,18 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     self.EXP_1_ID, [1, 2, 3, 4]))
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         with self.assertRaisesRegex(
             ValueError,
             'At least one version number is invalid'):
             (
                 exp_fetchers
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-                    self.EXP_1_ID, [1, 2, 2.5, 3]))
+                    self.EXP_1_ID, [1, 2, 2.5, 3]))  # type: ignore[list-item]
 
-    def test_retrieval_of_multiple_uncached_explorations(self):
+    def test_retrieval_of_multiple_uncached_explorations(self) -> None:
         exp_ids = [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, exp_ids)
@@ -229,7 +259,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         for key in uncached_explorations:
             self.assertIn(key, uncached_explorations)
 
-    def test_retrieval_of_multiple_explorations(self):
+    def test_retrieval_of_multiple_explorations(self) -> None:
         exps = {}
         chars = 'abcde'
         exp_ids = ['%s%s' % (self.EXP_1_ID, c) for c in chars]
@@ -240,14 +270,14 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         result = exp_fetchers.get_multiple_explorations_by_id(
             exp_ids)
         for _id in exp_ids:
-            self.assertEqual(result.get(_id).title, exps.get(_id).title)
+            self.assertEqual(result[_id].title, exps[_id].title)
 
         # Test retrieval of non-existent ids.
         result = exp_fetchers.get_multiple_explorations_by_id(
             exp_ids + ['doesnt_exist'], strict=False
         )
         for _id in exp_ids:
-            self.assertEqual(result.get(_id).title, exps.get(_id).title)
+            self.assertEqual(result[_id].title, exps[_id].title)
 
         self.assertNotIn('doesnt_exist', result)
 
@@ -258,14 +288,16 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist'])
 
-    def test_exploration_user_data_is_none_before_starting_exploration(self):
+    def test_exploration_user_data_is_none_before_starting_exploration(
+        self
+    ) -> None:
         auth_id = 'test_id'
         user_email = 'test@email.com'
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         self.assertIsNone(exp_fetchers.get_exploration_user_data(
             user_id, self.EXP_1_ID))
 
-    def test_get_exploration_user_data(self):
+    def test_get_exploration_user_data(self) -> None:
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -292,8 +324,38 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         }
         exp_user_data = exp_fetchers.get_exploration_user_data(
             user_id, self.EXP_1_ID)
-        self.assertIsNotNone(exp_user_data)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_user_data is not None
         self.assertEqual(expected_user_data_dict, exp_user_data.to_dict())
+
+    def test_get_exploration_version_history(self) -> None:
+        version_history = exp_fetchers.get_exploration_version_history(
+            self.EXP_1_ID, 2
+        )
+
+        self.assertIsNone(version_history)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_1_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'New state'
+                })
+            ], 'A commit message.'
+        )
+        version_history = exp_fetchers.get_exploration_version_history(
+            self.EXP_1_ID, 2
+        )
+
+        self.assertIsNotNone(version_history)
+        if version_history is not None:
+            self.assertEqual(version_history.committer_ids, [self.owner_id])
+            self.assertEqual(
+                version_history.state_version_history['New state'].to_dict(),
+                state_domain.StateVersionHistory(
+                    None, None, self.owner_id
+                ).to_dict()
+            )
 
 
 class LoggedOutUserProgressTests(test_utils.GenericTestBase):
@@ -302,14 +364,14 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
     UNIQUE_PROGRESS_URL_ID = 'pid123'
     EXP_1_ID = 'exploration_1_id'
 
-    def setUp(self):
-        super(LoggedOutUserProgressTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
 
-    def test_get_logged_out_user_progress(self):
+    def test_get_logged_out_user_progress(self) -> None:
 
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID)
@@ -328,7 +390,8 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
         }
         logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
             self.UNIQUE_PROGRESS_URL_ID)
-        self.assertIsNotNone(logged_out_user_data)
+        # Ruling out the possibility of None for mypy type checking.
+        assert logged_out_user_data is not None
         self.assertEqual(
             expected_progress_dict['exploration_id'],
             logged_out_user_data.exploration_id)
@@ -349,10 +412,10 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
 
-    OLD_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
+    OLD_EXP_ID: Final = 'exp_id0'
+    NEW_EXP_ID: Final = 'exp_id1'
 
-    UPGRADED_EXP_YAML = (
+    UPGRADED_EXP_YAML: Final = (
         """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -410,6 +473,7 @@ states:
           value: 1
       default_outcome:
         dest: End
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -442,11 +506,11 @@ title: Old Title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
+    ALBERT_EMAIL: Final = 'albert@example.com'
+    ALBERT_NAME: Final = 'albert'
 
-    def setUp(self):
-        super(ExplorationConversionPipelineTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -474,21 +538,23 @@ title: Old Title
             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
             [self.OLD_EXP_ID, self.NEW_EXP_ID])
 
-    def test_converts_exp_model_with_default_states_schema_version(self):
+    def test_converts_exp_model_with_default_states_schema_version(
+        self
+    ) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.OLD_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
-    def test_does_not_convert_up_to_date_exploration(self):
+    def test_does_not_convert_up_to_date_exploration(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
 
-    def test_migration_with_invalid_state_schema(self):
+    def test_migration_with_invalid_state_schema(self) -> None:
         self.save_new_valid_exploration('fake_eid', self.albert_id)
         swap_earlier_state_to_60 = (
             self.swap(feconf, 'EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION', 60)
@@ -507,7 +573,7 @@ title: Old Title
             with self.assertRaisesRegex(Exception, error_regex):
                 exp_fetchers.get_exploration_from_model(exploration_model)
 
-    def test_migration_then_reversion_maintains_valid_exploration(self):
+    def test_migration_then_reversion_maintains_valid_exploration(self) -> None:
         """This integration test simulates the behavior of the domain layer
         prior to the introduction of a states schema. In particular, it deals
         with an exploration that was created before any states schema
@@ -525,8 +591,8 @@ title: Old Title
         as exp_fetchers.get_exploration_by_id as it skips many steps which
         include the conversion pipeline (which is crucial to this test).
         """
-        exp_id = 'exp_id2'
-        end_state_name = 'End'
+        exp_id: str = 'exp_id2'
+        end_state_name: str = 'End'
 
         # Create an exploration with an old states schema version.
         swap_states_schema_41 = self.swap(

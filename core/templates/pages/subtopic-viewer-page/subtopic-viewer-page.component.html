@@ -1,9 +1,14 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.rtl.css" as="style">
-
 <background-banner></background-banner>
 <div class="oppia-subtopic-viewer-container">
   <div class="oppia-subtopic-viewer-container-card">
+    <div class="oppia-topic-title">
+      <span *ngIf="!isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitle }}
+      </span>
+      <span *ngIf="isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitleTranslationKey | translate }}
+      </span>
+    </div>
     <div class="oppia-subtopic-title">
       <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
         {{ subtopicTitle }}
@@ -14,8 +19,8 @@
     </div>
     <div class="oppia-page-contents-viewer">
       <div>
-        <angular-html-bind-wrapper *ngIf="pageContents" [htmlData]="pageContents.getHtml()">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display *ngIf="pageContents" [rteString]="pageContents.getHtml()">
+        </oppia-rte-output-display>
       </div>
     </div>
   </div>
@@ -42,6 +47,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.rtl.css">

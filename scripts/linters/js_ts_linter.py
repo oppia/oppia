@@ -23,20 +23,12 @@ import os
 import re
 import shutil
 import subprocess
-import sys
+
+import esprima
 
 from .. import common
 from .. import concurrent_task_utils
 
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-
-ESPRIMA_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
-
-sys.path.insert(1, ESPRIMA_PATH)
-
-import esprima  # isort:skip pylint: disable=wrong-import-order, wrong-import-position
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
@@ -459,7 +451,7 @@ class ThirdPartyJsTsLintChecksManager:
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
         """
-        super(ThirdPartyJsTsLintChecksManager, self).__init__()
+        super().__init__()
         self.files_to_lint = files_to_lint
 
     @property

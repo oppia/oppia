@@ -28,6 +28,11 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import exp_models
+
 (base_models, exp_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration])
 
@@ -35,7 +40,7 @@ import apache_beam as beam
 class ValidateExplorationSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_validate_change_domain_implemented(self):
+    def test_validate_change_domain_implemented(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
             created_on=self.YEAR_AGO,
@@ -57,7 +62,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_validate_exp_model_object_with_missing_cmd(self):
+    def test_validate_exp_model_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
             created_on=self.YEAR_AGO,
@@ -83,7 +88,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
                 'Missing cmd key in change dict')
         ])
 
-    def test_validate_exp_model_object_with_invalid_cmd(self):
+    def test_validate_exp_model_object_with_invalid_cmd(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
             created_on=self.YEAR_AGO,
@@ -109,7 +114,9 @@ class ValidateExplorationSnapshotMetadataModelTests(
                 'Command invalid is not allowed')
         ])
 
-    def test_validate_exp_model_object_with_missing_attribute_in_cmd(self):
+    def test_validate_exp_model_object_with_missing_attribute_in_cmd(
+        self
+    ) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
             created_on=self.YEAR_AGO,
@@ -144,7 +151,9 @@ class ValidateExplorationSnapshotMetadataModelTests(
                 'new_value, state_name')
         ])
 
-    def test_validate_exp_model_object_with_extra_attribute_in_cmd(self):
+    def test_validate_exp_model_object_with_extra_attribute_in_cmd(
+        self
+    ) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
             created_on=self.YEAR_AGO,
@@ -180,7 +189,9 @@ class ValidateExplorationSnapshotMetadataModelTests(
                 'The following extra attributes are present: invalid')
         ])
 
-    def test_validate_exp_model_object_with_invalid_exploration_property(self):
+    def test_validate_exp_model_object_with_invalid_exploration_property(
+        self
+    ) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
             created_on=self.YEAR_AGO,
@@ -217,7 +228,9 @@ class ValidateExplorationSnapshotMetadataModelTests(
                 'invalid is not allowed')
         ])
 
-    def test_validate_exp_model_object_with_invalid_state_property(self):
+    def test_validate_exp_model_object_with_invalid_state_property(
+        self
+    ) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
             id='model_id-1',
             created_on=self.YEAR_AGO,
@@ -259,7 +272,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
 
 class RelationshipsOfTests(test_utils.TestBase):
 
-    def test_exploration_context_model_relationships(self):
+    def test_exploration_context_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExplorationContextModel', 'story_id'), ['StoryModel'])
@@ -267,7 +280,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExplorationContextModel', 'id'), ['ExplorationModel'])
 
-    def test_exp_summary_model_relationships(self):
+    def test_exp_summary_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExpSummaryModel', 'id'),
@@ -277,7 +290,7 @@ class RelationshipsOfTests(test_utils.TestBase):
 class ValidateExplorationRightsSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_exploration_rights_change_object_with_missing_cmd(self):
+    def test_exploration_rights_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel(
                 id='model_id-1',
@@ -302,7 +315,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
                 'Missing cmd key in change dict')
         ])
 
-    def test_exploration_rights_change_object_with_invalid_cmd(self):
+    def test_exploration_rights_change_object_with_invalid_cmd(self) -> None:
         invalid_commit_cmd_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel(
                 id='model_id-1',
@@ -328,7 +341,8 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
         ])
 
     def test_exploration_rights_change_object_with_missing_attribute_in_cmd(
-            self):
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel(
                 id='model_id-1',
@@ -361,7 +375,8 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
         ])
 
     def test_exploration_rights_change_object_with_extra_attribute_in_cmd(
-            self):
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel(
                 id='model_id-1',
@@ -397,7 +412,8 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
         ])
 
     def test_exploration_rights_change_object_with_invalid_role(
-            self):
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel(
                 id='model_id-1',
@@ -434,7 +450,8 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
         ])
 
     def test_exploration_rights_change_object_with_invalid_status(
-            self):
+        self
+    ) -> None:
         invalid_commit_cmd_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel(
                 id='model_id-1',
@@ -472,7 +489,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
 class ValidateExplorationCommitLogEntryModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_validate_rights_model(self):
+    def test_validate_rights_model(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
             id='rights_id123',
             created_on=self.YEAR_AGO,
@@ -492,7 +509,7 @@ class ValidateExplorationCommitLogEntryModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_validate_exploration_model(self):
+    def test_validate_exploration_model(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
             id='exploration_id123',
             created_on=self.YEAR_AGO,
@@ -513,7 +530,7 @@ class ValidateExplorationCommitLogEntryModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_raises_commit_cmd_none_error(self):
+    def test_raises_commit_cmd_none_error(self) -> None:
         invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
             id='model_id123',
             created_on=self.YEAR_AGO,

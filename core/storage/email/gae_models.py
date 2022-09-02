@@ -79,7 +79,10 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
-            feconf.BULK_EMAIL_INTENT_TEST
+            feconf.BULK_EMAIL_INTENT_TEST,
+            (
+                feconf
+                .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)
@@ -219,7 +222,7 @@ class SentEmailModel(base_models.BaseModel):
 
     def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
-        super(SentEmailModel, self)._pre_put_hook()
+        super()._pre_put_hook()
         self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
 

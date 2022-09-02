@@ -21,11 +21,14 @@ from __future__ import annotations
 import re
 
 from core import feconf
+from core.constants import constants
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -50,10 +53,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     skill_id_2 = 'skill_2'
 
     def setUp(self) -> None:
-        super(SubtopicPageServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+
         self.subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(  # type: ignore[no-untyped-call]
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Added subtopic',
@@ -67,6 +77,28 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.subtopic_page_id = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 self.TOPIC_ID, 1))
+
+        self.TOPIC_ID_1 = topic_fetchers.get_new_topic_id()
+        # Set up topic and subtopic.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'Place Values', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Naming Numbers', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-url'),
+            topic_domain.Subtopic(
+                2, 'Subtopic Name', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'other-subtopic-url')]
+        topic.next_subtopic_id = 3
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
+
+        # Publish the topic and its stories.
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id) # type: ignore[no-untyped-call]
 
     def test_get_subtopic_page_from_model(self) -> None:
         subtopic_page_model = subtopic_models.SubtopicPageModel.get(
@@ -142,12 +174,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.subtopic_page.update_page_contents_html(  # type: ignore[no-untyped-call]
+        self.subtopic_page.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
                 'content_id': 'content'
             }))
-        self.subtopic_page.update_page_contents_audio(  # type: ignore[no-untyped-call]
+        self.subtopic_page.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers))
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
@@ -170,7 +202,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_save_subtopic_page(self) -> None:
         subtopic_page_1 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(  # type: ignore[no-untyped-call]
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, 'topic_id_1'))
         subtopic_page_services.save_subtopic_page(
             self.user_id, subtopic_page_1, 'Added subtopic',
@@ -180,7 +212,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'title': 'Sample',
                 'url_fragment': 'sample-fragment-one'
             })])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unexpected error: received an invalid change list *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', [])
@@ -191,7 +223,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_id_1)
         subtopic_page_1.version = 2
         subtopic_page_model_1.version = 3
-        with self.assertRaisesRegex(Exception, 'Trying to update version *'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
                 [topic_domain.TopicChange({
@@ -202,7 +234,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 })])
         subtopic_page_1.version = 3
         subtopic_page_model_1.version = 2
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unexpected error: trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
@@ -232,13 +264,13 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         subtopic_page_services.delete_subtopic_page(
             self.user_id, self.TOPIC_ID, 1)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
                 'Entity for class SubtopicPageModel with id %s not found' % (
                     subtopic_page_id))):
             subtopic_models.SubtopicPageModel.get(subtopic_page_id)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
                 'Entity for class SubtopicPageModel with id %s not found' % (
@@ -588,7 +620,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v2 page schemas at present.')
 
@@ -601,3 +633,67 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             assert_raises_regexp_context_manager):
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)
+
+    def test_get_topic_ids_from_subtopic_page_ids(self) -> None:
+        topic_ids = (
+            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
+                ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
+            )
+        )
+
+        self.assertEqual(topic_ids, ['topic1', 'topic2'])
+
+    def test_get_multi_users_subtopic_pages_progress(self) -> None:
+        degree_of_mastery = 0.5
+        learner_id_1 = 'learner_1'
+        learner_id_2 = 'learner_2'
+
+        # Add some subtopic progress for the learner.
+        skill_services.create_user_skill_mastery(
+            learner_id_1, 'skill_id_1', degree_of_mastery
+        )
+
+        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        progress = (
+            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+                [learner_id_1, learner_id_2], [subtopic_page_id]
+            )
+        )
+
+        learner_1_progress = progress[learner_id_1]
+        learner_2_progress = progress[learner_id_2]
+
+        self.assertEqual(len(learner_1_progress), 1)
+        self.assertEqual(len(learner_2_progress), 1)
+        self.assertEqual(learner_1_progress[0]['subtopic_id'], 1)
+        self.assertEqual(
+            learner_1_progress[0]['subtopic_title'], 'Naming Numbers'
+        )
+        self.assertEqual(
+            learner_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
+        )
+        self.assertEqual(
+            learner_1_progress[0]['parent_topic_name'], 'Place Values'
+        )
+        self.assertEqual(
+            learner_1_progress[0]['subtopic_mastery'], degree_of_mastery
+        )
+        self.assertIsNone(learner_2_progress[0]['subtopic_mastery'])
+
+    def test_get_learner_group_syllabus_subtopic_page_summaries(self) -> None:
+        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        expected_summaries = [{
+            'subtopic_id': 1,
+            'subtopic_title': 'Naming Numbers',
+            'parent_topic_id': self.TOPIC_ID_1,
+            'parent_topic_name': 'Place Values',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color':
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            'subtopic_mastery': None
+        }]
+        summaries = (
+            subtopic_page_services
+                .get_learner_group_syllabus_subtopic_page_summaries(
+                    [subtopic_page_id]))
+        self.assertEqual(summaries, expected_summaries)

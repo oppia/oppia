@@ -14,7 +14,7 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-22.04]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -40,7 +40,7 @@ jobs:
       - name: Install chrome
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
-      - name: Check that all e2e test files are captured in protractor.conf.js
+      - name: Check that all e2e test files are captured in protractor.conf.js and wdio.conf.js
         run: python -m scripts.check_e2e_tests_are_captured_in_ci
       - name: Run typescript tests
         run: python -m scripts.typescript_checks
@@ -52,6 +52,3 @@ jobs:
         with:
           message: "A typescript test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-      - name: Checking Memory Usage
-        if: ${{ always() }}
-        run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes

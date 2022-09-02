@@ -44,9 +44,9 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
     MOCK_DATE: Final = datetime.datetime(2020, 6, 15)
 
     def setUp(self) -> None:
-        super(ImprovementsServicesTestBase, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         # Necessary to provide sufficient debug information when failures occur.
         self.maxDiff = 0
@@ -192,7 +192,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_tasks(self.exp))
 
         self.assertEqual(resolved_task_types_by_state_name, {})
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             [t.to_dict() for t in tasks],
             [t.to_dict() for t in open_tasks])
 
@@ -233,24 +233,24 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             improvements_services.fetch_exploration_tasks(self.exp))
 
         self.assertEqual(open_tasks, [])
-        self.assertItemsEqual(list(resolved_task_types_by_state_name.keys()), [  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(list(resolved_task_types_by_state_name.keys()), [
             'A',
             'B',
             'C',
             'D',
         ])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             resolved_task_types_by_state_name['A'], ['high_bounce_rate'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             resolved_task_types_by_state_name['B'], [
                 'high_bounce_rate',
                 'needs_guiding_responses',
             ])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             resolved_task_types_by_state_name['C'], [
                 'ineffective_feedback_loop',
             ])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             resolved_task_types_by_state_name['D'], [
                 'high_bounce_rate',
                 'needs_guiding_responses',
@@ -307,7 +307,7 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
         open_tasks, resolved_task_types_by_state_name = (
             improvements_services.fetch_exploration_tasks(self.exp))
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             [t.to_dict() for t in open_tasks], [tasks[3].to_dict()])
         self.assertEqual(
             resolved_task_types_by_state_name, {
@@ -320,7 +320,7 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
     """Unit tests for the fetch_exploration_task_history_page function."""
 
     def setUp(self) -> None:
-        super(FetchExplorationTaskHistoryPageTests, self).setUp()
+        super().setUp()
         task_entries = []
         for i in range(1, 26):
             task_entry = self._new_resolved_task(
@@ -500,7 +500,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
         task_entry.target_id = 'Different State'
 
-        with self.assertRaisesRegex(Exception, 'Wrong model provided'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Wrong model provided'):
             improvements_services.apply_changes_to_model(
                 task_entry, task_entry_model)
 
@@ -564,7 +564,10 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
-        task_entry.resolved_on = self.owner_id
+        # Here, `resolved_on` can only accept datetime values but for testing
+        # purposes here we are providing string value which causes MyPy to
+        # throw an error. Thus to avoid the error, we used ignore here.
+        task_entry.resolved_on = self.owner_id  # type: ignore[assignment]
 
         self.assertFalse(
             improvements_services.apply_changes_to_model(

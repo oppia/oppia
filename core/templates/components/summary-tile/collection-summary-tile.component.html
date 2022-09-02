@@ -7,13 +7,13 @@
                                 [activityActive]="collectionIsCurrentlyHoveredOver"
                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
   </oppia-learner-dashboard-icons>
-  <mat-card class="oppia-activity-summary-tile protractor-test-collection-card"
+  <mat-card class="oppia-activity-summary-tile e2e-test-collection-card"
           [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
     <a [href]="getCollectionLink()" class="thumbnail">
       <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
         <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
         <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
-        <h3 class="activity-title protractor-test-collection-summary-tile-title">
+        <h3 class="activity-title e2e-test-collection-summary-tile-title">
           {{ getCollectionTitle || defaultEmptyTitle }}
         </h3>
       </div>
@@ -61,7 +61,7 @@
       </div>
 
       <div class="mobile-activity-card-details">
-        <h3 class="mobile-collection-title protractor-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
+        <h3 class="mobile-collection-title e2e-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
         <div class="mobile-activity-card-summary-section">
           <ul class="mobile-activity-card-summary-elements">
             <li>

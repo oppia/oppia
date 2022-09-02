@@ -41,7 +41,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
     """
 
     def setUp(self):
-        super(StatisticsServicesTests, self).setUp()
+        super().setUp()
         self.exp_id = 'exp_id1'
         self.exp_version = 1
         self.stats_model_id = (
@@ -920,7 +920,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Unit tests focused on services related to exploration issues."""
 
     def setUp(self):
-        super(ExplorationIssuesTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp = self.save_new_linear_exp_with_state_names_and_interactions(
@@ -1544,42 +1544,50 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
             'answer_group_index': 0, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid1',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
             'answer_group_index': 0, 'rule_spec_index': 1,
             'classification_categorization': 'explicit', 'session_id': 'sid2',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': {'x': 1.0, 'y': 5.0}, 'time_spent_in_sec': 5.0,
             'answer_group_index': 1, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid1',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 10, 'time_spent_in_sec': 5.0, 'answer_group_index': 2,
             'rule_spec_index': 0, 'classification_categorization': 'explicit',
-            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {},
+            'answer_str': None, 'rule_spec_str': None
         }, {
             'answer': [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}],
             'time_spent_in_sec': 5.0, 'answer_group_index': 3,
             'rule_spec_index': 0, 'classification_categorization': 'explicit',
-            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {},
+            'answer_str': None, 'rule_spec_str': None
         }]
         expected_submitted_answer_list2 = [{
             'answer': [2, 4, 8], 'time_spent_in_sec': 5.0,
             'answer_group_index': 2, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid3',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': self.UNICODE_TEST_STRING, 'time_spent_in_sec': 5.0,
             'answer_group_index': 1, 'rule_spec_index': 1,
             'classification_categorization': 'explicit', 'session_id': 'sid4',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }]
         expected_submitted_answer_list3 = [{
             'answer': None, 'time_spent_in_sec': 5.0, 'answer_group_index': 1,
             'rule_spec_index': 1, 'classification_categorization': 'explicit',
-            'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {}
+            'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {},
+            'answer_str': None, 'rule_spec_str': None
         }]
 
         state_answers = stats_services.get_state_answers(
@@ -1607,7 +1615,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id0'
 
     def setUp(self):
-        super(RecordAnswerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
@@ -1633,7 +1641,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_and_retrieve_single_answer(self):
@@ -1666,7 +1676,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_and_retrieve_single_answer_with_preexisting_entry(self):
@@ -1689,7 +1701,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
         stats_services.record_answer(
@@ -1716,7 +1730,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'some text',
             'time_spent_in_sec': 10.0,
@@ -1725,7 +1741,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_many_answers(self):
@@ -1767,7 +1785,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+             'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer ccc',
             'time_spent_in_sec': 3.0,
@@ -1776,7 +1796,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer bbbbb',
             'time_spent_in_sec': 7.5,
@@ -1785,7 +1807,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_answers_exceeding_one_shard(self):
@@ -1858,7 +1882,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
         submitted_answer_list = [
@@ -1894,7 +1920,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer aaa',
             'time_spent_in_sec': 10.0,
@@ -1903,7 +1931,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer ccccc',
             'time_spent_in_sec': 3.0,
@@ -1912,7 +1942,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer bbbbbbb',
             'time_spent_in_sec': 7.5,
@@ -1921,7 +1953,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
 
@@ -1931,7 +1965,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id0'
 
     def setUp(self):
-        super(SampleAnswerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
@@ -2026,7 +2060,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
             self.exploration.id, str(self.exploration.version),
             self.exploration.init_state_name, '0'))
-        self.assertEqual(model.shard_count, 1)
+        self.assertGreater(model.shard_count, 1)
 
         # Verify that the list of sample answers returned contains fewer than
         # 100 answers, although a total of 100 answers were submitted.
@@ -2047,7 +2081,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     """Test for services related to learner answer details."""
 
     def setUp(self):
-        super(LearnerAnswerDetailsServicesTest, self).setUp()
+        super().setUp()
         self.exp_id = 'exp_id1'
         self.state_name = 'intro'
         self.question_id = 'q_id_1'

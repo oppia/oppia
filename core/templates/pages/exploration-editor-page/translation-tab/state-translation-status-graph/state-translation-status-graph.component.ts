@@ -16,10 +16,6 @@
  * @fileoverview Directive for the state translation status graph.
  */
 
-require(
-  'pages/exploration-editor-page/editor-tab/graph-directives/' +
-  'state-graph-visualization.directive.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
@@ -80,6 +76,8 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
             stateData.writtenTranslations);
           StateEditorService.onRefreshStateTranslation.emit();
         }
+
+        $scope.$apply();
       };
     }
   ]

@@ -12,7 +12,7 @@
       </i>
     </div>
 
-    <div class="oppia-mobile-collapsible-card-content protractor-test-settings-container" ng-if="$ctrl.basicSettingIsShown">
+    <div class="oppia-mobile-collapsible-card-content e2e-test-settings-container" ng-if="$ctrl.basicSettingIsShown">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="$ctrl.EditabilityService.isEditable()">
           <div role="form" class="form-horizontal">
@@ -33,7 +33,7 @@
               <div>
                 <div ng-if="$ctrl.hasPageLoaded">
                   <select2-dropdown id="explorationCategory"
-                                    class="protractor-test-exploration-category-input"
+                                    class="e2e-test-exploration-category-input"
                                     item="$ctrl.explorationCategoryService.displayed"
                                     choices="$ctrl.CATEGORY_LIST_FOR_SELECT2"
                                     placeholder="Choose or type new"
@@ -49,7 +49,7 @@
               <label for="explorationLanguageCode" class="d-block">Language</label>
               <div>
                 <div>
-                  <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getSupportedContentLanguages()" width="100%">
+                  <select id="explorationLanguageCode" class="form-control e2e-test-exploration-language-select" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getSupportedContentLanguages()" width="100%">
                   </select>
                 </div>
                 <div>
@@ -65,7 +65,7 @@
               <label for="explorationInitStateName" class="d-block">Name of first card</label>
               <div>
                 <div>
-                  <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="$ctrl.explorationInitStateNameService.displayed" ng-change="$ctrl.saveExplorationInitStateName()" ng-options="name as name for name in $ctrl.stateNames track by name" width="85%">
+                  <select id="explorationInitStateName" class="form-control e2e-test-initial-state-select" ng-model="$ctrl.explorationInitStateNameService.displayed" ng-change="$ctrl.saveExplorationInitStateName()" ng-options="name as name for name in $ctrl.stateNames track by name" width="85%">
                   </select>
                 </div>
                 <div>
@@ -101,7 +101,7 @@
               </div>
             </div>
             <div class="text-right">
-              <button type="button" class="btn btn-secondary protractor-test-open-preview-summary-modal"
+              <button type="button" class="btn btn-secondary e2e-test-open-preview-summary-modal"
                       ng-click="$ctrl.previewSummaryTile()"
                       title="Preview this exploration's summary card">
                 Preview Summary
@@ -195,7 +195,7 @@
             <div class="oppia-on-off-switch">
               <input span ng-if="$ctrl.areParametersEnabled()" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" checked disabled>
               <input span ng-if="!$ctrl.areParametersEnabled()" ng-disabled="$ctrl.explorationIsLinkedToStory" type="checkbox" class="oppia-on-off-switch-checkbox" id="parameter-switch" ng-click="$ctrl.enableParameters()">
-              <label class="oppia-on-off-switch-label protractor-test-enable-parameters" for="parameter-switch">
+              <label class="oppia-on-off-switch-label e2e-test-enable-parameters" for="parameter-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
               </label>
@@ -244,7 +244,7 @@
             <div class="oppia-on-off-switch">
               <input type="checkbox" ng-if="!$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()">
               <input type="checkbox" ng-if="$ctrl.isCorrectnessFeedbackEnabled()" ng-disabled="$ctrl.explorationIsLinkedToStory" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()" checked>
-              <label class="oppia-on-off-switch-label protractor-test-enable-mark-correctness-feedback" for="correctness-switch">
+              <label class="oppia-on-off-switch-label e2e-test-enable-mark-correctness-feedback" for="correctness-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
               </label>
@@ -279,7 +279,7 @@
       </div>
       <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
         <div ng-if="$ctrl.canModifyRoles" ng-hide="$ctrl.isRolesFormOpen" class="oppia-edit-roles-btn-container">
-          <span ng-click="$ctrl.openEditRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-roles">
+          <span ng-click="$ctrl.openEditRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-roles">
             EDIT
           </span>
         </div>
@@ -288,7 +288,7 @@
           <strong>Managers</strong>
           <ul>
             <li ng-repeat="ownerName in $ctrl.ExplorationRightsService.ownerNames track by $index">
-              <div class="oppia-user-list-item">
+              <div class="oppia-user-list-item e2e-test-role-owner-name">
                 <span><[ownerName]></span>
                 <span ng-hide="!$ctrl.isRolesFormOpen || ownerName === $ctrl.loggedInUser" uib-tooltip="Remove user" type="button" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(ownerName, 'Managers')">highlight_off
                 </span>
@@ -329,23 +329,23 @@
             <form ng-submit="$ctrl.editRole($ctrl.newMemberUsername, $ctrl.newMemberRole.value)">
               <label for="$ctrl.newMemberUsername">Username of invited user</label>
               <div>
-                <input type="text" id="$ctrl.newMemberUsername" class="form-control protractor-test-role-username" ng-model="$ctrl.newMemberUsername" placeholder="username" ng-blur="$ctrl.onRolesFormUsernameBlur()">
+                <input type="text" id="$ctrl.newMemberUsername" class="form-control e2e-test-role-username" ng-model="$ctrl.newMemberUsername" placeholder="username" ng-blur="$ctrl.onRolesFormUsernameBlur()">
               </div>
               <br>
               <label for="$ctrl.newMemberRole">Role of invited user</label>
               <div>
-                <select ng-model="$ctrl.newMemberRole" class="form-control oppia-role-select protractor-test-role-select" ng-options="r.name for r in $ctrl.ROLES" ng-blur="$ctrl.onRolesFormUsernameBlur()">
+                <select ng-model="$ctrl.newMemberRole" class="form-control oppia-role-select e2e-test-role-select" ng-options="r.name for r in $ctrl.ROLES" ng-blur="$ctrl.onRolesFormUsernameBlur()">
                 </select>
                 <span class="form-text">
                   <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of playtesters, and playtesters also have the permissions of viewers.</p>
                 </span>
               </div>
 
-              <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.rolesSaveButtonEnabled || !$ctrl.newMemberUsername">
+              <input type="submit" class="btn btn-secondary e2e-test-save-role" value="Save" ng-disabled="!$ctrl.rolesSaveButtonEnabled || !$ctrl.newMemberUsername">
               <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeEditRolesForm()" ng-show="$ctrl.isRolesFormOpen">
                 Cancel
               </button>
-              <p ng-show="!$ctrl.rolesSaveButtonEnabled" class="text-danger protractor-test-title-warning"><[$ctrl.errorMessage]></p>
+              <p ng-show="!$ctrl.rolesSaveButtonEnabled" class="text-danger e2e-test-title-warning"><[$ctrl.errorMessage]></p>
             </form>
           </div>
         </div>
@@ -373,7 +373,7 @@
             No voice artists are assigned to this exploration.
           </div>
           <div ng-if="$ctrl.canManageVoiceArtist" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
-            <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-voice-artist-roles">
+            <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-voice-artist-roles">
               EDIT
             </span>
           </div>
@@ -382,7 +382,7 @@
         <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
           <ul>
             <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
-              <div class="oppia-user-list-item protractor-test-voice-artist-{{voiceArtistName}}">
+              <div class="oppia-user-list-item e2e-test-voice-artist-{{voiceArtistName}}">
                 <span><[voiceArtistName]></span>
                 <span ng-show="$ctrl.isVoiceoverFormOpen" type="button" uib-tooltip="Remove user" class="material-icons" ng-click="$ctrl.removeVoiceArtist(voiceArtistName)">highlight_off
                 </span>
@@ -397,12 +397,12 @@
               <div>
                 <label>Add new voice artsit: </label>
                 <input id="$ctrl.newVoicAartistUsername"
-                       class="form-control protractor-test-new-voice-artist-username"
+                       class="form-control e2e-test-new-voice-artist-username"
                        ng-model="$ctrl.newVoicAartistUsername"
                        placeholder="Voice artist username"
                        type="text">
               </div>
-              <input type="submit" class="btn btn-secondary protractor-test-add-voice-artist-role-button" value="Save">
+              <input type="submit" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">
               <button type="button"
                       class="btn btn-secondary"
                       ng-click="$ctrl.closeVoiceoverForm()">
@@ -456,7 +456,7 @@
 
         <div ng-if="$ctrl.ExplorationRightsService.ownerNames.length === 0 && !$ctrl.ExplorationRightsService.isCloned()">
           <h3>Permissions</h3>
-          <div class="protractor-test-is-community-owned">
+          <div class="e2e-test-is-community-owned">
             This exploration is <strong>public</strong> and <strong>community-editable</strong>.
             <p ng-if="!$ctrl.ExplorationRightsService.isPrivate()">
               It is <strong>available</strong> in the Oppia library.
@@ -496,7 +496,7 @@
             <div class="oppia-on-off-switch">
               <input span ng-if="$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" ng-click="$ctrl.unmuteFeedbackNotifications()">
               <input span ng-if="!$ctrl.UserEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked ng-click="$ctrl.muteFeedbackNotifications()">
-              <label class="oppia-on-off-switch-label protractor-test-enable-fallbacks" for="feedback-switch">
+              <label class="oppia-on-off-switch-label e2e-test-enable-fallbacks" for="feedback-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
               </label>
@@ -518,8 +518,8 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input span ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" ng-click="$ctrl.unmuteSuggestionNotifications()">
-              <input span ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox protractor-test-enable-fallbacks" id="suggestion-switch" checked ng-click="$ctrl.muteSuggestionNotifications()">
+              <input span ng-if="$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" ng-click="$ctrl.unmuteSuggestionNotifications()">
+              <input span ng-if="!$ctrl.UserEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" checked ng-click="$ctrl.muteSuggestionNotifications()">
               <label class="oppia-on-off-switch-label" for="suggestion-switch">
                 <span class="oppia-on-off-switch-inner"></span>
                 <span class="oppia-on-off-switch-main"></span>
@@ -581,7 +581,7 @@
       </p>
 
       <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="$ctrl.ExplorationRightsService.isPublic() && ($ctrl.currentUserIsCurriculumAdmin || $ctrl.currentUserIsModerator)">
-        <button type="button" class="btn oppia-delete-button protractor-test-delete-exploration-button"
+        <button type="button" class="btn oppia-delete-button e2e-test-delete-exploration-button"
                 ng-click="$ctrl.deleteExploration()">
           DELETE EXPLORATION
           <span ng-if="$ctrl.currentUserIsCurriculumAdmin">(as admin)</span>
@@ -640,7 +640,7 @@
     </h3>
 
     <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 protractor-test-exploration-edit-param-changes">
+      <div class="col-lg-12 col-md-12 col-sm-12 e2e-test-exploration-edit-param-changes">
         <param-changes-editor param-changes-service="$ctrl.explorationParamChangesService"
                               post-save-hook="$ctrl.postSaveParamChangesHook"
                               currently-in-settings-tab="true">

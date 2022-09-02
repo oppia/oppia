@@ -38,7 +38,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
     """Tests for the PlatformFeaturesEvaluationHandler."""
 
     def setUp(self):
-        super(PlatformFeaturesEvaluationHandlerTest, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -69,7 +69,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', param_domain.ServerModes.DEV.value]
+                                ['=', param_domain.ServerMode.DEV.value]
                             ]
                         }
                     ],
@@ -82,7 +82,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
     def tearDown(self):
-        super(PlatformFeaturesEvaluationHandlerTest, self).tearDown()
+        super().tearDown()
 
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
@@ -182,7 +182,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     """Tests for the PlatformFeatureDummyHandler."""
 
     def setUp(self):
-        super(PlatformFeatureDummyHandlerTest, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -193,7 +193,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
             'clear rule', []
         )
 
-        super(PlatformFeatureDummyHandlerTest, self).tearDown()
+        super().tearDown()
 
     def _set_dummy_feature_status_for_mode(self, is_enabled, mode):
         """Enables the dummy_feature for the dev environment."""
@@ -228,7 +228,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.ServerModes.DEV
+                True, param_domain.ServerMode.DEV
             )
 
             result = self.get_json(
@@ -243,7 +243,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.ServerModes.DEV
+                False, param_domain.ServerMode.DEV
             )
             self.get_json(
                 '/platform_feature_dummy_handler',
@@ -257,7 +257,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.ServerModes.PROD
+                True, param_domain.ServerMode.PROD
             )
 
             result = self.get_json(
@@ -272,7 +272,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.ServerModes.PROD
+                False, param_domain.ServerMode.PROD
             )
             self.get_json(
                 '/platform_feature_dummy_handler',

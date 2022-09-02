@@ -39,15 +39,15 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up learner group model in datastore for use in testing."""
-        super(LearnerGroupModelUnitTest, self).setUp()
+        super().setUp()
 
         self.learner_group_model = learner_group_models.LearnerGroupModel(
-            id='3232',
+            id='learner_group_32',
             title='title',
             description='description',
             facilitator_user_ids=['user_1', 'user_11'],
-            student_user_ids=['user_2', 'user_3', 'user_4'],
-            invited_student_user_ids=['user_5', 'user_6'],
+            learner_user_ids=['user_2', 'user_3', 'user_4'],
+            invited_learner_user_ids=['user_5', 'user_6'],
             subtopic_page_ids=['subtopic_1', 'subtopic_2'],
             story_ids=['story_1', 'story_2'])
         self.learner_group_model.update_timestamps()
@@ -74,8 +74,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             'title': base_models.EXPORT_POLICY.EXPORTED,
             'description': base_models.EXPORT_POLICY.EXPORTED,
             'facilitator_user_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'student_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'invited_student_user_ids':
+            'learner_user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'invited_learner_user_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subtopic_page_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
@@ -92,7 +92,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             learner_group_models.LearnerGroupModel)
 
         # Test create method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'A learner group with the given group ID exists already.'
         ):
@@ -105,7 +105,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
                 learner_group_model_cls.create('Abcd', 'title', 'description')
 
         # Test get_new_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New id generator is producing too many collisions.'
         ):
@@ -139,38 +139,38 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             .get_field_names_for_takeout(),
             expected_results)
 
-    def test_export_data_on_students(self) -> None:
-        """Test export data on users that are students of the learner group."""
+    def test_export_data_on_learners(self) -> None:
+        """Test export data on users that are learners of the learner group."""
 
-        student_user_data = (
+        learner_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_2'))
-        expected_student_user_data = {
-            '3232': {
+        expected_learner_user_data = {
+            'learner_group_32': {
                 'title': 'title',
                 'description': 'description',
-                'role_in_group': 'student',
+                'role_in_group': 'learner',
                 'subtopic_page_ids': ['subtopic_1', 'subtopic_2'],
                 'story_ids': ['story_1', 'story_2']
             }
         }
-        self.assertEqual(expected_student_user_data, student_user_data)
+        self.assertEqual(expected_learner_user_data, learner_user_data)
 
-    def test_export_data_on_invited_students(self) -> None:
-        """Test export data on students that have been invited to join the
+    def test_export_data_on_invited_learners(self) -> None:
+        """Test export data on learners that have been invited to join the
         learner group.
         """
-        invited_student_data = (
+        invited_learner_data = (
             learner_group_models.LearnerGroupModel.export_data('user_6'))
-        expected_invited_student_data = {
-            '3232': {
+        expected_invited_learner_data = {
+            'learner_group_32': {
                 'title': 'title',
                 'description': 'description',
-                'role_in_group': 'invited_student',
+                'role_in_group': 'invited_learner',
                 'subtopic_page_ids': [],
                 'story_ids': []
             }
         }
-        self.assertEqual(expected_invited_student_data, invited_student_data)
+        self.assertEqual(expected_invited_learner_data, invited_learner_data)
 
     def test_export_data_on_facilitators(self) -> None:
         """Test export data on users that are facilitators of
@@ -179,7 +179,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         facilitator_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_1'))
         expected_facilitator_user_data = {
-            '3232': {
+            'learner_group_32': {
                 'title': 'title',
                 'description': 'description',
                 'role_in_group': 'facilitator',
@@ -201,8 +201,8 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
             expected_uninvolved_user_data,
             uninvolved_user_data)
 
-    def test_apply_deletion_policy_on_students(self) -> None:
-        """Test apply_deletion_policy on users that are students of
+    def test_apply_deletion_policy_on_learners(self) -> None:
+        """Test apply_deletion_policy on users that are learners of
         the learner group.
         """
         self.assertTrue(
@@ -253,3 +253,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_11'))
+
+    def test_get_by_facilitator_id(self) -> None:
+        """Test get_by_facilitator_id."""
+        learner_group_model = (
+            learner_group_models.LearnerGroupModel.get_by_facilitator_id(
+                'user_1'))
+        self.assertEqual(learner_group_model[0].id, 'learner_group_32')

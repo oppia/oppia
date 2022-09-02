@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for the NumberWithUnits interaction.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { InteractiveNumberWithUnitsComponent } from './oppia-interactive-number-with-units.component';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
 describe('Number with units interaction component', () => {
   let component: InteractiveNumberWithUnitsComponent;
@@ -33,8 +34,11 @@ describe('Number with units interaction component', () => {
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: NumberWithUnitsAnswer, rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -185,6 +189,22 @@ describe('Number with units interaction component', () => {
 
     expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
   });
+
+  it('should throw uncaught errors that are not Error type',
+    waitForAsync(() => {
+      spyOn(numberWithUnitsObjectFactory, 'fromRawInputString').and.callFake(
+        () => {
+          throw TypeError;
+        }
+      );
+
+      expect(()=>{
+        component.submitAnswer();
+        // The eslint error is suppressed since we need to test if
+        // just a string was thrown.
+        // eslint-disable-next-line oppia/no-to-throw
+      }).toThrow(TypeError);
+    }));
 
   it('should unsubscribe when component is destroyed', function() {
     spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();

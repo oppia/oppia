@@ -43,20 +43,18 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     # A dictionary representation of an exploration that contains unicode
     # characters.
-    exploration_dict_with_unicode_characters = {
+    exploration_dict_with_unicode_characters: exp_domain.ExplorationDict = {
         'tags': [],
         'title': '',
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 45,
+        'states_schema_version': 51,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
-        'created_on': '08/17/2020, 17:30:48:283600',
         'category': '',
         'auto_tts_enabled': True,
-        'version': 3,
         'states': {
             'Introduction': {
                 'card_is_checkpoint': True,
@@ -114,6 +112,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         'param_changes': [],
                         'refresher_exploration_id': None,
                         'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'default_outcome',
@@ -127,6 +126,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             'param_changes': [],
                             'refresher_exploration_id': None,
                             'dest': 'Introduction',
+                            'dest_if_really_stuck': None,
                             'missing_prerequisite_skill_id': None,
                             'feedback': {
                                 'content_id': 'feedback_2',
@@ -150,7 +150,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         },
         'correctness_feedback_enabled': False,
         'edits_allowed': True,
-        'last_updated': '08/17/2020, 18:04:57:799687',
         'language_code': 'en',
         'blurb': ''
     }
@@ -159,35 +158,36 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     # unicode characters that is set to the memory cache.
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, "tags"'
-        ': [], "states_schema_version": 45, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 51, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
         'ard_is_checkpoint": true, "interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'
         'nges": [], "feedback": {"content_id": "feedback_2", "html": "<p>This i'
-        's great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "refresher_expl'
-        'oration_id": null, "missing_prerequisite_skill_id": null, "labelled_as'
-        '_correct": false}, "training_data": [], "rule_specs": [{"rule_type": "'
-        'Contains", "inputs": {"x": {"normalizedStrSet": ["\\u00ae\\u00ae"], "c'
-        'ontentId": "rule_input_4"}}}]}], "default_outcome": {"param_changes": '
-        '[], "feedback": {"content_id": "default_outcome", "html": ""}, "dest"'
-        ': "Introduction", "refresher_exploration_id": null, "missing_prerequis'
-        'ite_skill_id": null, "labelled_as_correct": false}, "customization_arg'
-        's": {"rows": {"value": 1}, "placeholder": {"value": {"unicode_str": "'
-        '\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id'
-        '": "ca_placeholder_0"}}}, "confirmed_unclassified_answers": [], "id": '
-        '"TextInput", "hints": [{"hint_content": {"content_id": "hint_3", "html'
-        '": "<p>This is a copyright character \\u00a9.</p>"}}]}, "linked_skill_'
-        'id": null, "recorded_voiceovers": {"voiceovers_mapping": {"feedback_2"'
-        ': {}, "rule_input_4": {}, "content": {}, "hint_3": {}, "default_outcom'
-        'e": {}, "ca_placeholder_0": {}}}, "classifier_model_id": null, "conten'
-        't": {"content_id": "content", "html": "<p>Unicode Characters \\ud83d\\'
-        'ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, "written_transl'
-        'ations": {"translations_mapping": {"feedback_2": {}, "rule_input_4": {'
-        '}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder'
-        '_0": {}}}, "next_content_id_index": 5, "solicit_answer_details": false'
-        '}}, "version": 0, "correctness_feedback_enabled": false, "edits_allowe'
-        'd": true, "language_code": "en", "objective": "", "init_state_name": "'
-        'Introduction", "blurb": "", "author_notes": ""}'
+        's great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "dest_if_really'
+        '_stuck": null, "refresher_exploration_id": null, "missing_prerequisite'
+        '_skill_id": null, "labelled_as_correct": false}, "training_data": [], '
+        '"rule_specs": [{"rule_type": "Contains", "inputs": {"x": {"normalizedS'
+        'trSet": ["\\u00ae\\u00ae"], "contentId": "rule_input_4"}}}]}], "defaul'
+        't_outcome": {"param_changes": [], "feedback": {"content_id": "default_'
+        'outcome", "html": ""}, "dest": "Introduction", "dest_if_really_stuck":'
+        ' null, "refresher_exploration_id": null, "missing_prerequisite_skill_i'
+        'd": null, "labelled_as_correct": false}, "customization_args": {"rows"'
+        ': {"value": 1}, "placeholder": {"value": {"unicode_str": "\\ud83d\\ude'
+        '0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id": "ca_place'
+        'holder_0"}}}, "confirmed_unclassified_answers": [], "id": "TextInput",'
+        ' "hints": [{"hint_content": {"content_id": "hint_3", "html": "<p>This '
+        'is a copyright character \\u00a9.</p>"}}]}, "linked_skill_id": null, "'
+        'recorded_voiceovers": {"voiceovers_mapping": {"feedback_2": {}, "rule_'
+        'input_4": {}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_'
+        'placeholder_0": {}}}, "classifier_model_id": null, "content": {"conten'
+        't_id": "content", "html": "<p>Unicode Characters \\ud83d\\ude0d\\ud83d'
+        '\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, "written_translations": {"t'
+        'ranslations_mapping": {"feedback_2": {}, "rule_input_4": {}, "content"'
+        ': {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, "'
+        'next_content_id_index": 5, "solicit_answer_details": false}}, "version'
+        '": 0, "correctness_feedback_enabled": false, "edits_allowed": true, "l'
+        'anguage_code": "en", "objective": "", "init_state_name": "Introduction'
+        '", "blurb": "", "author_notes": ""}'
     )
 
     def test_retrieved_memory_profile_contains_correct_elements(self) -> None:
@@ -206,7 +206,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -251,11 +251,11 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             caching_services.SERIALIZATION_FUNCTIONS['exploration']
         )
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         self.assertEqual(
             default_exploration.to_dict(),
-            deserialize(serialize(default_exploration)).to_dict()) # type: ignore[no-untyped-call]
+            deserialize(serialize(default_exploration)).to_dict())
 
     def test_invalid_namespace_raises_error(self) -> None:
         invalid_namespace = 'invalid'
@@ -264,7 +264,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # DESERIALIZATION_FUNCTIONS Dict and 'invalid' is not one of them.
         # So, we don't have any overload function for 'invalid' key.
         # that's why we added call-overload ignore statement here.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
             caching_services.get_multi( # type: ignore[call-overload]
@@ -272,7 +272,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c'])
 
         invalid_sub_namespace = 'sub:namespace'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Sub-namespace %s cannot contain \':\'.' % invalid_sub_namespace):
             caching_services.get_multi(
@@ -312,7 +312,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi( # type: ignore[call-overload]
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -337,7 +337,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             '0', [exploration_id])
         self.assertEqual(
             default_exploration.to_dict(),
-            exp_ids_to_explorations[exploration_id].to_dict()) # type: ignore[no-untyped-call]
+            exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_partial_fetches_returns_correct_elements(self) -> None:
         """Testing that querying the cache returns reasonable output for
@@ -347,7 +347,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         exploration_id = 'id'
         nonexistent_exploration_id = 'id2'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
 
         self.assertEqual(
@@ -397,14 +397,14 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            result[exploration_id].to_dict()) # type: ignore[no-untyped-call]
+            result[exploration_id].to_dict())
 
         self.assertFalse(nonexistent_exploration_id in result)
 
     def test_queries_to_wrong_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
 
         caching_services.set_multi(
@@ -424,7 +424,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     def test_queries_to_wrong_sub_namespace_returns_none(self) -> None:
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
 
         self.assertEqual(
@@ -446,7 +446,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             [exploration_id])
 
         self.assertEqual(
-            existent_result[exploration_id].to_dict(), # type: ignore[no-untyped-call]
+            existent_result[exploration_id].to_dict(),
             default_exploration.to_dict())
 
     def test_set_multi_returns_true_for_successful_insert_into_cache(
@@ -459,7 +459,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         cache_exploration_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -486,7 +486,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         exploration_id = 'id'
         default_exploration = (
-            exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
@@ -663,7 +663,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        default_exploration = exp_domain.Exploration.from_dict( # type: ignore[no-untyped-call]
+        default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
         # id_value_mapping is a Dict whose values can be any of the type from
@@ -742,7 +742,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        default_exploration = exp_domain.Exploration.from_dict( # type: ignore[no-untyped-call]
+        default_exploration = exp_domain.Exploration.from_dict(
             self.exploration_dict_with_unicode_characters)
 
         caching_services.set_multi(
@@ -758,7 +758,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_exploration.to_dict(),
-            exp_ids_to_explorations[exploration_id].to_dict()) # type: ignore[no-untyped-call]
+            exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_collections_with_unicode_characters_are_set_and_get_correctly(
         self
@@ -825,7 +825,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'])]
 
         default_skill = (
-            skill_domain.Skill.create_default_skill( # type: ignore[no-untyped-call]
+            skill_domain.Skill.create_default_skill(
                 skill_id, 'Description 😍', rubrics))
 
         caching_services.set_multi(
@@ -841,7 +841,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             default_skill.to_dict(),
-            skills[skill_id].to_dict()) # type: ignore[no-untyped-call]
+            skills[skill_id].to_dict())
 
     def test_topics_with_unicode_characters_are_set_and_get_correctly(
         self

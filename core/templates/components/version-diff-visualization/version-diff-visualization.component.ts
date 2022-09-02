@@ -13,245 +13,332 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the visualization of the diff between two
+ * @fileoverview Component for the visualization of the diff between two
  *   versions of an exploration.
  */
 
-import { StateDiffModalComponent } from
-  'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.component.ts');
-require('components/code-mirror/codemirror-mergeview.component');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/ngb-modal.service.ts');
+interface NodesData {
+  [key: string]: {
+    newestStateName: string;
+    stateProperty: string;
+    originalStateName: string;
+  };
+}
 
-angular.module('oppia').component('versionDiffVisualization', {
-  bindings: {
-    // An object with the following properties:
-    // - nodes: an object whose keys are state IDs and whoe value is an
-    //     object with the following keys:
-    //     - 'newestStateName': the latest name of the state
-    //     - 'originalStateName': the first encountered name for the state
-    //     - 'stateProperty': 'changed', 'unchanged', 'added' or 'deleted'
-    // - links: a list of objects representing links in the diff graph. Each
-    //     object represents one link, and has keys:
-    //     - 'source': source state of link
-    //     - 'target': target state of link
-    //     - 'linkProperty': 'added', 'deleted' or 'unchanged'
-    // - v1InitStateId: the id of the initial state in the earlier version
-    // - v2InitStateId: the id of the initial state in the later version
-    // - finalStateIds: whether a state is terminal in either the earlier or
-    //     later version
-    // - v1States: the states dict for the earlier version of the
-    // exploration
-    // - v2States: the states dict for the later version of the exploration.
-    getDiffData: '&diffData',
-    // The header for the pane of the state comparison modal corresponding
-    // to the earlier version of the exploration.
-    getEarlierVersionHeader: '&earlierVersionHeader',
-    // The header for the pane of the state comparison modal corresponding
-    // to the later version of the exploration.
-    getLaterVersionHeader: '&laterVersionHeader',
-  },
-  template: require('./version-diff-visualization.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['NgbModal', function(NgbModal) {
-    var ctrl = this;
-    // Constants for color of nodes in diff graph.
-    var COLOR_ADDED = '#4EA24E';
-    var COLOR_DELETED = '#DC143C';
-    var COLOR_CHANGED = '#1E90FF';
-    var COLOR_UNCHANGED = 'beige';
-    var COLOR_RENAMED_UNCHANGED = '#FFD700';
+interface LegendGraph {
+  nodes: object;
+  links: {
+    source: string;
+    target: string;
+    linkProperty: string;
+  }[];
+  finalStateIds: string[];
+  initStateId: string;
+}
 
-    // Constants for names in legend.
-    var NODE_TYPE_ADDED = 'Added';
-    var NODE_TYPE_DELETED = 'Deleted';
-    var NODE_TYPE_CHANGED = 'Changed';
-    var NODE_TYPE_CHANGED_RENAMED = 'Changed/renamed';
-    var NODE_TYPE_RENAMED = 'Renamed';
-    var NODE_TYPE_UNCHANGED = 'Unchanged';
+interface DiffNodeData {
+  nodes: NodesData;
+  v2States: object;
+  v1States: object;
+  finalStateIds: string[];
+  v2InitStateId: string;
+  links: string[];
+  v1InitStateId: string;
+}
 
-    var STATE_PROPERTY_ADDED = 'added';
-    var STATE_PROPERTY_DELETED = 'deleted';
-    var STATE_PROPERTY_CHANGED = 'changed';
-    var STATE_PROPERTY_UNCHANGED = 'unchanged';
+interface DIFF_GRAPH_LINK_PROPERTY_MAPPING {
+  added: string;
+  deleted: string;
+}
 
-    // Object whose keys are legend node names and whose values are
-    // 'true' or false depending on whether the state property is used in
-    // the diff graph. (Will be used to generate legend).
-    var _stateTypeUsed = {};
-    var diffGraphNodes = {};
-    var nodesData;
-    // Opens the modal showing the history diff for a given state.
-    // stateId is the unique ID assigned to a state during the
-    // calculation of the state graph.
-    ctrl.onClickStateInDiffGraph = function(stateId) {
-      var oldStateName = undefined;
-      if (nodesData[stateId].newestStateName !==
-          nodesData[stateId].originalStateName) {
-        oldStateName = nodesData[stateId].originalStateName;
-      }
-      ctrl.showStateDiffModal(
-        nodesData[stateId].newestStateName,
-        oldStateName, nodesData[stateId].stateProperty);
+interface LEGEND_GRAPH_COLORS {
+  Added: string;
+  Deleted: string;
+  Changed: string;
+  'Changed/renamed': string;
+  Renamed: string;
+  Unchanged: string;
+}
+
+interface LEGEND_GRAPH_LINK_PROPERTY_MAPPING {
+  hidden: string;
+}
+
+interface LEGEND_GRAPH_SECONDARY_LABELS {
+  'Changed/renamed': string;
+  Renamed: string;
+}
+
+interface DiffGraphSecondaryLabels {
+  [nodeId: string]: string;
+}
+
+interface DiffGraphNodeColors {
+  [nodeId: string]: string;
+}
+
+interface DiffGraphData {
+  nodes: object;
+  links: string[];
+  initStateId: string;
+  finalStateIds: string[];
+}
+
+@Component({
+  selector: 'oppia-version-diff-visualization',
+  templateUrl: './version-diff-visualization.component.html'
+})
+export class VersionDiffVisualizationComponent implements OnInit {
+  // An object with the following properties:
+  // - nodes: an object whose keys are state IDs and whoe value is an
+  //     object with the following keys:
+  //     - 'newestStateName': the latest name of the state
+  //     - 'originalStateName': the first encountered name for the state
+  //     - 'stateProperty': 'changed', 'unchanged', 'added' or 'deleted'
+  // - links: a list of objects representing links in the diff graph. Each
+  //     object represents one link, and has keys:
+  //     - 'source': source state of link
+  //     - 'target': target state of link
+  //     - 'linkProperty': 'added', 'deleted' or 'unchanged'
+  // - v1InitStateId: the id of the initial state in the earlier version
+  // - v2InitStateId: the id of the initial state in the later version
+  // - finalStateIds: whether a state is terminal in either the earlier or
+  //     later version
+  // - v1States: the states dict for the earlier version of the
+  // exploration
+  // - v2States: the states dict for the later version of the exploration.
+  @Input() diffData: DiffNodeData;
+
+  // The header for the pane of the state comparison modal corresponding
+  // to the earlier version of the exploration.
+  @Input() earlierVersionHeader: string;
+
+  // The header for the pane of the state comparison modal corresponding
+  // to the later version of the exploration.
+  @Input() laterVersionHeader: string;
+
+  // Constants for color of nodes in diff graph.
+  COLOR_ADDED: string = '#4EA24E';
+  COLOR_DELETED: string = '#DC143C';
+  COLOR_CHANGED: string = '#1E90FF';
+  COLOR_UNCHANGED: string = 'beige';
+  COLOR_RENAMED_UNCHANGED: string = '#FFD700';
+
+  // Constants for names in legend.
+  NODE_TYPE_ADDED: string = 'Added';
+  NODE_TYPE_DELETED: string = 'Deleted';
+  NODE_TYPE_CHANGED: string = 'Changed';
+  NODE_TYPE_CHANGED_RENAMED: string = 'Changed/renamed';
+  NODE_TYPE_RENAMED: string = 'Renamed';
+  NODE_TYPE_UNCHANGED: string = 'Unchanged';
+
+  STATE_PROPERTY_ADDED: string = 'added';
+  STATE_PROPERTY_DELETED: string = 'deleted';
+  STATE_PROPERTY_CHANGED: string = 'changed';
+  STATE_PROPERTY_UNCHANGED: string = 'unchanged';
+
+  // Object whose keys are legend node names and whose values are
+  // 'true' or false depending on whether the state property is used in
+  // the diff graph. (Will be used to generate legend).
+  _stateTypeUsed: object = {};
+  diffGraphNodes: object = {};
+  nodesData: NodesData;
+
+  diffGraphData: DiffGraphData;
+  diffGraphNodeColors: DiffGraphNodeColors;
+  v1InitStateId: string;
+  diffGraphSecondaryLabels: DiffGraphSecondaryLabels;
+  DIFF_GRAPH_LINK_PROPERTY_MAPPING: DIFF_GRAPH_LINK_PROPERTY_MAPPING;
+  legendGraph: LegendGraph;
+  LEGEND_GRAPH_COLORS: LEGEND_GRAPH_COLORS | object;
+  LEGEND_GRAPH_SECONDARY_LABELS: LEGEND_GRAPH_SECONDARY_LABELS | object;
+  LEGEND_GRAPH_LINK_PROPERTY_MAPPING: LEGEND_GRAPH_LINK_PROPERTY_MAPPING;
+
+  constructor(
+    private ngbModal: NgbModal,
+  ) {}
+
+  // Opens the modal showing the history diff for a given state.
+  // stateId is the unique ID assigned to a state during the
+  // calculation of the state graph.
+  onClickStateInDiffGraph(stateId: string): void {
+    let oldStateName = undefined;
+    if (this.nodesData[stateId].newestStateName !==
+      this.nodesData[stateId].originalStateName) {
+      oldStateName = this.nodesData[stateId].originalStateName;
+    }
+    this.showStateDiffModal(
+      this.nodesData[stateId].newestStateName,
+      oldStateName, this.nodesData[stateId].stateProperty);
+  }
+
+  // Shows a modal comparing changes on a state between 2 versions.
+  //
+  // Arguments:
+  // - stateName is the name of the state in the newer version.
+  // - oldStateName is undefined if the name of the state is unchanged
+  //     between the 2 versions, or the name of the state in the older
+  //     version if the state name is changed.
+  // - stateProperty is whether the state is added, changed, unchanged or
+  //   deleted.
+  showStateDiffModal(
+      newStateName: string,
+      oldStateName: string,
+      stateProperty: string
+  ): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(StateDiffModalComponent, {
+      backdrop: true,
+      windowClass: 'state-diff-modal',
+      size: 'xl'
+    });
+
+    modalRef.componentInstance.newStateName = newStateName;
+    modalRef.componentInstance.oldStateName = oldStateName;
+
+    let newState = null;
+    if (stateProperty !== this.STATE_PROPERTY_DELETED &&
+        this.diffData.v2States.hasOwnProperty(newStateName)) {
+      newState = this.diffData.v2States[newStateName];
+    }
+
+    let oldState = null;
+    let stateNameToRetrieve = oldStateName || newStateName;
+    if (stateProperty !== this.STATE_PROPERTY_ADDED &&
+        this.diffData.v1States.hasOwnProperty(stateNameToRetrieve)) {
+      oldState = this.diffData.v1States[stateNameToRetrieve];
+    }
+
+    modalRef.componentInstance.newState = newState;
+    modalRef.componentInstance.oldState = oldState;
+    modalRef.componentInstance.headers = {
+      leftPane: this.earlierVersionHeader,
+      rightPane: this.laterVersionHeader
     };
 
-    // Shows a modal comparing changes on a state between 2 versions.
-    //
-    // Arguments:
-    // - stateName is the name of the state in the newer version.
-    // - oldStateName is undefined if the name of the state is unchanged
-    //     between the 2 versions, or the name of the state in the older
-    //     version if the state name is changed.
-    // - stateProperty is whether the state is added, changed, unchanged or
-    //   deleted.
-    ctrl.showStateDiffModal = function(
-        newStateName, oldStateName, stateProperty) {
-      let modalRef: NgbModalRef = NgbModal.open(StateDiffModalComponent, {
-        backdrop: true,
-        windowClass: 'state-diff-modal',
-        size: 'xl'
-      });
-      modalRef.componentInstance.newStateName = newStateName;
-      modalRef.componentInstance.oldStateName = oldStateName;
+    modalRef.result.then(() => {}, () => {});
+  }
 
-      var newState = null;
-      if (stateProperty !== STATE_PROPERTY_DELETED &&
-          ctrl.getDiffData().v2States.hasOwnProperty(newStateName)) {
-        newState = ctrl.getDiffData().v2States[newStateName];
-      }
 
-      var oldState = null;
-      var stateNameToRetrieve = oldStateName || newStateName;
-      if (stateProperty !== STATE_PROPERTY_ADDED &&
-          ctrl.getDiffData().v1States.hasOwnProperty(stateNameToRetrieve)) {
-        oldState = ctrl.getDiffData().v1States[stateNameToRetrieve];
-      }
+  ngOnInit(): void {
+    this.nodesData = this.diffData.nodes;
+    this._stateTypeUsed[this.NODE_TYPE_ADDED] = false;
+    this._stateTypeUsed[this.NODE_TYPE_DELETED] = false;
+    this._stateTypeUsed[this.NODE_TYPE_CHANGED] = false;
+    this._stateTypeUsed[this.NODE_TYPE_UNCHANGED] = false;
+    this._stateTypeUsed[this.NODE_TYPE_RENAMED] = false;
+    this._stateTypeUsed[this.NODE_TYPE_CHANGED_RENAMED] = false;
+    this.LEGEND_GRAPH_COLORS = {};
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_ADDED] = this.COLOR_ADDED;
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_DELETED] = this.COLOR_DELETED;
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED] = this.COLOR_CHANGED;
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_UNCHANGED] = this.COLOR_UNCHANGED;
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_RENAMED] = (
+      this.COLOR_RENAMED_UNCHANGED);
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED_RENAMED] = (
+      this.COLOR_CHANGED);
 
-      modalRef.componentInstance.newState = newState;
-      modalRef.componentInstance.oldState = oldState;
-      modalRef.componentInstance.headers = {
-        leftPane: ctrl.getEarlierVersionHeader(),
-        rightPane: ctrl.getLaterVersionHeader()
-      };
-
-      modalRef.result.then(function() {}, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+    this.LEGEND_GRAPH_SECONDARY_LABELS = {};
+    this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_CHANGED_RENAMED] = (
+      '(was: Old name)');
+    this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_RENAMED] = (
+      '(was: Old name)');
+    this.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
+      hidden: 'stroke: none; marker-end: none;'
     };
-    ctrl.$onInit = function() {
-      nodesData = ctrl.getDiffData().nodes;
-      _stateTypeUsed[NODE_TYPE_ADDED] = false;
-      _stateTypeUsed[NODE_TYPE_DELETED] = false;
-      _stateTypeUsed[NODE_TYPE_CHANGED] = false;
-      _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
-      _stateTypeUsed[NODE_TYPE_RENAMED] = false;
-      _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
-      ctrl.LEGEND_GRAPH_COLORS = {};
-      ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
-      ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
-      ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED] = COLOR_CHANGED;
-      ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_UNCHANGED] = COLOR_UNCHANGED;
-      ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_RENAMED] = COLOR_RENAMED_UNCHANGED;
-      ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED_RENAMED] = COLOR_CHANGED;
+    this.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
+      added: (
+        'stroke: #1F7D1F; stroke-opacity: 0.8; ' +
+        'marker-end: url(#arrowhead-green)'),
+      deleted: (
+        'stroke: #B22222; stroke-opacity: 0.8; ' +
+        'marker-end: url(#arrowhead-red)')
+    };
+    this.diffGraphSecondaryLabels = {};
+    this.diffGraphNodeColors = {};
 
-      ctrl.LEGEND_GRAPH_SECONDARY_LABELS = {};
-      ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_CHANGED_RENAMED] = (
-        '(was: Old name)');
-      ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_RENAMED] = (
-        '(was: Old name)');
-      ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
-        hidden: 'stroke: none; marker-end: none;'
-      };
-      ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
-        added: (
-          'stroke: #1F7D1F; stroke-opacity: 0.8; ' +
-          'marker-end: url(#arrowhead-green)'),
-        deleted: (
-          'stroke: #B22222; stroke-opacity: 0.8; ' +
-          'marker-end: url(#arrowhead-red)')
-      };
-      ctrl.diffGraphSecondaryLabels = {};
-      ctrl.diffGraphNodeColors = {};
-
-      for (var nodeId in nodesData) {
-        var nodeStateProperty = nodesData[nodeId].stateProperty;
-        if (nodeStateProperty === STATE_PROPERTY_ADDED) {
-          diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-          ctrl.diffGraphNodeColors[nodeId] = COLOR_ADDED;
-          _stateTypeUsed[NODE_TYPE_ADDED] = true;
-        } else if (nodeStateProperty === STATE_PROPERTY_DELETED) {
-          diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-          ctrl.diffGraphNodeColors[nodeId] = COLOR_DELETED;
-          _stateTypeUsed[NODE_TYPE_DELETED] = true;
-        } else if (nodeStateProperty === STATE_PROPERTY_CHANGED) {
-          diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-          ctrl.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
-          if (nodesData[nodeId].originalStateName !==
-              nodesData[nodeId].newestStateName) {
-            ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-              nodesData[nodeId].originalStateName + ')';
-            diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-            _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = true;
-          } else {
-            _stateTypeUsed[NODE_TYPE_CHANGED] = true;
-          }
-        } else if (nodeStateProperty === STATE_PROPERTY_UNCHANGED) {
-          diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-          ctrl.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
-          if (nodesData[nodeId].originalStateName !==
-              nodesData[nodeId].newestStateName) {
-            ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-              nodesData[nodeId].originalStateName + ')';
-            diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-            ctrl.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
-            _stateTypeUsed[NODE_TYPE_RENAMED] = true;
-          } else {
-            _stateTypeUsed[NODE_TYPE_UNCHANGED] = true;
-          }
+    for (let nodeId in this.nodesData) {
+      let nodeStateProperty = this.nodesData[nodeId].stateProperty;
+      if (nodeStateProperty === this.STATE_PROPERTY_ADDED) {
+        this.diffGraphNodes[nodeId] = this.nodesData[nodeId].newestStateName;
+        this.diffGraphNodeColors[nodeId] = this.COLOR_ADDED;
+        this._stateTypeUsed[this.NODE_TYPE_ADDED] = true;
+      } else if (nodeStateProperty === this.STATE_PROPERTY_DELETED) {
+        this.diffGraphNodes[nodeId] = this.nodesData[nodeId].originalStateName;
+        this.diffGraphNodeColors[nodeId] = this.COLOR_DELETED;
+        this._stateTypeUsed[this.NODE_TYPE_DELETED] = true;
+      } else if (nodeStateProperty === this.STATE_PROPERTY_CHANGED) {
+        this.diffGraphNodes[nodeId] = this.nodesData[nodeId].originalStateName;
+        this.diffGraphNodeColors[nodeId] = this.COLOR_CHANGED;
+        if (this.nodesData[nodeId].originalStateName !==
+            this.nodesData[nodeId].newestStateName) {
+          this.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+          this.nodesData[nodeId].originalStateName + ')';
+          this.diffGraphNodes[nodeId] = this.nodesData[nodeId].newestStateName;
+          this._stateTypeUsed[this.NODE_TYPE_CHANGED_RENAMED] = true;
         } else {
-          throw new Error('Invalid state property.');
+          this._stateTypeUsed[this.NODE_TYPE_CHANGED] = true;
         }
-      }
-
-      ctrl.v1InitStateId = ctrl.getDiffData().v1InitStateId;
-
-      ctrl.diffGraphData = {
-        nodes: diffGraphNodes,
-        links: ctrl.getDiffData().links,
-        initStateId: ctrl.getDiffData().v2InitStateId,
-        finalStateIds: ctrl.getDiffData().finalStateIds
-      };
-
-      // Generate the legend graph.
-      ctrl.legendGraph = {
-        nodes: {},
-        links: []
-      };
-      var _lastUsedStateType = null;
-      for (var stateProperty in _stateTypeUsed) {
-        if (_stateTypeUsed[stateProperty]) {
-          ctrl.legendGraph.nodes[stateProperty] = stateProperty;
-          if (_lastUsedStateType) {
-            ctrl.legendGraph.links.push({
-              source: _lastUsedStateType,
-              target: stateProperty,
-              linkProperty: 'hidden'
-            });
-          }
-          _lastUsedStateType = stateProperty;
-          if (!ctrl.legendGraph.hasOwnProperty('initStateId')) {
-            ctrl.legendGraph.initStateId = stateProperty;
-          }
+      } else if (nodeStateProperty === this.STATE_PROPERTY_UNCHANGED) {
+        this.diffGraphNodes[nodeId] = this.nodesData[nodeId].originalStateName;
+        this.diffGraphNodeColors[nodeId] = this.COLOR_UNCHANGED;
+        if (this.nodesData[nodeId].originalStateName !==
+            this.nodesData[nodeId].newestStateName) {
+          this.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+          this.nodesData[nodeId].originalStateName + ')';
+          this.diffGraphNodes[nodeId] = this.nodesData[nodeId].newestStateName;
+          this.diffGraphNodeColors[nodeId] = this.COLOR_RENAMED_UNCHANGED;
+          this._stateTypeUsed[this.NODE_TYPE_RENAMED] = true;
+        } else {
+          this._stateTypeUsed[this.NODE_TYPE_UNCHANGED] = true;
         }
+      } else {
+        throw new Error('Invalid state property.');
       }
-      ctrl.legendGraph.finalStateIds = [_lastUsedStateType];
+    }
+
+    this.v1InitStateId = this.diffData.v1InitStateId;
+
+    this.diffGraphData = {
+      nodes: this.diffGraphNodes,
+      links: this.diffData.links,
+      initStateId: this.diffData.v2InitStateId,
+      finalStateIds: this.diffData.finalStateIds
     };
-  }]
-});
+
+    // Generate the legend graph.
+    this.legendGraph = {
+      nodes: {},
+      links: [],
+      finalStateIds: [],
+      initStateId: null
+    };
+
+    let _lastUsedStateType = null;
+    for (let stateProperty in this._stateTypeUsed) {
+      if (this._stateTypeUsed[stateProperty]) {
+        this.legendGraph.nodes[stateProperty] = stateProperty;
+        if (_lastUsedStateType) {
+          this.legendGraph.links.push({
+            source: _lastUsedStateType,
+            target: stateProperty,
+            linkProperty: 'hidden'
+          });
+        }
+        _lastUsedStateType = stateProperty;
+        this.legendGraph.initStateId = stateProperty;
+      }
+    }
+
+    this.legendGraph.finalStateIds = [_lastUsedStateType];
+  }
+}
+angular.module('oppia').directive('oppiaVersionDiffVisualization',
+  downgradeComponent({
+    component: VersionDiffVisualizationComponent
+  }) as angular.IDirectiveFactory);

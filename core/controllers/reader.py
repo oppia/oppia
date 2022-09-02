@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import random
 
@@ -285,7 +284,9 @@ class ExplorationHandler(base.BaseHandler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
-        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False
+        )
 
         preferred_audio_language_code = None
         preferred_language_codes = None
@@ -375,6 +376,7 @@ class ExplorationHandler(base.BaseHandler):
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
+            'exploration_metadata': exploration.get_metadata().to_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
@@ -1367,18 +1369,72 @@ class RecommendationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'include_system_recommendations': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': True
+            },
+            'author_recommended_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            },
+            'story_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'current_node_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        collection_id = self.request.get('collection_id')
-
-        include_system_recommendations = self.request.get(
+        collection_id = self.normalized_request.get('collection_id')
+        include_system_recommendations = self.normalized_request.get(
             'include_system_recommendations')
-        try:
-            author_recommended_exp_ids = json.loads(self.request.get(
-                'stringified_author_recommended_ids'))
-        except Exception as e:
-            raise self.PageNotFoundException from e
+        author_recommended_exp_ids = self.normalized_request.get(
+            'author_recommended_ids')
 
         system_recommended_exp_ids = []
         next_exp_id = None
@@ -1794,3 +1850,171 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
             )
 
         self.render_json(self.values)
+
+
+class StateVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for a state at the given
+    version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'state_name': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_STATE_NAME_LENGTH
+                }]
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, state_name, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
+        state_version_history = (
+            version_history.state_version_history[state_name]
+        )
+        last_edited_version_number = (
+            state_version_history.previously_edited_in_version
+        )
+        state_name_in_previous_version = (
+            state_version_history.state_name_in_previous_version
+        )
+        state_in_previous_version = None
+        last_edited_committer_username = user_services.get_username(
+            state_version_history.committer_id
+        )
+
+        # If the state has not been updated after it was added for the
+        # first time, the value of last_edited_version_number will be None.
+        if last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=last_edited_version_number
+            )
+            state_in_previous_version = (
+                exploration.states[state_name_in_previous_version]
+            )
+
+        self.render_json({
+            'last_edited_version_number': last_edited_version_number,
+            'state_name_in_previous_version': state_name_in_previous_version,
+            'state_dict_in_previous_version': (
+                state_in_previous_version.to_dict()
+                if state_in_previous_version is not None else None
+            ),
+            'last_edited_committer_username': last_edited_committer_username
+        })
+
+
+class MetadataVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for the exploration metadata
+    at the given version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
+        metadata_version_history = version_history.metadata_version_history
+        metadata_in_previous_version = None
+
+        # If the metadata has not been updated after the exploration was
+        # created, the value of last_edited_version_number will be None.
+        if metadata_version_history.last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                version=metadata_version_history.last_edited_version_number
+            )
+            metadata_in_previous_version = exploration.get_metadata()
+
+        self.render_json({
+            'last_edited_version_number': (
+                metadata_version_history.last_edited_version_number
+            ),
+            'last_edited_committer_username': user_services.get_username(
+                metadata_version_history.last_edited_committer_id
+            ),
+            'metadata_dict_in_previous_version': (
+                metadata_in_previous_version.to_dict()
+                if metadata_in_previous_version is not None else None
+            )
+        })
+
+
+class CheckpointsFeatureStatusHandler(base.BaseHandler):
+    """The handler for checking whether the checkpoints feature is enabled."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        self.render_json({
+            'checkpoints_feature_is_enabled': (
+                config_domain.CHECKPOINTS_FEATURE_IS_ENABLED.value)
+        })

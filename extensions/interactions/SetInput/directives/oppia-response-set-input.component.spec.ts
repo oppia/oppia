@@ -55,12 +55,12 @@ describe('ResponseSetInputComponent', () => {
     fixture = TestBed.createComponent(ResponseSetInputComponent);
     component = fixture.componentInstance;
 
-    component.answerWithValue = '["answer1"]';
+    component.answer = '["answer1"]';
   });
 
   it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
-    expect(component.answer).toEqual(['answer1'] as unknown as string);
+    expect(component.escapedAnswer).toEqual(['answer1'] as unknown as string);
   });
 });

@@ -9,7 +9,7 @@
       <div class="story-input-header">
         <span>Title*</span>
       </div>
-      <input class="form-control protractor-test-new-story-title-field required" ng-model="story.title" maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" aria-label="Title" autofocus>
+      <input class="form-control e2e-test-new-story-title-field required" ng-model="story.title" maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" aria-label="Title" autofocus>
       <div>
         <span class="oppia-input-box-subtitle">
           <em>
@@ -22,7 +22,7 @@
       <div class="story-input-header">
         <span>Description*</span>
       </div>
-      <textarea rows="3" cols="50" maxlength="<[MAX_CHARS_IN_STORY_DESCRIPTION]>" ng-model="story.description" class="form-control protractor-test-new-story-description-field required" aria-label="Description"></textarea>
+      <textarea rows="3" cols="50" maxlength="<[MAX_CHARS_IN_STORY_DESCRIPTION]>" ng-model="story.description" class="form-control e2e-test-new-story-description-field required" aria-label="Description"></textarea>
       <span class="oppia-input-box-subtitle">
         <em>
           Story description should be at most
@@ -34,7 +34,7 @@
       <div class="story-input-header">
         <span>Url Fragment*</span>
       </div>
-      <input class="form-control protractor-test-new-story-url-fragment-field" ng-model="story.urlFragment" maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>"
+      <input class="form-control e2e-test-new-story-url-fragment-field" ng-model="story.urlFragment" maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>"
              ng-class="{'is-invalid': storyUrlFragmentExists || !validUrlFragmentRegex.test(story.urlFragment)}"
              ng-change="onStoryUrlFragmentChange()"
              aria-label="Url fragment">
@@ -48,7 +48,7 @@
         </span>
         <div ng-if="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
           <em>
-            This story URL fragment already exists.
+            This story fragment already exists in this or another topic.
           </em>
         </div>
       </div>
@@ -70,7 +70,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-story-creation-button" type="submit" ng-disabled="!isValid()">
+    <button class="btn btn-success e2e-test-confirm-story-creation-button" type="submit" ng-disabled="!isValid()">
       <span>Create Story</span>
     </button>
   </div>

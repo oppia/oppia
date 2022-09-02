@@ -27,6 +27,7 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContextService } from 'services/context.service';
 import { ContinueRulesService } from './continue-rules.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-interactive-continue',
@@ -34,7 +35,10 @@ import { ContinueRulesService } from './continue-rules.service';
   styleUrls: []
 })
 export class OppiaInteractiveContinue implements OnInit {
-  @Input() buttonTextWithValue: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() buttonTextWithValue!: string;
   buttonText: string = '';
   isInEditorMode: boolean = false;
   readonly DEFAULT_BUTTON_TEXT: string = 'Continue';
@@ -45,6 +49,7 @@ export class OppiaInteractiveContinue implements OnInit {
     private continueRulesService: ContinueRulesService,
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService) {}
 
@@ -72,6 +77,10 @@ export class OppiaInteractiveContinue implements OnInit {
     };
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswer, null);
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 angular.module('oppia').directive(

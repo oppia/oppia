@@ -16,7 +16,7 @@
  * @fileoverview Component for the outcome editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
@@ -26,49 +26,79 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+
+
+interface AddOutcomeModalResponse {
+  outcome: Outcome;
+}
 
 @Component({
   selector: 'oppia-outcome-editor',
   templateUrl: './outcome-editor.component.html'
 })
 export class OutcomeEditorComponent implements OnInit {
-  @Input() areWarningsSuppressed: boolean;
-  @Input() displayFeedback: boolean;
-  @Input() isEditable: boolean;
-  @Input() outcome: Outcome;
-  @Input() addState: (value: string) => void;
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<string[]> = new EventEmitter();
 
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveDestIfStuck: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() areWarningsSuppressed!: boolean;
+  @Input() displayFeedback!: boolean;
+  @Input() isEditable!: boolean;
+  @Input() outcome!: Outcome;
+  @Input() addState!: (value: string) => void;
+  savedOutcome!: Outcome;
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
-  canAddPrerequisiteSkill: boolean;
-  correctnessLabelEditorIsOpen: boolean;
-  destinationEditorIsOpen: boolean;
-  feedbackEditorIsOpen: boolean;
-  savedOutcome: Outcome;
+  canAddPrerequisiteSkill: boolean = false;
+  correctnessLabelEditorIsOpen: boolean = false;
+  destinationEditorIsOpen: boolean = false;
+  destinationIfStuckEditorIsOpen: boolean = false;
+  feedbackEditorIsOpen: boolean = false;
+  destIfStuckFeatEnabled: boolean = (
+    AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
+
+  onMobile: boolean = false;
+  resizeSubscription!: Subscription;
+  // The value of this variable should match the breapoint used in
+  // outcome-editor.component.html.
+  mobileBreakpoint: number = 500;
 
   constructor(
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
+    private ngbModal: NgbModal,
+    private changeDetectorRef: ChangeDetectorRef,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   isInQuestionMode(): boolean {
     return this.stateEditorService.isInQuestionMode();
   }
 
+  isFeedbackLengthExceeded(): boolean {
+    // TODO(#13764): Edit this check after appropriate limits are found.
+    return (this.outcome.feedback._html.length > 10000);
+  }
+
   isCorrectnessFeedbackEnabled(): boolean {
     return this.stateEditorService.getCorrectnessFeedbackEnabled();
   }
 
-  // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    return Boolean(interactionId) && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear;
   }
 
   onExternalSave(): void {
@@ -96,17 +126,23 @@ export class OutcomeEditorComponent implements OnInit {
         this.cancelThisDestinationEdit();
       }
     }
-  }
 
-  isFeedbackLengthExceeded(): boolean {
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return (this.outcome.feedback._html.length > 10000);
+    if (this.destinationIfStuckEditorIsOpen) {
+      this.saveThisIfStuckDestination();
+    }
   }
 
   isSelfLoop(outcome: Outcome): boolean {
     return Boolean (
       outcome &&
       outcome.dest === this.stateEditorService.getActiveStateName());
+  }
+
+  isSelfLoopDestStuck(outcome: Outcome): boolean {
+    return Boolean (
+      outcome &&
+      outcome.destIfReallyStuck === (
+        this.stateEditorService.getActiveStateName()));
   }
 
   getCurrentInteractionId(): string {
@@ -131,6 +167,26 @@ export class OutcomeEditorComponent implements OnInit {
     return this.isSelfLoopWithNoFeedback(tmpOutcome);
   }
 
+  openFeedbackEditorModal(): void {
+    if (this.isEditable) {
+      let modalRef = this.ngbModal.open(AddOutcomeModalComponent, {
+        backdrop: 'static',
+      });
+
+      let currentOutcome = cloneDeep(this.outcome);
+      modalRef.componentInstance.outcome = currentOutcome;
+
+      modalRef.result.then((result: AddOutcomeModalResponse): void => {
+        this.outcome = result.outcome;
+        this.saveThisFeedback(true);
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    }
+  }
+
   openFeedbackEditor(): void {
     if (this.isEditable) {
       this.feedbackEditorIsOpen = true;
@@ -143,6 +199,12 @@ export class OutcomeEditorComponent implements OnInit {
     }
   }
 
+  openDestinationIfStuckEditor(): void {
+    if (this.isEditable) {
+      this.destinationIfStuckEditorIsOpen = true;
+    }
+  }
+
   saveThisFeedback(fromClickSaveFeedbackButton: boolean): void {
     this.feedbackEditorIsOpen = false;
     let contentHasChanged = (
@@ -151,19 +213,27 @@ export class OutcomeEditorComponent implements OnInit {
     this.savedOutcome.feedback = cloneDeep(
       this.outcome.feedback);
 
-    if (this.stateEditorService.isInQuestionMode()) {
-      this.savedOutcome.dest = null;
-    } else if (
+    if (
+      !this.stateEditorService.isInQuestionMode() &&
       this.savedOutcome.dest === this.outcome.dest &&
         !this.stateEditorService.getStateNames().includes(
           this.outcome.dest)) {
       // If the stateName has changed and previously saved
       // destination points to the older name, update it to
       // the active state name.
-      this.savedOutcome.dest = this.stateEditorService.getActiveStateName();
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      if (activeStateName === null) {
+        throw new Error(
+          'The active state name is null in the outcome editor.');
+      }
+      this.savedOutcome.dest = activeStateName;
     }
     if (fromClickSaveFeedbackButton && contentHasChanged) {
       let contentId = this.savedOutcome.feedback.contentId;
+      if (contentId === null) {
+        throw new Error(
+          'The content ID is null in the outcome editor.');
+      }
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
     }
     this.saveFeedback.emit(this.savedOutcome);
@@ -182,6 +252,14 @@ export class OutcomeEditorComponent implements OnInit {
       this.outcome.missingPrerequisiteSkillId;
 
     this.saveDest.emit(this.savedOutcome);
+  }
+
+  saveThisIfStuckDestination(): void {
+    this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
+    this.destinationIfStuckEditorIsOpen = false;
+    this.savedOutcome.destIfReallyStuck = (
+      cloneDeep(this.outcome.destIfReallyStuck));
+    this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
   onChangeCorrectnessLabel(): void {
@@ -206,6 +284,12 @@ export class OutcomeEditorComponent implements OnInit {
     this.destinationEditorIsOpen = false;
   }
 
+  cancelThisIfStuckDestinationEdit(): void {
+    this.outcome.destIfReallyStuck = (
+      cloneDeep(this.savedOutcome.destIfReallyStuck));
+    this.destinationIfStuckEditorIsOpen = false;
+  }
+
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.externalSaveService.onExternalSave.subscribe(
@@ -223,6 +307,14 @@ export class OutcomeEditorComponent implements OnInit {
     this.destinationEditorIsOpen = false;
     this.correctnessLabelEditorIsOpen = false;
     this.savedOutcome = cloneDeep(this.outcome);
+
+    this.onMobile = (
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.onMobile = (
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+      });
   }
 
   ngOnDestroy(): void {

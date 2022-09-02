@@ -10,22 +10,22 @@
             class="nav-item icon nav-list-item"
             ng-click="$ctrl.navigateToStoryEditor()">
           <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab">
-            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected()}">&#xE254;</i>
+            <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected()}"></i>
           </a>
           <div ng-show="$ctrl.getTotalWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
                ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
-            <span class="oppia-editor-warnings-count protractor-test-warning-indicator">
+            <span class="oppia-editor-warnings-count e2e-test-warning-indicator">
               <[$ctrl.getTotalWarningsCount()]>
             </span>
             <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box story-editor-warning-box" ng-if="$ctrl.warningsAreShown">
               <span class="oppia-editor-warnings-header">Warnings</span>
-              <li class="oppia-editor-warnings-text protractor-test-warnings-text"
+              <li class="oppia-editor-warnings-text e2e-test-warnings-text"
                   ng-repeat="issue in $ctrl.validationIssues.concat($ctrl.explorationValidationIssues) track by $index">
                 <hr class="oppia-editor-warnings-separator">
                 <[issue]>
               </li>
-              <li class="oppia-editor-warnings-text protractor-test-warnings-text"
+              <li class="oppia-editor-warnings-text e2e-test-warnings-text"
                   ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
                 <hr class="oppia-editor-warnings-separator">
                 <[issue]>
@@ -36,7 +36,7 @@
 
         <li ng-if="!($ctrl.getActiveTab() === 'chapter_editor')" ng-class="{'navbar-tab-active': $ctrl.getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.navigateToStoryPreviewTab()">
           <a class="nav-link navbar-tab" uib-tooltip="Preview" aria-label="Preview" tooltip-placement="bottom">
-            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}">&#xE037;</i>
+            <i class="fas fa-play navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}"></i>
           </a>
         </li>
       </div>
@@ -85,7 +85,7 @@
   story-editor-page .navbar-tab-icon {
     color: #fff;
     display: block;
-    font-size: 30px;
+    font-size: 22px;
     width: 100%;
   }
   story-editor-page .navbar-tab span {

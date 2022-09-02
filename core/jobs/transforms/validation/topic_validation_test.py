@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core.domain import topic_domain
 from core.jobs import job_test_utils
 from core.jobs.decorators import validation_decorators
@@ -31,6 +29,11 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import topic_models
+
 (base_models, topic_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.topic])
 
@@ -38,9 +41,7 @@ import apache_beam as beam
 class ValidateCanonicalNameMatchesNameInLowercaseTests(
         job_test_utils.PipelinedTestBase):
 
-    NOW = datetime.datetime.utcnow()
-
-    def test_process_for_not_matching_canonical_name(self):
+    def test_process_for_not_matching_canonical_name(self) -> None:
         model_with_different_name = topic_models.TopicModel(
             id='123',
             name='name',
@@ -64,7 +65,7 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
                 model_with_different_name)
         ])
 
-    def test_process_for_matching_canonical_name(self):
+    def test_process_for_matching_canonical_name(self) -> None:
         model_with_same_name = topic_models.TopicModel(
             id='123',
             name='SOMEthing',
@@ -88,7 +89,7 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
 
 class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_change_domain_implemented(self):
+    def test_validate_change_domain_implemented(self) -> None:
         valid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -107,7 +108,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [])
 
-    def test_topic_change_object_with_missing_cmd(self):
+    def test_topic_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -130,7 +131,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 'Missing cmd key in change dict')
         ])
 
-    def test_topic_change_object_with_invalid_cmd(self):
+    def test_topic_change_object_with_invalid_cmd(self) -> None:
         invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -153,7 +154,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 'Command invalid is not allowed')
         ])
 
-    def test_topic_change_object_with_missing_attribute_in_cmd(self):
+    def test_topic_change_object_with_missing_attribute_in_cmd(self) -> None:
         invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -183,7 +184,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 'new_value, old_value')
         ])
 
-    def test_topic_change_object_with_extra_attribute_in_cmd(self):
+    def test_topic_change_object_with_extra_attribute_in_cmd(self) -> None:
         invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -218,7 +219,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 'The following extra attributes are present: invalid')
         ])
 
-    def test_topic_change_object_with_invalid_topic_property(self):
+    def test_topic_change_object_with_invalid_topic_property(self) -> None:
         invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -252,7 +253,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 'invalid is not allowed')
         ])
 
-    def test_topic_change_object_with_invalid_subtopic_property(self):
+    def test_topic_change_object_with_invalid_subtopic_property(self) -> None:
         invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -288,7 +289,9 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 'invalid is not allowed')
         ])
 
-    def test_topic_change_object_with_invalid_subtopic_page_property(self):
+    def test_topic_change_object_with_invalid_subtopic_page_property(
+        self
+    ) -> None:
         invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
@@ -328,7 +331,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 class ValidateTopicRightsSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_topic_rights_change_object_with_missing_cmd(self):
+    def test_topic_rights_change_object_with_missing_cmd(self) -> None:
         invalid_commit_cmd_model = (
             topic_models.TopicRightsSnapshotMetadataModel(
                 id='123',
@@ -353,7 +356,7 @@ class ValidateTopicRightsSnapshotMetadataModelTests(
                 'Missing cmd key in change dict')
         ])
 
-    def test_topic_change_rights_object_with_invalid_cmd(self):
+    def test_topic_change_rights_object_with_invalid_cmd(self) -> None:
         invalid_commit_cmd_model = (
             topic_models.TopicRightsSnapshotMetadataModel(
                 id='123',
@@ -378,7 +381,9 @@ class ValidateTopicRightsSnapshotMetadataModelTests(
                 'Command invalid is not allowed')
         ])
 
-    def test_topic_rights_change_object_with_missing_attribute_in_cmd(self):
+    def test_topic_rights_change_object_with_missing_attribute_in_cmd(
+        self
+    ) -> None:
         commit_dict = {
             'cmd': 'change_role',
             'assignee_id': 'assignee_id',
@@ -408,7 +413,9 @@ class ValidateTopicRightsSnapshotMetadataModelTests(
                 'new_role, old_role')
         ])
 
-    def test_topic_rights_change_object_with_extra_attribute_in_cmd(self):
+    def test_topic_rights_change_object_with_extra_attribute_in_cmd(
+        self
+    ) -> None:
         commit_dict = {
             'cmd': 'publish_topic',
             'invalid': 'invalid'
@@ -437,7 +444,7 @@ class ValidateTopicRightsSnapshotMetadataModelTests(
                 'The following extra attributes are present: invalid')
         ])
 
-    def test_topic_rights_change_object_with_invalid_role(self):
+    def test_topic_rights_change_object_with_invalid_role(self) -> None:
         commit_dict = {
             'cmd': 'change_role',
             'assignee_id': 'assignee_id',
@@ -472,7 +479,7 @@ class ValidateTopicRightsSnapshotMetadataModelTests(
 
 class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
-    def test_validate_rights_model(self):
+    def test_validate_rights_model(self) -> None:
         valid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
             id='rights_id123',
             created_on=self.YEAR_AGO,
@@ -493,7 +500,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [])
 
-    def test_validate_topic_model(self):
+    def test_validate_topic_model(self) -> None:
         valid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
             id='topic_id123',
             created_on=self.YEAR_AGO,
@@ -514,7 +521,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [])
 
-    def test_raises_commit_cmd_none_error(self):
+    def test_raises_commit_cmd_none_error(self) -> None:
         invalid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
             id='model_id123',
             created_on=self.YEAR_AGO,
@@ -540,7 +547,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
 class RelationshipsOfTests(test_utils.TestBase):
 
-    def test_topic_summary_model_relationships(self):
+    def test_topic_summary_model_relationships(self) -> None:
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'TopicSummaryModel', 'id'),

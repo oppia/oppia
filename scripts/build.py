@@ -27,12 +27,15 @@ import shutil
 import subprocess
 import threading
 
-from core import utils
-from scripts import common
-from scripts import servers
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common # isort:skip pylint: disable=wrong-import-position
+from core import utils # isort:skip pylint: disable=wrong-import-position
+from scripts import servers # isort:skip pylint: disable=wrong-import-position
 
-from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple
-from typing_extensions import TypedDict
+from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple # isort:skip pylint: disable=wrong-import-position
+from typing_extensions import TypedDict # isort:skip pylint: disable=wrong-import-position
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -91,9 +94,9 @@ WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
 # Files with these name patterns shouldn't be moved to build directory, and will
-# not be served in production. (This includes protractor.js files in
-# /extensions.)
-JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
+# not be served in production. (This includes protractor.js, and webdriverio.js
+# files in /extensions.)
+JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js', 'webdriverio.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
@@ -141,6 +144,8 @@ HASH_BLOCK_SIZE = 2**20
 
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
+
+MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -683,7 +688,8 @@ def build_using_webpack(config_path: str) -> None:
 
     print('Building webpack')
     managed_webpack_compiler = servers.managed_webpack_compiler(
-        config_path=config_path, max_old_space_size=6144)
+        config_path=config_path,
+        max_old_space_size=MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD)
     with managed_webpack_compiler as p:
         p.wait()
     assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (

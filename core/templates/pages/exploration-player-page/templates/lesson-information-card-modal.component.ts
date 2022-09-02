@@ -16,21 +16,37 @@
  * @fileoverview Component for lesson information card modal.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { EditableExplorationBackendApiService } from
-  'domain/exploration/editable-exploration-backend-api.service';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
-import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+
+interface ExplorationTagSummary {
+  tagsToShow: string[];
+  tagsInTooltip: string[];
+}
+
+const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
+const CHECKPOINT_STATUS_COMPLETED = 'completed';
+const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
+const EXPLORATION_STATUS_PRIVATE = 'private';
+
+import './lesson-information-card-modal.component.css';
+
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
@@ -40,13 +56,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  storyTitleTranslationKey!: string;
-  storyPlaythroughObject!: StoryPlaythrough;
-  storyId!: string;
-  storyTitle: string = '';
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  storyUrlFragment: string;
   expTitleTranslationKey!: string;
   expDescTranslationKey!: string;
   displayedCard!: StateCard;
@@ -54,38 +63,60 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expTitle!: string;
   expDesc!: string;
   contributorNames!: string[];
-  storyTitleIsPresent!: boolean;
-  chapterTitle!: string;
-  chapterDesc!: string;
-  chapterNumber!: string;
   checkpointCount!: number;
   expInfo: LearnerExplorationSummaryBackendDict;
-  completedWidth!: number;
-  separatorArray: number[] = [];
+  completedCheckpointsCount!: number;
+  checkpointStatusArray: string[];
   userIsLoggedIn: boolean = false;
+  infoCardBackgroundCss!: {'background-color': string};
+  infoCardBackgroundImageUrl!: string;
+  averageRating: number | null;
+  numViews!: number;
+  lastUpdatedString: string;
+  explorationIsPrivate!: boolean;
+  explorationTags!: ExplorationTagSummary;
   lessonAuthorsSubmenuIsShown: boolean = false;
-
+  loggedOutProgressUniqueUrlId: string;
+  loggedOutProgressUniqueUrl: string;
+  saveProgressMenuIsShown: boolean = false;
+  // The below property is defined only when the learner is on a
+  // checkpointed state, and is undefined otherwise.
+  translatedCongratulatoryCheckpointMessage: string | undefined;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private ratingComputationService: RatingComputationService,
+    private dateTimeFormatService: DateTimeFormatService,
+    private clipboard: Clipboard,
+    private urlService: UrlService,
+    private userService: UserService,
     private windowRef: WindowRef,
-    private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService,
-    private explorationPlayerStateService: ExplorationPlayerStateService
+    private localStorageService: LocalStorageService,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private checkpointCelebrationUtilityService:
+      CheckpointCelebrationUtilityService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
+    this.averageRating = this.ratingComputationService.computeAverageRating(
+      this.expInfo.ratings);
+    this.numViews = this.expInfo.num_views;
+    this.lastUpdatedString = this.getLastUpdatedString(
+      this.expInfo.last_updated_msec);
+    this.explorationIsPrivate = (
+      this.expInfo.status === EXPLORATION_STATUS_PRIVATE);
+    this.explorationTags = this.getExplorationTagsSummary(this.expInfo.tags);
     this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
     this.expDesc = this.expInfo.objective;
-    this.storyTitleIsPresent = (
-      this.explorationPlayerStateService.isInStoryChapterMode()
-    );
+    this.infoCardBackgroundCss = {
+      'background-color': this.expInfo.thumbnail_bg_color
+    };
+    this.infoCardBackgroundImageUrl = this.expInfo.thumbnail_icon_url;
 
     this.expTitleTranslationKey = (
       this.i18nLanguageCodeService.
@@ -98,49 +129,79 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
           this.explorationId, TranslationKeyType.DESCRIPTION)
     );
 
-    if (this.storyTitleIsPresent) {
-      this.topicUrlFragment = (
-        this.urlService.getTopicUrlFragmentFromLearnerUrl());
-      this.classroomUrlFragment = (
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-      this.storyUrlFragment = (
-        this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    // This array is used to keep track of the status of each checkpoint,
+    // i.e. whether it is completed, in-progress, or yet-to-be-completed by the
+    // learner. This information is then used to display the progress bar
+    // in the lesson info card.
+    this.checkpointStatusArray = new Array(this.checkpointCount);
+    for (let i = 0; i < this.completedCheckpointsCount; i++) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;
+    }
+    // If not all checkpoints are completed, then the checkpoint immediately
+    // following the last completed checkpoint is labeled 'in-progress'.
+    if (this.checkpointCount > this.completedCheckpointsCount) {
+      this.checkpointStatusArray[this.completedCheckpointsCount] = (
+        CHECKPOINT_STATUS_IN_PROGRESS);
+    }
+    for (
+      let i = this.completedCheckpointsCount + 1;
+      i < this.checkpointCount;
+      i++
+    ) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
+    }
+    this.loggedOutProgressUniqueUrlId = (
+      this.explorationPlayerStateService.getUniqueProgressUrlId());
+    if (this.loggedOutProgressUniqueUrlId) {
+      this.loggedOutProgressUniqueUrl = (
+        this.urlService.getOrigin() +
+        '/progress/' + this.loggedOutProgressUniqueUrlId);
+    }
+    if (this.checkpointCelebrationUtilityService.getIsOnCheckpointedState()) {
+      this.translatedCongratulatoryCheckpointMessage = (
+        this.checkpointCelebrationUtilityService.getCheckpointMessage(
+          this.completedCheckpointsCount, this.checkpointCount));
+    }
+  }
 
-      this.storyViewerBackendApiService.fetchStoryDataAsync(
-        this.topicUrlFragment,
-        this.classroomUrlFragment,
-        this.storyUrlFragment).then(
-        (storyDataDict) => {
-          this.storyTitle = storyDataDict.title;
-          this.storyId = storyDataDict.id;
-          this.storyTitleTranslationKey = (
-            this.i18nLanguageCodeService
-              .getStoryTranslationKey(
-                this.storyId, TranslationKeyType.TITLE));
-        });
+  getCompletedProgressBarWidth(): number {
+    if (this.completedCheckpointsCount === 0) {
+      return 0;
+    }
+    const spaceBetweenEachNode = 100 / (this.checkpointCount - 1);
+    return (
+      ((this.completedCheckpointsCount - 1) * spaceBetweenEachNode) +
+      (spaceBetweenEachNode / 2));
+  }
+
+  getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {
+    let tagsToShow = [];
+    let tagsInTooltip = [];
+    let MAX_CHARS_TO_SHOW = 45;
+
+    for (let i = 0; i < arrayOfTags.length; i++) {
+      const newLength = (tagsToShow.toString() + arrayOfTags[i]).length;
+
+      if (newLength < MAX_CHARS_TO_SHOW) {
+        tagsToShow.push(arrayOfTags[i]);
+      } else {
+        tagsInTooltip.push(arrayOfTags[i]);
+      }
     }
 
-    // Rendering the separators in the progress bar requires
-    // the number of separators.The purpose of separatorArray
-    // is to provide the number of checkpoints in the template file.
-    this.separatorArray = new Array(this.checkpointCount);
+    return {
+      tagsToShow: tagsToShow,
+      tagsInTooltip: tagsInTooltip
+    };
   }
 
-  restartExploration(): void {
-    this.editableExplorationBackendApiService.resetExplorationProgressAsync(
-      this.explorationId
-    ).then(() => {
-      // Required for the put operation to deliver data to backend.
-      this.windowRef.nativeWindow.location.reload();
-    });
+  getLastUpdatedString(millisSinceEpoch: number): string {
+    return this.dateTimeFormatService
+      .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   }
 
-  isHackyStoryTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.storyTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
+  getStaticImageUrl(imageUrl: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imageUrl);
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {
@@ -159,11 +220,39 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     );
   }
 
-  toggleLessonAuthorsSubmenu(): void {
-    this.lessonAuthorsSubmenuIsShown = !this.lessonAuthorsSubmenuIsShown;
-  }
-
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  async saveLoggedOutProgress(): Promise<void> {
+    if (!this.loggedOutProgressUniqueUrlId) {
+      this.explorationPlayerStateService
+        .setUniqueProgressUrlId()
+        .then(() => {
+          this.loggedOutProgressUniqueUrlId = (
+            this.explorationPlayerStateService.getUniqueProgressUrlId());
+          this.loggedOutProgressUniqueUrl = (
+            this.urlService.getOrigin() +
+            '/progress/' + this.loggedOutProgressUniqueUrlId);
+        });
+    }
+    this.saveProgressMenuIsShown = true;
+  }
+
+  copyProgressUrl(): void {
+    this.clipboard.copy(this.loggedOutProgressUniqueUrl);
+  }
+
+  onLoginButtonClicked(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) => {
+        this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+          this.loggedOutProgressUniqueUrlId);
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      });
+  }
+
+  closeSaveProgressMenu(): void {
+    this.saveProgressMenuIsShown = false;
   }
 }

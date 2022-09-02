@@ -1262,7 +1262,7 @@ class Story:
         """
         for node in story_contents_dict['nodes']:
             node['outline'] = (
-                html_validation_service.add_math_content_to_math_rte_components(  # type: ignore[no-untyped-call]
+                html_validation_service.add_math_content_to_math_rte_components(
                     node['outline']
                 )
             )
@@ -1861,3 +1861,25 @@ class StorySummary:
             'thumbnail_filename': self.thumbnail_filename,
             'url_fragment': self.url_fragment
         }
+
+
+class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
+    """Dictionary representation of a StorySummary object for learner
+    groups syllabus.
+    """
+
+    story_is_published: bool
+    completed_node_titles: List[str]
+    all_node_dicts: List[StoryNodeDict]
+    topic_name: str
+    topic_url_fragment: str
+
+
+class StoryChapterProgressSummaryDict(TypedDict):
+    """Dictionary representation of a StoryChapterProgressSummary object for
+    learner groups syllabus.
+    """
+
+    exploration_id: str
+    visited_checkpoints_count: int
+    total_checkpoints_count: int

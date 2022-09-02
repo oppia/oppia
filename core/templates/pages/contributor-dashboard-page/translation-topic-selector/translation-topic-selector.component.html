@@ -1,15 +1,14 @@
-<div #dropdown class="oppia-translation-topic-selector-container protractor-test-topic-selector">
-  <div class="oppia-translation-topic-selector-inner-container protractor-test-topic-selector-selected" (click)="toggleDropdown()">
+<div #dropdown class="oppia-translation-topic-selector-container e2e-test-topic-selector">
+  <div class="oppia-translation-topic-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
     {{activeTopicName}}
-    <span class="material-icons oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-      arrow_drop_down
+    <span class="fas fa-caret-down oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
     </span>
   </div>
 
-  <div *ngIf="dropdownShown" class="oppia-translation-topic-selector-dropdown-container protractor-test-topic-selector-dropdown">
+  <div *ngIf="dropdownShown" class="oppia-translation-topic-selector-dropdown-container e2e-test-topic-selector-dropdown">
     <!-- TODO(#15648): Re-enable "All Topics" after fetching latency is fixed. -->
     <!-- <div class="oppia-translation-topic-selector-dropdown-label">All Topics</div> -->
-    <div class="oppia-translation-topic-selector-dropdown-option protractor-test-topic-selector-option"
+    <div class="oppia-translation-topic-selector-dropdown-option e2e-test-topic-selector-option"
          *ngFor="let option of options"
          (click)="selectOption(option)"
          [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
@@ -40,6 +39,7 @@
   .oppia-translation-topic-selector-inner-container-arrow {
     color: #009688;
     cursor: pointer;
+    padding-top: 3px;
   }
 
   .oppia-translation-topic-selector-dropdown-container {
@@ -108,5 +108,11 @@
     right: 0;
     width: 250px;
     z-index: 1;
+  }
+
+  @media screen and (max-width: 700px) {
+    .oppia-translation-topic-selector-inner-container {
+      font-size: 18px;
+    }
   }
 </style>

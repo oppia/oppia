@@ -72,11 +72,13 @@ export class QuestionUpdateService {
       }, apply, reverse);
   }
 
-  _getParameterFromChangeDict(changeDict: unknown, paramName: string): string {
+  _getParameterFromChangeDict(
+      changeDict: BackendChangeObject, paramName: string
+  ): string {
     return changeDict[paramName];
   }
 
-  _getNewPropertyValueFromChangeDict(changeDict: unknown): string {
+  _getNewPropertyValueFromChangeDict(changeDict: BackendChangeObject): string {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
@@ -91,8 +93,10 @@ export class QuestionUpdateService {
           // All rules input types which are translatable are subclasses of
           // BaseTranslatableObject having dict structure with contentId
           // as a key.
-          if (ruleInput && 'contentId' in ruleInput) {
-            allContentIdsSet.add(ruleInput.contentId);
+          if (ruleInput.hasOwnProperty('contentId')) {
+            if (ruleInput && 'contentId' in ruleInput) {
+              allContentIdsSet.add(ruleInput.contentId);
+            }
           }
         });
       });

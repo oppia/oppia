@@ -25,6 +25,7 @@ import { AppConstants } from 'app.constants';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -33,23 +34,31 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
+import './subtopic-viewer-page.component.css';
+
+
 @Component({
   selector: 'oppia-subtopic-viewer-page',
   templateUrl: './subtopic-viewer-page.component.html',
   styleUrls: []
 })
 export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  subtopicUrlFragment!: string;
+  pageContents!: SubtopicPageContents;
+  subtopicTitle!: string;
+  subtopicTitleTranslationKey!: string;
+  parentTopicTitle!: string;
+  parentTopicTitleTranslationKey!: string;
+  parentTopicId!: string;
+  nextSubtopic!: Subtopic;
+  prevSubtopic!: Subtopic;
   directiveSubscriptions = new Subscription();
   subtopicSummaryIsShown: boolean = false;
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  subtopicUrlFragment: string;
-  pageContents: SubtopicPageContents;
-  subtopicTitle: string;
-  subtopicTitleTranslationKey: string;
-  parentTopicId: string;
-  nextSubtopic: Subtopic = null;
-  prevSubtopic: Subtopic = null;
 
   constructor(
     private alertsService: AlertsService,
@@ -58,6 +67,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService
@@ -65,10 +75,6 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   checkMobileView(): boolean {
     return (this.windowDimensionsService.getWidth() < 500);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   subscribeToOnLangChange(): void {
@@ -133,6 +139,20 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
             TranslationKeyType.TITLE)
       );
 
+      this.topicViewerBackendApiService.fetchTopicDataAsync(
+        this.topicUrlFragment,
+        this.classroomUrlFragment
+      ).then(topicDataObject => {
+        this.parentTopicTitle = topicDataObject.getTopicName();
+        this.parentTopicTitleTranslationKey = (
+          this.i18nLanguageCodeService
+            .getTopicTranslationKey(
+              topicDataObject.getTopicId(),
+              TranslationKeyType.TITLE
+            )
+        );
+      });
+
       this.loaderService.hideLoadingScreen();
     },
     (errorResponse) => {
@@ -152,6 +172,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.subtopicTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyTopicTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.parentTopicTitleTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }

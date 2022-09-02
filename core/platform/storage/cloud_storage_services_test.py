@@ -267,7 +267,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
             path_slash_blobs = (
                 cloud_storage_services.listdir('bucket_1', 'path/'))
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             path_blobs,
             [
                 self.bucket_1.blobs['path/to/file.txt'],
@@ -275,7 +275,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
                 self.bucket_1.blobs['path/to/file2.txt']
             ]
         )
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             path_slash_blobs,
             [
                 self.bucket_1.blobs['path/to/file.txt'],

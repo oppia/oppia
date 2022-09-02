@@ -29,18 +29,42 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
 import { InteractiveMapRulesService } from './interactive-map-rules.service';
-import { icon, LatLng, latLng, LeafletMouseEvent, marker, TileLayer, tileLayer } from 'leaflet';
+import { icon, LatLng, latLng, LeafletMouseEvent, Marker, marker, TileLayer, tileLayer } from 'leaflet';
 import { downgradeComponent } from '@angular/upgrade/static';
+
+interface OverlayStyle {
+  'background-color': string;
+  opacity: number;
+  'z-index': number;
+}
+
+interface MapOptions {
+  center: LatLng;
+  layers: TileLayer[];
+  zoom: number;
+}
 
 @Component({
   selector: 'oppia-interactive-interactive-map',
   templateUrl: './interactive-map-interaction.component.html'
 })
 export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
-  @Input() lastAnswer;
-  @Input() latitudeWithValue: string;
-  @Input() longitudeWithValue: string;
-  @Input() zoomWithValue: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() latitudeWithValue!: string;
+  // Last amswer property only exist in exploration_player view (including the
+  // preview mode). Otherwise, it is null.
+  @Input() lastAnswer!: number[] | null;
+  @Input() longitudeWithValue!: string;
+  @Input() zoomWithValue!: string;
+  mapMarkers!: Marker<string>;
+  mapOptions!: MapOptions;
+  coords!: [number, number];
+  zoomLevel!: number;
+  overlayStyle!: OverlayStyle;
+
+  zoom!: number;
   private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   optionsSpec = {
@@ -49,18 +73,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   };
 
   directiveSubscriptions = new Subscription();
-  coords: [number, number];
-  zoomLevel: number;
-  overlayStyle: {
-    'background-color'?: string;
-    opacity?: number;
-    'z-index'?: number;
-  };
-
-  zoom: number;
-  interactionIsActive: boolean;
-  mapMarkers;
-  mapOptions: {center: LatLng; layers: TileLayer[]; zoom: number};
+  interactionIsActive: boolean = false;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -103,7 +116,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
       zoom: this.zoomLevel,
       center: latLng([this.coords[0], this.coords[1]])
     };
-    if (!this.interactionIsActive) {
+    if (!this.interactionIsActive && this.lastAnswer !== null) {
       this._changeMarkerPosition(
         this.lastAnswer[0], this.lastAnswer[1]);
     }
@@ -117,7 +130,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     };
   }
 
-  private _changeMarkerPosition(lat, lng) {
+  private _changeMarkerPosition(lat: number, lng: number): void {
     const newMarker = marker(
       [lat, lng],
       {
@@ -180,7 +193,9 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
 
   hideOverlay(): void {
     this.overlayStyle = {
-      'background-color': '#fff'
+      'background-color': '#fff',
+      opacity: 0,
+      'z-index': 0
     };
   }
 

@@ -13,8 +13,8 @@
         </div>
         <strong>Explanation:</strong>
         <span>
-          <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="stateSolutionService.savedMemento.explanation.html">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display class="oppia-rte-editor" [rteString]="stateSolutionService.savedMemento.explanation.html">
+          </oppia-rte-output-display>
         </span>
       </div>
     </div>
@@ -53,3 +53,11 @@
     </div>
   </div>
 </div>
+
+<style>
+  @media screen and (max-width: 500px) {
+    .oppia-editor-edit-icon {
+      right: 3px;
+    }
+  }
+</style>

@@ -33,7 +33,7 @@ import { UserService } from 'services/user.service';
 export class SearchResultsComponent {
   directiveSubscriptions = new Subscription();
   someResultsExist: boolean = true;
-  userIsLoggedIn: boolean = null;
+  userIsLoggedIn: boolean = false;
 
   constructor(
     private windowRef: WindowRef,

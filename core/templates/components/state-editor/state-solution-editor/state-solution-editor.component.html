@@ -20,7 +20,7 @@
             <div *ngIf="isEditable()">
               <button *ngIf="!savedMemento()"
                       type="button"
-                      class="btn btn-secondary oppia-add-hint-button protractor-test-oppia-add-solution-button"
+                      class="btn btn-secondary oppia-add-hint-button e2e-test-oppia-add-solution-button"
                       (click)="openAddOrUpdateSolutionModal()">
                 + ADD SOLUTION
               </button>
@@ -39,7 +39,7 @@
                 </div>
               </div>
               <a (click)="toggleInlineSolutionEditorIsActive()"
-                 class="oppia-rule-tab protractor-test-oppia-solution-tab">
+                 class="oppia-rule-tab e2e-test-oppia-solution-tab">
                 <oppia-response-header [summary]="getSolutionSummary()"
                                        [defaultOutcome]="false"
                                        [shortSummary]="getSolutionSummary()"
@@ -48,7 +48,7 @@
               </a>
 
               <div *ngIf="inlineSolutionEditorIsActive">
-                <div class="oppia-editor-card-section protractor-test-oppia-solution-body">
+                <div class="oppia-editor-card-section e2e-test-oppia-solution-body">
                   <oppia-solution-editor (openSolutionEditorModal)="openAddOrUpdateSolutionModal()"
                                          (saveSolution)="onSaveSolution($event)"
                                          (showMarkAllAudioAsNeedingUpdateModalIfRequired)="openMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
@@ -83,14 +83,27 @@
     margin: 10px 0;
   }
   @media screen and (max-width: 768px) {
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
+    }
+    .state-solution-content-container {
+      margin-top: 10px;
+      padding: 15px 5px;
+    }
     .state-solution-header-container {
       padding: 0;
     }
     .state-solution-header {
-      padding: 18px 15px;
+      padding: 0;
     }
     .state-solution-header i {
       display: block;
+    }
+  }
+  @media screen and (max-width: 500px) {
+    .oppia-editor-card-section {
+      padding-left: 10px;
+      padding-right: 10px;
     }
   }
 </style>

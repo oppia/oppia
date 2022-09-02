@@ -132,13 +132,13 @@ def normalize_against_schema(
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
         from core.domain import object_registry
-        obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
+        obj_class = object_registry.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
                 obj, obj_class.get_schema(), apply_custom_validators=False)
         else:
-            normalized_obj = obj_class.normalize(obj)
+            normalized_obj = obj_class.normalize(obj)  # type: ignore[no-untyped-call]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
@@ -583,11 +583,11 @@ class _Validators:
         if len(obj) == 0:
             return True
 
-        if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
+        if not expression_parser.is_valid_expression(obj):
             return False
 
         expression_contains_at_least_one_variable = (
-            expression_parser.contains_at_least_one_variable(obj)) # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable(obj))
         # This ensures that numeric expressions don't contain variables.
         return algebraic or not expression_contains_at_least_one_variable
 
@@ -645,9 +645,9 @@ class _Validators:
             return False
 
         lhs_contains_variable = (
-            expression_parser.contains_at_least_one_variable(lhs)) # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable(lhs))
         rhs_contains_variable = (
-            expression_parser.contains_at_least_one_variable(rhs)) # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable(rhs))
 
         if not lhs_contains_variable and not rhs_contains_variable:
             return False

@@ -22,6 +22,9 @@ import { InteractiveDragAndDropSortInputComponent } from './oppia-interactive-dr
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CdkDragDrop, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { DragAndDropAnswer } from 'interactions/answer-defs';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 interface ContainerModel<T> {
   id: string;
@@ -35,7 +38,9 @@ describe('Drag and drop sort input interactive component', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         choices: {
           value: JSON.parse(attributes.choicesWithValue)
@@ -49,8 +54,12 @@ describe('Drag and drop sort input interactive component', () => {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: DragAndDropAnswer, rulesService: CurrentInteractionService
+    ) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
     }
   }
@@ -82,12 +91,9 @@ describe('Drag and drop sort input interactive component', () => {
       return {
         previousIndex: previousIndex,
         currentIndex: currentIndex,
-        item: undefined,
-        container: undefined,
-        previousContainer: undefined,
         isPointerOverContainer: true,
         distance: { x: 0, y: 0 }
-      };
+      } as CdkDragDrop<T[], T[]>;
     }
 
     private createContainer(
@@ -201,7 +207,7 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list of lists when user did not save a solution',
       () => {
-        component.savedSolution = undefined;
+        component.savedSolution = null;
         component.ngOnInit();
 
         expect(component.allowMultipleItemsInSamePosition).toBe(true);
@@ -244,6 +250,63 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
       expect(component.dragStarted).toBeFalse();
+    });
+
+    it('should throw error if story url fragment is not present', () => {
+      component.choicesValue = [
+        {
+          html: '<p>choice 1</p>',
+          contentId: null
+        },
+        {
+          html: '<p>choice 2</p>',
+          contentId: 'ca_choices_2'
+        },
+        {
+          html: '<p>choice 3</p>',
+          contentId: 'ca_choices_3'
+        },
+        {
+          html: '<p>choice 4</p>',
+          contentId: 'ca_choices_4'
+        },
+      ] as SubtitledHtml[];
+
+      component.choices = [
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+        '<p>choice 3</p>',
+        '<p>choice 4</p>'
+      ];
+
+      expect(() => {
+        component.getContentIdOfHtml('<p>choice 1</p>');
+      }).toThrowError('contentId cannot be null');
+    });
+
+    it('should throw error if content id not exist', () => {
+      component.choicesValue = [
+        {
+          html: '<p>choice 1</p>',
+          contentId: 'ca_choices_1'
+        },
+        {
+          html: '<p>choice 2</p>',
+          contentId: 'ca_choices_2'
+        },
+        {
+          html: '<p>choice 3</p>',
+          contentId: 'ca_choices_3'
+        },
+        {
+          html: '<p>choice 4</p>',
+          contentId: 'ca_choices_4'
+        },
+      ] as SubtitledHtml[];
+
+      expect(() => {
+        component.getHtmlOfContentId('ca_choices_5');
+      }).toThrowError('contentId not found');
     });
 
     it('should move items between lists', () => {
@@ -401,7 +464,7 @@ describe('Drag and drop sort input interactive component', () => {
       const containerData = component.multipleItemsInSamePositionArray[1];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedItems', containerData, undefined, undefined);
+        'selectedItems', containerData, 0, 0);
       component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(1);
@@ -417,7 +480,7 @@ describe('Drag and drop sort input interactive component', () => {
       ];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedItems', containerData, undefined, undefined);
+        'selectedItems', containerData, 0, 0);
       component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(-1);
@@ -493,7 +556,7 @@ describe('Drag and drop sort input interactive component', () => {
 
     it('should make a default list when user did not save a solution',
       () => {
-        component.savedSolution = undefined;
+        component.savedSolution = null;
         component.ngOnInit();
 
         expect(component.allowMultipleItemsInSamePosition).toBe(false);

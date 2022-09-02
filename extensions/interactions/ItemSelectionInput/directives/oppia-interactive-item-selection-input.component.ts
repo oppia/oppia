@@ -35,28 +35,33 @@ import { PlayerTranscriptService } from 'pages/exploration-player-page/services/
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
+import '../static/item_selection_input.css';
+
 @Component({
   selector: 'oppia-interactive-item-selection-input',
   templateUrl: './item-selection-input-interaction.component.html',
   styleUrls: []
 })
 export class InteractiveItemSelectionInputComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() choicesWithValue!: string;
+  @Input() maxAllowableSelectionCountWithValue!: string;
+  @Input() minAllowableSelectionCountWithValue!: string;
+  choices!: string[];
+  choicesValue!: SubtitledHtml[];
+  maxAllowableSelectionCount!: number;
+  minAllowableSelectionCount!: number;
+  selectionCount!: number;
+  userSelections!: Record<string, boolean>;
+  displayedCard!: StateCard;
+  recordedVoiceovers!: RecordedVoiceovers;
   COMPONENT_NAME_RULE_INPUT!: string;
-  @Input() choicesWithValue: string;
-  @Input() maxAllowableSelectionCountWithValue: string;
-  @Input() minAllowableSelectionCountWithValue: string;
-  choices: string[];
-  choicesValue: SubtitledHtml[];
-  displayCheckboxes: boolean;
-  maxAllowableSelectionCount: number;
-  minAllowableSelectionCount: number;
-  newQuestion: boolean;
-  notEnoughSelections: boolean;
-  preventAdditionalSelections: boolean;
-  selectionCount: number;
-  userSelections: {[key: string]: boolean};
-  displayedCard: StateCard;
-  recordedVoiceovers: RecordedVoiceovers;
+  displayCheckboxes: boolean = false;
+  newQuestion: boolean = false;
+  notEnoughSelections: boolean = false;
+  preventAdditionalSelections: boolean = false;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -111,10 +116,10 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
         combinedChoiceLabels += this.audioTranslationManagerService
           .cleanUpHTMLforVoiceover(choiceLabel);
       }
+
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(
-          this.choicesValue[0]._contentId),
+        this.recordedVoiceovers.getBindableVoiceovers(this.getContentId()),
         combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
       );
     }
@@ -130,6 +135,15 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.notEnoughSelections = this.minAllowableSelectionCount > 0;
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this), this.validityCheckFn.bind(this));
+  }
+
+  getContentId(): string {
+    let contentId = this.choicesValue[0]._contentId;
+    if (contentId === null) {
+      throw new Error('Content id is null');
+    } else {
+      return contentId;
+    }
   }
 
   onToggleCheckbox(): void {

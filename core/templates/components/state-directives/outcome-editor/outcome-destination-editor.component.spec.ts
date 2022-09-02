@@ -27,6 +27,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
+import { UserInfo } from 'domain/user/user-info.model';
 import { OutcomeDestinationEditorComponent } from './outcome-destination-editor.component';
 
 describe('Outcome Destination Editor', () => {
@@ -37,7 +38,7 @@ describe('Outcome Destination Editor', () => {
   let editorFirstTimeEventsService: EditorFirstTimeEventsService;
   let stateGraphLayoutService: StateGraphLayoutService;
   let focusManagerService: FocusManagerService;
-  let userService = null;
+  let userService: UserService;
   let PLACEHOLDER_OUTCOME_DEST = '/';
 
   beforeEach(waitForAsync(() => {
@@ -68,6 +69,15 @@ describe('Outcome Destination Editor', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
     userService = TestBed.inject(UserService);
+    component.outcome = new Outcome(
+      PLACEHOLDER_OUTCOME_DEST,
+      null,
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -85,26 +95,31 @@ describe('Outcome Destination Editor', () => {
       }, [
         {
           source: 'Introduction',
-          target: 'State1'
+          target: 'State1',
+          linkProperty: '',
+          connectsDestIfStuck: false
         },
         {
           source: 'State1',
-          target: 'End'
+          target: 'End',
+          linkProperty: '',
+          connectsDestIfStuck: false
         }
       ], 'Introduction', ['End']);
     spyOn(stateEditorService, 'getStateNames')
       .and.returnValue(['Introduction', 'State1', 'NewState', 'End']);
     spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
       .and.returnValue(computedLayout);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
     component.ngOnInit();
     tick(10);
 
     expect(component.canAddPrerequisiteSkill).toBeFalse();
-    expect(component.canEditRefresherExplorationId).toBeNull();
+    expect(component.canEditRefresherExplorationId).toBeFalse();
     expect(component.newStateNamePattern).toEqual(/^[a-zA-Z0-9.\s-]+$/);
     expect(component.destinationChoices).toEqual([{
-      id: null,
+      id: 'Hola',
       text: '(try again)'
     }, {
       id: 'Introduction',
@@ -126,14 +141,8 @@ describe('Outcome Destination Editor', () => {
 
   it('should set outcome destination as active state if it is a self loop' +
     ' when outcome destination details are saved', fakeAsync(() => {
-    component.outcome = new Outcome(
-      'Hola',
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
+    component.outcome.dest = 'Hola';
+
     let onSaveOutcomeDestDetailsEmitter = new EventEmitter();
     spyOnProperty(stateEditorService, 'onSaveOutcomeDestDetails')
       .and.returnValue(onSaveOutcomeDestDetailsEmitter);
@@ -145,19 +154,11 @@ describe('Outcome Destination Editor', () => {
 
     onSaveOutcomeDestDetailsEmitter.emit();
 
-    expect(component.outcome.dest).toBe('Introduction');
+    expect(component.outcome.dest).toBe('Hola');
   }));
 
   it('should add new state if outcome destination is a placeholder when' +
     ' outcome destination details are saved', fakeAsync(() => {
-    component.outcome = new Outcome(
-      PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
     component.outcomeNewStateName = 'End';
     let onSaveOutcomeDestDetailsEmitter = new EventEmitter();
     spyOnProperty(stateEditorService, 'onSaveOutcomeDestDetails')
@@ -180,11 +181,12 @@ describe('Outcome Destination Editor', () => {
     let userInfo = {
       isCurriculumAdmin: () => true,
       isModerator: () => false
-    };
+    } as UserInfo;
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo));
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
-    expect(component.canEditRefresherExplorationId).toBe(undefined);
+    expect(component.canEditRefresherExplorationId).toBeFalse();
 
     component.ngOnInit();
     tick(10);
@@ -202,11 +204,15 @@ describe('Outcome Destination Editor', () => {
       }, [
         {
           source: 'Introduction',
-          target: 'State1'
+          target: 'State1',
+          linkProperty: '',
+          connectsDestIfStuck: false
         },
         {
           source: 'State1',
-          target: 'End'
+          target: 'End',
+          linkProperty: '',
+          connectsDestIfStuck: false
         }
       ], 'Introduction', ['End']);
     spyOnProperty(stateEditorService, 'onStateNamesChanged')
@@ -217,12 +223,13 @@ describe('Outcome Destination Editor', () => {
         ['Introduction', 'State2', 'End']);
     spyOn(stateGraphLayoutService, 'getLastComputedArrangement')
       .and.returnValue(computedLayout);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
     component.ngOnInit();
     tick(10);
 
     expect(component.destinationChoices).toEqual([{
-      id: null,
+      id: 'Hola',
       text: '(try again)'
     }, {
       id: 'Introduction',
@@ -242,7 +249,7 @@ describe('Outcome Destination Editor', () => {
     tick(10);
 
     expect(component.destinationChoices).toEqual([{
-      id: null,
+      id: 'Hola',
       text: '(try again)'
     }, {
       id: 'Introduction',
@@ -259,16 +266,17 @@ describe('Outcome Destination Editor', () => {
     }]);
   }));
 
+  it('should throw error if active state name is null', fakeAsync(() => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+
+    expect(() => {
+      component.updateOptionNames();
+      tick(10);
+    }).toThrowError('Active state name is null');
+  }));
+
   it('should set focus to new state name input field on destination' +
     ' selector change', () => {
-    component.outcome = new Outcome(
-      PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
     spyOn(focusManagerService, 'setFocus');
 
     component.onDestSelectorChange();
@@ -279,19 +287,11 @@ describe('Outcome Destination Editor', () => {
   });
 
   it('should check if new state is being created', () => {
-    component.outcome = new Outcome(
-      PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
-
     expect(component.isCreatingNewState()).toBeTrue();
 
     component.outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
@@ -305,6 +305,7 @@ describe('Outcome Destination Editor', () => {
   it('should emit changes on destination selector change', () => {
     component.outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
@@ -327,4 +328,20 @@ describe('Outcome Destination Editor', () => {
 
     expect(component.outcomeNewStateName).toBe('New State');
   });
+
+  it('should return true if outcome destination is a current state name',
+    () => {
+      component.outcome = new Outcome(
+        'Introduction',
+        null,
+        new SubtitledHtml('<p> HTML string </p>', 'Id'),
+        false,
+        [],
+        null,
+        null,
+      );
+      component.currentStateName = 'Introduction';
+
+      expect(component.isSelfLoop()).toBeTrue();
+    });
 });

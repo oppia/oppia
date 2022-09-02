@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
-import { QuestionObjectFactory } from
+import { QuestionBackendDict, QuestionObjectFactory } from
   'domain/question/QuestionObjectFactory';
 
 describe('Pretest question backend API service', function() {
@@ -57,6 +57,7 @@ describe('Pretest question backend API service', function() {
           answer_groups: [{
             outcome: {
               dest: 'State 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: '<p>Try Again.</p>'
@@ -70,12 +71,13 @@ describe('Pretest question backend API service', function() {
               rule_type: 'Equals',
               inputs: {x: 0}
             }],
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
           },
           {
             outcome: {
               dest: 'State 2',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: '<p>Try Again.</p>'
@@ -93,7 +95,8 @@ describe('Pretest question backend API service', function() {
             tagged_skill_misconception_id: 'misconceptionId',
           }],
           default_outcome: {
-            dest: null,
+            dest: 'default',
+            dest_if_really_stuck: null,
             labelled_as_correct: true,
             missing_prerequisite_skill_id: null,
             refresher_exploration_id: null,
@@ -168,7 +171,7 @@ describe('Pretest question backend API service', function() {
     sampleDataResultsObjects = {
       pretest_question_objects: [
         questionObjectFactory.createFromBackendDict(
-          responseDictionaries.pretest_question_dicts[0])
+          responseDictionaries.pretest_question_dicts[0] as QuestionBackendDict)
       ]
     };
   });

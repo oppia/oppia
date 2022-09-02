@@ -67,7 +67,7 @@ describe('Response Header Component', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
 
-    component.outcome = outcomeObjectFactory.createNew('/', null, null, null);
+    component.outcome = outcomeObjectFactory.createNew('/', '0', '0', []);
     component.index = 0;
 
     fixture.detectChanges();
@@ -114,12 +114,5 @@ describe('Response Header Component', () => {
 
   it('should check if a new state is being created', () => {
     expect(component.isCreatingNewState()).toBe(true);
-  });
-
-  it('should delete response when user clicks delete button', () => {
-    spyOn(component.delete, 'emit').and.callThrough();
-    component.deleteResponse(new Event(''));
-
-    expect(component.delete.emit).toHaveBeenCalled();
   });
 });

@@ -1,12 +1,9 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.rtl.css" as="style">
-
 <ul class="nav navbar-nav oppia-navbar-breadcrumb">
   <li>
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <div class="lesson-info-section">
       <h1 class="oppia-exploration-h1">
-        <span class="protractor-test-exploration-header oppia-exploration-header"
+        <span class="e2e-test-exploration-header oppia-exploration-header"
               itemprop="description">
           <span *ngIf="!isHackyExpTitleTranslationDisplayed()">
             {{ explorationTitle }}
@@ -27,14 +24,4 @@
       </a>
     </div>
   </li>
-  <li (click)="showInformationCard()" tabindex="0"
-      placement="bottom" [ngbTooltip]="'I18N_PLAYER_INFO_TOOLTIP' | translate"
-      class="oppia-exploration-info-icon protractor-test-exploration-info-icon">
-    <i class="material-icons oppia-navbar-breadcrumb-icon oppia-navbar-info-icon">&#xE88E;</i>
-    <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
-  </li>
 </ul>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/learner-view-info.component.rtl.css">

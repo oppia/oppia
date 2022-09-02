@@ -8,8 +8,8 @@
         <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'navbar-tab-active': $ctrl.getActiveTabName() === 'main'}"
             ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>"
             ng-click="$ctrl.selectMainTab()" class="navbar-tab nav-list-item">
-          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="protractor-test-main-tab">
-            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
+          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="e2e-test-main-tab">
+            <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}"></i>
           </a>
           <div ng-show="$ctrl.getWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -27,16 +27,16 @@
             </li>
           </ul>
         </li>
-        <li class="navbar-tab icon nav-list-item protractor-test-questions-tab"
+        <li class="navbar-tab icon nav-list-item e2e-test-questions-tab"
             ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}"
             ng-click="$ctrl.selectQuestionsTab()">
           <a uib-tooltip="Questions" tooltip-placement="bottom" aria-label="Questions">
-            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}">import_contacts</i>
+            <i class="fas fa-book-open navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}"></i>
           </a>
         </li>
         <li class="navbar-tab icon nav-list-item" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview'}" ng-click="$ctrl.selectPreviewTab()" >
           <a class="nav-link" uib-tooltip="Preview" tooltip-placement="bottom" aria-label="Preview">
-            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}">&#xE037;</i>
+            <i class="fas fa-play navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}"></i>
           </a>
         </li>
       </div>
@@ -100,7 +100,7 @@
   .skill-editor-main .navbar-tab-icon {
     color: #fff;
     display: block;
-    font-size: 30px;
+    font-size: 22px;
     width: 100%;
   }
 

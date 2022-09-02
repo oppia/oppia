@@ -19,7 +19,7 @@
 import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
 
 describe('Newly Created Story Model', () => {
-  let story: NewlyCreatedStory = null;
+  let story: NewlyCreatedStory;
 
   beforeEach(() => {
     story = NewlyCreatedStory.createDefault();

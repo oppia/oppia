@@ -1,7 +1,4 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.rtl.css" as="style">
-
-<div class="progress-nav-bar row space-between center" [@fadeInOut]="this.displayedCard">
+<div class="progress-nav-bar row space-between center">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
@@ -10,7 +7,7 @@
       <button mat-raised-button
               aria-label="Previous Card"
               (click)="validateIndexAndChangeCard(displayedCardIndex-1)"
-              class="protractor-test-back-button oppia-back-button oppia-nav-button oppia-nav-left-button">
+              class="e2e-test-back-button oppia-back-button oppia-nav-button oppia-nav-left-button">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </button>
     </div>
@@ -19,7 +16,7 @@
     <button mat-raised-button
             (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
             aria-label="Next Card"
-            class="oppia-next-button protractor-test-next-button oppia-nav-button">
+            class="oppia-next-button e2e-test-next-button oppia-nav-button">
       <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
     </button>
   </div>
@@ -29,14 +26,14 @@
       <button mat-button
               *ngIf="interactionId === 'Continue'"
               (click)="submit.emit()"
-              class="oppia-learner-confirm-button protractor-test-continue-button oppia-autofocus"
+              class="oppia-learner-confirm-button e2e-test-continue-button oppia-autofocus"
               oppiaFocusOn="continue-btn">
         {{ interactionCustomizationArgs.buttonText.value.unicode }}
-        <i class="fas fa-arrow-right oppia-arrow-right"></i>
+        <i class="fas fa-arrow-right oppia-arrow"></i>
       </button>
       <button mat-button
               *ngIf="shouldGenericSubmitButtonBeShown()"
-              class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+              class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
               (click)="submit.emit()"
               [disabled]="submitButtonDisabled">
         {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
@@ -50,7 +47,3 @@
     </oppia-continue-button>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/layout-directives/progress-nav.component.rtl.css">

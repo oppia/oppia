@@ -34,6 +34,9 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
+import './progress-nav.component.css';
+
+
 @Component({
   selector: 'oppia-progress-nav',
   templateUrl: './progress-nav.component.html',
@@ -102,10 +105,6 @@ export class ProgressNavComponent {
       this.lastDisplayedCard = this.displayedCard;
       this.updateDisplayedCardInfo();
     }
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {

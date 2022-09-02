@@ -28,7 +28,7 @@ from core.tests import test_utils
 from typing import Dict, List, Optional, Union
 from typing_extensions import Final
 
-ServerModes = parameter_domain.ServerModes
+ServerMode = parameter_domain.ServerMode
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
@@ -41,21 +41,21 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_with_missing_cmd_raises_exception(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             parameter_domain.PlatformParameterChange({'invalid': 'data'})
 
     def test_param_change_object_with_invalid_cmd_raises_exception(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             parameter_domain.PlatformParameterChange({'cmd': 'invalid'})
 
     def test_param_change_object_missing_attribute_in_cmd_raises_exception(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The following required attributes are missing: new_rules'):
             parameter_domain.PlatformParameterChange({
@@ -65,22 +65,24 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        param_change_dict: Dict[str, Union[str, List[str]]] = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': [],
+            'invalid': 'invalid'
+        }
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The following extra attributes are present: invalid'):
-            parameter_domain.PlatformParameterChange({
-                'cmd': self.CMD_EDIT_RULES,
-                'new_rules': [],
-                'invalid': 'invalid'
-            })
+            parameter_domain.PlatformParameterChange(param_change_dict)
 
     def test_param_change_object_with_valid_data_success(self) -> None:
+        param_change_dict: Dict[str, Union[str, List[str]]] = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': []
+        }
         param_change_object = (
-            parameter_domain.PlatformParameterChange({
-                'cmd': self.CMD_EDIT_RULES,
-                'new_rules': []
-            }))
-
+            parameter_domain.PlatformParameterChange(param_change_dict)
+        )
         self.assertEqual(
             param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(
@@ -109,13 +111,13 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(context.platform_type, 'Android')
         self.assertEqual(context.browser_type, None)
         self.assertEqual(context.app_version, '1.0.0')
-        self.assertEqual(context.server_mode, ServerModes.DEV)
+        self.assertEqual(context.server_mode, ServerMode.DEV)
 
     def test_is_valid_with_invalid_platform_type_returns_false(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
@@ -125,7 +127,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertFalse(context.is_valid)
@@ -138,7 +140,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -151,7 +153,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': None,
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -164,7 +166,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '3.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -177,7 +179,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         context.validate()
@@ -192,7 +194,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         # No exception should be raised since invalid platform types are
@@ -207,10 +209,10 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid browser type \'Invalid\''):
             context.validate()
 
@@ -222,10 +224,10 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': 'a.a.a',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid version \'a.a.a\''):
             context.validate()
 
@@ -239,10 +241,10 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid version \'1.0.0.0\''):
             context.validate()
 
@@ -256,10 +258,10 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0-abcedef-invalid',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid version flavor \'invalid\''):
             context.validate()
 
@@ -274,13 +276,13 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             },
             {
                 # The expected type of 'server_mode' key is Enum defined under
-                # the name ServerModes, but for testing purpose we are providing
+                # the name ServerMode, but for testing purpose we are providing
                 # namedtuple (MockEnum) which causes MyPy to throw error. Thus
                 # to avoid the error, we used ignore here.
                 'server_mode': mock_enum,  # type: ignore[typeddict-item]
             },
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid server mode \'invalid\''
         ):
             context.validate()
@@ -306,7 +308,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 'app_version': app_version,
             },
             {
-                'server_mode': getattr(ServerModes, mode),
+                'server_mode': getattr(ServerMode, mode),
             },
         )
 
@@ -1332,7 +1334,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'server_mode', 'conditions': [['!=', 'dev']]}
             ))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unsupported comparison operator \'!=\''):
             filter_domain.evaluate(self._create_example_context())
 
@@ -1343,7 +1345,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
             filter_dict)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unsupported comparison operator \'>>\''):
             self.assertFalse(filter_domain.evaluate(
                 self._create_example_context(app_version='1.0.0-abcdef-test')))
@@ -1353,7 +1355,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'app_version_flavor', 'conditions': [['==', 'beta']]}
             ))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unsupported comparison operator \'==\''):
             filter_domain.evaluate(
                 self._create_example_context(app_version='1.0.0-abcdef-test')
@@ -1375,7 +1377,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'invalid', 'conditions': [['=', 'value1']]}
             ))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Unsupported filter type \'invalid\''):
             filter_domain.validate()
 
@@ -1387,7 +1389,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'server_mode', 'conditions': [['!=', 'dev']]}
             ))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Unsupported comparison operator \'!=\''):
             filter_domain.validate()
 
@@ -1399,7 +1401,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'server_mode', 'conditions': [['=', 'invalid']]}
             ))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid server mode \'invalid\''):
             filter_domain.validate()
 
@@ -1411,7 +1413,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(
                 {'type': 'platform_type', 'conditions': [['=', 'invalid']]}
             ))
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid platform type \'invalid\''):
             filter_domain.validate()
 
@@ -1424,7 +1426,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 {'type': 'app_version', 'conditions': [['=', '1.a.2']]}
             ))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid version expression \'1.a.2\''):
             filter_domain.validate()
 
@@ -1437,7 +1439,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 {'type': 'app_version_flavor', 'conditions': [['=', 'invalid']]}
             ))
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid app version flavor \'invalid\''):
             filter_domain.validate()
 
@@ -1526,7 +1528,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(rule.evaluate(context))
@@ -1548,7 +1550,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertFalse(rule.evaluate(context))
@@ -1564,7 +1566,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'value_when_matched': False,
             }
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Unsupported filter type \'invalid\''):
             rule.validate()
 
@@ -1629,7 +1631,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid parameter name \'%s\'' % param.name):
             param.validate()
@@ -1655,7 +1657,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid parameter name \'%s\'' % param1.name):
             param1.validate()
@@ -1683,7 +1685,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid parameter name \'%s\'' % long_name):
             param.validate()
@@ -1710,7 +1712,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Unsupported data type \'InvalidType\''):
             param.validate()
 
@@ -1738,7 +1740,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected bool, received \'222\' in value_when_matched'):
             param.validate()
@@ -1757,7 +1759,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': False,
             'feature_stage': None,
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected bool, received \'111\' in default value'):
             param.validate()
@@ -1765,7 +1767,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
     def test_create_with_old_rule_schema_version_failure(self) -> None:
         with self.swap(
             feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2):
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception,
                 'Current platform parameter rule schema version is v2, '
                 'received v1'):
@@ -1889,7 +1891,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
@@ -1924,7 +1926,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.PROD,
+                'server_mode': ServerMode.PROD,
             },
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
@@ -1961,7 +1963,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '111')
@@ -1998,7 +2000,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '111')
@@ -2036,7 +2038,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Data type of feature flags must be bool, got \'string\' instead'):
             parameter.validate()
@@ -2053,7 +2055,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'Invalid',
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
             parameter.validate()
 
@@ -2076,7 +2078,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'must have a server_mode filter'):
             parameter.validate()
 
@@ -2098,7 +2100,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'cannot be enabled in test or production'):
             parameter.validate()
 
@@ -2120,7 +2122,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'dev',
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'cannot be enabled in test or production'):
             parameter.validate()
 
@@ -2144,7 +2146,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'is_feature': True,
             'feature_stage': 'test',
         })
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'cannot be enabled in production'):
             parameter.validate()
 

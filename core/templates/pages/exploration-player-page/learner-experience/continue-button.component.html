@@ -1,32 +1,32 @@
 <button mat-button
-        class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button oppia-autofocus"
+        class="oppia-learner-confirm-button e2e-test-continue-to-next-card-button oppia-autofocus"
         [oppiaFocusOn]="focusLabel"
         (click)="clickContinueButton.emit()"
         aria-label="Continue">
   <div *ngIf="!isLearnAgainButton">
-    <span class="protractor-test-next-card-button">{{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate | uppercase }}</span>
-    <i class="fas fa-arrow-right icon">
-    </i>
+    <span class="e2e-test-next-card-button">{{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate | uppercase }}</span>
+    <i *ngIf="!isLanguageRTL()" class="fas fa-arrow-right icon"></i>
+    <i *ngIf="isLanguageRTL()" class="fas fa-arrow-left icon"></i>
   </div>
   <div *ngIf="isLearnAgainButton">
-    <span class="protractor-test-next-card-button">{{ 'I18N_PLAYER_LEARN_AGAIN_BUTTON' | translate | uppercase }}</span>
+    <span class="e2e-test-next-card-button">{{ 'I18N_PLAYER_LEARN_AGAIN_BUTTON' | translate | uppercase }}</span>
     <i class="fas fa-redo icon">
     </i>
   </div>
 </button>
 
 <style>
-  .oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled] {
+  .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled] {
     background-color: transparent;
     color: rgba(0,0,0,0.38);
     cursor: default;
   }
 
-  .oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled]:hover {
+  .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled]:hover {
     text-decoration: none;
   }
 
-  .oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
+  .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
     font: 16px;
     margin: 0;
     min-width: 55px;

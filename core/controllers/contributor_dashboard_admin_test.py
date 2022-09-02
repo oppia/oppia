@@ -38,7 +38,7 @@ class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
     QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
 
     def setUp(self):
-        super(ContributorDashboardAdminPageTest, self).setUp()
+        super().setUp()
         self.signup(self.USER_A_EMAIL, 'userA')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationExpert')
         self.signup(self.QUESTION_ADMIN_EMAIL, 'questionExpert')
@@ -84,7 +84,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
     QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
 
     def setUp(self):
-        super(ContributionRightsHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationExpert')
@@ -359,7 +359,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
     QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
 
     def setUp(self):
-        super(ContributorUsersListHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationAdmen')
@@ -416,7 +416,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     QUESTION_ADMIN = 'questionadmin@example.com'
 
     def setUp(self):
-        super(ContributionRightsDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.signup(self.TRANSLATION_ADMIN, 'translationAdmen')
         self.signup(self.QUESTION_ADMIN, 'questionAdmen')
@@ -500,7 +500,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
     CONTRIBUTOR_USERNAME = 'contributor'
 
     def setUp(self):
-        super(TranslationContributionStatsHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -528,6 +528,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 

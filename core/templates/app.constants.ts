@@ -50,6 +50,8 @@ export const AppConstants = {
   EXPLORATION_DATA_URL_TEMPLATE: '/explorehandler/init/<exploration_id>',
   EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?v=<version>'),
+  EXPLORATION_PROGRESS_PID_URL_TEMPLATE: (
+    '/explorehandler/init/<exploration_id>?pid=<pid>'),
 
   WARNING_TYPES: {
     // These must be fixed before the exploration can be saved.
@@ -86,6 +88,7 @@ export const AppConstants = {
 
   // We use a slash because this character is forbidden in a state name.
   PLACEHOLDER_OUTCOME_DEST: '/',
+  PLACEHOLDER_OUTCOME_DEST_IF_STUCK: '/',
   INTERACTION_DISPLAY_MODE_INLINE: 'inline',
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
@@ -99,6 +102,10 @@ export const AppConstants = {
     REAL: 'Real',
     UNICODE_STRING: 'UnicodeString',
   },
+
+  // Flag to toggle the support for a new state to direct the learners
+  // to if they get stuck.
+  DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
 
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,

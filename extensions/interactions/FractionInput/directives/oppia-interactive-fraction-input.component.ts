@@ -37,12 +37,15 @@ import { FractionAnswer, InteractionAnswer } from 'interactions/answer-defs';
   styleUrls: []
 })
 export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
-  @Input() requireSimplestFormWithValue: string = '';
-  @Input() allowImproperFractionWithValue: string = '';
-  @Input() allowNonzeroIntegerPartWithValue: string = '';
-  @Input() customPlaceholderWithValue: string = '';
-  @Input() labelForFocusTarget: string;
-  @Input() savedSolution: InteractionAnswer;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() requireSimplestFormWithValue!: string;
+  @Input() allowImproperFractionWithValue!: string;
+  @Input() allowNonzeroIntegerPartWithValue!: string;
+  @Input() customPlaceholderWithValue!: string;
+  @Input() labelForFocusTarget!: string;
+  @Input() savedSolution!: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
   allowImproperFraction: boolean = true;
@@ -185,7 +188,11 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
           fraction, this.fractionInputRulesService);
       }
     } catch (parsingError) {
-      this.errorMessageI18nKey = parsingError.message;
+      if (parsingError instanceof Error) {
+        this.errorMessageI18nKey = parsingError.message;
+      } else {
+        throw parsingError;
+      }
       this.isValid = false;
     }
   }

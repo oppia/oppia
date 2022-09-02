@@ -404,6 +404,15 @@ export class UrlService {
     }
     return null;
   }
+
+  getPidFromUrl(): string | null {
+    let urlParams: UrlParamsType = this.getUrlParams();
+    if (urlParams.hasOwnProperty('pid')) {
+      let pid = urlParams.pid;
+      return String(pid);
+    }
+    return null;
+  }
 }
 
 angular.module('oppia').factory(

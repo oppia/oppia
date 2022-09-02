@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, MisconceptionSkillMap, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
 import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
@@ -37,11 +37,6 @@ interface Outcome {
   feedback: SubtitledHtmlBackendDict;
 }
 
-interface TaggedMisconception {
-  skillId: string;
-  misconceptionId: number;
-}
-
 @Component({
   selector: 'oppia-question-misconception-editor',
   templateUrl: './question-misconception-editor.component.html'
@@ -53,16 +48,19 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Output() saveTaggedMisconception:
     EventEmitter<TaggedMisconception> = (new EventEmitter());
 
-  @Input() outcome: Outcome;
-  @Input() isEditable: boolean;
-  @Input() rules: Rule;
-  @Input() taggedSkillMisconceptionId: string;
-  feedbackIsUsed: boolean;
-  misconceptionEditorIsOpen: boolean;
-  misconceptionName: string;
-  misconceptionsBySkill: MisconceptionSkillMap;
-  selectedMisconception: Misconception;
-  selectedMisconceptionSkillId: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() outcome!: Outcome;
+  @Input() isEditable!: boolean;
+  @Input() rules!: Rule;
+  @Input() taggedSkillMisconceptionId!: string;
+  misconceptionName!: string;
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  selectedMisconception!: Misconception;
+  selectedMisconceptionSkillId!: string;
+  feedbackIsUsed: boolean = false;
+  misconceptionEditorIsOpen: boolean = false;
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -71,9 +69,6 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.misconceptionName = null;
-    this.selectedMisconception = null;
-    this.selectedMisconceptionSkillId = null;
     this.misconceptionsBySkill = (
       this.stateEditorService.getMisconceptionsBySkill());
     this.misconceptionEditorIsOpen = false;

@@ -1,13 +1,13 @@
 <div *ngIf="!misconceptionEditorIsOpen && misconceptionName && !outcome.labelledAsCorrect"
      title="{{ isEditable ? 'Edit Misconception' : '' }}"
      class="oppia-misconception-editor-container">
-  <div class="oppia-readonly-rule-tile protractor-test-edit-misconception-button"
+  <div class="oppia-readonly-rule-tile e2e-test-edit-misconception-button"
        [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-transition-200">
-      <div class="oppia-click-to-start-editing protractor-test-open-misconception-editor"
+      <div class="oppia-click-to-start-editing e2e-test-open-misconception-editor"
            *ngIf="isEditable" (click)="editMisconception()">
-        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
-           title="Edit Misconception">&#xE254;
+        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
+           title="Edit Misconception">
         </i>
       </div>
       <strong>Tagged Misconception:</strong>
@@ -29,7 +29,7 @@
 </div>
 <button type="button"
         *ngIf="!misconceptionName && isEditable && rules && !outcome.labelledAsCorrect && containsMisconceptions()"
-        class="btn btn-primary btn-lg oppia-add-rule-button protractor-test-add-answer"
+        class="btn btn-primary btn-lg oppia-add-rule-button e2e-test-add-answer"
         (click)="tagAnswerGroupWithMisconception()">
   Tag with misconception
 </button>

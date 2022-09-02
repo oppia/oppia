@@ -74,7 +74,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
         user_id: Optional[str]=None,
         fake_field: Optional[str]=None
     ) -> None:
-        super(MockModifiableUserData, self).__init__(
+        super().__init__(
             display_alias,
             pin,
             preferred_language_codes,
@@ -136,12 +136,13 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
 class UserSettingsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(UserSettingsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner = user_services.get_user_actions_info(self.owner_id)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
-        self.user_settings = user_services.get_user_settings(self.owner_id)  # type: ignore[no-untyped-call]
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.user_settings = user_settings
         self.user_settings.validate()
         self.assertEqual(self.owner.roles, [feconf.ROLE_ID_FULL_USER])
         user_data_dict: user_domain.RawUserDataDict = {
@@ -169,9 +170,12 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_user_id_raises_exception(self) -> None:
-        self.user_settings.user_id = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.user_id = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected user_id to be a string'
         ):
             self.user_settings.validate()
@@ -180,42 +184,48 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
         self.user_settings.user_id = 'a' * 36
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_invalid_banned_value_type_raises_exception(self) -> None:
-        self.user_settings.banned = 123
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.banned = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
-        self.user_settings.banned = '123'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.banned = '123'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected banned to be a bool'):
             self.user_settings.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_invalid_roles_value_type_raises_exception(self) -> None:
-        self.user_settings.roles = 123
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.roles = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
-        self.user_settings.roles = True
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.roles = True  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a list'):
             self.user_settings.validate()
 
@@ -225,7 +235,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.roles = ['FULL_USER']
         self.user_settings.banned = True
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected roles for banned user to be empty'):
             self.user_settings.validate()
@@ -235,7 +245,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
     ) -> None:
         self.user_settings.roles = ['FULL_USER', 'FULL_USER', 'TOPIC_MANAGER']
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Roles contains duplicate values:'):
             self.user_settings.validate()
 
@@ -244,14 +254,17 @@ class UserSettingsTests(test_utils.GenericTestBase):
     ) -> None:
         self.user_settings.roles = ['TOPIC_MANAGER']
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected roles to contains one default role.'):
             self.user_settings.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_pin_id(self) -> None:
-        self.user_settings.pin = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.pin = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected PIN to be a string'
         ):
             self.user_settings.validate()
@@ -263,7 +276,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
         )
         for pin in invalid_pin_values_list:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 utils.ValidationError, error_msg
             ):
                 self.user_settings.pin = pin
@@ -283,7 +296,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         valid_pin_values_list = ['AbC', '123A}', '1!2', 'AB!', '[123]']
         error_msg = 'Only numeric characters are allowed in PIN'
         for pin in valid_pin_values_list:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 utils.ValidationError, error_msg
             ):
                 self.user_settings.pin = pin
@@ -291,44 +304,56 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_validate_empty_user_id_raises_exception(self) -> None:
         self.user_settings.user_id = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'No user id specified.'
         ):
             self.user_settings.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_role_raises_exception(self) -> None:
-        self.user_settings.roles = [0]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.roles = [0]  # type: ignore[list-item]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected roles to be a string'
         ):
             self.user_settings.validate()
 
     def test_validate_invalid_role_name_raises_exception(self) -> None:
         self.user_settings.roles = ['invalid_role']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_display_alias_raises_error(self) -> None:
-        self.user_settings.display_alias = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.display_alias = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected display_alias to be a string,'
             ' received %s' % self.user_settings.display_alias):
             self.user_settings.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_creator_dashboard_display_pref_raises_error(
         self
     ) -> None:
-        self.user_settings.creator_dashboard_display_pref = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.creator_dashboard_display_pref = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected dashboard display preference to be a string'
         ):
             self.user_settings.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validation_none__email_raises_error(self) -> None:
-        self.user_settings.email = None
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_settings.email = None  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected email to be a string,'
             ' received %s' % self.user_settings.email):
             self.user_settings.validate()
@@ -338,7 +363,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'testemail.com', '@testemail.com', 'testemail.com@']
         for email in invalid_emails_list:
             self.user_settings.email = email
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 utils.ValidationError, 'Invalid email address: %s' % email
             ):
                 self.user_settings.validate()
@@ -348,7 +373,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
     ) -> None:
         self.user_settings.creator_dashboard_display_pref = (
             'invalid_creator_dashboard_display_pref')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'invalid_creator_dashboard_display_pref is not a valid '
             'value for the dashboard display preferences.'
@@ -361,45 +386,49 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.modifiable_user_data.user_id = self.owner_id
         self.modifiable_user_data.pin = '12345'
         self.modifiable_user_data.display_alias = 'temp_name'
-        user_services.update_multiple_users_data([self.modifiable_user_data])  # type: ignore[no-untyped-call]
+        user_services.update_multiple_users_data([self.modifiable_user_data])
 
-        auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
         profile_pin = '123'
         error_msg = 'Expected display_alias to be a string, received'
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(utils.ValidationError, error_msg):
             self.modifiable_new_user_data.display_alias = ''
             self.modifiable_new_user_data.pin = profile_pin
-            user_services.create_new_profiles(  # type: ignore[no-untyped-call]
+            user_services.create_new_profiles(
                 auth_id, self.OWNER_EMAIL, [self.modifiable_new_user_data]
             )
 
     def test_has_not_fully_registered_for_guest_user_is_false(
         self
     ) -> None:
-        self.assertFalse(user_services.has_fully_registered_account(None))  # type: ignore[no-untyped-call]
+        self.assertFalse(user_services.has_fully_registered_account(
+            'non_existing_user'
+        ))
 
     def test_create_new_user_with_existing_auth_id_raises_error(self) -> None:
         user_id = self.user_settings.user_id
         user_auth_id = auth_services.get_auth_id_from_user_id(user_id)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'User %s already exists for auth_id %s.'
             % (user_id, user_auth_id)
         ):
-            user_services.create_new_user(user_auth_id, self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+            # Ruling out the possibility of None for mypy type checking.
+            assert user_auth_id is not None
+            user_services.create_new_user(user_auth_id, self.OWNER_EMAIL)
 
     def test_cannot_set_existing_username(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Sorry, the username \"%s\" is already taken! Please pick '
             'a different one.' % self.OWNER_USERNAME
         ):
-            user_services.set_username(self.owner_id, self.OWNER_USERNAME)  # type: ignore[no-untyped-call]
+            user_services.set_username(self.owner_id, self.OWNER_USERNAME)
 
     def test_cannot_add_user_role_with_invalid_role(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Role invalid_role does not exist.'
         ):
-            user_services.add_user_role(self.owner_id, 'invalid_role')  # type: ignore[no-untyped-call]
+            user_services.add_user_role(self.owner_id, 'invalid_role')
 
     def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(
         self
@@ -412,11 +441,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_user_not_found = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_user_not_found = self.assertRaisesRegex(
             Exception, 'User not found.')
 
         with logging_swap, assert_raises_user_not_found:
-            user_services.get_human_readable_user_ids(['invalid_user_id'])  # type: ignore[no-untyped-call]
+            user_services.get_human_readable_user_ids(['invalid_user_id'])
 
         self.assertEqual(
             observed_log_messages,
@@ -433,7 +462,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             username=''
         ).put()
 
-        user_ids = user_services.get_human_readable_user_ids(  # type: ignore[no-untyped-call]
+        user_ids = user_services.get_human_readable_user_ids(
             [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
         expected_user_ids = [
             'owner', 'admin',
@@ -444,11 +473,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
         self
     ) -> None:
-        user_id = user_services.create_new_user(  # type: ignore[no-untyped-call]
+        user_id = user_services.create_new_user(
             'auth_id', 'user@example.com').user_id
-        user_services.set_username(user_id, 'username')  # type: ignore[no-untyped-call]
-        user_services.mark_user_for_deletion(user_id)  # type: ignore[no-untyped-call]
-        human_readable_user_ids = user_services.get_human_readable_user_ids(  # type: ignore[no-untyped-call]
+        user_services.set_username(user_id, 'username')
+        user_services.mark_user_for_deletion(user_id)
+        human_readable_user_ids = user_services.get_human_readable_user_ids(
             [user_id], strict=False)
 
         self.assertEqual(
@@ -458,14 +487,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_created_on_gets_updated_correctly(self) -> None:
         # created_on should not be updated upon updating other attributes of
         # the user settings model.
-        user_settings = user_services.create_new_user(  # type: ignore[no-untyped-call]
+        user_settings = user_services.create_new_user(
             'auth_id', 'user@example.com')
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         time_of_creation = user_settings_model.created_on
 
-        user_services.update_user_bio(user_settings.user_id, 'New bio.')  # type: ignore[no-untyped-call]
+        user_services.update_user_bio(user_settings.user_id, 'New bio.')
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
@@ -475,46 +504,62 @@ class UserSettingsTests(test_utils.GenericTestBase):
 class UserContributionsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(UserContributionsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_contributions = user_services.get_user_contributions(  # type: ignore[no-untyped-call]
-            self.owner_id)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_contributions = user_services.get_user_contributions(
+            self.owner_id, strict=True
+        )
         self.user_contributions.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_user_id(self) -> None:
-        self.user_contributions.user_id = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_contributions.user_id = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             Exception, 'Expected user_id to be a string'):
             self.user_contributions.validate()
 
     def test_validate_user_id(self) -> None:
         self.user_contributions.user_id = ''
-        with self.assertRaisesRegex(Exception, 'No user id specified.'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'No user id specified.'):
             self.user_contributions.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_list_created_exploration_ids(self) -> None:
-        self.user_contributions.created_exploration_ids = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_contributions.created_exploration_ids = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             Exception, 'Expected created_exploration_ids to be a list'):
             self.user_contributions.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_created_exploration_ids(self) -> None:
-        self.user_contributions.created_exploration_ids = [0]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_contributions.created_exploration_ids = [0]  # type: ignore[list-item]
+        with self.assertRaisesRegex(
             Exception, 'Expected exploration_id in created_exploration_ids '
             'to be a string'):
             self.user_contributions.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_list_edited_exploration_ids(self) -> None:
-        self.user_contributions.edited_exploration_ids = 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_contributions.edited_exploration_ids = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(
             Exception, 'Expected edited_exploration_ids to be a list'):
             self.user_contributions.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_edited_exploration_ids(self) -> None:
-        self.user_contributions.edited_exploration_ids = [0]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.user_contributions.edited_exploration_ids = [0]  # type: ignore[list-item]
+        with self.assertRaisesRegex(
             Exception, 'Expected exploration_id in edited_exploration_ids '
             'to be a string'):
             self.user_contributions.validate()
@@ -523,13 +568,15 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.assertIsNone(
-            user_services.create_user_contributions(  # type: ignore[no-untyped-call]
+            user_services.create_user_contributions(
                 feconf.MIGRATION_BOT_USER_ID, [], []))
 
     def test_update_user_contributions(self) -> None:
-        user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])  # type: ignore[no-untyped-call]
+        user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])
 
-        contributions = user_services.get_user_contributions(self.owner_id)  # type: ignore[no-untyped-call]
+        contributions = user_services.get_user_contributions(
+            self.owner_id, strict=True
+        )
         self.assertEqual(contributions.user_id, self.owner_id)
         self.assertEqual(contributions.created_exploration_ids, ['e1'])
         self.assertEqual(contributions.edited_exploration_ids, ['e2'])
@@ -537,19 +584,19 @@ class UserContributionsTests(test_utils.GenericTestBase):
     def test_cannot_create_user_contributions_with_existing_user_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'User contributions model for user %s already exists.'
             % self.owner_id):
-            user_services.create_user_contributions(self.owner_id, [], [])  # type: ignore[no-untyped-call]
+            user_services.create_user_contributions(self.owner_id, [], [])
 
     def test_cannot_update_user_contributions_with_invalid_user_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'User contributions model for user invalid_user_id does not exist'):
-            user_services.update_user_contributions('invalid_user_id', [], [])  # type: ignore[no-untyped-call]
+            user_services.update_user_contributions('invalid_user_id', [], [])
 
     def test_cannot_update_dashboard_stats_log_with_invalid_schema_version(
         self
@@ -559,12 +606,12 @@ class UserContributionsTests(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
 
-        self.assertIsNone(user_services.get_user_impact_score(self.owner_id))  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.assertIsNone(user_services.get_user_impact_score(self.owner_id))
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
-            user_services.update_dashboard_stats_log(self.owner_id)  # type: ignore[no-untyped-call]
+            user_services.update_dashboard_stats_log(self.owner_id)
 
 
 class UserGlobalPrefsTests(test_utils.GenericTestBase):
@@ -1111,7 +1158,7 @@ class UserContributionProficiencyTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
 
     def setUp(self) -> None:
-        super(UserContributionProficiencyTests, self).setUp()
+        super().setUp()
         self.user_proficiency = user_domain.UserContributionProficiency(
             'user_id0', 'category0', 0, False)
 
@@ -1154,7 +1201,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     """Testing UserContributionRights domain object."""
 
     def setUp(self) -> None:
-        super(UserContributionRightsTests, self).setUp()
+        super().setUp()
         self.user_contribution_rights = user_domain.UserContributionRights(
             'user_id', ['hi'], [], True, False)
 
@@ -1180,7 +1227,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         # Here, List type is expected but for test purpose we're assigning it
         # an int type. Thus to avoid MyPy error, we added an ignore here.
         user_contribution_rights.can_review_translation_for_language_codes = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
@@ -1193,7 +1240,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         # Here, List type is expected but for test purpose we're assigning it
         # an int type. Thus to avoid MyPy error, we added an ignore here.
         user_contribution_rights.can_review_voiceover_for_language_codes = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
@@ -1201,14 +1248,14 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     def test_incorrect_language_code_for_voiceover_raise_error(self) -> None:
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_translation_raise_error(self) -> None:
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_contribution_rights.validate()
 
@@ -1221,7 +1268,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
         self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes list not to have '
             'duplicate values'):
@@ -1236,7 +1283,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
         self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes list not to '
             'have duplicate values'):
@@ -1246,7 +1293,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         # Here, bool value is expected but for test purpose we're assigning it
         # an int type. Thus to avoid MyPy error, we added an ignore here.
         self.user_contribution_rights.can_review_questions = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_review_questions to be a boolean value'):
             self.user_contribution_rights.validate()
@@ -1255,7 +1302,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
         # Here, bool value is expected but for test purpose we're assigning it
         # an int type. Thus to avoid MyPy error, we added an ignore here.
         self.user_contribution_rights.can_submit_questions = 5  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected can_submit_questions to be a boolean value'):
             self.user_contribution_rights.validate()
@@ -1358,7 +1405,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'user_id': 'user_id',
         }
         error_msg = 'Invalid modifiable user data: no schema version specified.'
-        with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, error_msg):
             user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     def test_from_raw_dict_with_invalid_schema_version_raises_error(
@@ -1383,7 +1430,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         for version in invalid_schema_versions:
             user_data_dict['schema_version'] = version
             error_msg = 'Invalid version %s received.' % version
-            with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_msg):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     def test_from_raw_dict_with_invalid_schema_version_type_raises_error(
@@ -1409,7 +1456,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
                 'Version has invalid type, expected int, '
                 'received %s' % type(version)
             )
-            with self.assertRaisesRegex(Exception, error_msg):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_msg):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData
@@ -1631,8 +1678,8 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         learner_group_user_details = (
             user_domain.LearnerGroupUserDetails('group_id_1', True))
 
-        self._assert_validation_error( # type: ignore[no-untyped-call]
+        self._assert_validation_error(
             user_domain.LearnerGroupsUser(
                 'user1', ['group_id_1'], [learner_group_user_details], 1),
             'Learner cannot be invited to join learner group group_id_1 since '
-            'they are already its student.')
+            'they are already its learner.')

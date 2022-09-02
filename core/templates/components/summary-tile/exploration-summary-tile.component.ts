@@ -32,6 +32,8 @@ import { Subscription } from 'rxjs';
 import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
+import './exploration-summary-tile.component.css';
+
 @Component({
   selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
@@ -160,7 +162,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   checkIfMobileCardToBeShown(): void {
     let currentPageUrl = this.urlService.getPathname();
     this.mobileCardToBeShown = (
-      !this.isWindowLarge && (currentPageUrl === '/community-library'));
+      !this.isWindowLarge && ((
+        currentPageUrl === '/community-library') ||
+        currentPageUrl.includes('/explore')));
   }
 
   setHoverState(hoverState: boolean): void {

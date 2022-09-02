@@ -5,7 +5,8 @@
       Choose Interaction
     </h3>
 
-    <h3 *ngIf="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
+    <h3 class="oppia-customization-header"
+        *ngIf="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
       Customize Interaction ({{ getTitle(stateInteractionIdService.displayed) }})
     </h3>
     <i class="fa fa-times" (click)="cancel()"></i>
@@ -21,14 +22,14 @@
       <ng-container ngbNavItem
                     *ngFor="let category of allowedInteractionCategories">
         <a ngbNavLink
-           class="protractor-test-interaction-tab-{{ getHyphenatedLowercaseCategoryName(category.name) }}">
+           class="e2e-test-interaction-tab-{{ getHyphenatedLowercaseCategoryName(category.name) }}">
           {{ category.name }}
         </a>
         <ng-template ngbNavContent>
           <div>
             <div *ngFor="let interactionId of category.interaction_ids"
                  (click)="onChangeInteractionId(interactionId)"
-                 class="oppia-interaction-tile protractor-test-interaction-tile-{{ interactionId }}"
+                 class="oppia-interaction-tile e2e-test-interaction-tile-{{ interactionId }}"
                  [ngbPopover]="getDescription(interactionId)"
                  placement="bottom"
                  triggers="mouseenter:mouseleave">
@@ -45,8 +46,8 @@
   </div>
 
   <div *ngIf="!isinteractionOpen && stateInteractionIdService.displayed && hasCustomizationArgs"
-       class="interaction-editor-form protractor-test-interaction-editor">
-    <div class="protractor-test-multiple-options"
+       class="interaction-editor-form e2e-test-interaction-editor">
+    <div class="e2e-test-multiple-options"
          *ngFor="let customizationArgSpec of customizationArgSpecs">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'"
            class="oppia-interaction-customization-label">
@@ -97,14 +98,14 @@
        [ngbPopover]="isSaveInteractionButtonEnabled() ? '' : getSaveInteractionButtonTooltip()"
        placement="bottom"
        triggers="mouseenter:mouseleave">
-    <button class="btn btn-success protractor-test-save-interaction"
+    <button class="btn btn-success e2e-test-save-interaction"
             (click)="save()"
             [disabled]="!isSaveInteractionButtonEnabled()">
       Save Interaction
     </button>
   </div>
 
-  <button class="btn btn-success protractor-test-close-no-customization-modal"
+  <button class="btn btn-success e2e-test-close-no-customization-modal"
           (click)="confirm('okay')"
           *ngIf="!hasCustomizationArgs && customizationModalReopened">
     Okay
@@ -112,6 +113,11 @@
 </div>
 
 <style>
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
   .interaction-editor-form .boolean-checkbox {
     float: left;
     margin-right: 4px;
@@ -154,6 +160,11 @@
   }
 
   @media screen and (max-width: 768px) {
+    .modal-footer {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+    }
     .customize-interaction-modal .modal-content {
       border: 0;
       border-radius: 0;
@@ -180,6 +191,18 @@
 
     .customize-interaction-modal .modal-header-blue h3 {
       color: #fff;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .modal-footer .btn {
+      height: 50px;
+    }
+    .oppia-customization-header {
+      font-size: 18px;
+    }
+    .oppia-interaction-customization-label {
+      font-size: 16px;
     }
   }
 </style>

@@ -105,11 +105,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     self.assertEqual(ca_spec['default_value'], '')
                 else:
                     obj_class = (
-                        object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
+                        object_registry.Registry.get_object_class_by_type(
                             ca_spec['schema']['obj_type']))
                     self.assertEqual(
                         ca_spec['default_value'],
-                        obj_class.normalize(ca_spec['default_value']))
+                        obj_class.normalize(ca_spec['default_value']))  # type: ignore[no-untyped-call]
 
     def _listdir_omit_ignored(self, directory: str) -> List[str]:
         """List all files and directories within 'directory', omitting the ones
@@ -159,20 +159,22 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(component_dir))
 
             # In this directory there should be a /directives directory, an
-            # an icon .png file and a protractor.js file, and an optional
-            # preview .png file.
+            # an icon .png file, webdriverio.js file and a protractor.js file,
+            # and an optional preview .png file.
             # In /directives directory should be HTML file, a JS file,
             # there could be multiple JS and HTML files.
             dir_contents = self._listdir_omit_ignored(component_dir)
-            self.assertLessEqual(len(dir_contents), 4)
+            self.assertLessEqual(len(dir_contents), 5)
 
             directives_dir = os.path.join(component_dir, 'directives')
             png_file = os.path.join(component_dir, '%s.png' % component_id)
             protractor_file = os.path.join(component_dir, 'protractor.js')
+            webdriverio_file = os.path.join(component_dir, 'webdriverio.js')
 
             self.assertTrue(os.path.isdir(directives_dir))
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
+            self.assertTrue(os.path.isfile(webdriverio_file))
 
             main_ts_file = os.path.join(
                 directives_dir, 'oppia-noninteractive-%s.component.ts'

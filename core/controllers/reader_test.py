@@ -22,6 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -44,8 +45,9 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(classifier_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.classifier, models.NAMES.statistics])
+(classifier_models, exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.classifier, models.NAMES.exploration, models.NAMES.statistics
+])
 
 
 def _get_change_list(state_name, property_name, new_value):
@@ -65,7 +67,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
-        super(ReaderPermissionsTest, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -199,7 +201,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, initialize data."""
-        super(ExplorationPretestsUnitTest, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -290,7 +292,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, initialize data."""
-        super(QuestionsUnitTest, self).setUp()
+        super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
@@ -426,7 +428,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
     EXP_ID = '0'
 
     def setUp(self):
-        super(RatingsIntegrationTests, self).setUp()
+        super().setUp()
         exp_services.load_demo(self.EXP_ID)
 
     def test_assign_and_read_ratings(self):
@@ -542,7 +544,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     COL_ID = '0'
 
     def setUp(self):
-        super(RecommendationsHandlerTests, self).setUp()
+        super().setUp()
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -577,7 +579,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             if include_system_recommendations is not None else '')
         recommendations_url = (
             '/explorehandler/recommendations/%s?'
-            'stringified_author_recommended_ids=%s%s%s' % (
+            'author_recommended_ids=%s%s%s' % (
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
@@ -973,10 +975,10 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     def test_get_recommendation_ids_with_invalid_author_recommended_ids(self):
         self.get_json(
             '/explorehandler/recommendations/%s' % self.EXP_ID_1, params={
-                'collection_id': 'collection_id',
+                'collection_id': self.COL_ID,
                 'include_system_recommendations': True,
-                'stringified_author_recommended_ids': 'invalid_type'
-            }, expected_status_int=404
+                'author_recommended_ids': 'invalid_type'
+            }, expected_status_int=400
         )
 
 
@@ -987,7 +989,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     REPORT_TEXT = 'AD'
 
     def setUp(self):
-        super(FlagExplorationHandlerTests, self).setUp()
+        super().setUp()
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1100,7 +1102,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
     USER_USERNAME = 'user'
 
     def setUp(self):
-        super(LearnerProgressTest, self).setUp()
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
@@ -1510,7 +1512,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
 
     def setUp(self):
-        super(StorePlaythroughHandlerTest, self).setUp()
+        super().setUp()
         self.exp_id = '15'
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -1781,7 +1783,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
 
     def setUp(self):
-        super(StatsEventHandlerTest, self).setUp()
+        super().setUp()
         self.exp_id = '15'
 
         self.login(self.VIEWER_EMAIL)
@@ -2051,7 +2053,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateHitEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_hitting_new_state(self):
@@ -2158,7 +2160,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateCompleteEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_completing_a_state(self):
@@ -2224,7 +2226,7 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LeaveForRefresherExpEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_leaving_an_exploration(self):
@@ -2271,7 +2273,7 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationStartEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -2436,7 +2438,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationActualStartEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_actually_starting_a_state(self):
@@ -2501,7 +2503,7 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(SolutionHitEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_viewing_solution(self):
@@ -2571,7 +2573,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
 
     def setUp(self):
-        super(ExplorationEmbedPageTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -3255,3 +3257,174 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'Welcome!')
 
         self.logout()
+
+
+class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of a particular state of an
+    exploration.
+    """
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'b'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': 'a'
+            })
+        ], 'A commit message.')
+
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            ), expected_status_int=404
+        )
+
+        self.logout()
+
+    def test_version_history_for_a_state_is_fetched_correctly(self):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response_for_state_a = self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            )
+        )
+        response_for_state_b = self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'b', 2
+            )
+        )
+
+        self.assertEqual(
+            response_for_state_a, {
+                'last_edited_version_number': 1,
+                'state_name_in_previous_version': (
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ),
+                'state_dict_in_previous_version': exploration_v1.states[
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ].to_dict(),
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+        self.assertEqual(
+            response_for_state_b, {
+                'last_edited_version_number': None,
+                'state_name_in_previous_version': None,
+                'state_dict_in_previous_version': None,
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+
+        self.logout()
+
+
+class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of the exploration metadata."""
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })
+        ], 'A commit message.')
+
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            ), expected_status_int=404)
+
+        self.logout()
+
+    def test_version_history_for_exploration_metadata_is_fetched_correctly(
+        self
+    ):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            )
+        )
+
+        self.assertEqual(
+            response, {
+                'last_edited_version_number': 1,
+                'last_edited_committer_username': self.OWNER_USERNAME,
+                'metadata_dict_in_previous_version': (
+                    exploration_v1.get_metadata().to_dict()
+                )
+            }
+        )
+
+        self.logout()
+
+
+class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
+    """Unit test for CheckpointsFeatureStatusHandler."""
+
+    def test_get_request_returns_correct_status(self):
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, False)
+
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': False
+            })
+
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, True)
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': True,
+            })

@@ -24,107 +24,107 @@ var waitFor = require('./waitFor.js');
 var SkillEditorPage = function() {
   var EDITOR_URL_PREFIX = '/skill_editor/';
   var confirmSkillDifficultyButton = element(
-    by.css('.protractor-test-confirm-skill-difficulty-button'));
+    by.css('.e2e-test-confirm-skill-difficulty-button'));
   var editConceptCardExplanationButton = element(
-    by.css('.protractor-test-edit-concept-card'));
+    by.css('.e2e-test-edit-concept-card'));
   var saveConceptCardExplanationButton = element(
-    by.css('.protractor-test-save-concept-card'));
+    by.css('.e2e-test-save-concept-card'));
   var conceptCardExplanationText = element(
-    by.css('.protractor-test-concept-card-explanation'));
+    by.css('.e2e-test-concept-card-explanation'));
   var addWorkedExampleButton = element(
-    by.css('.protractor-test-add-worked-example'));
+    by.css('.e2e-test-add-worked-example'));
   var saveWorkedExampleButton = element(
-    by.css('.protractor-test-save-worked-example-button'));
+    by.css('.e2e-test-save-worked-example-button'));
   var deleteExampleButtonLocator = by.css(
-    '.protractor-test-delete-example-button');
+    '.e2e-test-delete-example-button');
   var workedExampleSummary = function(index) {
-    return element(by.css('.protractor-test-worked-example-' + index));
+    return element(by.css('.e2e-test-worked-example-' + index));
   };
   var workedExampleQuestionInput = element(
-    by.css('.protractor-test-worked-example-question .protractor-test-rte'));
+    by.css('.e2e-test-worked-example-question .e2e-test-rte'));
   var workedExampleExplanationInput = element(
-    by.css('.protractor-test-worked-example-explanation .protractor-test-rte'));
+    by.css('.e2e-test-worked-example-explanation .e2e-test-rte'));
   var workedExampleQuestionField = element(
-    by.css('.protractor-test-worked-example-question-field'));
+    by.css('.e2e-test-worked-example-question-field'));
   var workedExampleExplanationField = element(
-    by.css('.protractor-test-worked-example-explanation-field'));
+    by.css('.e2e-test-worked-example-explanation-field'));
   var deleteWorkedExampleButton = function(index) {
     return element(
-      by.css('.protractor-test-worked-example-' + index))
+      by.css('.e2e-test-worked-example-' + index))
       .element(deleteExampleButtonLocator);
   };
   var confirmDeleteWorkedExample = element(
-    by.css('.protractor-test-confirm-delete-worked-example-button'));
+    by.css('.e2e-test-confirm-delete-worked-example-button'));
   var addMisconceptionButton = element(
-    by.css('.protractor-test-add-misconception-modal-button'));
+    by.css('.e2e-test-add-misconception-modal-button'));
   var misconceptionNameField = element(
-    by.css('.protractor-test-misconception-name-field'));
+    by.css('.e2e-test-misconception-name-field'));
   var misconceptionNotesField = element(
-    by.css('.protractor-test-notes-textarea .protractor-test-rte'));
+    by.css('.e2e-test-notes-textarea .e2e-test-rte'));
   var misconceptionFeedbackField = element(
-    by.css('.protractor-test-feedback-textarea .protractor-test-rte'));
+    by.css('.e2e-test-feedback-textarea .e2e-test-rte'));
   var confirmAddMisconception = element(
-    by.css('.protractor-test-confirm-add-misconception-button'));
+    by.css('.e2e-test-confirm-add-misconception-button'));
   var misconceptionListItems = element.all(
-    by.css('.protractor-test-misconception-list-item'));
+    by.css('.e2e-test-misconception-list-item'));
   var misconceptionListContainer = element(
-    by.css('.protractor-test-misconception-list-container'));
+    by.css('.e2e-test-misconception-list-container'));
   var deleteMisconceptionButton = function(index) {
     return element(
-      by.css('.protractor-test-misconception-' + index))
+      by.css('.e2e-test-misconception-' + index))
       .element(deleteExampleButtonLocator);
   };
   var confirmDeleteMisconception =
-    element(by.css('.protractor-test-confirm-delete-misconception-button'));
+    element(by.css('.e2e-test-confirm-delete-misconception-button'));
   var saveOrPublishSkillButton = element(
-    by.css('.protractor-test-save-or-publish-skill')
+    by.css('.e2e-test-save-or-publish-skill')
   );
   var closeSaveModalButton = element(
-    by.css('.protractor-test-close-save-modal-button'));
+    by.css('.e2e-test-close-save-modal-button'));
   var commitMessageField = element(
-    by.css('.protractor-test-commit-message-input'));
+    by.css('.e2e-test-commit-message-input'));
   var skillDescriptionField = element(
-    by.css('.protractor-test-skill-description-field'));
-  var questionsTab = element(by.css('.protractor-test-questions-tab'));
+    by.css('.e2e-test-skill-description-field'));
+  var questionsTab = element(by.css('.e2e-test-questions-tab'));
   var createQuestionButton = element(
-    by.css('.protractor-test-create-question-button'));
+    by.css('.e2e-test-create-question-button'));
   var saveQuestionButton = element(
-    by.css('.protractor-test-save-question-button'));
+    by.css('.e2e-test-save-question-button'));
   var questionItems = element.all(
-    by.css('.protractor-test-question-list-item'));
-  var questionItem = element(by.css('.protractor-test-question-list-item'));
+    by.css('.e2e-test-question-list-item'));
+  var questionItem = element(by.css('.e2e-test-question-list-item'));
 
   var saveRubricExplanationButton = element(
-    by.css('.protractor-test-save-rubric-explanation-button'));
+    by.css('.e2e-test-save-rubric-explanation-button'));
   var deleteRubricExplanationButton = element(
-    by.css('.protractor-test-delete-rubric-explanation-button'));
+    by.css('.e2e-test-delete-rubric-explanation-button'));
   var easyRubricDifficulty = element(
-    by.css('.protractor-test-skill-difficulty-easy'));
+    by.css('.e2e-test-skill-difficulty-easy'));
   var skillChangeCount = element(
-    by.css('.protractor-test-changes-count-text'));
+    by.css('.e2e-test-changes-count-text'));
   var selectRubricDifficulty = element(
-    by.css('.protractor-test-select-rubric-difficulty'));
+    by.css('.e2e-test-select-rubric-difficulty'));
   var rubricExplanationEditorElement = element(
-    by.css('.protractor-test-rubric-explanation-text'));
+    by.css('.e2e-test-rubric-explanation-text'));
   var rubricExplanationEditorInput = element(
-    by.css('.protractor-test-rubric-explanation-text .protractor-test-rte'));
+    by.css('.e2e-test-rubric-explanation-text .e2e-test-rte'));
   var addWorkedExampleModal = element(
-    by.css('.protractor-test-add-worked-example-modal'));
+    by.css('.e2e-test-add-worked-example-modal'));
   var deleteWorkedExampleModal = element(
-    by.css('.protractor-test-delete-worked-example-modal'));
+    by.css('.e2e-test-delete-worked-example-modal'));
   var addMisconceptionModal = element(
-    by.css('.protractor-test-add-misconception-modal'));
+    by.css('.e2e-test-add-misconception-modal'));
   var deleteMisconceptionModal = element(
-    by.css('.protractor-test-delete-misconception-modal'));
+    by.css('.e2e-test-delete-misconception-modal'));
   var conceptCardTextElement = element(
-    by.css('.protractor-test-concept-card-text'));
+    by.css('.e2e-test-concept-card-text'));
   var conceptCardExplanationEditorInput = element(
-    by.css('.protractor-test-concept-card-text .protractor-test-rte'));
+    by.css('.e2e-test-concept-card-text .e2e-test-rte'));
 
   var staleTabInfoModal = element(
-    by.css('.protractor-test-stale-tab-info-modal'));
+    by.css('.e2e-test-stale-tab-info-modal'));
   var unsavedChangesStatusInfoModal = element(
-    by.css('.protractor-test-unsaved-changes-info-modal'));
+    by.css('.e2e-test-unsaved-changes-info-modal'));
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -144,7 +144,7 @@ var SkillEditorPage = function() {
       difficulty, explanation) {
     await this.selectDifficultyForRubric(difficulty);
     var addRubricExplanationButton = element(
-      by.css('.protractor-test-add-explanation-button-' + difficulty));
+      by.css('.e2e-test-add-explanation-button-' + difficulty));
     await action.click(
       'Add rubric explanation button',
       addRubricExplanationButton);
@@ -166,7 +166,7 @@ var SkillEditorPage = function() {
     // index.
     await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
-      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
+      by.css('.e2e-test-edit-rubric-explanation-' + difficulty));
     var button = editRubricExplanationButtons.get(explIndex);
     await action.click(
       `Edit rubric explanation button ${explIndex}`,
@@ -186,7 +186,7 @@ var SkillEditorPage = function() {
     // index.
     await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
-      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
+      by.css('.e2e-test-edit-rubric-explanation-' + difficulty));
     await action.click(
       `Edit rubric explanation button ${explIndex}`,
       editRubricExplanationButtons.get(explIndex));
@@ -202,7 +202,7 @@ var SkillEditorPage = function() {
       difficulty, explanations) {
     await this.selectDifficultyForRubric(difficulty);
     var rubricExplanationsForDifficulty = element.all(
-      by.css('.protractor-test-rubric-explanation-' + difficulty));
+      by.css('.e2e-test-rubric-explanation-' + difficulty));
     var explanationCount = await rubricExplanationsForDifficulty.count();
     for (var i = 0; i < explanationCount; i++) {
       var text = await action.getText(
