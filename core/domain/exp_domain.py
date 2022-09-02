@@ -2649,7 +2649,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                     if lnk_attr is None:
                         # Delete the link.
-                        link.extract()
+                        link.decompose()
                     if txt_attr is None:
                         # Set link text to be the url itself.
                         txt_attr = lnk_attr
@@ -2659,7 +2659,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                     # If text is empty and the link is not.
                     if len(lnk) != 0 and len(txt) == 0:
-                        txt = lnk
+                        # Delete the link.
+                        link.decompose()
 
                     # If link is http.
                     if urlparse(lnk).scheme == 'http':
@@ -2669,7 +2670,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     # If link is invalid.
                     if urlparse(lnk).scheme not in acceptable_schemes:
                         # Delete the link.
-                        link.extract()
+                        link.decompose()
 
                     link['url-with-value'] = '&quot;' + lnk + '&quot;'
                     link['text-with-value'] = '&quot;' + txt + '&quot;'
