@@ -76,6 +76,8 @@ var ExplorationEditorSettingsTab = function() {
   this.expectAvailableFirstStatesToBe = async function(names) {
     await waitFor.visibilityOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
+    let selectedStateName = await initialStateSelect.getText();
+
     await action.click('State Dropdown element', initialStateSelect);
 
     var options = await $$(
@@ -87,6 +89,13 @@ var ExplorationEditorSettingsTab = function() {
     });
 
     expect(options.sort()).toEqual(names.sort());
+
+    // After opening dropdown and checking its options
+    // to close this dropdown we have written this piece
+    // of code.
+    await action.click(
+      'State name option', initialStateSelectOption(selectedStateName));
+    await action.click('Neutral element', neutralElement);
   };
 
   this.openAndClosePreviewSummaryTile = async function() {

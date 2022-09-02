@@ -80,7 +80,7 @@
             </div>
             <div class="oppia-settings-input-group">
               <div>
-                <div>
+                <div *ngIf="stateNames && stateNames.length > 0">
                   <mat-form-field  id="explorationInitStateName" appearance="fill">
                     <mat-label for="explorationInitStateName" class="d-block">Name of first card</mat-label>
                     <mat-select class="e2e-test-initial-state-select" [(value)]="explorationInitStateNameService.displayed" name="language">
