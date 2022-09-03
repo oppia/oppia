@@ -1116,13 +1116,13 @@ def get_formatted_query_string(escaped_string: str) -> str:
     # http://stackoverflow.com/a/11693937
     remove_punctuation_map = dict(
         (ord(char), None) for char in string.punctuation)
-    query_string = query_string.translate(remove_punctuation_map)
-    return query_string
+    return query_string.translate(remove_punctuation_map)
 
 
 def convert_filter_parameter_string_into_list(filter_string: str) -> List[str]:
     """Converts the filter parameter string into a list of applied filter
-    values.Filter string should be in the following form: ("Algebra" OR "Math")
+    values. Filter string should be in the following form:
+    ("Algebra" OR "Math" OR "Geometry"), ("hi" OR "en") 
 
     Args:
         filter_string: str. The filter parameter string.
@@ -1132,10 +1132,9 @@ def convert_filter_parameter_string_into_list(filter_string: str) -> List[str]:
     """
     # The 2 and -2 account for the '("" and '")' characters at the beginning and
     # end.
-    applied_filter_values = (
+    return (
         filter_string[2:-2].split('" OR "') if filter_string else []
     )
-    return applied_filter_values
 
 
 def snake_case_to_camel_case(snake_str: str) -> str:

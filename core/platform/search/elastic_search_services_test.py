@@ -17,8 +17,8 @@
 """Tests for the python elastic search wrapper."""
 
 from __future__ import annotations
-from core.domain import search_services
 
+from core.domain import search_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
