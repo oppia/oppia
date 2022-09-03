@@ -724,14 +724,14 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         for schema in valid_schemas:
             validate_schema(schema)
         for schemas, error_msg in invalid_schemas_with_error_messages:
-            with self.assertRaisesRegex((AssertionError, KeyError), error_msg): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex((AssertionError, KeyError), error_msg):
                 validate_schema(schemas) # type: ignore[arg-type]
 
     def test_normalize_against_schema_raises_exception(self) -> None:
         """Tests if normalize against schema raises exception
         for invalid key.
         """
-        with self.assertRaisesRegex(Exception, 'Invalid schema type: invalid'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid schema type: invalid'):
             schema = {SCHEMA_KEY_TYPE: 'invalid'}
             schema_utils.normalize_against_schema('obj', schema)
 
@@ -769,7 +769,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Tests if class method 'get' in _Validator raises exception
         for invalid validator id.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid validator id: some invalid validator method name'):
             schema_utils.get_validator('some invalid validator method name')
@@ -858,7 +858,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
 
     def test_global_validators_raise_exception_when_error_in_dict(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             r'^Validation failed: does_not_contain_email .* email@email.com$'
         ):
@@ -872,7 +872,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
 
     def test_global_validators_raise_exception_when_error_in_list(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             r'^Validation failed: does_not_contain_email .* email2@email.com$'
         ):
@@ -994,7 +994,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value, error_msg in invalid_items_with_error_messages:
-            with self.assertRaisesRegex(Exception, error_msg): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_msg):
                 schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self) -> None:
@@ -1371,12 +1371,12 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests if class method get of Normalizers raises exception when given
         an invalid normalizer id.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Invalid normalizer id: some invalid normalizer method name'):
             schema_utils.Normalizers.get('some invalid normalizer method name')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid normalizer id: normalize_space'):
             # Test substring of an actual id.
             schema_utils.Normalizers.get('normalize_space')
@@ -1410,13 +1410,13 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
         # Raise AssertionError if string does not start with http:// or
         # https://.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received oppia.org'):
             sanitize_url('oppia.org')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError,
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received www.oppia.org'):

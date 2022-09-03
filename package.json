@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.2.7",
+  "version": "3.2.8",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -115,8 +115,8 @@
     "uglify-js": "^3.5.8",
     "underscore-template-loader": "^1.0.0",
     "wdio-wait-for": "^2.2.6",
-    "webdriverio": "^7.17.0",
     "webdriver-manager": "^12.1.8",
+    "webdriverio": "^7.17.0",
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1",
     "webpack-merge": "^5.0.8",
@@ -191,6 +191,7 @@
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
     "vanilla-picker": "^2.10.1",
-    "wavesurfer.js": "^5.2.0"
+    "wavesurfer.js": "^5.2.0",
+    "wdio-intercept-service": "^4.2.2"
   }
 }

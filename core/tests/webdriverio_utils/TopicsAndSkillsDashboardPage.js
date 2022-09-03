@@ -24,6 +24,8 @@ var general = require('../webdriverio_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
+  var assignSkillToTopicButtonLocator =
+    '.e2e-test-assign-skill-to-topic-button';
   var assignSkillToTopicButtonsSelector = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
@@ -116,9 +118,6 @@ var TopicsAndSkillsDashboardPage = function() {
       topicsTable, 'Topics table taking too long to appear');
     await waitFor.visibilityOf(
       topicsListItem, 'Topics list taking too long to appear');
-    var topicsListItems = await topicsListItemsSelector();
-    await waitFor.visibilityOf(
-      topicsListItems[0], 'Topics list taking too long to appear');
   };
 
   this.isTopicTablePresent = async function() {
@@ -175,8 +174,9 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       assignSkillToTopicButton,
       'Assign skill to topic buttons taking too long to appear');
+    await waitFor.numberOfElementsToBe(
+      assignSkillToTopicButtonLocator, 'assignSkillToTopicButtons', 1);
     var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
-    expect(assignSkillToTopicButtons.length).toEqual(1);
     await action.click(
       'Assign skill to topic button', assignSkillToTopicButtons[0]);
 

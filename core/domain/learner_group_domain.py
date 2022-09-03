@@ -34,8 +34,8 @@ class LearnerGroupDict(TypedDict):
     title: str
     description: str
     facilitator_user_ids: List[str]
-    student_user_ids: List[str]
-    invited_student_user_ids: List[str]
+    learner_user_ids: List[str]
+    invited_learner_user_ids: List[str]
     subtopic_page_ids: List[str]
     story_ids: List[str]
 
@@ -49,8 +49,8 @@ class LearnerGroup:
         title: str,
         description: str,
         facilitator_user_ids: List[str],
-        student_user_ids: List[str],
-        invited_student_user_ids: List[str],
+        learner_user_ids: List[str],
+        invited_learner_user_ids: List[str],
         subtopic_page_ids: List[str],
         story_ids: List[str]
     ) -> None:
@@ -62,10 +62,10 @@ class LearnerGroup:
             description: str. The description of the learner group.
             facilitator_user_ids: List[str]. The list of user ids of
                 facilitators of the learner group.
-            student_user_ids: List[str]. The list of user ids of students
+            learner_user_ids: List[str]. The list of user ids of learners
                 of the learner group.
-            invited_student_user_ids: List[str]. The list of user ids of the
-                users invited to join the learner group as a student.
+            invited_learner_user_ids: List[str]. The list of user ids of the
+                users invited to join the learner group as a learner.
             subtopic_page_ids: List[str]. The list of subtopic page ids that
                 are part of the learner group syllabus. A subtopic page id is
                 depicted as topicId:subtopicId string.
@@ -75,8 +75,8 @@ class LearnerGroup:
         self.title = title
         self.description = description
         self.facilitator_user_ids = facilitator_user_ids
-        self.student_user_ids = student_user_ids
-        self.invited_student_user_ids = invited_student_user_ids
+        self.learner_user_ids = learner_user_ids
+        self.invited_learner_user_ids = invited_learner_user_ids
         self.subtopic_page_ids = subtopic_page_ids
         self.story_ids = story_ids
 
@@ -94,8 +94,8 @@ class LearnerGroup:
             'title': self.title,
             'description': self.description,
             'facilitator_user_ids': self.facilitator_user_ids,
-            'student_user_ids': self.student_user_ids,
-            'invited_student_user_ids': self.invited_student_user_ids,
+            'learner_user_ids': self.learner_user_ids,
+            'invited_learner_user_ids': self.invited_learner_user_ids,
             'subtopic_page_ids': self.subtopic_page_ids,
             'story_ids': self.story_ids
         }
@@ -112,20 +112,20 @@ class LearnerGroup:
             raise utils.ValidationError(
                 'Expected learner group to have at least one facilitator.')
 
-        invited_student_set = set(self.invited_student_user_ids)
-        student_set = set(self.student_user_ids)
+        invited_learner_set = set(self.invited_learner_user_ids)
+        learner_set = set(self.learner_user_ids)
 
-        if len(invited_student_set.intersection(student_set)) > 0:
+        if len(invited_learner_set.intersection(learner_set)) > 0:
             raise utils.ValidationError(
-                'Learner group student cannot be invited to join the group.')
+                'Learner group learner cannot be invited to join the group.')
 
         facilitator_set = set(self.facilitator_user_ids)
 
-        if len(facilitator_set.intersection(student_set)) > 0:
+        if len(facilitator_set.intersection(learner_set)) > 0:
             raise utils.ValidationError(
-                'Learner group facilitator cannot be a student of the group.')
+                'Learner group facilitator cannot be a learner of the group.')
 
-        if len(facilitator_set.intersection(invited_student_set)) > 0:
+        if len(facilitator_set.intersection(invited_learner_set)) > 0:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be invited to '
                 'join the group.')

@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LibraryPageConstants } from '../library-page.constants';
 
-type libraryPathToModesKeys = (
+type LibraryPathToModesKeys = (
   keyof typeof LibraryPageConstants.LIBRARY_PATHS_TO_MODES);
 
 @Component({
@@ -37,7 +37,7 @@ export class LibraryFooterComponent {
 
   ngOnInit(): void {
     let pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[
-      this.windowRef.nativeWindow.location.pathname as libraryPathToModesKeys];
+      this.windowRef.nativeWindow.location.pathname as LibraryPathToModesKeys];
     this.footerIsDisplayed = (
       pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH);
   }
