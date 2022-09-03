@@ -463,7 +463,7 @@ class UserSuppliedFeedback:
         """
         return {
             'report_type': self.report_type.name,
-            'category': self.category.name,
+            'category': self.category.value,
             'user_feedback_selected_items': self.user_feedback_selected_items,
             'user_feedback_other_text_input': (
                 self.user_feedback_other_text_input)
