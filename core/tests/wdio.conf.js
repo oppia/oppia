@@ -304,9 +304,9 @@ exports.config = {
     }
     // If the tests are running in debug mode,
     // the mobile viewport information is passed as
-    // the 10th argument, else it is passed as the 9th argument.
+    // the 9th argument, else it is passed as the 8th argument.
     // eslint-disable-next-line eqeqeq
-    mobileViewportArg = (args[0] == 'DEBUG=true') ? args[8] : args[9];
+    mobileViewportArg = (args[0] == 'DEBUG=true') ? args[8] : args[7];
 
     // eslint-disable-next-line eqeqeq
     if (mobileViewportArg == '--params.mobile=true') {
