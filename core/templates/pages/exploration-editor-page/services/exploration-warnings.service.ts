@@ -245,16 +245,16 @@ export class ExplorationWarningsService {
     let states = this.explorationStatesService.getStates();
     let bfsStateList = this.computeGraphService.computeBfsTraversalOfStates(
       initStateId, states, initStateId);
-    let seen: Record<string, boolean> = {};
+    let visited: Record<string, boolean> = {};
     bfsStateList.forEach((stateName) => {
       // Go through all states, taking in the dest and source
       // calculate distance for each, if invalid push in results.
-      seen[stateName] = true;
+      visited[stateName] = true;
       let state = states.getState(stateName);
       if (state && state.interaction) {
         if (state.interaction.defaultOutcome) {
           let defaultDest = state.interaction.defaultOutcome.dest;
-          if (defaultDest !== stateName && seen[defaultDest] &&
+          if (defaultDest !== stateName && visited[defaultDest] &&
             !this.redirectionIsValid(defaultDest, stateName, links)) {
             results.push(stateName);
           }
@@ -262,7 +262,8 @@ export class ExplorationWarningsService {
         let answerGroups = state.interaction.answerGroups;
         for (let i = 0; i < answerGroups.length; i++) {
           let dest = answerGroups[i].outcome.dest;
-          if (seen[dest] && !this.redirectionIsValid(dest, stateName, links)) {
+          if (visited[dest] &&
+            !this.redirectionIsValid(dest, stateName, links)) {
             results.push(stateName);
           }
         }
@@ -545,38 +546,38 @@ export class ExplorationWarningsService {
   getDistanceToDestState(
       sourceStateName: string, destStateName: string, links: GraphLink[]
   ): number {
-    let distance = -1;
+    let distanceToDestState = -1;
     let stateFound = false;
-    let deque = new Dequeue();
-    let seen: Record<string, boolean> = {};
-    seen[sourceStateName] = true;
-    deque.push(sourceStateName);
-    while (deque.length > 0 && !stateFound) {
-      let dequeSize = deque.length;
-      distance++;
-      while (dequeSize > 0) {
+    let dequeue = new Dequeue();
+    let visited: Record<string, boolean> = {};
+    visited[sourceStateName] = true;
+    dequeue.push(sourceStateName);
+    while (dequeue.length > 0 && !stateFound) {
+      let dequeueSize = dequeue.length;
+      distanceToDestState++;
+      while (dequeueSize > 0) {
         // '.shift()' here can return an undefined value, but we're already
         // checking for queue.length > 0, so this is safe.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        let currStateName = deque.shift()!;
+        let currStateName = dequeue.shift()!;
         if (currStateName === destStateName) {
           stateFound = true;
         }
-        dequeSize--;
+        dequeueSize--;
         for (let e = 0; e < links.length; e++) {
           let edge = links[e];
           let dest = edge.target;
-          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
-            seen[dest] = true;
-            deque.push(dest);
+          if (edge.source === currStateName && !visited.hasOwnProperty(dest)) {
+            visited[dest] = true;
+            dequeue.push(dest);
           }
         }
       }
     }
-    if (distance !== -1 && !stateFound) {
-      distance = -1;
+    if (distanceToDestState !== -1 && !stateFound) {
+      distanceToDestState = -1;
     }
-    return distance;
+    return distanceToDestState;
   }
 }
 
