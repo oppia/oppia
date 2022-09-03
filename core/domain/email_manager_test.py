@@ -6222,7 +6222,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    def test_without_language_code_email_not_Sent_to_new_translation_reviewer(
+    def test_without_language_code_email_not_sent_to_new_translation_reviewer(
         self
     ) -> None:
         with self.assertRaisesRegex(
@@ -6235,7 +6235,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
                 )
 
-    def test_without_language_code_email_not_Sent_to_removed_translation_reviewer(
+    def test_without_language_code_email_not_sent_to_removed_translation_reviewer(
         self
     ) -> None:
         with self.assertRaisesRegex(
