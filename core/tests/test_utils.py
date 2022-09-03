@@ -609,7 +609,7 @@ class ElasticSearchStub:
                     # language or category to which the exploration or collection
                     # belongs, 'v' is a string of all the languages or
                     # categories (separated by space eg. 'en hi') in which if
-                    # doc[k] is present, the 'doc' should be returned. 
+                    # doc[k] is present, the 'doc' should be returned.
                     # Therefore, we check using 'doc[k] in v'.
                     result_docs = [doc for doc in result_docs if doc[k] in v]
 
