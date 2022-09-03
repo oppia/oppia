@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 
 from core import feconf
@@ -87,6 +88,33 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             'request',
             self.mock_request)
 
+        self.init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app')
+
+        admin_password = hashlib.md5(
+            contributor_dashboard_debug.SUPER_ADMIN_EMAIL.encode(
+                'utf-8')).hexdigest()
+        contributor_password = hashlib.md5(
+            contributor_dashboard_debug.CONTRIBUTOR_EMAIL.encode(
+                'utf-8')).hexdigest()
+        self.create_user_swap = self.swap_with_checks(
+            firebase_auth, 'create_user', self.mock_firebase_auth_create_user,
+            expected_kwargs=[
+                {
+                    'email': contributor_dashboard_debug.SUPER_ADMIN_EMAIL,
+                    'password': admin_password
+                },
+                {
+                    'email': contributor_dashboard_debug.CONTRIBUTOR_EMAIL,
+                    'password': contributor_password
+                }
+            ]
+        )
+
+        self.begin_session_swap = self.swap(
+            self.initializer, '_sign_in',
+            self.mock_login_as_admin)
+
     def tearDown(self) -> None:
         self.firebase_sdk_stub.uninstall()
         self.logout()
@@ -110,17 +138,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             return self.testapp.put(url, params=params, headers=headers)
 
     def test_populate_debug_data(self) -> None:
-        init_app_swap = self.swap_with_call_counter(
-            firebase_admin, 'initialize_app')
-        create_user_swap = self.swap(
-            firebase_auth, 'create_user', self.mock_firebase_auth_create_user)
-        begin_session_swap = self.swap(
-            self.initializer, '_sign_in',
-            self.mock_login_as_admin)
-
-        with self.request_swap, create_user_swap, begin_session_swap, (
-            init_app_swap) as init_app_counter:
-            self.initializer.populate_debug_data()
+        with self.request_swap, self.create_user_swap, self.begin_session_swap:
+            with self.init_app_swap as init_app_counter:
+                self.initializer.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the function mock_login_as_admin() is called.
@@ -190,19 +210,10 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def test_sign_up_new_user(self) -> None:
         os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = '0000'
-        self.assertEqual(os.environ['FIREBASE_AUTH_EMULATOR_HOST'], '0000')
 
-        init_app_swap = self.swap_with_call_counter(
-            firebase_admin, 'initialize_app')
-        create_user_swap = self.swap(
-            firebase_auth, 'create_user', self.mock_firebase_auth_create_user)
-        begin_session_swap = self.swap(
-            self.initializer, '_sign_in',
-            self.mock_login_as_admin)
-
-        with self.request_swap, create_user_swap, begin_session_swap, (
-            init_app_swap) as init_app_counter:
-            self.initializer.populate_debug_data()
+        with self.request_swap, self.create_user_swap, self.begin_session_swap:
+            with self.init_app_swap as init_app_counter:
+                self.initializer.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the environment variable 'FIREBASE_AUTH_EMULATOR_HOST' is
@@ -226,19 +237,22 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings.username, username)
 
     def test_sign_in(self) -> None:
-        init_app_swap = self.swap_with_call_counter(
-            firebase_admin, 'initialize_app')
-        create_user_swap = self.swap(
-            firebase_auth, 'create_user', self.mock_firebase_auth_create_user)
-        sign_in_swap = self.swap(
-            requests, 'post', self.mock_firebase_auth_sign_in)
+        sign_in_swap = self.swap_with_checks(
+            requests, 'post', self.mock_firebase_auth_sign_in,
+            expected_args=[
+                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, ),
+                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, ),
+                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, )
+            ]
+        )
         establish_session_swap = self.swap(
             auth_services, 'establish_auth_session',
             self.mock_establish_auth_session)
 
-        with self.request_swap, create_user_swap, sign_in_swap, (
-            establish_session_swap), init_app_swap as init_app_counter:
-            self.initializer.populate_debug_data()
+        with self.request_swap, self.create_user_swap: 
+            with sign_in_swap, establish_session_swap:
+                with self.init_app_swap as init_app_counter:
+                    self.initializer.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the function mock_firebase_auth_sign_in() is called.
