@@ -302,17 +302,19 @@ exports.config = {
         console.log(`ffmpeg exited with code ${code}`);
       });
     }
-    // If the tests are running in debug mode, '--inspect-brk' is inserted
-    // as the 2nd argument and the mobile viewport information is passed as
-    // the 8th argument, else it is passed as the 7th argument.
-    mobileViewportArg = (args[1] === '--inspect-brk') ? args[7] : args[6];
+    // If the tests are running in debug mode,
+    // the mobile viewport information is passed as
+    // the 10th argument, else it is passed as the 9th argument.
+    // eslint-disable-next-line eqeqeq
+    mobileViewportArg = (args[0] == 'DEBUG=true') ? args[8] : args[9];
 
-    if (mobileViewportArg === '--params.mobile=False') {
+    // eslint-disable-next-line eqeqeq
+    if (mobileViewportArg == '--params.mobile=true') {
+      browser.setWindowSize(600, 1000);
+    } else {
       // Set a wide enough window size for the navbar in the library pages to
       // display fully.
       browser.setWindowSize(1285, 1000);
-    } else {
-      browser.setWindowSize(600, 1000);
     }
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
