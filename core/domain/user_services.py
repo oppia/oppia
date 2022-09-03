@@ -2519,8 +2519,20 @@ def get_contributor_usernames(
         Exception. The language code is not of None for question review
             contribution.
         Exception. Invalid category.
+        Exception. The language_code cannot be None if review category is
+            translation or voiceover.
     """
     user_ids = []
+    if (
+        category in (
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+        ) and language_code is None
+    ):
+        raise Exception(
+            'The language_code cannot be None if review category is translation'
+            ' or voiceover.'
+        )
     if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
         # Ruling out the possibility of None for mypy type checking.
         assert language_code is not None

@@ -85,7 +85,10 @@ def try_upgrading_draft_to_exp_version(
     upgrade_times = 0
     while current_draft_version + upgrade_times < to_exp_version:
         commit = commits_list[upgrade_times]
-        # Ruling out the possibility of None for mypy type checking.
+        # Here we are assured that the commit is never going to be None, because
+        # every time a commit to ExplorationModel or ExplorationRightsModel
+        # occurs an instance of ExplorationCommitLogEntryModel is saved, even
+        # if we create an exploration a commit occurs.
         assert commit is not None
         if (
                 len(commit.commit_cmds) != 1 or

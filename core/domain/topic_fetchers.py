@@ -605,15 +605,12 @@ def get_canonical_story_dicts(
     """
     canonical_story_ids: List[str] = topic.get_canonical_story_ids(
         include_only_published=True)
-    canonical_story_summaries: List[Optional[story_domain.StorySummary]] = [
+    canonical_story_summaries: List[story_domain.StorySummary] = [
         story_fetchers.get_story_summary_by_id(
             canonical_story_id) for canonical_story_id
         in canonical_story_ids]
     canonical_story_dicts = []
     for story_summary in canonical_story_summaries:
-        # Ruling out the possibility of None for mypy type checking.
-        assert story_summary is not None
-
         pending_and_all_nodes_in_story = (
             story_fetchers.get_pending_and_all_nodes_in_story(
                 user_id, story_summary.id))

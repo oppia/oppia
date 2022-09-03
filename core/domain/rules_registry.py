@@ -82,7 +82,9 @@ class Registry:
                 state_schema_version
             ] = specs_from_json
         elif not cached:
-            # Ruling out the possibility of None for mypy type checking.
+            # In the above 'if clause', we are already checking and handling
+            # the case of None state_schema_version. So, if this block of code
+            # executed then state_schema_version is never going to be None here.
             assert state_schema_version is not None
             file_name = 'html_field_types_to_rule_specs_state_v%i.json' % (
                 state_schema_version

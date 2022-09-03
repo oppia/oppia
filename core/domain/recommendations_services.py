@@ -147,7 +147,9 @@ def save_topic_similarities(
     topic_similarities_entity.update_timestamps()
     topic_similarities_entity.put()
 
-    # Ruling out the possibility of None for mypy type checking.
+    # Ruling out the possibility of None for mypy type checking, because
+    # if topic_similarities_entity is None then we are handling that
+    # case above and creating a new TopicSimilaritiesModel.
     assert topic_similarities_entity is not None
     return topic_similarities_entity
 
