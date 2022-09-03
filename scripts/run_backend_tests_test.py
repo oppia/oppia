@@ -185,7 +185,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             expected_args=((COVERAGE_EXCLUSION_LIST_PATH, 'r'),))
 
         with swap_open:
-            excluded_files = run_backend_tests._load_coverage_exclusion_list( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            excluded_files = run_backend_tests._load_coverage_exclusion_list( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 COVERAGE_EXCLUSION_LIST_PATH)
 
         expected_excluded_files = [
@@ -207,7 +207,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec)
 
         with swap_shard_modules:
-            returned_error_msg = run_backend_tests._check_shards_match_tests() # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            returned_error_msg = run_backend_tests._check_shards_match_tests() # type: ignore[no-untyped-call] # pylint: disable=protected-access
 
         self.assertEqual(
             '%s duplicated in %s' % (shards_spec['1'][0], SHARDS_SPEC_PATH),
@@ -225,7 +225,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec)
 
         with swap_shard_modules:
-            returned_error_msg = run_backend_tests._check_shards_match_tests() # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            returned_error_msg = run_backend_tests._check_shards_match_tests() # type: ignore[no-untyped-call] # pylint: disable=protected-access
 
         self.assertEqual(
             'Modules %s in shards not found. See %s.' % (
@@ -236,7 +236,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
-        test_modules = run_backend_tests._get_all_test_targets_from_path() # pylint: disable=protected-access # type: ignore[no-untyped-call]
+        test_modules = run_backend_tests._get_all_test_targets_from_path() # type: ignore[no-untyped-call] # pylint: disable=protected-access
         test_modules.append('scripts.new_script_test')
 
         swap_test_modules = self.swap(
@@ -244,7 +244,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             lambda *unused_args, **unused_kwargs: test_modules)
 
         with swap_test_modules:
-            returned_error_msg = run_backend_tests._check_shards_match_tests() # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            returned_error_msg = run_backend_tests._check_shards_match_tests() # type: ignore[no-untyped-call] # pylint: disable=protected-access
 
         self.assertEqual(
             'Modules %s not in shards. See %s.' % (
@@ -255,7 +255,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
-        test_modules = run_backend_tests._get_all_test_targets_from_path( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+        test_modules = run_backend_tests._get_all_test_targets_from_path( # type: ignore[no-untyped-call] # pylint: disable=protected-access
             include_load_tests=False)
         self.assertNotIn(os.path.join(
             _LOAD_TESTS_DIR, 'new_test.py'), test_modules)
@@ -278,7 +278,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'Command \'%s\' returned non-zero exit status 1.' % test_cmd)
         with self.assertRaisesRegex(
                 subprocess.CalledProcessError, expected_error_msg):
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, False)
 
     def test_empty_test_files_show_no_tests_were_run(self) -> None:
@@ -295,7 +295,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False)
 
         with self.print_swap:
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -317,7 +317,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False)
 
         with self.print_swap:
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -340,7 +340,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.print_swap, self.assertRaisesRegex(
             Exception, 'Some internal error.'
         ):
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -366,7 +366,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False)
 
         with self.print_swap:
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, True)
 
         self.assertIn('CANCELED  %s' % test_target, self.print_arr)
@@ -388,7 +388,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, True)
 
         self.assertIn(
@@ -411,7 +411,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, False)
 
         self.assertIn(
@@ -439,7 +439,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             expected_args=((COVERAGE_EXCLUSION_LIST_PATH,),))
 
         with self.print_swap, swap_load_excluded_files:
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, True)
 
         self.assertNotIn(
@@ -465,7 +465,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests._check_test_results( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_test_results( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 tasks, task_to_taskspec, True)
 
         self.assertIn(
@@ -697,7 +697,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             '\n%s' % failed_process_output)
         with swap_subprocess_run, self.assertRaisesRegex(
                 RuntimeError, error_msg):
-            run_backend_tests._check_coverage(True) # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_coverage(True) # type: ignore[no-untyped-call] # pylint: disable=protected-access
 
     def test_failure_to_calculate_coverage_report_throws_error(self) -> None:
         with self.swap_install_third_party_libs:
@@ -720,7 +720,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             '%s' % failed_process_output)
         with swap_subprocess_run, self.assertRaisesRegex(
                 RuntimeError, error_msg):
-            run_backend_tests._check_coverage(True) # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            run_backend_tests._check_coverage(True) # type: ignore[no-untyped-call] # pylint: disable=protected-access
 
     def test_coverage_is_calculated_correctly_for_specific_files(self) -> None:
         with self.swap_install_third_party_libs:
@@ -743,7 +743,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
-            returned_output, coverage = run_backend_tests._check_coverage( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            returned_output, coverage = run_backend_tests._check_coverage( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 True, include=include_files)
 
         self.assertEqual(returned_output, coverage_report_output)
@@ -768,7 +768,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
-            returned_output, coverage = run_backend_tests._check_coverage( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            returned_output, coverage = run_backend_tests._check_coverage( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 False, data_file=data_file)
 
         self.assertEqual(returned_output, coverage_report_output)
@@ -792,7 +792,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         with swap_subprocess_run:
-            returned_output, coverage = run_backend_tests._check_coverage( # pylint: disable=protected-access # type: ignore[no-untyped-call]
+            returned_output, coverage = run_backend_tests._check_coverage( # type: ignore[no-untyped-call] # pylint: disable=protected-access
                 True)
 
         self.assertEqual(returned_output, coverage_report_output)
