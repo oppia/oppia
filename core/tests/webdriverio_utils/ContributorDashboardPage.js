@@ -54,9 +54,12 @@ var ContributorDashboardPage = function() {
   var reviewRightsDiv = $('.e2e-test-review-rights');
 
   this.get = async function() {
+    let width = (await browser.getWindowSize()).width;
     await browser.url('/contributor-dashboard');
-    await waitFor.visibilityOf(
-      usernameContainer, 'Username takes too much time to load');
+    if (width > 700) {
+      await waitFor.visibilityOf(
+        usernameContainer, 'Username takes too much time to load');
+    }
   };
 
   this.getTranslateTextTab = function() {

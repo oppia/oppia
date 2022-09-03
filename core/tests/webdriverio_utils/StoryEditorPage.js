@@ -57,8 +57,6 @@ var StoryEditorPage = function() {
   var cancelChapterCreationButton = $(
     '.e2e-test-cancel-chapter-creation-button');
   var saveStoryIcon = $('.e2e-test-mobile-options-base');
-  var storyOptionsDropdown = $('.e2e-test-mobile-changes-dropdown');
-  var publishStoryMobile = $('.e2e-test-mobile-publish-button');
 
   /*
    * CHAPTER
@@ -139,8 +137,18 @@ var StoryEditorPage = function() {
     let width = (await browser.getWindowSize()).width;
 
     if (width < 1000) {
-      await action.click('Story Options', storyOptionsDropdown);
-      await action.click('Publish Story', publishStoryMobile);
+      var anchorSelector = function() {
+        return $$('i');
+      };
+      let i = await anchorSelector();
+
+      await action.click('Mobile options', i[11]);
+
+      var publishSelector = function() {
+        return $$('.e2e-test-mobile-publish-button');
+      };
+      let publish = (await publishSelector())[0];
+      await action.click('Publish Story Mobile', publish);
     } else {
       await action.click('Publish Story Button', publishStoryButton);
     }
@@ -309,8 +317,18 @@ var StoryEditorPage = function() {
 
   this.returnToTopic = async function() {
     await general.scrollToTop();
-    await action.click('Return to topic button', returnToTopicButton);
     await waitFor.pageToFullyLoad();
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 1000) {
+      var topicButtonSelector = function() {
+        return $$('.e2e-test-mobile-back-to-topic');
+      };
+      var button = (await topicButtonSelector())[0];
+      await action.click('Return to topic button', button);
+    } else {
+      await action.click('Return to topic button', returnToTopicButton);
+    }
   };
 
   this.changeStoryDescription = async function(storyDescription) {
@@ -338,13 +356,11 @@ var StoryEditorPage = function() {
 
     if (width < 1000) {
       await action.click('Story Options', saveStoryIcon);
-
-      var saveDraftMobile = $(function() {
-        return document
-          .getElementByClassName('e2e-test-mobile-save-changes');
-      });
-
-      await action.click('Save Draft', saveDraftMobile);
+      var buttonSelector = function() {
+        return $$('.e2e-test-mobile-save-changes');
+      };
+      var button = (await buttonSelector())[1];
+      await action.click('Save Draft Mobile', button);
     } else {
       await action.click('Save Story Button', saveStoryButton);
     }

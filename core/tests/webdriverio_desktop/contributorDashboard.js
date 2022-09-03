@@ -154,8 +154,7 @@ describe('Contributor dashboard page', function() {
       await users.logout();
     });
 
-  //eslint-disable-next-line oppia/no-test-blockers
-  fit('should allow the users to use the copy tool', async function() {
+  it('should allow the users to use the copy tool', async function() {
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -205,7 +204,6 @@ describe('Contributor dashboard page', function() {
     await storyEditorPage.updateMetaTagContent('story meta tag');
     await storyEditorPage.saveStory('Saving Story');
     await storyEditorPage.publishStory();
-    await storyEditorPage.returnToTopic();
 
     // Testing the copy tool.
     let opportunityActionButtonCss = $(
@@ -215,6 +213,7 @@ describe('Contributor dashboard page', function() {
     let cancelButton = $('.e2e-test-cancel-rich-text-editor');
 
     await contributorDashboardPage.get();
+    await waitFor.pageToFullyLoad();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(
       GERMAN_LANGUAGE);
