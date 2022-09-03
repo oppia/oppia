@@ -37,6 +37,17 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import memory_cache_services
 
+    AllowedCacheableObjectTypes = Union[
+        str,
+        config_domain.AllowedDefaultValueTypes,
+        collection_domain.Collection,
+        exp_domain.Exploration,
+        skill_domain.Skill,
+        story_domain.Story,
+        topic_domain.Topic,
+        platform_parameter_domain.PlatformParameter
+    ]
+
 memory_cache_services = models.Registry.import_cache_services()
 
 # NOTE: Namespaces and sub-namespaces cannot contain ':' because this is used as
@@ -87,18 +98,6 @@ CACHE_NAMESPACE_CONFIG: Final = 'config'
 # handles default datatypes allowed by Redis including Strings, Lists, Sets,
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
 CACHE_NAMESPACE_DEFAULT: Final = 'default'
-
-
-AllowedCacheableObjectTypes = Union[
-    str,
-    config_domain.AllowedDefaultValueTypes,
-    collection_domain.Collection,
-    exp_domain.Exploration,
-    skill_domain.Skill,
-    story_domain.Story,
-    topic_domain.Topic,
-    platform_parameter_domain.PlatformParameter
-]
 
 
 class DeserializationFunctionsDict(TypedDict):
