@@ -80,12 +80,12 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[
 ] = {
     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
         lambda suggestion: suggestion.change.translation_html),
-    # Here, change is of type BaseChange and all attributes on BaseChange are
-    # created dynamically except cmd, and the type of all dynamically created
-    # attributes are considered as string (str) type. So, question_dict
-    # is also considered as string type but here we are using it as a Dict
-    # type which causes MyPy throws an error. Thus to avoid the error, we
-    # used ignore here.
+    # Here we use MyPy ignore because change is of type BaseChange and all
+    # attributes on BaseChange are created dynamically except cmd, and the
+    # type of all dynamically created attributes are considered as string
+    # (str) type. So, question_dict is also considered as string type but
+    # here we are using it as a Dict type which causes MyPy to throw a error.
+    # Thus to avoid the error, we used ignore here.
     feconf.SUGGESTION_TYPE_ADD_QUESTION: (
         lambda suggestion: suggestion.change.question_dict[
             'question_state_data']['content']['html'])  # type: ignore[index]
@@ -198,8 +198,9 @@ def create_suggestion(
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change['question_dict'], dict)
-        # Here, we are narrowing down the type from various Dict types that are
-        # present in AcceptableChangeDictTypes to QuestionDict type.
+        # Here we use cast because we are narrowing down the type from
+        # various Dict types that are present in AcceptableChangeDictTypes
+        # to QuestionDict type.
         question_dict = cast(
             question_domain.QuestionDict,
             change['question_dict']
@@ -216,10 +217,10 @@ def create_suggestion(
     suggestion_domain_class = (
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_type])
-    # Here, suggestion_domain_class is of Union type which contains
-    # all suggestion classes, but out of these suggestion classes only
-    # `SuggestionEditStateContent` can accept Optional[str] value for
-    # language code and for other classes MyPy throws an `incompatible
+    # Here we use MyPy ignore because suggestion_domain_class is of Union
+    # type which contains all suggestion classes, but out of these suggestion
+    # classes only `SuggestionEditStateContent` can accept Optional[str] type
+    # for language code and for other classes MyPy throws an `incompatible
     # argument type` error. Thus to avoid the error, we used ignore here.
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
@@ -1766,11 +1767,11 @@ def update_translation_suggestion(
     suggestion = get_suggestion_by_id(suggestion_id)
 
     # Clean the translation HTML if not a list of strings.
-    # Here, change is of type BaseChange and all attributes on BaseChange are
-    # created dynamically except cmd, so due this MyPy is unable to recognize
-    # `translation_html` as an attribute of change and throwing `"BaseChange"
-    # has no attribute "translation_html"` error. Thus to avoid the error, we
-    # used ignore here.
+    # Here we use MyPy ignore because change is of type BaseChange and all
+    # attributes on BaseChange are created dynamically except cmd, so due this
+    # MyPy is unable to recognize `translation_html` as an attribute of change
+    # and throwing `"BaseChange" has no attribute "translation_html"` error.
+    # Thus to avoid the error, we used ignore here.
     suggestion.change.translation_html = (  # type: ignore[attr-defined]
         html_cleaner.clean(translation_html)
         if isinstance(translation_html, str)

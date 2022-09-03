@@ -22,6 +22,7 @@ import json
 
 from core.domain import caching_domain
 from core.domain import collection_domain
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
 from core.domain import skill_domain
@@ -90,6 +91,7 @@ CACHE_NAMESPACE_DEFAULT: Final = 'default'
 
 AllowedCacheableObjectTypes = Union[
     str,
+    config_domain.AllowedDefaultValueTypes,
     collection_domain.Collection,
     exp_domain.Exploration,
     skill_domain.Skill,
@@ -108,7 +110,7 @@ class DeserializationFunctionsDict(TypedDict):
     story: Callable[[str], story_domain.Story]
     topic: Callable[[str], topic_domain.Topic]
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
-    config: Callable[[str], str]
+    config: Callable[[str], config_domain.AllowedDefaultValueTypes]
     default: Callable[[str], str]
 
 
@@ -121,7 +123,7 @@ class SerializationFunctionsDict(TypedDict):
     story: Callable[[story_domain.Story], str]
     topic: Callable[[topic_domain.Topic], str]
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
-    config: Callable[[str], str]
+    config: Callable[[config_domain.AllowedDefaultValueTypes], str]
     default: Callable[[str], str]
 
 
@@ -256,7 +258,7 @@ def get_multi(
     namespace: Literal['config'],
     sub_namespace: str | None,
     obj_ids: List[str]
-) -> Dict[str, str]: ...
+) -> Dict[str, config_domain.AllowedDefaultValueTypes]: ...
 
 
 @overload
@@ -368,7 +370,7 @@ def set_multi(
 def set_multi(
     namespace: Literal['config'],
     sub_namespace: str | None,
-    id_value_mapping: Dict[str, str]
+    id_value_mapping: Dict[str, config_domain.AllowedDefaultValueTypes]
 ) -> bool: ...
 
 
