@@ -126,7 +126,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         error_msg = 'Eslint test coverage is not 100%'
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
-            with self.assertRaisesRegex(Exception, error_msg): # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_msg):
                 run_custom_eslint_tests.main()
 
         self.assertIn(self.proc_args, self.cmd_token_list)
