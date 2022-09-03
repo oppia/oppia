@@ -196,6 +196,17 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         assert optional_report_models[0] is not None
         self.assertEqual(optional_report_models[0].id, self.android_report_id)
 
+    def test_invalid_report_id_raises_error_if_method_is_called_strictly(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No AppFeedbackReportModel exists for the id invalid_id'
+        ):
+            app_feedback_report_services.get_report_models(
+                ['invalid_id'], strict=True
+            )
+
     def test_get_multiple_reports_returns_all_reports(self) -> None:
         new_report_id_1 = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(

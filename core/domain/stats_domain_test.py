@@ -1098,6 +1098,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         self.assertFalse(exploration_issue == different_issue)
 
+    # TODO(#15982): Here we use type Any because currently customization
+    # args are typed according to the codebase implementation, which can
+    # be considered as loose type. But once the customization args are
+    # implemented properly. we can remove this Any type and this todo also.
     def _dummy_convert_issue_v1_dict_to_v2_dict(
         self, issue_dict: Dict[str, Any]
     ) -> Dict[str, Any]:
