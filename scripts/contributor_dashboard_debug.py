@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script helps develop for the contributor dashboard. When the
+"""This script assists development of for the contributor dashboard. When the
 "contributor dashboard debug" flag is enabled, the start script will call the
 "populate_debug_data" function, which does the following:
     1. Create an admin user with the username "a" and assign curriculum,
@@ -99,10 +99,15 @@ class ContributorDashboardDebugInitializer:
         """Sign up a new user based on email and username. The password is
         generated automatically from email.
         """
-        # In development mode, to save developers and end-to-end test authors
-        # the trouble of providing passwords, passwords are generated through
-        # the md5 hash of email addresses in frontend codes. This script also
-        # uses the md5 hash so that the created users can sign in from login UI.
+        # In development mode, the "Sign In" button will call the function
+        # AuthService.signInWithEmail() in the file
+        # core/templates/services/auth.service.ts. That function generates a
+        # password through the MD5 hash of email addresses to save developers
+        # and end-to-end test authors the trouble of providing passwords. This
+        # script also uses the MD5 hash when creating a user in the Firebase
+        # Authentication emulator. When we want to sign in a user created using
+        # this script, clicking the "Sign In" button will generate a valid
+        # password which is the same as that in the emulator.
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
         # The FIREBASE_AUTH_EMULATOR_HOST environment variable is set to connect
