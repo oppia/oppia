@@ -56,7 +56,7 @@ pylint==2.11.1
     # via
     #   -r requirements_dev.in
     #   pylint-quotes
-pylint-quotes @ git+https://github.com/oppia/pylint-quotes.git
+pylint-quotes @ git+https://github.com/oppia/pylint-quotes.git@0.2.4
     # via -r requirements_dev.in
 pynacl==1.5.0
     # via pygithub
