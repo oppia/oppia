@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,16 +19,14 @@
  * refresher explorations, state parameters, etc.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
-var action = require('../protractor_utils/action.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
 
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-
-var lostChangesModal = element(by.css('.e2e-test-lost-changes-modal'));
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 
 describe('Full exploration editor', function() {
   var explorationEditorPage = null;
@@ -65,7 +63,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
       await users.logout();
 
@@ -76,7 +74,7 @@ describe('Full exploration editor', function() {
       await general.openEditor(explorationId, true);
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('You must be feeling great?');
-      });
+      }, true);
       await explorationEditorPage.saveChanges();
       await users.logout();
 
@@ -84,6 +82,7 @@ describe('Full exploration editor', function() {
       // lost changes should appear.
       await users.login('user11@editor.com');
       await general.openEditor(explorationId, false);
+      var lostChangesModal = $('.e2e-test-lost-changes-modal');
       await waitFor.visibilityOf(
         lostChangesModal, 'Lost Changes Modal taking too long to appear');
       await explorationEditorPage.discardLostChanges();
@@ -120,7 +119,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
       await users.logout();
 
@@ -131,7 +130,7 @@ describe('Full exploration editor', function() {
       await general.openEditor(explorationId, true);
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('You must be feeling great?');
-      });
+      }, true);
       await explorationEditorPage.saveChanges();
       await users.logout();
 
@@ -140,6 +139,7 @@ describe('Full exploration editor', function() {
       // file.
       await users.login('user13@editor.com');
       await general.openEditor(explorationId, false);
+      var lostChangesModal = $('.e2e-test-lost-changes-modal');
       await waitFor.visibilityOf(
         lostChangesModal, 'Lost Changes Modal taking too long to appear');
       await explorationEditorPage.discardLostChanges();
@@ -165,7 +165,7 @@ describe('Full exploration editor', function() {
       await explorationEditorPage.navigateToMainTab();
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('Content 1');
-      });
+      }, true);
       await action.waitForAutosave();
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('Content 2');
@@ -367,7 +367,7 @@ describe('Full exploration editor', function() {
       // After 50th change, modal should appear recommending user to save the
       // changes.
       await waitFor.visibilityOf(
-        element(by.css('.e2e-test-save-prompt-modal')),
+        $('.e2e-test-save-prompt-modal'),
         'Save Recommendation Prompt Modal taking too long to appear');
       await explorationEditorPage.acceptSaveRecommendationPrompt(
         'Changed Content so many times');
@@ -393,7 +393,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
 
       // Check that the save changes button is enabled when online.

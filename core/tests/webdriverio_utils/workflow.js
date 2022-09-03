@@ -209,6 +209,53 @@ var createAndPublishTwoCardExploration = async function(
   await publishExploration();
 };
 
+var createAndPublishExplorationWithAdditionalCheckpoints = async function(
+    title, category, objective, language, welcomeModalIsShown,
+    correctnessFeedbackIsEnabled) {
+  await createExploration(welcomeModalIsShown);
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));
+  await explorationEditorMainTab.setInteraction('Continue');
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('second card', true, null);
+  await explorationEditorMainTab.moveToState('second card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 2'), true);
+  await explorationEditorMainTab.enableCheckpointForCurrentState();
+  await explorationEditorMainTab.setInteraction('Continue');
+  responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('third card', true, null);
+  await explorationEditorMainTab.moveToState('third card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 3'), true);
+  await explorationEditorMainTab.enableCheckpointForCurrentState();
+  await explorationEditorMainTab.setInteraction('Continue');
+  responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('fourth card', true, null);
+  await explorationEditorMainTab.moveToState('fourth card');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('card 4'), true);
+  await explorationEditorMainTab.setInteraction('EndExploration');
+
+  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  await explorationEditorPage.navigateToSettingsTab();
+  await explorationEditorSettingsTab.setTitle(title);
+  await explorationEditorSettingsTab.setCategory(category);
+  await explorationEditorSettingsTab.setObjective(objective);
+  if (language) {
+    await explorationEditorSettingsTab.setLanguage(language);
+  }
+  if (!correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.disableCorrectnessFeedback();
+  }
+  await explorationEditorPage.saveChanges();
+  await publishExploration();
+};
+
 // ---- Role management (state editor settings tab) ----
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
@@ -327,7 +374,7 @@ var createQuestion = async function() {
   await skillEditorPage.moveToQuestionsTab();
   await skillEditorPage.clickCreateQuestionButton();
   await explorationEditorMainTab.setContent(
-    await forms.toRichText('Question 1'));
+    await forms.toRichText('Question 1'), true);
   await explorationEditorMainTab.setInteraction(
     'TextInput', 'Placeholder', 5);
   await explorationEditorMainTab.addResponse(
@@ -357,6 +404,8 @@ exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
+exports.createAndPublishExplorationWithAdditionalCheckpoints = (
+  createAndPublishExplorationWithAdditionalCheckpoints);
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
 exports.isExplorationCommunityOwned = isExplorationCommunityOwned;
