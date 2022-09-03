@@ -37,6 +37,8 @@ var ExplorationEditorSettingsTab = function() {
   var initialStateSelectOption = function(stateName) {
     return $(`.e2e-test-initial-state-select-element=${stateName}`);
   };
+  var explorationCategoryDropdown = $(
+    '.e2e-test-exploration-category-dropdown');
   var neutralElement = $('.e2e-test-settings-container');
 
   /*
@@ -161,7 +163,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationCategory,
       'Exploration category input takes too long to be visible.');
-    expect(await $('.e2e-test-exploration-category-dropdown').getText()).
+    expect(await explorationCategoryDropdown.getText()).
       toEqual(category);
   };
 

@@ -66,7 +66,7 @@ var ExplorationEditorPage = function() {
   var promptModalElement = $('.e2e-test-save-prompt-modal');
   var languageChoiceOptionElement = function(language) {
     return $$(
-      `.e2e-test-exploration-language-select-lan=${language}`).first();
+      `.e2e-test-exploration-language-select-lan=${language}`);
   };
   var explorationCategoryDropdown = $(
     '.e2e-test-exploration-category-dropdown');
@@ -183,7 +183,7 @@ var ExplorationEditorPage = function() {
 
     await action.click(
       'Language input Choice takes too long to be visible. ',
-      languageChoiceOptionElement(language));
+      languageChoiceOptionElement(language)[0]);
 
     await action.click(
       'Exploration metadata modal header',
