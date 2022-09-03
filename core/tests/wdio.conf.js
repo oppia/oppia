@@ -309,7 +309,7 @@ exports.config = {
     mobileViewportArg = (args[0] == 'DEBUG=true') ? args[8] : args[7];
 
     // eslint-disable-next-line eqeqeq
-    if (mobileViewportArg == '--params.mobile=true') {
+    if (mobileViewportArg == '--params.mobile=True') {
       browser.setWindowSize(600, 1000);
     } else {
       // Set a wide enough window size for the navbar in the library pages to
