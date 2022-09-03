@@ -420,6 +420,15 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     });
   }
 
+  saveActiveAnswerGroupDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateActiveAnswerGroup({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck,
+    } as unknown as AnswerGroup, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+      this.refreshWarnings.emit();
+    });
+  }
+
   saveActiveAnswerGroupCorrectnessLabel(
       updatedOutcome: Outcome): void {
     this.responsesService.updateActiveAnswerGroup({
@@ -454,6 +463,14 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       refresherExplorationId: updatedOutcome.refresherExplorationId,
       missingPrerequisiteSkillId:
         updatedOutcome.missingPrerequisiteSkillId
+    } as Outcome, (newDefaultOutcome) => {
+      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+    });
+  }
+
+  saveDefaultOutcomeDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateDefaultOutcome({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck
     } as Outcome, (newDefaultOutcome) => {
       this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
     });
