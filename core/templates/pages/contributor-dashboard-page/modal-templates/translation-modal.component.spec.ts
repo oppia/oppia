@@ -146,6 +146,11 @@ describe('Translation Modal Component', () => {
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 
+  it('should return the ExoansionTabType enum', ()=>{
+    let enumVariable = component.expansionTabType;
+    expect(typeof enumVariable === typeof ExpansionTabType);
+  });
+
   it('should expand the content area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
     // The content area is contracted by default.
