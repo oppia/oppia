@@ -54,7 +54,7 @@ var ExplorationEditorPage = function() {
     return $$('.select2-selection__choice');
   };
   var expObjective = $('.e2e-test-exploration-objective-input');
-  var expTags = $('.e2e-test-tags');
+  var expInput = $('.e2e-test-chip-list-tags');
   var expTitle = $('.e2e-test-exploration-title-input');
   var expTitleInPostPublishModal = $(
     '.e2e-test-exploration-title-input-modal');
@@ -181,9 +181,10 @@ var ExplorationEditorPage = function() {
     await action.click(
       'Exploration Language', expLanguageSelectorElementModal);
 
+    var languageChoiceOption = await languageChoiceOptionElement(language)[0];
     await action.click(
       'Language input Choice takes too long to be visible. ',
-      languageChoiceOptionElement(language)[0]);
+      languageChoiceOption);
 
     await action.click(
       'Exploration metadata modal header',
@@ -191,7 +192,6 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
 
     for (var elem of tags) {
-      var expInput = expTags.$('<input>');
       await action.click('Exploration input', expInput);
       await action.setValue('Exploration input', expInput, elem + '\n');
       await action.click(

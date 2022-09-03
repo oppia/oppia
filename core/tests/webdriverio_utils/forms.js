@@ -326,6 +326,9 @@ var AutocompleteDropdownEditor = function(elem) {
   var containerLocator = '.e2e-test-exploration-category-dropdown';
   var searchInputLocator = '.mat-select-search-input.mat-input-element';
   var categorySelectorChoice = '.e2e-test-exploration-category-selector-choice';
+  var searchInputLocatorTextElement = function(text) {
+    return $$(`.e2e-test-exploration-category-selector-choice=${text}`);
+  };
 
   return {
     setValue: async function(text) {
@@ -336,7 +339,13 @@ var AutocompleteDropdownEditor = function(elem) {
       // field when it is 'activated', i.e. when the dropdown is clicked.
 
       await action.setValue(
-        'Dropdown Element Search', $(searchInputLocator), text + '\n');
+        'Dropdown Element Search', $(searchInputLocator), text);
+
+      var searchInputLocatorTextOption = await searchInputLocatorTextElement(
+        text)[0];
+      await action.click(
+        'Dropdown Element Select',
+        searchInputLocatorTextOption);
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click(
