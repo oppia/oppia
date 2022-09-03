@@ -233,12 +233,14 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: config_domain.ConfigProperty = (
     )
 )
 
+NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE: List[str] = []
+
 NOTIFICATION_USER_IDS_FOR_FAILED_TASKS: config_domain.ConfigProperty = (
     config_domain.ConfigProperty(
         'notification_user_ids_for_failed_tasks',
         NOTIFICATION_USER_IDS_LIST_SCHEMA,
         'User IDs to notify if an ML training task fails',
-        []
+        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS_DEFAULT_VALUE
     )
 )
 
@@ -784,7 +786,13 @@ def send_post_signup_email(
 
     if not test_for_duplicate_email:
         for key, content in SIGNUP_EMAIL_CONTENT.value.items():
-            if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
+            email_content_default_value = SIGNUP_EMAIL_CONTENT.default_value
+            # Here, we used assert to narrow down the type from various allowed
+            # default types to Dict[str, str] and we are sure that it is always
+            # going to be Dict type because at the time of initialization of
+            # SIGNUP_EMAIL_CONTENT we are providing Dict as a default value.
+            assert isinstance(email_content_default_value, dict)
+            if content == email_content_default_value[key]:
                 logging.error(
                     'Please ensure that the value for the admin config '
                     'property SIGNUP_EMAIL_CONTENT is set, before allowing '

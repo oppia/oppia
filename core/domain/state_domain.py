@@ -3607,7 +3607,7 @@ class State(translation_domain.BaseTranslatableObject):
         """
         self.param_changes = param_changes
 
-    def update_interaction_id(self, interaction_id: str) -> None:
+    def update_interaction_id(self, interaction_id: Optional[str]) -> None:
         """Update the interaction id attribute.
 
         Args:
