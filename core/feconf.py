@@ -577,7 +577,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.7'
+OPPIA_VERSION = '3.2.8'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -676,6 +676,9 @@ EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
 )
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
+EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
+    'notify_contributor_dashboard_achievements'
+)
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -1573,6 +1576,12 @@ CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
 SUGGESTION_TYPE_EDIT_STATE_CONTENT: Final = 'edit_exploration_state_content'
 SUGGESTION_TYPE_TRANSLATE_CONTENT: Final = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION: Final = 'add_question'
+
+CONTRIBUTION_TYPE_TRANSLATION: Final = 'translation'
+CONTRIBUTION_TYPE_QUESTION: Final = 'question'
+CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
+CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
+CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
