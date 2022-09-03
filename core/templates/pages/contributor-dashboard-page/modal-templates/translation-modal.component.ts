@@ -111,8 +111,6 @@ export class TranslationModalComponent {
   textToTranslate: string | string[] = '';
   languageDescription: string;
   activeStatus: Status;
-  contentTab = ExpansionTabType.CONTENT;
-  translationTab = ExpansionTabType.TRANSLATION;
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
@@ -172,6 +170,10 @@ export class TranslationModalComponent {
     private readonly wds: WindowDimensionsService
   ) {
     this.contextService = OppiaAngularRootComponent.contextService;
+  }
+
+  public get expansionTabType(): typeof ExpansionTabType {
+    return ExpansionTabType;
   }
 
   ngOnInit(): void {

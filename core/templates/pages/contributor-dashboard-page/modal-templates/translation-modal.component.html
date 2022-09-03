@@ -59,7 +59,7 @@
     </div>
     <div class="oppia-collapse-content"
          *ngIf="isContentOverflowing"
-         (click)="toggleExpansionState(contentTab)">
+         (click)="toggleExpansionState(expansionTabType.CONTENT)">
       {{ isContentExpanded ? textWhenExpanded : textWhenContracted }}
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
@@ -93,7 +93,7 @@
           </div>
         </div>
         <div class="oppia-collapse-content"
-             (click)="toggleExpansionState(translationTab)"
+             (click)="toggleExpansionState(expansionTabType(TRANSLATION))"
              *ngIf="isTranslationOverflowing">
           {{ isTranslationExpanded ? textWhenExpanded : textWhenContracted }}
         </div>
