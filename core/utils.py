@@ -1122,7 +1122,7 @@ def get_formatted_query_string(escaped_string: str) -> str:
 def convert_filter_parameter_string_into_list(filter_string: str) -> List[str]:
     """Converts the filter parameter string into a list of applied filter
     values. Filter string should be in the following form:
-    ("Algebra" OR "Math" OR "Geometry"), ("hi" OR "en") 
+    ("Algebra" OR "Math" OR "Geometry"), ("hi" OR "en"), ("Fractions")
 
     Args:
         filter_string: str. The filter parameter string.
