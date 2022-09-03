@@ -6235,7 +6235,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
                 )
 
-    def test_without_language_code_email_not_sent_to_removed_translation_reviewer(
+    def test_without_language_code_email_not_sent_to_removed_translation_reviewer(   # pylint: disable=line-too-long
         self
     ) -> None:
         with self.assertRaisesRegex(
