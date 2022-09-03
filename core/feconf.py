@@ -26,10 +26,12 @@ import os
 from core.constants import constants
 
 from typing import Callable, Dict, List, Union
-from typing_extensions import TypedDict
+from typing_extensions import Final, TypedDict
 
-CommandType = (
-    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
+MYPY = False
+if MYPY:  # pragma: no cover
+    # Here, we are importing 'state_domain' only for type checking.
+    from core.domain import state_domain
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -414,14 +416,14 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_RECORDED_VOICEOVERS: state_domain.RecordedVoiceoversDict = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
 }
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_WRITTEN_TRANSLATIONS: state_domain.WrittenTranslationsDict = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
@@ -675,6 +677,9 @@ EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
 )
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
+EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
+    'notify_contributor_dashboard_achievements'
+)
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -1062,6 +1067,10 @@ VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
+EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
+CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
+CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+CLASSROOM_HANDLER_URL = '/classroom'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1565,9 +1574,15 @@ CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
 }
 
 # Constants defining various suggestion types.
-SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
-SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
-SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+SUGGESTION_TYPE_EDIT_STATE_CONTENT: Final = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT: Final = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION: Final = 'add_question'
+
+CONTRIBUTION_TYPE_TRANSLATION: Final = 'translation'
+CONTRIBUTION_TYPE_QUESTION: Final = 'question'
+CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
+CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
+CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
