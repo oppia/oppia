@@ -182,9 +182,7 @@ var ExplorationEditorPage = function() {
       'Exploration Language', expLanguageSelectorElementModal);
 
     var languageChoiceOption = await languageChoiceOptionElement(language)[0];
-    await action.click(
-      'Language input Choice takes too long to be visible. ',
-      languageChoiceOption);
+    await action.click('Language input Choice', languageChoiceOption);
 
     await action.click(
       'Exploration metadata modal header',
