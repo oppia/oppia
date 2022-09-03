@@ -33,7 +33,7 @@
                        alt="User Avatar">
                 </span>
                 <span *ngIf="!profilePictureDataUrl">
-                  <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
+                  <i class="fas fa-user-circle oppia-profile-picture-icon"></i>
                 </span>
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
@@ -154,7 +154,7 @@
                      alt="User Avatar">
               </span>
               <span *ngIf="!profilePictureDataUrl">
-                <i class="material-icons oppia-profile-picture-icon collapsed-oppia-contributor-img">&#xE853;</i>
+                <i class="fas fa-user-circle oppia-profile-picture-icon collapsed-oppia-contributor-img"></i>
               </span>
             </div>
             <div class="collapsed-oppia-contributor-username-container">
@@ -434,6 +434,7 @@
     display: flex;
     flex-grow: 1;
     justify-content: start;
+    padding-left: 25px;
     width: 100%;
   }
   .oppia-opportunities-tab-customization-container {

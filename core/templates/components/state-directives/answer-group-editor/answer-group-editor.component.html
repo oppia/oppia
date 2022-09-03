@@ -53,6 +53,7 @@
   <oppia-outcome-editor [isEditable]="isEditable"
                         [displayFeedback]="displayFeedback"
                         (saveDest)="sendOnSaveAnswerGroupDest($event)"
+                        (saveDestIfStuck)="sendOnSaveAnswerGroupDestIfStuck($event)"
                         (saveFeedback)="sendOnSaveAnswerGroupFeedback($event)"
                         (saveCorrectnessLabel)="sendOnSaveAnswerGroupCorrectnessLabel($event)"
                         [outcome]="outcome"
