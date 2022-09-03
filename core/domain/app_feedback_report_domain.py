@@ -37,13 +37,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-    AcceptableEntryPointClasses = Union[
-        NavigationDrawerEntryPointDict,
-        LessonPlayerEntryPointDict,
-        RevisionCardEntryPointDict,
-        CrashEntryPointDict
-    ]
-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
@@ -1656,6 +1649,14 @@ class AppFeedbackReportTicket:
                 'The Github repo %s is invalid, must be one of %s.' % (
                     repo_name,
                     app_feedback_report_constants.GITHUB_REPO_CHOICES))
+
+
+AcceptableEntryPointClasses = Union[
+    NavigationDrawerEntryPointDict,
+    LessonPlayerEntryPointDict,
+    RevisionCardEntryPointDict,
+    CrashEntryPointDict
+]
 
 
 class AppFeedbackReportDailyStatsDict(TypedDict):
