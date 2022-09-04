@@ -488,6 +488,27 @@ def get_all_topic_assignments_for_skill(
     return topic_assignments
 
 
+def get_topic_names_with_given_skill_in_diagnostic_test(
+    skill_id: str
+) -> List[str]:
+    """Returns a list of topic names for which the given skill is assigned
+    to that topic's diagnostic test.
+
+    Args:
+        skill_id: str. ID of the skill.
+
+    Returns:
+        list(str). A list of topic names for which the given skill is assigned
+        to that topic's diagnostic test.
+    """
+    topics = topic_fetchers.get_all_topics()
+    topic_names = []
+    for topic in topics:
+        if skill_id in topic.skill_ids_for_diagnostic_test:
+            topic_names.append(topic.name)
+    return topic_names
+
+
 def replace_skill_id_in_all_topics(
     user_id: str, old_skill_id: str, new_skill_id: str
 ) -> None:
