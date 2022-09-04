@@ -1936,10 +1936,12 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0045': (
-            'MyPy type ignore is used. Add a proper comment if \'type: ignore\''
-            ' is needed.',
+            'Please try to Rule out the possibility of \'type: ignore\'.'
+            ' If \'type: ignore\' is really necessary, then add a proper'
+            ' comment.',
             'mypy-ignore-used',
-            'MyPy ignores should be used with proper comments. Except for'
+            'MyPy ignores should be used with proper comments following'
+            ' the established patterns in the codebase. Except for'
             ' no-untyped-call MyPy ignore.'
         ),
         'C0046': (
@@ -2052,11 +2054,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0047': (
-            'Any type is used. Please add a proper comment if'
-            ' Any type is needed.',
+            'Any type is used. Please try to use a more specific type instead.',
             'any-type-used',
-            'Annotations with Any type should be done with'
-            ' a proper comments.'
+            'Annotations with Any type should only be done for exceptional'
+            ' cases with proper comments.'
         ),
         'C0048': (
             'cast function is used. Please add a proper comment if'
@@ -2065,11 +2066,11 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             'Casting of any value should be done with a proper comment.'
         ),
         'C0049': (
-            'object class is used. Please add a proper comment if'
-            ' object is needed.',
+            'object class is used. Please try to use a more specific'
+            ' type instead.',
             'object-class-used',
-            'Annotating any value with object should be done with a proper'
-            ' comment.'
+            'Annotations with object should only be done for exceptional'
+            ' cases with proper comments.'
         )
     }
 
