@@ -5902,6 +5902,8 @@ export default {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 2,
+
   "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
 
   // The default number of opportunities to show on the contributor dashboard

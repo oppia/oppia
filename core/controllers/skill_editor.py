@@ -351,3 +351,35 @@ class SkillDescriptionHandler(base.BaseHandler):
                     skill_description))
         })
         self.render_json(self.values)
+
+
+class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
+    """A handler that returns a list of topic names for which the given skill
+    is assigned to that topic's diagnostic test.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_edit_skill
+    def get(self, skill_id: str) -> None:
+        """Returns a list of topic names for which the given skill is assigned
+        to that topic's diagnostic test.
+        """
+        self.values.update({
+            'topic_names': (
+                skill_services
+                .get_topic_names_with_given_skill_in_diagnostic_test(skill_id))
+        })
+        self.render_json(self.values)

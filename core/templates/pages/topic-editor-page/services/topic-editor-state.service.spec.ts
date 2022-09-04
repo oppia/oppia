@@ -201,7 +201,8 @@ describe('Topic editor state service', () => {
       url_fragment: 'fragment',
       practice_tab_is_displayed: true,
       meta_tag_content: 'content',
-      page_title_fragment_for_web: 'title_fragment'
+      page_title_fragment_for_web: 'title_fragment',
+      skill_ids_for_diagnostic_test: []
     };
     storySummaryBackendDict = {
       id: 'id',

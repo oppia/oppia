@@ -29,6 +29,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.tests import test_utils
 
 
@@ -1063,3 +1064,53 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=404)
 
         self.logout()
+
+
+class TopicIdToDiagnosticTestSkillIdsHandlerTests(
+    BaseTopicsAndSkillsDashboardTests):
+    """Tests TopicIdToDiagnosticTestSkillIdsHandler class."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER, 'topic_id')
+
+        self.topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'topic', 'abbrev', 'description', 'fragm')
+        self.topic.thumbnail_filename = 'thumbnail.svg'
+        self.topic.thumbnail_bg_color = '#C6DCDA'
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.admin_id, self.topic)
+
+    def test_topic_id_to_diagnostic_test_skill_ids_handler_returns_correctly(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(
+            json_response['topic_id_to_diagnostic_test_skill_ids'],
+            {'topic_id': ['skill_id_1']}
+        )
+
+        url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
+            'incorrect_topic_id')
+        json_response = self.get_json(url, expected_status_int=500)
+        self.assertEqual(
+            json_response['error'],
+            'No corresponding topic models exist for these topic IDs: '
+            'incorrect_topic_id.'
+        )
+
+        url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER, '')
+        json_response = self.get_json(url)
+        self.assertEqual(
+            json_response['topic_id_to_diagnostic_test_skill_ids'], {})

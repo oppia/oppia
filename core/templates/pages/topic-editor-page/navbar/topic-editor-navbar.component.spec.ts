@@ -84,6 +84,7 @@ describe('topicEditorNavbar', () => {
     topic = TopicObjectFactory.createInterstitialTopic();
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
+    topic._skillSummariesForDiagnosticTest = [skillSummary];
 
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();

@@ -25,6 +25,9 @@ import { Subtopic } from './subtopic.model';
 describe('Topic object factory', () => {
   let topicObjectFactory: TopicObjectFactory;
   let _sampleTopic: Topic;
+  let skillSummary1: ShortSkillSummary;
+  let skillSummary2: ShortSkillSummary;
+  let skillSummary3: ShortSkillSummary;
 
   beforeEach(() => {
     topicObjectFactory = TestBed.get(TopicObjectFactory);
@@ -65,13 +68,21 @@ describe('Topic object factory', () => {
       language_code: 'en',
       meta_tag_content: 'topic meta tag content',
       practice_tab_is_displayed: false,
-      page_title_fragment_for_web: 'topic page title'
+      page_title_fragment_for_web: 'topic page title',
+      skill_ids_for_diagnostic_test: ['skill_1']
     };
     let skillIdToDescriptionDict = {
       skill_1: 'Description 1',
       skill_2: 'Description 2',
       skill_3: 'Description 3'
     };
+    skillSummary1 = ShortSkillSummary.create(
+      'skill_1', 'Description 1');
+    skillSummary2 = ShortSkillSummary.create(
+      'skill_2', 'Description 2');
+    skillSummary3 = ShortSkillSummary.create(
+      'skill_3', 'Description 3');
+
     _sampleTopic = topicObjectFactory.create(
       sampleTopicBackendObject, skillIdToDescriptionDict);
   });
@@ -106,6 +117,28 @@ describe('Topic object factory', () => {
     _sampleTopic._urlFragment = Array(22).join('x');
     expect(_sampleTopic.validate()).toEqual([
       'Topic url fragment should not be longer than 20 characters.'
+    ]);
+  });
+
+  it('should warn user when no skills were added for the diagnostic test',
+    () => {
+      _sampleTopic._skillSummariesForDiagnosticTest = [];
+      expect(_sampleTopic.prepublishValidate()).toEqual([
+        'The diagnostic test for the topic should test at least one skill.'
+      ]);
+    });
+
+  it('should warn user when more than 3 skills were added for the ' +
+    'diagnostic test', () => {
+    var shortSkillSummaries = [
+      ShortSkillSummary.create('skill 1', 'description 1'),
+      ShortSkillSummary.create('skill 2', 'description 2'),
+      ShortSkillSummary.create('skill 3', 'description 3'),
+      ShortSkillSummary.create('skill 4', 'description 4'),
+    ];
+    _sampleTopic._skillSummariesForDiagnosticTest = shortSkillSummaries;
+    expect(_sampleTopic.prepublishValidate()).toEqual([
+      'The diagnostic test for the topic should test at most 3 skills.'
     ]);
   });
 
@@ -148,7 +181,75 @@ describe('Topic object factory', () => {
     expect(topic.getAdditionalStoryReferences()).toEqual([]);
     expect(topic.getCanonicalStoryReferences()).toEqual([]);
     expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(topic.getSkillSummariesForDiagnosticTest()).toEqual([]);
   });
+
+  it('should be able to correctly update skill Ids for the diagnostic test',
+    () => {
+      expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
+        [skillSummary1]);
+
+      _sampleTopic.setSkillSummariesForDiagnosticTest([skillSummary2]);
+      expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
+        [skillSummary2]);
+    });
+
+  it(
+    'should show no available skill summaries when no skill is ' +
+    'assigned to the topic', () => {
+      _sampleTopic._uncategorizedSkillSummaries = [];
+      _sampleTopic._subtopics = [];
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([]);
+    });
+
+  it(
+    'should show no available skill summaries when all skills are ' +
+    'assigned to the diagnostic test', () => {
+      expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
+        [skillSummary1, skillSummary2]);
+      expect(_sampleTopic._subtopics[0].getSkillSummaries()).toEqual(
+        [skillSummary3]);
+
+      _sampleTopic._skillSummariesForDiagnosticTest = (
+        [skillSummary1, skillSummary2, skillSummary3]);
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([]);
+    });
+
+  it(
+    'should be able to get all available skill summaries when no skill is ' +
+    'assigned to the diagnostic test', () => {
+      expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
+        [skillSummary1, skillSummary2]);
+      expect(_sampleTopic._subtopics[0].getSkillSummaries()).toEqual(
+        [skillSummary3]);
+
+      _sampleTopic._skillSummariesForDiagnosticTest = [];
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([skillSummary1, skillSummary2, skillSummary3]);
+    });
+
+  it(
+    'should be able to get available skill summaries when a skill is ' +
+    'assigned to the diagnostic test', () => {
+      expect(_sampleTopic._uncategorizedSkillSummaries).toEqual(
+        [skillSummary1, skillSummary2]);
+      expect(_sampleTopic._subtopics[0].getSkillSummaries()).toEqual(
+        [skillSummary3]);
+
+      _sampleTopic._skillSummariesForDiagnosticTest = [skillSummary1];
+
+      expect(
+        _sampleTopic.getAvailableSkillSummariesForDiagnosticTest()
+      ).toEqual([skillSummary2, skillSummary3]);
+    });
 
   it('should correctly remove the various array elements', () => {
     _sampleTopic.removeCanonicalStory('story_1');
@@ -196,7 +297,8 @@ describe('Topic object factory', () => {
       }],
       practice_tab_is_displayed: false,
       meta_tag_content: 'second topic meta tag content',
-      page_title_fragment_for_web: 'topic page title'
+      page_title_fragment_for_web: 'topic page title',
+      skill_ids_for_diagnostic_test: []
     }, {
       skill_1: 'Description 1',
       skill_2: 'Description 2',

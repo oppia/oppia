@@ -116,6 +116,12 @@ var TopicEditorPage = function() {
   var easyRubricDifficulty = element(
     by.css('.e2e-test-skill-difficulty-easy'));
   var storyTitleClassname = '.e2e-test-story-title';
+  var addNewDiagnosticTestSkillButton = element(
+    by.css('.e2e-test-add-diagnostic-test-skill'));
+  var diagnosticTestSkillSelector = element(
+    by.css('.e2e-test-diagnostic-test-skill-selector'));
+  var removeDiagnosticTestButtonElement = element(
+    by.css('.e2e-test-remove-skill-from-diagnostic-test'));
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -530,6 +536,16 @@ var TopicEditorPage = function() {
         'e2e-test-topic-description-field')[0].value;
     });
     await expect(desc).toMatch(description);
+  };
+
+  this.addDiagnosticTestSkill = async function(skillId) {
+    await action.click(
+      'Add new diagnostic test', addNewDiagnosticTestSkillButton);
+    await action.select(
+      'New skill selector', diagnosticTestSkillSelector, skillId);
+    await waitFor.visibilityOf(
+      removeDiagnosticTestButtonElement,
+      'Diagnostic test skill removal button takes too long to appear.');
   };
 
   this.saveTopic = async function(commitMessage) {

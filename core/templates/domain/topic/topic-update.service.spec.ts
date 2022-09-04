@@ -68,6 +68,7 @@ describe('Topic update service', function() {
       }],
       next_subtopic_id: 2,
       language_code: 'en',
+      skill_ids_for_diagnostic_test: []
     },
     skillIdToDescriptionDict: {
       skill_1: 'Description 1',
@@ -208,6 +209,24 @@ describe('Topic update service', function() {
         _sampleTopic, _thirdSkillSummary);
     }).toThrowError('Given skillId is not an uncategorized skill.');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should create a proper backend change dict for updating the skill Ids ' +
+     'for diagnostic test', function() {
+    _sampleTopic.setSkillSummariesForDiagnosticTest([_secondSkillSummary]);
+    topicUpdateService.updateDiagnosticTestSkills(
+      _sampleTopic, [_firstSkillSummary]);
+    expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
+      [_firstSkillSummary]);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'skill_ids_for_diagnostic_test',
+      new_value: ['skill_1'],
+      old_value: ['skill_2']
+    }]);
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
+      [_secondSkillSummary]);
   });
 
   it('should set/unset changes to a topic\'s name', () => {
