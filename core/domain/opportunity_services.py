@@ -640,7 +640,7 @@ def get_exploration_opportunity_summary_by_id(
 
     Returns:
         ExplorationOpportunitySummary|None. An ExplorationOpportunitySummary
-        domain object corresponding to the opportunity id if exist else None.
+        domain object corresponding to the opportunity id if exists else None.
     """
     exp_opportunity_summary_model = (
         opportunity_models.ExplorationOpportunitySummaryModel.get(
@@ -648,7 +648,7 @@ def get_exploration_opportunity_summary_by_id(
     if exp_opportunity_summary_model is None:
         return None
     return get_exploration_opportunity_summary_from_model(
-            exp_opportunity_summary_model)
+        exp_opportunity_summary_model)
 
 
 def get_exploration_opportunity_summaries_by_topic_id(

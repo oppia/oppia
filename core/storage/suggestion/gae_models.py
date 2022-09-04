@@ -1140,7 +1140,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     def construct_id(
         language_code: str, contributor_user_id: str, topic_id: str
     ) -> str:
-        """Builds a unique ID for a TranslationContributionStatsModel
+        """Constructs a unique ID for a TranslationContributionStatsModel
         instance.
 
         Args:
@@ -1380,7 +1380,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
     def construct_id(
         language_code: str, reviewer_user_id: str, topic_id: str
     ) -> str:
-        """Builds a unique ID for a TranslationReviewStatsModel
+        """Constructs a unique ID for a TranslationReviewStatsModel
         instance.
 
         Args:
@@ -1598,7 +1598,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
     def construct_id(
         contributor_user_id: str, topic_id: str
     ) -> str:
-        """Builds a unique ID for a QuestionContributionStatsModel
+        """Constructs a unique ID for a QuestionContributionStatsModel
         instance.
 
         Args:
@@ -1804,7 +1804,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
     def construct_id(
         reviewer_user_id: str, topic_id: str
     ) -> str:
-        """Builds a unique ID for a QuestionReviewStatsModel
+        """Constructs a unique ID for a QuestionReviewStatsModel
         instance.
 
         Args:

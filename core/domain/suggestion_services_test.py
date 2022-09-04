@@ -28,6 +28,7 @@ from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
@@ -2199,8 +2200,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             topic_services.add_uncategorized_skill( # type: ignore[no-untyped-call]
                 self.admin_id, topic.id, skill_id)
 
-    def test_update_translation_contribution_stats_when_submitting(
-        self) -> None:
+    def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,
@@ -2221,11 +2221,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
 
         self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_0', topic_id, '0')
+            self.owner_id, self.admin_id, 'story_id_01', topic_id, '0')
         self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_1', topic_id, '1')
+            self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
 
-        change_dict = {
+        return {
             'cmd': 'add_translation',
             'content_id': 'content',
             'language_code': 'hi',
@@ -2233,6 +2233,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
+
+    def test_update_translation_contribution_stats_when_submitting(
+        self) -> None:
+        change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2241,11 +2245,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
+
         suggestion_services.update_translation_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, '0'
+            initial_suggestion
         )
         suggestion_services.update_translation_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, '1'
+            latest_suggestion
         )
 
         translation_contribution_stats_model = (
@@ -2274,38 +2279,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a translation suggestion is accepted.
-        explorations = [self.save_new_valid_exploration(
-            '%s' % i,
-            self.owner_id,
-            title='title %d' % i,
-            category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
-        ) for i in range(3)]
-
-        for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)
-
-        topic_id = '0'
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
-        skill_id_0 = 'skill_id_0'
-        skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
-
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_01', topic_id, '0')
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
-
-        change_dict = {
-            'cmd': 'add_translation',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '',
-            'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
-        }
+        change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2316,17 +2290,17 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             '1', 1, self.author_id, change_dict, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, '0'
+            initial_suggestion
         )
         suggestion_services.update_translation_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, '1'
+            latest_suggestion
         )
-
         translation_contribution_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 'hi', self.author_id, '0'
             )
         )
+
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2344,18 +2318,28 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
-        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.accept_suggestion(
+            initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
         suggestion_services.update_translation_review_stats(
-            initial_suggestion, self.reviewer_id, '0', True
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
         )
         suggestion_services.update_translation_review_stats(
-            latest_suggestion, self.reviewer_id, '1', True
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
         )
-
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
                 'hi', self.reviewer_id, '0'
+            )
+        )
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, '0'
             )
         )
 
@@ -2370,12 +2354,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 .reviewed_translation_word_count
             ),
             6
-        )
-
-        translation_contribution_stats_model = (
-            suggestion_models.TranslationContributionStatsModel.get(
-                'hi', self.author_id, '0'
-            )
         )
         assert translation_contribution_stats_model is not None
         self.assertEqual(
@@ -2398,38 +2376,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a translation suggestion is rejected.
-        explorations = [self.save_new_valid_exploration(
-            '%s' % i,
-            self.owner_id,
-            title='title %d' % i,
-            category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
-        ) for i in range(3)]
-
-        for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)
-
-        topic_id = '0'
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
-        skill_id_0 = 'skill_id_0'
-        skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
-
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_01', topic_id, '0')
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
-
-        change_dict = {
-            'cmd': 'add_translation',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '',
-            'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
-        }
+        change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2440,17 +2387,17 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             '1', 1, self.author_id, change_dict, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, '0'
+            initial_suggestion
         )
         suggestion_services.update_translation_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, '1'
+            latest_suggestion
         )
-
         translation_contribution_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 'hi', self.author_id, '0'
             )
         )
+
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2468,18 +2415,26 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
-        initial_suggestion.status = suggestion_models.STATUS_REJECTED
-        latest_suggestion.status = suggestion_models.STATUS_REJECTED
+        suggestion_services.reject_suggestion(
+            initial_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+        suggestion_services.reject_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
         suggestion_services.update_translation_review_stats(
-            initial_suggestion, self.reviewer_id, '0', False
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
         )
         suggestion_services.update_translation_review_stats(
-            latest_suggestion, self.reviewer_id, '1', False
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
         )
-
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
                 'hi', self.reviewer_id, '0'
+            )
+        )
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, '0'
             )
         )
 
@@ -2498,12 +2453,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 .reviewed_translation_word_count
             ),
             6
-        )
-
-        translation_contribution_stats_model = (
-            suggestion_models.TranslationContributionStatsModel.get(
-                'hi', self.author_id, '0'
-            )
         )
         assert translation_contribution_stats_model is not None
         self.assertEqual(
@@ -2526,38 +2475,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a translation suggestion is accepted with reviewer edits.
-        explorations = [self.save_new_valid_exploration(
-            '%s' % i,
-            self.owner_id,
-            title='title %d' % i,
-            category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
-        ) for i in range(3)]
-
-        for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)
-
-        topic_id = '0'
-        topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
-        skill_id_0 = 'skill_id_0'
-        skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [skill_id_0, skill_id_1])
-
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_01', topic_id, '0')
-        self.create_story_for_translation_opportunity(
-            self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
-
-        change_dict = {
-            'cmd': 'add_translation',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '',
-            'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
-        }
+        change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -2568,17 +2486,17 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             '1', 1, self.author_id, change_dict, 'description')
 
         suggestion_services.update_translation_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, '0'
+            initial_suggestion
         )
         suggestion_services.update_translation_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, '1'
+            latest_suggestion
         )
-
         translation_contribution_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 'hi', self.author_id, '0'
             )
         )
+
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2603,19 +2521,30 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
-        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        latest_suggestion.edited_by_reviewer = True
+        suggestion_services.update_translation_suggestion(
+            initial_suggestion.suggestion_id, 'Edited')
+        suggestion_services.accept_suggestion(
+            initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
         suggestion_services.update_translation_review_stats(
-            initial_suggestion, self.reviewer_id, '0', True
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
         )
         suggestion_services.update_translation_review_stats(
-            latest_suggestion, self.reviewer_id, '1', True
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
         )
-
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
                 'hi', self.reviewer_id, '0'
+            )
+        )
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, '0'
             )
         )
 
@@ -2629,7 +2558,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_review_stats_model
                 .reviewed_translation_word_count
             ),
-            6
+            4
         )
         self.assertEqual(
             translation_review_stats_model
@@ -2637,11 +2566,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             1
         )
 
-        translation_contribution_stats_model = (
-            suggestion_models.TranslationContributionStatsModel.get(
-                'hi', self.author_id, '0'
-            )
-        )
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2671,6 +2595,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id_1, self.author_id, description='description')
+        self.save_new_skill(
+            skill_id_2, self.author_id, description='description')
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'topic_admin', name='Topic1',
@@ -2727,10 +2653,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
         suggestion_services.update_question_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, skill_id_1
+            initial_suggestion
         )
         suggestion_services.update_question_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, skill_id_2
+            latest_suggestion
         )
 
         question_contribution_stats_model = (
@@ -2749,15 +2675,20 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
-        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.accept_suggestion(
+            initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
         suggestion_services.update_question_review_stats(
-            initial_suggestion, self.reviewer_id, skill_id_1, True
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
         )
         suggestion_services.update_question_review_stats(
-            latest_suggestion, self.reviewer_id, skill_id_2, True
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
         )
-
         question_review_stats_model = (
             suggestion_models.QuestionReviewStatsModel.get(
                 self.reviewer_id, topic_id
@@ -2785,6 +2716,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id_1, self.author_id, description='description')
+        self.save_new_skill(
+            skill_id_2, self.author_id, description='description')
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'topic_admin', name='Topic1',
@@ -2841,10 +2774,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
         suggestion_services.update_question_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, skill_id_1
+            initial_suggestion
         )
         suggestion_services.update_question_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, skill_id_2
+            latest_suggestion
         )
 
         question_contribution_stats_model = (
@@ -2863,18 +2796,29 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
-        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.accept_suggestion(
+            initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
         suggestion_services.update_question_review_stats(
-            initial_suggestion, self.reviewer_id, skill_id_1, True
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
         )
         suggestion_services.update_question_review_stats(
-            latest_suggestion, self.reviewer_id, skill_id_2, True
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
         )
 
         question_review_stats_model = (
             suggestion_models.QuestionReviewStatsModel.get(
                 self.reviewer_id, topic_id
+            )
+        )
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id
             )
         )
 
@@ -2889,12 +2833,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 .reviewed_questions_count
             ),
             2
-        )
-
-        question_contribution_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                self.author_id, topic_id
-            )
         )
 
         assert question_contribution_stats_model is not None
@@ -2915,6 +2853,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id_1, self.author_id, description='description')
+        self.save_new_skill(
+            skill_id_2, self.author_id, description='description')
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'topic_admin', name='Topic1',
@@ -2971,10 +2911,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
         suggestion_services.update_question_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, skill_id_1
+            initial_suggestion
         )
         suggestion_services.update_question_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, skill_id_2
+            latest_suggestion
         )
 
         question_contribution_stats_model = (
@@ -2993,18 +2933,27 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
-        initial_suggestion.status = suggestion_models.STATUS_REJECTED
-        latest_suggestion.status = suggestion_models.STATUS_REJECTED
+        suggestion_services.reject_suggestion(
+            initial_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+        suggestion_services.reject_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
         suggestion_services.update_question_review_stats(
-            initial_suggestion, self.reviewer_id, skill_id_1, False
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
         )
         suggestion_services.update_question_review_stats(
-            latest_suggestion, self.reviewer_id, skill_id_2, False
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
         )
 
         question_review_stats_model = (
             suggestion_models.QuestionReviewStatsModel.get(
                 self.reviewer_id, topic_id
+            )
+        )
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id
             )
         )
 
@@ -3025,12 +2974,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             2
         )
 
-        question_contribution_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                self.author_id, topic_id
-            )
-        )
-
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -3049,6 +2992,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id_1, self.author_id, description='description')
+        self.save_new_skill(
+            skill_id_2, self.author_id, description='description')
+        print(skill_fetchers.get_skill_by_id(skill_id_1, strict=False))
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'topic_admin', name='Topic1',
@@ -3104,11 +3050,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
+        change_question_dict = initial_suggestion.change.question_dict
+        question_state_data = change_question_dict[
+            'question_state_data']
         suggestion_services.update_question_contribution_stats_at_submission(
-            initial_suggestion, self.author_id, skill_id_1
+            initial_suggestion
         )
         suggestion_services.update_question_contribution_stats_at_submission(
-            latest_suggestion, self.author_id, skill_id_2
+            latest_suggestion
         )
 
         question_contribution_stats_model = (
@@ -3134,19 +3083,31 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
 
-        initial_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        latest_suggestion.status = suggestion_models.STATUS_ACCEPTED
-        latest_suggestion.edited_by_reviewer = True
+        suggestion_services.accept_suggestion(
+            initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.accept_suggestion(
+            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
+            'Accepted')
+        suggestion_services.update_question_suggestion(
+            initial_suggestion.suggestion_id, 0.6, question_state_data)
         suggestion_services.update_question_review_stats(
-            initial_suggestion, self.reviewer_id, skill_id_1, True
+            suggestion_services.get_suggestion_by_id(
+                initial_suggestion.suggestion_id)
         )
         suggestion_services.update_question_review_stats(
-            latest_suggestion, self.reviewer_id, skill_id_2, True
+            suggestion_services.get_suggestion_by_id(
+                latest_suggestion.suggestion_id)
         )
 
         question_review_stats_model = (
             suggestion_models.QuestionReviewStatsModel.get(
                 self.reviewer_id, topic_id
+            )
+        )
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id
             )
         )
 
@@ -3166,13 +3127,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             1
         )
-
-        question_contribution_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                self.author_id, topic_id
-            )
-        )
-
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
