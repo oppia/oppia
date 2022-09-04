@@ -268,7 +268,7 @@ def run_tests(args):
             }))
 
         if (args.mobile) and (args.suite not in MOBILE_SUITES):
-            print(f'The {args.suite} suite should not be run' +
+            print(f'The {args.suite} suite should not be run ' +
                     'in the mobile viewport')
             sys.exit(1)
 
