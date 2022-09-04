@@ -61,12 +61,21 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     )
 
                 else:
-                    tag['alt-with-value'] == '&amp;quot;&amp;quot;'
+                    if tag['alt-with-value'] in ('&quot;&quot;', ''):
+                        states_with_errored_values.append(
+                            'alt attr is empty'
+                        )
 
                 if 'filepath-with-value' not in tag:
                     states_with_errored_values.append(
                         'filepath attr not exists'
                     )
+
+                else:
+                    if tag['filepath-with-value'] in ('&quot;&quot;', ''):
+                        states_with_errored_values.append(
+                            'filepath attr is empty'
+                        )
 
             elif tag.name == 'oppia-noninteractive-math':
                 if 'math_content-with-value' not in tag:
@@ -79,26 +88,33 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             'raw lattex attr not exists'
                         )
                     elif tag['math_content-with-value'][
-                        'raw_latex'] is None:
-                        states_with_errored_values.append(
-                            'raw lattex attr None'
-                        )
-                    elif tag['math_content-with-value'][
-                        'raw_latex'].strip() == '':
+                        'raw_latex'].strip() in ('&quot;&quot;', ''):
                         states_with_errored_values.append(
                             'raw lattex attr empty'
                         )
+
+                    if 'svg_filename' not in tag['math_content-with-value']:
+                        states_with_errored_values.append(
+                            'svg_filename attr not exists'
+                        )
+                    else:
+                        svg_filename = tag['math_content-with-value'][
+                            'svg_filename']
+                        if svg_filename.strip() in ('&quot;&quot;', ''):
+                            states_with_errored_values.append(
+                                'svg_filename attr empty'
+                            )
+                        elif svg_filename.strip().split('&quot;')[1] != '.svg':
+                            states_with_errored_values.append(
+                                'svg_filename attr does not have svg extension'
+                            )
 
             elif tag.name == 'oppia-noninteractive-skillreview':
                 if 'text-with-value' not in tag:
                     states_with_errored_values.append(
                         'text attr not in skillreview tag'
                     )
-                elif tag['text-with-value'] is None:
-                    states_with_errored_values.append(
-                        'text attr None in skillreview tag'
-                    )
-                elif tag['text-with-value'].strip() == '':
+                elif tag['text-with-value'].strip() in ('&quot;&quot;', ''):
                     states_with_errored_values.append(
                         'text attr empty in skillreview tag'
                     )
@@ -119,7 +135,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         'autoplay value invalid'
                     )
 
-                if 'autoplay-with-value' in tag:
+                else:
                     if tag['autoplay-with-value'] not in ('true', 'false'):
                         states_with_errored_values.append(
                             'autoplay value invalid'
@@ -130,12 +146,9 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         'No video id'
                     )
 
-                if 'video_id-with-value' in tag:
-                    if tag['video_id-with-value'] is None:
-                        states_with_errored_values.append(
-                            'No video id'
-                        )
-                    elif tag['video_id-with-value'].strip() == '':
+                else:
+                    if tag['video_id-with-value'].strip() in (
+                        '&quot;&quot;', ''):
                         states_with_errored_values.append(
                             'video id empty'
                         )
@@ -149,7 +162,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         'No text or url attr in link tag'
                     )
 
-                elif tag['text-with-value'].strip() == '':
+                elif tag['text-with-value'].strip() in ('&quot;&quot;', ''):
                     states_with_errored_values.append(
                         'text attr empty in link tag'
                     )
@@ -164,8 +177,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     'Nested collapsables'
                 )
 
-        return states_with_errored_values
-
+        states_with_errored_values = list(set(states_with_errored_values))
 
     @staticmethod
     def invalid_tabs_rte_tag(
@@ -191,20 +203,27 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             for tag in tabs_tags:
                 if 'tab_contents-with-value' not in tag:
                     states_with_errored_values.append(
-                        'Not content attr in tabs'
+                        'No content attr in tabs'
                     )
                 tab_content_json = html_validation_service.unescape_html(
                     tag['tab_contents-with-value'])
+                print("*************************************")
+                print(tab_content_json)
+
+                print("*************************************")
+                print(html_validation_service.escape_html(
+                    tab_content_json))
                 tab_content_list = json.loads(tab_content_json)
+                print("*************************************")
+                print(tab_content_list)
                 if len(tab_content_list) == 0:
                     states_with_errored_values.append('No tabs')
                 for tab_content in tab_content_list:
-                    states_with_errored_values = (
-                        TabsCollapsablesValidationJob.
-                        _filter_invalid_rte_values(
-                            tab_content['content'], states_with_errored_values
-                        )
+                    TabsCollapsablesValidationJob._filter_invalid_rte_values(
+                        tab_content['content'], states_with_errored_values
                     )
+
+            states_with_errored_values = list(set(states_with_errored_values))
             if len(states_with_errored_values) > 0:
                 errored_values.append(
                     {
