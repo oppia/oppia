@@ -2201,6 +2201,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.admin_id, topic.id, skill_id)
 
     def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
+        """Sets up required topics and stories for translations
+
+        Returns:
+            Dict[str, str]. A dictionary of the change object for the
+                translations.
+        """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,
@@ -2994,7 +3000,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             skill_id_1, self.author_id, description='description')
         self.save_new_skill(
             skill_id_2, self.author_id, description='description')
-        print(skill_fetchers.get_skill_by_id(skill_id_1, strict=False))
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'topic_admin', name='Topic1',
