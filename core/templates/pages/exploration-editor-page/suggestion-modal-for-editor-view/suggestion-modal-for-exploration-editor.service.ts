@@ -29,13 +29,14 @@ import { StateEditorRefreshService } from '../services/state-editor-refresh.serv
 import { ExplorationEditorSuggestionModalComponent } from './exploration-editor-suggestion-modal.component';
 import { AppConstants } from 'app.constants';
 import { LoggerService } from 'services/contextual/logger.service';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 
 interface ExtraParams {
-  activeThread: string;
+  activeThread: SuggestionThread;
   isSuggestionHandled: boolean;
   isSuggestionValid: boolean;
   hasUnsavedChanges: boolean;
-  setActiveThread: () => void;
+  setActiveThread: (threadId: string) => Promise<void>;
 }
 
 @Injectable({
@@ -54,8 +55,13 @@ export class SuggestionModalForExplorationEditorService {
   ) {}
 
   showEditStateContentSuggestionModal(
-      activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
-      setActiveThread = (threadId => {}), threadUibModalInstance = null): void {
+      activeThread: SuggestionThread,
+      isSuggestionHandled: boolean,
+      hasUnsavedChanges: boolean,
+      isSuggestionValid: boolean,
+      setActiveThread = (threadId => {}),
+      threadUibModalInstance = null
+  ): void {
     const modalRef = this.ngbModal.open(
       ExplorationEditorSuggestionModalComponent, {
         backdrop: 'static',
@@ -69,15 +75,15 @@ export class SuggestionModalForExplorationEditorService {
     modalRef.componentInstance.newContent = (
       activeThread.getReplacementHtmlFromSuggestion());
     modalRef.componentInstance.suggestionIsHandled = (
-      isSuggestionHandled()),
+      isSuggestionHandled),
     modalRef.componentInstance.suggestionIsValid = (
-      isSuggestionValid()),
+      isSuggestionValid),
     modalRef.componentInstance.suggestionStatus = (
       activeThread.getSuggestionStatus()),
     modalRef.componentInstance.threadUibModalInstance = (
       threadUibModalInstance),
     modalRef.componentInstance.unsavedChangesExist = (
-      hasUnsavedChanges());
+      hasUnsavedChanges);
 
     modalRef.result.then(result => {
       return this.threadDataBackendApiService.resolveSuggestionAsync(
@@ -142,4 +148,6 @@ export class SuggestionModalForExplorationEditorService {
 
 angular.module('oppia').factory(
   'SuggestionModalForExplorationEditorService',
-  downgradeInjectable(SuggestionModalForExplorationEditorService));
+  downgradeInjectable(
+    SuggestionModalForExplorationEditorService
+  ));

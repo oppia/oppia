@@ -83,6 +83,7 @@ import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
 import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-for-editor-view/exploration-editor-suggestion-modal.component';
+import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
 
 @NgModule({
   imports: [
@@ -148,7 +149,8 @@ import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-fo
     PreviewTabComponent,
     HistoryTabComponent,
     ImprovementsTabComponent,
-    ExplorationEditorSuggestionModalComponent
+    ExplorationEditorSuggestionModalComponent,
+    FeedbackTabComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -196,7 +198,8 @@ import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-fo
     PreviewTabComponent,
     HistoryTabComponent,
     ImprovementsTabComponent,
-    ExplorationEditorSuggestionModalComponent
+    ExplorationEditorSuggestionModalComponent,
+    FeedbackTabComponent
   ],
   providers: [
     {

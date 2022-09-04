@@ -31,6 +31,7 @@ import { ChangeListService } from '../services/change-list.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
 import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
 import { ThreadStatusDisplayService } from './services/thread-status-display.service';
+import { SuggestionModalForExplorationEditorService } from '../suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service';
 
 @Component({
   selector: 'oppia-feedback-tab',
@@ -148,14 +149,15 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
         'Trying to show suggestion of a non-existent thread');
     }
     this.suggestionModalForExplorationEditorService.showSuggestionModal(
-      this.activeThread.suggestion.suggestionType, {
+      this.activeThread.suggestion.suggestionType,
+      {
         activeThread: this.activeThread,
         setActiveThread: (
           threadId => this.fetchUpdatedThreads()
             .then(() => this.setActiveThread(threadId))),
-        isSuggestionHandled: this._isSuggestionHandled,
-        hasUnsavedChanges: this._hasUnsavedChanges,
-        isSuggestionValid: this._isSuggestionValid
+        isSuggestionHandled: this._isSuggestionHandled(),
+        hasUnsavedChanges: this._hasUnsavedChanges(),
+        isSuggestionValid: this._isSuggestionValid()
       }
     );
   }
