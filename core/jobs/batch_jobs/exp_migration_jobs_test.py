@@ -170,6 +170,7 @@ class MigrateExplorationJobTests(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
 
