@@ -38,7 +38,6 @@ type SiaTask = SuccessiveIncorrectAnswersTask;
   selector: 'oppia-improvements-tab',
   templateUrl: './improvements-tab.component.html'
 })
-
 export class ImprovementsTabComponent implements OnInit {
   stateRetentions: Map<string, number>;
   stateVisibility: Map<string, boolean>;

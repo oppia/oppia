@@ -152,6 +152,9 @@ import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashbo
 import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
 import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page.component';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
+import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
+import { NeedsGuidingResponsesTaskComponent } from 'pages/exploration-editor-page/improvements-tab/needs-guiding-responses-task.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -322,7 +325,10 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent
+    ReviewTestPageComponent,
+    AnswerContentModalComponent,
+    VisualizationSortedTilesComponent,
+    NeedsGuidingResponsesTaskComponent
   ],
 
   entryComponents: [
@@ -442,7 +448,10 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent
+    ReviewTestPageComponent,
+    AnswerContentModalComponent,
+    VisualizationSortedTilesComponent,
+    NeedsGuidingResponsesTaskComponent
   ],
 
   exports: [
@@ -573,7 +582,10 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent
+    ReviewTestPageComponent,
+    AnswerContentModalComponent,
+    VisualizationSortedTilesComponent,
+    NeedsGuidingResponsesTaskComponent
   ],
 })
 

@@ -44,8 +44,8 @@
                                            addressed-info-is-supported="vizInfo.addressedInfoIsSupported">
       </oppia-visualization-frequency-table>
       <oppia-visualization-sorted-tiles ng-switch-when="SortedTiles"
-                                        data="vizInfo.data"
-                                        options="vizInfo.options">
+                                        [data]="vizInfo.data"
+                                        [options]="vizInfo.options">
       </oppia-visualization-sorted-tiles>
     </div>
   </div>

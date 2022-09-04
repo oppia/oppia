@@ -511,8 +511,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts',
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.spec.ts',
     'extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive.ts',
-    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.spec.ts',
-    'extensions/visualizations/oppia-visualization-sorted-tiles.directive.ts',
+    'extensions/visualizations/oppia-visualization-sorted-tiles.component.spec.ts',
+    'extensions/visualizations/oppia-visualization-sorted-tiles.component.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
