@@ -100,12 +100,18 @@ _PARSER.add_argument(
 
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
+    'accessibility',
+    'additionalEditorFeatures',
+    'additionalEditorFeaturesModals',
+    'additionalPlayerFeatures',
+    'adminPage',
     'blogDashboard',
     'checkpointFeatures',
     'classroomPage',
     'classroomPageFileUploadFeatures',
     'collections',
     'contributorDashboard',
+    'coreEditorAndPlayerFeatures',
     'creatorDashboard',
     'learner',
     'learnerDashboard',
@@ -124,12 +130,6 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
-    'accessibility',
-    'additionalEditorFeatures',
-    'additionalEditorFeaturesModals',
-    'additionalPlayerFeatures',
-    'adminPage',
-    'coreEditorAndPlayerFeatures',
     'embedding',
     'explorationImprovementsTab',
     'explorationFeedbackTab',
