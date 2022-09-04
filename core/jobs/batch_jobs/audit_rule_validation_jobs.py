@@ -273,6 +273,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         Returns:
             invalid_found: bool. Returns True if the exploration is invalid.
         """
+        invalid_found = False
         for state in states_dict.values():
             if state.interaction.id != 'Continue':
                 continue
@@ -281,8 +282,9 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 ['buttonText'].value.unicode_str
             )
             if len(text_value) > 20:
-                return True
-        return False
+                invalid_found = True
+                break
+        return invalid_found
 
     @staticmethod
     def _get_invalid_choices_indexes(
@@ -1043,9 +1045,11 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         states_dict: Dict[str, state_domain.State]
     ) -> List[Dict[str, object]]:
         """Checks the following in the MultipleChoiceInput interaction
-            - `Contains` should always come after `Equals` and `Startswith`
-            rules
-            - `Startswith` should always come after the `Equals` rule
+            - `contains` should always come after the `Equals without taking
+            case into account` and `Starts-with` rule where the contains
+            string is a substring of the other rule's string
+            - `starts-with` should always come after `Equals` rule where
+            a `starts-with` string is a prefix of the `Equals` rule's string
             - Rule is duplicate
 
         Args:
