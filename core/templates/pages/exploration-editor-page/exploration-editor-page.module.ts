@@ -82,6 +82,7 @@ import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answ
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
 import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
+import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-for-editor-view/exploration-editor-suggestion-modal.component';
 
 @NgModule({
   imports: [
@@ -146,7 +147,8 @@ import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.co
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
-    ImprovementsTabComponent
+    ImprovementsTabComponent,
+    ExplorationEditorSuggestionModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -193,7 +195,8 @@ import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.co
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
-    ImprovementsTabComponent
+    ImprovementsTabComponent,
+    ExplorationEditorSuggestionModalComponent
   ],
   providers: [
     {
