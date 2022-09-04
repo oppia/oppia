@@ -228,7 +228,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             returned_error_msg = run_backend_tests._check_shards_match_tests() # type: ignore[no-untyped-call] # pylint: disable=protected-access
 
         self.assertEqual(
-            'Modules %s in shards not found. See %s.' % (
+            'Modules %s are in the backend test shards but missing from the '
+            'filesystem. See %s.' % (
             {'scripts.new_script_test'}, SHARDS_WIKI_LINK),
             returned_error_msg)
 
@@ -247,7 +248,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             returned_error_msg = run_backend_tests._check_shards_match_tests() # type: ignore[no-untyped-call] # pylint: disable=protected-access
 
         self.assertEqual(
-            'Modules %s not in shards. See %s.' % (
+            'Modules %s are present on the filesystem but are not listed in '
+            'the backend test shards. See %s.' % (
             {'scripts.new_script_test'}, SHARDS_WIKI_LINK),
             returned_error_msg)
 
