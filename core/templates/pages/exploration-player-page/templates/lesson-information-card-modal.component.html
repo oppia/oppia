@@ -45,7 +45,6 @@
           <button type="button"
                   class="btn btn-secondary save-progress-btn"
                   *ngIf="!userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
                   (click)="saveLoggedOutProgress()">
             {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
           </button>
