@@ -243,7 +243,7 @@ var ExplorationEditorPage = function() {
     if (width > 768) {
       await action.click('Save changes button', saveChangesButton);
       if (commitMessage) {
-        await action.sendKeys(
+        await action.setValue(
           'Commit message input', commitMessageInput, commitMessage);
       }
 
@@ -262,7 +262,7 @@ var ExplorationEditorPage = function() {
       }
       await action.click('Save draft', saveButtonMobile[0]);
       if (commitMessage) {
-        await action.sendKeys(
+        await action.sendValue(
           'Commit message input', commitMessageInput, commitMessage);
       }
       await action.click('Save draft button', commitChangesButton);

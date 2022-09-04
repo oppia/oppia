@@ -154,6 +154,7 @@ MOBILE_SUITES = [
     'contributorDashboard'
 ]
 
+
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
@@ -268,8 +269,10 @@ def run_tests(args):
             }))
 
         if (args.mobile) and (args.suite not in MOBILE_SUITES):
-            print(f'The {args.suite} suite should not be run ' +
-                    'in the mobile viewport')
+            print(
+                f'The {args.suite} suite should not be run ' +
+                'in the mobile viewport'
+                )
             sys.exit(1)
 
         if args.suite == 'full':
