@@ -348,6 +348,13 @@ URLS = [
         r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
         skill_editor.SkillDescriptionHandler),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER,
+        skill_editor.DiagnosticTestSkillAssignmentHandler),
+    get_redirect_route(
+        r'%s/' %
+        feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
+        topics_and_skills_dashboard.TopicIdToDiagnosticTestSkillIdsHandler),
+    get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
@@ -972,8 +979,11 @@ URLS = [
         r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
+        r'/learner_group_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSyllabusHandler),
+    get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
-        learner_group.LearnerGroupStudentProgressHandler),
+        learner_group.LearnerGroupLearnerProgressHandler),
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
@@ -981,8 +991,19 @@ URLS = [
         r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
         learner_group.CreateLearnerGroupPage),
     get_redirect_route(
-        r'/learner_group_search_student_handler',
-        learner_group.LearnerGroupSearchStudentHandler)
+        r'/learner_group_search_learner_handler',
+        learner_group.LearnerGroupSearchLearnerHandler),
+    get_redirect_route(
+        r'/learner_group_learners_info_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnersInfoHandler),
+    get_redirect_route(
+        r'/learner_group_learner_invitation_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnerInvitationHandler),
+    get_redirect_route(
+        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
+    get_redirect_route(
+        r'/user_progress_in_stories_chapters_handler/<username>',
+        learner_group.LearnerStoriesChaptersProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.

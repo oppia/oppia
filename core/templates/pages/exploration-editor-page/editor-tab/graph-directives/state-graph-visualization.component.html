@@ -6,7 +6,7 @@ with the same id on the page. -->
   <button *ngIf="maximize"
           (click)="sendOnMaximizeFunction()"
           class="btn btn-secondary btn-sm oppia-graph-resize-button">
-    <i title="Expand Map" class="material-icons oppia-material-icons">&#xE56B;</i>
+    <i title="Expand Map" class="fas fa-expand-arrows-alt oppia-material-icons"></i>
   </button>
 
   <svg class="oppia-graph-viz" width="100%" height="100%">
@@ -18,7 +18,9 @@ with the same id on the page. -->
         <g [attr.transform]="overallTransformStr" width="100%" height="100%">
           <g class="pannable-child" [attr.transform]="innerTransformStr">
             <g class="widthLocation" *ngFor="let link of augmentedLinks">
-              <path class="link e2e-test-link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style">
+              <path class="link e2e-test-link" *ngIf="link.d && !link.connectsDestIfStuck" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style">
+              </path>
+              <path class="link e2e-test-link" *ngIf="link.d && link.connectsDestIfStuck" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style" stroke-dasharray="3,4">
               </path>
             </g>
 
