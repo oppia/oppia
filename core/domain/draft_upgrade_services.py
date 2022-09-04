@@ -129,7 +129,6 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            new_value = None
             if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
             # The change object has the key 'new_value' only if the
@@ -137,16 +136,22 @@ class DraftUpgradeUtil:
             # 'CMD_EDIT_EXPLORATION_PROPERTY'.
             new_value = change.new_value
             if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
+                # Ruling out the possibility of any other type for MyPy
+                # type checking, because here 'new_value' is a value of
+                # attribute that was dynamically defined on change_domain
+                # and that attribute has str type. Thus to convert the
+                # type, we used assert here.
                 assert isinstance(new_value, dict)
                 new_value['html'] = conversion_fn(new_value['html'])
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 # Only customization args with the key 'choices' have HTML
                 # content in them.
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
+                # Ruling out the possibility of any other type for MyPy type
+                # checking because here 'new_value' is a value of attribute
+                # that was dynamically defined on change_domain and that
+                # attribute has str type. Thus to convert the type, we used
+                # assert here.
                 assert isinstance(new_value, dict)
                 if 'choices' in new_value.keys():
                     for value_index, value in enumerate(
@@ -172,13 +177,22 @@ class DraftUpgradeUtil:
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   new_value is not None):
+                # Ruling out the possibility of any other type for MyPy
+                # type checking, because here 'new_value' is a value of
+                # attribute that was dynamically defined on change_domain
+                # and that attribute has str type. Thus to convert the
+                # type, we used assert here.
+                assert isinstance(new_value, dict)
                 new_value = (
-                    state_domain.Outcome.convert_html_in_outcome(  # type: ignore[no-untyped-call]
+                    state_domain.Outcome.convert_html_in_outcome(
                         new_value, conversion_fn))
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
+                # Ruling out the possibility of any other type for MyPy
+                # type checking, because here 'new_value' is a value of
+                # attribute that was dynamically defined on change_domain
+                # and that attribute has str type. Thus to convert the
+                # type, we used assert here.
                 assert isinstance(new_value, list)
                 hint_dicts: List[state_domain.HintDict] = new_value
                 new_value = [
@@ -188,8 +202,11 @@ class DraftUpgradeUtil:
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
                   new_value is not None):
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
+                # Ruling out the possibility of any other type for MyPy
+                # type checking, because here 'new_value' is a value of
+                # attribute that was dynamically defined on change_domain
+                # and that attribute has str type. Thus to convert the
+                # type, we used assert here.
                 assert isinstance(new_value, dict)
                 new_value['explanation']['html'] = (
                     conversion_fn(new_value['explanation']['html']))
@@ -217,8 +234,11 @@ class DraftUpgradeUtil:
                 html_field_types_to_rule_specs = (
                     rules_registry.Registry.get_html_field_types_to_rule_specs(
                         state_schema_version=41))
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
+                # Ruling out the possibility of any other type for MyPy
+                # type checking, because here 'new_value' is a value of
+                # attribute that was dynamically defined on change_domain
+                # and that attribute has str type. Thus to convert the
+                # type, we used assert here.
                 assert isinstance(new_value, list)
                 answer_group_dicts: List[state_domain.AnswerGroupDict] = (
                     new_value

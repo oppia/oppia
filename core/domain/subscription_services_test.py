@@ -63,10 +63,10 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.OWNER_2_EMAIL, self.OWNER2_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
@@ -245,7 +245,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_creating_exploration_results_in_subscription(self) -> None:
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
@@ -254,7 +254,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
-        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [])
@@ -274,7 +274,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
-        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
@@ -285,11 +285,11 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
     def test_deleting_exploration_does_not_delete_subscription(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
-        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
 
-        exp_services.delete_exploration(self.owner_id, EXP_ID)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, EXP_ID)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
 
@@ -423,8 +423,8 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_2_EMAIL, self.OWNER2_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
 
     def _get_all_subscribers_of_creator(self, user_id: str) -> List[str]:
         """Returns all the ids of the subscribers that have subscribed to the
@@ -470,7 +470,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             return []
 
     def test_exception_is_raised_when_user_self_subscribes(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'User %s is not allowed to self subscribe.' % USER_ID):
             subscription_services.subscribe_to_creator(USER_ID, USER_ID)
 

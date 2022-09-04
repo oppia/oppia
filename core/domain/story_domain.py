@@ -664,6 +664,8 @@ class StoryContents:
         Returns:
             list(StoryNode). The ordered list of nodes.
         """
+        if len(self.nodes) == 0:
+            return []
         # Ruling out the possibility of None for mypy type checking.
         assert self.initial_node_id is not None
         initial_index = self.get_node_index(self.initial_node_id)
@@ -1873,3 +1875,13 @@ class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
     all_node_dicts: List[StoryNodeDict]
     topic_name: str
     topic_url_fragment: str
+
+
+class StoryChapterProgressSummaryDict(TypedDict):
+    """Dictionary representation of a StoryChapterProgressSummary object for
+    learner groups syllabus.
+    """
+
+    exploration_id: str
+    visited_checkpoints_count: int
+    total_checkpoints_count: int

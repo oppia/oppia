@@ -118,7 +118,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '0.2,1.0,0.8\n'
             '0.1,0.8,1.0')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Length of topic similarities columns: 2 does not match '
                 'length of topic list: 3.')
@@ -128,7 +128,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '1.0,0.2,0.1\n'
                 '0.2,1.0,0.8')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Length of topic similarities rows: 2 does not match '
                 'length of topic list: 3.')
@@ -139,7 +139,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Expected similarity to be between 0.0 and 1.0, received 800'
             ):
@@ -149,7 +149,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,800\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Expected similarity to be a float, received string'
             ):
@@ -159,7 +159,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Topic Fake Topic not in list of known topics.'
             ):
             recommendations_services.update_topic_similarities(
@@ -168,7 +168,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8\n'
                 '0.1,0.8,1.0')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected topic similarities to be symmetric.'
             ):
             recommendations_services.update_topic_similarities(
@@ -252,7 +252,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
         for name, user in self.USER_DATA.items():
             self.signup(user['email'], name)
-            user['id'] = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+            user['id'] = self.get_user_id_from_email(
                 user['email'])
             self.USER_DATA[name]['id'] = user['id']
 
@@ -277,7 +277,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             sorted(recommendations_services.RECOMMENDATION_CATEGORIES))
 
     def test_get_item_similarity(self) -> None:
-        exp_summaries = exp_services.get_all_exploration_summaries()  # type: ignore[no-untyped-call]
+        exp_summaries = exp_services.get_all_exploration_summaries()
 
         self.assertEqual(
             recommendations_services.get_item_similarity(
@@ -292,7 +292,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
         system_user = user_services.get_system_user()
         rights_manager.unpublish_exploration(system_user, 'exp_id_2')
-        exp_summaries = exp_services.get_all_exploration_summaries()  # type: ignore[no-untyped-call]
+        exp_summaries = exp_services.get_all_exploration_summaries()
         self.assertEqual(
             recommendations_services.get_item_similarity(
                 exp_summaries['exp_id_1'], exp_summaries['exp_id_2']),

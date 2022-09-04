@@ -144,7 +144,7 @@ export class AddOrUpdateSolutionModalComponent
     this.solutionType = this.stateSolutionService.savedMemento;
     if (this.solutionType) {
       this.savedMemento = (
-        this.solutionType?.correctAnswer);
+        this.solutionType.correctAnswer);
     } else {
       this.savedMemento = null;
     }

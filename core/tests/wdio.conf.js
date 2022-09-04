@@ -29,8 +29,32 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  accessibility: [
+    './core/tests/webdriverio/accessibility.js'
+  ],
+
+  additionalEditorFeatures: [
+    './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
+  ],
+
+  additionalEditorFeaturesModals: [
+    './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
+  ],
+
+  additionalPlayerFeatures: [
+    './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
+  ],
+
+  adminPage: [
+    './core/tests/webdriverio_desktop/adminTabFeatures.js'
+  ],
+
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
+  ],
+
+  checkpointFeatures: [
+    './core/tests/webdriverio_desktop/checkpointFeatures.js'
   ],
 
   classroomPage: [
@@ -47,6 +71,10 @@ var suites = {
 
   contributorDashboard: [
     './core/tests/webdriverio_desktop/contributorDashboard.js'
+  ],
+
+  coreEditorAndPlayerFeatures: [
+    './core/tests/webdriverio_desktop/coreEditorAndPlayerFeatures.js'
   ],
 
   creatorDashboard: [
@@ -192,7 +220,8 @@ exports.config = {
       logPath: 'logs',
       installArgs: { drivers },
       args: { drivers }
-    }]
+    }],
+    'intercept'
   ],
 
   // Framework you want to run your specs with.

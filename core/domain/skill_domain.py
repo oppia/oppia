@@ -1562,13 +1562,13 @@ class Skill:
         recorded_voiceovers = self.skill_contents.recorded_voiceovers
 
         for content_id in content_ids_to_delete:
-            recorded_voiceovers.delete_content_id_for_voiceover(content_id)  # type: ignore[no-untyped-call]
-            written_translations.delete_content_id_for_translation(  # type: ignore[no-untyped-call]
+            recorded_voiceovers.delete_content_id_for_voiceover(content_id)
+            written_translations.delete_content_id_for_translation(
                 content_id)
 
         for content_id in content_ids_to_add:
-            recorded_voiceovers.add_content_id_for_voiceover(content_id)  # type: ignore[no-untyped-call]
-            written_translations.add_content_id_for_translation(content_id)  # type: ignore[no-untyped-call]
+            recorded_voiceovers.add_content_id_for_voiceover(content_id)
+            written_translations.add_content_id_for_translation(content_id)
 
     def _find_misconception_index(self, misconception_id: int) -> Optional[int]:
         """Returns the index of the misconception with the given misconception
@@ -1995,7 +1995,7 @@ class TopicAssignment:
             topic_name: str. The name of the topic.
             topic_version: int. The current version of the topic to which the
                 skill is assigned.
-            subtopic_id: str or None. The id of the subtopic to which the skill
+            subtopic_id: int or None. The id of the subtopic to which the skill
                 is assigned, or None if the skill is not assigned to any
                 subtopic.
         """

@@ -93,10 +93,16 @@ export class States {
         if (groups[i].outcome.dest === deleteStateName) {
           groups[i].outcome.dest = otherStateName;
         }
+        if (groups[i].outcome.destIfReallyStuck === deleteStateName) {
+          groups[i].outcome.destIfReallyStuck = otherStateName;
+        }
       }
       if (interaction.defaultOutcome) {
         if (interaction.defaultOutcome.dest === deleteStateName) {
           interaction.defaultOutcome.dest = otherStateName;
+        }
+        if (interaction.defaultOutcome.destIfReallyStuck === deleteStateName) {
+          interaction.defaultOutcome.destIfReallyStuck = otherStateName;
         }
       }
     }
@@ -114,10 +120,16 @@ export class States {
         if (groups[i].outcome.dest === oldStateName) {
           groups[i].outcome.dest = newStateName;
         }
+        if (groups[i].outcome.destIfReallyStuck === oldStateName) {
+          groups[i].outcome.destIfReallyStuck = newStateName;
+        }
       }
       if (interaction.defaultOutcome) {
         if (interaction.defaultOutcome.dest === oldStateName) {
           interaction.defaultOutcome.dest = newStateName;
+        }
+        if (interaction.defaultOutcome.destIfReallyStuck === oldStateName) {
+          interaction.defaultOutcome.destIfReallyStuck = newStateName;
         }
       }
     }

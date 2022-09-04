@@ -1,0 +1,28 @@
+<div class="modal-body">
+  <oppia-invite-learners [learnerGroupID]="learnerGroupId"
+                         (updateLearnerGroupInvitedLearners)="updateNewlyInvitedLearners($event)"
+                         (updateLearnerGroupInvitedLearnersInfo)="updateNewlyInvitedLearnersInfo($event)">
+  </oppia-invite-learners>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
+  <button class="btn btn-primary send-invitation-button" [disabled]="invitedLearners.length === 0" (click)="confirm()">Send Invitation</button>
+</div>
+
+<style>
+  .btn-primary {
+    background-color: #00645c;
+    border: solid 1px #00645c;
+    margin-right: 20px;
+    padding: 6px 16px;
+  }
+
+  .btn-primary:disabled {
+    background: #9e9e9e;
+    border: solid 1px #9e9e9e;
+  }
+
+  .btn-primary.send-invitation-button {
+    margin-right: unset;
+  }
+</style>

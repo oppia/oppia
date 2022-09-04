@@ -236,7 +236,6 @@ class TopicPageDataHandlerTests(
                     self.skill_id_2: 0.5
                 },
                 'skill_descriptions': {
-                    self.skill_id_1: None,
                     self.skill_id_2: 'Skill Description 2'
                 },
                 'practice_tab_is_displayed': False
@@ -342,8 +341,7 @@ class TopicPageDataHandlerTests(
                 self.skill_id_2: None
             },
             'skill_descriptions': {
-                self.skill_id_1: 'Skill Description 1',
-                self.skill_id_2: None
+                self.skill_id_1: 'Skill Description 1'
             },
             'practice_tab_is_displayed': True
         }
@@ -399,7 +397,6 @@ class TopicPageDataHandlerTests(
             },
             'skill_descriptions': {
                 self.skill_id_1: 'Skill Description 1',
-                self.skill_id_2: None
             },
             'practice_tab_is_displayed': True
         }

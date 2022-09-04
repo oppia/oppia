@@ -6,9 +6,8 @@
               (click)="saveChanges()"
               [disabled]="!isStorySaveable()">
         <span *ngIf="!isSaveInProgress()">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+          <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
              alt="Save Story">
-            &#xE161;
           </i>
           <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">
             Save Draft
@@ -198,6 +197,10 @@
     margin-right: 20px;
     margin-top: 8px;
   }
+  .story-editor-save-draft-icon {
+    padding-left: 4px;
+  }
+
   @media screen and (max-width: 768px) {
     .navbar-desktop li {
       display: none;

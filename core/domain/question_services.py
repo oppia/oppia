@@ -768,6 +768,7 @@ def compute_summary_of_question(
 
     Raises:
         Exception. No interaction_id found for the given question.
+        Exception. No data available for when the question was last_updated on.
     """
     question_content = question.question_state_data.content.html
     answer_groups = question.question_state_data.interaction.answer_groups
@@ -784,9 +785,11 @@ def compute_summary_of_question(
         raise Exception(
             'No interaction_id found for the given question.'
         )
-    # Ruling out the possibility of None for mypy type checking.
-    assert question.created_on is not None
-    assert question.last_updated is not None
+
+    if question.created_on is None or question.last_updated is None:
+        raise Exception(
+            'No data available for when the question was last_updated on.'
+        )
     question_summary = question_domain.QuestionSummary(
         question.id, question_content, misconception_ids, interaction_id,
         question.created_on, question.last_updated)

@@ -546,8 +546,12 @@ class SuggestionEditStateContent(BaseSuggestion):
             commit_message: str. The commit message.
         """
         change_list = self.get_change_list_for_accepting_suggestion()
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
-            self.final_reviewer_id, self.target_id, change_list, commit_message)
+        # Before calling this accept method we are already checking if user
+        # with 'final_reviewer_id' exists or not.
+        assert self.final_reviewer_id is not None
+        exp_services.update_exploration(
+            self.final_reviewer_id, self.target_id, change_list,
+            commit_message)
 
     def pre_update_validate(self, change: exp_domain.ExplorationChange) -> None:
         """Performs the pre update validation. This function needs to be called
@@ -791,9 +795,12 @@ class SuggestionTranslateContent(BaseSuggestion):
 
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
+        # Before calling this accept method we are already checking if user
+        # with 'final_reviewer_id' exists or not.
+        assert self.final_reviewer_id is not None
         if (hasattr(self.change, 'data_format') and (
                 translation_domain.TranslatableContentFormat
-                .is_data_format_list(self.change.data_format))): # type: ignore[no-untyped-call]
+                .is_data_format_list(self.change.data_format))):
             return
 
         self._copy_new_images_to_target_entity_storage()
@@ -1946,28 +1953,27 @@ class ContributorMilestoneEmailInfo:
 
     Attributes:
         contributor_user_id: str. The ID of the contributor.
-        language_code: str. The language code of the suggestion.
+        language_code: str|None. The language code of the suggestion.
         contribution_type: str. The type of the contribution i.e.
             translation or question.
         contribution_sub_type: str. The sub type of the contribution
             i.e. submissions/acceptances/reviews/edits.
-        contributions_count: int. The number of contributions made to
-            reach the milestone.
+        rank_name: str. The name of the rank that the contributor achieved.
     """
 
     def __init__(
         self,
         contributor_user_id: str,
         contribution_type: str,
-        contribution_sub_type: str,
-        language_code: str,
-        contributions_count: int
+        contribution_subtype: str,
+        language_code: Optional[str],
+        rank_name: str
     ) -> None:
         self.contributor_user_id = contributor_user_id
         self.contribution_type = contribution_type
-        self.contribution_sub_type = contribution_sub_type
+        self.contribution_subtype = contribution_subtype
         self.language_code = language_code
-        self.contributions_count = contributions_count
+        self.rank_name = rank_name
 
 
 class ContributorStatsSummaryDict(TypedDict):

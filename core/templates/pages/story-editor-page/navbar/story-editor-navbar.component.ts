@@ -177,8 +177,8 @@ export class StoryEditorNavbarComponent implements OnInit {
         // The type of errorMessage is unknown because error messages
         // can be of type anything. For example, it can be a string
         // or an object.
-        }, (errorMessage: unknown) => {
-          this.alertsService.addInfoMessage(errorMessage as string, 5000);
+        }, (errorMessage: string) => {
+          this.alertsService.addInfoMessage(errorMessage, 5000);
         }
       );
     }, () => {

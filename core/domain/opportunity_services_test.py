@@ -84,10 +84,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'
@@ -435,7 +435,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -542,7 +542,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'data_format': 'html'
             }),
         ]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', change_list, 'commit message')
 
         # get_translation_opportunities should no longer return the opportunity
@@ -560,7 +560,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'content_id': 'content_0',
             'language_code': 'hi'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, '0', translation_needs_update_change_list,
             'commit message')
         translation_opportunities, _, _ = (
@@ -573,7 +573,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='skill_description')
 
         skill_opportunities, _, _ = (
@@ -587,7 +587,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self
     ) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -611,7 +611,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'SkillOpportunity corresponding to skill ID %s already exists.'
             % self.SKILL_ID):
@@ -619,7 +619,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 self.SKILL_ID, 'description')
 
     def test_update_skill_description_updates_skill_opportunity(self) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='skill_description')
         changelist = [
             skill_domain.SkillChange({
@@ -631,7 +631,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             })
         ]
 
-        skill_services.update_skill(  # type: ignore[no-untyped-call]
+        skill_services.update_skill(
             self.admin_id, self.SKILL_ID, changelist,
             'Updated misconception name.')
 
@@ -652,13 +652,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 0)
 
     def test_delete_skill_deletes_skill_opportunity(self) -> None:
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='skill_description')
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
 
-        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)  # type: ignore[no-untyped-call]
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -733,7 +733,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -749,7 +749,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -769,7 +769,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             ['skill_2'],
@@ -787,7 +787,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -807,7 +807,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             ['skill_2'],
@@ -832,10 +832,10 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -1030,11 +1030,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     ) -> None:
         story_models.StoryModel.delete_by_id(self.STORY_ID)
 
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'Failed to regenerate opportunities',
-            lambda: (
-                opportunity_services.regenerate_opportunities_related_to_topic(
-                    self.TOPIC_ID)))
+        with self.assertRaisesRegex(
+            Exception, 'Failed to regenerate opportunities'
+        ):
+            opportunity_services.regenerate_opportunities_related_to_topic(
+                self.TOPIC_ID
+            )
 
 
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(

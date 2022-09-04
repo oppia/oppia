@@ -47,9 +47,8 @@ import {
   SubscriberSummaryBackendDict,
 } from 'domain/user/profile-summary.model';
 import {
-  SuggestionThread,
-  SuggestionThreadObjectFactory
-} from 'domain/suggestion/SuggestionThreadObjectFactory';
+  SuggestionThread
+} from 'domain/suggestion/suggestion-thread-object.model';
 import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict
@@ -96,7 +95,6 @@ export class CreatorDashboardBackendApiService {
   constructor(
     private http: HttpClient,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
-    private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private suggestionsService: SuggestionsService,
     private loggerService: LoggerService) {}
 
@@ -118,7 +116,7 @@ export class CreatorDashboardBackendApiService {
         var threadDict = feedbackDicts[i];
         if (threadDict.thread_id === suggestionThreadId) {
           var suggestionThread = (
-            this.suggestionThreadObjectFactory.createFromBackendDicts(
+            SuggestionThread.createFromBackendDicts(
               threadDict, suggestionDicts[j]));
           suggestionThreads.push(suggestionThread);
         }

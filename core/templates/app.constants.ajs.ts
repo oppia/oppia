@@ -73,6 +73,9 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'PLACEHOLDER_OUTCOME_DEST', AppConstants.PLACEHOLDER_OUTCOME_DEST);
 angular.module('oppia').constant(
+  'PLACEHOLDER_OUTCOME_DEST_IF_STUCK',
+  AppConstants.PLACEHOLDER_OUTCOME_DEST_IF_STUCK);
+angular.module('oppia').constant(
   'INTERACTION_DISPLAY_MODE_INLINE',
   AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
 angular.module('oppia').constant(
