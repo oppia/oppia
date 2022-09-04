@@ -60,9 +60,6 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/run_presubmit_checks.py',
     'scripts/run_tests.py',
     'scripts/check_backend_associated_test_file.py',
-    'scripts/third_party_size_check.py',
-    'scripts/linters/warranted_angular_security_bypasses.py',
-    'core/domain/cron_services.py',
     'core/platform/datastore/cloud_datastore_services.py',
     'core/platform/transactions/cloud_transaction_services.py',
 ]

@@ -90,7 +90,7 @@ def _check_size_in_dir(dir_path: str, skip_files_list: List[str]) -> int:
             )
             if not matches_skip_files:
                 number_of_files_in_dir += 1
-        elif os.path.isdir(file_path):
+        else:
             number_of_files_in_dir += _check_size_in_dir(
                 file_path, skip_files_list)
     return number_of_files_in_dir
@@ -121,7 +121,7 @@ def _check_third_party_size() -> None:
         print('')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     print('Running third-party size check')
     _check_third_party_size()
     print('Third-party folder size check passed.')
