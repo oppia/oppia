@@ -202,7 +202,7 @@ class TestingTaskSpec:
             covered_path = covered_path[:-len('_test')]
             covered_path += '.py'
             if os.path.exists(covered_path):
-                report, coverage = _check_coverage(
+                report, coverage = check_coverage(
                     False, data_file=data_file, include=(covered_path,))
             else:
                 # Some test files (e.g. scripts/script_import_test.py)
@@ -218,7 +218,7 @@ class TestingTaskSpec:
             None, None, None, messages)]
 
 
-def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
+def get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -246,7 +246,7 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     return result
 
 
-def _get_all_test_targets_from_shard(shard_name):
+def get_all_test_targets_from_shard(shard_name):
     """Find all test modules in a shard.
 
     Args:
@@ -260,7 +260,7 @@ def _get_all_test_targets_from_shard(shard_name):
     return shards_spec[shard_name]
 
 
-def _check_shards_match_tests(include_load_tests=True):
+def check_shards_match_tests(include_load_tests=True):
     """Check whether the test shards match the tests that exist.
 
     Args:
@@ -277,7 +277,7 @@ def _check_shards_match_tests(include_load_tests=True):
         shards_spec = json.load(shards_file)
     shard_modules = sorted([
         module for shard in shards_spec.values() for module in shard])
-    test_modules = _get_all_test_targets_from_path(
+    test_modules = get_all_test_targets_from_path(
         include_load_tests=include_load_tests)
     test_modules_set = set(test_modules)
     test_modules = sorted(test_modules_set)
@@ -311,7 +311,7 @@ def _check_shards_match_tests(include_load_tests=True):
     ).format(test_extra, SHARDS_WIKI_LINK)
 
 
-def _load_coverage_exclusion_list(path):
+def load_coverage_exclusion_list(path):
     """Load modules excluded from per-file coverage checks.
 
     Args:
@@ -331,9 +331,9 @@ def _load_coverage_exclusion_list(path):
     return exclusion_list
 
 
-def _check_test_results(tasks, task_to_taskspec, generate_coverage_report):
+def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
     """Run tests and parse coverage reports."""
-    coverage_exclusions = _load_coverage_exclusion_list(
+    coverage_exclusions = load_coverage_exclusion_list(
         COVERAGE_EXCLUSION_LIST_PATH)
 
     # Check we ran all tests as expected.
@@ -449,15 +449,15 @@ def main(args=None):
                 print('Redirecting to its corresponding test file...')
                 all_test_targets = [parsed_args.test_target + '_test']
         elif parsed_args.test_shard:
-            validation_error = _check_shards_match_tests(
+            validation_error = check_shards_match_tests(
                 include_load_tests=True)
             if validation_error:
                 raise Exception(validation_error)
-            all_test_targets = _get_all_test_targets_from_shard(
+            all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
         else:
             include_load_tests = not parsed_args.exclude_load_tests
-            all_test_targets = _get_all_test_targets_from_path(
+            all_test_targets = get_all_test_targets_from_path(
                 test_path=parsed_args.test_path,
                 include_load_tests=include_load_tests)
 
@@ -492,7 +492,7 @@ def main(args=None):
 
     (
         total_count, total_errors, total_failures, incomplete_coverage
-    ) = _check_test_results(
+    ) = check_test_results(
         tasks, task_to_taskspec, parsed_args.generate_coverage_report)
 
     print('')
@@ -522,7 +522,7 @@ def main(args=None):
 
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
-        report_stdout, coverage = _check_coverage(True)
+        report_stdout, coverage = check_coverage(True)
         print(report_stdout)
 
         if (coverage != 100
@@ -533,7 +533,7 @@ def main(args=None):
     print('Done!')
 
 
-def _check_coverage(
+def check_coverage(
         combine, data_file=None, include=tuple()):
     """Check code coverage of backend tests.
 
