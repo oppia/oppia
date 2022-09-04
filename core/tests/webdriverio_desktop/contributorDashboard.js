@@ -280,8 +280,18 @@ describe('Contributor dashboard page', function() {
     await users.login(USER_EMAILS[1]);
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await contributorDashboardPage.clickOpportunityActionButton(
-      'Question 1', SKILL_DESCRIPTIONS[0]);
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 700) {
+      let opportunityItemSelector = function() {
+        return $$('.e2e-test-opportunity-list-item');
+      };
+      let opportunity = (await opportunityItemSelector())[0];
+      await action.click('Opportunity Item', opportunity);
+    } else {
+      await contributorDashboardPage.clickOpportunityActionButton(
+        'Question 1', SKILL_DESCRIPTIONS[0]);
+    }
     await (
       contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.clickAcceptQuestionSuggestionButton();
@@ -342,8 +352,18 @@ describe('Contributor dashboard page', function() {
     await users.login(USER_EMAILS[1]);
     await contributorDashboardPage.get();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await contributorDashboardPage.clickOpportunityActionButton(
-      'Question 1', SKILL_DESCRIPTIONS[0]);
+
+    let width = (await browser.getWindowSize()).width;
+    if (width < 700) {
+      let opportunityItemSelector = function() {
+        return $$('.e2e-test-opportunity-list-item');
+      };
+      let opportunity = (await opportunityItemSelector())[0];
+      await action.click('Opportunity Item', opportunity);
+    } else {
+      await contributorDashboardPage.clickOpportunityActionButton(
+        'Question 1', SKILL_DESCRIPTIONS[0]);
+    }
     await (
       contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
     await contributorDashboardPage.setQuestionSuggestionReviewMessage(
