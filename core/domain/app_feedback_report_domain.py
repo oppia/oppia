@@ -27,18 +27,17 @@ from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
 
-from typing import Any, Dict, List, Match, Optional, Union
+from typing import Any, Dict, List, Mapping, Match, Optional, Union, cast
 from typing_extensions import TypedDict
 
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
 from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
 
 (app_feedback_report_models,) = models.Registry.import_models([
     models.NAMES.app_feedback_report
@@ -58,6 +57,21 @@ class AppFeedbackReportDict(TypedDict):
     user_supplied_feedback: UserSuppliedFeedbackDict
     device_system_context: DeviceSystemContextDict
     app_context: AppContextDict
+
+
+class AndroidFeedbackReportDict(TypedDict):
+    """Dictionary representing the android's AppFeedbackReport object."""
+
+    report_id: str
+    schema_version: int
+    platform: str
+    submitted_on_timestamp: str
+    local_timezone_offset_hrs: int
+    ticket_id: Optional[str]
+    scrubbed_by: Optional[str]
+    user_supplied_feedback: UserSuppliedFeedbackDict
+    device_system_context: AndroidDeviceSystemContextDict
+    app_context: AndroidAppContextDict
 
 
 class AppFeedbackReport:
@@ -244,13 +258,15 @@ class AppFeedbackReport:
             raise utils.ValidationError(
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
+    # Here we use type Any because this method can accept JSON response Dicts
+    # and JSON response dicts have type Dict[str, Any].
     @classmethod
     def from_dict(cls, report_dict: Dict[str, Any]) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict of the report sent in
         an incoming feedback report request.
 
         Args:
-            report_dict: dict. A dict representing the incoming feebdack report
+            report_dict: dict. A dict representing the incoming feedback report
                 sent in a request.
 
         Returns:
@@ -262,14 +278,19 @@ class AppFeedbackReport:
         """
         if report_dict['platform_type'] == (
             app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
-            return cls.get_android_report_from_dict(report_dict)
+            # Here we use cast because we are narrowing down the feedback report
+            # request dict to AndroidFeedbackReportDict.
+            android_report_dict = cast(
+                AndroidFeedbackReportDict, report_dict
+            )
+            return cls.get_android_report_from_dict(android_report_dict)
         else:
             raise NotImplementedError(
                 'Domain objects for web reports must be implemented.')
 
     @classmethod
     def get_android_report_from_dict(
-        cls, report_dict: Dict[str, Any]
+        cls, report_dict: AndroidFeedbackReportDict
     ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict for an Android
         report.
@@ -291,8 +312,16 @@ class AppFeedbackReport:
                 user_supplied_feedback_json['user_feedback_selected_items'],
                 user_supplied_feedback_json['user_feedback_other_text_input']))
 
-        system_context_json = report_dict['system_context']
-        device_context_json = report_dict['device_context']
+        # Here we use MyPy ignore because 'system_context' key is not defined
+        # in AndroidFeedbackReportDict and to_dict() but still we are accessing
+        # this key which causes MyPy to throw a error. Thus to avoid the error,
+        # we used ignore here.
+        system_context_json = report_dict['system_context']  # type: ignore[misc]
+        # Here we use MyPy ignore because 'device_context' key is not defined
+        # in AndroidFeedbackReportDict and to_dict() but still we are accessing
+        # this key which causes MyPy to throw a error. Thus to avoid the error,
+        # we used ignore here.
+        device_context_json = report_dict['device_context']  # type: ignore[misc]
         device_system_context_obj = (
             AndroidDeviceSystemContext(
                 system_context_json['platform_version'],
@@ -319,14 +348,34 @@ class AppFeedbackReport:
             app_context_json['event_logs'], app_context_json['logcat_logs'])
 
         report_datetime = datetime.datetime.fromtimestamp(
-            report_dict['report_submission_timestamp_sec'])
+            # Here we use MyPy ignore because 'report_submission_timestamp_sec'
+            # key is not defined in AndroidFeedbackReportDict and to_dict() but
+            # still we are accessing this key which causes MyPy to throw error.
+            # Thus to avoid the error, we used ignore here.
+            report_dict['report_submission_timestamp_sec'])  # type: ignore[misc]
         report_id = (
+            # Here we use MyPy ignore because 'platform_type' key is not
+            # defined in AndroidFeedbackReportDict and to_dict() but still
+            # we are accessing this key which causes MyPy to throw error.
+            # Thus to avoid the error, we used ignore here.
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                report_dict['platform_type'], report_datetime))
+                report_dict['platform_type'], report_datetime))  # type: ignore[misc]
         report_obj = AppFeedbackReport(
-            report_id, report_dict['android_report_info_schema_version'],
-            report_dict['platform_type'], report_datetime,
-            report_dict['report_submission_utc_offset_hrs'], None, None,
+            # Here we use MyPy ignore because android_report_info_schema_version
+            # key is not defined in AndroidFeedbackReportDict and to_dict() but
+            # still we are accessing this key which causes MyPy to throw error.
+            # Thus to avoid the error, we used ignore here.
+            report_id, report_dict['android_report_info_schema_version'],  # type: ignore[misc]
+            # Here we use MyPy ignore because 'platform_type' key is not
+            # defined in AndroidFeedbackReportDict and to_dict() but still
+            # we are accessing this key which causes MyPy to throw error.
+            # Thus to avoid the error, we used ignore here.
+            report_dict['platform_type'], report_datetime,  # type: ignore[misc]
+            # Here we use MyPy ignore because 'report_submission_utc_offset_hrs'
+            # key is not defined in AndroidFeedbackReportDict and to_dict() but
+            # still we are accessing this key which causes MyPy to throw error.
+            # Thus to avoid the error, we used ignore here.
+            report_dict['report_submission_utc_offset_hrs'], None, None,  # type: ignore[misc]
             user_supplied_feedback_obj, device_system_context_obj,
             app_context_obj)
 
@@ -386,9 +435,11 @@ class AppFeedbackReport:
         raise utils.InvalidInputException(
             'The given Android app text size %s is invalid.' % text_size_name)
 
+    # Here we use type Any because this method can accept JSON response Dicts
+    # and JSON response dicts have type Dict[str, Any].
     @classmethod
     def get_entry_point_from_json(
-        cls, entry_point_json: Dict[str, Any]
+        cls, entry_point_json: Mapping[str, Any]
     ) -> EntryPoint:
         """Determines the entry point type based on the rececived JSON.
 
@@ -1189,6 +1240,9 @@ class EntryPoint:
         self.exploration_id = exploration_id
         self.subtopic_id = subtopic_id
 
+    # Here we use type Any because in sub-classes this method can be
+    # re-implemented with different return types. So, to allow every
+    # return type we used Any type here.
     def to_dict(self) -> Any:
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
