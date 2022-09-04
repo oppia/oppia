@@ -81,6 +81,7 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
+import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
 
 @NgModule({
   imports: [
@@ -144,7 +145,8 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ImprovementsTabComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -190,7 +192,8 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ImprovementsTabComponent
   ],
   providers: [
     {
