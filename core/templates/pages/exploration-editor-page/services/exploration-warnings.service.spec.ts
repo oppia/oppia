@@ -28,7 +28,6 @@ import { ExplorationWarningsService } from './exploration-warnings.service';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
 
  class MockNgbModal {
    open() {
@@ -2285,16 +2284,14 @@ describe('Exploration Warnings Service', () => {
         'Placeholder text must be a string.',
         'Number of rows must be integral.',
         'Learner should not be directed back by more than' +
-          ' ' + AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION +
-          ' cards in the lesson.',
+          ' 3 cards in the lesson.',
         'Checkpoints must not be assigned to cards that can be bypassed.'
       ],
       State7: [
         'Placeholder text must be a string.',
         'Number of rows must be integral.',
         'Learner should not be directed back by more than' +
-          ' ' + AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION +
-          ' cards in the lesson.'
+          ' 3 cards in the lesson.'
       ],
       End: [
         'Please make sure end exploration interactions do not ' +
