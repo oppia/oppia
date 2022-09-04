@@ -271,9 +271,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             states_dict: dict[str, state_domain.State]. The state dictionary.
 
         Returns:
-            invalid_found: bool. Returns True if the exploration is invalid.
+            bool. Returns True if the exploration is invalid.
         """
-        invalid_found = False
         for state in states_dict.values():
             if state.interaction.id != 'Continue':
                 continue
@@ -282,9 +281,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 ['buttonText'].value.unicode_str
             )
             if len(text_value) > 20:
-                invalid_found = True
-                break
-        return invalid_found
+                return True
+        return False
 
     @staticmethod
     def _get_invalid_choices_indexes(
@@ -1045,11 +1043,12 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         states_dict: Dict[str, state_domain.State]
     ) -> List[Dict[str, object]]:
         """Checks the following in the MultipleChoiceInput interaction
-            - `contains` should always come after the `Equals without taking
-            case into account` and `Starts-with` rule where the contains
-            string is a substring of the other rule's string
-            - `starts-with` should always come after `Equals` rule where
-            a `starts-with` string is a prefix of the `Equals` rule's string
+            - `contains` should always come after the `Equals_without_taking
+            _case_into_account`, `Contains` and `Starts-with` rule where the
+            contains string is a substring of the other rule's string
+            - `starts-with` should always come after `Equals` and `starts-with`
+            rule where a `starts-with` string is a prefix of the other
+            rule's string
             - Rule is duplicate
 
         Args:
@@ -1080,24 +1079,48 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         rule_spec_till_now.append(rule_spec.to_dict())
 
                     if rule_spec.rule_type == 'Contains':
-                        seen_strings_contains.append(
-                            rule_spec.inputs['x']['normalizedStrSet'])
-
-                    if rule_spec.rule_type == 'StartsWith':
-                        # `Contains` should always come after `Equals` and
-                        # `Startswith` rules.
                         rule_values = rule_spec.inputs['x']['normalizedStrSet']
-                        seen_strings_startswith.append(rule_values)
+                        # `Contains` should always come after another
+                        # `Contains` rule where the first contains rule
+                        # strings is a substring of the other contains
+                        # rule strings.
                         for contain_rule_ele in seen_strings_contains:
                             for contain_rule_string in contain_rule_ele:
                                 for rule_value in rule_values:
                                     if contain_rule_string in rule_value:
                                         invalid_rules.append(rule_spec)
 
-                    if rule_spec.rule_type == 'Equals':
-                        # `Contains` should always come after `Equals` and
-                        # `Startswith` rules.
+                        seen_strings_contains.append(
+                            rule_spec.inputs['x']['normalizedStrSet'])
+
+                    if rule_spec.rule_type == 'StartsWith':
                         rule_values = rule_spec.inputs['x']['normalizedStrSet']
+                        # `StartsWith` rule should always come after another
+                        # `StartsWith` rule where the first starts-with string
+                        # is the prefix of the other starts-with string.
+                        for start_with_rule_ele in seen_strings_startswith:
+                            for start_with_rule_string in start_with_rule_ele:
+                                for rule_value in rule_values:
+                                    if rule_value.startswith(
+                                        start_with_rule_string):
+                                        invalid_rules.append(rule_spec)
+
+                        # `Contains` should always come after `StartsWith` rule
+                        # where the contains rule strings is a substring
+                        # of the `Equals` rule string.
+                        for contain_rule_ele in seen_strings_contains:
+                            for contain_rule_string in contain_rule_ele:
+                                for rule_value in rule_values:
+                                    if contain_rule_string in rule_value:
+                                        invalid_rules.append(rule_spec)
+
+                        seen_strings_startswith.append(rule_values)
+
+                    if rule_spec.rule_type == 'Equals':
+                        rule_values = rule_spec.inputs['x']['normalizedStrSet']
+                        # `Contains` should always come after `Equals` rule
+                        # where the contains rule strings is a substring
+                        # of the `Equals` rule string.
                         for contain_rule_ele in seen_strings_contains:
                             for contain_rule_string in contain_rule_ele:
                                 for rule_value in rule_values:
@@ -1105,7 +1128,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                                         invalid_rules.append(rule_spec)
 
                         # `Startswith` should always come after the `Equals`
-                        # rule.
+                        # rule where a `starts-with` string is a prefix of the
+                        # `Equals` rule's string.
                         for start_with_rule_ele in seen_strings_startswith:
                             for start_with_rule_string in start_with_rule_ele:
                                 for rule_value in rule_values:

@@ -1627,6 +1627,28 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
                   'normalizedStrSet': ['z']
                 }
               }
+            },
+            {
+              'rule_type': 'StartsWith',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_30',
+                  'normalizedStrSet': [
+                    'excitement'
+                  ]
+                }
+              }
+            },
+            {
+              'rule_type': 'Contains',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_27',
+                  'normalizedStrSet': [
+                    'helloabc',
+                  ]
+                }
+              }
             }
           ],
           'outcome': {
