@@ -28,7 +28,6 @@ from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
@@ -2201,7 +2200,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.admin_id, topic.id, skill_id)
 
     def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
-        """Sets up required topics and stories for translations
+        """Sets up required topics and stories for translations.
 
         Returns:
             Dict[str, str]. A dictionary of the change object for the
