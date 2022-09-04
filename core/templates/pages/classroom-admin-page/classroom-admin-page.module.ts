@@ -21,11 +21,14 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -46,6 +49,7 @@ declare var angular: ng.IAngularStatic;
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     // TODO(#13443): Remove smart router module provider once all pages are
@@ -53,6 +57,7 @@ declare var angular: ng.IAngularStatic;
     SmartRouterModule,
     RouterModule.forRoot([]),
     MatCardModule,
+    MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)

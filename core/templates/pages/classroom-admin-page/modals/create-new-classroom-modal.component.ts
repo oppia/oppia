@@ -40,6 +40,7 @@ export class CreateNewClassroomModalComponent
   newClassroomName: string = '';
   newClassroomId: string = '';
   classroomNameAlreadyExist: boolean = false;
+  creatingNewClassroom: boolean = false;
 
   getNewClassroomId(): void {
     this.classroomBackendApiService.getNewClassroomIdAsync().then(
@@ -58,6 +59,7 @@ export class CreateNewClassroomModalComponent
       this.classroomNameAlreadyExist = true;
       return;
     }
+    this.creatingNewClassroom = true;
 
     let defaultClassroomDict = {
       classroom_id: this.newClassroomId,
@@ -71,6 +73,7 @@ export class CreateNewClassroomModalComponent
     this.classroomBackendApiService.updateClassroomDataAsync(
       this.newClassroomId, defaultClassroomDict).then(() => {
       this.ngbActiveModal.close(defaultClassroomDict);
+      this.creatingNewClassroom = false;
     });
   }
 }

@@ -7,10 +7,10 @@
   <p>
     Enter the name of the new classroom
   </p>
-  <p *ngIf="classroomNameAlreadyExist">
-    <em>A classroom with this name already exists</em>
-  </p>
   <textarea class="new-classroom-name-input" [(ngModel)]="newClassroomName" rows="1"></textarea>
+  <p *ngIf="classroomNameAlreadyExist" class="oppia-warning-text">
+    A classroom with this name already exists.
+  </p>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary"
@@ -20,12 +20,26 @@
   <button class="btn btn-success"
           (click)="createClassroom(newClassroomName)"
           [disabled]="newClassroomName === ''">
-    Create
+    <span *ngIf="!creatingNewClassroom">Create</span>
+    <mat-spinner *ngIf="creatingNewClassroom"
+                 class="oppia-create-classroom-spinning-button"
+                 [diameter]="22">
+    </mat-spinner>
   </button>
 </div>
 
 <style>
+  :host /deep/ .oppia-create-classroom-spinning-button circle {
+    stroke: #fff;
+  }
+  .oppia-create-classroom-spinning-button {
+    margin: 0 5px;
+  }
   .new-classroom-name-input {
     width: 400px;
+  }
+  .oppia-warning-text {
+    color: #f00;
+    font-size: 0.8em;
   }
 </style>

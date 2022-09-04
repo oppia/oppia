@@ -56,6 +56,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomDetailsIsShown: boolean = false;
   classroomViewerMode: boolean = false;
   classroomEditorMode: boolean = false;
+  savingClassroomData: boolean = false;
 
   getClassroomData(classroomId: string): void {
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
@@ -66,7 +67,7 @@ export class ClassroomAdminPageComponent implements OnInit {
           return;
         }
 
-        if (this.classroomId === classroomId && this.classroomEditorMode) {
+        if (this.classroomEditorMode) {
           return;
         }
 
@@ -126,6 +127,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   saveClassroomData(classroomId: string): void {
+    this.savingClassroomData = true;
     let backendDict = this.convertClassroomDictToBackendForm(
       this.updatedClassroomDict);
     this.classroomBackendApiService.updateClassroomDataAsync(
@@ -135,6 +137,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomDataIsChanged = false;
       this.classroomIdToClassroomName[this.classroomId] = this.classroomName;
       this.selectedClassroomDict = cloneDeep(this.updatedClassroomDict);
+      this.savingClassroomData = false;
     });
   }
 
@@ -184,6 +187,8 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   createNewClassroom(): void {
+    this.classroomViewerMode = false;
+    this.classroomDetailsIsShown = false;
     let modalRef: NgbModalRef = this.ngbModal.
       open(CreateNewClassroomModalComponent, {
         backdrop: 'static'
@@ -194,6 +199,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     modalRef.result.then((classroomDict) => {
       this.classroomIdToClassroomName[classroomDict.classroom_id] = (
         classroomDict.name);
+      this.classroomCount++;
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is

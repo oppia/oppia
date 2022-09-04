@@ -33,7 +33,7 @@
           </span>
           <button mat-button matSuffix mat-icon-button
                   aria-label="Clear"
-                  *ngIf="!(classroomEditorMode && classroom.key == classroomId)"
+                  *ngIf="!classroomEditorMode"
                   (click)="deleteClassroom(classroom.key); $event.stopPropagation()">
             <mat-icon matListIcon>close</mat-icon>
           </button>
@@ -108,28 +108,57 @@
             </textarea>
           </div>
 
-          <div *ngIf="classroomEditorMode">
-            <button class="btn btn-success action-buttons"
-                    [disabled]="!classroomDataIsChanged"
-                    (click)="saveClassroomData(classroom.key)">
-              Save
-            </button>
-            <button class="btn btn-secondary action-buttons"
+          <div *ngIf="classroomEditorMode" class="action-buttons">
+            <button class="btn btn-secondary cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()">
               Cancel
+            </button>
+            <button class="btn btn-success save-classroom-changes"
+                    [disabled]="!classroomDataIsChanged"
+                    (click)="saveClassroomData(classroom.key)">
+              <span *ngIf="!savingClassroomData">Save</span>
+              <mat-spinner *ngIf="savingClassroomData"
+                           class="oppia-save-classroom-spinning-button"
+                           [diameter]="22">
+              </mat-spinner>
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <button class="btn btn-primary add-new-classroom" (click)="createNewClassroom()">
-      Add new classroom
-    </button>
+    <div matTooltip="Please save all edits before adding a new classroom"
+         [matTooltipDisabled]="!classroomEditorMode"
+         matTooltipPosition="right"
+         aria-tooltip="Button that creates a new classroom"
+         class="create-new-classroom-button-wrapper">
+      <button class="btn add-new-classroom"
+              (click)="createNewClassroom()"
+              [disabled]="classroomEditorMode">
+        Add new classroom
+      </button>
+    </div>
   </div>
 </mat-card>
 
 <style>
+  :host /deep/ .oppia-save-classroom-spinning-button circle {
+    stroke: #fff;
+  }
+  .oppia-save-classroom-spinning-button {
+    margin: 0 5px;
+  }
+  .create-new-classroom-button-wrapper {
+    width: fit-content;
+  }
+  .save-classroom-changes {
+    margin-left: 5px;
+    margin-top: 5px;
+  }
+  .cancel-classroom-changes {
+    margin-right: 5px;
+    margin-top: 5px;
+  }
   .classroom-field {
     width: 400px;
   }
@@ -148,7 +177,8 @@
     margin-top: 20px;
   }
   .action-buttons {
-    margin: 10px 5px;
+    margin-left: 70%;
+    margin-top: 5px;
   }
   .oppia-edit-icon {
     cursor: pointer;
@@ -181,9 +211,13 @@
     padding-top: 20px;
   }
   .add-new-classroom {
-    background-color: #00376d;
+    background-color: #00645c;
+    color: #fff;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     margin-top: 10px;
+  }
+  .add-new-classroom:hover {
+    color: #fff;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {
