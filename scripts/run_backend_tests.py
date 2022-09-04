@@ -322,9 +322,8 @@ def _load_coverage_exclusion_list(path):
     with open(path, 'r', encoding='utf-8') as exclusion_file:
         for line in exclusion_file:
             line = line.strip()
-            if line.startswith('#') or not line:
-                continue
-            exclusion_list.append(line)
+            if line and not line.startswith('#'):
+                exclusion_list.append(line)
     return exclusion_list
 
 
