@@ -325,7 +325,7 @@
   animation: slideUp 0.8s;
   background-color: #fff;
   border-radius: 10px;
-  height: 425px;
+  height: auto;
   left: 50%;
   max-width: 450px;
   position: fixed;
@@ -365,7 +365,7 @@
   background-color: #00645c;
   color: #fff;
   cursor: pointer;
-  font-family: Capriola, sans-serif;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 700;
   height: 38px;
@@ -379,6 +379,7 @@
   flex-direction: row;
   height: 10%;
   justify-content: space-evenly;
+  margin: 15px 0px;
   width: 100%;
 }
 
@@ -398,8 +399,8 @@
 }
 
 .save-progress-menu .uid-box .guide-text {
-  margin-top: 15px;
-  text-align: center;
+  padding: 10px 20px;
+  text-align: left;
   width: 100%;
 }
 
@@ -415,6 +416,7 @@
   align-items: center;
   display: flex;
   flex-direction: row;
+  margin-bottom: 30px;
   width: 100%;
 }
 
@@ -438,7 +440,37 @@
   font-size: 14px;
   font-weight: 700;
   margin: 0 auto;
+  position: relative;
   width: 20%;
+}
+
+.save-progress-menu .uid-box .uid-copy ::before {
+  background-color: #00645c;
+  border-radius: 2px;
+  color: white;
+  content: "Copied!";
+  cursor: default;
+  /* display: none; */
+  font-size: 14px;
+  font-style: Roboto, sans-serif;
+  padding: 8px 10px;
+  position: absolute;
+  right: 0;
+  top: -50px;
+}
+
+.save-progress-menu .uid-box .uid-copy ::after {
+  background-color: #00645c;
+  color: white;
+  content: "";
+  cursor: default;
+  /* display: none; */
+  height: 10px;
+  position: absolute;
+  right: 25px;
+  top: -20px;
+  transform: rotate(45deg);
+  width: 10px;
 }
 
 .save-progress-menu .save-progress-close-button {

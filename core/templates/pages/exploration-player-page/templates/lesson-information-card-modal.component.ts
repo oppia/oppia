@@ -241,6 +241,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   copyProgressUrl(): void {
     this.clipboard.copy(this.loggedOutProgressUniqueUrl);
+    // document.getElementsByClassName('copy-tooltip ::before')[0].style.display = "block";
+    // document.getElementsByClassName('copy-tooltip ::after')[0].style.display = "block";
+    // setTimeout(() => {
+    //   document.getElementsByClassName('copy-tooltip ::before')[0].classList.remove('d-block');
+    //   document.getElementsByClassName('copy-tooltip ::after')[0].classList.remove('d-block');
+    // }, 2500);
   }
 
   onLoginButtonClicked(): void {
