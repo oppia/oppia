@@ -2203,8 +2203,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         """Sets up required topics and stories for translations.
 
         Returns:
-            Dict[str, str]. A dictionary of the change object for the
-                translations.
+            Dict[str, str]. A dictionary of the change for the translations.
         """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
