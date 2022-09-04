@@ -120,7 +120,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
             '    The size of third-party folder is within the limits.',
             print_arr)
 
-    def test_check_third_party_size_pass(self) -> None:
+    def test_check_third_party_size_fail(self) -> None:
         print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
