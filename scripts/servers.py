@@ -688,6 +688,7 @@ def managed_webdriverio_server(
             on. If None, then the currently-installed version of Google Chrome
             is used instead.
         **kwargs: dict(str: *). Keyword arguments passed to psutil.Popen.
+        mobile: bool. Whether to run the webdriverio tests in mobile mode.
 
     Yields:
         psutil.Process. The webdriverio process.

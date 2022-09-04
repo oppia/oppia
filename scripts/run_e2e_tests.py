@@ -269,6 +269,10 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
+        if (args.mobile) and (args.suite not in MOBILE_SUITES):
+            print(f'The {args.suite} suite should not be run in the mobile viewport')
+            sys.exit(1)
+
         if args.suite == 'full':
             stack.enter_context(servers.managed_webdriver_server(
                 chrome_version=args.chrome_driver_version))
@@ -354,12 +358,6 @@ def run_tests(args):
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
-
-    suite = parsed_args.suite
-
-    if (parsed_args.mobile) and (suite not in MOBILE_SUITES):
-        print(f'The {suite} suite should not be run in the mobile viewport')
-        sys.exit(1)
 
     with servers.managed_portserver():
         for attempt_num in range(1, MAX_RETRY_COUNT + 1):
