@@ -31,4 +31,3 @@ class CronServicesTests(test_utils.GenericTestBase):
 
     def test_delete_models_marked_as_deleted(self) -> None:
         pass
-
