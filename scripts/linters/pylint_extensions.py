@@ -27,6 +27,7 @@ import re
 import tokenize
 
 from core import handler_schema_constants
+from pylint import utils as pylint_utils
 
 from .. import docstrings_checker
 
@@ -45,6 +46,12 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = [
     'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:']
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
+
+EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
+    'core/controllers/',
+    'extensions/',
+    'scripts/'
+]
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1930,7 +1937,11 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
     documented or not.
     """
 
-    __implements__ = interfaces.ITokenChecker
+    __implements__ = interfaces.IAstroidChecker
+
+    EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = copy.deepcopy(
+        EXCLUDED_TYPE_COMMENT_DIRECTORIES
+    )
 
     name = 'type-ignore-comment'
     priority = -1
@@ -1953,13 +1964,29 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         )
     }
 
-    def process_tokens(self, tokens):
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a comment for each MyPy
+        type ignore.
+
+        Args:
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        module_excluded_from_comment_checks = False
+        for directory in self.EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS:
+            if re.search(directory, node.root().file):
+                module_excluded_from_comment_checks = True
+        if not module_excluded_from_comment_checks:
+            tokens = pylint_utils.tokenize_module(node)
+            self._process_module_tokens(tokens, node)
+
+    def _process_module_tokens(self, tokens, node):
         """Custom pylint checker which allows only those MyPy type ignores
         that are properly documented by a comment in the code. The comment
         must be close to the actually ignore.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         type_ignore_comment_regex = r'Here we use MyPy ignore because'
         type_ignore_comment_present = False
@@ -1986,7 +2013,8 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                         type_ignore_comment_present = False
                     else:
                         self.add_message(
-                            'mypy-ignore-used', line=line_num)
+                            'mypy-ignore-used', line=line_num, node=node
+                        )
 
         if type_ignore_comment_present:
             self.add_message(
@@ -2048,7 +2076,11 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         'func_def_start_line': 0,
     }
 
-    __implements__ = interfaces.ITokenChecker
+    EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = copy.deepcopy(
+        EXCLUDED_TYPE_COMMENT_DIRECTORIES
+    )
+
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'comment-for-exceptional-types'
     priority = -1
@@ -2074,17 +2106,33 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         )
     }
 
-    def process_tokens(self, tokens):
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a comment for each exceptional
+        type (cast, Any and object).
+
+        Args:
+            node: astroid.scoped_nodes.Module. Node to access module content.
+        """
+        module_excluded_from_comment_checks = False
+        for directory in self.EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS:
+            if re.search(directory, node.root().file):
+                module_excluded_from_comment_checks = True
+        if not module_excluded_from_comment_checks:
+            tokens = pylint_utils.tokenize_module(node)
+            self._process_module_tokens(tokens, node)
+
+    def _process_module_tokens(self, tokens, node):
         """Custom pylint checker which makes sure that every exceptional type
         should be documented properly by a comment in the code. The comment
         must be close to the actually ignore.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        self.check_comment_is_present_with_any_type(tokens)
-        self.check_comment_is_present_with_cast_method(tokens)
-        self.check_comment_is_present_with_object_class(tokens)
+        self.check_comment_is_present_with_any_type(tokens, node)
+        self.check_comment_is_present_with_cast_method(tokens, node)
+        self.check_comment_is_present_with_object_class(tokens, node)
 
     def _check_import_status(
         self, import_status_dict, token_type, token, line_num
@@ -2134,7 +2182,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
     def _check_exceptional_type_is_documented(
         self, type_status_dict, import_status_dict, token_type, token,
-        line, line_num, exceptional_type
+        line, line_num, exceptional_type, node
     ):
         """Checks whether the given exceptional type in a module has been
         documented or not. If the exceptional type is not documented then
@@ -2153,6 +2201,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             line_num: int. The line number of given token.
             exceptional_type: str. The exceptional type for which this method
                 is called, Possible values can be 'Any' or 'object'.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         # Here, we are defining new variables so that we don't have to fetch
         # the values from 'type_status_dict' dictionary again and again.
@@ -2224,7 +2273,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                 else:
                     self._add_exceptional_type_error_message(
                         exceptional_type,
-                        func_def_start_line
+                        func_def_start_line,
+                        node
                     )
 
                 type_present_in_function_signature = False
@@ -2257,7 +2307,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     type_comment_present = False
                 else:
                     self._add_exceptional_type_error_message(
-                        exceptional_type, line_num
+                        exceptional_type, line_num, node
                     )
 
         # Updating the 'type_status_dict' dictionary so that previous data of
@@ -2282,7 +2332,9 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         type_status_dict['type_comment_line_num'] = type_comment_line_num
         type_status_dict['func_def_start_line'] = func_def_start_line
 
-    def _add_exceptional_type_error_message(self, exceptional_type, line_num):
+    def _add_exceptional_type_error_message(
+        self, exceptional_type, line_num, node
+    ):
         """This method should be called only when an exceptional type error is
         encountered. If exceptional type is Any then 'any-type-used' error
         message is added, for object 'object-class-used' is added and for cast
@@ -2292,27 +2344,29 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             exceptional_type: str. The exceptional type for which this method
                 is called, Possible values can be 'Any', 'object' and 'cast'.
             line_num: int. The line number where error is encountered.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         if exceptional_type == 'Any':
             self.add_message(
-                'any-type-used', line=line_num
+                'any-type-used', line=line_num, node=node
             )
         if exceptional_type == 'object':
             self.add_message(
-                'object-class-used', line=line_num
+                'object-class-used', line=line_num, node=node
             )
         if exceptional_type == 'cast':
             self.add_message(
-                'cast-func-used', line=line_num
+                'cast-func-used', line=line_num, node=node
             )
 
-    def check_comment_is_present_with_object_class(self, tokens):
+    def check_comment_is_present_with_object_class(self, tokens, node):
         """Checks whether the object class in a module has been documented
         or not. If the object class is not documented then adds an error
         message.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         object_class_status_dict = copy.deepcopy(
             self.EXCEPTIONAL_TYPE_STATUS_DICT
@@ -2330,16 +2384,17 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
             self._check_exceptional_type_is_documented(
                 object_class_status_dict, None, token_type, token,
-                line, line_num, 'object'
+                line, line_num, 'object', node
             )
 
-    def check_comment_is_present_with_cast_method(self, tokens):
+    def check_comment_is_present_with_cast_method(self, tokens, node):
         """Checks whether the cast method in a module has been documented
         or not. If the cast method is not documented then adds an error
         message.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         cast_type_regex = r'Here we use cast because'
         cast_comment_present = False
@@ -2382,15 +2437,18 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                 ):
                     cast_comment_present = False
                 else:
-                    self._add_exceptional_type_error_message('cast', line_num)
+                    self._add_exceptional_type_error_message(
+                        'cast', line_num, node
+                    )
 
-    def check_comment_is_present_with_any_type(self, tokens):
+    def check_comment_is_present_with_any_type(self, tokens, node):
         """Checks whether the Any type in a module has been documented
         or not. If the Any type is not documented then adds an error
         message.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
+            node: astroid.scoped_nodes.Module. Node to access module content.
         """
         import_status_dict = {
             'single_line_import': False,
@@ -2418,7 +2476,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
             self._check_exceptional_type_is_documented(
                 any_type_status_dict, import_status_dict, token_type, token,
-                line, line_num, 'Any'
+                line, line_num, 'Any', node
             )
 
 

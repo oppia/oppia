@@ -2397,12 +2397,13 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function_with_type_ignore_only.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_function_with_type_ignore_only)
+        self.checker_test_object.checker.visit_module(
+            node_function_with_type_ignore_only
         )
         message = testutils.Message(
             msg_id='mypy-ignore-used',
-            line=2
+            line=2,
+            node=node_function_with_type_ignore_only
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2432,8 +2433,8 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function_with_extra_comment.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_function_with_extra_comment)
+        self.checker_test_object.checker.visit_module(
+            node_function_with_extra_comment
         )
         message = testutils.Message(
             msg_id='redundant-type-comment',
@@ -2468,9 +2469,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_function)
-        )
+        self.checker_test_object.checker.visit_module(node_function)
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
@@ -2496,9 +2495,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_function)
-        )
+        self.checker_test_object.checker.visit_module(node_function)
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
@@ -2535,12 +2532,13 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_with_ignore_and_more_than_ten_gap.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_ignore_and_more_than_ten_gap)
+        self.checker_test_object.checker.visit_module(
+            node_with_ignore_and_more_than_ten_gap
         )
         message1 = testutils.Message(
             msg_id='mypy-ignore-used',
-            line=18
+            line=18,
+            node=node_with_ignore_and_more_than_ten_gap
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
@@ -2571,8 +2569,34 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_with_ignore_having_todo.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_ignore_having_todo)
+        self.checker_test_object.checker.visit_module(
+            node_with_ignore_having_todo
+        )
+        with self.checker_test_object.assertAddsMessages():
+            temp_file.close()
+
+    def test_raises_no_error_if_module_is_excluded(self):
+        node_with_ignore_having_todo = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                    return 'hi' #@
+                """
+            )
+        node_with_ignore_having_todo.file = filename
+
+        self.checker_test_object.checker.EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = (   # pylint: disable=line-too-long
+            [filename]
+        )
+        self.checker_test_object.checker.visit_module(
+            node_with_ignore_having_todo
         )
         with self.checker_test_object.assertAddsMessages():
             temp_file.close()
@@ -2606,12 +2630,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_any_type)
-        )
+        self.checker_test_object.checker.visit_module(node_with_any_type)
         message = testutils.Message(
             msg_id='any-type-used',
-            line=2
+            line=2,
+            node=node_with_any_type
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2632,12 +2655,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_type.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_object_type)
-        )
+        self.checker_test_object.checker.visit_module(node_with_object_type)
         message = testutils.Message(
             msg_id='object-class-used',
-            line=2
+            line=2,
+            node=node_with_object_type
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2658,12 +2680,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_cast_method.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_cast_method)
-        )
+        self.checker_test_object.checker.visit_module(node_with_cast_method)
         message = testutils.Message(
             msg_id='cast-func-used',
-            line=2
+            line=2,
+            node=node_with_cast_method
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2702,20 +2723,21 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_combined_types.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_combined_types)
-        )
+        self.checker_test_object.checker.visit_module(node_with_combined_types)
         message1 = testutils.Message(
             msg_id='any-type-used',
-            line=2
+            line=2,
+            node=node_with_combined_types
         )
         message2 = testutils.Message(
             msg_id='object-class-used',
-            line=6
+            line=6,
+            node=node_with_combined_types
         )
         message3 = testutils.Message(
             msg_id='cast-func-used',
-            line=18
+            line=18,
+            node=node_with_combined_types
         )
         with self.checker_test_object.assertAddsMessages(
             message1, message3, message2
@@ -2739,12 +2761,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_arg.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_any_type_arg)
-        )
+        self.checker_test_object.checker.visit_module(node_with_any_type_arg)
         message = testutils.Message(
             msg_id='any-type-used',
-            line=2
+            line=2,
+            node=node_with_any_type_arg
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2765,8 +2786,12 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_return.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_any_type_return)
+        self.checker_test_object.checker.visit_module(node_with_any_type_return)
+
+        message = testutils.Message(
+            msg_id='any-type-used',
+            line=2,
+            node=node_with_any_type_return
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2787,8 +2812,13 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_return_and_args.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_any_type_return_and_args)
+        self.checker_test_object.checker.visit_module(
+            node_with_any_type_return_and_args
+        )
+        message = testutils.Message(
+            msg_id='any-type-used',
+            line=2,
+            node=node_with_any_type_return_and_args
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2815,12 +2845,18 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_multiple_any_type_functions.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_multiple_any_type_functions)
+        self.checker_test_object.checker.visit_module(
+            node_with_multiple_any_type_functions
+        )
+        message = testutils.Message(
+            msg_id='any-type-used',
+            line=2,
+            node=node_with_multiple_any_type_functions
         )
         message2 = testutils.Message(
             msg_id='any-type-used',
-            line=8
+            line=8,
+            node=node_with_multiple_any_type_functions
         )
         with self.checker_test_object.assertAddsMessages(
             message, message2
@@ -2843,8 +2879,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_and_cast_imported.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_any_and_cast_imported)
+        self.checker_test_object.checker.visit_module(
+            node_with_any_and_cast_imported
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2868,10 +2904,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_and_cast_in_multi_line_import.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-            pylint_utils.tokenize_module(
-                node_with_any_and_cast_in_multi_line_import
-            )
+        self.checker_test_object.checker.visit_module(
+            node_with_any_and_cast_in_multi_line_import
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2911,8 +2945,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_and_comment.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_any_type_and_comment)
+        self.checker_test_object.checker.visit_module(
+            node_with_any_type_and_comment
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2956,8 +2990,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_cast_method_and_comment.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_cast_method_and_comment)
+        self.checker_test_object.checker.visit_module(
+            node_with_cast_method_and_comment
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -2981,8 +3015,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_multiple_objects_in_func.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_multiple_objects_in_func)
+        self.checker_test_object.checker.visit_module(
+            node_with_multiple_objects_in_func
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -3024,14 +3058,13 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_and_more_than_expected_gap.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-            pylint_utils.tokenize_module(
-                node_with_object_and_more_than_expected_gap
-            )
+        self.checker_test_object.checker.visit_module(
+            node_with_object_and_more_than_expected_gap
         )
         message = testutils.Message(
             msg_id='object-class-used',
-            line=18
+            line=18,
+            node=node_with_object_and_more_than_expected_gap
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -3061,8 +3094,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_and_less_than_ten_gap.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_object_and_less_than_ten_gap)
+        self.checker_test_object.checker.visit_module(
+            node_with_object_and_less_than_ten_gap
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
@@ -3087,8 +3120,34 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_and_todo_comment.file = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_object_and_todo_comment)
+        self.checker_test_object.checker.visit_module(
+            node_with_object_and_todo_comment
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_no_error_raised_if_module_is_excluded(self):
+        node_with_object_and_todo_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def foo(exp_id: object) -> object:
+                    return 'hi' #@
+                """
+            )
+        node_with_object_and_todo_comment.file = filename
+
+        self.checker_test_object.checker.EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = (   # pylint: disable=line-too-long
+            [filename]
+        )
+        self.checker_test_object.checker.visit_module(
+            node_with_object_and_todo_comment
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
