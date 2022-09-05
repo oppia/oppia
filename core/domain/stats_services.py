@@ -498,8 +498,10 @@ def update_exp_issues_for_new_exp_version(
         if 'state_names' in playthrough.issue_customization_args:
             state_names = (
                 playthrough.issue_customization_args['state_names']['value'])
-            # Ruling out the possibility of any other type for mypy type
-            # checking.
+            # TODO(#15995): Currently, we are define all issue customization
+            # args in one Dict type which forces us to use assert here, but once
+            # we have a more narrower and specific type for a specific issue
+            # customization args then we can remove assert from here.
             assert isinstance(state_names, list)
             playthrough.issue_customization_args['state_names']['value'] = [
                 state_name if state_name not in old_to_new_state_names else
@@ -509,9 +511,10 @@ def update_exp_issues_for_new_exp_version(
         if 'state_name' in playthrough.issue_customization_args:
             state_name = (
                 playthrough.issue_customization_args['state_name']['value'])
-            # Here, issue_customization_args can contain str, int and list
-            # values but fom the implementation we are sure that state_name
-            # is always going to be a str value. So that's why assert is used.
+            # TODO(#15995): Currently, we are define all issue customization
+            # args in one Dict type which forces us to use assert here, but once
+            # we have a more narrower and specific type for a specific issue
+            # customization args then we can remove assert from here.
             assert isinstance(state_name, str)
             playthrough.issue_customization_args['state_name']['value'] = (
                 state_name if state_name not in old_to_new_state_names else
@@ -522,10 +525,10 @@ def update_exp_issues_for_new_exp_version(
 
             if 'state_name' in action_customization_args:
                 state_name = action_customization_args['state_name']['value']
-                # Here, issue_customization_args can contain str, int and list
-                # values but fom the implementation we are sure that state_name
-                # is always going to be a str value. So that's why assert is
-                # used here.
+                # TODO(#15995): Currently, we are define all issue customization
+                # args in one Dict type which forces us to use assert here, but
+                # once we have a more narrower and specific type for a specific
+                # issue customization args then we can remove assert from here.
                 assert isinstance(state_name, str)
                 action_customization_args['state_name']['value'] = (
                     state_name if state_name not in old_to_new_state_names else
@@ -534,10 +537,10 @@ def update_exp_issues_for_new_exp_version(
             if 'dest_state_name' in action_customization_args:
                 dest_state_name = (
                     action_customization_args['dest_state_name']['value'])
-                # Here, issue_customization_args can contain str, int and
-                # list values but fom the implementation we are sure that
-                # dest_state_name is always going to be a str value. So
-                # that's why assert is used.
+                # TODO(#15995): Currently, we are define all issue customization
+                # args in one Dict type which forces us to use assert here, but
+                # once we have a more narrower and specific type for a specific
+                # issue customization args then we can remove assert from here.
                 assert isinstance(dest_state_name, str)
                 action_customization_args['dest_state_name']['value'] = (
                     dest_state_name
@@ -559,8 +562,10 @@ def update_exp_issues_for_new_exp_version(
         if 'state_names' in exp_issue.issue_customization_args:
             state_names = (
                 exp_issue.issue_customization_args['state_names']['value'])
-            # Ruling out the possibility of any other type for mypy type
-            # checking.
+            # TODO(#15995): Currently, we are define all issue customization
+            # args in one Dict type which forces us to use assert here, but
+            # once we have a more narrower and specific type for a specific
+            # issue customization args then we can remove assert from here.
             assert isinstance(state_names, list)
 
             if any(name in deleted_state_names for name in state_names):
@@ -576,9 +581,10 @@ def update_exp_issues_for_new_exp_version(
             state_name = (
                 exp_issue.issue_customization_args['state_name']['value'])
 
-            # Here, issue_customization_args can contain str, int and list
-            # values but fom the implementation we are sure that state_name
-            # is always going to be a str value. So that's why assert is used.
+            # TODO(#15995): Currently, we are define all issue customization
+            # args in one Dict type which forces us to use assert here, but
+            # once we have a more narrower and specific type for a specific
+            # issue customization args then we can remove assert from here.
             assert isinstance(state_name, str)
             if state_name in deleted_state_names:
                 exp_issue.is_valid = False
