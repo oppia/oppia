@@ -18,6 +18,7 @@ suggestions.
 
 from __future__ import annotations
 
+import datetime
 import heapq
 import logging
 import re
@@ -25,27 +26,47 @@ import re
 from core import feconf
 from core.constants import constants
 from core.domain import email_manager
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import question_domain
+from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
+from typing import (
+    Callable, Dict, List, Mapping, Match, Optional, Sequence,
+    Set, Tuple, Type, Union, cast, overload
+)
+from typing_extensions import Final, Literal
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    # Here, change domain is imported only for type checking.
+    from core.domain import change_domain
+    from mypy_imports import feedback_models
+    from mypy_imports import suggestion_models
+    from mypy_imports import transaction_services
+    from mypy_imports import user_models
+
 (feedback_models, suggestion_models, user_models) = (
-    models.Registry.import_models(
-        [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
+    models.Registry.import_models([
+        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user
+    ])
+)
+
 transaction_services = models.Registry.import_transaction_services()
 
-DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
-DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
+DEFAULT_SUGGESTION_THREAD_SUBJECT: Final = 'Suggestion from a user'
+DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE: Final = ''
 
 # The maximum number of suggestions to recommend to a reviewer to review in an
 # email.
-MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER = 5
+MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER: Final = 5
 
 # A dictionary that maps the suggestion type to a lambda function, which is
 # used to retrieve the html content that corresponds to the suggestion's
@@ -54,18 +75,68 @@ MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER = 5
 # suggestion opportunities. For instance, for translation suggestions the
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
-SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
+SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[
+    str, Callable[[suggestion_registry.BaseSuggestion], str]
+] = {
     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
         lambda suggestion: suggestion.change.translation_html),
+    # Here, change is of type BaseChange and all attributes on BaseChange are
+    # created dynamically except cmd, and the type of all dynamically created
+    # attributes are considered as string (str) type. So, question_dict
+    # is also considered as string type but here we are using it as a Dict
+    # type which causes MyPy throws an error. Thus to avoid the error, we
+    # used ignore here.
     feconf.SUGGESTION_TYPE_ADD_QUESTION: (
         lambda suggestion: suggestion.change.question_dict[
-            'question_state_data']['content']['html'])
+            'question_state_data']['content']['html'])  # type: ignore[index]
 }
 
 
+@overload
 def create_suggestion(
-        suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change, description):
+    suggestion_type: Literal['add_question'],
+    target_type: str,
+    target_id: str,
+    target_version_at_submission: int,
+    author_id: str,
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    description: Optional[str]
+) -> suggestion_registry.SuggestionAddQuestion: ...
+
+
+@overload
+def create_suggestion(
+    suggestion_type: Literal['translate_content'],
+    target_type: str,
+    target_id: str,
+    target_version_at_submission: int,
+    author_id: str,
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    description: Optional[str]
+) -> suggestion_registry.SuggestionTranslateContent: ...
+
+
+@overload
+def create_suggestion(
+    suggestion_type: Literal['edit_exploration_state_content'],
+    target_type: str,
+    target_id: str,
+    target_version_at_submission: int,
+    author_id: str,
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    description: Optional[str]
+) -> suggestion_registry.SuggestionEditStateContent: ...
+
+
+def create_suggestion(
+    suggestion_type: str,
+    target_type: str,
+    target_id: str,
+    target_version_at_submission: int,
+    author_id: str,
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    description: Optional[str]
+) -> suggestion_registry.BaseSuggestion:
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
@@ -78,7 +149,8 @@ def create_suggestion(
             entity at the time of creation of the suggestion.
         author_id: str. The ID of the user who submitted the suggestion.
         change: dict. The details of the suggestion.
-        description: str. The description of the changes provided by the author.
+        description: str|None. The description of the changes provided by the
+            author or None, if no description is provided.
 
     Returns:
         Suggestion. The newly created suggestion domain object.
@@ -108,7 +180,12 @@ def create_suggestion(
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
         # The language code of the translation, used for querying purposes.
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(change['language_code'], str)
         language_code = change['language_code']
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(change['state_name'], str)
+        assert isinstance(change['content_id'], str)
         content_html = exploration.get_content_html(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
@@ -119,9 +196,17 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
-        change['question_dict']['language_code'] = (
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(change['question_dict'], dict)
+        # Here, we are narrowing down the type from various Dict types that are
+        # present in AcceptableChangeDictTypes to QuestionDict type.
+        question_dict = cast(
+            question_domain.QuestionDict,
+            change['question_dict']
+        )
+        question_dict['language_code'] = (
             constants.DEFAULT_LANGUAGE_CODE)
-        change['question_dict']['question_state_data_schema_version'] = (
+        question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         # The language code of the question, used for querying purposes.
         language_code = constants.DEFAULT_LANGUAGE_CODE
@@ -131,9 +216,14 @@ def create_suggestion(
     suggestion_domain_class = (
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_type])
+    # Here, suggestion_domain_class is of Union type which contains
+    # all suggestion classes, but out of these suggestion classes only
+    # `SuggestionEditStateContent` can accept Optional[str] value for
+    # language code and for other classes MyPy throws an `incompatible
+    # argument type` error. Thus to avoid the error, we used ignore here.
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category, language_code, False)
+        None, change, score_category, language_code, False)  # type: ignore[arg-type]
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
@@ -148,7 +238,9 @@ def create_suggestion(
     return get_suggestion_by_id(thread_id)
 
 
-def get_suggestion_from_model(suggestion_model):
+def get_suggestion_from_model(
+    suggestion_model: suggestion_models.GeneralSuggestionModel
+) -> suggestion_registry.BaseSuggestion:
     """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
@@ -170,22 +262,55 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.edited_by_reviewer, suggestion_model.last_updated)
 
 
-def get_suggestion_by_id(suggestion_id):
+@overload
+def get_suggestion_by_id(
+    suggestion_id: str
+) -> suggestion_registry.BaseSuggestion: ...
+
+
+@overload
+def get_suggestion_by_id(
+    suggestion_id: str, *, strict: Literal[True]
+) -> suggestion_registry.BaseSuggestion: ...
+
+
+@overload
+def get_suggestion_by_id(
+    suggestion_id: str, *, strict: Literal[False]
+) -> Optional[suggestion_registry.BaseSuggestion]: ...
+
+
+def get_suggestion_by_id(
+    suggestion_id: str, strict: bool = True
+) -> Optional[suggestion_registry.BaseSuggestion]:
     """Finds a suggestion by the suggestion ID.
 
     Args:
         suggestion_id: str. The ID of the suggestion.
+        strict: bool. Whether to fail noisily if no suggestion with a given id
+            exists.
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
         is found.
+
+    Raises:
+        Exception. The suggestion model does not exists for the given id.
     """
     model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
+
+    if strict and model is None:
+        raise Exception(
+            'No suggestion model exists for the corresponding suggestion id: %s'
+            % suggestion_id
+        )
 
     return get_suggestion_from_model(model) if model else None
 
 
-def get_suggestions_by_ids(suggestion_ids):
+def get_suggestions_by_ids(
+    suggestion_ids: List[str]
+) -> List[Optional[suggestion_registry.BaseSuggestion]]:
     """Finds suggestions using the given suggestion IDs.
 
     Args:
@@ -206,7 +331,9 @@ def get_suggestions_by_ids(suggestion_ids):
     ]
 
 
-def query_suggestions(query_fields_and_values):
+def query_suggestions(
+    query_fields_and_values: List[Tuple[str, str]]
+) -> List[suggestion_registry.BaseSuggestion]:
     """Queries for suggestions.
 
     Args:
@@ -225,7 +352,9 @@ def query_suggestions(query_fields_and_values):
     ]
 
 
-def get_translation_suggestion_ids_with_exp_ids(exp_ids):
+def get_translation_suggestion_ids_with_exp_ids(
+    exp_ids: List[str]
+) -> List[str]:
     """Gets the ids of the translation suggestions corresponding to
     explorations with the given exploration ids.
 
@@ -247,7 +376,7 @@ def get_translation_suggestion_ids_with_exp_ids(exp_ids):
     )
 
 
-def get_all_stale_suggestion_ids():
+def get_all_stale_suggestion_ids() -> List[str]:
     """Gets a list of the suggestion ids corresponding to suggestions that have
     not had any activity on them for THRESHOLD_TIME_BEFORE_ACCEPT time.
 
@@ -261,7 +390,9 @@ def get_all_stale_suggestion_ids():
     )
 
 
-def _update_suggestion(suggestion):
+def _update_suggestion(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> None:
     """Updates the given suggestion.
 
     Args:
@@ -270,7 +401,10 @@ def _update_suggestion(suggestion):
     _update_suggestions([suggestion])
 
 
-def _update_suggestions(suggestions, update_last_updated_time=True):
+def _update_suggestions(
+    suggestions: List[suggestion_registry.BaseSuggestion],
+    update_last_updated_time: bool = True
+) -> None:
     """Updates the given suggestions.
 
     Args:
@@ -284,12 +418,18 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion.validate()
         suggestion_ids.append(suggestion.suggestion_id)
 
-    suggestion_models_to_update = (
+    suggestion_models_to_update_with_none = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
     )
+    suggestion_models_to_update = []
 
-    for index, suggestion_model in enumerate(suggestion_models_to_update):
+    for index, suggestion_model in enumerate(
+        suggestion_models_to_update_with_none
+    ):
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestion_model is not None
         suggestion = suggestions[index]
+        suggestion_models_to_update.append(suggestion_model)
         suggestion_model.status = suggestion.status
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
         suggestion_model.change_cmd = suggestion.change.to_dict()
@@ -304,7 +444,9 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_models_to_update)
 
 
-def get_commit_message_for_suggestion(author_username, commit_message):
+def get_commit_message_for_suggestion(
+    author_username: str, commit_message: str
+) -> str:
     """Returns a modified commit message for an accepted suggestion.
 
     Args:
@@ -322,7 +464,11 @@ def get_commit_message_for_suggestion(author_username, commit_message):
 
 
 def accept_suggestion(
-        suggestion_id, reviewer_id, commit_message, review_message):
+    suggestion_id: str,
+    reviewer_id: str,
+    commit_message: str,
+    review_message: str
+) -> None:
     """Accepts the suggestion with the given suggestion_id after validating it.
 
     Args:
@@ -340,7 +486,7 @@ def accept_suggestion(
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
 
-    suggestion = get_suggestion_by_id(suggestion_id)
+    suggestion = get_suggestion_by_id(suggestion_id, strict=False)
 
     if suggestion is None:
         raise Exception(
@@ -417,7 +563,9 @@ def accept_suggestion(
         _update_user_proficiency(user_proficiency)
 
 
-def reject_suggestion(suggestion_id, reviewer_id, review_message):
+def reject_suggestion(
+    suggestion_id: str, reviewer_id: str, review_message: str
+) -> None:
     """Rejects the suggestion with the given suggestion_id.
 
     Args:
@@ -433,7 +581,9 @@ def reject_suggestion(suggestion_id, reviewer_id, review_message):
     reject_suggestions([suggestion_id], reviewer_id, review_message)
 
 
-def reject_suggestions(suggestion_ids, reviewer_id, review_message):
+def reject_suggestions(
+    suggestion_ids: List[str], reviewer_id: str, review_message: str
+) -> None:
     """Rejects the suggestions with the given suggestion_ids.
 
     Args:
@@ -445,14 +595,16 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     Raises:
         Exception. One or more of the suggestions has already been handled.
     """
-    suggestions = get_suggestions_by_ids(suggestion_ids)
+    suggestions_with_none = get_suggestions_by_ids(suggestion_ids)
+    suggestions = []
 
-    for index, suggestion in enumerate(suggestions):
+    for index, suggestion in enumerate(suggestions_with_none):
         if suggestion is None:
             raise Exception(
                 'You cannot reject the suggestion with id %s because it does '
                 'not exist.' % (suggestion_ids[index])
             )
+        suggestions.append(suggestion)
         if suggestion.is_handled:
             raise Exception(
                 'The suggestion with id %s has already been accepted/'
@@ -478,7 +630,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
     )
 
 
-def auto_reject_question_suggestions_for_skill_id(skill_id):
+def auto_reject_question_suggestions_for_skill_id(skill_id: str) -> None:
     """Rejects all SuggestionAddQuestions with target ID matching the supplied
     skill ID. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
@@ -495,13 +647,19 @@ def auto_reject_question_suggestions_for_skill_id(skill_id):
         ]
     )
 
-    suggestion_ids = [suggestion.suggestion_id for suggestion in suggestions]
+    suggestion_ids: List[str] = []
+    for suggestion in suggestions:
+        # Narrowing down the type from BaseSuggestion to SuggestionAddQuestion.
+        assert isinstance(
+            suggestion, suggestion_registry.SuggestionAddQuestion
+        )
+        suggestion_ids.append(suggestion.suggestion_id)
     reject_suggestions(
         suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
-def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
+def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
     """Rejects all translation suggestions with target IDs matching the
     supplied exploration IDs. These suggestions are being rejected because
     their corresponding exploration was removed from a story or the story was
@@ -519,7 +677,14 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
 
 
 def resubmit_rejected_suggestion(
-        suggestion_id, summary_message, author_id, change):
+    suggestion_id: str,
+    summary_message: str,
+    author_id: str,
+    change: Union[
+        exp_domain.ExplorationChange,
+        question_domain.QuestionSuggestionChange
+    ]
+) -> None:
     """Resubmit a rejected suggestion with the given suggestion_id.
 
     Args:
@@ -562,7 +727,9 @@ def resubmit_rejected_suggestion(
         None, summary_message)
 
 
-def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
+def get_all_suggestions_that_can_be_reviewed_by_user(
+    user_id: str
+) -> List[suggestion_registry.BaseSuggestion]:
     """Returns a list of suggestions which need to be reviewed, in categories
     where the user has crossed the minimum score to review.
 
@@ -589,7 +756,11 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
 
 
 def get_reviewable_translation_suggestions_by_offset(
-        user_id, opportunity_summary_exp_ids, limit, offset):
+    user_id: str,
+    opportunity_summary_exp_ids: Optional[List[str]],
+    limit: Optional[int],
+    offset: int
+) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
 
@@ -622,7 +793,9 @@ def get_reviewable_translation_suggestions_by_offset(
     if len(language_codes) == 0:
         return [], offset
 
-    in_review_translation_suggestions = []
+    in_review_translation_suggestions: Sequence[
+        suggestion_models.GeneralSuggestionModel
+    ] = []
     next_offset = offset
     if opportunity_summary_exp_ids is None:
         in_review_translation_suggestions, next_offset = (
@@ -638,15 +811,24 @@ def get_reviewable_translation_suggestions_by_offset(
                 user_id, language_codes,
                 opportunity_summary_exp_ids))
 
-    translation_suggestions = ([
-        get_suggestion_from_model(s)
-        for s in in_review_translation_suggestions
-    ])
+    translation_suggestions = []
+    for suggestion_model in in_review_translation_suggestions:
+        suggestion = get_suggestion_from_model(suggestion_model)
+        # Here, we are narrowing down the type from BaseSuggestion to
+        # SuggestionTranslateContent.
+        assert isinstance(
+            suggestion, suggestion_registry.SuggestionTranslateContent
+        )
+        translation_suggestions.append(suggestion)
+
     return translation_suggestions, next_offset
 
 
 def get_reviewable_question_suggestions_by_offset(
-        user_id, limit, offset):
+    user_id: str,
+    limit: int,
+    offset: int
+) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
 
@@ -667,13 +849,20 @@ def get_reviewable_question_suggestions_by_offset(
         suggestion_models.GeneralSuggestionModel
         .get_in_review_question_suggestions_by_offset(limit, offset, user_id))
 
-    question_suggestions = ([
-        get_suggestion_from_model(s) for s in suggestions
-    ])
+    question_suggestions = []
+    for suggestion_model in suggestions:
+        suggestion = get_suggestion_from_model(suggestion_model)
+        # Here, we are narrowing down the type from BaseSuggestion to
+        # SuggestionAddQuestion.
+        assert isinstance(suggestion, suggestion_registry.SuggestionAddQuestion)
+        question_suggestions.append(suggestion)
+
     return question_suggestions, next_offset
 
 
-def get_question_suggestions_waiting_longest_for_review():
+def get_question_suggestions_waiting_longest_for_review() -> List[
+    suggestion_registry.SuggestionAddQuestion
+]:
     """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
     of question suggestions, sorted in descending order by review wait time.
 
@@ -681,15 +870,24 @@ def get_question_suggestions_waiting_longest_for_review():
         list(Suggestion). A list of question suggestions, sorted in descending
         order based on how long the suggestions have been waiting for review.
     """
-    return [
-        get_suggestion_from_model(suggestion_model) for suggestion_model in (
-            suggestion_models.GeneralSuggestionModel
+    question_suggestion_models = (
+        suggestion_models.GeneralSuggestionModel
             .get_question_suggestions_waiting_longest_for_review()
-        )
-    ]
+    )
+
+    question_suggestion = []
+    for suggestion_model in question_suggestion_models:
+        suggestion = get_suggestion_from_model(suggestion_model)
+        # Here, we are narrowing down the type from BaseSuggestion to
+        # SuggestionAddQuestion.
+        assert isinstance(suggestion, suggestion_registry.SuggestionAddQuestion)
+        question_suggestion.append(suggestion)
+    return question_suggestion
 
 
-def get_translation_suggestions_waiting_longest_for_review(language_code):
+def get_translation_suggestions_waiting_longest_for_review(
+    language_code: str
+) -> List[suggestion_registry.SuggestionTranslateContent]:
     """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
     number of translation suggestions in the specified language code,
     sorted in descending order by review wait time.
@@ -703,16 +901,28 @@ def get_translation_suggestions_waiting_longest_for_review(language_code):
         descending order based on how long the suggestions have been waiting
         for review.
     """
-    return [
-        get_suggestion_from_model(suggestion_model) for suggestion_model in (
-            suggestion_models.GeneralSuggestionModel
+    translation_suggestion_models = (
+        suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_waiting_longest_for_review(
                 language_code)
+    )
+
+    translation_suggestions = []
+    for suggestion_model in translation_suggestion_models:
+        suggestion = get_suggestion_from_model(suggestion_model)
+        # Here, we are narrowing down the type from BaseSuggestion
+        # to SuggestionTranslateContent.
+        assert isinstance(
+            suggestion, suggestion_registry.SuggestionTranslateContent
         )
-    ]
+        translation_suggestions.append(suggestion)
+
+    return translation_suggestions
 
 
-def get_translation_suggestions_in_review_by_exploration(exp_id, language_code):
+def get_translation_suggestions_in_review_by_exploration(
+    exp_id: str, language_code: str
+) -> List[Optional[suggestion_registry.BaseSuggestion]]:
     """Returns translation suggestions in review by exploration ID.
 
     Args:
@@ -720,8 +930,8 @@ def get_translation_suggestions_in_review_by_exploration(exp_id, language_code):
         language_code: str. Language code.
 
     Returns:
-        list(Suggestion). A list of translation suggestions in review with
-        target_id == exp_id.
+        list(Suggestion|None). A list of translation suggestions in review with
+        target_id == exp_id, or None if suggestion model does not exists.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
@@ -734,7 +944,9 @@ def get_translation_suggestions_in_review_by_exploration(exp_id, language_code):
     ]
 
 
-def get_translation_suggestions_in_review_by_exp_ids(exp_ids, language_code):
+def get_translation_suggestions_in_review_by_exp_ids(
+    exp_ids: List[str], language_code: str
+) -> List[Optional[suggestion_registry.BaseSuggestion]]:
     """Returns translation suggestions in review by exploration ID and language
     code.
 
@@ -746,7 +958,8 @@ def get_translation_suggestions_in_review_by_exp_ids(exp_ids, language_code):
 
     Returns:
         list(Suggestion). A list of translation suggestions in review with
-        target_id in exp_ids and language_code == language_code.
+        target_id in exp_ids and language_code == language_code, or None if
+        suggestion model does not exists.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
@@ -759,7 +972,9 @@ def get_translation_suggestions_in_review_by_exp_ids(exp_ids, language_code):
     ]
 
 
-def get_suggestions_with_translatable_explorations(suggestions):
+def get_suggestions_with_translatable_explorations(
+    suggestions: List[suggestion_registry.BaseSuggestion]
+) -> List[suggestion_registry.BaseSuggestion]:
     """Filters the supplied suggestions for those suggestions that have
     translatable exploration content. That is, the following are true:
     - The suggestion's change content corresponds to an existing exploration
@@ -774,7 +989,10 @@ def get_suggestions_with_translatable_explorations(suggestions):
         list(Suggestion). List of filtered translation suggestions.
     """
 
-    def _has_translatable_exploration(suggestion, suggestion_exp_id_to_exp):
+    def _has_translatable_exploration(
+        suggestion: suggestion_registry.BaseSuggestion,
+        suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
+    ) -> bool:
         """Returns whether the supplied suggestion corresponds to a translatable
         exploration content card.
 
@@ -811,7 +1029,7 @@ def get_suggestions_with_translatable_explorations(suggestions):
         suggestions))
 
 
-def _get_plain_text_from_html_content_string(html_content_string):
+def _get_plain_text_from_html_content_string(html_content_string: str) -> str:
     """Retrieves the plain text from the given html content string. RTE element
     occurrences in the html are replaced by their corresponding rte component
     name, capitalized in square brackets.
@@ -827,7 +1045,7 @@ def _get_plain_text_from_html_content_string(html_content_string):
         str. The plain text string from the given html content string.
     """
 
-    def _replace_rte_tag(rte_tag):
+    def _replace_rte_tag(rte_tag: Match[str]) -> str:
         """Replaces all of the <oppia-noninteractive-**> tags with their
         corresponding rte component name in square brackets.
 
@@ -845,13 +1063,18 @@ def _get_plain_text_from_html_content_string(html_content_string):
         # component is more than one word.
         rte_tag_name = re.search(
             r'oppia-noninteractive-(\w|-)+', rte_tag_string)
+        # Here, rte_tag_name is always going to exists because the string
+        # that was passed in this function is always going to contain
+        # `<oppia-noninteractive>` substring. So, to just rule out the
+        # possibility of None for mypy type checking. we used assertion here.
+        assert rte_tag_name is not None
         # Retrieve the matched string from the MatchObject.
         rte_tag_name_string = rte_tag_name.group(0)
         # Get the name of the rte component.
-        rte_component_name_string = rte_tag_name_string.split('-')[2:]
+        rte_component_name_string_list = rte_tag_name_string.split('-')[2:]
         # If the component name is more than word, connect the words with spaces
         # to create a single string.
-        rte_component_name_string = ' '.join(rte_component_name_string)
+        rte_component_name_string = ' '.join(rte_component_name_string_list)
         # Captialize each word in the string.
         capitalized_rte_component_name_string = (
             rte_component_name_string.title())
@@ -873,7 +1096,9 @@ def _get_plain_text_from_html_content_string(html_content_string):
     return plain_text_without_contiguous_whitespace
 
 
-def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
+def create_reviewable_suggestion_email_info_from_suggestion(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> suggestion_registry.ReviewableSuggestionEmailInfo:
     """Creates an object with the key information needed to notify reviewers or
     admins that the given suggestion needs review.
 
@@ -905,13 +1130,19 @@ def create_reviewable_suggestion_email_info_from_suggestion(suggestion):
     )
     plain_text = _get_plain_text_from_html_content_string(
         get_html_representing_suggestion(suggestion))
+    # Here, suggestion can only be of `translate_content` or `add_question`
+    # type and in both suggestions language_code cannot be None. So, to
+    # just narrow down type from Optional[str] to str we used assertion here.
+    assert suggestion.language_code is not None
     return suggestion_registry.ReviewableSuggestionEmailInfo(
         suggestion.suggestion_type, suggestion.language_code, plain_text,
         suggestion.last_updated
     )
 
 
-def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
+def get_suggestions_waiting_for_review_info_to_notify_reviewers(
+    reviewer_ids: List[str]
+) -> List[List[suggestion_registry.ReviewableSuggestionEmailInfo]]:
     """For each user, returns information that will be used to notify reviewers
     about the suggestions waiting longest for review, that the reviewer has
     permissions to review.
@@ -948,7 +1179,9 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
         # Use a min heap because then the suggestions that have been waiting the
         # longest for review (earliest review submission date) are automatically
         # efficiently sorted.
-        suggestions_waiting_longest_heap = []
+        suggestions_waiting_longest_heap: List[
+            Tuple[datetime.datetime, suggestion_registry.BaseSuggestion]
+        ] = []
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
                 # Break early because we only want the top
@@ -1020,7 +1253,9 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(reviewer_ids):
     return reviewers_reviewable_suggestion_infos
 
 
-def get_submitted_suggestions(user_id, suggestion_type):
+def get_submitted_suggestions(
+    user_id: str, suggestion_type: str
+) -> List[suggestion_registry.BaseSuggestion]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 
@@ -1041,7 +1276,8 @@ def get_submitted_suggestions(user_id, suggestion_type):
 
 
 def get_submitted_suggestions_by_offset(
-        user_id, suggestion_type, limit, offset):
+    user_id: str, suggestion_type: str, limit: int, offset: int
+) -> Tuple[List[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 
@@ -1072,7 +1308,9 @@ def get_submitted_suggestions_by_offset(
     return suggestions, next_offset
 
 
-def get_info_about_suggestions_waiting_too_long_for_review():
+def get_info_about_suggestions_waiting_too_long_for_review() -> List[
+    suggestion_registry.ReviewableSuggestionEmailInfo
+]:
     """Gets the information about the suggestions that have been waiting longer
     than suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days
     for a review on the Contributor Dashboard. There can be information about at
@@ -1101,7 +1339,9 @@ def get_info_about_suggestions_waiting_too_long_for_review():
     ]
 
 
-def get_user_proficiency_from_model(user_proficiency_model):
+def get_user_proficiency_from_model(
+    user_proficiency_model: user_models.UserContributionProficiencyModel
+) -> user_domain.UserContributionProficiency:
     """Converts the given UserContributionProficiencyModel to a
     UserContributionProficiency domain object.
 
@@ -1121,7 +1361,9 @@ def get_user_proficiency_from_model(user_proficiency_model):
     )
 
 
-def _update_user_proficiency(user_proficiency):
+def _update_user_proficiency(
+    user_proficiency: user_domain.UserContributionProficiency
+) -> None:
     """Updates the user_proficiency.
 
     Args:
@@ -1149,7 +1391,7 @@ def _update_user_proficiency(user_proficiency):
             user_proficiency.score, user_proficiency.onboarding_email_sent)
 
 
-def get_all_scores_of_user(user_id):
+def get_all_scores_of_user(user_id: str) -> Dict[str, int]:
     """Gets all scores for a given user.
 
     Args:
@@ -1168,7 +1410,9 @@ def get_all_scores_of_user(user_id):
     return scores
 
 
-def can_user_review_category(user_id, score_category):
+def can_user_review_category(
+    user_id: str, score_category: str
+) -> bool:
     """Checks if user can review suggestions in category score_category.
     If the user has score above the minimum required score, then the user is
     allowed to review.
@@ -1185,7 +1429,9 @@ def can_user_review_category(user_id, score_category):
     return user_proficiency.can_user_review_category()
 
 
-def get_all_user_ids_who_are_allowed_to_review(score_category):
+def get_all_user_ids_who_are_allowed_to_review(
+    score_category: str
+) -> List[str]:
     """Gets all user_ids of users who are allowed to review (as per their
     scores) suggestions to a particular category.
 
@@ -1202,7 +1448,9 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
     ]
 
 
-def _get_user_proficiency(user_id, score_category):
+def _get_user_proficiency(
+    user_id: str, score_category: str
+) -> user_domain.UserContributionProficiency:
     """Gets the user proficiency model from storage and creates the
     corresponding user proficiency domain object if the model exists. If the
     model does not exist a user proficiency domain object with the given
@@ -1226,7 +1474,7 @@ def _get_user_proficiency(user_id, score_category):
         user_id, score_category, 0, False)
 
 
-def check_can_resubmit_suggestion(suggestion_id, user_id):
+def check_can_resubmit_suggestion(suggestion_id: str, user_id: str) -> bool:
     """Checks whether the given user can resubmit the suggestion.
 
     Args:
@@ -1242,7 +1490,9 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
     return suggestion.author_id == user_id
 
 
-def _get_voiceover_application_class(target_type):
+def _get_voiceover_application_class(
+    target_type: str
+) -> Type[suggestion_registry.ExplorationVoiceoverApplication]:
     """Returns the voiceover application class for a given target type.
 
     Args:
@@ -1263,7 +1513,9 @@ def _get_voiceover_application_class(target_type):
             'Invalid target type for voiceover application: %s' % target_type)
 
 
-def get_voiceover_application(voiceover_application_id):
+def get_voiceover_application(
+    voiceover_application_id: str
+) -> suggestion_registry.BaseVoiceoverApplication:
     """Returns the BaseVoiceoverApplication object for the give
     voiceover application model object.
 
@@ -1292,7 +1544,10 @@ def get_voiceover_application(voiceover_application_id):
 
 
 def create_community_contribution_stats_from_model(
-        community_contribution_stats_model):
+    community_contribution_stats_model: (
+        suggestion_models.CommunityContributionStatsModel
+    )
+) -> suggestion_registry.CommunityContributionStats:
     """Creates a domain object that represents the community contribution
     stats from the model given. Note that each call to this function returns
     a new domain object, but the data copied into the domain object comes from
@@ -1320,7 +1575,8 @@ def create_community_contribution_stats_from_model(
     )
 
 
-def get_community_contribution_stats():
+def get_community_contribution_stats(
+) -> suggestion_registry.CommunityContributionStats:
     """Gets the CommunityContributionStatsModel and converts it into the
     corresponding domain object that represents the community contribution
     stats. Note that there is only ever one instance of this model and if the
@@ -1339,7 +1595,10 @@ def get_community_contribution_stats():
 
 
 def create_translation_contribution_stats_from_model(
-        translation_contribution_stats_model):
+    translation_contribution_stats_model: (
+        suggestion_models.TranslationContributionStatsModel
+    )
+) -> suggestion_registry.TranslationContributionStats:
     """Creates a domain object representing the supplied
     TranslationContributionStatsModel.
 
@@ -1369,7 +1628,9 @@ def create_translation_contribution_stats_from_model(
     )
 
 
-def get_all_translation_contribution_stats(user_id):
+def get_all_translation_contribution_stats(
+    user_id: str
+) -> List[suggestion_registry.TranslationContributionStats]:
     """Gets all TranslationContributionStatsModels corresponding to the supplied
     user and converts them to their corresponding domain objects.
 
@@ -1391,7 +1652,7 @@ def get_all_translation_contribution_stats(user_id):
     ]
 
 
-def get_suggestion_types_that_need_reviewers():
+def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers. Suggestion types need more reviewers if the
     number of suggestions in that type divided by the number of reviewers is
@@ -1408,7 +1669,7 @@ def get_suggestion_types_that_need_reviewers():
             language codes of the translation suggestions that need more
             reviewers.
     """
-    suggestion_types_needing_reviewers = {}
+    suggestion_types_needing_reviewers: Dict[str, Set[str]] = {}
     stats = get_community_contribution_stats()
 
     language_codes_that_need_reviewers = (
@@ -1422,14 +1683,15 @@ def get_suggestion_types_that_need_reviewers():
 
     if stats.are_question_reviewers_needed():
         suggestion_types_needing_reviewers[
-            feconf.SUGGESTION_TYPE_ADD_QUESTION] = {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION] = set()
 
     return suggestion_types_needing_reviewers
 
 
 @transaction_services.run_in_transaction_wrapper
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
-        suggestions, amount):
+    suggestions: List[suggestion_registry.BaseSuggestion], amount: int
+) -> None:
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount. Note that this method should only ever be
     called in a transaction.
@@ -1474,7 +1736,8 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
 
 
 def _update_suggestion_counts_in_community_contribution_stats(
-        suggestions, amount):
+    suggestions: List[suggestion_registry.BaseSuggestion], amount: int
+) -> None:
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount. The GET and PUT is done in a single
     transaction to avoid loss of updates that come in rapid succession.
@@ -1490,7 +1753,9 @@ def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount)
 
 
-def update_translation_suggestion(suggestion_id, translation_html):
+def update_translation_suggestion(
+    suggestion_id: str, translation_html: str
+) -> None:
     """Updates the translation_html of a suggestion with the given
     suggestion_id.
 
@@ -1501,7 +1766,12 @@ def update_translation_suggestion(suggestion_id, translation_html):
     suggestion = get_suggestion_by_id(suggestion_id)
 
     # Clean the translation HTML if not a list of strings.
-    suggestion.change.translation_html = (
+    # Here, change is of type BaseChange and all attributes on BaseChange are
+    # created dynamically except cmd, so due this MyPy is unable to recognize
+    # `translation_html` as an attribute of change and throwing `"BaseChange"
+    # has no attribute "translation_html"` error. Thus to avoid the error, we
+    # used ignore here.
+    suggestion.change.translation_html = (  # type: ignore[attr-defined]
         html_cleaner.clean(translation_html)
         if isinstance(translation_html, str)
         else translation_html
@@ -1512,7 +1782,10 @@ def update_translation_suggestion(suggestion_id, translation_html):
 
 
 def update_question_suggestion(
-        suggestion_id, skill_difficulty, question_state_data):
+    suggestion_id: str,
+    skill_difficulty: float,
+    question_state_data: state_domain.StateDict
+) -> Optional[suggestion_registry.BaseSuggestion]:
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
 
@@ -1526,20 +1799,21 @@ def update_question_suggestion(
         is found.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
+    question_dict = suggestion.change.question_dict
+    # Ruling out the possibility of any other type for mypy type checking.
+    assert isinstance(question_dict, dict)
     new_change_obj = question_domain.QuestionSuggestionChange(
         {
             'cmd': suggestion.change.cmd,
             'question_dict': {
                 'question_state_data': question_state_data,
-                'language_code': suggestion.change.question_dict[
-                    'language_code'],
+                'language_code': question_dict['language_code'],
                 'question_state_data_schema_version': (
-                    suggestion.change.question_dict[
+                    question_dict[
                         'question_state_data_schema_version']),
-                'linked_skill_ids': suggestion.change.question_dict[
-                    'linked_skill_ids'],
+                'linked_skill_ids': question_dict['linked_skill_ids'],
                 'inapplicable_skill_misconception_ids': (
-                    suggestion.change.question_dict[
+                    question_dict[
                         'inapplicable_skill_misconception_ids'])
             },
             'skill_id': suggestion.change.skill_id,

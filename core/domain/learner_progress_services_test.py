@@ -41,37 +41,52 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List
+from typing_extensions import Final, TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
+class IncompleteExplorationDetailsDict(TypedDict):
+    """Type for the incompletely played exploration's details dictionary."""
+
+    timestamp: datetime.datetime
+    state_name: str
+    version: int
 
 
 class LearnerProgressTests(test_utils.GenericTestBase):
     """Test the services related to tracking the progress of the learner."""
 
-    EXP_ID_0 = '0_en_arch_bridges_in_england'
-    EXP_ID_1 = '1_fi_arch_sillat_suomi'
-    EXP_ID_2 = '2_en_welcome_introduce_oppia'
-    EXP_ID_3 = '3_welcome_oppia'
-    EXP_ID_4 = 'exp_4'
-    EXP_ID_5 = 'exp_5'
-    EXP_ID_6 = 'exp_6'
-    EXP_ID_7 = 'exp_7'
-    COL_ID_0 = '0_arch_bridges_in_england'
-    COL_ID_1 = '1_welcome_introduce_oppia'
-    COL_ID_2 = '2_welcome_introduce_oppia_interactions'
-    COL_ID_3 = '3_welcome_oppia_collection'
-    STORY_ID_0 = 'story_0'
-    TOPIC_ID_0 = 'topic_0'
-    STORY_ID_1 = 'story_1'
-    STORY_ID_2 = 'story_2'
-    STORY_ID_3 = 'story_3'
-    TOPIC_ID_1 = 'topic_1'
-    TOPIC_ID_2 = 'topic_2'
-    TOPIC_ID_3 = 'topic_3'
-    USER_EMAIL = 'user@example.com'
-    USER_USERNAME = 'user'
+    EXP_ID_0: Final = '0_en_arch_bridges_in_england'
+    EXP_ID_1: Final = '1_fi_arch_sillat_suomi'
+    EXP_ID_2: Final = '2_en_welcome_introduce_oppia'
+    EXP_ID_3: Final = '3_welcome_oppia'
+    EXP_ID_4: Final = 'exp_4'
+    EXP_ID_5: Final = 'exp_5'
+    EXP_ID_6: Final = 'exp_6'
+    EXP_ID_7: Final = 'exp_7'
+    COL_ID_0: Final = '0_arch_bridges_in_england'
+    COL_ID_1: Final = '1_welcome_introduce_oppia'
+    COL_ID_2: Final = '2_welcome_introduce_oppia_interactions'
+    COL_ID_3: Final = '3_welcome_oppia_collection'
+    STORY_ID_0: Final = 'story_0'
+    TOPIC_ID_0: Final = 'topic_0'
+    STORY_ID_1: Final = 'story_1'
+    STORY_ID_2: Final = 'story_2'
+    STORY_ID_3: Final = 'story_3'
+    TOPIC_ID_1: Final = 'topic_1'
+    TOPIC_ID_2: Final = 'topic_2'
+    TOPIC_ID_3: Final = 'topic_3'
+    USER_EMAIL: Final = 'user@example.com'
+    USER_USERNAME: Final = 'user'
 
-    def setUp(self):
-        super(LearnerProgressTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -161,9 +176,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'dummy-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
         self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
-        topic_services.add_canonical_story(
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
 
         changelist = [
@@ -206,9 +221,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
         self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
-        topic_services.add_canonical_story(
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
 
         changelist = [
@@ -252,9 +267,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'sample-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
         self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_2)
-        topic_services.add_canonical_story(
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -281,29 +296,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'sample-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
         self.save_new_story(self.STORY_ID_3, self.owner_id, self.TOPIC_ID_3)
-        topic_services.add_canonical_story(
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_3, self.STORY_ID_3)
 
         # Publish topics and stories.
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
 
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)  # type: ignore[no-untyped-call]
 
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)  # type: ignore[no-untyped-call]
 
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)  # type: ignore[no-untyped-call]
 
-    def _get_all_completed_exp_ids(self, user_id):
+    def _get_all_completed_exp_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the explorations completed by the learner
         corresponding to the given user id.
         """
@@ -311,11 +326,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get(
                 user_id, strict=False))
 
-        return (
-            completed_activities_model.exploration_ids if
-            completed_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if completed_activities_model:
+            exploration_ids: List[str] = (
+                completed_activities_model.exploration_ids
+            )
+            return exploration_ids
+        else:
+            return []
 
-    def _get_all_completed_collection_ids(self, user_id):
+    def _get_all_completed_collection_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the collections completed by the learner
         corresponding to the given user id.
         """
@@ -323,11 +345,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get(
                 user_id, strict=False))
 
-        return (
-            completed_activities_model.collection_ids if
-            completed_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if completed_activities_model:
+            collection_ids: List[str] = (
+                completed_activities_model.collection_ids
+            )
+            return collection_ids
+        else:
+            return []
 
-    def _get_all_completed_story_ids(self, user_id):
+    def _get_all_completed_story_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the stories completed by the learner
         corresponding to the given user id.
         """
@@ -335,11 +364,16 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get(
                 user_id, strict=False))
 
-        return (
-            completed_activities_model.story_ids if
-            completed_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if completed_activities_model:
+            story_ids: List[str] = completed_activities_model.story_ids
+            return story_ids
+        else:
+            return []
 
-    def _get_all_learnt_topic_ids(self, user_id):
+    def _get_all_learnt_topic_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the topics learnt by the learner
         corresponding to the given user id.
         """
@@ -347,22 +381,38 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get(
                 user_id, strict=False))
 
-        return (
-            completed_activities_model.learnt_topic_ids if
-            completed_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if completed_activities_model:
+            learnt_topic_ids: List[str] = (
+                completed_activities_model.learnt_topic_ids
+            )
+            return learnt_topic_ids
+        else:
+            return []
 
-    def _get_all_incomplete_exp_ids(self, user_id):
+    def _get_all_incomplete_exp_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the explorations not fully completed by the
         learner corresponding to the given user id.
         """
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
-        return (
-            incomplete_activities_model.exploration_ids if
-            incomplete_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if incomplete_activities_model:
+            exploration_ids: List[str] = (
+                incomplete_activities_model.exploration_ids
+            )
+            return exploration_ids
+        else:
+            return []
 
-    def _get_incomplete_exp_details(self, user_id, exploration_id):
+    def _get_incomplete_exp_details(
+        self, user_id: str, exploration_id: str
+    ) -> IncompleteExplorationDetailsDict:
         """Returns the dict containing all the exploration details that are
         incompletely played by the learner corresponding to the given user id.
         """
@@ -370,6 +420,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             user_models.ExpUserLastPlaythroughModel.get(
                 user_id, exploration_id))
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert incomplete_exploration_user_model is not None
         return {
             'timestamp': (
                 incomplete_exploration_user_model.last_updated),
@@ -379,7 +431,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         }
 
     def _check_if_exp_details_match(
-            self, actual_details, details_fetched_from_model):
+        self,
+        actual_details: IncompleteExplorationDetailsDict,
+        details_fetched_from_model: IncompleteExplorationDetailsDict
+    ) -> None:
         """Verifies the exploration details fetched from the model matches the
         actual details.
         """
@@ -397,40 +452,59 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             actual_details['timestamp'] -
             details_fetched_from_model['timestamp']).total_seconds(), 10)
 
-    def _get_all_incomplete_collection_ids(self, user_id):
+    def _get_all_incomplete_collection_ids(self, user_id: str) -> List[str]:
         """Returns the list of all the collection ids that are incompletely
         played by the learner corresponding to the given user id.
         """
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
-        return (
-            incomplete_activities_model.collection_ids if
-            incomplete_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if incomplete_activities_model:
+            collection_ids: List[str] = (
+                incomplete_activities_model.collection_ids
+            )
+            return collection_ids
+        else:
+            return []
 
-    def _get_all_incomplete_story_ids(self, user_id):
+    def _get_all_incomplete_story_ids(self, user_id: str) -> List[str]:
         """Returns the list of all the story ids that are incompletely
         played by the learner corresponding to the given user id.
         """
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
-        return (
-            incomplete_activities_model.story_ids if
-            incomplete_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if incomplete_activities_model:
+            story_ids: List[str] = incomplete_activities_model.story_ids
+            return story_ids
+        else:
+            return []
 
-    def _get_all_partially_learnt_topic_ids(self, user_id):
+    def _get_all_partially_learnt_topic_ids(self, user_id: str) -> List[str]:
         """Returns the list of all the topics ids that are partially
         learnt by the learner corresponding to the given user id.
         """
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel.get(user_id, strict=False))
 
-        return (
-            incomplete_activities_model.partially_learnt_topic_ids if
-            incomplete_activities_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if incomplete_activities_model:
+            learnt_topic_ids: List[str] = (
+                incomplete_activities_model.partially_learnt_topic_ids
+            )
+            return learnt_topic_ids
+        else:
+            return []
 
-    def test_mark_exploration_as_completed(self):
+    def test_mark_exploration_as_completed(self) -> None:
         self.assertEqual(self._get_all_completed_exp_ids(self.user_id), [])
 
         # Add an exploration to the completed list of a learner.
@@ -486,7 +560,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
-    def test_mark_collection_as_completed(self):
+    def test_mark_collection_as_completed(self) -> None:
         self.assertEqual(
             self._get_all_completed_collection_ids(self.user_id), [])
 
@@ -542,7 +616,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
-    def test_mark_story_as_completed(self):
+    def test_mark_story_as_completed(self) -> None:
         self.assertEqual(
             self._get_all_completed_story_ids(self.user_id), [])
 
@@ -574,7 +648,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_story_ids(
             self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
 
-    def test_mark_topic_as_learnt(self):
+    def test_mark_topic_as_learnt(self) -> None:
         self.assertEqual(
             self._get_all_learnt_topic_ids(self.user_id), [])
 
@@ -618,14 +692,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.user_id), [])
 
-    def test_mark_exploration_as_incomplete(self):
+    def test_mark_exploration_as_incomplete(self) -> None:
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
         state_name = u'state name'
         version = 1
 
-        exp_details = {
+        exp_details: IncompleteExplorationDetailsDict = {
             'timestamp': datetime.datetime.utcnow(),
             'state_name': state_name,
             'version': version
@@ -643,7 +717,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         state_name = u'new_state_name'
         version = 2
 
-        modified_exp_details = {
+        modified_exp_details: IncompleteExplorationDetailsDict = {
             'timestamp': datetime.datetime.utcnow(),
             'state_name': state_name,
             'version': version
@@ -691,7 +765,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_3])
 
-    def test_mark_collection_as_incomplete(self):
+    def test_mark_collection_as_incomplete(self) -> None:
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [])
 
@@ -740,7 +814,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_3])
 
-    def test_record_story_started(self):
+    def test_record_story_started(self) -> None:
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [])
 
@@ -765,7 +839,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [self.STORY_ID_0])
 
-    def test_record_topic_started(self):
+    def test_record_topic_started(self) -> None:
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [])
 
@@ -790,12 +864,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [self.TOPIC_ID_0])
 
-    def test_remove_exp_from_incomplete_list(self):
+    def test_remove_exp_from_incomplete_list(self) -> None:
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
-        state_name = 'state name'
-        version = 1
+        state_name: str = 'state name'
+        version: int = 1
 
         # Add incomplete explorations.
         learner_progress_services.mark_exploration_as_incomplete(
@@ -823,7 +897,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
 
-    def test_remove_collection_from_incomplete_list(self):
+    def test_remove_collection_from_incomplete_list(self) -> None:
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [])
 
@@ -853,7 +927,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [])
 
-    def test_remove_story_from_incomplete_list(self):
+    def test_remove_story_from_incomplete_list(self) -> None:
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [])
 
@@ -883,7 +957,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [])
 
-    def test_remove_topic_from_partially_learnt_list(self):
+    def test_remove_topic_from_partially_learnt_list(self) -> None:
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [])
 
@@ -913,7 +987,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [])
 
-    def test_remove_story_from_completed_list(self):
+    def test_remove_story_from_completed_list(self) -> None:
         self.assertEqual(self._get_all_completed_story_ids(
             self.user_id), [])
 
@@ -943,7 +1017,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_story_ids(
             self.user_id), [])
 
-    def test_remove_topic_from_learnt_list(self):
+    def test_remove_topic_from_learnt_list(self) -> None:
         self.assertEqual(self._get_all_learnt_topic_ids(
             self.user_id), [])
 
@@ -973,7 +1047,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_learnt_topic_ids(
             self.user_id), [])
 
-    def test_get_all_completed_exp_ids(self):
+    def test_get_all_completed_exp_ids(self) -> None:
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [])
 
@@ -989,7 +1063,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-    def test_unpublishing_completed_exploration_filters_it_out(self):
+    def test_unpublishing_completed_exploration_filters_it_out(self) -> None:
         # Add explorations to the completed list.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
@@ -1025,7 +1099,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_exp_summaries[1].id, '1_fi_arch_sillat_suomi')
         self.assertEqual(len(completed_exp_summaries), 2)
 
-    def test_republishing_completed_exploration_filters_as_complete(self):
+    def test_republishing_completed_exploration_filters_as_complete(
+        self
+    ) -> None:
         # Add exploration to the completed list.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
@@ -1070,7 +1146,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_exp_summaries[0].id, '0_en_arch_bridges_in_england')
         self.assertEqual(len(completed_exp_summaries), 1)
 
-    def test_get_all_completed_collection_ids(self):
+    def test_get_all_completed_collection_ids(self) -> None:
         self.assertEqual(
             learner_progress_services.get_all_completed_collection_ids(
                 self.user_id), [])
@@ -1089,7 +1165,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_completed_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-    def test_get_all_completed_story_ids(self):
+    def test_get_all_completed_story_ids(self) -> None:
         self.assertEqual(
             learner_progress_services.get_all_completed_story_ids(
                 self.user_id), [])
@@ -1108,7 +1184,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_completed_story_ids(
                 self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
 
-    def test_get_all_learnt_topic_ids(self):
+    def test_get_all_learnt_topic_ids(self) -> None:
         self.assertEqual(
             learner_progress_services.get_all_learnt_topic_ids(
                 self.user_id), [])
@@ -1127,7 +1203,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_learnt_topic_ids(
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
-    def test_unpublishing_completed_collection_filters_it_out(self):
+    def test_unpublishing_completed_collection_filters_it_out(self) -> None:
         # Add collections to the completed list.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
@@ -1144,6 +1220,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         rights_manager.unpublish_collection(system_user, self.COL_ID_3)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1163,7 +1241,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_collection_summaries[1].id, '1_welcome_introduce_oppia')
         self.assertEqual(len(completed_collection_summaries), 2)
 
-    def test_republishing_completed_collection_filters_as_complete(self):
+    def test_republishing_completed_collection_filters_as_complete(
+        self
+    ) -> None:
         # Add collection to the completed list.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
@@ -1176,6 +1256,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         rights_manager.unpublish_collection(system_user, self.COL_ID_0)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1194,6 +1276,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_0)
         public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert public_collection is not None
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
@@ -1208,7 +1292,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_collection_summaries[0].id, '0_arch_bridges_in_england')
         self.assertEqual(len(completed_collection_summaries), 1)
 
-    def test_unpublishing_completed_story_filters_it_out(self):
+    def test_unpublishing_completed_story_filters_it_out(self) -> None:
         # Add stories to the completed list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
@@ -1223,7 +1307,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
 
         # Unpublish STORY_ID_1.
-        topic_services.unpublish_story(
+        topic_services.unpublish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
         # Call get_topics_and_stories_progress to get filtered progress.
@@ -1241,7 +1325,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_story_summaries[0].id, self.STORY_ID_0)
         self.assertEqual(len(completed_story_summaries), 1)
 
-    def test_unpublishing_learnt_topic_filters_it_out(self):
+    def test_unpublishing_learnt_topic_filters_it_out(self) -> None:
         # Add topics to the learnt list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
@@ -1260,7 +1344,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Unpublish TOPIC_ID_1.
-        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)  # type: ignore[no-untyped-call]
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_1)
         self.assertEqual(
             topic_rights.topic_is_published, False)
@@ -1280,7 +1364,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learnt_topic_summaries[0].id, self.TOPIC_ID_0)
         self.assertEqual(len(learnt_topic_summaries), 1)
 
-    def test_deleting_a_story_filters_it_out_from_completed_list(self):
+    def test_deleting_a_story_filters_it_out_from_completed_list(self) -> None:
         # Add stories to the completed list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
@@ -1312,7 +1396,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_story_summaries[0].id, self.STORY_ID_0)
         self.assertEqual(len(completed_story_summaries), 1)
 
-    def test_deleting_a_topic_filters_it_out_from_learnt_list(self):
+    def test_deleting_a_topic_filters_it_out_from_learnt_list(self) -> None:
         # Add topics to the learnt list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
@@ -1331,7 +1415,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Delete TOPIC_ID_1.
-        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_1)
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_1)  # type: ignore[no-untyped-call]
 
         # Call get_topics_and_stories_progress to get filtered progress.
         user_activity = (
@@ -1348,7 +1432,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learnt_topic_summaries[0].id, self.TOPIC_ID_0)
         self.assertEqual(len(learnt_topic_summaries), 1)
 
-    def test_get_all_incomplete_exp_ids(self):
+    def test_get_all_incomplete_exp_ids(self) -> None:
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -1370,7 +1454,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-    def test_unpublishing_incomplete_exploration_filters_it_out(self):
+    def test_unpublishing_incomplete_exploration_filters_it_out(self) -> None:
         state_name = 'state name'
         version = 1
 
@@ -1409,7 +1493,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             incomplete_exp_summaries[1].id, '1_fi_arch_sillat_suomi')
         self.assertEqual(len(incomplete_exp_summaries), 2)
 
-    def test_republishing_incomplete_exploration_filters_as_incomplete(self):
+    def test_republishing_incomplete_exploration_filters_as_incomplete(
+        self
+    ) -> None:
         state_name = 'state name'
         version = 1
 
@@ -1457,7 +1543,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             incomplete_exp_summaries[0].id, '0_en_arch_bridges_in_england')
         self.assertEqual(len(incomplete_exp_summaries), 1)
 
-    def test_get_all_incomplete_collection_ids(self):
+    def test_get_all_incomplete_collection_ids(self) -> None:
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
@@ -1476,7 +1562,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-    def test_get_all_incomplete_story_ids(self):
+    def test_get_all_incomplete_story_ids(self) -> None:
         self.assertEqual(
             learner_progress_services.get_all_incomplete_story_ids(
                 self.user_id), [])
@@ -1495,7 +1581,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_story_ids(
                 self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
 
-    def test_get_all_partially_learnt_topic_ids(self):
+    def test_get_all_partially_learnt_topic_ids(self) -> None:
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
@@ -1514,7 +1600,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
-    def test_get_all_and_untracked_topic_ids(self):
+    def test_get_all_and_untracked_topic_ids(self) -> None:
         # Add topics to config_domain.
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
@@ -1592,7 +1678,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(all_topics), 2)
         self.assertEqual(len(untracked_topics), 0)
 
-    def test_unpublishing_incomplete_collection_filters_it_out(self):
+    def test_unpublishing_incomplete_collection_filters_it_out(self) -> None:
         # Add collections to the incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
@@ -1609,6 +1695,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         rights_manager.unpublish_collection(system_user, self.COL_ID_3)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1628,7 +1716,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             incomplete_collection_summaries[1].id, '1_welcome_introduce_oppia')
         self.assertEqual(len(incomplete_collection_summaries), 2)
 
-    def test_republishing_incomplete_collection_filters_as_incomplete(self):
+    def test_republishing_incomplete_collection_filters_as_incomplete(
+        self
+    ) -> None:
         # Add collection to the incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
@@ -1641,6 +1731,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         rights_manager.unpublish_collection(system_user, self.COL_ID_0)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1659,6 +1751,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_0)
         public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert public_collection is not None
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
@@ -1673,7 +1767,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             incomplete_collection_summaries[0].id, '0_arch_bridges_in_england')
         self.assertEqual(len(incomplete_collection_summaries), 1)
 
-    def test_unpublishing_partially_learnt_topic_filters_it_out(self):
+    def test_unpublishing_partially_learnt_topic_filters_it_out(self) -> None:
         # Add topics to the partially learnt list.
         learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
@@ -1684,7 +1778,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Unpublish TOPIC_ID_1.
-        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)  # type: ignore[no-untyped-call]
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_1)
         self.assertEqual(
             topic_rights.topic_is_published, False)
@@ -1704,7 +1798,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             partially_learnt_topic_summaries[0].id, self.TOPIC_ID_0)
         self.assertEqual(len(partially_learnt_topic_summaries), 1)
 
-    def test_republishing_partially_learnt_topic_filters_as_incomplete(self):
+    def test_republishing_partially_learnt_topic_filters_as_incomplete(
+        self
+    ) -> None:
         # Add topic to the partially learnt list.
         learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
@@ -1713,7 +1809,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0])
 
         # Unpublish TOPIC_ID_0.
-        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)
+        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_0)
         self.assertEqual(
             topic_rights.topic_is_published, False)
@@ -1730,7 +1826,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(partially_learnt_topic_summaries), 0)
 
         # Republish TOPIC_ID_0.
-        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
         learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_0)
@@ -1751,7 +1847,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(partially_learnt_topic_summaries), 1)
 
     def test_removes_a_topic_from_topics_to_learn_list_when_topic_is_learnt(
-            self):
+        self
+    ) -> None:
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.user_id), [])
@@ -1778,7 +1875,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Test that topics to learn doesn't include completed topic.
         self.assertEqual(len(topics_to_learn), 0)
 
-    def test_unpublishing_topic_filters_it_out_from_topics_to_learn(self):
+    def test_unpublishing_topic_filters_it_out_from_topics_to_learn(
+        self
+    ) -> None:
         # Add topics to learn section of the learner goals.
         learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_0)
@@ -1789,7 +1888,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Unpublish TOPIC_ID_0.
-        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)
+        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
 
         # Call get_topics_and_stories_progress to get filtered progress.
         user_activity = (
@@ -1804,7 +1903,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             topics_to_learn[0].id, 'topic_1')
         self.assertEqual(len(topics_to_learn), 1)
 
-    def test_unpublishing_exploration_filters_it_out_from_playlist(self):
+    def test_unpublishing_exploration_filters_it_out_from_playlist(
+        self
+    ) -> None:
         # Add activities to the playlist section.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
@@ -1834,7 +1935,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             exploration_playlist[0].id, '0_en_arch_bridges_in_england')
         self.assertEqual(len(exploration_playlist), 1)
 
-    def test_republishing_exploration_keeps_it_in_exploration_playlist(self):
+    def test_republishing_exploration_keeps_it_in_exploration_playlist(
+        self
+    ) -> None:
         # Add activity to the playlist section.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
@@ -1879,7 +1982,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             exploration_playlist[0].id, '0_en_arch_bridges_in_england')
         self.assertEqual(len(exploration_playlist), 1)
 
-    def test_unpublishing_collection_filters_it_out_from_playlist(self):
+    def test_unpublishing_collection_filters_it_out_from_playlist(self) -> None:
         # Add activities to the playlist section.
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
@@ -1894,6 +1997,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         rights_manager.unpublish_collection(system_user, self.COL_ID_1)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1909,7 +2014,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             collection_playlist[0].id, '0_arch_bridges_in_england')
         self.assertEqual(len(collection_playlist), 1)
 
-    def test_republishing_collection_keeps_it_in_collection_playlist(self):
+    def test_republishing_collection_keeps_it_in_collection_playlist(
+        self
+    ) -> None:
         # Add activity to the playlist section.
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
@@ -1922,6 +2029,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         rights_manager.unpublish_collection(system_user, self.COL_ID_0)
         private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1940,6 +2049,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_0)
         public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert public_collection is not None
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
@@ -1954,7 +2065,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             collection_playlist[0].id, '0_arch_bridges_in_england')
         self.assertEqual(len(collection_playlist), 1)
 
-    def test_get_ids_of_activities_in_learner_dashboard(self):
+    def test_get_ids_of_activities_in_learner_dashboard(self) -> None:
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
@@ -2013,7 +2124,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             activity_ids.collection_playlist_ids, [self.COL_ID_3])
 
-    def test_get_all_activity_progress(self):
+    def test_get_all_activity_progress(self) -> None:
         # Add topics to config_domain.
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
@@ -2158,7 +2269,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             }], 'Add new exploration')
 
         # Delete a topic in the learn section of the learner goals.
-        topic_services.delete_topic(self.owner_id, self.TOPIC_ID_2)
+        topic_services.delete_topic(self.owner_id, self.TOPIC_ID_2)  # type: ignore[no-untyped-call]
 
         # Add a node to a story that has already been completed.
         changelist = [
@@ -2243,7 +2354,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         collection_services.delete_collection(self.owner_id, self.COL_ID_3)
 
         # Delete a topic from incomplete section.
-        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)  # type: ignore[no-untyped-call]
 
         # Get the progress of the user.
         collection_progress = (

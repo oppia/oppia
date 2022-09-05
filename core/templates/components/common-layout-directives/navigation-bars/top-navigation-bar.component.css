@@ -374,8 +374,8 @@ oppia-top-navigation-bar .oppia-launch-icon {
   color: #009688;
   font-size: 22px;
 }
-oppia-top-navigation-bar .oppia-user-avatar-icon {
-  margin-top: -1px;
+.oppia-user-avatar-icon {
+  font-size: 36px;
 }
 oppia-top-navigation-bar .oppia-admin-text {
   right: 4px;
@@ -505,8 +505,8 @@ oppia-top-navigation-bar .oppia-tick-mark {
   }
 }
 
-@media screen and (max-width: 768px) {
-  oppia-top-navigation-bar .nav-mobile-header-text-container {
+@media screen and (min-width: 300px) and (max-width: 768px) {
+  .nav-mobile-header-text-container {
     display: inline-block;
     font-size: 1px;
     margin-top: 2px;
@@ -529,12 +529,5 @@ oppia-top-navigation-bar .oppia-tick-mark {
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
-  }
-  @media screen and (max-width: 600px) {
-    oppia-top-navigation-bar .oppia-logo {
-      left: 0;
-      margin-left: 60px;
-      position: absolute;
-    }
   }
 }

@@ -46,6 +46,7 @@ describe('Contributor dashboard page', () => {
   };
   let focusManagerService: FocusManagerService;
   let windowRef: WindowRef;
+  let getTranslatableTopicNamesAsyncSpy;
   let getUserInfoAsyncSpy;
 
   beforeEach(waitForAsync(() => {
@@ -79,8 +80,10 @@ describe('Contributor dashboard page', () => {
     userService = TestBed.inject(UserService);
     focusManagerService = TestBed.inject(FocusManagerService);
 
-    spyOn(contributionOpportunitiesService, 'getTranslatableTopicNamesAsync')
-      .and.returnValue(Promise.resolve(['Topic 1', 'Topic 2']));
+    getTranslatableTopicNamesAsyncSpy = spyOn(
+      contributionOpportunitiesService, 'getTranslatableTopicNamesAsync');
+    getTranslatableTopicNamesAsyncSpy.and.returnValue(
+      Promise.resolve(['Topic 1', 'Topic 2']));
     spyOn(localStorageService, 'getLastSelectedTranslationLanguageCode').and
       .returnValue('');
     spyOn(localStorageService, 'getLastSelectedTranslationTopicName').and
@@ -99,7 +102,6 @@ describe('Contributor dashboard page', () => {
     spyOn(userService, 'getUserContributionRightsDataAsync')
       .and.returnValue(Promise.resolve(userContributionRights));
     getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
-
     getUserInfoAsyncSpy.and.returnValue(
       Promise.resolve(userInfo as UserInfo));
 
@@ -124,7 +126,7 @@ describe('Contributor dashboard page', () => {
 
     component.scrollFunction();
 
-    expect(component.defaultHeaderVisible).toBeFalse();
+    expect(component.defaultHeaderVisible).toBeTrue();
   });
 
   it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
@@ -144,14 +146,31 @@ describe('Contributor dashboard page', () => {
   }));
 
   describe('when user is logged in', () => {
-    it('should set specific properties after $onInit is called', () => {
-      expect(component.topicName).toBe('All');
-      expect(translationTopicService.setActiveTopicName)
-        .toHaveBeenCalled();
-      expect(component.activeTabName).toBe('myContributionTab');
-      expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
-        '/assets/images/avatar/oppia_avatar_100px.svg');
-    });
+    it('should set specific properties after $onInit is called',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        expect(component.topicName).toBe('Topic 1');
+        expect(translationTopicService.setActiveTopicName)
+          .toHaveBeenCalled();
+        expect(component.activeTabName).toBe('myContributionTab');
+        expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
+          '/assets/images/avatar/oppia_avatar_100px.svg');
+      }));
+
+    it('should not set active topic name when no topics are returned',
+      fakeAsync(() => {
+        getTranslatableTopicNamesAsyncSpy.and.returnValue(
+          Promise.resolve([]));
+
+        component.ngOnInit();
+        tick();
+
+        expect(component.topicName).toBe(undefined);
+        expect(translationTopicService.setActiveTopicName)
+          .not.toHaveBeenCalled();
+      }));
 
     it('should return language description in kebab case format', () => {
       let languageDescription = 'Deutsch (German)';
@@ -163,7 +182,7 @@ describe('Contributor dashboard page', () => {
     it('should initialize $scope properties after controller is initialized' +
       ' and get data from backend', () => {
       expect(component.userIsLoggedIn).toBe(false);
-      expect(component.username).toBe(null);
+      expect(component.username).toBe('');
       expect(component.userCanReviewQuestions).toBe(false);
       expect(component.userIsReviewer).toBe(false);
       expect(component.profilePictureDataUrl).toBe(null);
@@ -235,10 +254,10 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should show default header if window pageYOffset is ' +
-      'less than 5', () => {
+      'less than 80', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 4
+        pageYOffset: 79
       });
 
       component.scrollFunction();
@@ -247,10 +266,10 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 5', fakeAsync(() => {
+      ' scrolled greater than 80', fakeAsync(() => {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 6
+        pageYOffset: 81
       });
 
       component.scrollFunction();

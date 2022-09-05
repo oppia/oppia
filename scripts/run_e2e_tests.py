@@ -100,31 +100,36 @@ _PARSER.add_argument(
 
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
-    'blogDashboard',
-    'collections',
-    'contributorDashboard',
-    'creatorDashboard',
-    'learner',
-    'learnerDashboard',
-    'preferences',
-    'profileFeatures',
-    'profileMenu',
-    'subscriptions',
-    'topicAndStoryEditor',
-    'topicAndStoryEditorFileUploadFeatures',
-    'topicAndStoryViewer',
-    'users',
-]
-
-SUITES_STILL_IN_PROTRACTOR = [
     'accessibility',
     'additionalEditorFeatures',
     'additionalEditorFeaturesModals',
     'additionalPlayerFeatures',
     'adminPage',
+    'blogDashboard',
+    'checkpointFeatures',
     'classroomPage',
     'classroomPageFileUploadFeatures',
+    'collections',
+    'contributorDashboard',
     'coreEditorAndPlayerFeatures',
+    'creatorDashboard',
+    'learner',
+    'learnerDashboard',
+    'navigation',
+    'preferences',
+    'profileFeatures',
+    'profileMenu',
+    'skillEditor',
+    'subscriptions',
+    'topicsAndSkillsDashboard',
+    'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures',
+    'topicAndStoryViewer',
+    'users',
+    'wipeout',
+]
+
+SUITES_STILL_IN_PROTRACTOR = [
     'embedding',
     'explorationImprovementsTab',
     'explorationFeedbackTab',
@@ -137,12 +142,8 @@ SUITES_STILL_IN_PROTRACTOR = [
     'fileUploadExtensions',
     'learner',
     'library',
-    'navigation',
     'playVoiceovers',
     'publication',
-    'topicsAndSkillsDashboard',
-    'skillEditor',
-    'wipeout',
 ]
 
 

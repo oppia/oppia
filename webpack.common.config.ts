@@ -104,6 +104,9 @@ module.exports = {
     learner_group_creator:
       commonPrefix + '/pages/learner-group-pages/create-group/' +
       'create-learner-group-page.import.ts',
+    learner_group_editor:
+      commonPrefix + '/pages/learner-group-pages/edit-group/' +
+      'edit-learner-group-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
@@ -504,6 +507,17 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
+    new HtmlWebpackPlugin({
+      chunks: ['learner_group_editor'],
+      filename: 'edit-learner-group-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/learner-group-pages/edit-group/' +
+        'edit-learner-group-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
@@ -520,8 +534,8 @@ module.exports = {
     // For statically inserted bundles we handle this logic in
     // core/templates/pages/footer_js_libs.html.
     new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css',
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css',
       ignoreOrder: false,
       insert: function(linkTag) {
         if (localStorage.getItem('direction') === 'rtl') {

@@ -18,32 +18,56 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { of } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { OutcomeEditorComponent } from './outcome-editor.component';
+
+class MockWindowDimensionsService {
+  getResizeEvent() {
+    return of(new Event('resize'));
+  }
+
+  getWidth(): number {
+    // Screen width of iPhone 12 Pro (to simulate a mobile viewport).
+    return 390;
+  }
+}
 
 describe('Outcome Editor Component', () => {
   let component: OutcomeEditorComponent;
   let fixture: ComponentFixture<OutcomeEditorComponent>;
   let externalSaveService: ExternalSaveService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
+  let ngbModal: NgbModal;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let windowDimensionsService: MockWindowDimensionsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+      ],
       declarations: [
-        OutcomeEditorComponent
+        OutcomeEditorComponent,
+        AddOutcomeModalComponent
       ],
       providers: [
         ExternalSaveService,
         StateEditorService,
         StateInteractionIdService,
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -56,6 +80,8 @@ describe('Outcome Editor Component', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    ngbModal = TestBed.inject(NgbModal);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -76,11 +102,18 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = outcome;
 
+    const windowResizeSpy = spyOn(
+      windowDimensionsService, 'getResizeEvent').and.callThrough();
+
     expect(component.savedOutcome).toBeUndefined();
 
     component.ngOnInit();
+    fixture.detectChanges();
 
     expect(component.savedOutcome).toEqual(outcome);
+    expect(windowResizeSpy).toHaveBeenCalled();
+    expect(component.resizeSubscription).not.toBe(undefined);
+    expect(component.onMobile).toBeTrue();
   });
 
   it('should save feedback on external save event when editFeedbackForm is' +
@@ -155,6 +188,54 @@ describe('Outcome Editor Component', () => {
     onInteractionIdChangedEmitter.emit();
 
     expect(component.saveThisDestination).toHaveBeenCalled();
+  });
+
+  it('should save destination for the stuck learner on interaction change' +
+    ' when state is not invalid after destination save', () => {
+    let onInteractionIdChangedEmitter = new EventEmitter();
+    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
+      .and.returnValue(onInteractionIdChangedEmitter);
+    spyOn(component, 'saveThisIfStuckDestination');
+
+    component.ngOnInit();
+
+    component.destinationIfStuckEditorIsOpen = true;
+
+    onInteractionIdChangedEmitter.emit();
+
+    expect(component.saveThisIfStuckDestination).toHaveBeenCalled();
+  });
+
+  it('should cancel destination if-stuck edit correctly', () => {
+    component.ngOnInit();
+
+    // Setup. No pre-check as we are setting up values below.
+    component.destinationIfStuckEditorIsOpen = true;
+    component.savedOutcome = new Outcome(
+      'Introduction',
+      'Stuck state',
+      new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Saved Outcome',
+      'Changed state',
+      new SubtitledHtml('<p>Outcome</p>', 'Id'),
+      true,
+      [],
+      '',
+      '',
+    );
+
+    // Action.
+    component.cancelThisIfStuckDestinationEdit();
+
+    // Post-check.
+    expect(component.destinationIfStuckEditorIsOpen).toBeFalse();
+    expect(component.outcome.destIfReallyStuck).toBe('Stuck state');
   });
 
   it('should cancel destination edit on interaction change when edit' +
@@ -296,6 +377,35 @@ describe('Outcome Editor Component', () => {
     expect(component.invalidStateAfterDestinationSave()).toBeTrue();
   });
 
+  it('should check if a destination for stuck learner forms a loop', () => {
+    let outcome = new Outcome(
+      'Me Llamo',
+      'Hola',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    component.outcome = outcome;
+    spyOn(stateEditorService, 'getActiveStateName')
+      .and.returnValue('Hola');
+
+    expect(component.isSelfLoopDestStuck(outcome)).toBeTrue();
+
+    outcome = new Outcome(
+      'Ma Llamo',
+      'Me Llmao',
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+    component.outcome = outcome;
+    expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
+  });
+
   it('should open feedback editor if it is editable', () => {
     component.feedbackEditorIsOpen = false;
     component.isEditable = true;
@@ -305,6 +415,36 @@ describe('Outcome Editor Component', () => {
     expect(component.feedbackEditorIsOpen).toBeTrue();
   });
 
+  it('should open feedback editor modal if it is editable', fakeAsync(() => {
+    const outcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        outcome: outcome
+      },
+      result: Promise.resolve({
+        outcome: outcome
+      })
+    } as NgbModalRef);
+
+    spyOn(component, 'saveThisFeedback').and.callFake(()=>{
+      component.feedbackEditorIsOpen = false;
+    });
+
+    component.isEditable = true;
+    component.openFeedbackEditorModal();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
+
   it('should open destination editor if it is editable', () => {
     component.destinationEditorIsOpen = false;
     component.isEditable = true;
@@ -312,6 +452,15 @@ describe('Outcome Editor Component', () => {
     component.openDestinationEditor();
 
     expect(component.destinationEditorIsOpen).toBeTrue();
+  });
+
+  it('should open destination if-stuck editor if it is editable', () => {
+    component.destinationIfStuckEditorIsOpen = false;
+    component.isEditable = true;
+
+    component.openDestinationIfStuckEditor();
+
+    expect(component.destinationIfStuckEditorIsOpen).toBeTrue();
   });
 
   it('should save correctness label when it is changed', () => {
@@ -474,6 +623,32 @@ describe('Outcome Editor Component', () => {
     expect(component.outcome.refresherExplorationId).toBe(null);
     expect(component.savedOutcome.refresherExplorationId).toBe(null);
     expect(component.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
+  });
+
+  it('should set the dest_if_really_stuck property correctly' +
+    'when the destination for the stuck learner is saved.', () => {
+    component.savedOutcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Dest',
+      'Stuck state',
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
+
+    component.saveThisIfStuckDestination();
+
+    expect(component.savedOutcome.destIfReallyStuck).toBe('Stuck state');
   });
 
   it('should check if outcome feedback exceeds 10000 characters', () => {

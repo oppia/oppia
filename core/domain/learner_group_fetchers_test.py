@@ -28,11 +28,11 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for skill fetchers."""
 
     FACILITATOR_ID = 'facilitator_user_1'
-    STUDENT_ID_1 = 'student_user_1'
-    STUDENT_ID_2 = 'student_user_2'
+    LEARNER_ID_1 = 'learner_user_1'
+    LEARNER_ID_2 = 'learner_user_2'
 
     def setUp(self) -> None:
-        super(LearnerGroupFetchersUnitTests, self).setUp()
+        super().setUp()
 
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()
@@ -40,7 +40,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
-            [self.FACILITATOR_ID], [self.STUDENT_ID_1, self.STUDENT_ID_2],
+            [self.FACILITATOR_ID], [self.LEARNER_ID_1, self.LEARNER_ID_2],
             ['subtopic_id_1'], ['story_id_1'])
 
     def test_get_new_learner_group_id(self) -> None:
@@ -77,14 +77,14 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(learner_groups), 1)
         self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)
 
-    def test_can_multi_students_share_progress(self) -> None:
-        learner_group_services.add_student_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID_1, True)
+    def test_can_multi_learners_share_progress(self) -> None:
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
 
-        learner_group_services.add_student_to_learner_group(
-            self.LEARNER_GROUP_ID, self.STUDENT_ID_2, False)
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_2, False)
 
         self.assertEqual(
-            learner_group_fetchers.can_multi_students_share_progress(
-                [self.STUDENT_ID_1, self.STUDENT_ID_2], self.LEARNER_GROUP_ID
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
             ), [True, False])

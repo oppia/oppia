@@ -39,13 +39,13 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
     USER_QUERY_2_ID = 'user_query_2_id'
 
     def setUp(self) -> None:
-        super(UserQueryServicesTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_user_id = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.user_query_model_1 = user_models.UserQueryModel(
             id=self.USER_QUERY_1_ID,

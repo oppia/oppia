@@ -59,7 +59,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     skill_id_3 = 'skill_3'
 
     def setUp(self):
-        super(TopicServicesUnitTests, self).setUp()
+        super().setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
@@ -1121,7 +1121,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_services.get_subtopic_page_by_id(
                 self.TOPIC_ID, 1, strict=False))
         self.assertIsNone(
-            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
+            suggestion_services.get_suggestion_by_id(
+                suggestion.suggestion_id, strict=False
+            )
+        )
 
     def test_delete_subtopic_with_skill_ids(self):
         changelist = [topic_domain.TopicChange({
@@ -1819,6 +1822,63 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
+
+    def test_get_topic_id_to_diagnostic_test_skill_ids(self):
+        fractions_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            fractions_id, self.user_id, name='Fractions',
+            url_fragment='fractions', description='Description of fraction',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': [self.skill_id_1]
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, fractions_id, changelist,
+            'Adds diagnostic test.')
+
+        additions_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            additions_id, self.user_id, name='Additions',
+            url_fragment='additions', description='Description of addition.',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': [self.skill_id_2]
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, additions_id, changelist,
+            'Adds diagnostic test.')
+
+        expected_dict = {
+            fractions_id: [self.skill_id_1],
+            additions_id: [self.skill_id_2]
+        }
+        self.assertEqual(
+            topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                [fractions_id, additions_id]), expected_dict)
+
+        error_msg = (
+            'No corresponding topic models exist for these topic IDs: %s.'
+            % (', '.join(['']))
+        )
+        with self.assertRaisesRegex(Exception, error_msg):
+            topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                [additions_id, 'incorrect_topic_id'])
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class

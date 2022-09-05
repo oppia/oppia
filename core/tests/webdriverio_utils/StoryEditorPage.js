@@ -178,6 +178,7 @@ var StoryEditorPage = function() {
   this.discardStoryChanges = async function() {
     await action.click('Show discard option button', discardOption);
     await action.click('Discard changes button', discardChangesButton);
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
@@ -264,7 +265,8 @@ var StoryEditorPage = function() {
   this.expectTitleToBe = async function(title) {
     await waitFor.visibilityOf(
       storyTitleField, 'Story Title Field takes too long to appear');
-    var storyTitleValue = await storyTitleField.getValue();
+    var storyTitleValue = await action.getValue(
+      'Story Title Field', storyTitleField);
     expect(storyTitleValue).toEqual(title);
   };
 
@@ -272,7 +274,8 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       storyDescriptionField,
       'Story Description Field takes too long to appear');
-    var storyDescriptionValue = await storyDescriptionField.getValue();
+    var storyDescriptionValue = await action.getValue(
+      'Story Description Field', storyDescriptionField);
     expect(storyDescriptionValue).toEqual(description);
   };
 

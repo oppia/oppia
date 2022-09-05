@@ -125,6 +125,7 @@ describe('Topic and Story viewer functionality', function() {
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+
     var url = await browser.getUrl();
     skillId = url.split('/')[4];
     await skillEditorPage.get(skillId);
@@ -133,7 +134,7 @@ describe('Topic and Story viewer functionality', function() {
       await skillEditorPage.moveToQuestionsTab();
       await skillEditorPage.clickCreateQuestionButton();
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('Question 1'));
+        await forms.toRichText('Question 1'), true);
       await explorationEditorMainTab.setInteraction(
         'TextInput', 'Placeholder', 5);
       await explorationEditorMainTab.addResponse(
@@ -161,6 +162,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
     await topicEditorPage.togglePracticeTab();
+    await topicEditorPage.addDiagnosticTestSkill('Skill TASV1');
     await topicEditorPage.addSubtopic(
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');
