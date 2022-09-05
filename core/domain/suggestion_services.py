@@ -310,6 +310,198 @@ def get_suggestion_by_id(
     return get_suggestion_from_model(model) if model else None
 
 
+@overload
+def get_translation_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.TranslationContributionStatsModel]: ...
+
+
+@overload
+def get_translation_contribution_stats_models(
+    stats_ids: List[str]
+) -> List[Optional[suggestion_models.TranslationContributionStatsModel]]: ...
+
+
+@overload
+def get_translation_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.TranslationContributionStatsModel]]: ...
+
+
+def get_translation_contribution_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.TranslationContributionStatsModel]]:
+    """Finds translation contribution stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(TranslationContributionStatsModel|None). The corresponding translation
+        contribution stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+
+    stats_models = (
+    suggestion_models.TranslationContributionStatsModel.get_multi(
+        list(stats_ids)))
+
+    if strict:
+        for model in stats_models:
+                if model is None:
+                    raise Exception(
+                        'The stats models do not exist for the given IDs.')
+
+    return stats_models
+
+
+@overload
+def get_translation_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.TranslationReviewStatsModel]: ...
+
+
+@overload
+def get_translation_review_stats_models(
+    stats_ids: List[str]
+) -> List[Optional[suggestion_models.TranslationReviewStatsModel]]: ...
+
+
+@overload
+def get_translation_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.TranslationReviewStatsModel]]: ...
+
+
+def get_translation_review_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.TranslationReviewStatsModel]]:
+    """Finds translation review stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(TranslationReviewStatsModel|None). The corresponding translation review
+        stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+
+    stats_models = (
+    suggestion_models.TranslationReviewStatsModel.get_multi(
+        list(stats_ids)))
+
+    if strict:
+        for model in stats_models:
+                if model is None:
+                    raise Exception(
+                        'The stats models do not exist for the given IDs.')
+
+    return stats_models
+
+
+@overload
+def get_question_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.QuestionContributionStatsModel]: ...
+
+
+@overload
+def get_question_contribution_stats_models(
+    stats_ids: List[str]
+) -> List[Optional[suggestion_models.QuestionContributionStatsModel]]: ...
+
+
+@overload
+def get_question_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.QuestionContributionStatsModel]]: ...
+
+
+def get_question_contribution_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.QuestionContributionStatsModel]]:
+    """Finds question contribution stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(QuestionContributionStatsModel|None). The corresponding question
+        contribution stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+
+    stats_models = (
+    suggestion_models.QuestionContributionStatsModel.get_multi(
+        list(stats_ids)))
+
+    if strict:
+        for model in stats_models:
+                if model is None:
+                    raise Exception(
+                        'The stats models do not exist for the given IDs.')
+
+    return stats_models
+
+
+@overload
+def get_question_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.QuestionReviewStatsModel]: ...
+
+
+@overload
+def get_question_review_stats_models(
+    stats_ids: List[str]
+) -> List[Optional[suggestion_models.QuestionReviewStatsModel]]: ...
+
+
+@overload
+def get_question_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.QuestionReviewStatsModel]]: ...
+
+
+def get_question_review_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.QuestionReviewStatsModel]]:
+    """Finds question review stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(QuestionReviewStatsModel|None). The corresponding question review
+        stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+
+    stats_models = (
+    suggestion_models.QuestionReviewStatsModel.get_multi(
+        list(stats_ids)))
+
+    if strict:
+        for model in stats_models:
+                if model is None:
+                    raise Exception(
+                        'The stats models do not exist for the given IDs.')
+
+    return stats_models
+
+
 def get_suggestions_by_ids(
     suggestion_ids: List[str]
 ) -> List[Optional[suggestion_registry.BaseSuggestion]]:
@@ -2031,6 +2223,12 @@ def _update_translation_contribution_stats_models(
     """
     stats_dict = {}
     for stat in translation_contribution_stats:
+        if stat.language_code is None:
+            raise Exception('Language code should not be None')
+        if stat.contributor_user_id is None:
+            raise Exception('Contributor user ID should not be None')
+        if stat.topic_id is None:
+            raise Exception('Topic ID should not be None')
         stat_id = (
             suggestion_models.TranslationContributionStatsModel.construct_id(
                 str(stat.language_code),
@@ -2041,15 +2239,13 @@ def _update_translation_contribution_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    stats_models = (
-        suggestion_models.TranslationContributionStatsModel.get_multi(
-            list(stats_ids)))
+    stats_models = get_translation_contribution_stats_models(list(stats_ids))
     stats_models_to_update: List[
         suggestion_models.TranslationContributionStatsModel] = []
     for stats_model in stats_models:
-        # We can confirm that stats_model will not be None since the for loop
-        # already gives the not None stats_model object. Hence we can rule out
-        # the possibility of None for mypy type checking.
+        # We can confirm that stats_model will not be None since we are
+        # checking None case in the get_translation_contribution_stats_models
+        # function.
         assert stats_model is not None
         stat = stats_dict[stats_model.id]
         stats_model.submitted_translations_count = (
@@ -2067,8 +2263,8 @@ def _update_translation_contribution_stats_models(
         stats_model.rejected_translation_word_count = (
             stat.rejected_translation_word_count)
         stats_model.contribution_dates = stat.contribution_dates
+        stats_models_to_update.append(stats_model)
 
-    assert stats_models_to_update is not None
     suggestion_models.TranslationContributionStatsModel.update_timestamps_multi(
         stats_models_to_update,
         update_last_updated_time=True)
@@ -2096,15 +2292,13 @@ def _update_translation_review_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    stats_models = (
-        suggestion_models.TranslationReviewStatsModel.get_multi(list(
-            stats_ids)))
+    stats_models = get_translation_review_stats_models(list(stats_ids))
     stats_models_to_update: List[
         suggestion_models.TranslationReviewStatsModel] = []
     for stats_model in stats_models:
-        # We can confirm that stats_model will not be None since the for loop
-        # already gives the not None stats_model object. Hence we can rule out
-        # the possibility of None for mypy type checking.
+        # We can confirm that stats_model will not be None since we are
+        # checking None case in the get_translation_review_stats_models
+        # function.
         assert stats_model is not None
         stat = stats_dict[stats_model.id]
         stats_model.reviewed_translations_count = (
@@ -2119,6 +2313,7 @@ def _update_translation_review_stats_models(
             stat.first_contribution_date)
         stats_model.last_contribution_date = (
             stat.last_contribution_date)
+        stats_models_to_update.append(stats_model)
 
     suggestion_models.TranslationReviewStatsModel.update_timestamps_multi(
         stats_models_to_update,
@@ -2147,15 +2342,13 @@ def _update_question_contribution_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    stats_models = (
-        suggestion_models.QuestionContributionStatsModel.get_multi(list(
-            stats_ids)))
+    stats_models = get_question_contribution_stats_models(list(stats_ids))
     stats_models_to_update: List[
         suggestion_models.QuestionContributionStatsModel] = []
     for stats_model in stats_models:
-        # We can confirm that stats_model will not be None since the for loop
-        # already gives the not None stats_model object. Hence we can rule out
-        # the possibility of None for mypy type checking.
+        # We can confirm that stats_model will not be None since we are
+        # checking None case in the get_question_contribution_stats_models
+        # function.
         assert stats_model is not None
         stat = stats_dict[stats_model.id]
         stats_model.submitted_questions_count = (
@@ -2166,6 +2359,7 @@ def _update_question_contribution_stats_models(
             stat.accepted_questions_without_reviewer_edits_count)
         stats_model.first_contribution_date = stat.first_contribution_date
         stats_model.last_contribution_date = stat.last_contribution_date
+        stats_models_to_update.append(stats_model)
 
     suggestion_models.QuestionContributionStatsModel.update_timestamps_multi(
         stats_models_to_update,
@@ -2194,15 +2388,13 @@ def _update_question_review_stats_models(
 
     stats_ids = stats_dict.keys()
 
-    stats_models = (
-        suggestion_models.QuestionReviewStatsModel.get_multi(
-            list(stats_ids)))
+    stats_models = get_question_review_stats_models(list(stats_ids))
     stats_models_to_update: List[
         suggestion_models.QuestionReviewStatsModel] = []
     for stats_model in stats_models:
-        # We can confirm that stats_model will not be None since the for loop
-        # already gives the not None stats_model object. Hence we can rule out
-        # the possibility of None for mypy type checking.
+        # We can confirm that stats_model will not be None since we are
+        # checking None case in the get_question_review_stats_models
+        # function.
         assert stats_model is not None
         stat = stats_dict[stats_model.id]
         stats_model.reviewed_questions_count = (
@@ -2213,6 +2405,7 @@ def _update_question_review_stats_models(
             stat.accepted_questions_with_reviewer_edits_count)
         stats_model.first_contribution_date = stat.first_contribution_date
         stats_model.last_contribution_date = stat.last_contribution_date
+        stats_models_to_update.append(stats_model)
 
     suggestion_models.QuestionReviewStatsModel.update_timestamps_multi(
         stats_models_to_update,
@@ -2381,14 +2574,14 @@ def update_translation_review_stats(
 
     translation_review_stat_model = (
         suggestion_models.TranslationReviewStatsModel.get(
-            suggestion.change.language_code, suggestion.final_reviewer_id,
+            suggestion.change.language_code, str(suggestion.final_reviewer_id),
             topic_id
         ))
 
     if translation_review_stat_model is None:
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=suggestion.change.language_code,
-            reviewer_user_id=suggestion.final_reviewer_id,
+            reviewer_user_id=str(suggestion.final_reviewer_id),
             topic_id=topic_id,
             reviewed_translations_count=1,
             reviewed_translation_word_count=content_word_count,
@@ -2540,12 +2733,12 @@ def update_question_review_stats(
     for topic_id in topic_ids:
         question_review_stat_model = (
             suggestion_models.QuestionReviewStatsModel.get(
-                suggestion.final_reviewer_id, topic_id
+                str(suggestion.final_reviewer_id), topic_id
             ))
 
         if question_review_stat_model is None:
             suggestion_models.QuestionReviewStatsModel.create(
-                reviewer_user_id=suggestion.final_reviewer_id,
+                reviewer_user_id=str(suggestion.final_reviewer_id),
                 topic_id=topic_id,
                 reviewed_questions_count=1,
                 accepted_questions_count=int(suggestion_is_accepted),

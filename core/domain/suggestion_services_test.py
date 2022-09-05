@@ -2203,7 +2203,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         """Sets up required topics and stories for translations.
 
         Returns:
-            Dict[str, str]. A dictionary of the change for the translations.
+            Dict[str, str]. A dictionary of the change object for the
+            translations.
         """
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -2238,6 +2239,42 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'translation_html': '<p>Translation for content.</p>'
         }
 
+    def test_get_translation_contribution_stats_for_invalid_id_with_strict_true(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The stats models do not exist for the given IDs.'):
+            suggestion_services.get_translation_contribution_stats_models(
+                ['invalid_id'])
+
+    def test_get_translation_review_stats_for_invalid_id_with_strict_true(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The stats models do not exist for the given IDs.'):
+            suggestion_services.get_translation_review_stats_models(
+                ['invalid_id'])
+
+    def test_get_question_contribution_stats_for_invalid_id_with_strict_true(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The stats models do not exist for the given IDs.'):
+            suggestion_services.get_question_contribution_stats_models(
+                ['invalid_id'])
+
+    def test_get_question_review_stats_for_invalid_id_with_strict_true(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The stats models do not exist for the given IDs.'):
+            suggestion_services.get_question_review_stats_models(
+                ['invalid_id'])
+    
     def test_update_translation_contribution_stats_when_submitting(
         self) -> None:
         change_dict = self._set_up_topics_and_stories_for_translations()
@@ -2262,6 +2299,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
+        # At this point we can confirm that there should be an assciated
+        # translation contribution stat object for the given IDs since we have
+        # called update_translation_contribution_stats_at_submission function
+        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2304,7 +2345,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # translation contribution stat object for the given IDs since we have
+        # called update_translation_contribution_stats_at_submission function
+        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2346,7 +2390,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # translation review stat object for the given IDs since we have
+        # called update_translation_review_stats function to create/update
+        # translation contribution stats.
         assert translation_review_stats_model is not None
         self.assertEqual(
             translation_review_stats_model.accepted_translations_count,
@@ -2359,6 +2406,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             6
         )
+        # At this point we can confirm that there should be an assciated
+        # translation contribution stat object for the given IDs since we have
+        # called update_translation_contribution_stats_at_submission function
+        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2401,7 +2452,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # translation contribution stat object for the given IDs since we have
+        # called update_translation_contribution_stats_at_submission function
+        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2441,7 +2495,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # translation review stat object for the given IDs since we have
+        # called update_translation_review_stats function to create/update
+        # translation contribution stats.
         assert translation_review_stats_model is not None
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count,
@@ -2458,6 +2515,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             6
         )
+        # At this point we can confirm that there should be an assciated
+        # translation contribution stat object for the given IDs since we have
+        # called update_translation_contribution_stats_at_submission function
+        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2500,7 +2561,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # translation contribution stat object for the given IDs since we have
+        # called update_translation_contribution_stats_at_submission function
+        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2551,7 +2615,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'hi', self.author_id, '0'
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # translation review stat object for the given IDs since we have
+        # called update_translation_review_stats function to create/update
+        # translation contribution stats.
         assert translation_review_stats_model is not None
         self.assertEqual(
             translation_review_stats_model.accepted_translations_count,
@@ -2569,7 +2636,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             .accepted_translations_with_reviewer_edits_count,
             1
         )
-
+        # At this point we can confirm that there should be an assciated
+        # translation contribution stat object for the given IDs since we have
+        # called update_translation_contribution_stats_at_submission function
+        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2668,7 +2738,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -2698,7 +2771,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.reviewer_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question review stat object for the given IDs since we have
+        # called update_question_review_stats function to create/update question
+        # contribution stats.
         assert question_review_stats_model is not None
         self.assertEqual(
             question_review_stats_model.accepted_questions_count,
@@ -2789,7 +2865,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -2825,7 +2904,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question review stat object for the given IDs since we have
+        # called update_question_review_stats function to create/update question
+        # contribution stats.
         assert question_review_stats_model is not None
         self.assertEqual(
             question_review_stats_model.accepted_questions_count,
@@ -2838,7 +2920,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             2
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -2926,7 +3011,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -2960,7 +3048,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question review stat object for the given IDs since we have
+        # called update_question_review_stats function to create/update question
+        # contribution stats.
         assert question_review_stats_model is not None
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count,
@@ -2977,7 +3068,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             2
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -3007,6 +3101,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
+        question_state_data = self._create_valid_question_data(
+            'default_state').to_dict()
         suggestion_change_1: Dict[
             str,
             Union[str, float, Dict[str, Union[
@@ -3015,8 +3111,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                'question_state_data': question_state_data,
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
@@ -3034,8 +3129,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                'question_state_data': question_state_data,
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
@@ -3053,9 +3147,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
-        change_question_dict = initial_suggestion.change.question_dict
-        question_state_data = change_question_dict[
-            'question_state_data']
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -3068,7 +3159,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -3113,7 +3207,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, topic_id
             )
         )
-
+        # At this point we can confirm that there should be an assciated
+        # question review stat object for the given IDs since we have
+        # called update_question_review_stats function to create/update question
+        # contribution stats.
         assert question_review_stats_model is not None
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count,
@@ -3130,6 +3227,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             1
         )
+        # At this point we can confirm that there should be an assciated
+        # question contribution stat object for the given IDs since we have
+        # called update_question_contribution_stats_at_submission function to
+        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
