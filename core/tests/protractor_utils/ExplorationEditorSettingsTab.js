@@ -127,14 +127,14 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setFirstState = async function(stateName) {
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    await action.click('State Dropdown element', initialStateSelect, true);
+    await action.click('State Dropdown element', initialStateSelect);
 
     await action.click(
-      'State name option', initialStateSelectOption(stateName), true);
+      'State name option', initialStateSelectOption(stateName));
     await action.click('Neutral element', neutralElement);
   };
 
@@ -156,7 +156,7 @@ var ExplorationEditorSettingsTab = function() {
       'Exploration Objective input', explorationObjectiveInput);
     await action.sendKeys(
       'Exploration Objective input', explorationObjectiveInput, objective);
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setTitle = async function(title) {

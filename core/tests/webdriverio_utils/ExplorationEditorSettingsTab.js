@@ -92,9 +92,8 @@ var ExplorationEditorSettingsTab = function() {
 
     expect(options.sort()).toEqual(names.sort());
 
-    // After opening dropdown and checking its options
-    // to close this dropdown we have written this piece
-    // of code.
+    // Now that we have opened the dropdown and
+    // checked its options, the below code closes the dropdown.
     await action.click(
       'State name option', initialStateSelectOption(selectedStateName));
     await action.click('Neutral element', neutralElement);
@@ -115,7 +114,6 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
-    await action.click('Neutral element', neutralElement);
     await waitFor.presenceOf(
       explorationCategory, 'Category input takes too long to be visible.');
     await (
@@ -124,7 +122,6 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setFirstState = async function(stateName) {
-    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
