@@ -421,7 +421,7 @@ def get_matching_story_syllabus_item_dicts(
         )
     ]
     matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
-    stories = story_fetchers.get_stories_by_ids(story_ids)
+    stories = story_fetchers.get_stories_by_ids(story_ids, strict=True)
 
     matching_story_syllabus_item_dicts: List[
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
@@ -429,8 +429,6 @@ def get_matching_story_syllabus_item_dicts(
     for ind, story_summary in enumerate(matching_stories):
         if keyword is None or keyword in story_summary.title.lower():
             story = stories[ind]
-            # Ruling out the possibility of None for mypy type checking.
-            assert story is not None
             summary_dict = story_summary.to_dict()
             matching_story_syllabus_item_dicts.append({
                 'id': summary_dict['id'],
