@@ -19,9 +19,11 @@
 
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
@@ -32,11 +34,13 @@ describe('Classroom page functionality', function() {
   var classroomPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
+  var skillEditorPage = null;
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = (
@@ -81,12 +85,23 @@ describe('Classroom page functionality', function() {
         await
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 1', 'Concept card explanation', false));
+      await skillEditorPage.addRubricExplanationForDifficulty(
+        'Easy', 'Second explanation for easy difficulty.');
+      await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+      // A minimum of two questions are required for skill to get assigned in a
+      // topic’s diagnostic test.
+      await workflow.createQuestion();
+      await workflow.createQuestion();
+
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.assignSkillToTopic(
         'Skill 1', 'Topic 1');
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+
+      await topicEditorPage.addDiagnosticTestSkill('Skill 1');
+
       await topicEditorPage.addSubtopic(
         'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
         'Subtopic content');
