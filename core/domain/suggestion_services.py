@@ -338,8 +338,8 @@ def get_translation_contribution_stats_models(
         strict: bool. Whether to fail noisily if no stat with given ids exists.
 
     Returns:
-        list(TranslationContributionStatsModel|None). The corresponding translation
-        contribution stats for the given IDs.
+        list(TranslationContributionStatsModel|None). The corresponding
+        translation contribution stats for the given IDs.
 
     Raises:
         Exception. The stats models do not exist for the given IDs.
@@ -351,9 +351,9 @@ def get_translation_contribution_stats_models(
 
     if strict:
         for model in stats_models:
-                if model is None:
-                    raise Exception(
-                        'The stats models do not exist for the given IDs.')
+            if model is None:
+                raise Exception(
+                    'The stats models do not exist for the given IDs.')
 
     return stats_models
 
@@ -399,9 +399,9 @@ def get_translation_review_stats_models(
 
     if strict:
         for model in stats_models:
-                if model is None:
-                    raise Exception(
-                        'The stats models do not exist for the given IDs.')
+            if model is None:
+                raise Exception(
+                    'The stats models do not exist for the given IDs.')
 
     return stats_models
 
@@ -447,9 +447,9 @@ def get_question_contribution_stats_models(
 
     if strict:
         for model in stats_models:
-                if model is None:
-                    raise Exception(
-                        'The stats models do not exist for the given IDs.')
+            if model is None:
+                raise Exception(
+                    'The stats models do not exist for the given IDs.')
 
     return stats_models
 
@@ -495,9 +495,9 @@ def get_question_review_stats_models(
 
     if strict:
         for model in stats_models:
-                if model is None:
-                    raise Exception(
-                        'The stats models do not exist for the given IDs.')
+            if model is None:
+                raise Exception(
+                    'The stats models do not exist for the given IDs.')
 
     return stats_models
 
@@ -2220,15 +2220,20 @@ def _update_translation_contribution_stats_models(
     Args:
         translation_contribution_stats: list(TranslationContributionStats).
             A list of TranslationContributionStats domain objects.
+    
+    Raises:
+        Exception. Language code should not be None.
+        Exception. Contributor user ID should not be None.
+        Exception. Topic ID should not be None.       
     """
     stats_dict = {}
     for stat in translation_contribution_stats:
         if stat.language_code is None:
-            raise Exception('Language code should not be None')
+            raise Exception('Language code should not be None.')
         if stat.contributor_user_id is None:
-            raise Exception('Contributor user ID should not be None')
+            raise Exception('Contributor user ID should not be None.')
         if stat.topic_id is None:
-            raise Exception('Topic ID should not be None')
+            raise Exception('Topic ID should not be None.')
         stat_id = (
             suggestion_models.TranslationContributionStatsModel.construct_id(
                 str(stat.language_code),

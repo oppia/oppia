@@ -2274,7 +2274,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'The stats models do not exist for the given IDs.'):
             suggestion_services.get_question_review_stats_models(
                 ['invalid_id'])
-    
+
     def test_update_translation_contribution_stats_when_submitting(
         self) -> None:
         change_dict = self._set_up_topics_and_stories_for_translations()
