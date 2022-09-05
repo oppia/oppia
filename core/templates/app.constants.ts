@@ -71,6 +71,8 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
+    INVALID_REDIRECTION: 'Learner should not be directed back by more than' +
+      ' 3 cards in the lesson.'
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
@@ -88,6 +90,7 @@ export const AppConstants = {
 
   // We use a slash because this character is forbidden in a state name.
   PLACEHOLDER_OUTCOME_DEST: '/',
+  PLACEHOLDER_OUTCOME_DEST_IF_STUCK: '/',
   INTERACTION_DISPLAY_MODE_INLINE: 'inline',
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
@@ -102,6 +105,10 @@ export const AppConstants = {
     UNICODE_STRING: 'UnicodeString',
   },
 
+  // Flag to toggle the support for a new state to direct the learners
+  // to if they get stuck.
+  DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
+
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,
   // The following variable must be at least 3. It represents the maximum
@@ -111,6 +118,10 @@ export const AppConstants = {
   // If an $http request fails with the following error codes, a warning is
   // displayed.
   FATAL_ERROR_CODES: [400, 401, 404, 500],
+
+  // Maximum number of states the learner can be directed back from a state
+  // by an editor in an exploration.
+  MAX_CARD_COUNT_FOR_VALID_REDIRECTION: 3,
 
   // Do not modify these, for backwards-compatibility reasons. These strings are
   // used to identify components, to generate content ids, and to determine what

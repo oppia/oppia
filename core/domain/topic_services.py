@@ -1452,3 +1452,42 @@ def update_subtopic_thumbnail_filename(
         raise Exception(
             'The thumbnail %s for subtopic with topic_id %s does not exist'
             ' in the filesystem.' % (new_thumbnail_filename, topic.id))
+
+
+def get_topic_id_to_diagnostic_test_skill_ids(topic_ids):
+    """Returns a dict with topic ID as key and a list of diagnostic test
+    skill IDs as value.
+
+    Args:
+        topic_ids: List(str). A list of topic IDs.
+
+    Raises:
+        Exception. The topic models for some of the given topic IDs do not
+            exist.
+
+    Returns:
+        dict(str, list(str)). A dict with topic ID as key and a list of
+        diagnostic test skill IDs as value.
+    """
+    topic_id_to_diagnostic_test_skill_ids = {}
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+
+    for topic in topics:
+        if topic is None:
+            continue
+        topic_id_to_diagnostic_test_skill_ids[topic.id] = (
+            topic.skill_ids_for_diagnostic_test)
+
+    correct_topic_ids = list(topic_id_to_diagnostic_test_skill_ids.keys())
+    # The topic IDs for which topic models do not exist are referred to as
+    # incorrect topic IDs.
+    incorrect_topic_ids = [
+        topic_id for topic_id in topic_ids if topic_id not in correct_topic_ids
+    ]
+    if incorrect_topic_ids:
+        error_msg = (
+            'No corresponding topic models exist for these topic IDs: %s.'
+            % (', '.join(incorrect_topic_ids))
+        )
+        raise Exception(error_msg)
+    return topic_id_to_diagnostic_test_skill_ids

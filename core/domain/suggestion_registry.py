@@ -1910,28 +1910,27 @@ class ContributorMilestoneEmailInfo:
 
     Attributes:
         contributor_user_id: str. The ID of the contributor.
-        language_code: str. The language code of the suggestion.
+        language_code: str|None. The language code of the suggestion.
         contribution_type: str. The type of the contribution i.e.
             translation or question.
         contribution_sub_type: str. The sub type of the contribution
             i.e. submissions/acceptances/reviews/edits.
-        contributions_count: int. The number of contributions made to
-            reach the milestone.
+        rank_name: str. The name of the rank that the contributor achieved.
     """
 
     def __init__(
         self,
         contributor_user_id: str,
         contribution_type: str,
-        contribution_sub_type: str,
-        language_code: str,
-        contributions_count: int
+        contribution_subtype: str,
+        language_code: Optional[str],
+        rank_name: str
     ) -> None:
         self.contributor_user_id = contributor_user_id
         self.contribution_type = contribution_type
-        self.contribution_sub_type = contribution_sub_type
+        self.contribution_subtype = contribution_subtype
         self.language_code = language_code
-        self.contributions_count = contributions_count
+        self.rank_name = rank_name
 
 
 class ContributorStatsSummaryDict(TypedDict):
