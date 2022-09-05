@@ -2128,6 +2128,21 @@ describe('ImageEditor', () => {
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func(obj);
     });
+    spyOn(window, 'GifFrames').and.resolveTo([{
+      getImage: () => {
+        return {
+          toDataURL: () => {
+            return {
+              image: dataGif.uploadedImageData
+            };
+          }
+        };
+      },
+      frameInfo: {
+        disposal: 1
+      },
+    }] as never);
+
     spyOn(component, 'saveImage').and.callThrough();
     spyOn(component, 'validateProcessedFilesize').and.stub();
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
@@ -2199,7 +2214,7 @@ describe('ImageEditor', () => {
     }, 150);
   });
 
-  it('should alert user if resampled gif file is not obtained when the user' +
+  fit('should alert user if resampled gif file is not obtained when the user' +
   ' saves image', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
@@ -2217,6 +2232,20 @@ describe('ImageEditor', () => {
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func(obj);
     });
+    spyOn(window, 'GifFrames').and.resolveTo([{
+      getImage: () => {
+        return {
+          toDataURL: () => {
+            return {
+              image: dataGif.uploadedImageData
+            };
+          }
+        };
+      },
+      frameInfo: {
+        disposal: 1
+      },
+    }] as never);
     spyOn(component, 'saveImage').and.callThrough();
     spyOn(component, 'validateProcessedFilesize').and.stub();
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
@@ -2233,18 +2262,6 @@ describe('ImageEditor', () => {
       .and.returnValue(null);
 
     component.saveUploadedFile();
-    tick(200);
-
-    let req = httpTestingController.expectOne(
-      '/createhandler/imageupload/question/2'
-    );
-    expect(req.request.method).toEqual('POST');
-    req.flush({
-      filename: 'img_20210701_185457_qgrrul296o_height_200_width_260.gif'
-    });
-    httpTestingController.verify();
-
-    tick(100);
 
     expect(alertsService.addWarning)
       .toHaveBeenCalledWith('Could not get resampled file.');
