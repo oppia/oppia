@@ -294,7 +294,8 @@ def check_shards_match_tests(include_load_tests=True):
             if shard_modules.count(module) != 1:
                 return '{} duplicated in {}'.format(
                     module, SHARDS_SPEC_PATH)
-        raise Exception('Failed to find  module duplicated in shards.') # pragma: no cover
+        raise Exception(
+            'Failed to find  module duplicated in shards.') # pragma: no cover
 
     # Since there are no duplicates among the shards, we know the
     # problem must be a module in one list but not the other.
