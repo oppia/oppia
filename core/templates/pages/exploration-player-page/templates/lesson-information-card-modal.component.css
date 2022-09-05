@@ -433,6 +433,12 @@
   word-break: break-word;
 }
 
+.save-progress-menu .uid-box .uid-copy .uid-btn-container {
+  margin-left: 2%;
+  position: relative;
+  width: 20%;
+}
+
 .save-progress-menu .uid-box .uid-copy .uid-copy-btn {
   box-shadow: 1px 1px 2px 0 rgba(0, 100, 92, 0.8);
   color: #00645c;
@@ -441,34 +447,33 @@
   font-weight: 700;
   margin: 0 auto;
   position: relative;
-  width: 20%;
+  width: 100%;
 }
 
-.save-progress-menu .uid-box .uid-copy ::before {
+.save-progress-menu .uid-box .uid-copy .uid-btn-container .uid-btn-message-box {
   background-color: #00645c;
-  border-radius: 2px;
+  border-radius: 4px;
   color: white;
-  content: "Copied!";
   cursor: default;
-  /* display: none; */
+  display: none;
   font-size: 14px;
   font-style: Roboto, sans-serif;
   padding: 8px 10px;
   position: absolute;
   right: 0;
-  top: -50px;
+  top: -45px;
 }
 
-.save-progress-menu .uid-box .uid-copy ::after {
+.save-progress-menu .uid-box .uid-copy .uid-btn-container .uid-btn-message-arrow {
   background-color: #00645c;
   color: white;
   content: "";
   cursor: default;
-  /* display: none; */
+  display: none;
   height: 10px;
   position: absolute;
-  right: 25px;
-  top: -20px;
+  right: 28px;
+  top: -15px;
   transform: rotate(45deg);
   width: 10px;
 }

@@ -189,7 +189,11 @@
     <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
     <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
       <div class="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
-      <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
+      <div class="uid-btn-container">
+        <div class="uid-btn-message-box">Copied !</div>
+        <div class="uid-btn-message-arrow"></div>
+        <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
+      </div>
     </div>
   </div>
   <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
