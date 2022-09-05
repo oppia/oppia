@@ -47,7 +47,8 @@ describe('NumericInputValidationService', () => {
     lessThanOrEqualToOneRuleLessThanZero: Rule,
     greaterThanOrEqualToNegativeOneRule: Rule,
     zeroWithinToleranceOfOneRule: Rule,
-    zeroWithinToleranceOfOneRuleLessThanZero: Rule;
+    zeroWithinToleranceOfOneRuleLessThanZero: Rule,
+    nonPositiveToleranceRule: Rule;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
@@ -140,6 +141,14 @@ describe('NumericInputValidationService', () => {
           tol: 1
         }
       }, 'NumericInput');
+    nonPositiveToleranceRule =
+      rof.createFromBackendDict({
+        rule_type: 'IsWithinTolerance',
+        inputs: {
+          x: 2,
+          tol: -1
+        }
+      }, 'NumericInput');
     lessThanOneRuleLessThanZero = rof.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
@@ -175,6 +184,17 @@ describe('NumericInputValidationService', () => {
       ' or equal to zero.'
     }]);
   });
+
+  it('should show warning if tolerance is not positive for IsWithinTolerance',
+    () => {
+      answerGroups[0].rules = [nonPositiveToleranceRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 1 tolerance must be a positive value.'
+      }]);
+    });
 
   it('should show warning if input less than zero for IsWithinTolerance',
     () => {
