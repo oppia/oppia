@@ -2931,13 +2931,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         #     return False
         # return True
 
-        if earlier_rule['rule_type'] != 'IsExactlyEqualTo':
-            return True
-        return later_rule['rule_type'] in (
-            'IsExactlyEqualTo', 'IsEquivalentTo',
-            'IsEquivalentToAndInSimplestForm'
-        )
-
         if earlier_rule['rule_type'] in (
             'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan'
             'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
