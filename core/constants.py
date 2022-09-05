@@ -27,8 +27,8 @@ import re
 from typing import Any, Dict
 
 
-# Here we use Dict[str, Any] as return type because we need to parse and return
-# generic JSON objects.
+# Here we use type Any because we need to parse and return the generic JSON
+# objects and these JSON objects are of type Dict[str, Any].
 def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
     """Extracts JSON object from TS file.
 
@@ -43,6 +43,8 @@ def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
     json_start = text_without_comments.find('{\n')
     # Add 1 to index returned because the '}' is part of the JSON object.
     json_end = text_without_comments.rfind('}') + 1
+    # Here we use type Any because 'json_dict' is a generic JSON object and
+    # generic JSON objects are of type Dict[str, Any].
     json_dict: Dict[str, Any] = (
         json.loads(text_without_comments[json_start:json_end]))
     return json_dict
@@ -94,17 +96,19 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return file_data.decode('utf-8')
 
 
+# Here we use MyPy ignore because error thrown is 'Missing type parameters
+# for type "dict"' but here we don't need to specify this.
 class Constants(dict):  # type: ignore[type-arg]
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
-    # Here `value` has the type Any because it parses and stores the values of
-    # contants defined in constants.ts file and we cannot define a single type
+    # Here we use type Any because this method parses and stores the values of
+    # constants defined in constants.ts file and we cannot define a single type
     # which works for all of them.
     def __setattr__(self, name: str, value: Any) -> None:
         self[name] = value
 
-    # The return value here refers to the `value` in the above method, hence the
-    # type Any is used for it.
+    # Here we use type Any because the return value here refers to the `value`
+    # in the above method, hence the type Any is used for it.
     def __getattr__(self, name: str) -> Any:
         return self[name]
 

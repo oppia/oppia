@@ -113,14 +113,14 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Using Dict[str, Any] because this class inherits this attribute
+    # Here we use type Any because this class inherits this attribute
     # from core.controllers.base.BaseModel.
     URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Using Dict[str, Any] because this class inherits this attribute
+    # Here we use type Any because this class inherits this attribute
     # from core.controllers.base.BaseModel.
     HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
@@ -133,7 +133,7 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "post" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def post(self) -> None:
@@ -145,7 +145,7 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access # type: ignore[misc]
     def get(self) -> None:
@@ -156,7 +156,7 @@ class WarmupPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    # Using type ignore[misc] here because untyped decorator makes function
+    # Here we use MyPy ignore because untyped decorator makes function
     # "get" also untyped.
     @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
@@ -1113,11 +1113,13 @@ class NdbWsgiMiddleware:
         environ: Dict[str, str],
         start_response: webapp2.Response
     ) -> webapp2.Response:
+        # Here we use MyPy ignore because cache_services is of ModuleType
+        # and ModuleType does not contain 'CLOUD_NDB_REDIS_CLIENT' attribute.
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            # Cast is needed since webapp2.WSGIApplication is not
-            # correctly typed.
+            # Here we use cast because webapp2.WSGIApplication is not
+            # correctly typed in it's stubs.
             return cast(
                 webapp2.Response, self.wsgi_app(environ, start_response))
 

@@ -90,8 +90,9 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
 # result in any errors.
 # Note to developers: please keep this in sync with
 #     https://github.com/oppia/oppia/wiki/Schema-Based-Forms
-# The following types have recurive type definition, and currently mypy does
-# not support it, hence we are using type Any here.
+# Here we use type Any because the following types have recursive type
+# definition, and currently mypy does not support it, hence we are using
+# type Any here.
 # See - https://github.com/python/mypy/issues/731
 UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
@@ -130,8 +131,9 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
 }
 
 # Schemas for validators for the various types.
-# The following types have recurive type definition, and currently mypy does
-# not support it, hence we are using type Any here.
+# Here we use type Any because the following types have recursive type
+# definition, and currently mypy does not support it, hence we are
+# using type Any here.
 # See - https://github.com/python/mypy/issues/731
 VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
@@ -220,8 +222,8 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
 }
 
 
-# The type of `validator` is Dict[str, Any] here because its values represent
-# objects for normalization, and they can have any type.
+# Here we use type Any because the argument `validator` represent objects
+# for normalization, and they can have any type.
 def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
     """Validates the value of a UI configuration.
 
@@ -242,8 +244,8 @@ def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
             value, reference_dict[key])
 
 
-# The type of `validator` is Dict[str, Any] here because its values represent
-# objects for normalization, and they can have any type.
+# Here we use type Any because the argument `validator` represent objects
+# for normalization, and they can have any type.
 def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
     """Validates the value of a 'validator' field.
 
@@ -292,9 +294,9 @@ def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
                     set(customization_keys + ['obj']))))
 
 
-# Here the type chosen for `dict_to_check` is Dict[str, Any] because here we are
-# only concerned about the keys of the dictionary, not its values. Using Any for
-# dictionary values helps us achieve that.
+# Here we use type Any because here we are only concerned about the keys
+# of the 'dict_to_check' dictionary, not its values. Using Any for dictionary
+# values helps us achieve that.
 def _validate_dict_keys(
         dict_to_check: Dict[str, Any],
         required_keys: List[str],
@@ -318,8 +320,8 @@ def _validate_dict_keys(
         'Extra keys: %s' % dict_to_check)
 
 
-# The type Dict[str, Any] is used as type for schema because it can have a
-# recursive structure and mypy doesn't support recursive type currently.
+# Here we use type Any because schema can have a recursive structure and
+# mypy doesn't support recursive type currently.
 # See: https://github.com/python/mypy/issues/731
 def validate_schema(schema: Dict[str, Any]) -> None:
     """Validates a schema.
@@ -470,16 +472,11 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         }]
     }
 
-    # The following types have recurive type definition, and currently mypy does
-    # not support it, hence we are using type Any here.
-    # See - https://github.com/python/mypy/issues/731
-    GLOBAL_VALIDATORS: List[Dict[str, Any]] = [{
+    GLOBAL_VALIDATORS: List[Dict[str, str]] = [{
         'id': 'does_not_contain_email'
     }]
 
-    # We are only concerned with dictionary keys here and the method should work
-    # regardless of dictionary value type, hence using type Any for it.
-    def arbitary_method(self, obj: Dict[str, Any]) -> None:
+    def arbitary_method(self, obj: Dict[str, str]) -> None:
         """Only required for testing.
 
         Args:
@@ -652,8 +649,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        # The following types have recurive type definition, and currently mypy
-        # does not support it, hence we are using type Any here.
+        # Here we use type Any because the following types have recursive type
+        # definition, and currently mypy does not support it, hence we are using
+        # type Any here.
         # See - https://github.com/python/mypy/issues/731
         valid_schemas: List[Dict[str, Any]] = [{
             'type': 'float'
@@ -724,6 +722,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         for schema in valid_schemas:
             validate_schema(schema)
         for schemas, error_msg in invalid_schemas_with_error_messages:
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
             with self.assertRaisesRegex((AssertionError, KeyError), error_msg):
                 validate_schema(schemas) # type: ignore[arg-type]
 
@@ -960,8 +961,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
 
-    # `schema` has recursive type definition, and currently mypy does not
-    # support it, hence we are using type Any here.
+    # Here we use type Any because `schema` has recursive type definition,
+    # and currently mypy does not support it, hence we are using type Any here.
     # See - https://github.com/python/mypy/issues/731
     # `mappings` has type Tuple[Any, Any] because objects for normalization and
     # normalized objects can have any type.
@@ -1026,9 +1027,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             'type': schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE,
         }
         mappings = [('a', 'a'), ('', ''), (b'bytes', 'bytes'), (None, None)]
-        # Type Any used because its passed as an argument to check_normalization
-        # method defined above.
-        invalid_values_with_error_messages: List[Tuple[List[Any], str]] = [
+        invalid_values_with_error_messages: List[Tuple[List[str], str]] = [
             ([], r'Expected unicode string or None, received'),
         ]
         self.check_normalization(
