@@ -386,8 +386,8 @@ def get_translation_review_stats_models(
         strict: bool. Whether to fail noisily if no stat with given ids exists.
 
     Returns:
-        list(TranslationReviewStatsModel|None). The corresponding translation review
-        stats for the given IDs.
+        list(TranslationReviewStatsModel|None). The corresponding translation
+        review stats for the given IDs.
 
     Raises:
         Exception. The stats models do not exist for the given IDs.
