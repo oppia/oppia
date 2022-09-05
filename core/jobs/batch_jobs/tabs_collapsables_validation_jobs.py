@@ -55,52 +55,61 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
         soup = bs4.BeautifulSoup(html, 'html.parser')
         for tag in soup.find_all():
             if tag.name == 'oppia-noninteractive-image':
-                if 'alt-with-value' not in tag:
-                    states_with_errored_values.append(
-                        'alt attr not exists'
-                    )
-
-                else:
-                    if tag['alt-with-value'] in ('&quot;&quot;', ''):
+                try:
+                    print("**************************")
+                    print(tag['alt-with-value'].strip() in ('&quot;&quot;', '', ""))
+                    print(tag['alt-with-value'].strip() == " ")
+                    print(tag['alt-with-value'])
+                    print(type(tag['alt-with-value']))
+                    if tag['alt-with-value'] in ('&quot;&quot;', '', ""):
                         states_with_errored_values.append(
                             'alt attr is empty'
                         )
 
-                if 'filepath-with-value' not in tag:
+                except Exception:
                     states_with_errored_values.append(
-                        'filepath attr not exists'
+                        'alt attr not exists'
                     )
 
-                else:
-                    if tag['filepath-with-value'] in ('&quot;&quot;', ''):
+                try:
+                    if tag['filepath-with-value'] in ('&quot;&quot;', '', ""):
                         states_with_errored_values.append(
                             'filepath attr is empty'
                         )
 
-            elif tag.name == 'oppia-noninteractive-math':
-                if 'math_content-with-value' not in tag:
+                except Exception:
                     states_with_errored_values.append(
-                        'math content attr not exists'
+                        'filepath attr not exists'
                     )
-                else:
-                    if 'raw_latex' not in tag['math_content-with-value']:
+
+                try:
+                    tag['caption-with-value']
+                except Exception:
+                    states_with_errored_values.append(
+                        'caption attr not exists'
+                    )
+
+            elif tag.name == 'oppia-noninteractive-math':
+                try:
+                    if tag['math_content-with-value'] in ('', ""):
+                        states_with_errored_values.append(
+                            'math content attr is empty'
+                        )
+                    try:
+                        if tag['math_content-with-value'][
+                            'raw_latex'].strip() in ('&quot;&quot;', '', ""):
+                            states_with_errored_values.append(
+                                'raw lattex attr empty'
+                            )
+                    except Exception:
                         states_with_errored_values.append(
                             'raw lattex attr not exists'
                         )
-                    elif tag['math_content-with-value'][
-                        'raw_latex'].strip() in ('&quot;&quot;', ''):
-                        states_with_errored_values.append(
-                            'raw lattex attr empty'
-                        )
 
-                    if 'svg_filename' not in tag['math_content-with-value']:
-                        states_with_errored_values.append(
-                            'svg_filename attr not exists'
-                        )
-                    else:
+                    try:
                         svg_filename = tag['math_content-with-value'][
                             'svg_filename']
-                        if svg_filename.strip() in ('&quot;&quot;', ''):
+                        if svg_filename.strip() in ('&quot;&quot;', '', ""):
                             states_with_errored_values.append(
                                 'svg_filename attr empty'
                             )
@@ -109,62 +118,88 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                                 'svg_filename attr does not have svg extension'
                             )
 
+                    except Exception:
+                        states_with_errored_values.append(
+                            'svg_filename attr not exists'
+                        )
+
+                except Exception:
+                    states_with_errored_values.append(
+                        'math content attr not exists'
+                    )
+
             elif tag.name == 'oppia-noninteractive-skillreview':
-                if 'text-with-value' not in tag:
+                try:
+                    if tag['text-with-value'].strip() in (
+                        '&quot;&quot;', '', ""):
+                        states_with_errored_values.append(
+                            'text attr empty in skillreview tag'
+                        )
+
+                except Exception:
                     states_with_errored_values.append(
                         'text attr not in skillreview tag'
                     )
-                elif tag['text-with-value'].strip() in ('&quot;&quot;', ''):
-                    states_with_errored_values.append(
-                        'text attr empty in skillreview tag'
-                    )
 
             elif tag.name == 'oppia-noninteractive-video':
-                if 'start-with-value' not in tag:
+                try:
+                    tag['start-with-value']
+
+                except Exception:
                     states_with_errored_values.append(
                         'start value invalid'
                     )
 
-                if 'end-with-value' not in tag:
+                try:
+                    tag['end-with-value']
+
+                except Exception:
                     states_with_errored_values.append(
                         'end value invalid'
                     )
 
-                if 'autoplay-with-value' not in tag:
-                    states_with_errored_values.append(
-                        'autoplay value invalid'
-                    )
-
-                else:
+                try:
                     if tag['autoplay-with-value'] not in ('true', 'false'):
                         states_with_errored_values.append(
                             'autoplay value invalid'
                         )
 
-                if 'video_id-with-value' not in tag:
+                except Exception:
                     states_with_errored_values.append(
-                        'No video id'
+                        'autoplay value invalid'
                     )
 
-                else:
+                try:
                     if tag['video_id-with-value'].strip() in (
                         '&quot;&quot;', ''):
                         states_with_errored_values.append(
                             'video id empty'
                         )
 
-            elif tag.name == 'oppia-noninteractive-link':
-                if (
-                    'text-with-value' not in tag or
-                    'url-with-value' not in tag
-                ):
+                except Exception:
                     states_with_errored_values.append(
-                        'No text or url attr in link tag'
+                        'No video id'
                     )
 
-                elif tag['text-with-value'].strip() in ('&quot;&quot;', ''):
+            elif tag.name == 'oppia-noninteractive-link':
+                try:
+                    if tag['text-with-value'].strip() in (
+                        '&quot;&quot;', '', ""):
+                        states_with_errored_values.append(
+                            'text attr empty in link tag'
+                        )
+
+                except Exception:
                     states_with_errored_values.append(
-                        'text attr empty in link tag'
+                        'No text attr in link tag'
+                    )
+
+                try:
+                    tag['url-with-value']
+
+                except Exception:
+                    states_with_errored_values.append(
+                        'No url attr in link tag'
                     )
 
             elif tag.name == 'oppia-noninteractive-tabs':
@@ -176,8 +211,6 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                 states_with_errored_values.append(
                     'Nested collapsables'
                 )
-
-        states_with_errored_values = list(set(states_with_errored_values))
 
     @staticmethod
     def invalid_tabs_rte_tag(
@@ -192,7 +225,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             states_dict: dict[str, state_domain.State]. The state dictionary.
 
         Returns:
-            
+
         """
         errored_values = []
         for state_name, state in states_dict.items():
@@ -207,15 +240,20 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     )
                 tab_content_json = html_validation_service.unescape_html(
                     tag['tab_contents-with-value'])
-                print("*************************************")
-                print(tab_content_json)
 
-                print("*************************************")
-                print(html_validation_service.escape_html(
-                    tab_content_json))
                 tab_content_list = json.loads(tab_content_json)
-                print("*************************************")
+
+                # abcd = "<p>Content</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><oppia-noninteractive-image></oppia-noninteractive-image><p>&nbsp;</p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-link><oppia-noninteractive-link></oppia-noninteractive-link></p><p>&nbsp;</p><p><oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}\"></oppia-noninteractive-math><oppia-noninteractive-math></oppia-noninteractive-math><oppia-noninteractive-math math_content-with-value=\'\'></oppia-noninteractive-math></p><p>&nbsp;</p><p><oppia-noninteractive-skillreview skill_id-with-value=\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-skillreview><oppia-noninteractive-skillreview></oppia-noninteractive-skillreview></p><oppia-noninteractive-video autoplay-with-value=\"&amp;quot;&amp;quot;\" end-with-value=\"&amp;quot;&amp;quot;\" start-with-value=\"&amp;quot;&amp;quot;\" video_id-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-video><oppia-noninteractive-video></oppia-noninteractive-video>"
+                # efgh = "<p>Content</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;dssddsdssdsd&amp;quot;\" caption-with-value=\"&amp;quot;sdds&amp;quot;\" filepath-with-value=\"&amp;quot;img.svg&amp;quot;\"></oppia-noninteractive-image><p>&nbsp;</p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;link&amp;quot;\" url-with-value=\"&amp;quot;https://www.example.com&amp;quot;\"></oppia-noninteractive-link></p><p>&nbsp;</p><p><oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220905_011442_tq4lzh784k_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\"></oppia-noninteractive-math></p><p>&nbsp;</p><p><oppia-noninteractive-skillreview skill_id-with-value=\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;concept card&amp;quot;\"></oppia-noninteractive-skillreview></p><oppia-noninteractive-video autoplay-with-value=\"&amp;quot;&amp;quot;\" end-with-value=\"&amp;quot;&amp;quot;\" start-with-value=\"&amp;quot;&amp;quot;\" video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;quot;\"></oppia-noninteractive-video>"
+
+                # tab_content_list[1]['content'] = abcd
+
+                print("**********************************")
                 print(tab_content_list)
+
+                # print("**********************************")
+                # print(html_validation_service.escape_html(json.dumps(tab_content_list)))
+
                 if len(tab_content_list) == 0:
                     states_with_errored_values.append('No tabs')
                 for tab_content in tab_content_list:
@@ -231,7 +269,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         'errored_values': states_with_errored_values
                     }
                 )
-        print(state.name.abc)
+        # print(state.name.abc)
         return errored_values
 
     @staticmethod
