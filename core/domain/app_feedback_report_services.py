@@ -545,14 +545,14 @@ def save_feedback_report_to_storage(
 
     report.validate()
     user_supplied_feedback = report.user_supplied_feedback
-    # Here we use cast because this method is not implemented for web
-    # platform. So, to narrow down the type from DeviceSystemContext to
+    # Here we use cast because this method is currently not implemented for
+    # web platform. So, to narrow down the type from DeviceSystemContext to
     # AndroidDeviceSystemContext, we used cast here.
     device_system_context = cast(
         app_feedback_report_domain.AndroidDeviceSystemContext,
         report.device_system_context)
-    # Here we use cast because this method is not implemented for web
-    # platform. So, to narrow down the type from AppContext to
+    # Here we use cast because this method is currently not implemented
+    # for web platform. So, to narrow down the type from AppContext to
     # AndroidAppContext, we used cast here.
     app_context = cast(
         app_feedback_report_domain.AndroidAppContext, report.app_context)

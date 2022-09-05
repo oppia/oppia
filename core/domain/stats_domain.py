@@ -66,6 +66,7 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
+# TODO(#1595): Narrow down this Dict type to each issue customization arg type.
 IssuesCustomizationArgsDictType = Dict[
     str, Dict[str, Union[str, int, List[str]]]
 ]

@@ -96,8 +96,10 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         return file_data.decode('utf-8')
 
 
-# Here we use MyPy ignore because error thrown is 'Missing type parameters
-# for type "dict"' but here we don't need to specify this.
+# Here we use MyPy ignore because here error thrown by MyPy is
+# 'Missing type parameters for type "dict"' but here we don't need
+# to specify type parameters because we are inheriting dict only
+# for implementation purpose.
 class Constants(dict):  # type: ignore[type-arg]
     """Transforms dict to object, attributes can be accessed by dot notation."""
 

@@ -263,7 +263,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # Here we use MyPy ignore because get_multi has namespace argument,
         # which can accept only keys of DESERIALIZATION_FUNCTIONS Dict and
         # 'invalid' is not one of them. So, we don't have any overload function
-        # for 'invalid' key. that's why we added call-overload ignore here.
+        # for 'invalid' key but still we are passing 'invalid' to function which
+        # causes MyPy to throw a error. Thus to avoid error, we used ignore.
         with self.assertRaisesRegex(
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):

@@ -627,7 +627,7 @@ def get_canonical_story_dicts(
         # which do not contain topic_url_fragment, story_is_published and
         # other keys. To overcome this missing keys issue, we have defined
         # a CannonicalStoryDict and assigned it to the `story_summary_dict`.
-        # Due to this a conflict in type assignment is raised which cause
+        # So, due to this a conflict in type assignment is raised which cause
         # MyPy to throw `Incompatible types in assignment` error. Thus to
         # avoid error, we used ignore here.
         story_summary_dict: CannonicalStoryDict = (

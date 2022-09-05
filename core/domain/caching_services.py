@@ -415,11 +415,11 @@ def set_multi(
     memory_cache_id_value_mapping = {
         _get_memcache_key(namespace, sub_namespace, obj_id):
         # Here we use MyPy ignore because 'SERIALIZATION_FUNCTIONS[namespace]'
-        # is a function which can accept arguments of type Exploration,
-        # Collection, and etc. But instead of providing them as individual type
-        # we are providing these types as a Union (AllowedCacheableObjectTypes).
-        # So, because of this MyPy throws an error. Thus to avoid the error, we
-        # used ignore here.
+        # is a function which can accept argument of type Exploration,
+        # Collection, and etc, but instead of providing argument as
+        # individual type we are providing argument as a Union type
+        # (AllowedCacheableObjectTypes). So, because of this MyPy throws
+        # an error. Thus to avoid the error, we used ignore here.
         SERIALIZATION_FUNCTIONS[namespace](value)  # type: ignore[arg-type]
         for obj_id, value in id_value_mapping.items()
     }

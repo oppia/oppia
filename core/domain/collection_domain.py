@@ -569,9 +569,9 @@ class Collection:
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
         # Here we use MyPy ignore because CollectionDict is defined to match
-        # the current version of domain object and here in _convert_* functions,
-        # we can ignore some MyPy errors as we work with the previous versions
-        # of the domain objects.
+        # the current version of Collection domain object and here in _convert_*
+        # functions, we can ignore some MyPy errors as we work with the previous
+        # versions of the domain objects.
         collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
         # Here we use MyPy ignore because 'next_skill_id' key is
         # deprecated from the latest domain object and while accessing
@@ -742,9 +742,9 @@ class Collection:
         skill_names = set()
         for node in collection_contents['nodes']:
             # Here we use MyPy ignore because CollectionNodeDict is defined
-            # to match the current version of domain object and here in
-            # _convert_* functions, we can ignore some MyPy errors as we
-            # work with the previous versions of the domain objects.
+            # to match the current version of CollectionNode domain object
+            # and here in _convert_* functions, we can ignore some MyPy errors
+            # as we work with the previous versions of the domain objects.
             skill_names.update(node['acquired_skills']) # type: ignore[misc]
             # Here we use MyPy ignore because 'prerequisite_skills' key is
             # deprecated from the latest domain object and while accessing
@@ -756,8 +756,9 @@ class Collection:
         }
         # Here we use MyPy ignore because collection_contents['nodes']
         # can accept list of CollectionNodeDicts, but here we are providing
-        # a list of older version dict of domain object instead of
-        # CollectionNodeDict, which causes MyPy to throw an error.
+        # a list of older version dict of CollectionNode domain object instead
+        # of CollectionNodeDict, which causes MyPy to throw an error. Thus to
+        # avoid the error, we used ignore here.
         collection_contents['nodes'] = [{ # type: ignore[typeddict-item]
             'exploration_id': node['exploration_id'],
             'prerequisite_skill_ids': [
@@ -769,9 +770,9 @@ class Collection:
         } for node in collection_contents['nodes']]
 
         # Here we use MyPy ignore because CollectionDict is defined to match
-        # the current version of domain object and here in _convert_* functions,
-        # we can ignore some MyPy errors as we work with the previous versions
-        # of the domain objects.
+        # the current version of Collection domain object and here in _convert_*
+        # functions, we can ignore some MyPy errors as we work with the previous
+        # versions of the domain objects.
         collection_contents['skills'] = { # type: ignore[misc]
             skill_id: {
                 'name': skill_name,

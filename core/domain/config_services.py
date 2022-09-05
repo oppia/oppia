@@ -26,7 +26,7 @@ from typing import Any
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
-# Here we use type Any because value of a particular property can be bool,
+# Here we use type Any because value of a particular property can be a bool,
 # str, List[Dict], Dict, int and other types too. so, Any type has to be
 # used for value parameter.
 def set_property(committer_id: str, name: str, value: Any) -> None:

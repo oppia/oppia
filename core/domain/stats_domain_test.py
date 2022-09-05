@@ -1098,7 +1098,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         self.assertFalse(exploration_issue == different_issue)
 
-    # TODO(#15982): Here we use type Any because currently customization
+    # TODO(#15995): Here we use type Any because currently customization
     # args are typed according to the codebase implementation, which can
     # be considered as loose type. But once the customization args are
     # implemented properly. we can remove this Any type and this todo also.

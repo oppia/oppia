@@ -359,8 +359,9 @@ def save_classifier_data(
     content = utils.compress_to_zlib(
         # Here we use MyPy ignore because classifier_data_proto is of general
         # object type and general objects do not contain any extra methods and
-        # properties. Thus to avoid MyPy error, we added an [attr-defined]
-        # ignore statement.
+        # properties but for implementation we are accessing 'SerializeToString'
+        # method on classifier_data_proto which causes MyPy to throw a error.
+        # Thus to avoid the error, we added an [attr-defined] ignore statement.
         classifier_data_proto.SerializeToString())  # type: ignore[attr-defined]
     fs.commit(
         filepath, content, mimetype='application/octet-stream')
