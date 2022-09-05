@@ -248,23 +248,55 @@ def get_topic_by_id(
             return None
 
 
+@overload
+def get_topics_by_ids(
+    topic_ids: List[str], *, strict: Literal[True]
+) -> List[topic_domain.Topic]: ...
+
+
+@overload
 def get_topics_by_ids(
     topic_ids: List[str]
-) -> List[Optional[topic_domain.Topic]]:
+) -> List[Optional[topic_domain.Topic]]: ...
+
+
+@overload
+def get_topics_by_ids(
+    topic_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[topic_domain.Topic]]: ...
+
+
+def get_topics_by_ids(
+    topic_ids: List[str], strict: bool = False
+) -> Sequence[Optional[topic_domain.Topic]]:
     """Returns a list of topics matching the IDs provided.
 
     Args:
         topic_ids: list(str). List of IDs to get topics for.
+        strict: bool. Whether to fail noisily if no topic model exists
+            with a given ID exists in the datastore.
 
     Returns:
         list(Topic|None). The list of topics corresponding to given ids
         (with None in place of topic ids corresponding to deleted topics).
+
+    Raises:
+        Exception. No topic Model exist for the given topic_id.
     """
     all_topic_models: List[Optional[topic_models.TopicModel]] = (
-        topic_models.TopicModel.get_multi(topic_ids))
-    topics: List[Optional[topic_domain.Topic]] = [
-        get_topic_from_model(topic_model) if topic_model is not None else None
-        for topic_model in all_topic_models]
+        topic_models.TopicModel.get_multi(topic_ids)
+    )
+    topics: List[Optional[topic_domain.Topic]] = []
+    for index, topic_model in enumerate(all_topic_models):
+        if topic_model is None:
+            if strict:
+                raise Exception(
+                    'No topic Model exist for the topic_id: %s'
+                    % topic_ids[index]
+                )
+            topics.append(topic_model)
+        elif topic_model is not None:
+            topics.append(get_topic_from_model(topic_model))
     return topics
 
 

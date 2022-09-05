@@ -366,6 +366,15 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
 
+    def test_raises_error_if_topics_fetched_with_invalid_ids_and_strict(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No topic Model exist for the topic_id: invalid_id'
+        ):
+            topic_fetchers.get_topics_by_ids(['invalid_id'], strict=True)
+
     def test_get_all_topic_rights_of_user(self) -> None:
         topic_rights: List[topic_domain.TopicRights] = (
             topic_fetchers.get_topic_rights_with_user(self.user_id_a)
