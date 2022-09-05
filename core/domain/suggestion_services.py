@@ -2182,7 +2182,8 @@ def _get_all_question_review_stats(
         for model in question_review_stats_models
     ]
 
-
+# TODO(https://shorturl.at/deLSV): pre-fetching and caching of stats data should be
+# done.
 def get_all_contributor_stats(
     user_id: str
 ) -> suggestion_registry.ContributorStatsSummary:
