@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.2.7",
+  "version": "3.2.8",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -163,6 +163,7 @@
     "d3-scale": "^3.2.1",
     "dayjs": "^1.8.35",
     "default-passive-events": "^2.0.0",
+    "dequeue": "^1.0.5",
     "fabric": "^4.1.0",
     "firebase": "^8.10.0",
     "gif-frames": "^1.0.1",
