@@ -2182,8 +2182,9 @@ def _get_all_question_review_stats(
         for model in question_review_stats_models
     ]
 
-# TODO(https://shorturl.at/deLSV): pre-fetching and caching of stats data should be
-# done.
+
+# TODO(https://shorturl.at/deLSV): pre-fetching and caching of stats data
+# should be done.
 def get_all_contributor_stats(
     user_id: str
 ) -> suggestion_registry.ContributorStatsSummary:
@@ -2747,7 +2748,7 @@ def update_question_review_stats(
                 reviewer_user_id=str(suggestion.final_reviewer_id),
                 topic_id=topic_id,
                 reviewed_questions_count=1,
-                accepted_questions_count=int(suggestion_is_accepted),
+                accepted_questions_count=(1 if suggestion_is_accepted else 0),
                 accepted_questions_with_reviewer_edits_count=int(
                     suggestion.edited_by_reviewer),
                 first_contribution_date=_get_date_as_string(
@@ -2795,7 +2796,7 @@ def increment_translation_contribution_stats_at_review(
         .accepted_translations_without_reviewer_edits_count
     ) += int(edited_by_reviewer)
     translation_contribution_stat.accepted_translation_word_count += (
-        content_word_count * int(suggestion_is_accepted))
+       0 if not suggestion_is_accepted else content_word_count)
     translation_contribution_stat.rejected_translations_count += int(
         not suggestion_is_accepted)
     translation_contribution_stat.rejected_translation_word_count += (
