@@ -77,6 +77,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_BUTTON": "Удалить мою учётную запись",
 	"I18N_DELETE_ACCOUNT_PAGE_HEADING": "Удалить учётную запись",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "Обзор",
+	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "Теперь вы можете указать новую карточку, в которой вы сможете рассказать учащимся о тех идеях, которые используются в вопросе, в случае, когда они застряли на месте!",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Перетащите изображение в эту область",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Загрузить файл",
 	"I18N_DONATE_PAGE_BROWSER_TAB_TITLE": "Пожертвовать | Сделайте положительный вклад | Oppia",

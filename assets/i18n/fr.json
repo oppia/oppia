@@ -255,6 +255,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO": "Cela vous conduira vers une page où vous pourrez supprimer votre compte Oppia.",
 	"I18N_DELETE_ACCOUNT_PAGE_TITLE": "Supprimer un compte | Oppia",
 	"I18N_DELETE_LEARNER_GROUP": "Supprimer le groupe",
+	"I18N_DEST_IF_STUCK_INFO_TOOLTIP": "Vous pouvez maintenant spécifier une nouvelle carte dans laquelle vous pouvez guider les élèves au travers des concepts utilisés dans la question, quand ils sont vraiment bloqués !",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Faire glisser une image dans cette zone",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Téléverser un fichier",
 	"I18N_DONATE_PAGE_BREADCRUMB": "Faire un don",
