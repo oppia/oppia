@@ -75,7 +75,8 @@ angular.module('oppia').component('historyTab', {
         // array items are directly manipulated based on indices on change.
         if (
           Number.isInteger(ctrl.selectedVersionsArray[0]) &&
-          Number.isInteger(ctrl.selectedVersionsArray[1])
+          Number.isInteger(ctrl.selectedVersionsArray[1]) &&
+          ctrl.selectedVersionsArray.length === 2
         ) {
           ctrl.changeCompareVersion();
           ctrl.hideHistoryGraph = false;
