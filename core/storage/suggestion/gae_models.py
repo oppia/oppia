@@ -21,7 +21,7 @@ import datetime
 from core import feconf
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union
 from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False

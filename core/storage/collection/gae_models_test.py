@@ -29,7 +29,7 @@ from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, List
+from typing import Dict, List
 from typing_extensions import Final
 
 MYPY = False

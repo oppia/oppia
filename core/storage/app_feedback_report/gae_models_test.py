@@ -360,7 +360,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             with self.swap(
                 model_class, 'query',
                 self._mock_query_filters_returns_empty_list):
-                # Using type ignore[arg-type] because we passes arg of type
+                # Here we use MyPy ignore because we passes arg of type
                 # InvalidFilter to type class filter_field_names. This is done
                 # to ensure that InvalidInputException is thrown.
                 model_class.get_filter_options_for_field(

@@ -27,7 +27,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
+from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
 from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False
