@@ -287,7 +287,7 @@ def check_shards_match_tests(include_load_tests=True):
         # A module is duplicated, so we find the duplicate.
         # All elements in a set are unique and when
         # len(set(shard_modules)) != len(shard_modules), there has to be
-        # atleast one duplicate module in shard_modules.
+        # at least one duplicate module in shard_modules.
         # We add no-cover for the branch condition where the loop terminates
         # instead of being exited early by return statement.
         for module in shard_modules: # pragma: no cover
