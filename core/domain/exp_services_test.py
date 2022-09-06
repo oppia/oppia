@@ -6389,7 +6389,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(story_id, self.albert_id, topic_id)
-        topic_services.add_canonical_story(self.albert_id, topic_id, story_id)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(self.albert_id, topic_id, story_id)
         change_list = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -6632,7 +6632,7 @@ title: Old Title
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(story_id, user_id, topic_id)
-        topic_services.add_canonical_story(user_id, topic_id, story_id)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(user_id, topic_id, story_id)
         change_list_story = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,

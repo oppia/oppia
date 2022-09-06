@@ -804,15 +804,22 @@ class StoryContents:
 
     @overload
     def get_node_index(
-        self,
-        node_id: str,
+        self, node_id: str,
     ) -> int: ...
 
     @overload
     def get_node_index(
-        self,
-        node_id: str,
-        strict: bool = False
+        self, node_id: str, *, strict: Literal[True]
+    ) -> int: ...
+
+    @overload
+    def get_node_index(
+        self, node_id: str, *, strict: Literal[False]
+    ) -> Optional[int]: ...
+
+    @overload
+    def get_node_index(
+        self, node_id: str, *, strict: bool = ...
     ) -> Optional[int]: ...
 
     def get_node_index(
