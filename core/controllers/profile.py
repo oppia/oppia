@@ -187,6 +187,8 @@ class ProfilePictureDataUrlHandler(base.BaseHandler):
         data = self.payload.get('data')
         user_services.update_profile_picture_data_url(self.user_id, data)
 
+        self.render_json({'data': data})
+
 
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
