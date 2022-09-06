@@ -48,8 +48,8 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
             self.web_inf_index_yaml_file.name, 'a', encoding='utf-8')
 
     def _run_test_for_extend_index_yaml(
-        self, index_yaml, web_inf_index_yaml, expected_index_yaml
-    ):
+        self, index_yaml: str, web_inf_index_yaml: str, expected_index_yaml: str
+    ) -> None:
         """Run tests for extend_index_yaml script."""
         with self.index_yaml_swap, self.web_inf_index_yaml_swap:
             with self.open_index_yaml_w as f:
@@ -66,7 +66,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
         self.index_yaml_file.close()
         self.web_inf_index_yaml_file.close()
 
-    def test_extend_index_yaml_with_changes(self):
+    def test_extend_index_yaml_with_changes(self) -> None:
         index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
@@ -111,7 +111,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
         self._run_test_for_extend_index_yaml(
             index_yaml, web_inf_index_yaml, expected_index_yaml)
 
-    def test_extend_index_yaml_without_changes(self):
+    def test_extend_index_yaml_without_changes(self) -> None:
         index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
@@ -139,7 +139,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
         self._run_test_for_extend_index_yaml(
             index_yaml, web_inf_index_yaml, index_yaml)
 
-    def test_extend_index_yaml_with_empty_web_inf_ind_yaml(self):
+    def test_extend_index_yaml_with_empty_web_inf_ind_yaml(self) -> None:
         index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
@@ -161,7 +161,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
         self._run_test_for_extend_index_yaml(
             index_yaml, web_inf_index_yaml, index_yaml)
 
-    def test_extend_index_yaml_with_same_kind(self):
+    def test_extend_index_yaml_with_same_kind(self) -> None:
         index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
@@ -218,7 +218,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
         self._run_test_for_extend_index_yaml(
             index_yaml, web_inf_index_yaml, expected_index_yaml)
 
-    def test_extend_index_yaml_with_same_kind_in_web_inf(self):
+    def test_extend_index_yaml_with_same_kind_in_web_inf(self) -> None:
         index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
@@ -276,7 +276,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
         self._run_test_for_extend_index_yaml(
             index_yaml, web_inf_index_yaml, expected_index_yaml)
 
-    def test_extend_index_yaml_with_same_kind_different_order(self):
+    def test_extend_index_yaml_with_same_kind_different_order(self) -> None:
         index_yaml = """indexes:
 
 - kind: AppFeedbackReportModel
