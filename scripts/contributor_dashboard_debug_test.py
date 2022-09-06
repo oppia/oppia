@@ -129,6 +129,12 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
     ) -> Any:
         """Returns a mock response for the given request."""
         if method == 'GET':
+            if url == '/session_begin':
+                cur_token = headers.get('Authorization', '').strip('Bearer ')
+                for email, token in self.token_by_email.items():
+                    if token == cur_token:
+                        self.mock_login_as_admin(email)
+                        break
             with self.swap(
                 base, 'load_template', test_utils.mock_load_template):
                 return self.testapp.get(url, params=params, headers=headers)
@@ -251,13 +257,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
                 (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, )
             ]
         )
-        establish_session_swap = self.swap(
-            auth_services, 'establish_auth_session',
-            self.mock_establish_auth_session)
 
         with self.request_swap, self.create_user_swap: 
-            with sign_in_swap, establish_session_swap:
-                with self.init_app_swap as init_app_counter:
+            with sign_in_swap, self.init_app_swap as init_app_counter:
                     self.initializer.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
@@ -293,14 +295,3 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.token_of_current_user = self.token_by_email[email]
         return MockResponse(json={'idToken': self.token_of_current_user})
 
-    def mock_establish_auth_session(
-        self,
-        request: webapp2.Request,
-        _: webapp2.Response
-    ) -> None:
-        """Mock for auth_services.establish_auth_session()."""
-        cur_token = request.headers.get('Authorization', '').strip('Bearer ')
-        for email, token in self.token_by_email.items():
-            if token == cur_token:
-                self.mock_login_as_admin(email)
-                break
