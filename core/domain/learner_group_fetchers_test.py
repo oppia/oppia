@@ -62,7 +62,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_raises_error_if_learner_group_model_is_fetched_with_strict_and_invalid_id(  # pylint: disable=line-too-long
         self
-    ):
+    ) -> None:
         with self.assertRaisesRegex(
             Exception,
             'No LearnerGroupsUserModel exists for the user_id: invalid_id'
