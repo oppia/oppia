@@ -17,7 +17,7 @@
  */
 
 import { DebugElement, SimpleChanges } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { OppiaRteParserService } from 'services/oppia-rte-parser.service';
 import { RichTextComponentsModule } from './rich-text-components.module';
