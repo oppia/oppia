@@ -19,21 +19,24 @@ from __future__ import annotations
 from core.platform import models
 from core.tests import test_utils
 
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import recommendations_models
 
-(base_models, recommendations_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.recommendations])
+(base_models, recommendations_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.recommendations
+])
 
 
 class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationRecommendationsModel class."""
 
-    RECOMMENDATION_1_ID = 'rec_1_id'
-    RECOMMENDATION_2_ID = 'rec_2_id'
-    RECOMMENDATION_3_ID = 'rec_3_id'
+    RECOMMENDATION_1_ID: Final = 'rec_1_id'
+    RECOMMENDATION_2_ID: Final = 'rec_2_id'
+    RECOMMENDATION_3_ID: Final = 'rec_3_id'
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
