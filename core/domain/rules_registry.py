@@ -88,7 +88,7 @@ class Registry:
                 )
                 spec_file = os.path.join(
                     feconf
-                    .LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,
+                    .LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,  # pylint: disable=line-too-long
                     file_name
                 )
 

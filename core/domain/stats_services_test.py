@@ -62,7 +62,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             self.exp_id, 'admin', title='Title 1', end_state_name='End',
             correctness_feedback_enabled=True)
 
-
     def test_raises_error_if_playthrough_model_fetched_with_invalid_id_and_strict(  # pylint: disable=line-too-long
         self
     ) -> None:
