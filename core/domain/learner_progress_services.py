@@ -1742,7 +1742,7 @@ def get_displayable_untracked_topic_summary_dicts(
                 'description': topic.description,
                 'language_code': topic.language_code,
                 'version': topic.version,
-                'story_titles': topic_services.get_story_titles_in_topic(  # type: ignore[no-untyped-call]
+                'story_titles': topic_services.get_story_titles_in_topic(
                     topic),
                 'total_published_node_count': untracked_topic_summaries[
                     index].total_published_node_count,
@@ -1794,7 +1794,7 @@ def get_displayable_topic_summary_dicts(
             'description': topic.description,
             'language_code': topic.language_code,
             'version': topic.version,
-            'story_titles': topic_services.get_story_titles_in_topic(topic),  # type: ignore[no-untyped-call]
+            'story_titles': topic_services.get_story_titles_in_topic(topic),
             'total_published_node_count': topic_summaries[
                 index].total_published_node_count,
             'thumbnail_filename': topic.thumbnail_filename,

@@ -248,7 +248,7 @@ def get_subtopic_page_contents_by_id(
 def save_subtopic_page(
     committer_id: str,
     subtopic_page: subtopic_page_domain.SubtopicPage,
-    commit_message: str,
+    commit_message: Optional[str],
     change_list: Sequence[change_domain.BaseChange]
 ) -> None:
     """Validates a subtopic page and commits it to persistent storage. If
@@ -259,7 +259,8 @@ def save_subtopic_page(
         committer_id: str. ID of the given committer.
         subtopic_page: SubtopicPage. The subtopic page domain object to be
             saved.
-        commit_message: str. The commit message.
+        commit_message: str|None. The commit description message, for
+            unpublished topics, it may be equal to None.
         change_list: list(SubtopicPageChange). List of changes applied to a
             subtopic page.
 
