@@ -697,8 +697,6 @@ def remove_story_reference_from_learner_groups(story_id: str) -> None:
 
     models_to_put = []
     for model in found_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         model.story_ids.remove(story_id)
         models_to_put.append(model)
 
@@ -731,8 +729,6 @@ def remove_subtopic_page_reference_from_learner_groups(
 
     models_to_put = []
     for model in found_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         model.subtopic_page_ids.remove(subtopic_page_id)
         models_to_put.append(model)
 
