@@ -86,6 +86,7 @@ import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-fo
 import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
 import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
 import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
+import { MatMenuModule} from '@angular/material/menu';
 
 @NgModule({
   imports: [
@@ -99,6 +100,7 @@ import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-an
     MatAutocompleteModule,
     ReactiveFormsModule,
     FormsModule,
+    MatMenuModule,
     MatPaginatorModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,

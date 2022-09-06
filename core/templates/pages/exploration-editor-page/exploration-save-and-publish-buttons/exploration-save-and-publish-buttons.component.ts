@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the exploration save & publish buttons.
+ * @fileoverview Component for the exploration save & publish buttons.
  */
 
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
@@ -48,7 +48,6 @@ export class ExplorationSaveAndPublishButtonsComponent
     private explorationRightsService: ExplorationRightsService,
     private editabilityService: EditabilityService,
     private changeListService: ChangeListService,
-    private changeDetectorRef: ChangeDetectorRef,
     private explorationWarningsService: ExplorationWarningsService,
     private explorationSaveService: ExplorationSaveService,
     private userExplorationPermissionsService:
@@ -150,7 +149,8 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.loadingDotsAreShown = true;
 
     this.explorationSaveService.showPublishExplorationModal(
-      this.showLoadingDots, this.hideLoadingAndUpdatePermission)
+      this.showLoadingDots.bind(this),
+      this.hideLoadingAndUpdatePermission.bind(this))
       .then(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
@@ -162,7 +162,8 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.loadingDotsAreShown = true;
 
     this.explorationSaveService.saveChangesAsync(
-      this.showLoadingDots, this.hideLoadingAndUpdatePermission)
+      this.showLoadingDots.bind(this),
+      this.hideLoadingAndUpdatePermission.bind(this))
       .then(() => {
         this.saveIsInProcess = false;
         this.loadingDotsAreShown = false;
@@ -179,7 +180,6 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.userExplorationPermissionsService.getPermissionsAsync()
       .then((permissions) => {
         this.explorationCanBePublished = permissions.canPublish;
-        this.changeDetectorRef.detectChanges();
       });
 
     this.directiveSubscriptions.add(
@@ -189,7 +189,6 @@ export class ExplorationSaveAndPublishButtonsComponent
             this.userExplorationPermissionsService.getPermissionsAsync()
               .then((permissions) => {
                 this.explorationCanBePublished = permissions.canPublish;
-                this.changeDetectorRef.detectChanges();
               });
           }
         )
@@ -208,7 +207,9 @@ export class ExplorationSaveAndPublishButtonsComponent
   }
 }
 
-angular.module('oppia').directive('explorationSaveAndPublishButtons',
+angular.module('oppia').directive(
+  'explorationSaveAndPublishButtons',
   downgradeComponent({
     component: ExplorationSaveAndPublishButtonsComponent
-  }) as angular.IDirectiveFactory);
+  }));
+
