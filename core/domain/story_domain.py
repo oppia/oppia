@@ -29,7 +29,7 @@ from core.constants import constants
 from core.domain import change_domain
 
 from typing import List, Optional, overload
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -614,15 +614,22 @@ class StoryContents:
 
     @overload
     def get_node_index(
-        self,
-        node_id: str,
+        self, node_id: str,
     ) -> int: ...
 
     @overload
     def get_node_index(
-        self,
-        node_id: str,
-        strict: bool = False
+        self, node_id: str, *, strict: Literal[True]
+    ) -> int: ...
+
+    @overload
+    def get_node_index(
+        self, node_id: str, *, strict: Literal[False]
+    ) -> Optional[int]: ...
+
+    @overload
+    def get_node_index(
+        self, node_id: str, *, strict: bool = ...
     ) -> Optional[int]: ...
 
     def get_node_index(
