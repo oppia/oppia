@@ -190,20 +190,24 @@ class DraftUpgradeUtil:
                         new_value['translations_mapping'].items()):
                     for language_code in (
                             language_code_to_written_translation.keys()):
-                        # In _convert_* functions, we allow less strict typing
-                        # because here we are working with previous versions
-                        # of the domain object and in previous versions of the
-                        # domain object there are some fields that are
-                        # discontinued in the latest domain object and here
-                        # 'html' field is discontinued. So, while accessing this
-                        # discontinued 'html' field MyPy throws an error. Thus
-                        # to avoid the error, we used ignore here.
-                        new_value['translations_mapping'][
-                            content_id][language_code]['html'] = (  # type: ignore[misc]
-                                conversion_fn(new_value[
-                                    'translations_mapping'][content_id][
-                                        language_code]['html'])  # type: ignore[misc]
-                            )
+                        translation_dict = new_value['translations_mapping'][
+                            content_id][language_code]
+                        if 'html' in translation_dict:
+                            # In _convert_* functions, we allow less strict
+                            # typing because here we are working with previous
+                            # versions of the domain object and in previous
+                            # versions of the domain object there are some
+                            # fields that are discontinued in the latest domain
+                            # object and here 'html' field is discontinued. So,
+                            # while accessing this discontinued 'html' field
+                            # MyPy throws an error. Thus to avoid the error,
+                            # we used ignore here.
+                            new_value['translations_mapping'][
+                                content_id][language_code]['html'] = (  # type: ignore[misc]
+                                    conversion_fn(new_value[
+                                        'translations_mapping'][content_id][
+                                            language_code]['html'])  # type: ignore[misc]
+                                )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   new_value is not None):
