@@ -164,9 +164,10 @@ var ExplorationEditorFeedbackTab = function() {
       feedbackResponseTextArea, feedbackResponse);
     await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
     var optionLabelFeedbackStatus = (
-      element(by.css(`option[label="${feedbackStatus}"]`)));
+      element(by.css(
+        '.e2e-test-oppia-feedback-status-' + feedbackStatus.toLowerCase())));
     await action.click(
-      'Option[label = "feedback status"', optionLabelFeedbackStatus);
+      'Option feedback status', optionLabelFeedbackStatus);
     await action.click(
       'Feedback Send Response Button', feedbackSendResponseButton);
   };

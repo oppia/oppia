@@ -112,7 +112,7 @@
           <span [hidden]="!(isExplorationEditable() && !activeThread.isSuggestionThread())">
             Change status (optional):
             <select class="e2e-test-oppia-feedback-status-menu" [(ngModel)]="tmpMessage.status" [disabled]="messageSendingInProgress">
-              <option *ngFor="let choice of STATUS_CHOICES" [value]="choice.id">{{ choice.text }}</option>
+              <option *ngFor="let choice of STATUS_CHOICES" class="e2e-test-oppia-feedback-status-{{choice.id}}" [value]="choice.id">{{ choice.text }}</option>
             </select>
             <div class="oppia-icon-container" *ngIf="!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable')">
               <i class="fas fa-info-circle"></i>
