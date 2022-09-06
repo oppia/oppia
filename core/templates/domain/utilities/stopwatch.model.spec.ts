@@ -82,10 +82,13 @@ describe('Stopwatch model', () => {
     // console.error needs to be spied.
     const errorLog = spyOn(console, 'error').and.callThrough();
     let stopwatch = Stopwatch.create();
+
     changeCurrentTime(1000);
     expect(stopwatch._getCurrentTime()).toBe(1000);
     stopwatch.reset();
+
     changeCurrentTime(10);
+
     expect(stopwatch._getCurrentTime()).toBe(10);
     expect(stopwatch.getTimeInSecs()).toEqual(0);
     expect(errorLog).toHaveBeenCalledWith(

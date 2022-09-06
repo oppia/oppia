@@ -108,8 +108,6 @@ describe('RTE display component', () => {
       component.rteString = rteString;
       component.ngOnChanges(changes);
       component.ngAfterViewInit();
-      fixture.detectChanges();
-      tick(1);
     }).toThrowError();
   }));
 });
