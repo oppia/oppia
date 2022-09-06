@@ -23,7 +23,6 @@ from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.domain import html_validation_service
@@ -46,22 +45,23 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class TabsCollapsablesValidationJob(base_jobs.JobBase):
-    """
-    """
+    """Job to test invalid RTE tabs and collapsibles tags"""
+
     @staticmethod
     def _filter_invalid_rte_values(html, states_with_errored_values):
-        """
+        """Validates the RTE tags
+
+        Args:
+            html: str. RTE tags present inside the tabs or collapsibles tag.
+            states_with_errored_values: List[str]. List containing RTE tag
+                errors.
         """
         soup = bs4.BeautifulSoup(html, 'html.parser')
         for tag in soup.find_all():
             if tag.name == 'oppia-noninteractive-image':
                 try:
-                    print("**************************")
-                    print(tag['alt-with-value'].strip() in ('&quot;&quot;', '', ""))
-                    print(tag['alt-with-value'].strip() == " ")
-                    print(tag['alt-with-value'])
-                    print(type(tag['alt-with-value']))
-                    if tag['alt-with-value'] in ('&quot;&quot;', '', ""):
+                    if tag['alt-with-value'] in (
+                        '&quot;&quot;', '', "", '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'alt attr is empty'
                         )
@@ -72,7 +72,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     )
 
                 try:
-                    if tag['filepath-with-value'] in ('&quot;&quot;', '', ""):
+                    if tag['filepath-with-value'] in (
+                        '&quot;&quot;', '', "", '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'filepath attr is empty'
                         )
@@ -91,13 +92,16 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
 
             elif tag.name == 'oppia-noninteractive-math':
                 try:
-                    if tag['math_content-with-value'] in ('', ""):
+                    if tag['math_content-with-value'] in (
+                        '&quot;&quot;', '', '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'math content attr is empty'
                         )
                     try:
-                        if tag['math_content-with-value'][
-                            'raw_latex'].strip() in ('&quot;&quot;', '', ""):
+                        math_content = json.loads(
+                            tag['math_content-with-value'])
+                        if math_content['raw_latex'].strip() in (
+                                '&quot;&quot;', '', '\'\'', '\"\"'):
                             states_with_errored_values.append(
                                 'raw lattex attr empty'
                             )
@@ -107,9 +111,11 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         )
 
                     try:
-                        svg_filename = tag['math_content-with-value'][
-                            'svg_filename']
-                        if svg_filename.strip() in ('&quot;&quot;', '', ""):
+                        math_content = json.loads(
+                            tag['math_content-with-value'])
+                        svg_filename = math_content['svg_filename']
+                        if svg_filename.strip() in (
+                            '&quot;&quot;', '', '\'\'', '\"\"'):
                             states_with_errored_values.append(
                                 'svg_filename attr empty'
                             )
@@ -131,7 +137,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             elif tag.name == 'oppia-noninteractive-skillreview':
                 try:
                     if tag['text-with-value'].strip() in (
-                        '&quot;&quot;', '', ""):
+                        '&quot;&quot;', '', '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'text attr empty in skillreview tag'
                         )
@@ -166,12 +172,12 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
 
                 except Exception:
                     states_with_errored_values.append(
-                        'autoplay value invalid'
+                        'autoplay attr not exists'
                     )
 
                 try:
                     if tag['video_id-with-value'].strip() in (
-                        '&quot;&quot;', ''):
+                        '&quot;&quot;', '', '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'video id empty'
                         )
@@ -184,7 +190,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             elif tag.name == 'oppia-noninteractive-link':
                 try:
                     if tag['text-with-value'].strip() in (
-                        '&quot;&quot;', '', ""):
+                        '&quot;&quot;', '', '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'text attr empty in link tag'
                         )
@@ -225,7 +231,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             states_dict: dict[str, state_domain.State]. The state dictionary.
 
         Returns:
-
+            errored_values: List[Dict[str, object]]. Returns the errored
+            tabs RTE tags.
         """
         errored_values = []
         for state_name, state in states_dict.items():
@@ -234,31 +241,25 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             soup = bs4.BeautifulSoup(html, 'html.parser')
             tabs_tags = soup.find_all('oppia-noninteractive-tabs')
             for tag in tabs_tags:
-                if 'tab_contents-with-value' not in tag:
+                try:
+                    tab_content_json = html_validation_service.unescape_html(
+                        tag['tab_contents-with-value'])
+
+                    tab_content_list = json.loads(tab_content_json)
+
+                    if len(tab_content_list) == 0:
+                        states_with_errored_values.append('No tabs')
+                    for tab_content in tab_content_list:
+                        (
+                            TabsCollapsablesValidationJob.
+                            _filter_invalid_rte_values(
+                                tab_content['content'],
+                                states_with_errored_values
+                            )
+                        )
+                except Exception:
                     states_with_errored_values.append(
                         'No content attr in tabs'
-                    )
-                tab_content_json = html_validation_service.unescape_html(
-                    tag['tab_contents-with-value'])
-
-                tab_content_list = json.loads(tab_content_json)
-
-                # abcd = "<p>Content</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;&amp;quot;\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><oppia-noninteractive-image></oppia-noninteractive-image><p>&nbsp;</p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;&amp;quot;\" url-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-link><oppia-noninteractive-link></oppia-noninteractive-link></p><p>&nbsp;</p><p><oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}\"></oppia-noninteractive-math><oppia-noninteractive-math></oppia-noninteractive-math><oppia-noninteractive-math math_content-with-value=\'\'></oppia-noninteractive-math></p><p>&nbsp;</p><p><oppia-noninteractive-skillreview skill_id-with-value=\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-skillreview><oppia-noninteractive-skillreview></oppia-noninteractive-skillreview></p><oppia-noninteractive-video autoplay-with-value=\"&amp;quot;&amp;quot;\" end-with-value=\"&amp;quot;&amp;quot;\" start-with-value=\"&amp;quot;&amp;quot;\" video_id-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-video><oppia-noninteractive-video></oppia-noninteractive-video>"
-                # efgh = "<p>Content</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;dssddsdssdsd&amp;quot;\" caption-with-value=\"&amp;quot;sdds&amp;quot;\" filepath-with-value=\"&amp;quot;img.svg&amp;quot;\"></oppia-noninteractive-image><p>&nbsp;</p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;link&amp;quot;\" url-with-value=\"&amp;quot;https://www.example.com&amp;quot;\"></oppia-noninteractive-link></p><p>&nbsp;</p><p><oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220905_011442_tq4lzh784k_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\"></oppia-noninteractive-math></p><p>&nbsp;</p><p><oppia-noninteractive-skillreview skill_id-with-value=\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;concept card&amp;quot;\"></oppia-noninteractive-skillreview></p><oppia-noninteractive-video autoplay-with-value=\"&amp;quot;&amp;quot;\" end-with-value=\"&amp;quot;&amp;quot;\" start-with-value=\"&amp;quot;&amp;quot;\" video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;quot;\"></oppia-noninteractive-video>"
-
-                # tab_content_list[1]['content'] = abcd
-
-                print("**********************************")
-                print(tab_content_list)
-
-                # print("**********************************")
-                # print(html_validation_service.escape_html(json.dumps(tab_content_list)))
-
-                if len(tab_content_list) == 0:
-                    states_with_errored_values.append('No tabs')
-                for tab_content in tab_content_list:
-                    TabsCollapsablesValidationJob._filter_invalid_rte_values(
-                        tab_content['content'], states_with_errored_values
                     )
 
             states_with_errored_values = list(set(states_with_errored_values))
@@ -269,14 +270,23 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         'errored_values': states_with_errored_values
                     }
                 )
-        # print(state.name.abc)
         return errored_values
 
     @staticmethod
     def invalid_collapsibles_rte_tag(
         states_dict: Dict[str, state_domain.State]
-    ):
-        """
+    ) -> List[Dict[str, object]]:
+        """Validating the `collapsibles` RTE tag, validates the following
+            - `content-with-value` attribute should be present
+            - `heading-with-value` attribute should be present
+            - RTE tags inside `collapsibles` should be valid
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            errored_values: List[Dict[str, object]]. Returns the errored
+            collapsibles RTE tags.
         """
         errored_values = []
         for state_name, state in states_dict.items():
@@ -286,11 +296,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             collapsibles_tags = soup.find_all(
                 'oppia-noninteractive-collapsible')
             for tag in collapsibles_tags:
-                if 'content-with-value' not in tag:
-                    states_with_errored_values.append(
-                        'No content attr in collapsible tag'
-                    )
-                else:
+                try:
                     collapsible_content_json = (
                         html_validation_service.unescape_html(
                         tag['content-with-value'])
@@ -299,21 +305,20 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         collapsible_content_json)
                     if len(collapsible_content_list) == 0:
                         states_with_errored_values.append(
-                            'No collapsible content')
-                    for collapsible_content in collapsible_content_list:
-                        states_with_errored_values = (
-                            TabsCollapsablesValidationJob.
-                            _filter_invalid_rte_values(
-                                collapsible_content['content'],
-                                states_with_errored_values
-                            )
+                            'collapsible content empty')
+                    (
+                        TabsCollapsablesValidationJob.
+                        _filter_invalid_rte_values(
+                            collapsible_content_list,
+                            states_with_errored_values
                         )
-
-                if 'heading-with-value' not in tag:
-                    states_with_errored_values.append(
-                        'No heading attr in collapsible tag'
                     )
-                else:
+                except:
+                    states_with_errored_values.append(
+                        'No content attr in collapsible tag'
+                    )
+
+                try:
                     collapsible_heading_json = (
                         html_validation_service.unescape_html(
                         tag['heading-with-value'])
@@ -322,8 +327,13 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         collapsible_heading_json)
                     if len(collapsible_heading_list) == 0:
                         states_with_errored_values.append(
-                            'No collapsible heading')
+                            'collapsible heading empty')
+                except:
+                    states_with_errored_values.append(
+                        'No heading attr in collapsible tag'
+                    )
 
+            states_with_errored_values = list(set(states_with_errored_values))
             if len(states_with_errored_values) > 0:
                 errored_values.append(
                     {
@@ -366,9 +376,11 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
         Optional[exp_models.ExplorationModel],
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]:
-        """Returns the pair of exp and opportunity models.
+        """Returns the pair of exp and opportunity models
+
         Args:
             models_list_pair: tuple. The pair of models list.
+
         Returns:
             tuple. The pair of exp and opportunity models.
         """
@@ -386,9 +398,11 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
         Optional[exp_models.ExplorationModel],
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]) -> bool:
-        """Returns whether the exp model is curated or not.
+        """Returns whether the exp model is curated or not
+
         Args:
             model_pair: tuple. The pair of exp and opportunity models.
+
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
