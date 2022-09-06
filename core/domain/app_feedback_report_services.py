@@ -115,7 +115,7 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
             report is added or removed from the model.
     """
     # The stats we want to aggregate on.
-    report_type = report_obj.user_supplied_feedback.report_type.name
+    report_type = report_obj.user_supplied_feedback.report_type.value
     country_locale_code = (
         report_obj.device_system_context.device_country_locale_code)
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
@@ -530,8 +530,8 @@ def save_feedback_report_to_storage(
             report.report_id, report.platform,
             report.submitted_on_timestamp,
             report.local_timezone_offset_hrs,
-            user_supplied_feedback.report_type.name,
-            user_supplied_feedback.category.name,
+            user_supplied_feedback.report_type.value,
+            user_supplied_feedback.category.value,
             device_system_context.version_name,
             device_system_context.device_country_locale_code,
             device_system_context.sdk_version,

@@ -588,7 +588,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             actual_model.submitted_on, self.REPORT_SUBMITTED_TIMESTAMP)
         self.assertEqual(
-            actual_model.report_type, self.REPORT_TYPE_SUGGESTION.name)
+            actual_model.report_type, self.REPORT_TYPE_SUGGESTION.value)
         self.assertEqual(
             actual_model.entry_point, self.ENTRY_POINT_NAVIGATION_DRAWER.value)
 
@@ -618,7 +618,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.REPORT_TYPE.value: {
-                self.REPORT_TYPE_SUGGESTION.name: 2
+                self.REPORT_TYPE_SUGGESTION.value: 2
             },
             stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
@@ -670,7 +670,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.REPORT_TYPE.value: {
-                self.REPORT_TYPE_SUGGESTION.name: 2
+                self.REPORT_TYPE_SUGGESTION.value: 2
             },
             stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
@@ -892,7 +892,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.REPORT_TYPE.value: {
-                self.REPORT_TYPE_SUGGESTION.name: 1
+                self.REPORT_TYPE_SUGGESTION.value: 1
             },
             stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 1
@@ -955,7 +955,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.REPORT_TYPE.value: {
-                self.REPORT_TYPE_SUGGESTION.name: 0
+                self.REPORT_TYPE_SUGGESTION.value: 0
             },
             stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
@@ -1010,7 +1010,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.REPORT_TYPE.value: {
-                self.REPORT_TYPE_SUGGESTION.name: 0
+                self.REPORT_TYPE_SUGGESTION.value: 0
             },
             stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0

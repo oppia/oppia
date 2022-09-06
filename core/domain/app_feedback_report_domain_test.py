@@ -160,7 +160,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'ticket_id': TICKET_ID,
             'scrubbed_by': None,
             'user_supplied_feedback': {
-                'report_type': REPORT_TYPE_SUGGESTION.name,
+                'report_type': REPORT_TYPE_SUGGESTION.value,
                 'category': CATEGORY_SUGGESTION_OTHER.value,
                 'user_feedback_selected_items': USER_SELECTED_ITEMS,
                 'user_feedback_other_text_input': USER_TEXT_INPUT
@@ -444,7 +444,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_dict = {
-            'report_type': REPORT_TYPE_SUGGESTION.name,
+            'report_type': REPORT_TYPE_SUGGESTION.value,
             'category': CATEGORY_SUGGESTION_OTHER.value,
             'user_feedback_selected_items': USER_SELECTED_ITEMS,
             'user_feedback_other_text_input': USER_TEXT_INPUT
@@ -1325,7 +1325,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
         app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, PLATFORM_ANDROID,
-            REPORT_SUBMITTED_TIMESTAMP, 0, REPORT_TYPE_SUGGESTION.name,
+            REPORT_SUBMITTED_TIMESTAMP, 0, REPORT_TYPE_SUGGESTION.value,
             CATEGORY_SUGGESTION_OTHER.value, ANDROID_PLATFORM_VERSION,
             COUNTRY_LOCALE_CODE_INDIA, ANDROID_SDK_VERSION,
             ANDROID_DEVICE_MODEL, ENTRY_POINT_NAVIGATION_DRAWER, None, None,
@@ -1339,7 +1339,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             ),
             'report_type': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
-                    REPORT_TYPE_SUGGESTION.name: 1})
+                    REPORT_TYPE_SUGGESTION.value: 1})
             ),
             'country_locale_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
@@ -1383,7 +1383,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             'total_reports_submitted': 1,
             'daily_param_stats': {
                 'platform': {PLATFORM_ANDROID: 1},
-                'report_type': {REPORT_TYPE_SUGGESTION.name: 1},
+                'report_type': {REPORT_TYPE_SUGGESTION.value: 1},
                 'country_locale_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
                 'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
                 'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},

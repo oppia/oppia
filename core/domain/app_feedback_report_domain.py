@@ -462,7 +462,7 @@ class UserSuppliedFeedback:
             dict. A dict, mapping all fields of UserSuppliedFeedback instance.
         """
         return {
-            'report_type': self.report_type.name,
+            'report_type': self.report_type.value,
             'category': self.category.value,
             'user_feedback_selected_items': self.user_feedback_selected_items,
             'user_feedback_other_text_input': (
