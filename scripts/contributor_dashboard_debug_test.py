@@ -40,7 +40,6 @@ from firebase_admin import auth as firebase_auth
 
 import requests
 from typing import Any, Dict, List
-import webapp2
 
 auth_services = models.Registry.import_auth_services()
 
@@ -270,9 +269,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             ]
         )
 
-        with self.request_swap, self.create_user_swap: 
+        with self.request_swap, self.create_user_swap:
             with sign_in_swap, self.init_app_swap as init_app_counter:
-                    self.initializer.populate_debug_data()
+                self.initializer.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the function _mock_firebase_auth_sign_in() is called.
@@ -294,4 +293,3 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         email = kwargs['json']['email']
         self.token_of_current_user = self.token_by_email[email]
         return MockResponse(json={'idToken': self.token_of_current_user})
-
