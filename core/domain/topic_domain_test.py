@@ -858,6 +858,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'diagnostic test but they are not associated with the topic.')
         self._assert_validation_error(error_msg)
 
+    def test_min_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Validates empty skill_ids_for_diagnostic_test field must raise
+        exception.
+        """
+        self.topic.thumbnail_filename = 'filename.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.skill_ids_for_diagnostic_test = []
+        error_msg = (
+            'The skill_ids_for_diagnostic_test field should not be empty.')
+        self._assert_strict_validation_error(error_msg)
+
     def test_max_skill_ids_for_diagnostic_test_validation(self) -> None:
         """Validates maximum length for the skill_ids_for_diagnostic_test field
         for a topic.
@@ -1275,10 +1287,10 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self) -> None:
         self.topic_summary.thumbnail_bg_color = '#C6DCDA'
-        self.topic_summary.thumbnail_filename = None  # type: ignore[assignment]
+        self.topic_summary.thumbnail_filename = None
         self._assert_validation_error(
             'Topic thumbnail image is not provided.')
-        self.topic_summary.thumbnail_bg_color = None  # type: ignore[assignment]
+        self.topic_summary.thumbnail_bg_color = None
         self.topic_summary.thumbnail_filename = 'test.svg'
         self._assert_validation_error(
             'Topic thumbnail background color is not specified.')
