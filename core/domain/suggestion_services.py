@@ -191,7 +191,7 @@ def create_suggestion(
         if content_html != change['content_html']:
             raise Exception(
                 'The Exploration content has changed since this translation '
-                'was submitted.' + content_html + change['content_html'])
+                'was submitted.')
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +

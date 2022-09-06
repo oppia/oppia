@@ -95,6 +95,7 @@
 
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @oppia/lace-backend-reviewers
+/core/templates/domain/translation/ @oppia/lace-frontend-reviewers
 /core/templates/pages/exploration-editor-page/translation-tab/ @oppia/lace-frontend-reviewers
 /core/templates/services/audio-bar-status.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/audio-player.service.ts @oppia/lace-frontend-reviewers
@@ -103,7 +104,6 @@
 /core/templates/services/speech-synthesis-chunker.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/assets-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
-/core/templates/domain/translation/EntityTranslationObjectFactory.ts @oppia/lace-frontend-reviewers
 
 
 # Blog project

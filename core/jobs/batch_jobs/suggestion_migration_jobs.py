@@ -112,7 +112,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             states_dict[state_name] = exploration.states[state_name]
         (old_content_id_to_new_content_id, _) = (
             state_domain.State
-            .generate_old_content_id_to_new_content_id_in_v49_states(
+            .generate_old_content_id_to_new_content_id_in_v52_states(
                 states_dict))
         return (exploration.id, old_content_id_to_new_content_id)
 
@@ -234,7 +234,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 
 
 class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
-    """Regenerate question dict in question suggestion to latest schema."""
+    """Migrate question dict in question suggestion to latest schema."""
     @staticmethod
     def _migrate_question_dict(question_suggestion_model):
         """

@@ -765,13 +765,8 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
 
-    def accept(self, commit_message: str) -> None:
-        """Accepts the suggestion.
-
-        Args:
-            commit_message: str. The commit message.
-        """
-
+    def accept(self, _) -> None:
+        """Accepts the suggestion."""
         translated_content = translation_domain.TranslatedContent(
             self.change.translation_html,
             translation_domain.TranslatableContentFormat(

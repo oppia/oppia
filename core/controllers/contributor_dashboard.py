@@ -368,9 +368,19 @@ class TranslatableTextHandler(base.BaseHandler):
                 exp_id):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
-        exp = exp_fetchers.get_exploration_by_id(exp_id)
         state_names_to_content_id_mapping = (
-            translation_services.get_translatable_text(exp, language_code))
+            translation_services.get_translatable_text(exp_id, language_code))
+
+        contribution_rights = user_services.get_user_contribution_rights(
+            self.user_id)
+        reviewable_language_codes = (
+            contribution_rights.can_review_translation_for_language_codes)
+        if language_code not in reviewable_language_codes:
+            state_names_to_content_id_mapping = (
+                self._get_state_names_to_not_set_content_id_mapping(
+                    state_names_to_content_id_mapping
+                ))
+
         state_names_to_not_in_review_content_id_mapping = (
             self._get_state_names_to_not_in_review_content_id_mapping(
                 state_names_to_content_id_mapping,

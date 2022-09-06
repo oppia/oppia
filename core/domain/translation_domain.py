@@ -373,6 +373,26 @@ class BaseTranslatableObject:
         """
         return len(self.get_all_contents_which_need_translations())
 
+    def validate_translatable_contents(self, next_content_id_index):
+        """
+        """
+        content_id_to_translatable_content = (
+            self.get_translatable_contents_collection()
+            .content_id_to_translatable_content)
+
+        for content_id, translatable_content in (
+                content_id_to_translatable_content.items()):
+            content_id_suffix = content_id.split('_')[-1]
+
+            if (
+                    content_id_suffix.isdigit() and
+                    int(content_id_suffix) > next_content_id_index
+            ):
+                raise utils.ValidationError(
+                    'Expected all content id indexes to be less than the "next '
+                    'content id index", but received content id %s' % content_id
+                )
+
 
 class EntityTranslation:
     """A domain object to store all translations for a given versioned-entity
@@ -436,8 +456,7 @@ class EntityTranslation:
         )
 
     def validate(self):
-        """TODO
-        """
+        """Validates the EntityTranslation object."""
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
                 'entity_type must be a string, but got %r' % self.entity_type)
@@ -493,15 +512,13 @@ class EntityTranslation:
         return count
 
     def remove_translations(self, content_ids):
-        """
-        """
+        """Remove translations for the given list of content Ids."""
         for content_id in content_ids:
             if content_id in self.translations:
                 del self.translations[content_id]
 
     def mark_translations_needs_update(self, content_ids):
-        """
-        """
+        """Marks translation needs update for the given list of content Ids."""
         for content_id in content_ids:
             if content_id in self.translations:
                 self.translations[content_id].needs_update = True

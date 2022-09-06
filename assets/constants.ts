@@ -4970,11 +4970,6 @@ export default {
     "description": "English",
     "direction": "ltr",
     "decimal_separator": "."
-  }, {
-    "code": "ak",
-    "description": "Ákán (Akan)",
-    "direction": "ltr",
-    "decimal_separator": "."
   },{
     "code": "ar",
     "description": "العربية (Arabic)",

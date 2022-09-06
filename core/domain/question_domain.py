@@ -22,7 +22,6 @@ import collections
 import copy
 import datetime
 import re
-import logging
 
 from core import feconf
 from core import schema_utils

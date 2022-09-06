@@ -5,7 +5,7 @@ instance_class: F2
 version: default
 # Timeout is set to 60 so that the gunicorn workers don't die while sending
 # the Apache Beam jobs to Google Cloud Dataflow.
-entrypoint: gunicorn --timeout 6000 --bind :$PORT main:app
+entrypoint: gunicorn --timeout 60 --bind :$PORT main:app
 
 inbound_services:
 - warmup

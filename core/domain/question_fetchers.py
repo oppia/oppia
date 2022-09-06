@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import copy
-import logging
 
 from core import feconf
 from core.domain import question_domain
@@ -189,11 +188,11 @@ def migrate_state_schema(
             # be used for introducing next_content_id_index into
             # question level.
             next_content_id_index = (
-                question_domain.Question.update_state_from_model( # type: ignore[no-untyped-call]
+                question_domain.Question.update_state_from_model(
                     versioned_question_state, state_schema_version)
             )
         else:
-            question_domain.Question.update_state_from_model( # type: ignore[no-untyped-call]
+            question_domain.Question.update_state_from_model(
                 versioned_question_state, state_schema_version)
         state_schema_version += 1
 

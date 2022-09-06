@@ -2017,15 +2017,15 @@ class RecordedVoiceovers:
             ValidationError. One or more attributes of the RecordedVoiceovers
                 are invalid.
         """
-        # if expected_content_id_list is not None:
-        #     if not set(self.voiceovers_mapping.keys()) == (
-        #             set(expected_content_id_list)):
-        #         raise utils.ValidationError(
-        #             'Expected state recorded_voiceovers to match the listed '
-        #             'content ids %s, found %s' % (
-        #                 expected_content_id_list,
-        #                 list(self.voiceovers_mapping.keys()))
-        #             )
+        if expected_content_id_list is not None:
+            if not set(self.voiceovers_mapping.keys()) == (
+                    set(expected_content_id_list)):
+                raise utils.ValidationError(
+                    'Expected state recorded_voiceovers to match the listed '
+                    'content ids %s, found %s' % (
+                        expected_content_id_list,
+                        list(self.voiceovers_mapping.keys()))
+                    )
 
         for (content_id, language_code_to_voiceover) in (
                 self.voiceovers_mapping.items()):
@@ -3497,7 +3497,7 @@ class State(translation_domain.BaseTranslatableObject):
         return content_id_to_translatable_content[content_id].content_value
 
     @classmethod
-    def traverse_v49_state_dict_for_contents(
+    def traverse_v52_state_dict_for_contents(
         cls,
         state_dict
     ):
@@ -3631,7 +3631,7 @@ class State(translation_domain.BaseTranslatableObject):
             state = states_dict[state_name]
             voiceovers = []
             for content, content_type, extra_prefix in (
-                cls.traverse_v49_state_dict_for_contents(state)
+                cls.traverse_v52_state_dict_for_contents(state)
             ):
                 content_id_key = 'content_id'
                 if content_type == translation_domain.ContentType.RULE:
@@ -3708,7 +3708,7 @@ class State(translation_domain.BaseTranslatableObject):
         return states_dict, content_id_generator.next_content_id_index
 
     @classmethod
-    def generate_old_content_id_to_new_content_id_in_v49_states(
+    def generate_old_content_id_to_new_content_id_in_v52_states(
         cls,
         states_dict
     ):
@@ -3732,7 +3732,7 @@ class State(translation_domain.BaseTranslatableObject):
             old_id_to_new_id = {}
 
             for content, content_type, extra_prefix in (
-                cls.traverse_v49_state_dict_for_contents(
+                cls.traverse_v52_state_dict_for_contents(
                     states_dict[state_name])
             ):
                 if content_type == translation_domain.ContentType.RULE:

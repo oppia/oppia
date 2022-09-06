@@ -83,7 +83,7 @@ def get_machine_translation(
     return get_translation_from_model(translation_model)
 
 
-def _populate_entity_translation_from_model(entity_translation_model):
+def _get_entity_translation_from_model(entity_translation_model):
     """Returns the EntityTranslation domain object from its model representation
     (EntityTranslationsModel).
 
@@ -128,7 +128,7 @@ def get_all_entity_translations_for_entity(
     entity_translation_objects = []
     for model in entity_translation_models:
         if model:
-            domain_object = _populate_entity_translation_from_model(model)
+            domain_object = _get_entity_translation_from_model(model)
             entity_translation_objects.append(domain_object)
 
     return entity_translation_objects
@@ -152,7 +152,7 @@ def get_entity_translation(
     )
 
     if entity_translation_model:
-        domain_object = _populate_entity_translation_from_model(
+        domain_object = _get_entity_translation_from_model(
             entity_translation_model)
         return domain_object
     return translation_domain.EntityTranslation.create_empty(

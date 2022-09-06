@@ -67,8 +67,6 @@ FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: Final = (
 FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: Final = 'untag_deleted_misconceptions'
 FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = (
     'remove_user_from_rights_models')
-FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE: Final = (
-    'update_translation_related_change')
 
 
 # Here we used type Any because in defer() function '*args' points to the

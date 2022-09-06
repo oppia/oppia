@@ -189,11 +189,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
             if translation_model.entity_version == exp_version:
                 all_models.append(translation_model)
         return all_models
+
     @staticmethod
     def _generate_new_translation_model(
             exp_translation_model: translation_models.EntityTranslationsModel
         ):
-        """
+        """Generates new translation models for the given exploration
+        model.
         """
         try:
             with datastore_services.get_ndb_context():

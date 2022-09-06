@@ -60,6 +60,7 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
+from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -866,8 +867,8 @@ def update_states_version_history(
         for state_name in states_which_were_not_renamed
     }
     # The following ignore list contains those state properties which are
-    # related to translations. Hence, they are ignored in order to avoid
-    # updating the version history in case of translation-only commits.
+    # related to voiceovers. Hence, they are ignored in order to avoid
+    # updating the version history in case of voiceover-only commits.
     state_property_ignore_list = [
         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
     ]
@@ -1748,20 +1749,23 @@ def update_exploration(
             content_ids_corresponding_translations_to_remove.append(
                 change.content_id)
 
-    _save_exploration(
-        committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
 
     # Update translations related changes in the datastore.
-    taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_UPDATE_TRANSLATION_RELATED_CHANGE,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
+    # Running this function in task queue is avoided as failure updating
+    # translation models can lead to missing translations to all the future
+    # versions of exploration.
+    translation_services.update_translation_related_change(
+        exploration_id,
         updated_exploration.version - 1,
         content_ids_corresponding_translations_to_remove,
         content_ids_corresponding_translations_to_mark_needs_update,
         updated_exploration.get_content_count()
     )
+
+    _save_exploration(
+        committer_id, updated_exploration, commit_message, change_list)
 
     # Update summary of changed exploration in a deferred task.
     taskqueue_services.defer(

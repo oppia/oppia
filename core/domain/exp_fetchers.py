@@ -101,8 +101,7 @@ def _migrate_states_schema(
                     states_schema_version, init_state_name)
             )
         else:
-            exp_domain.Exploration.update_states_from_model( # type: ignore[no-untyped-call]
-                versioned_exploration_states,
+            exp_domain.Exploration.update_states_from_model(
                 states_schema_version, init_state_name)
         states_schema_version += 1
     return next_content_id_index

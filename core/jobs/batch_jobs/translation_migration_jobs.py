@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that migrate suggestion models."""
+"""Jobs that migrate translation models."""
 
 from __future__ import annotations
 
@@ -48,20 +48,16 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
 
     @staticmethod
     def _generate_validated_entity_translations_for_exploration(exploration):
-        """Returns EntityTranslation
+        """Generates EntityTranslation object for the given exploration.
+
         Args:
             exploration: Exploration. The exploration.
-
-        Returns:
-            Tuple(str, Dict). Consists of a Tuple where the first element is
-                the exploration id and the second element being the mapping
-                of old content ids to new content ids.
         """
         try:
             language_code_to_translation = {}
             (old_content_id_to_new_content_id, _) = (
                 state_domain.State
-                .generate_old_content_id_to_new_content_id_in_v49_states(
+                .generate_old_content_id_to_new_content_id_in_v52_states(
                     exploration.states))
             for state_name in exploration.states:
                 translations_mapping = exploration.states[state_name][

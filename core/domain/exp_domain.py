@@ -120,7 +120,7 @@ DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
 # This takes additional 'content_id' and 'state_name' parameters.
 DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
     'mark_written_translations_as_needing_update')
-CMD_MARK_TRANSLATIONS_NEEDS_UPDATE = 'mark_translations_as_needing_update'
+CMD_MARK_TRANSLATIONS_NEEDS_UPDATE = 'mark_translations_needs_update'
 # This takes additional 'content_id' parameters.
 CMD_REMOVE_TRANSLATIONS = 'remove_translations'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -1855,7 +1855,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    def update_next_content_id_index(self, next_content_id_index):
+    def update_next_content_id_index(self, next_content_id_index: int) -> None:
         """Update the interaction next content id index attribute.
 
         Args:
@@ -1863,8 +1863,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.next_content_id_index = next_content_id_index
 
-    def add_states(self, state_names):
-        """
+    def add_states(self, state_names: List[str]) -> None:
+        """Adds new states in the exploration with the given state names.
+
+        Args:
+            state_names: list(str).The new state name.
         """
         content_id_generator = translation_domain.ContentIdGenerator(
             self.next_content_id_index)
@@ -1878,8 +1881,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.next_content_id_index = content_id_generator.next_content_id_index
 
     def add_state(
-        self, state_name, content_id_for_state_content,
-        content_id_for_default_outcome):
+        self,
+        state_name: str,
+        content_id_for_state_content: str,
+        content_id_for_default_outcome: str
+    ) -> None:
         """Adds new state in the exploration with the given state name.
 
         Args:
@@ -1960,7 +1966,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     def get_translatable_text(
         self, language_code: str
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
         """Returns all the contents which needs translation in the given
         language.
 
@@ -1975,7 +1981,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_names_to_content_id_mapping = {}
         for state_name, state in self.states.items():
             state_names_to_content_id_mapping[state_name] = (
-                state.get_content_id_mapping_needing_translations(  # type: ignore[no-untyped-call]
+                state.get_content_id_mapping_needing_translations(
                     language_code))
 
         return state_names_to_content_id_mapping
@@ -2073,7 +2079,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str, int
         ] = collections.defaultdict(int)
         for state in self.states.values():
-            state_translation_counts = state.get_translation_counts()  # type: ignore[no-untyped-call]
+            state_translation_counts = state.get_translation_counts()
             for language, count in state_translation_counts.items():
                 exploration_translation_counts[language] += count
 
@@ -2092,7 +2098,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         content_count = 0
         for state in self.states.values():
-            content_count += state.get_translatable_content_count()  # type: ignore[no-untyped-call]
+            content_count += state.get_translatable_content_count()
 
         return content_count
 
@@ -3207,7 +3213,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 CURRENT_EXP_SCHEMA_VERSION].
         """
         exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
-
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

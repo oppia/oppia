@@ -24,7 +24,7 @@ import logging
 from core import feconf
 
 from core.domain import translation_fetchers
-from core.domain import translation_domain
+from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.platform import models
 
@@ -231,17 +231,20 @@ def get_translation_counts(entity_type, entity_id, entity_version):
     return dict(exploration_translation_counts)
 
 
-def get_translatable_text(exploration, language_code):
+def get_translatable_text(exp_id, language_code):
         """Returns all the contents which needs translation in the given
         language.
+
         Args:
-            exploration: Exploration. An instance of Exploration class.
+            exp_id: str. The Id of the exploration.
             language_code: str. The language code in which translation is
                 required.
+
         Returns:
             dict(str, list(TranslatableContent)). A dict with state names
             as keys and a list of TranslatableContent as values.
         """
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         entity_translations = (
             translation_fetchers.get_entity_translation(
                 feconf.TranslatableEntityType.EXPLORATION,
