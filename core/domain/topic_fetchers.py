@@ -295,7 +295,7 @@ def get_topics_by_ids(
                     % topic_ids[index]
                 )
             topics.append(topic_model)
-        elif topic_model is not None:
+        if topic_model is not None:
             topics.append(get_topic_from_model(topic_model))
     return topics
 
