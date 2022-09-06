@@ -358,11 +358,11 @@ class ExplorationModel(base_models.VersionedModel):
     # doesn't match with BaseModel.delete_multi().
     @classmethod
     def delete_multi( # type: ignore[override]
-            cls,
-            entity_ids: List[str],
-            committer_id: str,
-            commit_message: str,
-            force_deletion: bool = False
+        cls,
+        entity_ids: List[str],
+        committer_id: str,
+        commit_message: str,
+        force_deletion: bool = False
     ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 

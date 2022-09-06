@@ -502,7 +502,7 @@ def get_displayable_exp_summary_dicts(
     exp_version_references = [
         exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
         for exp_summary in exploration_summaries]
-    exp_stats_list = stats_services.get_exploration_stats_multi(  # type: ignore[no-untyped-call]
+    exp_stats_list = stats_services.get_exploration_stats_multi(
         exp_version_references)
     view_counts = [exp_stats.num_starts for exp_stats in exp_stats_list]
 

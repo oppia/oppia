@@ -27,6 +27,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     # Here, we are importing 'platform_parameter_domain' only for type checking.
     from core.domain import platform_parameter_domain  # pylint: disable=invalid-import # isort:skip
+    from mypy_imports import base_models
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()

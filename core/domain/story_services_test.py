@@ -75,7 +75,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         self.save_new_valid_exploration(
             self.EXP_ID, self.user_id_admin, end_state_name='End',
@@ -223,7 +223,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New Title'
             })
         ]
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin
             )
         story_services.update_story(
@@ -492,9 +492,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_id_1, self.USER_ID, self.TOPIC_ID, url_fragment='story-one')
         self.save_new_story(
             story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two')
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story_id_1)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story_id_2)
         self.assertTrue(
             story_services.does_story_exist_with_url_fragment('story-one'))
@@ -872,7 +872,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             exp_services.get_story_id_linked_to_exploration('2'))
 
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
 
         # Creates node 1 -> node 2 -> node 3, links exp IDs 0, 1 and 2 with them
@@ -976,7 +976,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_exploration_story_link_collision(self) -> None:
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
@@ -1118,7 +1118,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, [], 'Commit message')
 
     def test_cannot_update_story_with_invalid_exploration_id(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -1167,7 +1167,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                         'ID: exp_id_1. Error: Error in exploration'])
 
     def test_validate_exploration_returning_error_messages(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1185,7 +1185,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(validation_error_messages, [message_1, message_2])
 
     def test_cannot_update_story_with_private_exploration_id(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1205,7 +1205,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_blank_exp_id(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
 
         change_list = [story_domain.StoryChange({
@@ -1226,7 +1226,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_different_categories(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1288,7 +1288,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_invalid_categories(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
@@ -1324,7 +1324,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_other_languages(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1359,7 +1359,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_without_correctness_feedback(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1393,7 +1393,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_invalid_interactions(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1426,7 +1426,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_recommended_exps(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1477,7 +1477,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_invalid_rte_content(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1526,7 +1526,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_parameter_values(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1657,7 +1657,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, topic_id, title='new title')
-        topic_services.add_canonical_story(self.USER_ID, topic_id, story_id)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(self.USER_ID, topic_id, story_id)
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
@@ -2116,7 +2116,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_5'
         story_services.save_new_story(self.USER_ID, story)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story.id)
 
     def test_get_completed_node_ids(self) -> None:
@@ -2250,7 +2250,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
         self.save_new_story(self.STORY_ID_1, self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID_1)
         story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_ID_1, self.NODE_ID_1)

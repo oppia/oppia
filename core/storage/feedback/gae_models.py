@@ -33,7 +33,7 @@ from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
-from typing_extensions import Literal
+from typing_extensions import Final, Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -45,12 +45,12 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 # Allowed feedback thread statuses.
-STATUS_CHOICES_OPEN = 'open'
-STATUS_CHOICES_FIXED = 'fixed'
-STATUS_CHOICES_IGNORED = 'ignored'
-STATUS_CHOICES_COMPLIMENT = 'compliment'
-STATUS_CHOICES_NOT_ACTIONABLE = 'not_actionable'
-STATUS_CHOICES = [
+STATUS_CHOICES_OPEN: Final = 'open'
+STATUS_CHOICES_FIXED: Final = 'fixed'
+STATUS_CHOICES_IGNORED: Final = 'ignored'
+STATUS_CHOICES_COMPLIMENT: Final = 'compliment'
+STATUS_CHOICES_NOT_ACTIONABLE: Final = 'not_actionable'
+STATUS_CHOICES: Final = [
     STATUS_CHOICES_OPEN,
     STATUS_CHOICES_FIXED,
     STATUS_CHOICES_IGNORED,
@@ -59,8 +59,8 @@ STATUS_CHOICES = [
 ]
 
 # Constants used for generating new ids.
-_MAX_RETRIES = 10
-_RAND_RANGE = 127 * 127
+_MAX_RETRIES: Final = 10
+_RAND_RANGE: Final = 127 * 127
 
 
 class GeneralFeedbackThreadModel(base_models.BaseModel):
@@ -71,7 +71,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     """
 
     # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     # The type of entity the thread is linked to.
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
@@ -283,7 +283,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     """
 
     # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = datastore_services.StringProperty(required=True, indexed=True)
@@ -353,8 +353,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, bool, None]]]:
         """Exports the data from GeneralFeedbackMessageModel
         into dict format for Takeout.
@@ -440,7 +440,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def create_multi(
         cls,
         message_identifiers: List[
-            feedback_domain.FullyQualifiedMessageIdentifier]
+            feedback_domain.FullyQualifiedMessageIdentifier
+        ]
     ) -> List[GeneralFeedbackMessageModel]:
         """Creates a new GeneralFeedbackMessageModel entry for each
         (thread_id, message_id) pair.
@@ -498,19 +499,19 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @overload
     @classmethod
     def get(
-        cls, thread_id: str, message_id: int, strict: Literal[True]
+        cls, thread_id: str, message_id: int, *, strict: Literal[True]
     ) -> GeneralFeedbackMessageModel: ...
 
     @overload
     @classmethod
     def get(
-        cls, thread_id: str, message_id: int, strict: Literal[False]
+        cls, thread_id: str, message_id: int, *, strict: Literal[False]
     ) -> Optional[GeneralFeedbackMessageModel]: ...
 
     @overload
     @classmethod
     def get(
-        cls, thread_id: str, message_id: int, strict: bool = False
+        cls, thread_id: str, message_id: int, *, strict: bool = ...
     ) -> Optional[GeneralFeedbackMessageModel]: ...
 
     # Here we use MyPy ignore because the signature of this method
@@ -596,7 +597,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_message_counts(
-            cls, thread_ids: List[str]
+        cls, thread_ids: List[str]
     ) -> List[int]:
         """Returns a list containing the number of messages in the threads.
         Includes the deleted entries.
