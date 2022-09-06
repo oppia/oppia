@@ -86,7 +86,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.request_swap = self.swap(
             self.initializer.session,
             'request',
-            self.mock_request)
+            self._mock_request)
 
         self.init_app_swap = self.swap_with_call_counter(
             firebase_admin, 'initialize_app')
@@ -98,7 +98,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             contributor_dashboard_debug.CONTRIBUTOR_EMAIL.encode(
                 'utf-8')).hexdigest()
         self.create_user_swap = self.swap_with_checks(
-            firebase_auth, 'create_user', self.mock_firebase_auth_create_user,
+            firebase_auth, 'create_user', self._mock_firebase_auth_create_user,
             expected_kwargs=[
                 {
                     'email': contributor_dashboard_debug.SUPER_ADMIN_EMAIL,
@@ -113,14 +113,14 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
         self.begin_session_swap = self.swap(
             self.initializer, '_sign_in',
-            self.mock_login_as_admin)
+            self._mock_login_as_admin)
 
     def tearDown(self) -> None:
         self.firebase_sdk_stub.uninstall()
         self.logout()
         super().tearDown()
 
-    def mock_request(
+    def _mock_request(
         self,
         method: str,
         url: str,
@@ -133,7 +133,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
                 cur_token = headers.get('Authorization', '').strip('Bearer ')
                 for email, token in self.token_by_email.items():
                     if token == cur_token:
-                        self.mock_login_as_admin(email)
+                        self._mock_login_as_admin(email)
                         break
             with self.swap(
                 base, 'load_template', test_utils.mock_load_template):
@@ -143,13 +143,25 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         if method == 'PUT':
             return self.testapp.put(url, params=params, headers=headers)
 
+    def _mock_firebase_auth_create_user(self, **kwargs: Any) -> None:
+        """Mock for firebase_auth.create_user()."""
+        email = kwargs['email']
+        auth_id = self.get_auth_id_from_email(email)
+        self.token_by_email[email] = (
+            self.firebase_sdk_stub.create_user(auth_id, email))
+        print('token_by_email: %s' % self.token_by_email)
+
+    def _mock_login_as_admin(self, email: str) -> None:
+        """Sets the environment variables to simulate a login of admin."""
+        self.login(email, is_super_admin=True)
+
     def test_populate_debug_data(self) -> None:
         with self.request_swap, self.create_user_swap, self.begin_session_swap:
             with self.init_app_swap as init_app_counter:
                 self.initializer.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
-        # Asserts that the function mock_login_as_admin() is called.
+        # Asserts that the function _mock_login_as_admin() is called.
         self.assertEqual(
             os.environ['USER_EMAIL'],
             contributor_dashboard_debug.SUPER_ADMIN_EMAIL)
@@ -240,7 +252,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             contributor_dashboard_debug.CONTRIBUTOR_USERNAME)
 
     def _assert_sign_up_new_user(self, email: str, username: str) -> None:
-        """Asserts that the function mock_firebase_auth_create_user() is called
+        """Asserts that the function _mock_firebase_auth_create_user() is called
         and a user with the given email and username is created.
         """
         self.assertIsNotNone(self.firebase_sdk_stub.get_user_by_email(email))
@@ -250,7 +262,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def test_sign_in(self) -> None:
         sign_in_swap = self.swap_with_checks(
-            requests, 'post', self.mock_firebase_auth_sign_in,
+            requests, 'post', self._mock_firebase_auth_sign_in,
             expected_args=[
                 (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, ),
                 (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL, ),
@@ -263,7 +275,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
                     self.initializer.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
-        # Asserts that the function mock_firebase_auth_sign_in() is called.
+        # Asserts that the function _mock_firebase_auth_sign_in() is called.
         self.assertEqual(
             self.token_of_current_user,
             self.token_by_email[contributor_dashboard_debug.SUPER_ADMIN_EMAIL])
@@ -273,19 +285,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             contributor_dashboard_debug.SUPER_ADMIN_EMAIL)
         self.assertEqual(os.environ['USER_IS_ADMIN'], '1')
 
-    def mock_login_as_admin(self, email: str) -> None:
-        """Sets the environment variables to simulate a login of admin."""
-        self.login(email, is_super_admin=True)
-
-    def mock_firebase_auth_create_user(self, **kwargs: Any) -> None:
-        """Mock for firebase_auth.create_user()."""
-        email = kwargs['email']
-        auth_id = self.get_auth_id_from_email(email)
-        self.token_by_email[email] = (
-            self.firebase_sdk_stub.create_user(auth_id, email))
-        print('token_by_email: %s' % self.token_by_email)
-
-    def mock_firebase_auth_sign_in(
+    def _mock_firebase_auth_sign_in(
         self, _: str, **kwargs: Any
     ) -> MockResponse:
         """Mock for the post request to FIREBASE_SIGN_IN_URL, where the response
