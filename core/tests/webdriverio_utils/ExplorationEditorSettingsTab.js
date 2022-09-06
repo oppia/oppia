@@ -93,7 +93,7 @@ var ExplorationEditorSettingsTab = function() {
     expect(options.sort()).toEqual(names.sort());
 
     // Now that we have opened the dropdown and
-    // checked its options, the below code closes the dropdown.
+    // checked its all available options, the below code closes the dropdown.
     await action.click(
       'State name option', initialStateSelectOption(selectedStateName));
     await action.click('Neutral element', neutralElement);
