@@ -129,6 +129,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         """Returns a mock response for the given request."""
         if method == 'GET':
             if url == '/session_begin':
+                assert headers is not None
                 cur_token = headers.get('Authorization', '').strip('Bearer ')
                 for email, token in self.token_by_email.items():
                     if token == cur_token:
