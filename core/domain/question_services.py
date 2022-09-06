@@ -370,7 +370,7 @@ def delete_question(
         question_id, committer_id, force_deletion)
 
     question_summary_model = (
-        question_models.QuestionSummaryModel.get(question_id, False))
+        question_models.QuestionSummaryModel.get(question_id, strict=False))
     if question_summary_model is not None:
         question_summary_model.delete()
 

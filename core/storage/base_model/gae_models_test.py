@@ -519,7 +519,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self) -> None:
         version_model = TestVersionedModel(id='version_model')
         model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
-            'model_id-1', 'committer_id', 'create', None, None)
+            'model_id-1', 'committer_id', 'create', None, [])
         model1.update_timestamps()
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
@@ -545,7 +545,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         version_model = TestVersionedModel(id='version_model')
         model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
             'model_id-1', 'committer_id', 'create',
-            'Test uid_abcdefghijabcdefghijabcdefghijab', None)
+            'Test uid_abcdefghijabcdefghijabcdefghijab', [])
         model1.update_timestamps()
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(

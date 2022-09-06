@@ -351,11 +351,11 @@ class CollectionModel(base_models.VersionedModel):
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def delete_multi( # type: ignore[override]
-            cls,
-            entity_ids: List[str],
-            committer_id: str,
-            commit_message: str,
-            force_deletion: bool = False
+        cls,
+        entity_ids: List[str],
+        committer_id: str,
+        commit_message: str,
+        force_deletion: bool = False
     ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 
@@ -543,13 +543,11 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def save(
-            self,
-            committer_id: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_message: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -610,10 +608,12 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): This '_reconstitute' method accepts content NDB JSON
+    # properties and those NDB JSON properties have loose typing. So, once
+    # we explicitly typed those NDB JSON properties we can remove Any type
+    # from the argument of '_reconstitute' method.
     def _reconstitute(
-            self, snapshot_dict: Dict[str, Any]
+        self, snapshot_dict: Dict[str, Any]
     ) -> CollectionRightsModel:
         """Populates the model instance with the snapshot.
 

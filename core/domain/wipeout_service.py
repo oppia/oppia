@@ -607,7 +607,7 @@ def remove_user_from_activities_with_associated_rights_models(
     collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids, force_deletion=True)
 
-    topic_services.deassign_user_from_all_topics(  # type: ignore[no-untyped-call]
+    topic_services.deassign_user_from_all_topics(
         user_services.get_system_user(), user_id)
 
 

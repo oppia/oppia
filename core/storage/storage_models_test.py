@@ -22,42 +22,43 @@ from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
 
-(
-    base_models, collection_models, email_models,
-    exploration_models, feedback_models, skill_models,
-    topic_models, suggestion_models, user_models,
-    story_models, question_models, config_models
-) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
-    models.NAMES.story, models.NAMES.question, models.NAMES.config])
+from typing import Iterator, Type
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
 
-    def _get_base_or_versioned_model_child_classes(self):
+    def _get_base_or_versioned_model_child_classes(
+        self
+    ) -> Iterator[Type[base_models.BaseModel]]:
         """Get child model classes that inherit directly from BaseModel or
         VersionedModel, these are classes that are used directly for saving data
         and not just inherited from.
         """
 
-        for clazz in test_utils.get_storage_model_classes():
+        for clazz in test_utils.get_storage_model_classes():  # type: ignore[no-untyped-call]
             if (clazz.__name__ in
                     test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES):
                 continue
             yield clazz
 
-    def test_all_model_module_names_unique(self):
+    def test_all_model_module_names_unique(self) -> None:
         names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in test_utils.get_storage_model_classes()]
+            clazz.__name__ for clazz in test_utils.get_storage_model_classes()]  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),
             len(names_of_ndb_model_subclasses))
 
-    def test_base_or_versioned_child_classes_have_get_deletion_policy(self):
+    def test_base_or_versioned_child_classes_have_get_deletion_policy(
+        self
+    ) -> None:
         for clazz in self._get_base_or_versioned_model_child_classes():
             try:
                 self.assertIn(
@@ -67,11 +68,12 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     clazz.__name__))
 
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
-            self):
+        self
+    ) -> None:
         for clazz in self._get_base_or_versioned_model_child_classes():
             if (clazz.get_deletion_policy() ==
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
-                with self.assertRaisesRegex(
+                with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                     NotImplementedError,
                     re.escape(
                         'The has_reference_to_user_id() method is missing from '
@@ -89,14 +91,14 @@ class StorageModelsTest(test_utils.GenericTestBase):
                         msg='has_reference_to_user_id is not defined for %s' % (
                             clazz.__name__))
 
-    def test_get_models_which_should_be_exported(self):
+    def test_get_models_which_should_be_exported(self) -> None:
         """Ensure that the set of models to export is the set of models with
         export policy CONTAINS_USER_DATA, and that all other models have
         export policy NOT_APPLICABLE.
         """
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()
+            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
@@ -111,11 +113,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 self.assertNotIn(
                     base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
 
-    def test_all_fields_have_export_policy(self):
+    def test_all_fields_have_export_policy(self) -> None:
         """Ensure every field in every model has an export policy defined."""
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()
+            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]

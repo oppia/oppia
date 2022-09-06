@@ -558,7 +558,7 @@ def replace_skill_id_in_all_topics(
                         'skill_id': new_skill_id
                     })])
                     break
-            topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+            topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
                 'Replace skill id %s with skill id %s in the topic' % (
                     old_skill_id, new_skill_id))
@@ -589,7 +589,7 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
                 'uncategorized_skill_id': skill_id
             }))
             skill_name = get_skill_summary_by_id(skill_id).description
-            topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+            topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
                 'Removed skill with id %s and name %s from the topic' % (
                     skill_id, skill_name))
@@ -1046,7 +1046,7 @@ def delete_skill_summary(skill_id: str) -> None:
     """
 
     skill_summary_model = (
-        skill_models.SkillSummaryModel.get(skill_id, False))
+        skill_models.SkillSummaryModel.get(skill_id, strict=False))
     if skill_summary_model is not None:
         skill_summary_model.delete()
 

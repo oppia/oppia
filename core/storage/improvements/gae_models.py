@@ -25,6 +25,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import Dict, List, Optional
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,21 +36,21 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-TASK_ENTITY_TYPES = (
+TASK_ENTITY_TYPES: Final = (
     constants.TASK_ENTITY_TYPE_EXPLORATION,
 )
 
-TASK_STATUS_CHOICES = (
+TASK_STATUS_CHOICES: Final = (
     constants.TASK_STATUS_OPEN,
     constants.TASK_STATUS_OBSOLETE,
     constants.TASK_STATUS_RESOLVED,
 )
 
-TASK_TARGET_TYPES = (
+TASK_TARGET_TYPES: Final = (
     constants.TASK_TARGET_TYPE_STATE,
 )
 
-TASK_TYPES = (
+TASK_TYPES: Final = (
     constants.TASK_TYPE_HIGH_BOUNCE_RATE,
     constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
     constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
@@ -207,13 +208,13 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_task_id(
-            cls,
-            entity_type: str,
-            entity_id: str,
-            entity_version: int,
-            task_type: str,
-            target_type: str,
-            target_id: str
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        task_type: str,
+        target_type: str,
+        target_id: str
     ) -> str:
         """Generates a new task entry ID.
 
@@ -235,10 +236,10 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def generate_composite_entity_id(
-            cls,
-            entity_type: str,
-            entity_id: str,
-            entity_version: int
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int
     ) -> str:
         """Generates a new composite_entity_id value.
 
@@ -256,17 +257,17 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            entity_type: str,
-            entity_id: str,
-            entity_version: int,
-            task_type: str,
-            target_type: str,
-            target_id: str,
-            issue_description: Optional[str] = None,
-            status: str = constants.TASK_STATUS_OBSOLETE,
-            resolver_id: Optional[str] = None,
-            resolved_on: Optional[datetime.datetime] = None
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        task_type: str,
+        target_type: str,
+        target_id: str,
+        issue_description: Optional[str] = None,
+        status: str = constants.TASK_STATUS_OBSOLETE,
+        resolver_id: Optional[str] = None,
+        resolved_on: Optional[datetime.datetime] = None
     ) -> str:
         """Creates a new task entry and puts it in storage.
 
