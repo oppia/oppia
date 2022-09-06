@@ -281,7 +281,7 @@ def get_topics_by_ids(
         (with None in place of topic ids corresponding to deleted topics).
 
     Raises:
-        Exception. No topic Model exist for the given topic_id.
+        Exception. No topic model exists for the given topic_id.
     """
     all_topic_models: List[Optional[topic_models.TopicModel]] = (
         topic_models.TopicModel.get_multi(topic_ids)
@@ -291,7 +291,7 @@ def get_topics_by_ids(
         if topic_model is None:
             if strict:
                 raise Exception(
-                    'No topic Model exist for the topic_id: %s'
+                    'No topic model exists for the topic_id: %s'
                     % topic_ids[index]
                 )
             topics.append(topic_model)

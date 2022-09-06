@@ -315,7 +315,7 @@ def get_stories_by_ids(
         Story does not exist, the corresponding returned list element is None.
 
     Raises:
-        Exception. No story Model exist for the given story_id.
+        Exception. No story model exists for the given story_id.
     """
     all_story_models = story_models.StoryModel.get_multi(story_ids)
     stories: List[Optional[story_domain.Story]] = []
@@ -323,7 +323,7 @@ def get_stories_by_ids(
         if story_model is None:
             if strict:
                 raise Exception(
-                    'No story Model exist for the story_id: %s'
+                    'No story model exists for the story_id: %s'
                     % story_ids[index]
                 )
             stories.append(story_model)

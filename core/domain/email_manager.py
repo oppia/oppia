@@ -2178,7 +2178,7 @@ def send_email_to_new_contribution_reviewer(
     Raises:
         Exception. The review category is not valid.
         Exception. The language_code cannot be None if the review category is
-            translation or voiceover.
+            'translation' or 'voiceover'.
     """
     if review_category not in NEW_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2193,7 +2193,7 @@ def send_email_to_new_contribution_reviewer(
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
-                ' translation or voiceover'
+                ' \'translation\' or \'voiceover\''
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
@@ -2255,7 +2255,7 @@ def send_email_to_removed_contribution_reviewer(
     Raises:
         Exception. The review category is not valid.
         Exception. The language_code cannot be None if the review category is
-            translation or voiceover.
+            'translation' or 'voiceover'.
     """
     if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2270,7 +2270,7 @@ def send_email_to_removed_contribution_reviewer(
         if language_code is None:
             raise Exception(
                 'The language_code cannot be None if the review category is'
-                ' translation or voiceover'
+                ' \'translation\' or \'voiceover\''
             )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
