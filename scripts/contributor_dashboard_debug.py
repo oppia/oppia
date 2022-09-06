@@ -116,7 +116,7 @@ class ContributorDashboardDebugInitializer:
             'FIREBASE_AUTH_EMULATOR_HOST', FIREBASE_AUTH_EMULATOR_HOST
         ):
             # Create a new user in Firebase.
-            firebase_auth.create_user(email=email, password=password) # type: ignore
+            firebase_auth.create_user(email=email, password=password)
 
         # Sign up the new user in Oppia and set its username.
         self._sign_in(email)
