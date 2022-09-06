@@ -88,7 +88,7 @@ describe('Rte Helper Service', function() {
           type: 'unicode',
           validators: [{
             id: 'has_length_at_most',
-            max_value: 160
+            max_value: 500
           }]
         },
         default_value: ''
