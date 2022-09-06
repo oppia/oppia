@@ -52,6 +52,7 @@ export interface TopicBackendDict {
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
   'page_title_fragment_for_web': string;
+  'skill_ids_for_diagnostic_test': string[];
 }
 
 import constants from 'assets/constants';
@@ -76,6 +77,7 @@ export class Topic {
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
+  _skillSummariesForDiagnosticTest: ShortSkillSummary[];
   constructor(
       id: string | null,
       name: string,
@@ -94,7 +96,8 @@ export class Topic {
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
       practiceTabIsDisplayed: boolean,
       metaTagContent: string,
-      pageTitleFragmentForWeb: string
+      pageTitleFragmentForWeb: string,
+      skillIdsForDiagnosticTest: string[]
   ) {
     this._id = id;
     this._name = name;
@@ -117,6 +120,11 @@ export class Topic {
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
+    this._skillSummariesForDiagnosticTest = skillIdsForDiagnosticTest.map(
+      (skillId: string) => {
+        return ShortSkillSummary.create(
+          skillId, skillIdToDescriptionMap[skillId]);
+      });
   }
 
   // Returns 'null' when the topic is not yet fetched from the backend,
@@ -321,6 +329,14 @@ export class Topic {
     }
     if (!this._subtopics.length) {
       issues.push('Topic should have at least 1 subtopic.');
+    }
+    if (this._skillSummariesForDiagnosticTest.length === 0) {
+      issues.push(
+        'The diagnostic test for the topic should test at least one skill.');
+    }
+    if (this._skillSummariesForDiagnosticTest.length > 3) {
+      issues.push(
+        'The diagnostic test for the topic should test at most 3 skills.');
     }
     return issues;
   }
@@ -541,6 +557,35 @@ export class Topic {
     return this._uncategorizedSkillSummaries.slice();
   }
 
+  getSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
+    return this._skillSummariesForDiagnosticTest.slice();
+  }
+
+  setSkillSummariesForDiagnosticTest(
+      skillSummariesForDiagnosticTest: ShortSkillSummary[]): void {
+    this._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
+  }
+
+  getAvailableSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
+    let skillSummaries = cloneDeep(this._uncategorizedSkillSummaries);
+    let subtopics = this._subtopics;
+    for (let i = 0; i < subtopics.length; i++) {
+      skillSummaries = skillSummaries.concat(
+        subtopics[i].getSkillSummaries());
+    }
+    let diagnosticTestSkillSummaries = (
+      this.getSkillSummariesForDiagnosticTest());
+
+    const skillIdToDiagnosticTestMap: {[id: string]: boolean} = {};
+    for (let skillSummary of diagnosticTestSkillSummaries) {
+      skillIdToDiagnosticTestMap[skillSummary.getId()] = true;
+    }
+
+    return skillSummaries.filter(skillSummary => {
+      return !skillIdToDiagnosticTestMap.hasOwnProperty(skillSummary.getId());
+    });
+  }
+
   // Reassigns all values within this topic to match the existing
   // topic. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic.
@@ -556,6 +601,8 @@ export class Topic {
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
     this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
+    this.setSkillSummariesForDiagnosticTest(
+      otherTopic.getSkillSummariesForDiagnosticTest());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -618,7 +665,8 @@ export class TopicObjectFactory {
       skillIdToDescriptionDict,
       topicBackendDict.practice_tab_is_displayed,
       topicBackendDict.meta_tag_content,
-      topicBackendDict.page_title_fragment_for_web
+      topicBackendDict.page_title_fragment_for_web,
+      topicBackendDict.skill_ids_for_diagnostic_test
     );
   }
 
@@ -630,8 +678,7 @@ export class TopicObjectFactory {
     return new Topic(
       null, 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], null, '', {},
-      false, '', ''
+      [], [], [], 1, 1, [], null, '', {}, false, '', '', []
     );
   }
 }
