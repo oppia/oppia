@@ -1315,7 +1315,7 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
             'topic_id': 'topic_id1',
             'topic_name': 'Topic1',
             'topic_version': 2,
-            'subtopic_id': 1,
+            'subtopic_id': 1
         }
         self.assertEqual(
             self.topic_assignments.to_dict(),

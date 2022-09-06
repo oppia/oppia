@@ -171,11 +171,20 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.get();
       await (
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-          'Skill 2', 'Concept card explanation', true));
+          'Skill 2', 'Concept card explanation', false));
+      await skillEditorPage.addRubricExplanationForDifficulty(
+        'Easy', 'Second explanation for easy difficulty.');
+      await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+      // A minimum of two questions are required for skill to get assigned in a
+      // topic’s diagnostic test.
+      await workflow.createQuestion();
+      await workflow.createQuestion();
+
       await topicsAndSkillsDashboardPage.get();
       await (
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 3', 'Concept card explanation', true));
+
       var TOPIC_NAME = 'TASE2';
       var TOPIC_URL_FRAGMENT_NAME = 'tase-two';
       var TOPIC_DESCRIPTION = 'TASE2 description';
@@ -198,6 +207,8 @@ describe('Topic editor functionality', function() {
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+
+      await topicEditorPage.addDiagnosticTestSkill('Skill 2');
 
       await topicEditorPage.addSubtopic(
         'Subtopic 1', 'subtopic-two', '../data/test2_svg.svg',
