@@ -31,7 +31,7 @@ import { AppConstants } from 'app.constants';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 
-interface ExtraParams {
+export interface ExtraParams {
   activeThread: SuggestionThread;
   isSuggestionHandled: boolean;
   isSuggestionValid: boolean;

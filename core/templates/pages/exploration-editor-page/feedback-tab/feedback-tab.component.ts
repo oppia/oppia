@@ -32,6 +32,8 @@ import { ExplorationStatesService } from '../services/exploration-states.service
 import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
 import { ThreadStatusDisplayService } from './services/thread-status-display.service';
 import { SuggestionModalForExplorationEditorService } from '../suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service';
+import { FeedbackThread } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 
 @Component({
   selector: 'oppia-feedback-tab',
@@ -40,10 +42,10 @@ import { SuggestionModalForExplorationEditorService } from '../suggestion-modal-
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   STATUS_CHOICES = this.threadStatusDisplayService.STATUS_CHOICES;
-  activeThread;
-  userIsLoggedIn;
-  threadIsStale;
-  threadData;
+  activeThread: SuggestionThread;
+  userIsLoggedIn: boolean;
+  threadIsStale: boolean;
+  threadData: FeedbackThread[];
   messageSendingInProgress: boolean;
   tmpMessage: {
     status: string;
@@ -89,7 +91,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
           // Fetching threads invalidates old thread domain objects, so we
           // need to update our reference to the active thread afterwards.
           this.activeThread = this.threadDataBackendApiService.getThread(
-            activeThreadId);
+            activeThreadId) as SuggestionThread;
         }
         this.loaderService.hideLoadingScreen();
       });
@@ -202,7 +204,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     }
 
     this.threadDataBackendApiService.getMessagesAsync(thread).then(() => {
-      this.activeThread = thread;
+      this.activeThread = thread as SuggestionThread;
       this.threadDataBackendApiService.markThreadAsSeenAsync(this.activeThread);
       this.tmpMessage.status = this.activeThread.status;
       this.focusManagerService.setFocus('tmpMessageText');
