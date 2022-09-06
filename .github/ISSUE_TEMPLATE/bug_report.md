@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-labels: "TODO: triage, bug"
+labels: triage needed, bug
 ---
 <!--
   - Thanks for taking the time to report a bug in the Oppia project.
