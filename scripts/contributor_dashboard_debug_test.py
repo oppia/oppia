@@ -209,7 +209,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
                 topic_summary_dict, classroom_dict['topic_summary_dicts'])
 
     def test_sign_up_new_user(self) -> None:
-        os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = '0000'
+        auth_host = os.environ.get('FIREBASE_AUTH_EMULATOR_HOST')
+        if auth_host is None:
+            os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = '0000'
 
         with self.request_swap, self.create_user_swap, self.begin_session_swap:
             with self.init_app_swap as init_app_counter:
@@ -218,7 +220,11 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the environment variable 'FIREBASE_AUTH_EMULATOR_HOST' is
         # not changed after calling the function populate_debug_data().
-        self.assertEqual(os.environ['FIREBASE_AUTH_EMULATOR_HOST'], '0000')
+        if auth_host is None:
+            self.assertEqual(os.environ['FIREBASE_AUTH_EMULATOR_HOST'], '0000')
+            del os.environ['FIREBASE_AUTH_EMULATOR_HOST']
+        else:
+            self.assertNotIn('FIREBASE_AUTH_EMULATOR_HOST', auth_host)
 
         self._assert_sign_up_new_user(
             contributor_dashboard_debug.SUPER_ADMIN_EMAIL,
