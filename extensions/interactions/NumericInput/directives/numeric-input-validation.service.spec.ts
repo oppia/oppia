@@ -41,8 +41,8 @@ describe('NumericInputValidationService', () => {
     customizationArgs: NumericInputCustomizationArgs;
   let equalsZeroRule: Rule, equalsZeroRuleLessThanZero: Rule,
     betweenNegativeOneAndOneRule: Rule,
-    betweenFourAndTwoRule: Rule, lessThanOneRule: Rule,
-    lessThanOneRuleLessThanZero: Rule,
+    betweenOneAndOneRule: Rule, betweenFourAndTwoRule: Rule,
+    lessThanOneRule: Rule, lessThanOneRuleLessThanZero: Rule,
     greaterThanNegativeOneRule: Rule, lessThanOrEqualToOneRule: Rule,
     lessThanOrEqualToOneRuleLessThanZero: Rule,
     greaterThanOrEqualToNegativeOneRule: Rule,
@@ -92,6 +92,13 @@ describe('NumericInputValidationService', () => {
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: -1,
+        b: 1
+      }
+    }, 'NumericInput');
+    betweenOneAndOneRule = rof.createFromBackendDict({
+      rule_type: 'IsInclusivelyBetween',
+      inputs: {
+        a: 1,
         b: 1
       }
     }, 'NumericInput');
@@ -188,8 +195,10 @@ describe('NumericInputValidationService', () => {
   it('should show warning if tolerance is not positive for IsWithinTolerance',
     () => {
       answerGroups[0].rules = [nonPositiveToleranceRule];
+
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 1 tolerance must be a positive value.'
@@ -246,13 +255,19 @@ describe('NumericInputValidationService', () => {
   it('should raise warning for IsInclusivelyBetween rule ' +
   'caused by incorrect range',
   () => {
-    answerGroups[0].rules = [betweenFourAndTwoRule];
+    answerGroups[0].rules = [betweenOneAndOneRule, betweenFourAndTwoRule];
+
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'In Rule 1 from answer group 1, Please ensure ' +
-      'that the second number ' + 'is greater than the first number.'
+      'that the second number is greater than the first number.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'In Rule 2 from answer group 1, Please ensure ' +
+      'that the second number is greater than the first number.'
     }]);
   });
 
