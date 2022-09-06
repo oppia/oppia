@@ -127,6 +127,7 @@ import { QuestionMisconceptionEditorComponent } from './question-directives/ques
 import { SolutionExplanationEditor } from './state-directives/solution-editor/solution-explanation-editor.component';
 import { SolutionEditor } from './state-directives/solution-editor/solution-editor.component';
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
+import { OutcomeIfStuckDestinationEditorComponent } from './state-directives/outcome-editor/outcome-if-stuck-destination-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
 import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
@@ -144,11 +145,13 @@ import { QuestionEditorComponent } from './question-directives/question-editor/q
 import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
 import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
 import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
+import { RemoveQuestionSkillLinkModalComponent } from './question-directives/modal-templates/remove-question-skill-link-modal.component';
 import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
 import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
 import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
 import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 
 // Pipes.
@@ -192,6 +195,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
+    MatProgressSpinnerModule,
     NgbModalModule
   ],
 
@@ -245,6 +249,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeIfStuckDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
@@ -314,6 +319,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
@@ -368,6 +374,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     CheckpointCelebrationModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeIfStuckDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     AddOutcomeModalComponent,
@@ -431,6 +438,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
@@ -501,6 +509,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     RubricsEditorComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeIfStuckDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
@@ -559,6 +568,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
