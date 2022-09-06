@@ -288,7 +288,7 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   properties:
   - name: blog_post_is_published
   - name: editor_ids
-  - name: story__ids
+  - name: story_ids
   - name: last_updated
     direction: desc
 """
@@ -324,6 +324,14 @@ class ExtendIndexYamlTest(test_utils.GenericTestBase):
   properties:
   - name: blog_post_is_published
   - name: editor_ids
+  - name: story_ids
+  - name: last_updated
+    direction: desc
+
+- kind: BlogPostRightsModel
+  properties:
+  - name: editor_ids
+  - name: blog_post_is_published
   - name: story__ids
   - name: last_updated
     direction: desc
