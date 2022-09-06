@@ -272,18 +272,14 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-        matching_topics_with_none: Sequence[
-            Optional[topic_domain.Topic]
-        ] = (
-            topic_fetchers.get_topics_by_ids(matching_topic_ids)
+        matching_topics: List[topic_domain.Topic] = (
+            topic_fetchers.get_topics_by_ids(matching_topic_ids, strict=True)
         )
     else:
-        matching_topics_with_none = topic_fetchers.get_all_topics()
+        matching_topics = topic_fetchers.get_all_topics()
 
     keyword = keyword.lower()
-    for topic in matching_topics_with_none:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
+    for topic in matching_topics:
         if language_code not in (
             constants.DEFAULT_ADD_SYLLABUS_FILTER, topic.language_code
         ):
