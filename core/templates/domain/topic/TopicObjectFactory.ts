@@ -54,7 +54,7 @@ export interface TopicBackendDict {
   'page_title_fragment_for_web': string;
 }
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 export class Topic {
   // The 'id' and 'thumbnailFilename' is 'null' for an interstitial

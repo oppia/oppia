@@ -29,7 +29,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { Observable } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 interface SaveAudioResponse {
   'filename': string;

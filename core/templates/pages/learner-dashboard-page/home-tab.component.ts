@@ -16,7 +16,7 @@
  * @fileoverview Component for home tab in the Learner Dashboard page.
  */
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';

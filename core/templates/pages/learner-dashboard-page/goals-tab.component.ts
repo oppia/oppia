@@ -16,7 +16,7 @@
  * @fileoverview Component for goals tab in the Learner Dashboard page.
  */
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';

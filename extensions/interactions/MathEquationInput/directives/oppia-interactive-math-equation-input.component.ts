@@ -31,7 +31,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { MathEquationInputRulesService } from './math-equation-input-rules.service';
 import { TranslateService } from '@ngx-translate/core';
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 @Component({
   selector: 'oppia-interactive-math-equation-input',

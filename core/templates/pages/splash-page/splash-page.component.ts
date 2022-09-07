@@ -17,7 +17,7 @@
  */
 import { Component, OnInit } from '@angular/core';
 
-import splashConstants from 'assets/constants';
+const splashConstants = require('constants.ts');
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

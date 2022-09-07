@@ -24,7 +24,7 @@ import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ContextService } from 'services/context.service';
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 @Injectable({
   providedIn: 'root'

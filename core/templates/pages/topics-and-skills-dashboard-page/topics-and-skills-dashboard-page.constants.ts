@@ -15,7 +15,7 @@
 /**
  * @fileoverview Constants for the topics and skills dashboard.
  */
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 export enum ETopicSortOptions {
   IncreasingCreatedOn = 'Newly Created',

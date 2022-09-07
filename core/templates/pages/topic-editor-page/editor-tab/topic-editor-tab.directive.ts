@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-import topicConstants from 'assets/constants';
+const topicConstants = require('constants.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +

@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 import { ExplorationMetadata, ExplorationMetadataBackendDict, ExplorationMetadataObjectFactory } from './ExplorationMetadataObjectFactory';
 
 describe('Exploration metadata object factory', () => {

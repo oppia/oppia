@@ -28,7 +28,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { AlgebraicExpressionInputRulesService } from './algebraic-expression-input-rules.service';
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { TranslateService } from '@ngx-translate/core';

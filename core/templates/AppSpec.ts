@@ -28,7 +28,7 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 describe('App', function() {

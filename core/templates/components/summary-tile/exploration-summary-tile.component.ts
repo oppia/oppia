@@ -19,7 +19,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';

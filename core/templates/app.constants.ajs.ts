@@ -20,7 +20,7 @@
 // equivalents of the Angular constants are no longer needed.
 import { AppConstants } from 'app.constants';
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 for (var constantName in constants) {
   angular.module('oppia').constant(constantName, constants[constantName]);

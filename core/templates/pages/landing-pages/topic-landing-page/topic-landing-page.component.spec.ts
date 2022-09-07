@@ -29,7 +29,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 class MockWindowRef {
   _window = {

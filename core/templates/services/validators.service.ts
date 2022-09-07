@@ -24,7 +24,7 @@ import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 @Injectable({
   providedIn: 'root'

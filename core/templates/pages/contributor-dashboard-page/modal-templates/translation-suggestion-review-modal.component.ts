@@ -30,7 +30,7 @@ import { UserService } from 'services/user.service';
 import { ValidatorsService } from 'services/validators.service';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { AppConstants } from 'app.constants';
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 // This throws "TS2307". We need to

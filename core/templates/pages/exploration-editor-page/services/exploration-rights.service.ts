@@ -19,7 +19,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import AppConstants from 'assets/constants';
+const AppConstants = require('constants.ts');
 import { ExplorationDataService } from
   'pages/exploration-editor-page/services/exploration-data.service';
 import { AlertsService } from 'services/alerts.service';

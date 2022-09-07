@@ -23,7 +23,7 @@ import { ExplorationSummaryBackendApiService, ExplorationSummaryBackendDict } fr
   'domain/summary/exploration-summary-backend-api.service';
 import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
   './read-only-exploration-backend-api.service';
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 @Injectable({
   providedIn: 'root'

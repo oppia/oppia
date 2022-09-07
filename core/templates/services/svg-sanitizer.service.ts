@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+const constants =  require('constants.ts');
 
 type nodeAttr = (
   'style' |
