@@ -46,7 +46,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   @Input() activeLanguageCode!: string | null;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
-  @ViewChild('filterDiv') private filterDivRef!: ElementRef;
+  @ViewChild('filterDiv') filterDivRef!: ElementRef;
 
   options!: Options[];
   filteredOptions: Options[] = [];
@@ -109,9 +109,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
       this.optionsFilter = '';
       this.filteredOptions = this.options;
       setTimeout(() => {
-        if (this.filterDivRef) {
-          this.filterDivRef.nativeElement.focus();
-        }
+        this.filterDivRef.nativeElement.focus();
       }
       , 1);
     }
