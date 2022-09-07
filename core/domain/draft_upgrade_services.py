@@ -87,8 +87,8 @@ def try_upgrading_draft_to_exp_version(
         commit = commits_list[upgrade_times]
         # Here we are assured that the commit is never going to be None, because
         # every time a commit to ExplorationModel or ExplorationRightsModel
-        # occurs an instance of ExplorationCommitLogEntryModel is saved, even
-        # if we create an exploration a commit occurs.
+        # occurs an instance of ExplorationCommitLogEntryModel is saved. Even
+        # if we create an exploration, a commit occurs.
         assert commit is not None
         if (
                 len(commit.commit_cmds) != 1 or

@@ -182,7 +182,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'No story Model exist for the story_id: invalid_id'
+            'No story model exists for the story_id: invalid_id'
         ):
             story_fetchers.get_stories_by_ids(['invalid_id'], strict=True)
 

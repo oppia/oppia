@@ -371,7 +371,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'No topic Model exist for the topic_id: invalid_id'
+            'No topic model exists for the topic_id: invalid_id'
         ):
             topic_fetchers.get_topics_by_ids(['invalid_id'], strict=True)
 
