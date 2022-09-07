@@ -481,19 +481,10 @@ class AuditStoryMigrationJob(base_jobs.JobBase):
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
-        transformed_story_objects_list = (
+        story_objects_list_job_run_results = (
             story_objects_list
             | 'Remove unmigrated stories' >> beam.Filter(
                 lambda x: len(x['story_change']) > 0 and len(x['story']) > 0)
-            | 'Reorganize the story objects' >> beam.Map(lambda objects: {
-                    'story_model': objects['story_model'][0],
-                    'story': objects['story'][0],
-                    'story_change': objects['story_change'][0]
-                })
-        )
-
-        story_objects_list_job_run_results = (
-            transformed_story_objects_list
             | 'Transform story objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'STORY MIGRATED'))

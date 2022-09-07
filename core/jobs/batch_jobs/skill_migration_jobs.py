@@ -276,6 +276,10 @@ class MigrateSkillJob(base_jobs.JobBase):
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        transformed_skill_objects_list = (
+            skill_objects_list
             | 'Remove unmigrated skills' >> beam.Filter(
                 lambda x: len(x['skill_changes']) > 0 and len(x['skill']) > 0)
             | 'Reorganize the skill objects' >> beam.Map(lambda objects: {
@@ -284,28 +288,29 @@ class MigrateSkillJob(base_jobs.JobBase):
                     'skill': objects['skill'][0],
                     'skill_changes': objects['skill_changes']
                 })
-        )
 
-        skill_objects_list_job_run_results = (
-            skill_objects_list
-            | 'Transform skill objects into job run results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'SKILL MIGRATED'))
         )
 
         already_migrated_job_run_results = (
             skill_objects_list
             | 'Remove migrated skills' >> beam.Filter(
                 lambda x: (
-                    len(x['skill_changes']) == 0 and len(x['skill']) > 0
+                        len(x['skill_changes']) == 0 and len(x['skill']) > 0
                 ))
             | 'Transform previously migrated skills into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'SKILL PREVIOUSLY MIGRATED'))
         )
 
+        skill_objects_list_job_run_results = (
+            transformed_skill_objects_list
+            | 'Transform skill objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL MIGRATED'))
+        )
+
         cache_deletion_job_run_results = (
-            skill_objects_list
+            transformed_skill_objects_list
             | 'Delete skill from cache' >> beam.Map(
                 lambda skill_object: self._delete_skill_from_cache(
                     skill_object['skill']))
@@ -314,7 +319,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         )
 
         skill_models_to_put = (
-            skill_objects_list
+            transformed_skill_objects_list
             | 'Generate skill models to put' >> beam.FlatMap(
                 lambda skill_objects: self._update_skill(
                     skill_objects['skill_model'],
@@ -324,7 +329,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         )
 
         skill_summary_models_to_put = (
-            skill_objects_list
+            transformed_skill_objects_list
             | 'Generate skill summary models to put' >> beam.Map(
                 lambda skill_objects: self._update_skill_summary(
                     skill_objects['skill'],
@@ -475,31 +480,26 @@ class AuditSkillMigrationJob(base_jobs.JobBase):
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Remove unmigrated skills' >> beam.Filter(
-                lambda x: len(x['skill_changes']) > 0 and len(x['skill']) > 0)
-            | 'Reorganize the skill objects' >> beam.Map(lambda objects: {
-                    'skill_model': objects['skill_model'][0],
-                    'skill': objects['skill'][0],
-                    'skill_changes': objects['skill_changes']
-                })
-        )
-
-        skill_objects_list_job_run_results = (
-            skill_objects_list
-            | 'Transform skill objects into job run results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'SKILL MIGRATED'))
         )
 
         already_migrated_job_run_results = (
             skill_objects_list
             | 'Remove migrated skills' >> beam.Filter(
                 lambda x: (
-                    len(x['skill_changes']) == 0 and len(x['skill']) > 0
+                        len(x['skill_changes']) == 0 and len(x['skill']) > 0
                 ))
             | 'Transform previously migrated skills into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'SKILL PREVIOUSLY MIGRATED'))
+        )
+
+        skill_objects_list_job_run_results = (
+            skill_objects_list
+            | 'Remove unmigrated skills' >> beam.Filter(
+                lambda x: len(x['skill_changes']) > 0 and len(x['skill']) > 0)
+            | 'Transform skill objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL MIGRATED'))
         )
 
         return (

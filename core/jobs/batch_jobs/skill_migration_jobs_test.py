@@ -389,7 +389,9 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
         }])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='SKILL PREVIOUSLY MIGRATED SUCCESS: 1')
         ])
 
         unmigrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)
@@ -687,7 +689,9 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
         }])
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='SKILL PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='SKILL PREVIOUSLY MIGRATED SUCCESS: 1')
         ])
 
         unmigrated_skill_model = skill_models.SkillModel.get(self.SKILL_1_ID)

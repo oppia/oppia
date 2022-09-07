@@ -644,22 +644,12 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
         )
 
-        transformed_exp_objects_list = (
+        exp_objects_list_job_run_results = (
             exp_objects_list
             | 'Remove unmigrated explorations' >> beam.Filter(
                 lambda x: (
-                    len(x['exp_changes']) > 0 and
-                    len(x['exploration']) > 0
+                    len(x['exp_changes']) > 0 and len(x['exploration']) > 0
                 ))
-            | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
-                'exp_model': objects['exp_model'][0],
-                'exploration': objects['exploration'][0],
-                'exp_changes': objects['exp_changes']
-            })
-        )
-
-        exp_objects_list_job_run_results = (
-            transformed_exp_objects_list
             | 'Transform exp objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'EXP MIGRATED'))
