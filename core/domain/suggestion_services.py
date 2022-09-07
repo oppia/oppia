@@ -22,7 +22,6 @@ import datetime
 import heapq
 import logging
 import re
-from time import timezone
 
 from core import feconf
 from core.constants import constants
