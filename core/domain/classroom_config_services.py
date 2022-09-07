@@ -25,6 +25,7 @@
 from __future__ import annotations
 
 from core.domain import classroom_config_domain
+from core.domain import topic_services
 from core.platform import models
 
 from typing import Dict, List, Optional, overload
@@ -223,3 +224,21 @@ def delete_classroom(classroom_id: str) -> None:
         classroom_id: str. ID of the classroom which is to be deleted.
     """
     classroom_models.ClassroomModel.get(classroom_id).delete()
+
+
+def get_topic_dependencies_in_name(topic_id_to_prerequisite_topic_ids):
+    topic_ids = topic_id_to_prerequisite_topic_ids.keys()
+    topic_id_to_topic_name = topic_services.get_topic_id_to_topic_name(
+        topic_ids)
+    topic_name_to_prerequisite_topic_names = {}
+
+    for topic_id, topic_id_prerequisites in topic_id_to_prerequisite_topic_ids.items():
+        topic_name_prerequisites = []
+        for prerequisite_topic_id in topic_id_prerequisites:
+            topic_name_prerequisites.append(
+                topic_id_to_topic_name[prerequisite_topic_id])
+
+        topic_name_to_prerequisite_topic_names[
+            topic_id_to_topic_name[topic_id]] = topic_name_prerequisites
+
+    return topic_name_to_prerequisite_topic_names

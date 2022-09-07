@@ -362,6 +362,9 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
         classroom.ClassroomHandler),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_URL_FRAGMENT_HANDLER,
+        classroom.ClassroomUrlFragmentHandler),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'

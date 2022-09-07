@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
@@ -83,6 +83,10 @@ interface FetchClassroomDataBackendDict {
 
 interface ClassroomDataResponse {
   classroomDict: ClassroomDict;
+}
+
+interface DoesClassroomWithUrlFragmentExistBackendResponse {
+  'classoom_url_fragment_exists': boolean;
 }
 
 @Injectable({
@@ -248,6 +252,33 @@ export class ClassroomBackendApiService {
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
+    });
+  }
+
+  private _doesClassroomWithUrlFragmentExist(
+      classroomUrlFragment: string,
+      successCallback: (value: boolean) => void,
+      errorCallback: (errorResponse: HttpErrorResponse) => void
+  ): void {
+    let classroomUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
+      '/classroom_url_fragment_handler/<classroom_url_fragment>', {
+        classroom_url_fragment: classroomUrlFragment
+      });
+    this.http.get<DoesClassroomWithUrlFragmentExistBackendResponse>(
+      classroomUrlFragment).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback(response.classoom_url_fragment_exists);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse);
+    });
+  }
+
+  async doesClassroomWithUrlFragmentExist(classroomUrlFragment: string):
+       Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._doesClassroomWithUrlFragmentExist(
+        classroomUrlFragment, resolve, reject);
     });
   }
 }

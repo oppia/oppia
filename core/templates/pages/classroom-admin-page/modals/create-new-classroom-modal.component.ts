@@ -39,8 +39,11 @@ export class CreateNewClassroomModalComponent
   existingClassroomNames: string[] = [];
   newClassroomName: string = '';
   newClassroomId: string = '';
+  newClassroomUrlFragment: string = '';
   classroomNameAlreadyExist: boolean = false;
+  classroomUrlFragmentAlreadyExist: boolean = false;
   creatingNewClassroom: boolean = false;
+  classroomContainsValidInput: boolean = false;
 
   getNewClassroomId(): void {
     this.classroomBackendApiService.getNewClassroomIdAsync().then(
@@ -51,14 +54,14 @@ export class CreateNewClassroomModalComponent
   }
 
   ngOnInit(): void {
+    this.classroomContainsValidInput = false;
     this.getNewClassroomId();
+    console.log('no valid')
   }
 
-  createClassroom(classroomName: string): void {
-    if (this.existingClassroomNames.indexOf(classroomName) !== -1) {
-      this.classroomNameAlreadyExist = true;
-      return;
-    }
+  createClassroom(classroomName: string, classroomUrlFragment: string): void {
+    this.validateClassroomInput(classroomName, classroomUrlFragment);
+
     this.creatingNewClassroom = true;
 
     let defaultClassroomDict = {
@@ -75,5 +78,37 @@ export class CreateNewClassroomModalComponent
       this.ngbActiveModal.close(defaultClassroomDict);
       this.creatingNewClassroom = false;
     });
+  }
+
+  onClassroomNameChange() {
+    if (this.classroomNameAlreadyExist) {
+      this.classroomNameAlreadyExist = false;
+    }
+  }
+  onClassroomUrlFragmentChange() {
+    if(this.classroomUrlFragmentAlreadyExist) {
+      this.classroomUrlFragmentAlreadyExist = false;
+    }
+  }
+  validateClassroomName() {
+    if(this.newClassroomName === '') {
+      return
+    }
+  }
+  validateClassroomUrlFragment() {
+
+  }
+  validateClassroomInput(classroomName: string, classroomUrlFragment: string) {
+    if (this.existingClassroomNames.indexOf(classroomName) !== -1) {
+      this.classroomNameAlreadyExist = true;
+      this.classroomContainsValidInput = false;
+    }
+    this.classroomBackendApiService.doesClassroomWithUrlFragmentExist(
+      classroomUrlFragment).then(response => {
+        if (response) {
+          this.classroomUrlFragmentAlreadyExist = true;
+          this.classroomContainsValidInput = false;
+        }
+      });
   }
 }

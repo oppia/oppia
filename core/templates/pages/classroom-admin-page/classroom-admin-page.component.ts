@@ -219,6 +219,20 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroomDict.topicIdToPrerequisiteTopicIds);
   }
 
+  getTopicDependencyByTopicName() {
+
+  }
+
+  getTopicDependencyByTopicId() {
+
+  }
+
+  getTopicNameToTopicId() {
+
+  }
+
+
+
   ngOnInit(): void {
     this.getAllClassroomIdToClassroomName();
   }

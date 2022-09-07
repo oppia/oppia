@@ -1,16 +1,38 @@
 <div class="modal-header">
   <h3>
-    Fill the basic details of a classroom
+    Add new classroom
   </h3>
 </div>
 <div class="modal-body">
-  <p>
-    Enter the name of the new classroom
-  </p>
-  <textarea class="new-classroom-name-input" [(ngModel)]="newClassroomName" rows="1"></textarea>
-  <p *ngIf="classroomNameAlreadyExist" class="oppia-warning-text">
-    A classroom with this name already exists.
-  </p>
+  <div class="new-classroom-input-data">
+    <span class="col-lg-3 col-md-3 col-sm-3">Name</span>
+    <textarea class="new-classroom-name-input"
+              [(ngModel)]="newClassroomName"
+              rows="1"
+              (ngModelChange)="onClassroomNameChange(newClassroomName)">
+    </textarea>
+    <p *ngIf="classroomNameAlreadyExist" class="oppia-warning-text">
+      A classroom with this name already exists.
+    </p>
+  </div>
+
+  <div class="new-classroom-input-data">
+    <span class="col-lg-3 col-md-3 col-sm-3">Url Fragment</span>
+    <textarea class="new-classroom-name-input"
+              [(ngModel)]="newClassroomUrlFragment"
+              rows="1"
+              (ngModelChange)="onClassroomUrlFragmentChange(newClassroomUrlFragment)">
+    </textarea>
+    <span>
+      <em>
+        The classroom URL fragment is used to uniquely access the classroom.
+        It should consist of one or more hyphen-separated words, all in lowercase.
+      </em>
+    </span>
+    <p *ngIf="classroomUrlFragmentAlreadyExist" class="oppia-warning-text">
+      A classroom with this url fragment already exists.
+    </p>
+  </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary"
@@ -19,7 +41,7 @@
   </button>
   <button class="btn btn-success"
           (click)="createClassroom(newClassroomName)"
-          [disabled]="newClassroomName === ''">
+          [disabled]="newClassroomName === '' || newClassroomUrlFragment === ''">
     <span *ngIf="!creatingNewClassroom">Create</span>
     <mat-spinner *ngIf="creatingNewClassroom"
                  class="oppia-create-classroom-spinning-button"
@@ -29,6 +51,9 @@
 </div>
 
 <style>
+  .new-classroom-input-data {
+    margin: 10px;
+  }
   :host /deep/ .oppia-create-classroom-spinning-button circle {
     stroke: #fff;
   }
