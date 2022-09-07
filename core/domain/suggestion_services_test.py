@@ -2141,8 +2141,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             first_contribution_date=datetime.date.fromtimestamp(1616173836),
             last_contribution_date=datetime.date.fromtimestamp(1616173836)
         )
+
         stats = suggestion_services.get_all_contributor_stats( # pylint: disable=line-too-long
             'user_id')
+
         self.assertEqual(stats.contributor_user_id, 'user_id')
         self.assertEqual(len(stats.translation_contribution_stats), 1)
         self.assertEqual(
@@ -2200,7 +2202,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.admin_id, topic.id, skill_id)
 
     def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
-        """Sets up required topics and stories for translations.
+        """Sets up required topics and stories for translations. It does the
+        following.
+        1. Create 2 explorations and publish them.
+        2. Create a default topic.
+        3. Publish the topic with two story IDs.
+        4. Create a 2 stories for translation opportunities.
+        5. Return a mock change for a translation.
 
         Returns:
             Dict[str, str]. A dictionary of the change object for the
@@ -2213,7 +2221,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
-        ) for i in range(3)]
+        ) for i in range(2)]
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -2248,6 +2256,51 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services.get_translation_contribution_stats_models(
                 ['invalid_id'])
 
+    def test_update_translation_contribution_stats_without_language_codes(
+        self
+    ) -> None:
+        translation_contribution_stats = (
+            suggestion_registry.TranslationContributionStats(
+                None, 'user1', 'topic1', 1, 1, 1, 0, 1, 0, 0,
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Language code should not be None.'):
+            suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
+                [translation_contribution_stats])
+
+    def test_update_translation_contribution_stats_without_contributor_id(
+        self
+    ) -> None:
+        translation_contribution_stats = (
+            suggestion_registry.TranslationContributionStats(
+                'hi', None, 'topic1', 1, 1, 1, 0, 1, 0, 0,
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Contributor user ID should not be None.'):
+            suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
+                [translation_contribution_stats])
+
+    def test_update_translation_contribution_stats_without_topic_id(
+        self
+    ) -> None:
+        translation_contribution_stats = (
+            suggestion_registry.TranslationContributionStats(
+                'hi', 'user1', None, 1, 1, 1, 0, 1, 0, 0,
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Topic ID should not be None.'):
+            suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
+                [translation_contribution_stats])
+
     def test_get_translation_review_stats_for_invalid_id_with_strict_true(
         self
     ) -> None:
@@ -2277,10 +2330,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def test_update_translation_contribution_stats_when_submitting(
         self) -> None:
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Create and publish explorations.
         # 2. Create and publish topics.
-        # 3. Create stories for translation opportuinities.
+        # 3. Create stories for translation opportunities.
         # 4. Save translation suggestions.
         change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
@@ -2305,7 +2358,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert translation contribution stats.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
         # called update_translation_contribution_stats_at_submission function
         # to create/update translation contribution stats.
@@ -2330,10 +2383,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a translation suggestion is accepted.
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Create and publish explorations.
         # 2. Create and publish topics.
-        # 3. Create stories for translation opportuinities.
+        # 3. Create stories for translation opportunities.
         # 4. Save translation suggestions.
         change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
@@ -2357,7 +2410,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert translation contribution stats before the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
         # called update_translation_contribution_stats_at_submission function
         # to create/update translation contribution stats.
@@ -2403,7 +2456,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert translation review stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation review stat object for the given IDs since we have
         # called update_translation_review_stats function to create/update
         # translation review stats.
@@ -2420,7 +2473,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             6
         )
         # Assert translation contribution stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
         # called update_translation_contribution_stats_at_submission function
         # to create/update translation contribution stats.
@@ -2445,10 +2498,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a translation suggestion is rejected.
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Create and publish explorations.
         # 2. Create and publish topics.
-        # 3. Create stories for translation opportuinities.
+        # 3. Create stories for translation opportunities.
         # 4. Save translation suggestions.
         change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
@@ -2472,7 +2525,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert translation contribution stats before the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
         # called update_translation_contribution_stats_at_submission function
         # to create/update translation contribution stats.
@@ -2516,7 +2569,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert translation review stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation review stat object for the given IDs since we have
         # called update_translation_review_stats function to create/update
         # translation review stats.
@@ -2537,7 +2590,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             6
         )
         # Assert translation contribution stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
         # called update_translation_contribution_stats_at_submission function
         # to create/update translation contribution stats.
@@ -2562,10 +2615,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a translation suggestion is accepted with reviewer edits.
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Create and publish explorations.
         # 2. Create and publish topics.
-        # 3. Create stories for translation opportuinities.
+        # 3. Create stories for translation opportunities.
         # 4. Save translation suggestions.
         change_dict = self._set_up_topics_and_stories_for_translations()
         initial_suggestion = suggestion_services.create_suggestion(
@@ -2589,7 +2642,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert translation contribution stats before the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
         # called update_translation_contribution_stats_at_submission function
         # to create/update translation contribution stats.
@@ -2644,7 +2697,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert translation review stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation review stat object for the given IDs since we have
         # called update_translation_review_stats function to create/update
         # translation review stats.
@@ -2666,7 +2719,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             1
         )
         # Assert translation contribution stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # translation contribution stat object for the given IDs since we have
         # called update_translation_contribution_stats_at_submission function
         # to create/update translation contribution stats.
@@ -2695,10 +2748,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def test_update_question_contribution_stats_when_submitting(self) -> None:
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestions.
+        # 4. Create a question suggestion.
         skill_id_1 = skill_services.get_new_skill_id()
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -2773,7 +2826,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question contribution stats before the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question contribution stat object for the given IDs since we have
         # called update_question_contribution_stats_at_submission function to
         # create/update question contribution stats.
@@ -2807,7 +2860,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question review stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question review stat object for the given IDs since we have
         # called update_question_review_stats function to create/update question
         # review stats.
@@ -2828,10 +2881,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a question suggestion is accepted.
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestions.
+        # 4. Create a question suggestion.
         skill_id_1 = skill_services.get_new_skill_id()
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -2906,7 +2959,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question contribution stats before the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question contribution stat object for the given IDs since we have
         # called update_question_contribution_stats_at_submission function to
         # create/update question contribution stats.
@@ -2946,7 +2999,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question review stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question review stat object for the given IDs since we have
         # called update_question_review_stats function to create/update question
         # review stats.
@@ -2963,7 +3016,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             2
         )
         # Assert question contribution stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question contribution stat object for the given IDs since we have
         # called update_question_contribution_stats_at_submission function to
         # create/update question contribution stats.
@@ -2981,10 +3034,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a question suggestion is rejected.
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestions.
+        # 4. Create a question suggestion.
         skill_id_1 = skill_services.get_new_skill_id()
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -3059,7 +3112,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question contribution stats before the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question contribution stat object for the given IDs since we have
         # called update_question_contribution_stats_at_submission function to
         # create/update question contribution stats.
@@ -3097,7 +3150,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question review stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question review stat object for the given IDs since we have
         # called update_question_review_stats function to create/update question
         # review stats.
@@ -3118,7 +3171,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             2
         )
         # Assert question contribution stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question contribution stat object for the given IDs since we have
         # called update_question_contribution_stats_at_submission function to
         # create/update question contribution stats.
@@ -3133,13 +3186,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def test_update_question_stats_when_suggestion_is_edited(
-        self) -> None:
+        self
+    ) -> None:
         # This test case will check stats of the reviewer and the submitter
         # when a question suggestion is accepted with reviewer edits.
-        # Steps required in the setup pahse before testing.
+        # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestions.
+        # 4. Create a question suggestion.
         skill_id_1 = skill_services.get_new_skill_id()
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -3214,7 +3268,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question contribution stats before the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question contribution stat object for the given IDs since we have
         # called update_question_contribution_stats_at_submission function to
         # create/update question contribution stats.
@@ -3263,7 +3317,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         # Assert question review stats.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question review stat object for the given IDs since we have
         # called update_question_review_stats function to create/update question
         # review stats.
@@ -3284,7 +3338,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             1
         )
         # Assert question contribution stats after the review.
-        # At this point we can confirm that there should be an assciated
+        # At this point we can confirm that there should be an associated
         # question contribution stat object for the given IDs since we have
         # called update_question_contribution_stats_at_submission function to
         # create/update question contribution stats.
