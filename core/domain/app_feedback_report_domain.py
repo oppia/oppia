@@ -334,8 +334,9 @@ class AppFeedbackReport:
             'The given report type %s is invalid.' % report_type_name)
 
     @classmethod
-    def get_category_from_string(cls, category_name: str) -> (
-        app_feedback_report_constants.Category):
+    def get_category_from_string(
+        cls, category_name: str
+    ) -> app_feedback_report_constants.Category:
         """Determines the category based on the JSON value.
 
         Args:
