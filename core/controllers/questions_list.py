@@ -64,7 +64,7 @@ class QuestionsListHandler(base.BaseHandler):
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
         try:
-            offset = (self.normalized_request.get('offset'))
+            offset = self.normalized_request.get('offset')
             
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
