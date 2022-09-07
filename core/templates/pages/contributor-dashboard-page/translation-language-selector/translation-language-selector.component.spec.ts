@@ -275,11 +275,37 @@ describe('Translation language selector', () => {
     expect(component.dropdownShown).toBe(true);
     expect(component.optionsFilter).toBe('');
     expect(component.filteredOptions).toBe(component.options);
+    expect(component.filteredOptions).toContain(
+      {id: 'es', description: 'español (Spanish)'});
+    expect(component.filteredOptions).toContain(
+      {id: 'fr', description: 'français (French)'});
+
+    // Type a filter query.
+    component.optionsFilter = 'sp';
+    component.filterOptions();
+    fixture.detectChanges();
+
+    expect(component.filteredOptions).not.toBe(component.options);
+    expect(component.filteredOptions).toContain(
+      {id: 'es', description: 'español (Spanish)'});
+    expect(component.filteredOptions).not.toContain(
+      {id: 'fr', description: 'français (French)'});
 
     // Close the dropdown.
     component.toggleDropdown();
 
     expect(component.dropdownShown).toBe(false);
+
+    // Open the dropdown.
+    component.toggleDropdown();
+
+    expect(component.dropdownShown).toBe(true);
+    expect(component.optionsFilter).toBe('');
+    expect(component.filteredOptions).toBe(component.options);
+    expect(component.filteredOptions).toContain(
+      {id: 'es', description: 'español (Spanish)'});
+    expect(component.filteredOptions).toContain(
+      {id: 'fr', description: 'français (French)'});
   });
 
   it('should filter language options based on the filter text', () => {
