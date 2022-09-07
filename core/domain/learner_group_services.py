@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import config_domain
+from core.domain import config_domain, learner_group_fetchers
 from core.domain import learner_group_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -526,13 +526,14 @@ def remove_learners_from_learner_group(
         learner_group_model.update_timestamps()
         learner_group_model.put()
 
-    learner_grps_users_models = user_models.LearnerGroupsUserModel.get_multi(
-        user_ids)
+    learner_grps_users_models = (
+        learner_group_fetchers.get_learner_group_models_by_ids(
+            user_ids, strict=True
+        )
+    )
 
     models_to_put = []
     for learner_grps_user_model in learner_grps_users_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert learner_grps_user_model is not None
         learner_grps_user_model.learner_groups_user_details = [
             details for details in
             learner_grps_user_model.learner_groups_user_details
@@ -602,12 +603,13 @@ def remove_invited_learners_from_learner_group(
         learner_group_model.put()
 
     found_models = (
-        user_models.LearnerGroupsUserModel.get_multi(learner_ids))
+        learner_group_fetchers.get_learner_group_models_by_ids(
+            learner_ids, strict=True
+        )
+    )
 
     models_to_put = []
     for model in found_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         if group_id in model.invited_to_learner_groups_ids:
             model.invited_to_learner_groups_ids.remove(group_id)
             models_to_put.append(model)
