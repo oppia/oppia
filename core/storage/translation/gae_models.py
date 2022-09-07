@@ -29,8 +29,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models(
-    [models.Names.BASE_MODEL])
+(base_models,) = models.Registry.import_models([
+    models.Names.BASE_MODEL
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -228,11 +229,11 @@ class MachineTranslationModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            source_language_code: str,
-            target_language_code: str,
-            source_text: str,
-            translated_text: str
+        cls,
+        source_language_code: str,
+        target_language_code: str,
+        source_text: str,
+        translated_text: str
     ) -> Optional[str]:
         """Creates a new MachineTranslationModel instance and returns its ID.
 
@@ -270,9 +271,9 @@ class MachineTranslationModel(base_models.BaseModel):
 
     @staticmethod
     def _generate_id(
-            source_language_code: str,
-            target_language_code: str,
-            hashed_source_text: str
+        source_language_code: str,
+        target_language_code: str,
+        hashed_source_text: str
     ) -> str:
         """Generates a valid, deterministic key for a MachineTranslationModel
         instance.

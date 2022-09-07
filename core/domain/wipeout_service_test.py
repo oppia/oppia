@@ -582,7 +582,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
     def test_pre_delete_user_user_is_deassigned_from_topics(self) -> None:
         self.save_new_topic('top_id', self.user_1_id)
-        topic_services.assign_role(  # type: ignore[no-untyped-call]
+        topic_services.assign_role(
             user_services.get_system_user(),
             self.user_1_actions,
             feconf.ROLE_MANAGER,
@@ -4250,12 +4250,12 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.user_2_actions = user_services.get_user_actions_info(
             self.user_2_id)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
-        topic_services.assign_role(  # type: ignore[no-untyped-call]
+        topic_services.assign_role(
             self.user_1_actions,
             self.user_1_actions,
             topic_domain.ROLE_MANAGER,
             self.TOP_1_ID)
-        topic_services.assign_role(  # type: ignore[no-untyped-call]
+        topic_services.assign_role(
             self.user_1_actions,
             self.user_2_actions,
             topic_domain.ROLE_MANAGER,

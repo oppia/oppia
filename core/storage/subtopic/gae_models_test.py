@@ -24,13 +24,16 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.SUBTOPIC])
+    models.Names.BASE_MODEL, models.Names.SUBTOPIC
+])
 
 
 class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -45,7 +48,7 @@ class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageModel class."""
 
-    SUBTOPIC_PAGE_ID = 'subtopic_page_id'
+    SUBTOPIC_PAGE_ID: Final = 'subtopic_page_id'
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -69,7 +72,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(
-            self
+        self
     ) -> None:
         """Tests the _trusted_commit() method."""
 

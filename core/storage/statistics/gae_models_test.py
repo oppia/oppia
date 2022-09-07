@@ -33,8 +33,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import stats_models
 
-(base_models, stats_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.STATISTICS])
+(base_models, stats_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.STATISTICS
+])
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
@@ -1056,7 +1057,19 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
     def test_shard_count_is_updated_when_data_overflows(self) -> None:
 
-        submitted_answer_list = [{'answer': 'value'}]
+        submitted_answer_list: List[stats_domain.SubmittedAnswerDict] = [{
+            'answer': 'value',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': 'rule spec str',
+            'answer_str': 'answer str'
+        }]
 
         stats_models.StateAnswersModel.insert_submitted_answers(
             'exp_id', 1, 'state_name', 'interaction_id',
@@ -1120,12 +1133,36 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
         # The 'shard_count' will be zero since the number of answer lists
         # is less than _MAX_ANSWER_LIST_BYTE_SIZE.
-        submitted_answer_list1 = [{'answer1': 'value1'}]
+        submitted_answer_list1: List[stats_domain.SubmittedAnswerDict] = [{
+            'answer': 'value1',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': 'rule spec str',
+            'answer_str': 'answer str'
+        }]
         stats_models.StateAnswersModel.insert_submitted_answers(
             'exp_id', 1, 'state_name', 'interaction_id1',
             submitted_answer_list1)
 
-        submitted_answer_list2 = [{'answer2': 'value2'}]
+        submitted_answer_list2: List[stats_domain.SubmittedAnswerDict] = [{
+            'answer': 'value2',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': 'rule spec str',
+            'answer_str': 'answer str'
+        }]
         stats_models.StateAnswersModel.insert_submitted_answers(
             'exp_id', 1, 'state_name', 'interaction_id2',
             submitted_answer_list2)
@@ -1151,12 +1188,36 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         # exceed a shard. This will increase the 'shard_count'.
         with self.swap(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
-            submitted_answer_list1 = [{'answer1': 'value1'}]
+            submitted_answer_list1: List[stats_domain.SubmittedAnswerDict] = [{
+                'answer': 'value1',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 10.5,
+                'rule_spec_str': 'rule spec str',
+                'answer_str': 'answer str'
+            }]
             stats_models.StateAnswersModel.insert_submitted_answers(
                 'exp_id', 1, 'state_name', 'interaction_id1',
                 submitted_answer_list1)
 
-            submitted_answer_list2 = [{'answer2': 'value2'}]
+            submitted_answer_list2: List[stats_domain.SubmittedAnswerDict] = [{
+                'answer': 'value2',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 10.5,
+                'rule_spec_str': 'rule spec str',
+                'answer_str': 'answer str'
+            }]
             stats_models.StateAnswersModel.insert_submitted_answers(
                 'exp_id', 1, 'state_name', 'interaction_id2',
                 submitted_answer_list2)

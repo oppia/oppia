@@ -142,7 +142,7 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         user.
         """
         # TODO(sll): Escape these args?
-        stats_services.record_answer(  # type: ignore[no-untyped-call]
+        stats_services.record_answer(
             exploration_id, exploration_version, state_name, interaction_id,
             stats_domain.SubmittedAnswer(
                 normalized_answer, interaction_id, answer_group_index,

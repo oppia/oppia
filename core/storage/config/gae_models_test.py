@@ -31,8 +31,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import config_models
 
-(base_models, config_models) = models.Registry.import_models(
-    [models.Names.BASE_MODEL, models.Names.CONFIG])
+(base_models, config_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.CONFIG
+])
 
 
 class ConfigPropertySnapshotContentModelTests(test_utils.GenericTestBase):

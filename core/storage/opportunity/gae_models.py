@@ -89,11 +89,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_translation_opportunities(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str],
-            language_code: str,
-            topic_name: Optional[str]
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        language_code: str,
+        topic_name: Optional[str]
     ) -> Tuple[
         Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
