@@ -53,7 +53,6 @@ if MYPY: # pragma: no cover
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
-
 def _create_topic(
     committer_id: str,
     topic: topic_domain.Topic,
