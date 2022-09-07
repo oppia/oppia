@@ -3335,9 +3335,9 @@ title: Title
 
         story.language_code = 'en'
         story_services.save_new_story(owner_id, story)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             owner_id, topic_id, story.id)
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             topic_id, story.id, admin_id)
         story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
@@ -3649,7 +3649,7 @@ title: Title
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
             page_title_fragment_for_web, skill_ids_for_diagnostic_test)
-        topic_services.save_new_topic(owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(owner_id, topic)
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(

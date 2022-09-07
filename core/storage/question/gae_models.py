@@ -347,10 +347,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            question_id: str,
-            skill_id: str,
-            skill_difficulty: float
+        cls,
+        question_id: str,
+        skill_id: str,
+        skill_difficulty: float
     ) -> QuestionSkillLinkModel:
         """Creates a new QuestionSkillLinkModel entry.
 
@@ -382,7 +382,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_total_question_count_for_skill_ids(
-            cls, skill_ids: List[str]
+        cls, skill_ids: List[str]
     ) -> int:
         """Returns the number of questions assigned to the given skill_ids.
 
@@ -652,7 +652,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(
-            cls, skill_id: str
+        cls, skill_id: str
     ) -> List[str]:
         """Returns a list of all question ids corresponding to the given skill
         id.

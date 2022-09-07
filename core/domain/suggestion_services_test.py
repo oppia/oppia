@@ -2053,7 +2053,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             description='Description', notes='Notes')
 
         # Adds the story to the topic.
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
 
         # Adds the exploration to the story.
@@ -2266,7 +2266,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.EXP_ID, self.author_id)
         self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
 
-        topic_services.delete_topic(self.author_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
+        topic_services.delete_topic(self.author_id, self.TOPIC_ID)
 
         # Suggestion should be rejected after the topic is deleted.
         suggestions = suggestion_services.query_suggestions(

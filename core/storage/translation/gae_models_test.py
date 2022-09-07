@@ -27,8 +27,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import translation_models
 
-(base_models, translation_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.translation])
+(base_models, translation_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.translation
+])
 
 
 class EntityTranslationsModelTest(test_utils.GenericTestBase):
@@ -165,7 +166,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         self.assertEqual(translation_model.translated_text, 'hola mundo')
 
     def test_create_model_with_same_source_target_language_codes_returns_none(
-            self
+        self
     ) -> None:
         model_id = translation_models.MachineTranslationModel.create(
             source_language_code='en',
@@ -196,7 +197,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         self.assertEqual(translation.translated_text, 'hola mundo')
 
     def test_get_machine_translation_with_no_existing_translation_returns_none(
-            self
+        self
     ) -> None:
         translation = (
             translation_models.MachineTranslationModel
@@ -214,7 +215,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user_not_corresponding_to_user(
-            self
+        self
     ) -> None:
         self.assertEqual(
             (

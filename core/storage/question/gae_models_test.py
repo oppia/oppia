@@ -34,8 +34,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import question_models
 
-(base_models, question_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.question])
+(base_models, question_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.question
+])
 
 
 class QuestionSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -111,7 +112,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_model.linked_skill_ids, linked_skill_ids)
 
     def test_create_question_with_inapplicable_skill_misconception_ids(
-            self
+        self
     ) -> None:
         state = state_domain.State.create_default_state(
             'ABC', 'content_0', 'default_outcome_1')
@@ -621,7 +622,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model4])
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
-            self
+        self
     ) -> None:
         skill_ids = ['skill_id%s' % number for number in range(25)]
         with self.assertRaisesRegex(
@@ -690,7 +691,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model3 in question_skill_links)
 
     def test_get_question_skill_links_when_count_not_evenly_divisible(
-            self
+        self
     ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -721,7 +722,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model3 in question_skill_links)
 
     def test_get_question_skill_links_equidistributed_by_skill(
-            self
+        self
     ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -758,7 +759,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_ids.count('question_id2'), 1)
 
     def test_get_random_question_skill_links_equidistributed_by_skill(
-            self
+        self
     ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
