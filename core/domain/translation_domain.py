@@ -324,9 +324,6 @@ class BaseTranslatableObject:
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContent.
         """
-        translations_needing_update = 0
-        translations_missing = 0
-
         min_non_displayable_translation_count = (
             feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS)
 
@@ -334,30 +331,16 @@ class BaseTranslatableObject:
             self.get_translatable_contents_collection()
             .content_id_to_translatable_content)
 
-        content_id_to_translated_content = entity_translation.translations
-
         translatable_content_count = len(
             content_id_to_translatable_content.keys())
-        translated_content_count = len(
-            content_id_to_translated_content.keys())
+        translated_content_count = entity_translation.get_translation_count()
         translations_missing_count = (
             translatable_content_count - translated_content_count)
-        if  translations_missing_count > (
-                feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
-            ):
-            return False
+        translation_needs_update_count = (
+            entity_translation.get_translation_needs_update_count())
 
-        translation_requires_updates_count = 0
-        for translated_content in content_id_to_translated_content.values():
-            if translated_content.needs_update:
-                translation_requires_updates_count += 1
-
-        if  translations_missing_count + translation_requires_updates_count > (
-                feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
-            ):
-            return False
-
-        return True
+        return translations_missing_count + translation_needs_update_count < (
+                min_non_displayable_translation_count)
 
 
     def get_content_count(self):
@@ -374,13 +357,12 @@ class BaseTranslatableObject:
         return len(self.get_all_contents_which_need_translations())
 
     def validate_translatable_contents(self, next_content_id_index):
-        """
-        """
+        """Validates the content Ids of the translatable contents."""
         content_id_to_translatable_content = (
             self.get_translatable_contents_collection()
             .content_id_to_translatable_content)
 
-        for content_id, translatable_content in (
+        for content_id, _ in (
                 content_id_to_translatable_content.items()):
             content_id_suffix = content_id.split('_')[-1]
 
@@ -507,6 +489,15 @@ class EntityTranslation:
         count = 0
         for translated_content in self.translations.values():
             if not translated_content.needs_update:
+                count += 1
+
+        return count
+
+    def get_translation_needs_update_count(self):
+        """"""
+        count = 0
+        for translated_content in self.translations.values():
+            if translated_content.needs_update:
                 count += 1
 
         return count

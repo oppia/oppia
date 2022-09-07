@@ -93,7 +93,7 @@ angular.module('oppia').component('explorationEditorTab', {
         ExplorationInitStateNameService,
         ExplorationNextContentIdIndexService, ExplorationStatesService,
         ExplorationWarningsService, FocusManagerService,
-      GenerateContentIdService, GraphDataService, LoaderService, NgbModal,
+        GenerateContentIdService, GraphDataService, LoaderService, NgbModal,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -301,8 +301,8 @@ angular.module('oppia').component('explorationEditorTab', {
         if (shouldPrompt) {
           NgbModal.open(
             MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
-            backdrop: 'static',
-          }).result.then(function () {
+              backdrop: 'static',
+            }).result.then(function() {
             contentIds.forEach(contentId => {
               if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
                 recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
@@ -311,7 +311,7 @@ angular.module('oppia').component('explorationEditorTab', {
                   stateName, recordedVoiceovers);
               }
             });
-          }, function () {
+          }, function() {
             // This callback is triggered when the Cancel button is
             // clicked. No further action is needed.
           });

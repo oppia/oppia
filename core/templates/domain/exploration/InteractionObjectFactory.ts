@@ -109,7 +109,6 @@ export class Interaction extends BaseTranslatableObject {
     this.hints = hints;
     this.id = id;
     this.solution = solution;
-
   }
 
   getTranslatableFields(): (SubtitledUnicode | SubtitledHtml)[] {

@@ -28,8 +28,6 @@ export class SubtitledHtml {
   // but not saved. Before the 'SubtitledHtml' object is saved into a State,
   // the 'content_id' should be set to a string.
   _contentId: string | null;
-  static callbackForContentChange: () => void;
-
   constructor(html: string, contentId: string | null) {
     this._html = html;
     this._contentId = contentId;

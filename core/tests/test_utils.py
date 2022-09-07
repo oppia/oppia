@@ -3011,7 +3011,7 @@ title: Title
             interaction_id: str. The interaction id to set. Also sets the
                 default customization args for the given interaction id.
             content_id_generator: ContentIdGenerator. A ContentIdGenerator
-                object to be used for generating content Ids.
+                object to be used for generating new content Ids.
         """
         def traverse_schema_and_assign_content_ids(
             value: Any, schema: Dict[str, Any], contentId: str
@@ -3992,6 +3992,8 @@ title: Title
 
         Args:
             default_dest_state_name: str. The default destination state.
+            content_id_generator: ContentIdGenerator. A ContentIdGenerator
+                object to be used for generating new content Id.
 
         Returns:
             dict. The default question_data dict.

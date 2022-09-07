@@ -4970,7 +4970,7 @@ export default {
     "description": "English",
     "direction": "ltr",
     "decimal_separator": "."
-  },{
+  }, {
     "code": "ar",
     "description": "العربية (Arabic)",
     "direction": "rtl",

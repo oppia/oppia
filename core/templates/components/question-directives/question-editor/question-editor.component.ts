@@ -200,7 +200,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
         this.nextContentIdIndexMemento);
     });
 
-
     const stateData = this.questionStateData;
     stateData.interaction.defaultOutcome.setDestination(null);
     if (stateData) {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to send changes to a entity-translation to the backend.
+ * @fileoverview Service to fetch entity-translation from the backend.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';

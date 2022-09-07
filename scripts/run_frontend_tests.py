@@ -30,7 +30,7 @@ from typing import Optional, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
-# from . import install_third_party_libs  # isort:skip
+from . import install_third_party_libs  # isort:skip
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
@@ -134,8 +134,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         cmd.append('--prodEnv')
-    # else:
-    #     # build.main(args=[])
+    else:
+        build.main(args=[])
 
     if parsed_args.verbose:
         cmd.append('--terminalEnabled')

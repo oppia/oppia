@@ -380,7 +380,6 @@ class TranslatableTextHandler(base.BaseHandler):
                 self._get_state_names_to_not_set_content_id_mapping(
                     state_names_to_content_id_mapping
                 ))
-
         state_names_to_not_in_review_content_id_mapping = (
             self._get_state_names_to_not_in_review_content_id_mapping(
                 state_names_to_content_id_mapping,

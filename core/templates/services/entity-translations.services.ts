@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to change and validate active mode in the translation
- *      tab.
+ * @fileoverview Service to fetch and store EntityTranslation for the given
+ * entity in a given langauge.
  */
 
 import { Injectable } from '@angular/core';
@@ -37,8 +37,10 @@ export class EntityTranslationsService {
   ) {}
 
   init(
-      entityId: string, entityType: string,
-      entityVersion: number): void {
+      entityId: string,
+      entityType: string,
+      entityVersion: number
+  ): void {
     this.entityType = entityType;
     this.entityVersion = entityVersion;
     this.entityId = entityId;

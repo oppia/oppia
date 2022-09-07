@@ -698,9 +698,6 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       expect(actualDiffDict[lineNumber].text).toEqual(
         compareDict[lineNumber].text);
       if (compareHighLighting) {
-        if (compareDict[lineNumber].highlighted !== actualDiffDict[lineNumber].highlighted) {
-          console.error(lineNumber, actualDiffDict[lineNumber].highlighted);
-        }
         expect(actualDiffDict[lineNumber].highlighted).toEqual(
           compareDict[lineNumber].highlighted);
       }
