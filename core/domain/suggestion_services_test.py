@@ -2262,7 +2262,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         translation_contribution_stats = (
             suggestion_registry.TranslationContributionStats(
                 None, 'user1', 'topic1', 1, 1, 1, 0, 1, 0, 0,
-                [datetime.date.fromtimestamp(1616173836)]
+                set(datetime.date.fromtimestamp(1616173836))
             )
         )
         with self.assertRaisesRegex(
@@ -2277,7 +2277,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         translation_contribution_stats = (
             suggestion_registry.TranslationContributionStats(
                 'hi', None, 'topic1', 1, 1, 1, 0, 1, 0, 0,
-                [datetime.date.fromtimestamp(1616173836)]
+                set(datetime.date.fromtimestamp(1616173836))
             )
         )
         with self.assertRaisesRegex(
@@ -2292,7 +2292,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         translation_contribution_stats = (
             suggestion_registry.TranslationContributionStats(
                 'hi', 'user1', None, 1, 1, 1, 0, 1, 0, 0,
-                [datetime.date.fromtimestamp(1616173836)]
+                set(datetime.date.fromtimestamp(1616173836))
             )
         )
         with self.assertRaisesRegex(
