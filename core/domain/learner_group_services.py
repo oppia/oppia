@@ -19,8 +19,9 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import config_domain, learner_group_fetchers
+from core.domain import config_domain
 from core.domain import learner_group_domain
+from core.domain import learner_group_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
