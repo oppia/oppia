@@ -48,6 +48,7 @@ import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skil
 import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { RemoveQuestionSkillLinkModalComponent } from '../modal-templates/remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface GroupedSkillSummaries {
@@ -221,7 +222,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
     if (!this.canEditQuestion) {
       this.alertsService.addWarning(
-        'User does not have enough rights to delete the question');
+        'User does not have enough rights to edit the question');
       return;
     }
     this.newQuestionSkillIds = [];
@@ -273,51 +274,42 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = this.questionId;
   }
 
-  deleteQuestionFromSkill(
-      questionId: string, skillDescription: string): void {
-    if (!this.canEditQuestion) {
-      this.alertsService.addWarning(
-        'User does not have enough rights to delete the question');
-      return;
-    }
+  removeQuestionSkillLinkAsync(questionId: string, skillId: string): void {
+    this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
+      questionId, [
+        {
+          id: skillId,
+          task: 'remove'
+        } as SkillLinkageModificationsArray
+      ]
+    ).then(() => {
+      this.questionsListService.resetPageNumber();
+      this.questionsListService.getQuestionSummariesAsync(
+        this.selectedSkillId, true, true);
+      this.alertsService.addSuccessMessage('Question Removed');
+      this._removeArrayElement(questionId);
+    });
+  }
 
-    this.deletedQuestionIds.push(questionId);
-    // For the case when, it is in the skill editor.
-    if (this.allSkillSummaries.length === 0) {
-      this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-        questionId, [
-          {
-            id: this.selectedSkillId,
-            task: 'remove'
-          } as SkillLinkageModificationsArray
-        ]
-      ).then(() => {
-        this.questionsListService.resetPageNumber();
-        this.questionsListService.getQuestionSummariesAsync(
-          this.selectedSkillId, true, true);
-        this.alertsService.addSuccessMessage('Deleted Question');
-        this._removeArrayElement(questionId);
+  removeQuestionFromSkill(questionId: string): void {
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(RemoveQuestionSkillLinkModalComponent, {
+        backdrop: 'static'
       });
-    } else {
-      this.allSkillSummaries.forEach((summary) => {
-        if (summary.getDescription() === skillDescription) {
-          this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-            questionId, [
-              {
-                id: summary.getId(),
-                task: 'remove'
-              } as SkillLinkageModificationsArray
-            ]
-          ).then(() => {
-            this.questionsListService.resetPageNumber();
-            this.questionsListService.getQuestionSummariesAsync(
-              this.selectedSkillId, true, true);
-            this.alertsService.addSuccessMessage('Deleted Question');
-            this._removeArrayElement(questionId);
-          });
-        }
-      });
-    }
+
+    modalRef.componentInstance.skillId = this.selectedSkillId;
+    modalRef.componentInstance.canEditQuestion = this.canEditQuestion;
+    modalRef.componentInstance.numberOfQuestions = (
+      this.questionSummariesForOneSkill.length);
+
+    modalRef.result.then(() => {
+      this.deletedQuestionIds.push(questionId);
+      this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId);
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   _removeArrayElement(questionId: string): void {
