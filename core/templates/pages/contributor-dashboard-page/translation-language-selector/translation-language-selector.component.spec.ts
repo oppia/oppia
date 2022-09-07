@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the translation language selector component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TranslationLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
@@ -26,7 +26,7 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { EventEmitter } from '@angular/core';
+import { ElementRef, EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { FormsModule } from '@angular/forms';
 
@@ -94,6 +94,7 @@ describe('Translation language selector', () => {
         .querySelector('.oppia-translation-language-selector-inner-container')
         .click();
       fixture.detectChanges();
+      flush();
     };
 
     getDropdownOptionsContainer = () => {
@@ -112,7 +113,7 @@ describe('Translation language selector', () => {
     expect(component.languageIdToDescription.fr).toBe('français (French)');
   });
 
-  it('should correctly fetch featured languages', waitForAsync(() => {
+  it('should correctly fetch featured languages', fakeAsync(() => {
     fixture.whenStable().then(() => {
       fixture.detectChanges();
       expect(component.featuredLanguages).toEqual(featuredLanguages);
@@ -127,7 +128,7 @@ describe('Translation language selector', () => {
     expect(dropdown.firstChild.textContent.trim()).toBe('English');
   });
 
-  it('should correctly show and hide the dropdown', () => {
+  it('should correctly show and hide the dropdown', fakeAsync(() => {
     expect(component.dropdownShown).toBe(false);
     expect(getDropdownOptionsContainer()).toBeFalsy();
 
@@ -152,7 +153,7 @@ describe('Translation language selector', () => {
     fixture.detectChanges();
     expect(component.dropdownShown).toBe(false);
     expect(getDropdownOptionsContainer()).toBeFalsy();
-  });
+  }));
 
   it('should correctly select and indicate selection of an option', () => {
     spyOn(component.setActiveLanguageCode, 'emit');
@@ -163,7 +164,7 @@ describe('Translation language selector', () => {
     expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('fr');
   });
 
-  it('should show details of featured language', waitForAsync(() => {
+  it('should show details of featured language', fakeAsync(() => {
     clickDropdown();
 
     fixture.whenStable().then(() => {
@@ -193,7 +194,7 @@ describe('Translation language selector', () => {
   });
 
   it('should display the preferred language when the preferred' +
-    ' language is defined', waitForAsync(() => {
+    ' language is defined', fakeAsync(() => {
     component.activeLanguageCode = null;
     component.languageSelection = '';
     preferredLanguageCode = 'en';
@@ -217,7 +218,7 @@ describe('Translation language selector', () => {
   }));
 
   it('should ask user to select a language when the preferred' +
-    ' language is not defined', waitForAsync(() => {
+    ' language is not defined', fakeAsync(() => {
     preferredLanguageCode = '';
     component.activeLanguageCode = null;
     component.languageSelection = '';
@@ -263,14 +264,17 @@ describe('Translation language selector', () => {
     });
   });
 
-  it('should toggle dropdown', () => {
+  it('should toggle dropdown', fakeAsync(() => {
     component.ngOnInit();
+    component.filterDivRef = new ElementRef(document.createElement('div'));
+    spyOn(component.filterDivRef.nativeElement, 'focus');
 
     expect(component.dropdownShown).toBe(false);
     expect(component.filteredOptions).toBe(component.options);
 
     // Open the dropdown.
     component.toggleDropdown();
+    flush();
 
     expect(component.dropdownShown).toBe(true);
     expect(component.optionsFilter).toBe('');
@@ -279,6 +283,7 @@ describe('Translation language selector', () => {
       {id: 'es', description: 'español (Spanish)'});
     expect(component.filteredOptions).toContain(
       {id: 'fr', description: 'français (French)'});
+    expect(component.filterDivRef.nativeElement.focus).toHaveBeenCalled();
 
     // Type a filter query.
     component.optionsFilter = 'sp';
@@ -293,11 +298,15 @@ describe('Translation language selector', () => {
 
     // Close the dropdown.
     component.toggleDropdown();
+    flush();
 
     expect(component.dropdownShown).toBe(false);
 
+    spyOn(component.filterDivRef.nativeElement, 'focus');
+
     // Open the dropdown.
     component.toggleDropdown();
+    flush();
 
     expect(component.dropdownShown).toBe(true);
     expect(component.optionsFilter).toBe('');
@@ -306,7 +315,8 @@ describe('Translation language selector', () => {
       {id: 'es', description: 'español (Spanish)'});
     expect(component.filteredOptions).toContain(
       {id: 'fr', description: 'français (French)'});
-  });
+    expect(component.filterDivRef.nativeElement.focus).toHaveBeenCalled();
+  }));
 
   it('should filter language options based on the filter text', () => {
     component.ngOnInit();
