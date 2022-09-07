@@ -2187,8 +2187,7 @@ def _get_all_question_review_stats(
     ]
 
 
-# TODO(https://github.com/oppia/oppia/issues/16019): pre-fetching and caching
-# of stats data should be done.
+# TODO(#16019): pre-fetching and caching of stats data should be done.
 def get_all_contributor_stats(
     user_id: str
 ) -> suggestion_registry.ContributorStatsSummary:
