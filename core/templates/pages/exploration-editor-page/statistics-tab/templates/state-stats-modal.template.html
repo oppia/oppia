@@ -16,14 +16,14 @@
 
   <div class="section" ng-if="hasExplorationBeenAnswered">
     <div class="d-inline-block">
-      <pie-chart data="answerFeedbackPieChartData"
-                 options="answerFeedbackPieChartOptions">
-      </pie-chart>
+      <oppia-pie-chart [data]="answerFeedbackPieChartData"
+                       [options]="answerFeedbackPieChartOptions">
+      </oppia-pie-chart>
     </div>
     <div class="d-inline-block oppia-pie-chart">
-      <pie-chart data="solutionUsagePieChartData"
-                 options="solutionUsagePieChartOptions">
-      </pie-chart>
+      <oppia-pie-chart [data]="solutionUsagePieChartData"
+                       [options]="solutionUsagePieChartOptions">
+      </oppia-pie-chart>
     </div>
   </div>
 

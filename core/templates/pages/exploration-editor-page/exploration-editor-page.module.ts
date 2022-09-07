@@ -23,7 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
-
+import { MatMenuModule} from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
@@ -86,7 +86,7 @@ import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-fo
 import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
 import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
 import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
-import { MatMenuModule} from '@angular/material/menu';
+import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
 
 @NgModule({
   imports: [
@@ -156,7 +156,8 @@ import { MatMenuModule} from '@angular/material/menu';
     ExplorationEditorSuggestionModalComponent,
     FeedbackTabComponent,
     ExplorationSavePromptModalComponent,
-    ExplorationSaveAndPublishButtonsComponent
+    ExplorationSaveAndPublishButtonsComponent,
+    PieChartComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -207,7 +208,8 @@ import { MatMenuModule} from '@angular/material/menu';
     ExplorationEditorSuggestionModalComponent,
     FeedbackTabComponent,
     ExplorationSavePromptModalComponent,
-    ExplorationSaveAndPublishButtonsComponent
+    ExplorationSaveAndPublishButtonsComponent,
+    PieChartComponent
   ],
   providers: [
     {

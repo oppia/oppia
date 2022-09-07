@@ -16,74 +16,100 @@
  * @fileoverview Directive for pie chart visualization.
  */
 
-angular.module('oppia').component('pieChart', {
-  bindings: {
-    // A read-only array representing the table of chart data.
-    data: '&',
-    // A read-only object containing several chart options. This object
-    // should have the following keys: pieHole, pieSliceTextStyleColor,
-    // chartAreaWidth, colors, height, legendPosition, width.
-    options: '&'
-  },
-  controller: ['$element', '$scope', 'WindowDimensionsService', function(
-      $element, $scope, WindowDimensionsService) {
-    var ctrl = this;
-    ctrl.resizeSubscription = null;
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
-    ctrl.$onInit = function() {
-      if (!$.isArray(ctrl.data())) {
-        return;
+@Component({
+  selector: 'oppia-pie-chart',
+  templateUrl: './pie-chart.component.html'
+})
+export class PieChartComponent implements OnInit, OnDestroy {
+  // A read-only array representing the table of chart data.
+  @Input() data: string[];
+  // A read-only object containing several chart options. This object
+  // should have the following keys: pieHole, pieSliceTextStyleColor,
+  // chartAreaWidth, colors, height, legendPosition, width.
+  @Input() options: {
+    chartAreaWidth: number;
+    colors: string[];
+    height: number;
+    left: number;
+    legendPosition: string;
+    pieHole: number;
+    pieSliceBorderColor: string;
+    pieSliceTextStyleColor: string;
+    title: string;
+    width: number;
+  };
+
+  directiveSubscriptions = new Subscription();
+  container: HTMLElement;
+  chart: unknown;
+
+  constructor(
+    private windowDimensionsService: WindowDimensionsService,
+  ) { }
+
+  redrawChart(): void {
+    if (this.chart !== null) {
+      (this.chart as {draw: (data1, data2) => {}})
+        .draw(google.visualization.arrayToDataTable(this.data), {
+          title: this.options.title,
+          pieHole: this.options.pieHole,
+          pieSliceTextStyle: {
+            color: this.options.pieSliceTextStyleColor,
+          },
+          pieSliceBorderColor: this.options.pieSliceBorderColor,
+          pieSliceText: 'none',
+          chartArea: {
+            left: this.options.left,
+            width: this.options.chartAreaWidth
+          },
+          colors: this.options.colors,
+          height: this.options.height,
+          legend: {
+            position: this.options.legendPosition || 'none'
+          },
+          width: this.options.width
+        });
+    }
+  }
+
+  ngOnInit(): void {
+    this.container = document.getElementById('pieChart');
+
+    // Need to wait for load statement in editor template to finish.
+    // https://stackoverflow.com/questions/42714876/
+    google.charts.setOnLoadCallback(() => {
+      if (!this.chart) {
+        this.chart = new google.visualization.PieChart(this.container);
+
+        setTimeout(() => {
+          this.redrawChart();
+        });
       }
-      var options = ctrl.options();
-      var chart = null;
+    });
 
-      var redrawChart = function() {
-        if (chart !== null) {
-          chart.draw(google.visualization.arrayToDataTable(ctrl.data()), {
-            title: options.title,
-            pieHole: options.pieHole,
-            pieSliceTextStyle: {
-              color: options.pieSliceTextStyleColor,
-            },
-            pieSliceBorderColor: options.pieSliceBorderColor,
-            pieSliceText: 'none',
-            chartArea: {
-              left: options.left,
-              width: options.chartAreaWidth
-            },
-            colors: options.colors,
-            height: options.height,
-            legend: {
-              position: options.legendPosition || 'none'
-            },
-            width: options.width
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          setTimeout(() => {
+            this.redrawChart();
           });
         }
-      };
+      )
+    );
+  }
 
-      // Need to wait for load statement in editor template to finish.
-      // https://stackoverflow.com/questions/42714876/
-      google.charts.setOnLoadCallback(function() {
-        if (!chart) {
-          chart = new google.visualization.PieChart($element[0]);
-          redrawChart();
-          $scope.$applyAsync();
-        }
-      });
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
 
-      $scope.$watch('data()', redrawChart);
+angular.module('oppia').directive('oppiaPieChart',
+  downgradeComponent({
+    component: PieChartComponent
+  }) as angular.IDirectiveFactory);
 
-      ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
-        .subscribe(evt => {
-          redrawChart();
-          $scope.$applyAsync();
-        });
-    };
-
-    ctrl.$onDestroy = function() {
-      if (ctrl.resizeSubscription) {
-        ctrl.resizeSubscription.unsubscribe();
-      }
-    };
-  }]
-});

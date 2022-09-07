@@ -1583,6 +1583,11 @@
   resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.15.5.tgz#644b2be0f5613b1f822c70c73c6b0e0b5b5fa2ad"
   integrity sha512-6bgv24B+A2bo9AfzReeg5StdiijKzwwnRflA8RLd1V4Yv995LeTmo0z69/MPbBDFSiZWdZHQygLo/ccXhMEDgw==
 
+"@types/google.visualization@0.0.68":
+  version "0.0.68"
+  resolved "https://registry.yarnpkg.com/@types/google.visualization/-/google.visualization-0.0.68.tgz#773e908c02e08dffe689844f0972dd481516e704"
+  integrity sha512-LkLniL1TYykhz+ZdRof3Bi8cp1OhqoK11Tj1RM2bPtGVBNexQ0eRnOrOWcWTdi80Sz9DzJ4JIG2rTlSJBVV58w==
+
 "@types/google.visualization@^0.0.55":
   version "0.0.55"
   resolved "https://registry.yarnpkg.com/@types/google.visualization/-/google.visualization-0.0.55.tgz#58ad73cdaf268b65ffd84b93442fa5988dc0887c"
@@ -2571,6 +2576,14 @@ angular-cookies@^1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.8.2.tgz#0791c37c395d9fba8144781f3b2ed135ca7c5925"
   integrity sha512-M6fCnsnw1pj1+nXuO28ilJ+h6pFCIXQKSEgy9/PIoN0sZr5FqsE9BK18PdBQa8dif+fnHCAYpPU8MgDzT/sZSg==
+
+angular-google-charts@2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/angular-google-charts/-/angular-google-charts-2.2.3.tgz#a0ef3467b3b86adfe482a708352c6b209461ef74"
+  integrity sha512-uzwH/O/3SvfoS0207H1wJKsDlzSnPdVjJatCN+h69jdKN9ft0rCIVlMbUVK7hIj9wbxeetGRnVMPG6PAAannoQ==
+  dependencies:
+    "@types/google.visualization" "0.0.68"
+    tslib "^2.4.0"
 
 angular-route@^1.8.2:
   version "1.8.2"
@@ -14910,6 +14923,11 @@ tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.2.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
+
+tslib@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
+  integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
 tslint@5.14.0:
   version "5.14.0"

@@ -3,8 +3,8 @@
     <div ng-if="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
-        <pie-chart data="pieChartData" options="pieChartOptions">
-        </pie-chart>
+        <oppia-pie-chart [data]="pieChartData" [options]="pieChartOptions">
+        </oppia-pie-chart>
         <p class="text-center">
           <span ng-if="numPassersby"
                 class="e2e-test-num-passersby font-weight-bold">
