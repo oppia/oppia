@@ -2192,13 +2192,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'url_fragment': 'sample-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic) # type: ignore[no-untyped-call]
-        topic_services.publish_topic(topic.id, self.admin_id) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
 
         for skill_id in uncategorized_skill_ids:
             self.save_new_skill(
                 skill_id, self.admin_id, description='skill_description')
-            topic_services.add_uncategorized_skill( # type: ignore[no-untyped-call]
+            topic_services.add_uncategorized_skill(
                 self.admin_id, topic.id, skill_id)
 
     def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
@@ -2252,7 +2252,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'The stats models do not exist for the given IDs.'):
+            'A stats model does not exist for given ids: %s', ['invalid_id']):
             suggestion_services.get_translation_contribution_stats_models(
                 ['invalid_id'])
 
@@ -2301,12 +2301,21 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
                 [translation_contribution_stats])
 
+    def test_get_translation_contribution_stats_for_invalid_id_with_strict_true(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The stats models do not exist for the stats_id invalid_id.'):
+            suggestion_services.get_translation_contribution_stats_models(
+                ['invalid_id'])
+
     def test_get_translation_review_stats_for_invalid_id_with_strict_true(
         self
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'The stats models do not exist for the given IDs.'):
+            'The stats models do not exist for the stats_id invalid_id.'):
             suggestion_services.get_translation_review_stats_models(
                 ['invalid_id'])
 
@@ -2315,7 +2324,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'The stats models do not exist for the given IDs.'):
+            'The stats models do not exist for the stats_id invalid_id.'):
             suggestion_services.get_question_contribution_stats_models(
                 ['invalid_id'])
 
@@ -2324,7 +2333,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(
             Exception,
-            'The stats models do not exist for the given IDs.'):
+            'The stats models do not exist for the stats_id invalid_id.'):
             suggestion_services.get_question_review_stats_models(
                 ['invalid_id'])
 

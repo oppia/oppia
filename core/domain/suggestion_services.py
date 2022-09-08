@@ -351,10 +351,12 @@ def get_translation_contribution_stats_models(
     if not strict:
         return stats_models
 
-    for model in stats_models:
+    for index, model in enumerate(stats_models):
         if model is None:
             raise Exception(
-                'The stats models do not exist for the given IDs.')
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
 
     return stats_models
 
@@ -400,10 +402,12 @@ def get_translation_review_stats_models(
     if not strict:
         return stats_models
 
-    for model in stats_models:
+    for index, model in enumerate(stats_models):
         if model is None:
             raise Exception(
-                'The stats models do not exist for the given IDs.')
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
 
     return stats_models
 
@@ -449,10 +453,12 @@ def get_question_contribution_stats_models(
     if not strict:
         return stats_models
 
-    for model in stats_models:
+    for index, model in enumerate(stats_models):
         if model is None:
             raise Exception(
-                'The stats models do not exist for the given IDs.')
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
 
     return stats_models
 
@@ -498,10 +504,12 @@ def get_question_review_stats_models(
     if not strict:
         return stats_models
 
-    for model in stats_models:
+    for index, model in enumerate(stats_models):
         if model is None:
             raise Exception(
-                'The stats models do not exist for the given IDs.')
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
 
     return stats_models
 
@@ -2408,20 +2416,6 @@ def _update_question_review_stats_models(
         stats_models_to_update)
 
 
-def _get_date_as_string(date: datetime.datetime) -> datetime.date:
-    """Gets the string value of the given date.
-
-    Args:
-        date: datetime.datetime. Date that needs to converted into a string.
-
-    Returns:
-        datetime.date. The formatted object of the given date.
-    """
-    return datetime.datetime.strptime(str(
-        date.date().isoformat()), '%Y-%m-%d'
-    ).date()
-
-
 def update_translation_contribution_stats_at_submission(
     suggestion: suggestion_registry.BaseSuggestion
 ) -> None:
@@ -2462,7 +2456,7 @@ def update_translation_contribution_stats_at_submission(
             accepted_translation_word_count=0,
             rejected_translations_count=0,
             rejected_translation_word_count=0,
-            contribution_dates=[_get_date_as_string(suggestion.last_updated)]
+            contribution_dates=[suggestion.last_updated.date()]
         )
     else:
         translation_contribution_stat = (
@@ -2473,7 +2467,7 @@ def update_translation_contribution_stats_at_submission(
         translation_contribution_stat.submitted_translation_word_count += (
             content_word_count)
         translation_contribution_stat.contribution_dates.add(
-            _get_date_as_string(suggestion.last_updated))
+            suggestion.last_updated.date())
 
         _update_translation_contribution_stats_models(
             [translation_contribution_stat])
@@ -2519,7 +2513,7 @@ def update_translation_contribution_stats_at_review(
             accepted_translation_word_count=0,
             rejected_translations_count=0,
             rejected_translation_word_count=0,
-            contribution_dates=[_get_date_as_string(suggestion.last_updated)]
+            contribution_dates=[suggestion.last_updated.date()]
         )
     else:
         translation_contribution_stat = (
@@ -2564,12 +2558,18 @@ def update_translation_review_stats(
     content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
+        # This function is called when reviewing a translation and hence
+        # final_reviewer_id should not be None when the suggestion is
+        # up-to-date.
         suggestion_models.TranslationReviewStatsModel.get(
             suggestion.change.language_code, str(suggestion.final_reviewer_id),
             topic_id
         ))
 
     if translation_review_stat_model is None:
+        # This function is called when reviewing a translation and hence
+        # final_reviewer_id should not be None when the suggestion is
+        # up-to-date.
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=suggestion.change.language_code,
             reviewer_user_id=str(suggestion.final_reviewer_id),
@@ -2581,10 +2581,8 @@ def update_translation_review_stats(
                 1 if suggestion.edited_by_reviewer else 0),
             accepted_translation_word_count=(
                 content_word_count if suggestion_is_accepted else 0),
-            first_contribution_date=_get_date_as_string(
-                suggestion.last_updated),
-            last_contribution_date=_get_date_as_string(
-                suggestion.last_updated)
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
         )
     else:
         translation_review_stat = (
@@ -2625,10 +2623,8 @@ def update_question_contribution_stats_at_submission(
                 submitted_questions_count=1,
                 accepted_questions_count=0,
                 accepted_questions_without_reviewer_edits_count=0,
-                first_contribution_date=_get_date_as_string(
-                    suggestion.last_updated),
-                last_contribution_date=_get_date_as_string(
-                    suggestion.last_updated)
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
             )
             continue
 
@@ -2637,8 +2633,8 @@ def update_question_contribution_stats_at_submission(
                 question_contribution_stat_model))
 
         question_contribution_stat.submitted_questions_count += 1
-        question_contribution_stat.last_contribution_date = _get_date_as_string(
-            suggestion.last_updated)
+        question_contribution_stat.last_contribution_date = (
+            suggestion.last_updated.date())
         _update_question_contribution_stats_models(
             [question_contribution_stat])
 
@@ -2667,10 +2663,8 @@ def update_question_contribution_stats_at_review(
                 submitted_questions_count=1,
                 accepted_questions_count=0,
                 accepted_questions_without_reviewer_edits_count=0,
-                first_contribution_date=_get_date_as_string(
-                    suggestion.last_updated),
-                last_contribution_date=_get_date_as_string(
-                    suggestion.last_updated)
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
             )
             continue
 
@@ -2709,11 +2703,17 @@ def update_question_review_stats(
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id):
         question_review_stat_model = (
+            # This function is called when reviewing a question suggestion and
+            # hence final_reviewer_id should not be None when the suggestion is
+            # up-to-date.
             suggestion_models.QuestionReviewStatsModel.get(
                 str(suggestion.final_reviewer_id), topic.topic_id
             ))
 
         if question_review_stat_model is None:
+            # This function is called when reviewing a question suggestion and
+            # hence final_reviewer_id should not be None when the suggestion is
+            # up-to-date.
             suggestion_models.QuestionReviewStatsModel.create(
                 reviewer_user_id=str(suggestion.final_reviewer_id),
                 topic_id=topic.topic_id,
@@ -2721,10 +2721,8 @@ def update_question_review_stats(
                 accepted_questions_count=(1 if suggestion_is_accepted else 0),
                 accepted_questions_with_reviewer_edits_count=(
                     1 if suggestion.edited_by_reviewer else 0),
-                first_contribution_date=_get_date_as_string(
-                    suggestion.last_updated),
-                last_contribution_date=_get_date_as_string(
-                    suggestion.last_updated)
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
             )
             continue
 
@@ -2801,8 +2799,8 @@ def increment_translation_review_stats(
         translation_review_stat
         .accepted_translations_with_reviewer_edits_count
     ) += (1 if edited_by_reviewer else 0)
-    translation_review_stat.last_contribution_date = _get_date_as_string(
-        last_contribution_date)
+    translation_review_stat.last_contribution_date = (
+        last_contribution_date.date())
 
 
 def increment_question_contribution_stats_at_review(
@@ -2851,5 +2849,5 @@ def increment_question_review_stats(
         1 if suggestion_is_accepted else 0)
     question_review_stat.accepted_questions_with_reviewer_edits_count += (
         1 if edited_by_reviewer else 0)
-    question_review_stat.last_contribution_date = _get_date_as_string(
-        last_contribution_date)
+    question_review_stat.last_contribution_date = (
+        last_contribution_date.date())
