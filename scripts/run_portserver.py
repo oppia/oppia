@@ -68,7 +68,7 @@ _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
 
 
-def _get_process_command_line(pid):
+def get_process_command_line(pid):
     """Get the command for a process.
 
     Args:
@@ -84,7 +84,7 @@ def _get_process_command_line(pid):
         return ''
 
 
-def _get_process_start_time(pid):
+def get_process_start_time(pid):
     """Get the start time for a process.
 
     Args:
@@ -100,7 +100,7 @@ def _get_process_start_time(pid):
         return 0
 
 
-def _bind(port, socket_type, socket_protocol):
+def sock_bind(port, socket_type, socket_protocol):
     """Try to bind to a socket of the specified type, protocol, and port.
     For the port to be considered available, the kernel must support at least
     one of (IPv6, IPv4), and the port must be available on each supported
@@ -123,7 +123,7 @@ def _bind(port, socket_type, socket_protocol):
             sock = socket.socket(family, socket_type, socket_protocol)
             got_socket = True
         except socket.error:
-            continue
+            return None
         try:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind(('', port))
@@ -137,7 +137,7 @@ def _bind(port, socket_type, socket_protocol):
     return port if got_socket else None
 
 
-def _is_port_free(port):
+def is_port_free(port):
     """Check if specified port is free.
 
     Args:
@@ -146,10 +146,10 @@ def _is_port_free(port):
     Returns:
         bool. Whether the port is free to use for both TCP and UDP.
     """
-    return _bind(port, *_PROTOCOLS[0]) and _bind(port, *_PROTOCOLS[1])
+    return sock_bind(port, *_PROTOCOLS[0]) and sock_bind(port, *_PROTOCOLS[1])
 
 
-def _should_allocate_port(pid):
+def should_allocate_port(pid):
     """Determine whether to allocate a port for a process id.
 
     Args:
@@ -247,10 +247,10 @@ class _PortPool:
             check_count += 1
             if (candidate.start_time == 0
                     or candidate.start_time
-                    != _get_process_start_time(candidate.pid)):
-                if _is_port_free(candidate.port):
+                    != get_process_start_time(candidate.pid)):
+                if is_port_free(candidate.port):
                     candidate.pid = pid
-                    candidate.start_time = _get_process_start_time(pid)
+                    candidate.start_time = get_process_start_time(pid)
                     if not candidate.start_time:
                         logging.info('Can\'t read start time for pid %d.', pid)
                     self.ports_checked_for_last_request = check_count
@@ -319,9 +319,9 @@ class _PortServerRequestHandler:
             return
 
         logging.info('Request on behalf of pid %d.', pid)
-        logging.info('cmdline: %s', _get_process_command_line(pid))
+        logging.info('cmdline: %s', get_process_command_line(pid))
 
-        if not _should_allocate_port(pid):
+        if not should_allocate_port(pid):
             self._denied_allocations += 1
             return
 

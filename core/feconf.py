@@ -73,13 +73,16 @@ DEBUG = False
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
-if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
-    server_software = os.getenv('SERVER_SOFTWARE')
-    if (
-            server_software and
-            not server_software.startswith(('Development', 'gunicorn'))
-    ):
-        raise Exception('DEV_MODE can\'t be true on production.')
+def check_dev_mode_is_true() -> None:
+    if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+        server_software = os.getenv('SERVER_SOFTWARE')
+        if (
+                server_software and
+                not server_software.startswith(('Development', 'gunicorn'))
+        ):
+            raise Exception('DEV_MODE can\'t be true on production.')
+    
+check_dev_mode_is_true()
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')

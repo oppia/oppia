@@ -14,16 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core/feconf.py"""
+"""Unit tests for core/feconf.py."""
 
 from __future__ import annotations
 
 import os
 
+from core import feconf
 from core.tests import test_utils
 
 
 class FeconfTests(test_utils.GenericTestBase):
+    """Unit tests for core/feconf.py."""
 
     def test_dev_mode_in_production_throws_error(self) -> None:
         def mock_getenv(env: str):
@@ -34,7 +36,15 @@ class FeconfTests(test_utils.GenericTestBase):
         swap_getenv = self.swap(os, 'getenv', mock_getenv)
         with swap_getenv, self.assertRaisesRegex(
                 Exception, 'DEV_MODE can\'t be true on production.'):
-            from core import feconf # pylint: disable=unused-import
+            feconf.check_dev_mode_is_true()
+    
+    def test_dev_mode_in_development_passes_succcessfully(self) -> None:
+        def mock_getenv(env: str):
+            return 'Development'
+
+        swap_getenv = self.swap(os, 'getenv', mock_getenv)
+        with swap_getenv:
+            feconf.check_dev_mode_is_true()
 
     def test_get_empty_ratings(self) -> None:
         from core import feconf
@@ -51,3 +61,12 @@ class FeconfTests(test_utils.GenericTestBase):
         self.assertEqual(
             feconf.DEFAULT_SIGNOFF_HTML_FN(sender_username),
             'Thanks!<br>%s (Oppia moderator)' % sender_username)
+        
+        moderator_actions = feconf.VALID_MODERATOR_ACTIONS[
+            'unpublish_exploration'
+        ]
+        self.assertEqual(
+            moderator_actions['email_config'],
+            'unpublish_exploration_email_html_body')
+        self.assertEqual(
+            moderator_actions['email_intent'], 'unpublish_exploration')
