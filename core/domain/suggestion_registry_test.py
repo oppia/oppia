@@ -1876,12 +1876,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `question_dict` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.question_dict = None  # type: ignore[attr-defined]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        suggestion.change.question_dict = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain question_dict'
@@ -1932,12 +1930,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_difficulty` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_difficulty = None  # type: ignore[attr-defined]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        suggestion.change.skill_difficulty = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain skill_difficulty'
@@ -1956,12 +1952,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_difficulty` as an attribute of
-        # change and throwing `"QuestionSuggestionChange" has no attribute
-        # "skill_id"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_difficulty = 0.4  # type: ignore[attr-defined]
+        suggestion.change.skill_difficulty = 0.4
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1983,16 +1974,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_id` as an attribute of change
-        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_id = skill_id  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.skill_id = None  # type: ignore[attr-defined]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        suggestion.change.skill_id = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain skill_id'
@@ -2013,16 +2002,11 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_id` as an attribute of change
-        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_id = skill_id  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_services.get_new_skill_id()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'The skill with the given id doesn\'t exist.'
@@ -2077,12 +2061,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_id` as an attribute of change
-        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_services.get_new_skill_id()
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -2108,13 +2087,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'new_value': 'bn',
             'old_value': 'en'
         }
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change cmd must be equal to '
             'create_new_fully_specified_question'
         ):
             suggestion.pre_update_validate(
-                question_domain.QuestionChange(change))
+                question_domain.QuestionChange(change))  # type: ignore[arg-type]
 
     def test_pre_update_validate_change_skill_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -2145,7 +2127,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'The new change skill_id must be equal to skill_1'
         ):
             suggestion.pre_update_validate(
-                question_domain.QuestionChange(change))
+                question_domain.CreateNewFullySpecifiedQuestionCmd(
+                    change
+                )
+            )
 
     def test_pre_update_validate_complains_if_nothing_changed(self) -> None:
         change: ChangeType = {
@@ -2185,7 +2170,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'At least one of the new skill_difficulty or question_dict '
             'should be changed.'):
             suggestion.pre_update_validate(
-                question_domain.QuestionSuggestionChange(new_change))
+                question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+                    new_change
+                )
+            )
 
     def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
         self
@@ -2228,7 +2216,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # ignore here.
         self.assertEqual(
             suggestion.pre_update_validate(  # type: ignore[func-returns-value]
-                question_domain.QuestionSuggestionChange(new_change)), None)
+                question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+                    new_change
+                )
+            ),
+            None
+        )
 
     def test_pre_update_validate_accepts_a_change_in_state_data_only(
         self
@@ -2271,7 +2264,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # ignore here.
         self.assertEqual(
             suggestion.pre_update_validate(  # type: ignore[func-returns-value]
-                question_domain.QuestionSuggestionChange(new_change)), None)
+                question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+                    new_change
+                )
+            ),
+            None
+        )
 
     # TODO(#13059): After we fully type the codebase we plan to get
     # rid of the tests that intentionally test wrong inputs that we

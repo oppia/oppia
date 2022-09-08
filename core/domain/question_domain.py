@@ -224,7 +224,7 @@ class CreateNewFullySpecifiedQuestionSuggestionCmd(QuestionSuggestionChange):
 
     question_dict: QuestionDict
     skill_id: str
-    topic_name: str
+    skill_difficulty: float
 
 
 class QuestionDict(TypedDict):
