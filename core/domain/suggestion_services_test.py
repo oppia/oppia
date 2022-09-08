@@ -2621,7 +2621,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.author_id, change_dict, 'description')
-        
+
         with self.assertRaisesRegex(
             Exception,
             'The final_reviewer_id in the suggestion should not be None.'):
@@ -2637,7 +2637,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
-        
+
         with self.assertRaisesRegex(
             Exception,
             'The final_reviewer_id in the suggestion should not be None.'):
@@ -2789,6 +2789,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self,
         skill_id: str
     ) -> suggestion_registry.SuggestionAddQuestion:
+        """Creates a topic for a question.
+
+        Args:
+            skill_id: str. ID of the skill.
+
+        Returns:
+            SuggestionAddQuestion. A new question suggestion.
+        """
         suggestion_change: Dict[
             str,
             Union[str, float, Dict[str, Union[
@@ -2814,12 +2822,26 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.author_id, suggestion_change, 'test description')
 
     def _create_skill(self) -> str:
+        """Creates a topic for a question.
+
+        Returns:
+            str. A topic ID.
+        """
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         return skill_id
 
     def _create_topic(self, first_skill_id: str, second_skill_id: str) -> str:
+        """Creates a topic for a question.
+
+        Args:
+            first_skill_id: str. ID of the first skill.
+            second_skill_id: str. ID of the second skill.
+
+        Returns:
+            str. A topic ID.
+        """
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'topic_admin', name='Topic1',
@@ -2836,7 +2858,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
         # 4. Create a question suggestion.
-        
         skill_id_1 = self._create_skill()
         skill_id_2 = self._create_skill()
         topic_id = self._create_topic(skill_id_1, skill_id_2)
