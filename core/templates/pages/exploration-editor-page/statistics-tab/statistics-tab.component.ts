@@ -31,6 +31,7 @@ import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { StateInteractionStatsService } from 'services/state-interaction-stats.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { RouterService } from '../services/router.service';
+import { StateStatsModalComponent } from './templates/state-stats-modal.component';
 
 interface PieChartOptions {
   chartAreaWidth: number;
@@ -121,40 +122,34 @@ export class StatisticsTabComponent implements
     });
   }
 
-  openStateStatsModal(stateName: string): Promise<void> {
-    const state = this.states.getState(stateName);
-    this.alertsService.clearWarnings();
-
-    return this.stateInteractionStatsService.computeStatsAsync(
-      this.expId, state)
-      .then((stats) => {
-        $uibModal.open({
-          controller: 'StateStatsModalController',
-          templateUrl: this.urlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/statistics-tab/templates/' +
-            'state-stats-modal.template.html'),
-          styleUrl: this.urlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/statistics-tab/templates/' +
-            'state-stats-modal.template.css'),
-          backdrop: true,
-          resolve: {
-            interactionArgs: () => state.interaction.customizationArgs,
-            stateName: () => stateName,
-            visualizationsInfo: () => stats.visualizationsInfo,
-            stateStats: () => this.expStats.getStateStats(stateName),
-          },
-        }).result;
-      });
-  }
-
   onClickStateInStatsGraph(stateName: string): void {
     if (!this.stateStatsModalIsOpen) {
       this.stateStatsModalIsOpen = true;
-      this.openStateStatsModal(stateName).then(
-        () => this.stateStatsModalIsOpen = false,
-        () => {
-          this.alertsService.clearWarnings();
-          this.stateStatsModalIsOpen = false;
+
+      const state = this.states.getState(stateName);
+      this.alertsService.clearWarnings();
+
+      this.stateInteractionStatsService.computeStatsAsync(
+        this.expId, state)
+        .then((stats) => {
+          const modalRef = this.ngbModal.open(StateStatsModalComponent, {
+            backdrop: false,
+          });
+
+          modalRef.componentInstance.interactionArgs = (
+            state.interaction.customizationArgs);
+          modalRef.componentInstance.stateName = stateName;
+          modalRef.componentInstance.visualizationsInfo = (
+            stats.visualizationsInfo);
+          modalRef.componentInstance.stateStats = (
+            this.expStats.getStateStats(stateName));
+
+          modalRef.result.then(
+            () => this.stateStatsModalIsOpen = false,
+            () => {
+              this.alertsService.clearWarnings();
+              this.stateStatsModalIsOpen = false;
+            });
         });
     }
   }
@@ -164,10 +159,13 @@ export class StatisticsTabComponent implements
 
     this.stateStatsModalIsOpen = false;
     this.explorationHasBeenVisited = false;
+
     this.directiveSubscriptions.add(
       this.routerService.onRefreshStatisticsTab.subscribe(
         () => this.refreshExplorationStatistics())
     );
+
+    this.refreshExplorationStatistics();
   }
 
   ngOnDestroy(): void {

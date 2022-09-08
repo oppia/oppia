@@ -16,7 +16,7 @@
  * @fileoverview Directive for pie chart visualization.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -25,7 +25,9 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   selector: 'oppia-pie-chart',
   templateUrl: './pie-chart.component.html'
 })
-export class PieChartComponent implements OnInit, OnDestroy {
+export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('pieChart') pieChart: ElementRef;
+
   // A read-only array representing the table of chart data.
   @Input() data: string[];
   // A read-only object containing several chart options. This object
@@ -45,7 +47,6 @@ export class PieChartComponent implements OnInit, OnDestroy {
   };
 
   directiveSubscriptions = new Subscription();
-  container: HTMLElement;
   chart: unknown;
 
   constructor(
@@ -77,21 +78,21 @@ export class PieChartComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit(): void {
-    this.container = document.getElementById('pieChart');
-
+  ngAfterViewInit(): void {
     // Need to wait for load statement in editor template to finish.
     // https://stackoverflow.com/questions/42714876/
     google.charts.setOnLoadCallback(() => {
       if (!this.chart) {
-        this.chart = new google.visualization.PieChart(this.container);
-
         setTimeout(() => {
+          this.chart = new google.visualization.PieChart(
+            this.pieChart.nativeElement);
           this.redrawChart();
         });
       }
     });
+  }
 
+  ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.windowDimensionsService.getResizeEvent().subscribe(
         () => {

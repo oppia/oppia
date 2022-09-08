@@ -160,6 +160,7 @@ import { NeedsGuidingResponsesTaskComponent } from 'pages/exploration-editor-pag
 import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
 import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
 import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
+import { PieChartComponent } from 'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -338,7 +339,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     NeedsGuidingResponsesTaskComponent,
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent
+    OppiaVisualizationFrequencyTableComponent,
+    PieChartComponent
   ],
 
   entryComponents: [
@@ -465,7 +467,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     NeedsGuidingResponsesTaskComponent,
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent
+    OppiaVisualizationFrequencyTableComponent,
+    PieChartComponent
   ],
 
   exports: [
@@ -603,7 +606,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     NeedsGuidingResponsesTaskComponent,
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent
+    OppiaVisualizationFrequencyTableComponent,
+    PieChartComponent
   ],
 })
 

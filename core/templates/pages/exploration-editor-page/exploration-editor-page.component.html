@@ -122,7 +122,7 @@
     <oppia-preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
     </oppia-preview-tab>
 
-    <oppia-statistics-tab ng-show="$ctrl.getActiveTabName() === 'stats'">
+    <oppia-statistics-tab ng-if="$ctrl.getActiveTabName() === 'stats'">
     </oppia-statistics-tab>
 
     <oppia-improvements-tab ng-if="$ctrl.isImprovementsTabEnabled()" ng-show="$ctrl.getActiveTabName() === 'improvements'">

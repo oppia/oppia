@@ -3,7 +3,7 @@
     <div *ngIf="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
-        <oppia-pie-chart [data]="pieChartData" [options]="pieChartOptions">
+        <oppia-pie-chart *ngIf="pieChartData && pieChartOptions" [data]="pieChartData" [options]="pieChartOptions">
         </oppia-pie-chart>
         <p class="text-center">
           <span *ngIf="numPassersby"
@@ -19,8 +19,7 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-              <state-graph-visualization [graphData]="statsGraphData"
-                                         [nodeFill]="darkseagreen"
+              <state-graph-visualization [nodeFill]="darkseagreen"
                                          [versionGraphData]="null"
                                          (onClickFunction)="onClickStateInStatsGraph($event)">
               </state-graph-visualization>
