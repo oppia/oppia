@@ -128,7 +128,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_socket_gets_bind_to_a_port(self) -> None:
         port = 8181
         class MockSocket:
-            def setsockopt(*unused_args: Any) -> None: # pylint: disable=missing-docstring
+            def setsockopt(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
             def bind(self, info: Any) -> None: # pylint: disable=missing-docstring
                 if info[1] != port:
@@ -152,7 +152,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_sock_bind_handles_error_while_getting_port_name(self) -> None:
         port = 8181
         class MockSocket:
-            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
+            def setsockopt(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
             def bind(self, info: Any) -> None: # pylint: disable=missing-docstring
                 if info[1] != port:
@@ -262,9 +262,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         port_pool = run_portserver._PortPool() # pylint: disable=protected-access
         port_pool.add_port_to_free_pool(port1)
         port_pool.add_port_to_free_pool(port2)
-        port = port_pool._port_queue.pop()
+        port = port_pool._port_queue.pop() # pylint: disable=protected-access
         port.start_time = 1
-        port_pool._port_queue.append(port)
+        port_pool._port_queue.append(port) # pylint: disable=protected-access
         self.assertEqual(port_pool.num_ports(), 2)
         with swap_get_process_start_time, swap_is_port_free:
             returned_port = port_pool.get_port_for_process(12345)
@@ -340,15 +340,15 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_failure_to_start_server_throws_error(self) -> None:
         path = 8181
         class MockSocket:
-            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
+            def setsockopt(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(*unused_args) -> None: # pylint: disable=missing-docstring
+            def bind(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
-            def listen(*unused_args) -> None: # pylint: disable=missing-docstring
+            def listen(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(*unused_args) -> list(Any): # pylint: disable=missing-docstring
+            def getsockname(self, *unused_args) -> list(Any): # pylint: disable=missing-docstring
                 return ['Address', path]
-            def close(*unused_args) -> None: # pylint: disable=missing-docstring
+            def close(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
 
         def dummy_handler(data: int) -> str:
@@ -366,19 +366,19 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         path = '\08181'
         class MockSocket:
             server_closed = False
-            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
+            def setsockopt(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(*unused_args) -> None: # pylint: disable=missing-docstring
+            def bind(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def listen(*unused_args) -> None: # pylint: disable=missing-docstring
+            def listen(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(*unused_args) -> list(Any): # pylint: disable=missing-docstring
+            def getsockname(self, *unused_args) -> list(Any): # pylint: disable=missing-docstring
                 return ['Address', path]
-            def recv(*unused_args) -> None: # pylint: disable=missing-docstring
+            def recv(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def sendall(*unused_args) -> None: # pylint: disable=missing-docstring
+            def sendall(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def shutdown(*unused_args) -> None: # pylint: disable=missing-docstring
+            def shutdown(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
             def close(self) -> None: # pylint: disable=missing-docstring
                 self.server_closed = True
@@ -401,15 +401,15 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         path = '8181'
         class MockSocket:
             server_closed = False
-            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
+            def setsockopt(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(*unused_args) -> None: # pylint: disable=missing-docstring
+            def bind(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def listen(*unused_args) -> None: # pylint: disable=missing-docstring
+            def listen(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(*unused_args) -> list(Any): # pylint: disable=missing-docstring
+            def getsockname(self, *unused_args) -> list(Any): # pylint: disable=missing-docstring
                 return ['Address', path]
-            def shutdown(*unused_args) -> None: # pylint: disable=missing-docstring
+            def shutdown(self, *unused_args) -> None: # pylint: disable=missing-docstring
                 pass
             def close(self) -> None: # pylint: disable=missing-docstring
                 self.server_closed = True
@@ -431,12 +431,12 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_null_port_ranges_while_calling_script_throws_error(self) -> None:
         class MockServer:
-            def run(*unused_args) -> None: # pylint: disable=missing-docstring
+            def run(self) -> None: # pylint: disable=missing-docstring
                 pass
-            def close(*unused_args) -> None: # pylint: disable=missing-docstring
+            def close(self) -> None: # pylint: disable=missing-docstring
                 pass
 
-        class ParsedArguments:
+        class ParsedArguments: # pylint: disable=missing-docstring
             portserver_static_pool = 'abcd-efgh'
             portserver_unix_socket_address = '8181'
 
@@ -456,12 +456,12 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_server_starts_on_calling_script_successfully(self) -> None:
         class MockServer:
-            def run(*unused_args) -> None: # pylint: disable=missing-docstring
+            def run(self) -> None: # pylint: disable=missing-docstring
                 pass
-            def close(*unused_args) -> None: # pylint: disable=missing-docstring
+            def close(self) -> None: # pylint: disable=missing-docstring
                 pass
 
-        class ParsedArguments:
+        class ParsedArguments: # pylint: disable=missing-docstring
             portserver_static_pool = '8181-8185'
             portserver_unix_socket_address = '8181'
 
@@ -479,12 +479,12 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_server_closes_on_keyboard_interrupt(self) -> None:
         class MockServer:
-            def run(*unused_args) -> None: # pylint: disable=missing-docstring
+            def run(self) -> None: # pylint: disable=missing-docstring
                 raise KeyboardInterrupt('^C pressed.')
-            def close(*unused_args) -> None: # pylint: disable=missing-docstring
+            def close(self) -> None: # pylint: disable=missing-docstring
                 pass
 
-        class ParsedArguments:
+        class ParsedArguments: # pylint: disable=missing-docstring
             portserver_static_pool = '8181-8185'
             portserver_unix_socket_address = '8181'
 
