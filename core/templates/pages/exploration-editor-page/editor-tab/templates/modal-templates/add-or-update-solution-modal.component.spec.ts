@@ -102,51 +102,9 @@ describe('Add Or Update Solution Modal Component', () => {
       spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
         .and.returnValue('<p>Interaction Html</p>');
 
-      answerEditorHtml = {
-        ehfs: explorationHtmlFormatterService,
-        answerIsExclusive: true,
-        correctAnswer: 'solution',
-        explanation: SubtitledHtml.createDefault(
-          'Explanation html', 'cont_1'),
-
-        toBackendDict(): SolutionBackendDict {
-          return {
-            answer_is_exclusive: this.answerIsExclusive,
-            correct_answer: this.correctAnswer,
-            explanation: this.explanation.toBackendDict()
-          };
-        },
-
-        getSummary(interactionId: string): string {
-          return '';
-        },
-
-        setCorrectAnswer(correctAnswer: InteractionAnswer): void {
-          return;
-        },
-
-        setExplanation(explanation: SubtitledHtml): void {
-          return;
-        },
-
-        getOppiaShortAnswerResponseHtml(interaction: Interaction):
-          ShortAnswerResponse {
-          if (interaction.id === null) {
-            throw new Error('Interaction id is possibly null.');
-          }
-          return {
-            prefix: (this.answerIsExclusive ? 'The only' : 'One'),
-            answer: this.ehfs.getShortAnswerHtml(
-              this.correctAnswer, interaction.id,
-              interaction.customizationArgs
-            )
-          };
-        },
-
-        getOppiaSolutionExplanationResponseHtml(): string {
-          return '';
-        }
-      };
+      answerEditorHtml = new Solution(
+        explorationHtmlFormatterService, true, 'solution',
+        SubtitledHtml.createDefault('Explanation html', 'cont_1'));
 
       stateSolutionService.init('', answerEditorHtml);
       stateInteractionIdService.init('', 'TextInput');
@@ -159,12 +117,6 @@ describe('Add Or Update Solution Modal Component', () => {
 
       expect(component.correctAnswerEditorHtml).toEqual(
         '<p>Interaction Html</p>');
-      expect(component.EMPTY_SOLUTION_DATA).toEqual({
-        answerIsExclusive: false,
-        correctAnswer: undefined,
-        explanationHtml: '',
-        explanationContentId: 'solution'
-      });
       expect(component.data).toEqual({
         answerIsExclusive: true,
         correctAnswer: undefined,

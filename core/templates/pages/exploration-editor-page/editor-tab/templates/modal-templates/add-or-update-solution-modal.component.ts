@@ -66,7 +66,6 @@ export class AddOrUpdateSolutionModalComponent
   savedMemento!: InteractionAnswer | null;
   solutionType!: Solution | null;
   tempAnsOption!: string;
-  EMPTY_SOLUTION_DATA!: SolutionInterface;
   COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
 
   SOLUTION_EDITOR_FOCUS_LABEL: string = (

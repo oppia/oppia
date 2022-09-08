@@ -91,6 +91,8 @@ describe('State translation component', function() {
   var stateRecordedVoiceoversService = null;
   var subtitledUnicodeObjectFactory = null;
   var translationLanguageService = null;
+  var entityTranslationsService = null;
+  var contextService = null;
   var translationTabActiveContentIdService = null;
   var translationTabActiveModeService = null;
   var explorationHtmlFormatterService = null;
@@ -256,17 +258,6 @@ describe('State translation component', function() {
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          }
-        }
       }
     }
   };
@@ -321,17 +312,6 @@ describe('State translation component', function() {
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          }
-        }
       }
     }
   };
@@ -363,17 +343,6 @@ describe('State translation component', function() {
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          }
-        }
       }
     }
   };
@@ -1048,17 +1017,6 @@ describe('State translation component', function() {
           solicit_answer_details: false,
           recorded_voiceovers: {
             voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {
-              content_1: {
-                en: {
-                  data_format: 'html',
-                  translation: 'Translation',
-                  needs_update: false
-                }
-              }
-            }
           }
         }
       });
@@ -1275,14 +1233,18 @@ describe('State translation component', function() {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
       routerService = $injector.get('RouterService');
+      entityTranslationsService = $injector.get('EntityTranslationsService');
       translationLanguageService = $injector.get('TranslationLanguageService');
+      contextService = $injector.get('ContextService');
       translationTabActiveContentIdService = $injector.get(
         'TranslationTabActiveContentIdService');
       translationTabActiveModeService = $injector.get(
         'TranslationTabActiveModeService');
 
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        'Introduction');
+      contextService.explorationId = 'expId';
+      entityTranslationsService.entityTranslation = {
+          getWrittenTranslation: () => {}
+      };
       explorationStatesService.init(explorationState2);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(

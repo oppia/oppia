@@ -37,7 +37,7 @@ class MockNgbModal {
   }
 }
 
-fdescribe('Translation status service', () => {
+describe('Translation status service', () => {
   let tss: TranslationStatusService;
   let ess = null;
   let srvs = null;
@@ -352,7 +352,6 @@ fdescribe('Translation status service', () => {
     var statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
     expect(Object.keys(statesNeedingTranslationUpdate).length).toBe(0);
 
-    swts.init('First', ess.getWrittenTranslationsMemento('First'));
     swts.displayed.toggleNeedsUpdateAttribute('feedback_1', 'hi');
     swts.displayed.toggleNeedsUpdateAttribute('feedback_2', 'hi');
     ess.markWrittenTranslationsAsNeedingUpdate('feedback_1', 'First');

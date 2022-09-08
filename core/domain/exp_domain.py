@@ -2085,23 +2085,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return dict(exploration_translation_counts)
 
-    def get_content_count(self) -> int:
-        """Returns the total number of distinct content fields available in the
-        exploration which are user facing and can be translated into
-        different languages.
-
-        (The content field includes state content, feedback, hints, solutions.)
-
-        Returns:
-            int. The total number of distinct content fields available inside
-            the exploration.
-        """
-        content_count = 0
-        for state in self.states.values():
-            content_count += state.get_translatable_content_count()
-
-        return content_count
-
     def get_metadata(self) -> ExplorationMetadata:
         """Gets the ExplorationMetadata domain object for the exploration."""
         return ExplorationMetadata(
