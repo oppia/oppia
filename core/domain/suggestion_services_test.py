@@ -2192,13 +2192,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'url_fragment': 'sample-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(topic.id, self.admin_id)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(topic.id, self.admin_id)  # type: ignore[no-untyped-call]
 
         for skill_id in uncategorized_skill_ids:
             self.save_new_skill(
                 skill_id, self.admin_id, description='skill_description')
-            topic_services.add_uncategorized_skill(
+            topic_services.add_uncategorized_skill(  # type: ignore[no-untyped-call]
                 self.admin_id, topic.id, skill_id)
 
     def _set_up_topics_and_stories_for_translations(self) -> Dict[str, str]:
