@@ -400,8 +400,9 @@ class AppFeedbackReport:
             'The given report type %s is invalid.' % report_type_name)
 
     @classmethod
-    def get_category_from_string(cls, category_name: str) -> (
-        app_feedback_report_constants.CATEGORY):
+    def get_category_from_string(
+        cls, category_name: str
+    ) -> app_feedback_report_constants.Category:
         """Determines the category based on the JSON value.
 
         Args:
@@ -411,7 +412,7 @@ class AppFeedbackReport:
             CATEGORY. The enum representing this category.
         """
         for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
-            if category_name == category_type.name:
+            if category_name == category_type.value:
                 return category_type
         raise utils.InvalidInputException(
             'The given category %s is invalid.' % category_name)
@@ -455,21 +456,21 @@ class AppFeedbackReport:
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name):
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value):
             return NavigationDrawerEntryPoint()
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.lesson_player.name):
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value):
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.revision_card.name):
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value):
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.crash.name):
+            app_feedback_report_constants.EntryPoint.CRASH.value):
             return CrashEntryPoint()
         else:
             raise utils.InvalidInputException(
@@ -510,7 +511,7 @@ class UserSuppliedFeedback:
     def __init__(
         self,
         report_type: app_feedback_report_constants.ReportType,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         user_feedback_selected_items: List[str],
         user_feedback_other_text_input: str
     ) -> None:
@@ -519,7 +520,7 @@ class UserSuppliedFeedback:
         Args:
             report_type: ReportType. The type of feedback submitted by the user
                 as an enum.
-            category: CATEGORY. The category enum that this specific report_type
+            category: Category. The category enum that this specific report_type
                 is providing feedback on that correponds.
             user_feedback_selected_items: list(str). A list of strings that
                 represent any options selected by the user for the feedback
@@ -539,8 +540,8 @@ class UserSuppliedFeedback:
             dict. A dict, mapping all fields of UserSuppliedFeedback instance.
         """
         return {
-            'report_type': self.report_type.name,
-            'category': self.category.name,
+            'report_type': self.report_type.value,
+            'category': self.category.value,
             'user_feedback_selected_items': self.user_feedback_selected_items,
             'user_feedback_other_text_input': (
                 self.user_feedback_other_text_input)
@@ -591,7 +592,7 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_category(
-        cls, category: app_feedback_report_constants.CATEGORY
+        cls, category: app_feedback_report_constants.Category
     ) -> None:
         """Checks whether the category is valid.
 
@@ -612,7 +613,7 @@ class UserSuppliedFeedback:
     @classmethod
     def require_valid_user_feedback_items_for_category(
         cls,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         selected_items: List[str],
         other_text_input: str
     ) -> None:
@@ -1215,7 +1216,7 @@ class EntryPoint:
 
     def __init__(
         self,
-        entry_point: app_feedback_report_constants.ENTRY_POINT,
+        entry_point: app_feedback_report_constants.EntryPoint,
         topic_id: Optional[str] = None,
         story_id: Optional[str] = None,
         exploration_id: Optional[str] = None,
@@ -1234,7 +1235,7 @@ class EntryPoint:
             subtopic_id: int|None. The id for the current subtopic if the report
                 was sent during a revision session.
         """
-        self.entry_point_name = entry_point.name
+        self.entry_point_name = entry_point.value
         self.topic_id = topic_id
         self.story_id = story_id
         self.exploration_id = exploration_id
@@ -1270,7 +1271,7 @@ class EntryPoint:
     def require_valid_entry_point_name(
         cls,
         actual_name: str,
-        expected_entry_point: app_feedback_report_constants.ENTRY_POINT
+        expected_entry_point: app_feedback_report_constants.EntryPoint
     ) -> None:
         """Validates this EntryPoint name.
 
@@ -1282,7 +1283,7 @@ class EntryPoint:
         Raises:
             ValidationError. The name is not valid for the type.
         """
-        expected_name = expected_entry_point.name
+        expected_name = expected_entry_point.value
         if actual_name is None:
             raise utils.ValidationError('No entry point name supplied.')
         if not isinstance(actual_name, str):
@@ -1334,7 +1335,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
     def __init__(self) -> None:
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super().__init__(
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer, None,
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER, None,
             None, None, None)
 
     def to_dict(self) -> NavigationDrawerEntryPointDict:
@@ -1358,7 +1359,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER)
 
 
 class LessonPlayerEntryPointDict(TypedDict):
@@ -1387,7 +1388,7 @@ class LessonPlayerEntryPoint(EntryPoint):
                 user is playing when intiating the report.
         """
         super().__init__(
-            app_feedback_report_constants.ENTRY_POINT.lesson_player,
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER,
             topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
     def to_dict(self) -> LessonPlayerEntryPointDict:
@@ -1413,7 +1414,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.lesson_player)
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if self.story_id is None:
             raise utils.ValidationError(
@@ -1444,7 +1445,7 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super().__init__(
-            app_feedback_report_constants.ENTRY_POINT.revision_card,
+            app_feedback_report_constants.EntryPoint.REVISION_CARD,
             topic_id, None, None, subtopic_id)
 
     def to_dict(self) -> RevisionCardEntryPointDict:
@@ -1470,7 +1471,7 @@ class RevisionCardEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.revision_card)
+            app_feedback_report_constants.EntryPoint.REVISION_CARD)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
@@ -1490,7 +1491,7 @@ class CrashEntryPoint(EntryPoint):
     def __init__(self) -> None:
         """Constructs an CrashEntryPoint domain object."""
         super().__init__(
-                app_feedback_report_constants.ENTRY_POINT.crash, None, None,
+                app_feedback_report_constants.EntryPoint.CRASH, None, None,
                 None, None)
 
     def to_dict(self) -> CrashEntryPointDict:
@@ -1513,7 +1514,7 @@ class CrashEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.crash)
+            app_feedback_report_constants.EntryPoint.CRASH)
 
 
 class AppFeedbackReportTicketDict(TypedDict):
@@ -1839,7 +1840,7 @@ class AppFeedbackReportDailyStats:
                 'The parameter stats should be a dict, '
                 'received: %r' % param_stats)
         allowed_parameter_names = [
-            parameter.name for parameter in (
+            parameter.value for parameter in (
                 app_feedback_report_constants.ALLOWED_STATS_PARAMETERS)]
         for (param_name, param_count_obj) in param_stats.items():
             if param_name not in allowed_parameter_names:
