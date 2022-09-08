@@ -53,8 +53,6 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/concurrent_task_utils_test.py',
     'scripts/docstrings_checker.py',
     'scripts/docstrings_checker_test.py',
-    'scripts/extend_index_yaml.py',
-    'scripts/extend_index_yaml_test.py',
     'scripts/flake_checker.py',
     'scripts/flake_checker_test.py',
     'scripts/install_python_prod_dependencies.py',
