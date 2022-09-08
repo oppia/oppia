@@ -1829,7 +1829,7 @@ def update_question_suggestion(
     return suggestion
 
 
-def enqueue_contributor_ranking_notification_email_task_transactional(
+def enqueue_contributor_ranking_notification_email_task(
     contributor_user_id: str, contribution_type: str,
     contribution_sub_type: str, language_code: str, rank_name: str,
 ) -> None:
@@ -1852,5 +1852,5 @@ def enqueue_contributor_ranking_notification_email_task_transactional(
         'rank_name': rank_name,
     }
     taskqueue_services.enqueue_task(
-        feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS,
+        feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
         payload, 0)

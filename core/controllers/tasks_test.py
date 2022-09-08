@@ -232,7 +232,7 @@ class TasksTests(test_utils.EmailTestBase):
             }
             taskqueue_services.enqueue_task(
                 feconf
-                .TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS,
+                .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
                 payload, 0)
             self.process_and_flush_pending_tasks()
 

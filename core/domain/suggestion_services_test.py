@@ -4832,7 +4832,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         user_id = 'user'
         (
             suggestion_services
-            .enqueue_contributor_ranking_notification_email_task_transactional(
+            .enqueue_contributor_ranking_notification_email_task(
                 user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
                 feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE, 'hi',
                 'Initial Contributor'
@@ -4848,7 +4848,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         self.assertEqual(
             tasks[0].url,
             feconf
-            .TASK_URL_CONTRIBUTOR_DASHBOARD_ACIEVEMENT_NOTIFICATION_EMAILS)
+            .TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS)
         # Ruling out the possibility of None for mypy type checking.
         assert tasks[0].payload is not None
         self.assertEqual(
