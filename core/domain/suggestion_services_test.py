@@ -2641,7 +2641,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception,
             'The final_reviewer_id in the suggestion should not be None.'):
-            suggestion_services.update_question_contribution_stats_at_submission(
+            suggestion_services.update_question_review_stats(
                 initial_suggestion
             )
 

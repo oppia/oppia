@@ -2543,6 +2543,9 @@ def update_translation_review_stats(
     Args:
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
+
+    Raises:
+        Exception. The final_reviewer_id of the suggestion should not be None.
     """
     if suggestion.final_reviewer_id is None:
         raise Exception(
@@ -2710,6 +2713,9 @@ def update_question_review_stats(
     Args:
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
+
+    Raises:
+        Exception. The final_reviewer_id of the suggestion should not be None.
     """
     if suggestion.final_reviewer_id is None:
         raise Exception(
