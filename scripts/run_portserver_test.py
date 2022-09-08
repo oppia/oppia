@@ -48,7 +48,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
                 self.terminal_err_logs.append(msg)
         self.swap_log_err = self.swap(logging, 'error', mock_logging_err)
 
-    def test_get_process_start_time_handles_IOError(self) -> None:
+    def test_get_process_start_time_handles_ioerror(self) -> None:
         def mock_open(*unused_args, **unused_kwargs) -> None:
             raise IOError('File not found.')
         pid = 12345
@@ -80,7 +80,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         dummy_file_object.close()
         os.remove('dummy_file.txt')
 
-    def test_get_process_command_line_handles_IOError(self) -> None:
+    def test_get_process_command_line_handles_ioerror(self) -> None:
         def mock_open(*unused_args, **unused_kwargs) -> None:
             raise IOError('File not found.')
         pid = 12345
@@ -112,7 +112,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
         dummy_file_object.close()
         os.remove('dummy_file.txt')
-    
+
     def test_sock_bind_handles_error_while_creating_socket(self) -> None:
         port = 8181
         def mock_socket(*unused_args) -> None:
@@ -121,16 +121,16 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         with swap_socket:
             returned_port = run_portserver.sock_bind(
                 port, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-        
+
         self.assertIsNone(returned_port)
-    
+
     def test_socket_gets_bind_to_a_port(self) -> None:
         port = 8181
         class MockSocket:
             def setsockopt(*unused_args) -> None:
                 pass
             def bind(self, info: Any) -> None:
-                if(info[1] != port):
+                if info[1] != port:
                     raise Exception('Invalid call\n%s != %s' % (info[1], port))
                 pass
             def listen(self, time: int) -> None:
@@ -139,21 +139,21 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
                 return ['Address', port]
             def close(self) -> None:
                 pass
-            
+
         swap_socket = self.swap(socket, 'socket', lambda *unused_args: MockSocket())
         with swap_socket:
             returned_port = run_portserver.sock_bind(
                 port, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-        
+
         self.assertEqual(returned_port, port)
-        
+
     def test_sock_bind_handles_error_while_getting_port_name(self) -> None:
         port = 8181
         class MockSocket:
             def setsockopt(*unused_args) -> None:
                 pass
             def bind(self, info: Any) -> None:
-                if(info[1] != port):
+                if info[1] != port:
                     raise Exception('Invalid call\n%s != %s' % (info[1], port))
                 pass
             def listen(self, time: int) -> None:
@@ -162,50 +162,50 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
                 raise socket.error('Some error occurred.')
             def close(self) -> None:
                 pass
-            
+
         swap_socket = self.swap(socket, 'socket', lambda *unused_args: MockSocket())
         with swap_socket:
             returned_port = run_portserver.sock_bind(
                 port, socket.SOCK_DGRAM, socket.IPPROTO_TCP)
-        
+
         self.assertIsNone(returned_port)
-    
+
     def test_is_port_free(self) -> None:
         swap_sock_bind = self.swap(
             run_portserver, 'sock_bind', lambda *unused_args: True)
-        
+
         with swap_sock_bind:
             result = run_portserver.is_port_free(8181)
-        
+
         self.assertTrue(result)
-    
+
     def test_should_allocate_port(self) -> None:
         pid = 12345
         swap_os_kill = self.swap_with_checks(
             os, 'kill', lambda *unused_args: None, expected_args=((pid, 0),))
         with swap_os_kill:
             result = run_portserver.should_allocate_port(pid)
-        
+
         self.assertTrue(result)
-    
+
     def test_should_allocate_port_handles_invalid_pid(self) -> None:
         pid = 0
         with self.swap_log:
             result = run_portserver.should_allocate_port(pid)
-        
+
         self.assertFalse(result)
         self.assertIn(
             'Not allocating a port to invalid pid', self.terminal_logs)
-    
+
     def test_should_allocate_port_handles_init_pid(self) -> None:
         pid = 1
         with self.swap_log:
             result = run_portserver.should_allocate_port(pid)
-        
+
         self.assertFalse(result)
         self.assertIn(
             'Not allocating a port to init.', self.terminal_logs)
-    
+
     def test_should_allocate_port_handles_OSError(self) -> None:
         pid = 12345
         def mock_kill(*unused_args) -> None:
@@ -214,7 +214,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             os, 'kill', mock_kill, expected_args=((pid, 0),))
         with swap_os_kill, self.swap_log:
             result = run_portserver.should_allocate_port(pid)
-        
+
         self.assertFalse(result)
         self.assertIn(
             'Not allocating a port to a non-existent process',
@@ -226,7 +226,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         error_msg = r'Port must be in the \[1, 65535\] range, not -1.'
         with self.assertRaisesRegex(ValueError, error_msg):
             port_pool.add_port_to_free_pool(port)
-    
+
     def test_port_pool_handles_empty_port_queue(self) -> None:
         port_pool = run_portserver._PortPool()
         error_msg = 'No ports being managed.'
@@ -239,15 +239,15 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             run_portserver, 'get_process_start_time', lambda _: 0)
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: True)
-        
+
         port_pool = run_portserver._PortPool()
         port_pool.add_port_to_free_pool(port)
         self.assertEqual(port_pool.num_ports(), 1)
         with swap_get_process_start_time, swap_is_port_free:
             returned_port = port_pool.get_port_for_process(12345)
-        
+
         self.assertEqual(returned_port, port)
-    
+
     def test_get_port_for_process_looks_for_free_port(self) -> None:
         port1 = 8181
         port2 = 8182
@@ -255,7 +255,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             run_portserver, 'get_process_start_time', lambda _: 1)
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: True)
-        
+
         port_pool = run_portserver._PortPool()
         port_pool.add_port_to_free_pool(port1)
         port_pool.add_port_to_free_pool(port2)
@@ -265,42 +265,42 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertEqual(port_pool.num_ports(), 2)
         with swap_get_process_start_time, swap_is_port_free:
             returned_port = port_pool.get_port_for_process(12345)
-        
+
         self.assertEqual(returned_port, port1)
-    
+
     def test_get_port_for_process_handles_no_free_port(self) -> None:
         port = 8181
         swap_get_process_start_time = self.swap(
             run_portserver, 'get_process_start_time', lambda _: 0)
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: False)
-        
+
         port_pool = run_portserver._PortPool()
         port_pool.add_port_to_free_pool(port)
         self.assertEqual(port_pool.num_ports(), 1)
         with swap_get_process_start_time, swap_is_port_free, self.swap_log:
             returned_port = port_pool.get_port_for_process(12345)
-        
+
         self.assertEqual(returned_port, 0)
         self.assertIn('All ports in use.', self.terminal_logs)
-    
+
     def test_port_server_request_handler_handles_invalid_request(self) -> None:
         request_handler = run_portserver._PortServerRequestHandler((8181,))
         request_handler.handle_port_request('abcd')
         with self.swap_log:
             request_handler.dump_stats()
-        
+
         self.assertIn('client-request-errors 1', self.terminal_logs)
-    
+
     def test_port_server_request_handler_handles_denied_allocations(
             self) -> None:
         request_handler = run_portserver._PortServerRequestHandler((8181,))
         request_handler.handle_port_request(0)
         with self.swap_log:
             request_handler.dump_stats()
-        
+
         self.assertIn('denied-allocations 1', self.terminal_logs)
-    
+
     def test_port_server_request_handler_handles_no_free_ports(self) -> None:
         request_handler = run_portserver._PortServerRequestHandler((8181,))
         swap_get_port = self.swap(
@@ -311,9 +311,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         with self.swap_log, swap_get_port, swap_should_allocate_port:
             request_handler.handle_port_request(1010)
             request_handler.dump_stats()
-        
+
         self.assertIn('denied-allocations 1', self.terminal_logs)
-    
+
     def test_port_server_request_handler_allocates_port_to_client(
             self) -> None:
         request_handler = run_portserver._PortServerRequestHandler((8181,))
@@ -325,15 +325,15 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         with self.swap_log, swap_get_port, swap_should_allocate_port:
             request_handler.handle_port_request(1010)
             request_handler.dump_stats()
-        
+
         self.assertIn('total-allocations 1', self.terminal_logs)
-    
+
     def test_errors_while_parsing_port_ranges_are_handled(self) -> None:
         pool_str = 'abcd-efgh,0-8181,8182-8185'
         ports = run_portserver.parse_port_ranges(pool_str)
-        
+
         self.assertEqual(ports, set(range(8182, 8186)))
-    
+
     def test_failure_to_start_server_throws_error(self) -> None:
         path = 8181
         class MockSocket:
@@ -350,7 +350,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
         def dummy_handler(data: int) -> str:
             return str(data)
-            
+
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: MockSocket())
         error_msg = (
@@ -358,7 +358,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
                 path, socket.error('Some error occurred.')))
         with swap_socket, self.assertRaisesRegex(RuntimeError, error_msg):
             run_portserver.Server(dummy_handler, path)
-    
+
     def test_server_closes_gracefully(self) -> None:
         path = '\08181'
         class MockSocket:
@@ -386,14 +386,14 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             builtins, 'hasattr', lambda *unused_args: False)
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: MockSocket())
-        
+
         with swap_socket, swap_hasattr:
             server = run_portserver.Server(dummy_handler, path)
             run_portserver.Server.handle_connection(MockSocket(), dummy_handler)
             server.close()
-        
+
         self.assertTrue(server.socket.server_closed)
-    
+
     def test_server_on_close_removes_the_socket_file(self) -> None:
         path = '8181'
         class MockSocket:
@@ -419,20 +419,20 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             socket, 'socket', lambda *unused_args: MockSocket())
         swap_remove = self.swap_with_checks(
             os, 'remove', lambda _: None, expected_args=((path,),))
-        
+
         with swap_socket, swap_hasattr, swap_remove:
             server = run_portserver.Server(dummy_handler, path)
             server.close()
-        
+
         self.assertTrue(server.socket.server_closed)
-        
+
     def test_null_port_ranges_while_calling_script_throws_error(self) -> None:
         class MockServer:
             def run(*unused_args) -> None:
                 pass
             def close(*unused_args) -> None:
                 pass
-        
+
         class ParsedArguments:
             portserver_static_pool = 'abcd-efgh'
             portserver_unix_socket_address = '8181'
@@ -444,18 +444,18 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             run_portserver, '_parse_command_line', lambda: ParsedArguments())
         with self.swap_log_err, swap_sys_exit, swap_parser, swap_server:
             run_portserver.main()
-        
+
         self.assertIn(
             'No ports. Invalid port ranges in --portserver_static_pool?',
             self.terminal_err_logs)
-    
+
     def test_server_starts_on_calling_script_successfully(self) -> None:
         class MockServer:
             def run(*unused_args) -> None:
                 pass
             def close(*unused_args) -> None:
                 pass
-        
+
         class ParsedArguments:
             portserver_static_pool = '8181-8185'
             portserver_unix_socket_address = '8181'
@@ -467,7 +467,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             run_portserver, '_parse_command_line', lambda: ParsedArguments())
         with self.swap_log, swap_sys_exit, swap_parser, swap_server:
             run_portserver.main()
-        
+
         self.assertIn('Serving portserver on 8181', self.terminal_logs)
 
     def test_server_closes_on_keyboard_interrupt(self) -> None:

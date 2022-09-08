@@ -37,9 +37,9 @@ class FeconfTests(test_utils.GenericTestBase):
         with swap_getenv, self.assertRaisesRegex(
                 Exception, 'DEV_MODE can\'t be true on production.'):
             feconf.check_dev_mode_is_true()
-    
+
     def test_dev_mode_in_development_passes_succcessfully(self) -> None:
-        def mock_getenv(env: str):
+        def mock_getenv(*unused_args):
             return 'Development'
 
         swap_getenv = self.swap(os, 'getenv', mock_getenv)
@@ -47,11 +47,9 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.check_dev_mode_is_true()
 
     def test_get_empty_ratings(self) -> None:
-        from core import feconf
         self.assertEqual(feconf.get_empty_ratings(), feconf._EMPTY_RATINGS) # pylint: disable=protected-access
 
     def test_callable_variables_return_correctly(self) -> None:
-        from core import feconf
         recipient_username = 'Anshuman'
         self.assertEqual(
             feconf.DEFAULT_SALUTATION_HTML_FN(recipient_username),
@@ -61,7 +59,7 @@ class FeconfTests(test_utils.GenericTestBase):
         self.assertEqual(
             feconf.DEFAULT_SIGNOFF_HTML_FN(sender_username),
             'Thanks!<br>%s (Oppia moderator)' % sender_username)
-        
+
         moderator_actions = feconf.VALID_MODERATOR_ACTIONS[
             'unpublish_exploration'
         ]
