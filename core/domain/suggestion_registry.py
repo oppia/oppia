@@ -1051,7 +1051,11 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'The skill with the given id doesn\'t exist.')
 
     # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseSuggestion's method.
+    # doesn't match with BaseSuggestion's method. In BaseSuggestion,
+    # this method returns a list of BaseChange classes but in this
+    # sub-class 'SuggestionAddQuestion', we are not returning anything
+    # which causes conflict in both function signatures, and due to this
+    # MyPy throws an error. Thus, to avoid the error, we used ignore here.
     def get_change_list_for_accepting_suggestion(self) -> None:  # type: ignore[override]
         pass
 

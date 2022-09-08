@@ -110,7 +110,7 @@ class Constants(dict):  # type: ignore[type-arg]
         self[name] = value
 
     # Here we use type Any because the return value here refers to the `value`
-    # in the above method, hence the type Any is used for it.
+    # in the __setattr__ method, hence the type Any is used for it.
     def __getattr__(self, name: str) -> Any:
         return self[name]
 

@@ -322,11 +322,10 @@ def yaml_from_dict(dictionary: Mapping[str, Any], width: int = 80) -> str:
     Returns:
         str. Converted yaml of the passed dictionary.
     """
-    # Here we use MyPy ignore because typestubs define the return type
-    # of 'dump' as 'Any' which is wrong.
-    return yaml.dump( # type: ignore[no-any-return]
+    yaml_str: str = yaml.dump(
         dictionary, allow_unicode=True, width=width
     )
+    return yaml_str
 
 
 # Here we use type Any because here obj has a recursive structure. The list
@@ -1311,7 +1310,7 @@ def quoted(s: str) -> str:
     return json.dumps(s)
 
 
-def url_open(source_url: str) -> str:
+def url_open(source_url: str) -> urllib.request._UrlopenRet:
     """Opens a URL and returns the response.
 
     Args:
@@ -1323,6 +1322,4 @@ def url_open(source_url: str) -> str:
     # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
     # check is refactored.
     context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
-    # Here we use MyPy ignore because typestubs define the return type
-    # of 'urlopen' as 'Any' which is wrong.
-    return urllib.request.urlopen(source_url, context=context) # type: ignore[no-any-return]
+    return urllib.request.urlopen(source_url, context=context)

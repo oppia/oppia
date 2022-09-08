@@ -826,13 +826,9 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_url_open(self) -> None:
         response = utils.url_open('http://www.google.com')
-        # Here we use MyPy ignore because typsheds does not define
-        # the getcode method.
-        self.assertEqual(response.getcode(), 200) # type: ignore[attr-defined]
-        # Here we use MyPy ignore because typsheds does not define
-        # the getcode method.
+        self.assertEqual(response.getcode(), 200)
         self.assertEqual(
-            response.url, 'http://www.google.com') # type: ignore[attr-defined]
+            response.url, 'http://www.google.com')
 
     def test_get_random_int(self) -> None:
         self.assertLess(utils.get_random_int(5), 5)

@@ -668,9 +668,7 @@ def reassign_ticket(
         old_ticket_obj = get_ticket_from_model(old_ticket_model)
         old_ticket_obj.reports.remove(report.report_id)
         if len(old_ticket_obj.reports) == 0:
-            # Here we use MyPy ignore because we are removing the only report
-            # associated with this ticket and for this we have to assign None.
-            old_ticket_obj.newest_report_creation_timestamp = None # type: ignore[assignment]
+            old_ticket_obj.newest_report_creation_timestamp = None
         else:
             if old_ticket_obj.newest_report_creation_timestamp == (
                     report.submitted_on_timestamp):
@@ -699,8 +697,10 @@ def reassign_ticket(
             new_ticket_id))
     new_ticket_obj = get_ticket_from_model(new_ticket_model)
     new_ticket_obj.reports.append(report.report_id)
-    if report.submitted_on_timestamp > (
-            new_ticket_obj.newest_report_creation_timestamp):
+    if (new_ticket_obj.newest_report_creation_timestamp and
+        report.submitted_on_timestamp > (
+            new_ticket_obj.newest_report_creation_timestamp)
+    ):
         new_ticket_obj.newest_report_creation_timestamp = (
             report.submitted_on_timestamp)
     _save_ticket(new_ticket_obj)

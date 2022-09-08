@@ -1114,11 +1114,11 @@ class Story:
             the object.
         """
         # Here we use MyPy ignore because to_dict() method returns a general
-        # dictionary representation of domain object which do not contain
-        # properties like created_on and last_updated but MyPy expecting
-        # story_dict a dictionary which contain all the properties of domain
-        # object. That's why we explicitly changing the type of story_dict
-        # here which causes MyPy to throw error, thus to silent the error
+        # dictionary representation of domain object (StoryDict) which does not
+        # contain properties like created_on and last_updated but MyPy expecting
+        # story_dict, a dictionary which contain all the properties of domain
+        # object. That's why we explicitly changing the type of story_dict,
+        # here which causes MyPy to throw an error. Thus, to silence the error,
         # we added an ignore here.
         story_dict: SerializableStoryDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our

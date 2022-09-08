@@ -339,7 +339,7 @@ def save_original_and_compressed_versions_of_image(
 # protobuf's library.
 # Here we use object because the argument classifier_data_proto can accept
 # instances of `TextClassifierFrozenModel` class. But since we excluded
-# proto_files/ from the static type annotations. This argument is annotated
+# proto_files/ from the static type annotations, This argument is annotated
 # as general object type.
 def save_classifier_data(
     exp_id: str,

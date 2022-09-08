@@ -628,8 +628,8 @@ def get_canonical_story_dicts(
         # other keys. To overcome this missing keys issue, we have defined
         # a CannonicalStoryDict and assigned it to the `story_summary_dict`.
         # So, due to this a conflict in type assignment is raised which cause
-        # MyPy to throw `Incompatible types in assignment` error. Thus to
-        # avoid error, we used ignore here.
+        # MyPy to throw `Incompatible types in assignment` error. Thus, to
+        # avoid the error, we used ignore here.
         story_summary_dict: CannonicalStoryDict = (
             story_summary.to_human_readable_dict()  # type: ignore[assignment]
         )

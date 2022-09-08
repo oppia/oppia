@@ -33,7 +33,7 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict
+from typing import Dict, List, Optional, Union
 
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -286,12 +286,17 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         """
         # Key value mapping tests that strings, numbers, booleans, floats,
         # lists, and Nonetypes are all correctly set and get from the cache.
-        key_value_mapping = {
-            'a': '1', 'b': 2, 'c': [True, None],
+        key_value_mapping: Dict[
+            str, Union[str, int, List[Optional[bool]], Dict[str, float]]
+        ] = {
+            'a': '1',
+            'b': 2,
+            'c': [True, None],
             'd': {
                 'd.1': 1.2,
                 'd.2': 30
-            }}
+            }
+        }
 
         exploration_id = 'id'
 
@@ -308,10 +313,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 [exploration_id]),
             {})
 
-        # Here we use MyPy ignore because set_mutli can accept
-        # str with literal(default), but here we passing object.
-        # Hence, ignore statement is used.
-        caching_services.set_multi( # type: ignore[call-overload]
+        caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(

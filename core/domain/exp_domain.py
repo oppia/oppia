@@ -811,6 +811,14 @@ class VersionedExplorationStatesDict(TypedDict):
     states: Dict[str, state_domain.StateDict]
 
 
+class SerializableExplorationDict(ExplorationDict):
+    """Dictionary representing the serializable Exploration object."""
+
+    version: int
+    created_on: str
+    last_updated: str
+
+
 class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
@@ -3119,7 +3127,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # method is ExplorationDict and ExplorationDict does not contain
         # `schema_version` key, but here we are defining a `schema_version` key
         # which causes MyPy to throw error 'TypedDict has no key schema_version'
-        # thus to silent the error, we used ignore here.
+        # thus to silence the error, we used ignore here.
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
 
         # The ID is the only property which should not be stored within the
@@ -3166,7 +3174,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             str. JSON-encoded str encoding all of the information composing
             the object.
         """
-        exploration_dict = self.to_dict()
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object (ExplorationDict) which
+        # does not contain properties like created_on and last_updated but
+        # MyPy expects exploration_dict, a dictionary which contains all the
+        # properties of domain object. That's why we are explicitly changing
+        # the type of exploration_dict, here which causes MyPy to throw an
+        # error. Thus, to silence the error, we added an ignore here.
+        exploration_dict: SerializableExplorationDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
         # parameter.
@@ -3175,29 +3190,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # files must add a version parameter to their files with the correct
         # version of this object. The line below must then be moved to
         # to_dict().
-        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
-        # method is ExplorationDict and ExplorationDict does not contain
-        # `version` key, but here we are defining that key which causes MyPy to
-        # throw 'TypedDict has no version key' error. Thus to silent the error,
-        # we used ignore here.
-        exploration_dict['version'] = self.version  # type: ignore[misc]
+        exploration_dict['version'] = self.version
 
-        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
-        # method is ExplorationDict and ExplorationDict does not contain
-        # `created_on` key, but here we are defining that key which causes MyPy
-        # to throw 'TypedDict has no created_on key' error. Thus to silent the
-        # error, we used ignore here.
         if self.created_on:
-            exploration_dict['created_on'] = (  # type: ignore[misc]
+            exploration_dict['created_on'] = (
                 utils.convert_naive_datetime_to_string(self.created_on))
 
-        # Here we use MyPy ignore because the dictionary returned by `to_dict()`
-        # method is ExplorationDict and ExplorationDict does not contain
-        # `last_updated` key, but here we are defining that key which causes
-        # MyPy to throw 'TypedDict has no last_updated key' error. Thus to
-        # silent the error, we used ignore here.
         if self.last_updated:
-            exploration_dict['last_updated'] = (  # type: ignore[misc]
+            exploration_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(exploration_dict)

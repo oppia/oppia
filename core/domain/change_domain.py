@@ -249,15 +249,15 @@ class BaseChange:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
 
         # Here we use MyPy ignore because we are deleting the 'name' key which
-        # cause MyPy to throw error, because MyPy does not allow key deletion
-        # from TypedDict. So to silent the error, we added an ignore here.
+        # cause MyPy to throw a error, because MyPy does not allow key deletion
+        # from TypedDict. So to silence the error, we added an ignore here.
         valid_cmd_attribute_specs.pop('name', None)  # type: ignore[misc]
 
         actual_cmd_attributes = copy.deepcopy(change_dict)
         # Here we use MyPy ignore because `actual_cmd_attributes` is of type
         # Mapping and Mapping does not contain extra methods (e.g: .pop()).
         # But here we are accessing `pop()` method, which causes MyPy to throw
-        # error. Thus to avoid the error, we used ignore here.
+        # a error. Thus to avoid the error, we used ignore here.
         actual_cmd_attributes.pop('cmd', None)  # type: ignore[attr-defined]
 
         validate_cmd(

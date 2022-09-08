@@ -281,7 +281,7 @@ def get_beam_query_from_ndb_query(
 
 
 # Here we use type Any because this method can return a list of tuples
-# in which we have a property values from a model and that property values
+# in which we have a property values from a model and those property values
 # can be of any type.
 def _get_beam_filters_from_ndb_node(
     node: ndb_query.Node

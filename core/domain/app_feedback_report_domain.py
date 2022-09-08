@@ -1525,7 +1525,7 @@ class AppFeedbackReportTicketDict(TypedDict):
     github_issue_repo_name: Optional[str]
     github_issue_number: Optional[int]
     archived: bool
-    newest_report_creation_timestamp: str
+    newest_report_creation_timestamp: Optional[str]
     reports: List[str]
 
 
@@ -1540,7 +1540,7 @@ class AppFeedbackReportTicket:
         github_issue_repo_name: Optional[str],
         github_issue_number: Optional[int],
         archived: bool,
-        newest_report_creation_timestamp: datetime.datetime,
+        newest_report_creation_timestamp: Optional[datetime.datetime],
         reports: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportTicket domain object.
@@ -1556,7 +1556,8 @@ class AppFeedbackReportTicket:
                 this ticket.
             archived: bool. Whether this ticket is archived.
             newest_report_creation_timestamp: datetime.datetime. Timestamp in
-                UTC of the newest submitted report that is in this ticket.
+                UTC of the newest submitted report that is in this ticket, or
+                None if there is no report.
             reports: list(str). The list of IDs for the AppFeedbackReports
                 assigned to this ticket.
         """
@@ -1585,7 +1586,9 @@ class AppFeedbackReportTicket:
             'github_issue_number': self.github_issue_number,
             'archived': self.archived,
             'newest_report_creation_timestamp': (
-                self.newest_report_creation_timestamp.isoformat()),
+                self.newest_report_creation_timestamp.isoformat()
+                if self.newest_report_creation_timestamp else None
+            ),
             'reports': self.reports
         }
 

@@ -2067,7 +2067,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     EXCEPTIONAL_TYPE_STATUS_DICT = {
         'type_comment_present': False,
         'type_comment_line_num': 0,
-        'is_function_signature_block': True,
+        'outside_function_signature_block': True,
         'outside_args_section': True,
         'type_present_inside_arg_section': False,
         'type_present_inside_return_section': False,
@@ -2205,8 +2205,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         """
         # Here, we are defining new variables so that we don't have to fetch
         # the values from 'type_status_dict' dictionary again and again.
-        is_function_signature_block = type_status_dict[
-            'is_function_signature_block'
+        outside_function_signature_block = type_status_dict[
+            'outside_function_signature_block'
         ]
         outside_args_section = type_status_dict['outside_args_section']
         args_section_end_line_num = type_status_dict[
@@ -2233,7 +2233,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         #       <outside function signature block>.
         if token_type == tokenize.NAME:
             if token == 'def':
-                is_function_signature_block = False
+                outside_function_signature_block = False
                 func_def_start_line = line_num
                 outside_args_section = False
 
@@ -2242,7 +2242,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                 outside_args_section = True
                 args_section_end_line_num = line_num
             if outside_args_section and token == ':':
-                is_function_signature_block = True
+                outside_function_signature_block = True
 
         # Checking if exceptional_type is present in function definition or not.
         if token_type == tokenize.NAME and token == exceptional_type:
@@ -2260,7 +2260,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         ):
             type_present_in_function_signature = True
 
-        if is_function_signature_block:
+        if outside_function_signature_block:
             if type_present_in_function_signature:
                 if (
                     type_comment_present and
@@ -2312,8 +2312,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
         # Updating the 'type_status_dict' dictionary so that previous data of
         # exceptional types don't get lost.
-        type_status_dict['is_function_signature_block'] = (
-            is_function_signature_block
+        type_status_dict['outside_function_signature_block'] = (
+            outside_function_signature_block
         )
         type_status_dict['outside_args_section'] = outside_args_section
         type_status_dict['args_section_end_line_num'] = (

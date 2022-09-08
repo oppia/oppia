@@ -34,7 +34,7 @@ from core.domain import stats_services
 from core.domain import user_domain
 from core.domain import user_services
 
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 from typing_extensions import TypedDict
 
 
@@ -254,12 +254,14 @@ def get_learner_collection_dict_by_id(
         next_exploration_id = collection.first_exploration_id
         completed_exp_ids = []
 
-    # Here we use MyPy ignore because the return type of 'to_dict' method
+    # Here we use cast because the return type of 'to_dict' method
     # is CollectionDict but for implementation purpose we are assigning
     # LearnerCollectionDict which is inherited from CollectionDict. So,
-    # due to the difference in types MyPy throw a error. Thus to avoid
-    # the error, we used ignore here.
-    collection_dict: LearnerCollectionDict = collection.to_dict()  # type: ignore[assignment]
+    # due to this difference in types MyPy throws an error. Thus to avoid
+    # the error, we used cast here.
+    collection_dict: LearnerCollectionDict = cast(
+        LearnerCollectionDict, collection.to_dict()
+    )
     # Here we use MyPy ignore because expression has type List[
     # CollectionNodeDict] but for implementation purpose we are
     # assigning List[LearnerCollectionNodeDict]. So, due the

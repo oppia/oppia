@@ -50,7 +50,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         ):
             # Here we use MyPy ignore because the argument `entity_id` of
             # GcsFileSystem() can only accept string values, but here for
-            # testing purpose we are providing integer value. Thus to silent
+            # testing purpose we are providing integer value. Thus to avoid
             # incompatible argument type MyPy error, we added an ignore
             # statement here.
             fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 1)  # type: ignore[arg-type]

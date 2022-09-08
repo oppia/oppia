@@ -30,15 +30,19 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Callable, Dict, List, Mapping, Union, overload
+from typing import Callable, Dict, List, Mapping, Optional, Union, overload
 from typing_extensions import Final, Literal, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import memory_cache_services
 
+    AllowedDefaultTypes = Union[
+        str, int, List[Optional[bool]], Dict[str, float]
+    ]
+
     AllowedCacheableObjectTypes = Union[
-        str,
+        AllowedDefaultTypes,
         config_domain.AllowedDefaultValueTypes,
         collection_domain.Collection,
         exp_domain.Exploration,
@@ -265,7 +269,7 @@ def get_multi(
     namespace: Literal['default'],
     sub_namespace: str | None,
     obj_ids: List[str]
-) -> Dict[str, str]: ...
+) -> Dict[str, AllowedDefaultTypes]: ...
 
 
 def get_multi(
@@ -377,7 +381,7 @@ def set_multi(
 def set_multi(
     namespace: Literal['default'],
     sub_namespace: str | None,
-    id_value_mapping: Dict[str, str]
+    id_value_mapping: Mapping[str, AllowedDefaultTypes]
 ) -> bool: ...
 
 

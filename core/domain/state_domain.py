@@ -3618,7 +3618,7 @@ class State(translation_domain.BaseTranslatableObject):
         """Update the interaction id attribute.
 
         Args:
-            interaction_id: str. The new interaction id to set.
+            interaction_id: str|None. The new interaction id to set.
         """
         if self.interaction.id:
             old_content_id_list = [

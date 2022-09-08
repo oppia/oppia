@@ -60,7 +60,7 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Any, Dict, List, Tuple, Type, cast # isort: skip
+from typing import Dict, List, Tuple, Type, cast # isort: skip
 
 
 class JobMetaclass(type):
@@ -75,14 +75,11 @@ class JobMetaclass(type):
 
     _JOB_REGISTRY: Dict[str, Type[JobBase]] = {}
 
-    # Here we use type Any because argument 'namespace' can accept methods,
-    # functions, and attributes of a class and these can be of any type. So,
-    # to allow every method, function, and attribute, we used Any here.
     def __new__(
             cls: Type[JobMetaclass],
             name: str,
             bases: Tuple[type, ...],
-            namespace: Dict[str, Any]
+            namespace: Dict[str, str]
     ) -> JobMetaclass:
         """Creates a new job class with type `JobMetaclass`.
 

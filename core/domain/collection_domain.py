@@ -33,7 +33,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 from typing_extensions import Final, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -472,12 +472,12 @@ class Collection:
             the object.
         """
         # Here we use MyPy ignore because to_dict() method returns a general
-        # dictionary representation of domain object which do not contain
-        # properties like created_on and last_updated but MyPy expecting
-        # collection_dict a dictionary which contains all the properties
-        # of domain object. That's why we explicitly changing the type of
-        # collection_dict here which causes MyPy to throw error, thus to
-        # silent the error we added an ignore here.
+        # dictionary representation of domain object (CollectionDict) which
+        # does not contain properties like created_on and last_updated but
+        # MyPy expects collection_dict, a dictionary which contains all the
+        # properties of domain object. That's why we are explicitly changing
+        # the type of collection_dict, here which causes MyPy to throw an error.
+        # Thus, to silence the error, we added an ignore here.
         collection_dict: SerializableCollectionDict = self.to_dict() # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
         # yaml encoding/decoding of this object does not handle the version
@@ -575,11 +575,11 @@ class Collection:
         collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
         # Here we use MyPy ignore because 'next_skill_id' key is
         # deprecated from the latest domain object and while accessing
-        # this key MyPy throw an error.
+        # this key MyPy throws an error.
         collection_dict['next_skill_id'] = ( # type: ignore[misc]
             # Here we use MyPy ignore because 'next_skill_id' key is
             # deprecated from the latest domain object and while accessing
-            # this key MyPy throw an error.
+            # this key MyPy throws an error.
             new_collection_dict['next_skill_id']) # type: ignore[misc]
 
         collection_dict['schema_version'] = 4
@@ -640,10 +640,11 @@ class Collection:
             Exception. The collection schema version is not valid.
         """
         try:
-            # Here we use MyPy ignore because utils.dict_from_yaml() is a
-            # general function which returns Dict[str, Any] and here we
-            # know that the returned value will be CollectionDict.
-            collection_dict: CollectionDict = utils.dict_from_yaml(yaml_content) # type: ignore[assignment]
+            # Here we use cast because here we are narrowing down the type from
+            # Dict[str, Any] to CollectionDict.
+            collection_dict = cast(
+                CollectionDict, utils.dict_from_yaml(yaml_content)
+            )
         except utils.InvalidInputException as e:
             raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '

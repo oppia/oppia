@@ -95,7 +95,7 @@ class ModelPropertyTests(test_utils.TestBase):
             # Here we use MyPy ignore because ModelProperty has model_class
             # argument, which can only accept classes that are inherited from
             # BaseModel. But here we are passing a class that is inherited from
-            # datastore_services.Model. Thus to silent mypy error, we added an
+            # datastore_services.Model. Thus to silence mypy error, we added an
             # ignore here.
             model_property.ModelProperty(
                 SubclassOfNdbModel, SubclassOfNdbModel.value)  # type: ignore[arg-type]

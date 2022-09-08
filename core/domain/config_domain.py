@@ -357,7 +357,7 @@ class ConfigProperty:
         email_validators = [{'id': 'does_not_contain_email'}]
         normalized_value: AllowedDefaultValueTypes = (
             schema_utils.normalize_against_schema(
-            value, self._schema, global_validators=email_validators
+                value, self._schema, global_validators=email_validators
             )
         )
         return normalized_value
@@ -491,13 +491,13 @@ BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
     'batch_index_for_mailchimp', INT_SCHEMA,
     'Index of batch to populate mailchimp database.', 0)
 
-FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE: List[str] = []
+_FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE: List[str] = []
 
 FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
     'featured_translation_languages',
     LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
     'Featured Translation Languages',
-    FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE
+    _FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE
 )
 
 HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(

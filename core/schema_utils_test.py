@@ -222,8 +222,8 @@ VALIDATOR_SPECS: Dict[str, Dict[str, Any]] = {
 }
 
 
-# Here we use type Any because the argument `validator` represent objects
-# for normalization, and they can have any type.
+# Here we use type Any because the argument `validator` represents the object
+# to be normalized, and that object can of any type.
 def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
     """Validates the value of a UI configuration.
 
@@ -244,8 +244,8 @@ def _validate_ui_config(obj_type: str, ui_config: Dict[str, Any]) -> None:
             value, reference_dict[key])
 
 
-# Here we use type Any because the argument `validator` represent objects
-# for normalization, and they can have any type.
+# Here we use type Any because the argument `validator` represents the object
+# to be normalized, and that object can of any type.
 def _validate_validator(obj_type: str, validator: Dict[str, Any]) -> None:
     """Validates the value of a 'validator' field.
 

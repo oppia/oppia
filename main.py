@@ -87,6 +87,7 @@ from webapp2_extras import routes
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
+    from mypy_imports import memory_cache_services as cache_services
 
 T = TypeVar('T')  # pylint: disable=invalid-name
 
@@ -1120,10 +1121,8 @@ class NdbWsgiMiddleware:
         environ: Dict[str, str],
         start_response: webapp2.Response
     ) -> webapp2.Response:
-        # Here we use MyPy ignore because cache_services is of ModuleType
-        # and ModuleType does not contain 'CLOUD_NDB_REDIS_CLIENT' attribute.
         global_cache = datastore_services.RedisCache(
-            cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
+            cache_services.CLOUD_NDB_REDIS_CLIENT)
         with datastore_services.get_ndb_context(global_cache=global_cache):
             # Here we use cast because webapp2.WSGIApplication is not
             # correctly typed in it's stubs.

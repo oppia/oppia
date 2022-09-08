@@ -27,7 +27,7 @@ from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -285,16 +285,20 @@ class CollectionModel(base_models.VersionedModel):
             'rights_model': CollectionRightsModel.get_by_id(self.id)
         }
 
-    def compute_models_to_commit(
+    # Here we use MyPy ignore because super class (VersionedModel)
+    # defines this 'additional_models' argument as broader type but here
+    # we are sure that in this sub-class (CollectionModel) argument
+    # 'additional_models' is always going to be of type Dict[str,
+    # CollectionRightsModel]. So, due to this conflict in argument types,
+    # a conflict in signatures occurred which causes MyPy to throw an
+    # error. Thus, to avoid the error, we used ignore here.
+    def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,
         commit_type: str,
         commit_message: Optional[str],
         commit_cmds: base_models.AllowedCommitCmdsListType,
-        # We expect Mapping because we want to allow models that inherit
-        # from BaseModel as the values, if we used Dict this wouldn't
-        # be allowed.
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Dict[str, CollectionRightsModel]
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -327,11 +331,7 @@ class CollectionModel(base_models.VersionedModel):
             additional_models
         )
 
-        # Here we use cast because the additional_models is list of BaseModels
-        # and we want to hint to MyPy that this is CollectionRightsModel.
-        collection_rights_model = cast(
-            CollectionRightsModel, additional_models['rights_model']
-        )
+        collection_rights_model = additional_models['rights_model']
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id,
             self.version,
