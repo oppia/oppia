@@ -87,6 +87,7 @@ import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
 import { ExplorationSavePromptModalComponent } from './modal-templates/exploration-save-prompt-modal.component';
 import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
+import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
 
 @NgModule({
   imports: [
@@ -157,7 +158,8 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     FeedbackTabComponent,
     ExplorationSavePromptModalComponent,
     ExplorationSaveAndPublishButtonsComponent,
-    PieChartComponent
+    PieChartComponent,
+    StatisticsTabComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -209,7 +211,8 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     FeedbackTabComponent,
     ExplorationSavePromptModalComponent,
     ExplorationSaveAndPublishButtonsComponent,
-    PieChartComponent
+    PieChartComponent,
+    StatisticsTabComponent
   ],
   providers: [
     {
