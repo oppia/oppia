@@ -71,7 +71,13 @@ angular.module('oppia').component('historyTab', {
       // Compares the two selected versions and displays the comparison
       // results.
       ctrl.compareSelectedVersions = function() {
-        if (ctrl.selectedVersionsArray.length === 2) {
+        // The selectedVersionsArray may contain empty elements as the
+        // array items are directly manipulated based on indices on change.
+        if (
+          ctrl.selectedVersionsArray.length === 2 &&
+          Number.isInteger(ctrl.selectedVersionsArray[0]) &&
+          Number.isInteger(ctrl.selectedVersionsArray[1])
+        ) {
           ctrl.changeCompareVersion();
           ctrl.hideHistoryGraph = false;
         }
