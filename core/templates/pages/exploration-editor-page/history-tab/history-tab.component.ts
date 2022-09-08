@@ -115,7 +115,14 @@ export class HistoryTabComponent
   // Compares the two selected versions and displays the comparison
   // results.
   compareSelectedVersions(): void {
-    if (this.selectedVersionsArray && this.selectedVersionsArray.length === 2) {
+    // The selectedVersionsArray may contain empty elements as the
+    // array items are directly manipulated based on indices on change.
+    if (
+      this.selectedVersionsArray &&
+      this.selectedVersionsArray.length === 2 &&
+      Number.isInteger(this.selectedVersionsArray[0]) &&
+      Number.isInteger(this.selectedVersionsArray[1])
+    ) {
       this.changeCompareVersion();
       this.hideHistoryGraph = false;
     }
