@@ -30,6 +30,7 @@ from scripts import run_portserver
 
 from typing import Any
 
+
 class CloudTransactionServicesTests(test_utils.GenericTestBase):
     """Unit tests for scripts/run_portserver.py"""
 
@@ -127,20 +128,21 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_socket_gets_bind_to_a_port(self) -> None:
         port = 8181
         class MockSocket:
-            def setsockopt(*unused_args) -> None:
+            def setsockopt(*unused_args: Any) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(self, info: Any) -> None:
+            def bind(self, info: Any) -> None: # pylint: disable=missing-docstring
                 if info[1] != port:
                     raise Exception('Invalid call\n%s != %s' % (info[1], port))
                 pass
-            def listen(self, time: int) -> None:
+            def listen(self, time: int) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(self) -> list(Any):
+            def getsockname(self) -> list(Any): # pylint: disable=missing-docstring
                 return ['Address', port]
-            def close(self) -> None:
+            def close(self) -> None: # pylint: disable=missing-docstring
                 pass
 
-        swap_socket = self.swap(socket, 'socket', lambda *unused_args: MockSocket())
+        swap_socket = self.swap(
+            socket, 'socket', lambda *unused_args: MockSocket())
         with swap_socket:
             returned_port = run_portserver.sock_bind(
                 port, socket.SOCK_STREAM, socket.IPPROTO_TCP)
@@ -150,20 +152,21 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_sock_bind_handles_error_while_getting_port_name(self) -> None:
         port = 8181
         class MockSocket:
-            def setsockopt(*unused_args) -> None:
+            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(self, info: Any) -> None:
+            def bind(self, info: Any) -> None: # pylint: disable=missing-docstring
                 if info[1] != port:
                     raise Exception('Invalid call\n%s != %s' % (info[1], port))
                 pass
-            def listen(self, time: int) -> None:
+            def listen(self, time: int) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(self) -> None:
+            def getsockname(self) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
-            def close(self) -> None:
+            def close(self) -> None: # pylint: disable=missing-docstring
                 pass
 
-        swap_socket = self.swap(socket, 'socket', lambda *unused_args: MockSocket())
+        swap_socket = self.swap(
+            socket, 'socket', lambda *unused_args: MockSocket())
         with swap_socket:
             returned_port = run_portserver.sock_bind(
                 port, socket.SOCK_DGRAM, socket.IPPROTO_TCP)
@@ -206,7 +209,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertIn(
             'Not allocating a port to init.', self.terminal_logs)
 
-    def test_should_allocate_port_handles_OSError(self) -> None:
+    def test_should_allocate_port_handles_oserror(self) -> None:
         pid = 12345
         def mock_kill(*unused_args) -> None:
             raise OSError('Some XYZ error occurred.')
@@ -222,13 +225,13 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_port_pool_handles_invalid_port_request(self) -> None:
         port = -1
-        port_pool = run_portserver._PortPool()
+        port_pool = run_portserver._PortPool() # pylint: disable=protected-access
         error_msg = r'Port must be in the \[1, 65535\] range, not -1.'
         with self.assertRaisesRegex(ValueError, error_msg):
             port_pool.add_port_to_free_pool(port)
 
     def test_port_pool_handles_empty_port_queue(self) -> None:
-        port_pool = run_portserver._PortPool()
+        port_pool = run_portserver._PortPool() # pylint: disable=protected-access
         error_msg = 'No ports being managed.'
         with self.assertRaisesRegex(RuntimeError, error_msg):
             port_pool.get_port_for_process(12345)
@@ -240,7 +243,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: True)
 
-        port_pool = run_portserver._PortPool()
+        port_pool = run_portserver._PortPool() # pylint: disable=protected-access
         port_pool.add_port_to_free_pool(port)
         self.assertEqual(port_pool.num_ports(), 1)
         with swap_get_process_start_time, swap_is_port_free:
@@ -256,7 +259,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: True)
 
-        port_pool = run_portserver._PortPool()
+        port_pool = run_portserver._PortPool() # pylint: disable=protected-access
         port_pool.add_port_to_free_pool(port1)
         port_pool.add_port_to_free_pool(port2)
         port = port_pool._port_queue.pop()
@@ -275,7 +278,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_is_port_free = self.swap(
             run_portserver, 'is_port_free', lambda _: False)
 
-        port_pool = run_portserver._PortPool()
+        port_pool = run_portserver._PortPool() # pylint: disable=protected-access
         port_pool.add_port_to_free_pool(port)
         self.assertEqual(port_pool.num_ports(), 1)
         with swap_get_process_start_time, swap_is_port_free, self.swap_log:
@@ -285,7 +288,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertIn('All ports in use.', self.terminal_logs)
 
     def test_port_server_request_handler_handles_invalid_request(self) -> None:
-        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        request_handler = run_portserver._PortServerRequestHandler((8181,)) # pylint: disable=protected-access
         request_handler.handle_port_request('abcd')
         with self.swap_log:
             request_handler.dump_stats()
@@ -294,7 +297,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_port_server_request_handler_handles_denied_allocations(
             self) -> None:
-        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        request_handler = run_portserver._PortServerRequestHandler((8181,)) # pylint: disable=protected-access
         request_handler.handle_port_request(0)
         with self.swap_log:
             request_handler.dump_stats()
@@ -302,7 +305,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertIn('denied-allocations 1', self.terminal_logs)
 
     def test_port_server_request_handler_handles_no_free_ports(self) -> None:
-        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        request_handler = run_portserver._PortServerRequestHandler((8181,)) # pylint: disable=protected-access
         swap_get_port = self.swap(
             run_portserver._PortPool, 'get_port_for_process',
             lambda *unused_args: 0)
@@ -316,9 +319,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_port_server_request_handler_allocates_port_to_client(
             self) -> None:
-        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        request_handler = run_portserver._PortServerRequestHandler((8181,)) # pylint: disable=protected-access
         swap_get_port = self.swap(
-            run_portserver._PortPool, 'get_port_for_process',
+            run_portserver._PortPool, 'get_port_for_process', # pylint: disable=protected-access
             lambda *unused_args: 8080)
         swap_should_allocate_port = self.swap(
             run_portserver, 'should_allocate_port', lambda _: True)
@@ -337,15 +340,15 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_failure_to_start_server_throws_error(self) -> None:
         path = 8181
         class MockSocket:
-            def setsockopt(*unused_args) -> None:
+            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(*unused_args) -> None:
+            def bind(*unused_args) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
-            def listen(*unused_args) -> None:
+            def listen(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(*unused_args) -> list(Any):
+            def getsockname(*unused_args) -> list(Any): # pylint: disable=missing-docstring
                 return ['Address', path]
-            def close(*unused_args) -> None:
+            def close(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
 
         def dummy_handler(data: int) -> str:
@@ -363,21 +366,21 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         path = '\08181'
         class MockSocket:
             server_closed = False
-            def setsockopt(*unused_args) -> None:
+            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(*unused_args) -> None:
+            def bind(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def listen(*unused_args) -> None:
+            def listen(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(*unused_args) -> list(Any):
+            def getsockname(*unused_args) -> list(Any): # pylint: disable=missing-docstring
                 return ['Address', path]
-            def recv(*unused_args) -> None:
+            def recv(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def sendall(*unused_args) -> None:
+            def sendall(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def shutdown(*unused_args) -> None:
+            def shutdown(*unused_args) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
-            def close(self) -> None:
+            def close(self) -> None: # pylint: disable=missing-docstring
                 self.server_closed = True
 
         def dummy_handler(data: Any) -> str:
@@ -398,17 +401,17 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         path = '8181'
         class MockSocket:
             server_closed = False
-            def setsockopt(*unused_args) -> None:
+            def setsockopt(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def bind(*unused_args) -> None:
+            def bind(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def listen(*unused_args) -> None:
+            def listen(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def getsockname(*unused_args) -> list(Any):
+            def getsockname(*unused_args) -> list(Any): # pylint: disable=missing-docstring
                 return ['Address', path]
-            def shutdown(*unused_args) -> None:
+            def shutdown(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def close(self) -> None:
+            def close(self) -> None: # pylint: disable=missing-docstring
                 self.server_closed = True
 
         def dummy_handler(data: Any) -> str:
@@ -428,9 +431,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_null_port_ranges_while_calling_script_throws_error(self) -> None:
         class MockServer:
-            def run(*unused_args) -> None:
+            def run(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def close(*unused_args) -> None:
+            def close(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
 
         class ParsedArguments:
@@ -440,8 +443,10 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_server = self.swap(
             run_portserver, 'Server', lambda *unused_args: MockServer())
         swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        def mock_parse_command_line() -> ParsedArguments:
+            return ParsedArguments()
         swap_parser = self.swap(
-            run_portserver, '_parse_command_line', lambda: ParsedArguments())
+            run_portserver, '_parse_command_line', mock_parse_command_line)
         with self.swap_log_err, swap_sys_exit, swap_parser, swap_server:
             run_portserver.main()
 
@@ -451,9 +456,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_server_starts_on_calling_script_successfully(self) -> None:
         class MockServer:
-            def run(*unused_args) -> None:
+            def run(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
-            def close(*unused_args) -> None:
+            def close(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
 
         class ParsedArguments:
@@ -463,8 +468,10 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_server = self.swap(
             run_portserver, 'Server', lambda *unused_args: MockServer())
         swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        def mock_parse_command_line() -> ParsedArguments:
+            return ParsedArguments()
         swap_parser = self.swap(
-            run_portserver, '_parse_command_line', lambda: ParsedArguments())
+            run_portserver, '_parse_command_line', mock_parse_command_line)
         with self.swap_log, swap_sys_exit, swap_parser, swap_server:
             run_portserver.main()
 
@@ -472,9 +479,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_server_closes_on_keyboard_interrupt(self) -> None:
         class MockServer:
-            def run(*unused_args) -> None:
+            def run(*unused_args) -> None: # pylint: disable=missing-docstring
                 raise KeyboardInterrupt('^C pressed.')
-            def close(*unused_args) -> None:
+            def close(*unused_args) -> None: # pylint: disable=missing-docstring
                 pass
 
         class ParsedArguments:
@@ -484,8 +491,10 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_server = self.swap(
             run_portserver, 'Server', lambda *unused_args: MockServer())
         swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        def mock_parse_command_line() -> ParsedArguments:
+            return ParsedArguments()
         swap_parser = self.swap(
-            run_portserver, '_parse_command_line', lambda: ParsedArguments())
+            run_portserver, '_parse_command_line', mock_parse_command_line)
         with self.swap_log, swap_sys_exit, swap_parser, swap_server:
             run_portserver.main()
 

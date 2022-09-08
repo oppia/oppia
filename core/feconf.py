@@ -70,6 +70,7 @@ SUPPORTED_OBJ_TYPES = {
 # Whether to unconditionally log info messages.
 DEBUG = False
 
+
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
@@ -81,7 +82,8 @@ def check_dev_mode_is_true() -> None:
                 not server_software.startswith(('Development', 'gunicorn'))
         ):
             raise Exception('DEV_MODE can\'t be true on production.')
-    
+
+
 check_dev_mode_is_true()
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
