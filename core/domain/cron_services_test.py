@@ -31,7 +31,7 @@ class CronServicesTests(test_utils.GenericTestBase):
 
     NINE_WEEKS = datetime.timedelta(weeks=9)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -41,7 +41,7 @@ class CronServicesTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        completed_activities_model = user_models.CompletedActivitiesModel(
+        completed_activities_model = user_models.CompletedActivitiesModel( # type: ignore[attr-defined]
             id=admin_user_id,
             exploration_ids=[],
             collection_ids=[],
@@ -57,13 +57,13 @@ class CronServicesTests(test_utils.GenericTestBase):
         cron_services.delete_models_marked_as_deleted()
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id)) # type: ignore[attr-defined]
 
     def test_mark_outdated_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        user_query_model = user_models.UserQueryModel(
+        user_query_model = user_models.UserQueryModel( # type: ignore[attr-defined]
             id='query_id',
             user_ids=[],
             submitter_id=admin_user_id,
