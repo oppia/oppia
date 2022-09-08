@@ -18,9 +18,11 @@
 
 from __future__ import annotations
 
+import builtins
 import logging
 import os
 import socket
+import sys
 
 from core import utils
 from core.tests import test_utils
@@ -39,6 +41,12 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             for msg in all_messages:
                 self.terminal_logs.append(msg)
         self.swap_log = self.swap(logging, 'info', mock_logging)
+        self.terminal_err_logs: list[Any] = []
+        def mock_logging_err(*msgs: Any) -> None:
+            all_messages = [*msgs]
+            for msg in all_messages:
+                self.terminal_err_logs.append(msg)
+        self.swap_log_err = self.swap(logging, 'error', mock_logging_err)
 
     def test_get_process_start_time_handles_IOError(self) -> None:
         def mock_open(*unused_args, **unused_kwargs) -> None:
@@ -275,3 +283,211 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         
         self.assertEqual(returned_port, 0)
         self.assertIn('All ports in use.', self.terminal_logs)
+    
+    def test_port_server_request_handler_handles_invalid_request(self) -> None:
+        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        request_handler.handle_port_request('abcd')
+        with self.swap_log:
+            request_handler.dump_stats()
+        
+        self.assertIn('client-request-errors 1', self.terminal_logs)
+    
+    def test_port_server_request_handler_handles_denied_allocations(
+            self) -> None:
+        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        request_handler.handle_port_request(0)
+        with self.swap_log:
+            request_handler.dump_stats()
+        
+        self.assertIn('denied-allocations 1', self.terminal_logs)
+    
+    def test_port_server_request_handler_handles_no_free_ports(self) -> None:
+        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        swap_get_port = self.swap(
+            run_portserver._PortPool, 'get_port_for_process',
+            lambda *unused_args: 0)
+        swap_should_allocate_port = self.swap(
+            run_portserver, 'should_allocate_port', lambda _: True)
+        with self.swap_log, swap_get_port, swap_should_allocate_port:
+            request_handler.handle_port_request(1010)
+            request_handler.dump_stats()
+        
+        self.assertIn('denied-allocations 1', self.terminal_logs)
+    
+    def test_port_server_request_handler_allocates_port_to_client(
+            self) -> None:
+        request_handler = run_portserver._PortServerRequestHandler((8181,))
+        swap_get_port = self.swap(
+            run_portserver._PortPool, 'get_port_for_process',
+            lambda *unused_args: 8080)
+        swap_should_allocate_port = self.swap(
+            run_portserver, 'should_allocate_port', lambda _: True)
+        with self.swap_log, swap_get_port, swap_should_allocate_port:
+            request_handler.handle_port_request(1010)
+            request_handler.dump_stats()
+        
+        self.assertIn('total-allocations 1', self.terminal_logs)
+    
+    def test_errors_while_parsing_port_ranges_are_handled(self) -> None:
+        pool_str = 'abcd-efgh,0-8181,8182-8185'
+        ports = run_portserver.parse_port_ranges(pool_str)
+        
+        self.assertEqual(ports, set(range(8182, 8186)))
+    
+    def test_failure_to_start_server_throws_error(self) -> None:
+        path = 8181
+        class MockSocket:
+            def setsockopt(*unused_args) -> None:
+                pass
+            def bind(*unused_args) -> None:
+                raise socket.error('Some error occurred.')
+            def listen(*unused_args) -> None:
+                pass
+            def getsockname(*unused_args) -> list(Any):
+                return ['Address', path]
+            def close(*unused_args) -> None:
+                pass
+
+        def dummy_handler(data: int) -> str:
+            return str(data)
+            
+        swap_socket = self.swap(
+            socket, 'socket', lambda *unused_args: MockSocket())
+        error_msg = (
+            'Failed to bind socket {}. Error: {}'.format(
+                path, socket.error('Some error occurred.')))
+        with swap_socket, self.assertRaisesRegex(RuntimeError, error_msg):
+            run_portserver.Server(dummy_handler, path)
+    
+    def test_server_closes_gracefully(self) -> None:
+        path = '\08181'
+        class MockSocket:
+            server_closed = False
+            def setsockopt(*unused_args) -> None:
+                pass
+            def bind(*unused_args) -> None:
+                pass
+            def listen(*unused_args) -> None:
+                pass
+            def getsockname(*unused_args) -> list(Any):
+                return ['Address', path]
+            def recv(*unused_args) -> None:
+                pass
+            def sendall(*unused_args) -> None:
+                pass
+            def shutdown(*unused_args) -> None:
+                raise socket.error('Some error occurred.')
+            def close(self) -> None:
+                self.server_closed = True
+
+        def dummy_handler(data: Any) -> str:
+            return str(data)
+        swap_hasattr = self.swap(
+            builtins, 'hasattr', lambda *unused_args: False)
+        swap_socket = self.swap(
+            socket, 'socket', lambda *unused_args: MockSocket())
+        
+        with swap_socket, swap_hasattr:
+            server = run_portserver.Server(dummy_handler, path)
+            run_portserver.Server.handle_connection(MockSocket(), dummy_handler)
+            server.close()
+        
+        self.assertTrue(server.socket.server_closed)
+    
+    def test_server_on_close_removes_the_socket_file(self) -> None:
+        path = '8181'
+        class MockSocket:
+            server_closed = False
+            def setsockopt(*unused_args) -> None:
+                pass
+            def bind(*unused_args) -> None:
+                pass
+            def listen(*unused_args) -> None:
+                pass
+            def getsockname(*unused_args) -> list(Any):
+                return ['Address', path]
+            def shutdown(*unused_args) -> None:
+                pass
+            def close(self) -> None:
+                self.server_closed = True
+
+        def dummy_handler(data: Any) -> str:
+            return str(data)
+        swap_hasattr = self.swap(
+            builtins, 'hasattr', lambda *unused_args: False)
+        swap_socket = self.swap(
+            socket, 'socket', lambda *unused_args: MockSocket())
+        swap_remove = self.swap_with_checks(
+            os, 'remove', lambda _: None, expected_args=((path,),))
+        
+        with swap_socket, swap_hasattr, swap_remove:
+            server = run_portserver.Server(dummy_handler, path)
+            server.close()
+        
+        self.assertTrue(server.socket.server_closed)
+        
+    def test_null_port_ranges_while_calling_script_throws_error(self) -> None:
+        class MockServer:
+            def run(*unused_args) -> None:
+                pass
+            def close(*unused_args) -> None:
+                pass
+        
+        class ParsedArguments:
+            portserver_static_pool = 'abcd-efgh'
+            portserver_unix_socket_address = '8181'
+
+        swap_server = self.swap(
+            run_portserver, 'Server', lambda *unused_args: MockServer())
+        swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        swap_parser = self.swap(
+            run_portserver, '_parse_command_line', lambda: ParsedArguments())
+        with self.swap_log_err, swap_sys_exit, swap_parser, swap_server:
+            run_portserver.main()
+        
+        self.assertIn(
+            'No ports. Invalid port ranges in --portserver_static_pool?',
+            self.terminal_err_logs)
+    
+    def test_server_starts_on_calling_script_successfully(self) -> None:
+        class MockServer:
+            def run(*unused_args) -> None:
+                pass
+            def close(*unused_args) -> None:
+                pass
+        
+        class ParsedArguments:
+            portserver_static_pool = '8181-8185'
+            portserver_unix_socket_address = '8181'
+
+        swap_server = self.swap(
+            run_portserver, 'Server', lambda *unused_args: MockServer())
+        swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        swap_parser = self.swap(
+            run_portserver, '_parse_command_line', lambda: ParsedArguments())
+        with self.swap_log, swap_sys_exit, swap_parser, swap_server:
+            run_portserver.main()
+        
+        self.assertIn('Serving portserver on 8181', self.terminal_logs)
+
+    def test_server_closes_on_keyboard_interrupt(self) -> None:
+        class MockServer:
+            def run(*unused_args) -> None:
+                raise KeyboardInterrupt('^C pressed.')
+            def close(*unused_args) -> None:
+                pass
+
+        class ParsedArguments:
+            portserver_static_pool = '8181-8185'
+            portserver_unix_socket_address = '8181'
+
+        swap_server = self.swap(
+            run_portserver, 'Server', lambda *unused_args: MockServer())
+        swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        swap_parser = self.swap(
+            run_portserver, '_parse_command_line', lambda: ParsedArguments())
+        with self.swap_log, swap_sys_exit, swap_parser, swap_server:
+            run_portserver.main()
+
+        self.assertIn('Stopping portserver due to ^C.', self.terminal_logs)
+        self.assertIn('Shutting down portserver.', self.terminal_logs)

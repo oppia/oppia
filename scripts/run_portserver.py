@@ -350,7 +350,7 @@ class _PortServerRequestHandler:
             logging.info(stat)
 
 
-def _parse_command_line():
+def _parse_command_line(): # pragma: no cover
     """Configure and parse our command line flags.
 
     Returns:
@@ -370,7 +370,7 @@ def _parse_command_line():
     return parser.parse_args(args=sys.argv[1:])
 
 
-def _parse_port_ranges(pool_str):
+def parse_port_ranges(pool_str):
     """Given a 'N-P,X-Y' description of port ranges, return a set of ints.
 
     Args:
@@ -425,7 +425,7 @@ class Server:
         Spawns a thread to handle each connection to the socket. Uses
         the handle_connection function to handle each connection.
         """
-        while True:
+        while True: # pragma: no cover
             connection, _ = self.socket.accept()
             thread = threading.Thread(
                 target=Server.handle_connection,
@@ -513,7 +513,7 @@ class Server:
 def main():
     """Runs the portserver until ctrl-C, then shuts it down."""
     config = _parse_command_line()
-    ports_to_serve = _parse_port_ranges(config.portserver_static_pool)
+    ports_to_serve = parse_port_ranges(config.portserver_static_pool)
     if not ports_to_serve:
         logging.error(
             'No ports. Invalid port ranges in --portserver_static_pool?'
@@ -539,5 +539,5 @@ def main():
         sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     main()
