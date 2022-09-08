@@ -71,10 +71,10 @@ SUPPORTED_OBJ_TYPES = {
 DEBUG = False
 
 
-# When DEV_MODE is true check that we are running in development environment.
-# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
-# need for an explicit check.
 def check_dev_mode_is_true() -> None:
+    """When DEV_MODE is true check that we are running in development
+    environment. The SERVER_SOFTWARE environment variable does not exist
+    in Travis, hence the need for an explicit check."""
     if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
         server_software = os.getenv('SERVER_SOFTWARE')
         if (
