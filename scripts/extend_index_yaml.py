@@ -22,7 +22,6 @@ and appends it into index.yaml"""
 
 from __future__ import annotations
 
-import copy
 import os
 
 import yaml
@@ -43,26 +42,10 @@ def main() -> None:
     if web_inf_index_yaml_dict['indexes'] is None:
         return
 
-    # There is a possibility that an index in index.yaml may exist in
-    # ../cloud_datastore_emulator_cache/WEB-INF/index.yaml with different
-    # order of properties. We don't need to append those indexes. So we will
-    # compare sorted dictionaries. Deepcopy is used here to avoid changing the
-    # order of index_yaml_dict after sorting temp_index_yaml_dict.
-    temp_index_yaml_dict = copy.deepcopy(index_yaml_dict)
-    for kind in temp_index_yaml_dict['indexes']:
-        kind['properties'] = sorted(
-            kind['properties'], key=lambda x: x['name']
-    )
-
-    new_kinds = []
-    for kind in web_inf_index_yaml_dict['indexes']:
-        # Deepcopy is used here to avoid changing the order of kind in
-        # temp_index_yaml_dict after sorting temp_web_inf_kind.
-        temp_web_inf_kind = copy.deepcopy(kind)
-        temp_web_inf_kind['properties'] = sorted(
-            temp_web_inf_kind['properties'], key=lambda x: x['name'])
-        if temp_web_inf_kind not in temp_index_yaml_dict['indexes']:
-            new_kinds.append(kind)
+    new_kinds = [
+        kind for kind in web_inf_index_yaml_dict['indexes']
+        if kind not in index_yaml_dict['indexes']
+    ]
 
     if len(new_kinds) == 0:
         return
