@@ -349,7 +349,7 @@ var AutocompleteDropdownEditor = function(elem) {
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click(
-        'Container Element', await elem.$(containerLocator), true);
+        'Container Element', await elem.$(containerLocator));
       var actualOptions = await $$(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
