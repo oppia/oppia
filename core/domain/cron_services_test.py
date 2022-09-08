@@ -25,6 +25,7 @@ from core.tests import test_utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
+
 class CronServicesTests(test_utils.GenericTestBase):
     """Unit tests for the cron_services."""
 
