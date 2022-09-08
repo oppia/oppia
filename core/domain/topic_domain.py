@@ -1203,11 +1203,6 @@ class Topic:
                 ' are not associated with the topic.' %
                 skill_ids_for_diagnostic_that_are_not_in_topic)
 
-        if len(self.skill_ids_for_diagnostic_test) > 3:
-            raise utils.ValidationError(
-                'The skill_ids_for_diagnostic_test field should contain at '
-                'most 3 skill_ids.')
-
         if strict:
             if len(self.subtopics) == 0:
                 raise utils.ValidationError(
@@ -1217,6 +1212,18 @@ class Topic:
             raise utils.ValidationError(
                 'Subtopic url fragments are not unique across '
                 'subtopics in the topic')
+
+        if (
+            strict and
+            len(self.skill_ids_for_diagnostic_test) == 0
+        ):
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should not be empty.')
+
+        if len(self.skill_ids_for_diagnostic_test) > 3:
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should contain at '
+                'most 3 skill_ids.')
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
@@ -1867,8 +1874,8 @@ class TopicSummaryDict(TypedDict):
     subtopic_count: int
     total_skill_count: int
     total_published_node_count: int
-    thumbnail_filename: str
-    thumbnail_bg_color: str
+    thumbnail_filename: Optional[str]
+    thumbnail_bg_color: Optional[str]
     topic_model_created_on: float
     topic_model_last_updated: float
 
@@ -1890,8 +1897,8 @@ class TopicSummary:
         subtopic_count: int,
         total_skill_count: int,
         total_published_node_count: int,
-        thumbnail_filename: str,
-        thumbnail_bg_color: str,
+        thumbnail_filename: Optional[str],
+        thumbnail_bg_color: Optional[str],
         url_fragment: str,
         topic_model_created_on: datetime.datetime,
         topic_model_last_updated: datetime.datetime
@@ -1916,8 +1923,11 @@ class TopicSummary:
                 (including those that are uncategorized).
             total_published_node_count: int. The total number of chapters
                 that are published and associated with the stories of the topic.
-            thumbnail_filename: str. The filename for the topic thumbnail.
-            thumbnail_bg_color: str. The background color for the thumbnail.
+            thumbnail_filename: str|None. The filename for the topic thumbnail,
+                or None if no filename is provided.
+            thumbnail_bg_color: str|None. The background color for the
+                thumbnail, or None if no background color provided for
+                the thumbnail.
             url_fragment: str. The url fragment of the topic.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
@@ -1964,7 +1974,8 @@ class TopicSummary:
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        utils.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if self.thumbnail_filename is not None:
+            utils.require_valid_thumbnail_filename(self.thumbnail_filename)
         if (
                 self.thumbnail_bg_color is not None and not (
                     Topic.require_valid_thumbnail_bg_color(
