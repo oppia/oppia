@@ -28,7 +28,7 @@ class FeconfTests(test_utils.GenericTestBase):
     """Unit tests for core/feconf.py."""
 
     def test_dev_mode_in_production_throws_error(self) -> None:
-        def mock_getenv(env: str):
+        def mock_getenv(env: str) -> str:
             if env == 'SERVER_SOFTWARE':
                 return 'Production'
             return 'Development'
@@ -39,7 +39,7 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.check_dev_mode_is_true()
 
     def test_dev_mode_in_development_passes_succcessfully(self) -> None:
-        def mock_getenv(*unused_args):
+        def mock_getenv(*unused_args) -> str:
             return 'Development'
 
         swap_getenv = self.swap(os, 'getenv', mock_getenv)
