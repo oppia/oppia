@@ -2247,15 +2247,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'translation_html': '<p>Translation for content.</p>'
         }
 
-    def test_get_translation_contribution_stats_for_invalid_id_with_strict_true(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'A stats model does not exist for given ids: %s', ['invalid_id']):
-            suggestion_services.get_translation_contribution_stats_models(
-                ['invalid_id'])
-
     def test_update_translation_contribution_stats_without_language_codes(
         self
     ) -> None:
