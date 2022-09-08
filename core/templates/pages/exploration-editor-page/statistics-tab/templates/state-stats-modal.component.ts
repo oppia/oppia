@@ -16,9 +16,10 @@
  * @fileoverview Component for state stats modal.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 
 import './state-stats-modal.component.css';
@@ -43,7 +44,11 @@ interface PieChartOpitons {
 
 export class StateStatsModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  stateName: string;
+  @Input() visualizationsInfo: string[];
+  @Input() interactionArgs: InteractionCustomizationArgs;
+  @Input() stateName: string;
+  @Input() stateStats;
+
   solutionUsagePieChartOptions: PieChartOpitons;
   answerFeedbackPieChartOptions: PieChartOpitons;
   answerFeedbackPieChartData: (string[] | [string, number])[];
@@ -51,7 +56,6 @@ export class StateStatsModalComponent
   totalAnswersCount: number;
   usefulFeedbackCount: number;
   numTimesSolutionViewed: number;
-  stateStats;
   numEnters: number;
   numQuits: number;
   hasExplorationBeenAnswered: boolean;
