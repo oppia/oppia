@@ -74,8 +74,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   }
 
   isHintLengthExceeded(): boolean {
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return (this.hint.hintContent._html.length > 10000);
+    return (this.hint.hintContent._html.length > 500);
   }
 
   saveThisHint(): void {
