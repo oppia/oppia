@@ -22,6 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
@@ -34,7 +35,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { AlertsService } from 'services/alerts.service';
 import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
-import { TopicAssignments, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
+import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 import { SelectTopicsComponent } from '../topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list.component';
 
@@ -58,7 +59,7 @@ describe('Skills List Component', () => {
     topic_names: ['a'],
     classroom_names: ['a']
   };
-  let topicAssignmentsSummary: TopicAssignments = {
+  let topicAssignmentsSummary: TopicNameToTopicAssignments = {
     topic1: {
       subtopicId: 12,
       topicVersion: 7,
@@ -142,7 +143,8 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (topicsToUnassign: TopicAssignments) => void,
+                successCallback: (
+                  topicsToUnassign: TopicNameToTopicAssignments) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -248,6 +250,7 @@ describe('Skills List Component', () => {
         MatCardModule,
         MatCheckboxModule,
         MatRadioModule,
+        MatProgressSpinnerModule,
         FormsModule
       ],
       declarations: [
@@ -360,7 +363,7 @@ describe('Skills List Component', () => {
     tick(500);
   }));
 
-  it('should cancel delete skil modal', () => {
+  it('should cancel delete skill modal', () => {
     mockNgbModal.modal = 'delete_skill';
     mockNgbModal.success = false;
     componentInstance.deleteSkill('test_skill');

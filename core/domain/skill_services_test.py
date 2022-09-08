@@ -29,6 +29,7 @@ from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -912,7 +913,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_models.SkillSummaryModel.get(self.SKILL_ID))
         skill_summary_model.delete()
         skill_summary_model_with_none = (
-            skill_models.SkillSummaryModel.get(self.SKILL_ID, False))
+            skill_models.SkillSummaryModel.get(self.SKILL_ID, strict=False))
         self.assertIsNone(skill_summary_model_with_none)
 
         skill_services.delete_skill(
@@ -1450,6 +1451,33 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             categorized_skills.to_dict(),
             expected_categorized_skills_dict)
+
+    def test_get_topic_names_with_given_skill_in_diagnostic_test(self) -> None:
+        """Checks whether a skill is assigned for the diagnostic test in
+        any of the existing topics.
+        """
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'topic', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(owner_id, topic)
+
+        self.assertEqual(
+            skill_services.get_topic_names_with_given_skill_in_diagnostic_test(
+                'skill_id_1'), ['topic'])
+        self.assertEqual(
+            skill_services.get_topic_names_with_given_skill_in_diagnostic_test(
+                'incorrect_skill_id'), [])
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):

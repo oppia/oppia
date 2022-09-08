@@ -25,12 +25,14 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import caching_services
+from core.domain import change_domain
 from core.domain import feedback_services
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import state_domain
+from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -38,16 +40,25 @@ from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import Optional
+from typing import Dict, List, Optional, Sequence, Tuple
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import topic_models
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
-datastore_services = models.Registry.import_datastore_services()
 
 
-def _create_topic(committer_id, topic, commit_message, commit_cmds):
+def _create_topic(
+    committer_id: str,
+    topic: topic_domain.Topic,
+    commit_message: str,
+    commit_cmds: List[topic_domain.TopicChange]
+) -> None:
     """Creates a new topic, and ensures that rights for a new topic
     are saved first.
 
@@ -100,7 +111,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
     generate_topic_summary(topic.id)
 
 
-def does_topic_with_name_exist(topic_name):
+def does_topic_with_name_exist(topic_name: str) -> bool:
     """Checks if the topic with provided name exists.
 
     Args:
@@ -118,7 +129,7 @@ def does_topic_with_name_exist(topic_name):
     return existing_topic is not None
 
 
-def does_topic_with_url_fragment_exist(url_fragment):
+def does_topic_with_url_fragment_exist(url_fragment: str) -> bool:
     """Checks if topic with provided url fragment exists.
 
     Args:
@@ -137,7 +148,7 @@ def does_topic_with_url_fragment_exist(url_fragment):
     return existing_topic is not None
 
 
-def save_new_topic(committer_id, topic):
+def save_new_topic(committer_id: str, topic: topic_domain.Topic) -> None:
     """Saves a new topic.
 
     Args:
@@ -153,7 +164,15 @@ def save_new_topic(committer_id, topic):
         })])
 
 
-def apply_change_list(topic_id, change_list):
+def apply_change_list(
+    topic_id: str, change_list: Sequence[change_domain.BaseChange]
+) -> Tuple[
+    topic_domain.Topic,
+    Dict[str, subtopic_page_domain.SubtopicPage],
+    List[int],
+    List[int],
+    Dict[str, List[subtopic_page_domain.SubtopicPageChange]]
+]:
     """Applies a changelist to a topic and returns the result. The incoming
     changelist should not have simultaneuous creations and deletion of
     subtopics.
@@ -176,16 +195,23 @@ def apply_change_list(topic_id, change_list):
         applied to modified subtopic pages.
     """
     topic = topic_fetchers.get_topic_by_id(topic_id)
-    newly_created_subtopic_ids = []
-    existing_subtopic_page_ids_to_be_modified = []
-    deleted_subtopic_ids = []
-    modified_subtopic_pages_list = []
-    modified_subtopic_pages = {}
-    modified_subtopic_change_cmds = collections.defaultdict(list)
+    newly_created_subtopic_ids: List[int] = []
+    existing_subtopic_page_ids_to_be_modified: List[int] = []
+    deleted_subtopic_ids: List[int] = []
+    modified_subtopic_pages_list: List[
+        Optional[subtopic_page_domain.SubtopicPage]
+    ] = []
+    modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage] = {}
+    modified_subtopic_change_cmds: Dict[
+        str, List[subtopic_page_domain.SubtopicPageChange]
+    ] = collections.defaultdict(list)
 
     for change in change_list:
         if (change.cmd ==
                 subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
+            assert isinstance(change.subtopic_id, int)
             if change.subtopic_id < topic.next_subtopic_id:
                 existing_subtopic_page_ids_to_be_modified.append(
                     change.subtopic_id)
@@ -198,11 +224,16 @@ def apply_change_list(topic_id, change_list):
         subtopic_page_services.get_subtopic_pages_with_ids(
             topic_id, existing_subtopic_page_ids_to_be_modified))
     for subtopic_page in modified_subtopic_pages_list:
+        # Ruling out the possibility of None for mypy type checking.
+        assert subtopic_page is not None
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
 
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.subtopic_id, int)
                 topic.add_subtopic(
                     change.subtopic_id,
                     change.title,
@@ -223,6 +254,9 @@ def apply_change_list(topic_id, change_list):
                     }))
                 newly_created_subtopic_ids.append(change.subtopic_id)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.subtopic_id, int)
                 topic.delete_subtopic(change.subtopic_id)
                 if change.subtopic_id in newly_created_subtopic_ids:
                     raise Exception(
@@ -234,6 +268,10 @@ def apply_change_list(topic_id, change_list):
             elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
                 topic.delete_canonical_story(change.story_id)
             elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.from_index, int)
+                assert isinstance(change.to_index, int)
                 topic.rearrange_canonical_story(
                     change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
@@ -247,15 +285,31 @@ def apply_change_list(topic_id, change_list):
                 topic.remove_uncategorized_skill_id(
                     change.uncategorized_skill_id)
             elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                if change.old_subtopic_id is not None:
+                    assert isinstance(change.old_subtopic_id, int)
                 topic.move_skill_id_to_subtopic(
                     change.old_subtopic_id, change.new_subtopic_id,
                     change.skill_id)
             elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.subtopic_id, int)
+                assert isinstance(change.from_index, int)
+                assert isinstance(change.to_index, int)
                 topic.rearrange_skill_in_subtopic(
                     change.subtopic_id, change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.from_index, int)
+                assert isinstance(change.to_index, int)
                 topic.rearrange_subtopic(change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.subtopic_id, int)
                 topic.remove_skill_id_from_subtopic(
                     change.subtopic_id, change.skill_id)
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
@@ -285,6 +339,9 @@ def apply_change_list(topic_id, change_list):
                     topic.update_meta_tag_content(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, bool)
                     topic.update_practice_tab_is_displayed(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB):
@@ -292,9 +349,15 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain
                       .TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
                     topic.update_skill_ids_for_diagnostic_test(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.subtopic_id, int)
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))
@@ -307,6 +370,9 @@ def apply_change_list(topic_id, change_list):
                 if (change.property_name ==
                         subtopic_page_domain.
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, dict)
                     page_contents = state_domain.SubtitledHtml.from_dict(
                         change.new_value)
                     page_contents.validate()
@@ -317,11 +383,17 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       subtopic_page_domain.
                       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, dict)
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_audio(
                             state_domain.RecordedVoiceovers.from_dict(
                                 change.new_value))
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(change.subtopic_id, int)
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
                     topic.update_subtopic_title(
@@ -359,7 +431,12 @@ def apply_change_list(topic_id, change_list):
         raise e
 
 
-def _save_topic(committer_id, topic, commit_message, change_list):
+def _save_topic(
+    committer_id: str,
+    topic: topic_domain.Topic,
+    commit_message: Optional[str],
+    change_list: Sequence[change_domain.BaseChange]
+) -> None:
     """Validates a topic and commits it to persistent storage. If
     successful, increments the version number of the incoming topic domain
     object by 1.
@@ -367,7 +444,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     Args:
         committer_id: str. ID of the given committer.
         topic: Topic. The topic domain object to be saved.
-        commit_message: str. The commit message.
+        commit_message: str|None. The commit description message, for
+            unpublished topics, it may be equal to None.
         change_list: list(TopicChange). List of changes applied to a topic.
 
     Raises:
@@ -379,10 +457,10 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (topic.id, change_list))
-    topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
+    topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=True)
     topic.validate(strict=topic_rights.topic_is_published)
 
-    topic_model = topic_models.TopicModel.get(topic.id, strict=False)
+    topic_model = topic_models.TopicModel.get(topic.id, strict=True)
 
     # Topic model cannot be None as topic is passed as parameter here and that
     # is only possible if a topic model with that topic id exists. Also this is
@@ -433,7 +511,11 @@ def _save_topic(committer_id, topic, commit_message, change_list):
 
 
 def update_topic_and_subtopic_pages(
-        committer_id, topic_id, change_list, commit_message):
+    committer_id: str,
+    topic_id: str,
+    change_list: Sequence[change_domain.BaseChange],
+    commit_message: Optional[str]
+) -> None:
     """Updates a topic and its subtopic pages. Commits changes.
 
     Args:
@@ -448,7 +530,7 @@ def update_topic_and_subtopic_pages(
     Raises:
         ValueError. Current user does not have enough rights to edit a topic.
     """
-    topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
+    topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=True)
     if topic_rights.topic_is_published and not commit_message:
         raise ValueError(
             'Expected a commit message, received none.')
@@ -499,7 +581,11 @@ def update_topic_and_subtopic_pages(
             updated_topic.id, updated_topic.name)
 
 
-def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
+def delete_uncategorized_skill(
+    user_id: str,
+    topic_id: str,
+    uncategorized_skill_id: str
+) -> None:
     """Removes skill with given id from the topic.
 
     Args:
@@ -517,7 +603,11 @@ def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id)
 
 
-def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
+def add_uncategorized_skill(
+    user_id: str,
+    topic_id: str,
+    uncategorized_skill_id: str
+) -> None:
     """Adds a skill with given id to the topic.
 
     Args:
@@ -535,7 +625,11 @@ def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
         'Added %s to uncategorized skill ids' % uncategorized_skill_id)
 
 
-def publish_story(topic_id, story_id, committer_id):
+def publish_story(
+    topic_id: str,
+    story_id: str,
+    committer_id: str
+) -> None:
     """Marks the given story as published.
 
     Args:
@@ -548,7 +642,9 @@ def publish_story(topic_id, story_id, committer_id):
         Exception. The story is already published.
         Exception. The user does not have enough rights to publish the story.
     """
-    def _are_nodes_valid_for_publishing(story_nodes):
+    def _are_nodes_valid_for_publishing(
+        story_nodes: List[story_domain.StoryNode]
+    ) -> None:
         """Validates the story nodes before publishing.
 
         Args:
@@ -568,9 +664,7 @@ def publish_story(topic_id, story_id, committer_id):
         story_services.validate_explorations_for_story(
             exploration_id_list, True)
 
-    topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
-    if topic is None:
-        raise Exception('A topic with the given ID doesn\'t exist')
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
     user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
@@ -599,7 +693,9 @@ def publish_story(topic_id, story_id, committer_id):
         story_id, linked_exp_ids)
 
 
-def unpublish_story(topic_id, story_id, committer_id):
+def unpublish_story(
+    topic_id: str, story_id: str, committer_id: str
+) -> None:
     """Marks the given story as unpublished.
 
     Args:
@@ -616,7 +712,7 @@ def unpublish_story(topic_id, story_id, committer_id):
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the story.')
-    topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
     if topic is None:
         raise Exception('A topic with the given ID doesn\'t exist')
     story = story_fetchers.get_story_by_id(story_id, strict=False)
@@ -639,7 +735,9 @@ def unpublish_story(topic_id, story_id, committer_id):
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
-def delete_canonical_story(user_id, topic_id, story_id):
+def delete_canonical_story(
+    user_id: str, topic_id: str, story_id: str
+) -> None:
     """Removes story with given id from the topic.
 
     NOTE TO DEVELOPERS: Presently, this function only removes story_reference
@@ -659,7 +757,9 @@ def delete_canonical_story(user_id, topic_id, story_id):
         'Removed %s from canonical story ids' % story_id)
 
 
-def add_canonical_story(user_id, topic_id, story_id):
+def add_canonical_story(
+    user_id: str, topic_id: str, story_id: str
+) -> None:
     """Adds a story to the canonical story reference list of a topic.
 
     Args:
@@ -676,7 +776,9 @@ def add_canonical_story(user_id, topic_id, story_id):
         'Added %s to canonical story ids' % story_id)
 
 
-def delete_additional_story(user_id, topic_id, story_id):
+def delete_additional_story(
+    user_id: str, topic_id: str, story_id: str
+) -> None:
     """Removes story with given id from the topic.
 
     NOTE TO DEVELOPERS: Presently, this function only removes story_reference
@@ -696,7 +798,9 @@ def delete_additional_story(user_id, topic_id, story_id):
         'Removed %s from additional story ids' % story_id)
 
 
-def add_additional_story(user_id, topic_id, story_id):
+def add_additional_story(
+    user_id: str, topic_id: str, story_id: str
+) -> None:
     """Adds a story to the additional story reference list of a topic.
 
     Args:
@@ -713,7 +817,9 @@ def add_additional_story(user_id, topic_id, story_id):
         'Added %s to additional story ids' % story_id)
 
 
-def delete_topic(committer_id, topic_id, force_deletion=False):
+def delete_topic(
+    committer_id: str, topic_id: str, force_deletion: bool = False
+) -> None:
     """Deletes the topic with the given topic_id.
 
     Args:
@@ -764,7 +870,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         .delete_exploration_opportunities_corresponding_to_topic(topic_id))
 
 
-def delete_topic_summary(topic_id):
+def delete_topic_summary(topic_id: str) -> None:
     """Delete a topic summary model.
 
     Args:
@@ -776,7 +882,12 @@ def delete_topic_summary(topic_id):
 
 
 def update_story_and_topic_summary(
-        committer_id, story_id, change_list, commit_message, topic_id):
+    committer_id: str,
+    story_id: str,
+    change_list: List[story_domain.StoryChange],
+    commit_message: str,
+    topic_id: str
+) -> None:
     """Updates a story. Commits changes. Then generates a new
     topic summary.
 
@@ -786,7 +897,7 @@ def update_story_and_topic_summary(
         story_id: str. The story id.
         change_list: list(StoryChange). These changes are applied in sequence to
             produce the resulting story.
-        commit_message: str or None. A description of changes made to the
+        commit_message: str. A description of changes made to the
             story.
         topic_id: str. The id of the topic to which the story is belongs.
     """
@@ -798,7 +909,7 @@ def update_story_and_topic_summary(
     generate_topic_summary(topic_id)
 
 
-def generate_topic_summary(topic_id):
+def generate_topic_summary(topic_id: str) -> None:
     """Creates and stores a summary of the given topic.
 
     Args:
@@ -809,7 +920,9 @@ def generate_topic_summary(topic_id):
     save_topic_summary(topic_summary)
 
 
-def compute_summary_of_topic(topic):
+def compute_summary_of_topic(
+    topic: topic_domain.Topic
+) -> topic_domain.TopicSummary:
     """Create a TopicSummary domain object for a given Topic domain
     object and return it.
 
@@ -818,6 +931,9 @@ def compute_summary_of_topic(topic):
 
     Returns:
         TopicSummary. The computed summary for the given topic.
+
+    Raises:
+        Exception. No data available for when the topic was last updated.
     """
     canonical_story_count = 0
     additional_story_count = 0
@@ -841,6 +957,10 @@ def compute_summary_of_topic(topic):
     for subtopic in topic.subtopics:
         total_skill_count = total_skill_count + len(subtopic.skill_ids)
 
+    if topic.created_on is None or topic.last_updated is None:
+        raise Exception(
+            'No data available for when the topic was last updated.'
+        )
     topic_summary = topic_domain.TopicSummary(
         topic.id, topic.name, topic.canonical_name, topic.language_code,
         topic.description, topic.version, topic_model_canonical_story_count,
@@ -854,12 +974,12 @@ def compute_summary_of_topic(topic):
     return topic_summary
 
 
-def save_topic_summary(topic_summary):
+def save_topic_summary(topic_summary: topic_domain.TopicSummary) -> None:
     """Save a topic summary domain object as a TopicSummaryModel
     entity in the datastore.
 
     Args:
-        topic_summary: TopicSummaryModel. The topic summary object to be saved
+        topic_summary: TopicSummary. The topic summary object to be saved
             in the datastore.
     """
     topic_summary_dict = {
@@ -895,7 +1015,7 @@ def save_topic_summary(topic_summary):
         model.put()
 
 
-def publish_topic(topic_id, committer_id):
+def publish_topic(topic_id: str, committer_id: str) -> None:
     """Marks the given topic as published.
 
     Args:
@@ -927,7 +1047,7 @@ def publish_topic(topic_id, committer_id):
         topic_rights, committer_id, 'Published the topic', commit_cmds)
 
 
-def unpublish_topic(topic_id, committer_id):
+def unpublish_topic(topic_id: str, committer_id: str) -> None:
     """Marks the given topic as unpublished.
 
     Args:
@@ -957,7 +1077,12 @@ def unpublish_topic(topic_id, committer_id):
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
 
 
-def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
+def save_topic_rights(
+    topic_rights: topic_domain.TopicRights,
+    committer_id: str,
+    commit_message: str,
+    commit_cmds: List[topic_domain.TopicRightsChange]
+) -> None:
     """Saves a TopicRights domain object to the datastore.
 
     Args:
@@ -969,7 +1094,7 @@ def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
             what kind of commit was done.
     """
 
-    model = topic_models.TopicRightsModel.get(topic_rights.id, strict=False)
+    model = topic_models.TopicRightsModel.get(topic_rights.id, strict=True)
 
     model.manager_ids = topic_rights.manager_ids
     model.topic_is_published = topic_rights.topic_is_published
@@ -977,7 +1102,9 @@ def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
     model.commit(committer_id, commit_message, commit_cmd_dicts)
 
 
-def create_new_topic_rights(topic_id, committer_id):
+def create_new_topic_rights(
+    topic_id: str, committer_id: str
+) -> None:
     """Creates a new topic rights object and saves it to the datastore.
 
     Args:
@@ -994,7 +1121,7 @@ def create_new_topic_rights(topic_id, committer_id):
     ).commit(committer_id, 'Created new topic rights', commit_cmds)
 
 
-def filter_published_topic_ids(topic_ids):
+def filter_published_topic_ids(topic_ids: List[str]) -> List[str]:
     """Given list of topic IDs, returns the IDs of all topics that are published
     in that list.
 
@@ -1016,7 +1143,10 @@ def filter_published_topic_ids(topic_ids):
     return published_topic_ids
 
 
-def check_can_edit_topic(user, topic_rights):
+def check_can_edit_topic(
+    user: user_domain.UserActionsInfo,
+    topic_rights: Optional[topic_domain.TopicRights]
+) -> bool:
     """Checks whether the user can edit the given topic.
 
     Args:
@@ -1039,7 +1169,9 @@ def check_can_edit_topic(user, topic_rights):
     return False
 
 
-def deassign_user_from_all_topics(committer, user_id):
+def deassign_user_from_all_topics(
+    committer: user_domain.UserActionsInfo, user_id: str
+) -> None:
     """Deassigns given user from all topics assigned to them.
 
     Args:
@@ -1066,7 +1198,11 @@ def deassign_user_from_all_topics(committer, user_id):
         )
 
 
-def deassign_manager_role_from_topic(committer, user_id, topic_id):
+def deassign_manager_role_from_topic(
+    committer: user_domain.UserActionsInfo,
+    user_id: str,
+    topic_id: str
+) -> None:
     """Deassigns given user from all topics assigned to them.
 
     Args:
@@ -1097,7 +1233,12 @@ def deassign_manager_role_from_topic(committer, user_id, topic_id):
     )
 
 
-def assign_role(committer, assignee, new_role, topic_id):
+def assign_role(
+    committer: user_domain.UserActionsInfo,
+    assignee: user_domain.UserActionsInfo,
+    new_role: str,
+    topic_id: str
+) -> None:
     """Assigns a new role to the user.
 
     Args:
@@ -1159,7 +1300,7 @@ def assign_role(committer, assignee, new_role, topic_id):
     save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds)
 
 
-def get_story_titles_in_topic(topic):
+def get_story_titles_in_topic(topic: topic_domain.Topic) -> List[str]:
     """Returns titles of the stories present in the topic.
 
     Args:
@@ -1176,14 +1317,14 @@ def get_story_titles_in_topic(topic):
 
 
 def update_thumbnail_filename(
-    topic: topic_domain.Topic, new_thumbnail_filename: Optional[str]
+    topic: topic_domain.Topic, new_thumbnail_filename: str
 ) -> None:
     """Updates the thumbnail filename and file size in a topic object.
 
     Args:
         topic: topic_domain.Topic. The topic domain object whose thumbnail
             is to be updated.
-        new_thumbnail_filename: str|None. The updated thumbnail filename
+        new_thumbnail_filename: str. The updated thumbnail filename
             for the topic.
 
     Raises:
@@ -1193,7 +1334,7 @@ def update_thumbnail_filename(
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
     filepath = '%s/%s' % (
         constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-    if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+    if fs.isfile(filepath):
         thumbnail_size_in_bytes = len(fs.get(filepath))
         topic.update_thumbnail_filename_and_size(
             new_thumbnail_filename, thumbnail_size_in_bytes)
@@ -1224,7 +1365,7 @@ def update_subtopic_thumbnail_filename(
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
     filepath = '%s/%s' % (
         constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
-    if fs.isfile(filepath):  # type: ignore[no-untyped-call]
+    if fs.isfile(filepath):
         thumbnail_size_in_bytes = len(fs.get(filepath))
         topic.update_subtopic_thumbnail_filename_and_size(
             subtopic_id, new_thumbnail_filename, thumbnail_size_in_bytes)
@@ -1232,3 +1373,44 @@ def update_subtopic_thumbnail_filename(
         raise Exception(
             'The thumbnail %s for subtopic with topic_id %s does not exist'
             ' in the filesystem.' % (new_thumbnail_filename, topic.id))
+
+
+def get_topic_id_to_diagnostic_test_skill_ids(
+    topic_ids: List[str]
+) -> Dict[str, List[str]]:
+    """Returns a dict with topic ID as key and a list of diagnostic test
+    skill IDs as value.
+
+    Args:
+        topic_ids: List(str). A list of topic IDs.
+
+    Raises:
+        Exception. The topic models for some of the given topic IDs do not
+            exist.
+
+    Returns:
+        dict(str, list(str)). A dict with topic ID as key and a list of
+        diagnostic test skill IDs as value.
+    """
+    topic_id_to_diagnostic_test_skill_ids = {}
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+
+    for topic in topics:
+        if topic is None:
+            continue
+        topic_id_to_diagnostic_test_skill_ids[topic.id] = (
+            topic.skill_ids_for_diagnostic_test)
+
+    correct_topic_ids = list(topic_id_to_diagnostic_test_skill_ids.keys())
+    # The topic IDs for which topic models do not exist are referred to as
+    # incorrect topic IDs.
+    incorrect_topic_ids = [
+        topic_id for topic_id in topic_ids if topic_id not in correct_topic_ids
+    ]
+    if incorrect_topic_ids:
+        error_msg = (
+            'No corresponding topic models exist for these topic IDs: %s.'
+            % (', '.join(incorrect_topic_ids))
+        )
+        raise Exception(error_msg)
+    return topic_id_to_diagnostic_test_skill_ids
