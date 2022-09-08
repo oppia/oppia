@@ -2060,6 +2060,7 @@ def _create_translation_review_stats_from_model(
         (
             translation_review_stats_model
             .accepted_translations_with_reviewer_edits_count),
+        translation_review_stats_model.accepted_translation_word_count,
         translation_review_stats_model.first_contribution_date,
         translation_review_stats_model.last_contribution_date
     )
@@ -2317,6 +2318,8 @@ def _update_translation_review_stats_models(
             stat.reviewed_translation_word_count)
         stats_model.accepted_translations_count = (
             stat.accepted_translations_count)
+        stats_model.accepted_translation_word_count = (
+            stat.accepted_translation_word_count)
         stats_model.accepted_translations_with_reviewer_edits_count = (
             stat.accepted_translations_with_reviewer_edits_count)
         stats_model.first_contribution_date = (
@@ -2541,6 +2544,10 @@ def update_translation_review_stats(
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
     """
+    if suggestion.final_reviewer_id is None:
+        raise Exception(
+            'The final_reviewer_id in the suggestion should not be None.'
+        )
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2562,7 +2569,7 @@ def update_translation_review_stats(
         # final_reviewer_id should not be None when the suggestion is
         # up-to-date.
         suggestion_models.TranslationReviewStatsModel.get(
-            suggestion.change.language_code, str(suggestion.final_reviewer_id),
+            suggestion.change.language_code, suggestion.final_reviewer_id,
             topic_id
         ))
 
@@ -2570,17 +2577,24 @@ def update_translation_review_stats(
         # This function is called when reviewing a translation and hence
         # final_reviewer_id should not be None when the suggestion is
         # up-to-date.
+        accepted_translations_count = 0
+        accepted_translations_with_reviewer_edits_count = 0
+        accepted_translation_word_count = 0
+        if suggestion_is_accepted:
+            accepted_translations_count += 1
+            accepted_translation_word_count = content_word_count
+        if suggestion.edited_by_reviewer:
+            accepted_translations_with_reviewer_edits_count += 1
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=suggestion.change.language_code,
-            reviewer_user_id=str(suggestion.final_reviewer_id),
+            reviewer_user_id=suggestion.final_reviewer_id,
             topic_id=topic_id,
             reviewed_translations_count=1,
             reviewed_translation_word_count=content_word_count,
-            accepted_translations_count=(1 if suggestion_is_accepted else 0),
+            accepted_translations_count=accepted_translations_count,
             accepted_translations_with_reviewer_edits_count=(
-                1 if suggestion.edited_by_reviewer else 0),
-            accepted_translation_word_count=(
-                content_word_count if suggestion_is_accepted else 0),
+                accepted_translations_with_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
             first_contribution_date=suggestion.last_updated.date(),
             last_contribution_date=suggestion.last_updated.date()
         )
@@ -2676,12 +2690,13 @@ def update_question_contribution_stats_at_review(
             suggestion.status == suggestion_models.STATUS_ACCEPTED
         )
 
-        question_contribution_stat.accepted_questions_count += (
-            1 if suggestion_is_accepted else 0)
-        (
-            question_contribution_stat
-            .accepted_questions_without_reviewer_edits_count
-        ) += (1 if suggestion.edited_by_reviewer else 0)
+        if suggestion_is_accepted:
+            question_contribution_stat.accepted_questions_count += 1
+        if suggestion.edited_by_reviewer:
+            (
+                question_contribution_stat
+                .accepted_questions_without_reviewer_edits_count
+            ) += 1
         _update_question_contribution_stats_models(
             [question_contribution_stat])
 
@@ -2696,6 +2711,10 @@ def update_question_review_stats(
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
     """
+    if suggestion.final_reviewer_id is None:
+        raise Exception(
+            'The final_reviewer_id in the suggestion should not be None.'
+        )
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
@@ -2707,20 +2726,26 @@ def update_question_review_stats(
             # hence final_reviewer_id should not be None when the suggestion is
             # up-to-date.
             suggestion_models.QuestionReviewStatsModel.get(
-                str(suggestion.final_reviewer_id), topic.topic_id
+                suggestion.final_reviewer_id, topic.topic_id
             ))
 
         if question_review_stat_model is None:
             # This function is called when reviewing a question suggestion and
             # hence final_reviewer_id should not be None when the suggestion is
             # up-to-date.
+            accepted_questions_count = 0
+            accepted_questions_with_reviewer_edits_count = 0
+            if suggestion_is_accepted:
+                accepted_questions_count += 1
+            if suggestion.edited_by_reviewer:
+                accepted_questions_with_reviewer_edits_count += 1
             suggestion_models.QuestionReviewStatsModel.create(
-                reviewer_user_id=str(suggestion.final_reviewer_id),
+                reviewer_user_id=suggestion.final_reviewer_id,
                 topic_id=topic.topic_id,
                 reviewed_questions_count=1,
-                accepted_questions_count=(1 if suggestion_is_accepted else 0),
+                accepted_questions_count=accepted_questions_count,
                 accepted_questions_with_reviewer_edits_count=(
-                    1 if suggestion.edited_by_reviewer else 0),
+                    accepted_questions_with_reviewer_edits_count),
                 first_contribution_date=suggestion.last_updated.date(),
                 last_contribution_date=suggestion.last_updated.date()
             )
@@ -2757,18 +2782,19 @@ def increment_translation_contribution_stats_at_review(
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
-    translation_contribution_stat.accepted_translations_count += (
-        1 if suggestion_is_accepted else 0)
-    (
-        translation_contribution_stat
-        .accepted_translations_without_reviewer_edits_count
-    ) += (1 if edited_by_reviewer else 0)
-    translation_contribution_stat.accepted_translation_word_count += (
-       0 if not suggestion_is_accepted else content_word_count)
-    translation_contribution_stat.rejected_translations_count += (
-        1 if not suggestion_is_accepted else 0)
-    translation_contribution_stat.rejected_translation_word_count += (
-        0 if suggestion_is_accepted else content_word_count)
+    if suggestion_is_accepted:
+        translation_contribution_stat.accepted_translations_count += 1
+        translation_contribution_stat.accepted_translation_word_count += (
+            content_word_count)
+    else:
+        translation_contribution_stat.rejected_translations_count += 1
+        translation_contribution_stat.rejected_translation_word_count += (
+            content_word_count)
+    if not edited_by_reviewer:
+        (
+            translation_contribution_stat
+            .accepted_translations_without_reviewer_edits_count
+        ) += 1
 
 
 def increment_translation_review_stats(
@@ -2793,12 +2819,15 @@ def increment_translation_review_stats(
     translation_review_stat.reviewed_translations_count += 1
     translation_review_stat.reviewed_translation_word_count += (
         content_word_count)
-    translation_review_stat.accepted_translations_count += (
-        1 if suggestion_is_accepted else 0)
-    (
-        translation_review_stat
-        .accepted_translations_with_reviewer_edits_count
-    ) += (1 if edited_by_reviewer else 0)
+    if suggestion_is_accepted:
+        translation_review_stat.accepted_translations_count += 1
+        translation_review_stat.accepted_translation_word_count += (
+            content_word_count)
+    if edited_by_reviewer:
+        (
+            translation_review_stat
+            .accepted_translations_with_reviewer_edits_count
+        ) += 1
     translation_review_stat.last_contribution_date = (
         last_contribution_date.date())
 
@@ -2820,12 +2849,13 @@ def increment_question_contribution_stats_at_review(
         edited_by_reviewer: bool. A flag that indicates whether the suggestion
             is edited by the reviewer.
     """
-    question_contribution_stat.accepted_questions_count += (
-        1 if suggestion_is_accepted else 0)
-    (
-        question_contribution_stat
-        .accepted_questions_without_reviewer_edits_count
-    ) += (1 if edited_by_reviewer else 0)
+    if suggestion_is_accepted:
+        question_contribution_stat.accepted_questions_count += 1
+    if not edited_by_reviewer:
+        (
+            question_contribution_stat
+            .accepted_questions_without_reviewer_edits_count
+        ) += 1
 
 
 def increment_question_review_stats(
@@ -2845,9 +2875,9 @@ def increment_question_review_stats(
             is edited by the reviewer.
     """
     question_review_stat.reviewed_questions_count += 1
-    question_review_stat.accepted_questions_count += (
-        1 if suggestion_is_accepted else 0)
-    question_review_stat.accepted_questions_with_reviewer_edits_count += (
-        1 if edited_by_reviewer else 0)
+    if suggestion_is_accepted:
+        question_review_stat.accepted_questions_count += 1
+    if edited_by_reviewer:
+        question_review_stat.accepted_questions_with_reviewer_edits_count += 1
     question_review_stat.last_contribution_date = (
         last_contribution_date.date())

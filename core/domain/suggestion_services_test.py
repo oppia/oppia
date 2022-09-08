@@ -2207,8 +2207,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         1. Create 2 explorations and publish them.
         2. Create a default topic.
         3. Publish the topic with two story IDs.
-        4. Create a 2 stories for translation opportunities.
-        5. Return a mock change for a translation.
+        4. Create 2 stories for translation opportunities.
 
         Returns:
             Dict[str, str]. A dictionary of the change object for the
@@ -2583,6 +2582,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             0
         )
         self.assertEqual(
+            translation_review_stats_model.accepted_translation_word_count,
+            0
+        )
+        self.assertEqual(
             (
                 translation_review_stats_model
                 .reviewed_translation_word_count
@@ -2610,6 +2613,37 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             translation_contribution_stats_model.accepted_translations_count,
             0
         )
+
+    def test_update_translation_review_stats_without_a_reviewer_id(
+        self) -> None:
+        change_dict = self._set_up_topics_and_stories_for_translations()
+        translation_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.author_id, change_dict, 'description')
+        
+        with self.assertRaisesRegex(
+            Exception,
+            'The final_reviewer_id in the suggestion should not be None.'):
+            suggestion_services.update_translation_review_stats(
+                translation_suggestion)
+
+    def test_update_question_review_stats_without_a_reviewer_id(
+        self) -> None:
+        skill_id_1 = self._create_skill()
+        skill_id_2 = self._create_skill()
+        self._create_topic(skill_id_1, skill_id_2)
+        initial_suggestion = self._create_question_suggestion(skill_id_1)
+        suggestion_services.update_question_contribution_stats_at_submission(
+            initial_suggestion
+        )
+        
+        with self.assertRaisesRegex(
+            Exception,
+            'The final_reviewer_id in the suggestion should not be None.'):
+            suggestion_services.update_question_contribution_stats_at_submission(
+                initial_suggestion
+            )
 
     def test_update_translation_review_stats_when_suggestion_is_edited(
         self) -> None:
@@ -2707,6 +2741,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             2
         )
         self.assertEqual(
+            translation_review_stats_model.accepted_translation_word_count,
+            4
+        )
+        self.assertEqual(
             (
                 translation_review_stats_model
                 .reviewed_translation_word_count
@@ -2747,46 +2785,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             1
         )
 
-    def test_update_question_contribution_stats_when_submitting(self) -> None:
-        # Steps required in the setup phase before testing.
-        # 1. Save new skills.
-        # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestion.
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_1, self.author_id, description='description')
-        self.save_new_skill(
-            skill_id_2, self.author_id, description='description')
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, 'topic_admin', name='Topic1',
-            abbreviated_name='topic-three', url_fragment='topic-three',
-            description='Description',
-            canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[skill_id_1, skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-        suggestion_change_1: Dict[
-            str,
-            Union[str, float, Dict[str, Union[
-                str, List[str], int, state_domain.StateDict]]]] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id_1,
-            'skill_difficulty': 0.3
-        }
-        suggestion_change_2: Dict[
+    def _create_question_suggestion(
+        self,
+        skill_id: str
+    ) -> suggestion_registry.SuggestionAddQuestion:
+        suggestion_change: Dict[
             str,
             Union[str, float, Dict[str, Union[
                 str, List[str], int, state_domain.StateDict]]]] = {
@@ -2802,17 +2805,43 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'linked_skill_ids': ['skill_2'],
                 'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
-            'skill_id': skill_id_2,
+            'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(
+        return suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
-            self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
-            self.author_id, suggestion_change_2, 'test description')
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+    def _create_skill(self) -> str:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        return skill_id
+
+    def _create_topic(self, first_skill_id: str, second_skill_id: str) -> str:
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, 'topic_admin', name='Topic1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[first_skill_id, second_skill_id],
+            subtopics=[], next_subtopic_id=1)
+        return topic_id
+
+    def test_update_question_contribution_stats_when_submitting(self) -> None:
+        # Steps required in the setup phase before testing.
+        # 1. Save new skills.
+        # 2. Save a topic assigning skills for it.
+        # 4. Create a question suggestion.
+        
+        skill_id_1 = self._create_skill()
+        skill_id_2 = self._create_skill()
+        topic_id = self._create_topic(skill_id_1, skill_id_2)
+        initial_suggestion = self._create_question_suggestion(skill_id_1)
+        latest_suggestion = self._create_question_suggestion(skill_id_2)
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -2885,67 +2914,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
         # 4. Create a question suggestion.
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_1, self.author_id, description='description')
-        self.save_new_skill(
-            skill_id_2, self.author_id, description='description')
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, 'topic_admin', name='Topic1',
-            abbreviated_name='topic-three', url_fragment='topic-three',
-            description='Description',
-            canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[skill_id_1, skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-        suggestion_change_1: Dict[
-            str,
-            Union[str, float, Dict[str, Union[
-                str, List[str], int, state_domain.StateDict]]]] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id_1,
-            'skill_difficulty': 0.3
-        }
-        suggestion_change_2: Dict[
-            str,
-            Union[str, float, Dict[str, Union[
-                str, List[str], int, state_domain.StateDict]]]] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_2'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id_2,
-            'skill_difficulty': 0.3
-        }
-        initial_suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
-            self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
-            self.author_id, suggestion_change_2, 'test description')
+        skill_id_1 = self._create_skill()
+        skill_id_2 = self._create_skill()
+        topic_id = self._create_topic(skill_id_1, skill_id_2)
+        initial_suggestion = self._create_question_suggestion(skill_id_1)
+        latest_suggestion = self._create_question_suggestion(skill_id_2)
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -3038,67 +3011,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
         # 4. Create a question suggestion.
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_1, self.author_id, description='description')
-        self.save_new_skill(
-            skill_id_2, self.author_id, description='description')
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, 'topic_admin', name='Topic1',
-            abbreviated_name='topic-three', url_fragment='topic-three',
-            description='Description',
-            canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[skill_id_1, skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-        suggestion_change_1: Dict[
-            str,
-            Union[str, float, Dict[str, Union[
-                str, List[str], int, state_domain.StateDict]]]] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id_1,
-            'skill_difficulty': 0.3
-        }
-        suggestion_change_2: Dict[
-            str,
-            Union[str, float, Dict[str, Union[
-                str, List[str], int, state_domain.StateDict]]]] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_2'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id_2,
-            'skill_difficulty': 0.3
-        }
-        initial_suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
-            self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
-            self.author_id, suggestion_change_2, 'test description')
+        skill_id_1 = self._create_skill()
+        skill_id_2 = self._create_skill()
+        topic_id = self._create_topic(skill_id_1, skill_id_2)
+        initial_suggestion = self._create_question_suggestion(skill_id_1)
+        latest_suggestion = self._create_question_suggestion(skill_id_2)
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -3194,67 +3111,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
         # 4. Create a question suggestion.
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_1, self.author_id, description='description')
-        self.save_new_skill(
-            skill_id_2, self.author_id, description='description')
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, 'topic_admin', name='Topic1',
-            abbreviated_name='topic-three', url_fragment='topic-three',
-            description='Description',
-            canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[skill_id_1, skill_id_2],
-            subtopics=[], next_subtopic_id=1)
+        skill_id_1 = self._create_skill()
+        skill_id_2 = self._create_skill()
+        topic_id = self._create_topic(skill_id_1, skill_id_2)
+        initial_suggestion = self._create_question_suggestion(skill_id_1)
+        latest_suggestion = self._create_question_suggestion(skill_id_2)
         question_state_data = self._create_valid_question_data(
             'default_state').to_dict()
-        suggestion_change_1: Dict[
-            str,
-            Union[str, float, Dict[str, Union[
-                str, List[str], int, state_domain.StateDict]]]] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': question_state_data,
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id_1,
-            'skill_difficulty': 0.3
-        }
-        suggestion_change_2: Dict[
-            str,
-            Union[str, float, Dict[str, Union[
-                str, List[str], int, state_domain.StateDict]]]] = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': question_state_data,
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_2'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
-            },
-            'skill_id': skill_id_2,
-            'skill_difficulty': 0.3
-        }
-        initial_suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
-            self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
-            self.author_id, suggestion_change_2, 'test description')
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
