@@ -370,7 +370,7 @@ def _parse_command_line(): # pragma: no cover
     return parser.parse_args(args=sys.argv[1:])
 
 
-def parse_port_ranges(pool_str):
+def parse_port_ranges(pool_str) -> set(int):
     """Given a 'N-P,X-Y' description of port ranges, return a set of ints.
 
     Args:

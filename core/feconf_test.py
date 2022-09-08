@@ -39,7 +39,7 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.check_dev_mode_is_true()
 
     def test_dev_mode_in_development_passes_succcessfully(self) -> None:
-        def mock_getenv(*unused_args) -> str:
+        def mock_getenv(*unused_args: str) -> str:
             return 'Development'
 
         swap_getenv = self.swap(os, 'getenv', mock_getenv)
