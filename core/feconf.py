@@ -578,7 +578,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.7'
+OPPIA_VERSION = '3.2.8'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1026,6 +1026,8 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
+DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
+    '/diagnostic_test_skill_assignment_handler')
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
@@ -1060,6 +1062,8 @@ TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPIC_URL_FRAGMENT_HANDLER = '/topic_url_fragment_handler'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 UNASSIGN_SKILL_DATA_HANDLER_URL = '/topics_and_skills_dashboard/unassign_skill'
+TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER = (
+    '/topic_id_to_diagnostic_test_skill_ids_handler')
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
