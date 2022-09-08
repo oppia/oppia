@@ -184,7 +184,7 @@ def create_suggestion(
         suggestion: AllowedSuggestionClasses = (
             suggestion_registry.SuggestionEditStateContent(
                 thread_id, target_id, target_version_at_submission, status,
-                author_id,None, change, score_category, language_code, False
+                author_id, None, change, score_category, language_code, False
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -205,8 +205,8 @@ def create_suggestion(
                 'The Exploration content has changed since this translation '
                 'was submitted.')
         suggestion = suggestion_registry.SuggestionTranslateContent(
-            thread_id, target_id, target_version_at_submission, status, author_id,
-            None, change, score_category, language_code, False
+            thread_id, target_id, target_version_at_submission, status,
+            author_id, None, change, score_category, language_code, False
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
@@ -227,8 +227,9 @@ def create_suggestion(
         # The language code of the question, used for querying purposes.
         add_question_language_code = constants.DEFAULT_LANGUAGE_CODE
         suggestion = suggestion_registry.SuggestionAddQuestion(
-            thread_id, target_id, target_version_at_submission, status, author_id,
-            None, change, score_category, add_question_language_code, False
+            thread_id, target_id, target_version_at_submission, status,
+            author_id, None, change, score_category, add_question_language_code,
+            False
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)

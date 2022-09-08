@@ -858,7 +858,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = (
+        self.change: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = (  # pylint: disable=line-too-long
             question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(change)
         )
         self.score_category = score_category
