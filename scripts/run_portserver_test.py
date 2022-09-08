@@ -307,7 +307,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_port_server_request_handler_handles_no_free_ports(self) -> None:
         request_handler = run_portserver._PortServerRequestHandler((8181,)) # pylint: disable=protected-access
         swap_get_port = self.swap(
-            run_portserver._PortPool, 'get_port_for_process',
+            run_portserver._PortPool, 'get_port_for_process', # pylint: disable=protected-access
             lambda *unused_args: 0)
         swap_should_allocate_port = self.swap(
             run_portserver, 'should_allocate_port', lambda _: True)
