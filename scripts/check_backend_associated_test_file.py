@@ -54,7 +54,6 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
 
     # The files below are to be tested.
     # GSoC'22: Improve line and branch coverage for the backend and frontend.
-    'core/domain/cron_services.py',
     'core/platform/datastore/cloud_datastore_services.py',
     'core/platform/transactions/cloud_transaction_services.py',
 ]
