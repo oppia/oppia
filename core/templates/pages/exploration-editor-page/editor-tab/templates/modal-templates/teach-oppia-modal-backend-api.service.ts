@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,32 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview Backend api service for Setting tab;
+ * @fileoverview Service to retrieve information of review tests from the
+ * backend.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
-interface SettingTabBackendDict {
-  'draft_email_body': string;
-}
-
-export interface SettingTabResponse {
-  draft_email_body: string;
+export interface TeachOppiaModalData {
+  data: {
+    unresolved_answers: {answer: InteractionAnswer}[];
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class SettingTabBackendApiService {
-  constructor(private http: HttpClient) {}
+export class TeachOppiaModalBackendApiService {
+  constructor(
+     private http: HttpClient,
+  ) {}
 
-  getData(url: string): Promise<SettingTabResponse> {
-    return this.http.get<SettingTabBackendDict>(url).toPromise();
+  async fetchTeachOppiaModalDataAsync(
+      urlFragment: string, params: object):
+     Promise<TeachOppiaModalData> {
+    return this.http.get<TeachOppiaModalData>(
+      urlFragment,
+      params
+    ).toPromise();
   }
 }
 
 angular.module('oppia').factory(
-  'SettingTabBackendApiService',
-  downgradeInjectable(SettingTabBackendApiService));
+  'TeachOppiaModalBackendApiService',
+  downgradeInjectable(TeachOppiaModalBackendApiService));

@@ -17,36 +17,62 @@
  * @fileoverview Unit tests for the Exploration save service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { StateObjectsBackendDict, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { AlertsService } from 'services/alerts.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { EditabilityService } from 'services/editability.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { AutosaveInfoModalsService } from './autosave-info-modals.service';
 import { ChangeListService } from './change-list.service';
+import { ExplorationCategoryService } from './exploration-category.service';
 import { ExplorationDataService } from './exploration-data.service';
+import { ExplorationDiffService, ProcessedStateIdsAndData } from './exploration-diff.service';
 import { ExplorationLanguageCodeService } from './exploration-language-code.service';
+import { ExplorationObjectiveService } from './exploration-objective.service';
+import { ExplorationRightsService } from './exploration-rights.service';
+import { ExplorationSaveService } from './exploration-save.service';
+import { ExplorationStatesService } from './exploration-states.service';
 import { ExplorationTagsService } from './exploration-tags.service';
-// ^^^ This block is to be removed.
+import { ExplorationTitleService } from './exploration-title.service';
+import { ExplorationWarningsService } from './exploration-warnings.service';
+import { RouterService } from './router.service';
+
+class MockNgbModal {
+  open() {
+    return Promise.resolve();
+  }
+}
+
+class MockrouterService {
+  savePendingChanges() {}
+  onRefreshVersionHistory = new EventEmitter();
+}
 
 describe('Exploration save service ' +
   'when draft changes are present and there ' +
-  'is version mismatch it', function() {
-  let $rootScope = null;
-  let $uibModal = null;
-  let explorationSaveService = null;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
-  let changeListService: ChangeListService = null;
-  let ExplorationRightsService = null;
-  let ExplorationTitleService = null;
-  let ngbModal: NgbModal = null;
+  'is version mismatch it', () => {
+  let explorationSaveService: ExplorationSaveService;
+  let autosaveInfoModalsService: AutosaveInfoModalsService;
+  let changeListService: ChangeListService;
+  let explorationRightsService: ExplorationRightsService;
+  let explorationTitleService: ExplorationTitleService;
+  let ngbModal: NgbModal;
+  let mockConnectionServiceEmitter = new EventEmitter<boolean>();
+  let siteAnalyticsService: SiteAnalyticsService;
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
+  class MockInternetConnectivityService {
+    onInternetStateChange = mockConnectionServiceEmitter;
+
+    isOnline() {
+      return true;
+    }
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -64,86 +90,100 @@ describe('Exploration save service ' +
             }
           }
         },
+        ExplorationSaveService,
+        AutosaveInfoModalsService,
+        ChangeListService,
+        ExplorationRightsService,
+        ExplorationTitleService,
+        {
+          provide: InternetConnectivityService,
+          useClass: MockInternetConnectivityService
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: RouterService,
+          useClass: MockrouterService
+        },
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                reload() {}
+              }
+            }
+          }
+        }
       ]
     });
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', {
-      location: {
-        reload() {}
-      }
-    });
+  beforeEach(() => {
+    explorationSaveService = TestBed.inject(ExplorationSaveService);
+    autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
+    changeListService = TestBed.inject(ChangeListService);
+    explorationRightsService = TestBed.inject(ExplorationRightsService);
+    explorationTitleService = TestBed.inject(ExplorationTitleService);
+    ngbModal = TestBed.inject(NgbModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
+    spyOn(siteAnalyticsService, 'registerOpenPublishExplorationModalEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerPublishExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerCommitChangesToPublicExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerSavePlayableExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics')
+      .and.stub();
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    explorationSaveService = $injector.get('ExplorationSaveService');
-    $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
-    autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
-    changeListService = $injector.get('ChangeListService');
-    ExplorationRightsService = $injector.get('ExplorationRightsService');
-    ExplorationTitleService = $injector.get('ExplorationTitleService');
-    ngbModal = $injector.get('NgbModal');
-  }));
-
-  it('should open version mismatch modal', fakeAsync(function() {
+  it('should open version mismatch modal', fakeAsync(() => {
     let modalSpy = spyOn(
       autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.returnValue(null);
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    spyOn($uibModal, 'open').and.returnValue(
+    spyOn(ngbModal, 'open').and.returnValue(
       {
-        opened: Promise.resolve(),
         result: Promise.resolve(['1'])
-      });
-    spyOn(ExplorationRightsService, 'isPrivate')
+      } as NgbModalRef);
+    spyOn(explorationRightsService, 'isPrivate')
       .and.returnValue(true);
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
   }));
 
   it('should restore all memento\'s after modal was ' +
-    'closed', fakeAsync(function() {
+    'closed', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    let restoreSpy = spyOn(ExplorationTitleService, 'restoreFromMemento')
+    let restoreSpy = spyOn(explorationTitleService, 'restoreFromMemento')
       .and.returnValue(null);
-    spyOn($uibModal, 'open').and.returnValue(
+    spyOn(ngbModal, 'open').and.returnValue(
       {
-        opened: Promise.resolve(),
         result: Promise.reject()
-      });
+      } as NgbModalRef);
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
-    $rootScope.$apply();
+
     tick();
 
     expect(restoreSpy).toHaveBeenCalled();
   }));
 
   it('should open confirm discard changes modal when clicked ' +
-    'on discard changes button', fakeAsync(function() {
+    'on discard changes button', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return ({
         result: Promise.resolve()
@@ -153,19 +193,14 @@ describe('Exploration save service ' +
       .and.returnValue(Promise.resolve(null));
 
     explorationSaveService.discardChanges();
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
   }));
 
   it('should return \'initExplorationPageEventEmitter\' ' +
-    'when calling \'onInitExplorationPage\'', fakeAsync(function() {
+    'when calling \'onInitExplorationPage\'', fakeAsync(() => {
     let mockEventEmitter = new EventEmitter();
 
     expect(explorationSaveService.onInitExplorationPage)
@@ -174,23 +209,29 @@ describe('Exploration save service ' +
 });
 
 describe('Exploration save service ' +
-  'when there are no pending draft changes it', function() {
-  let $uibModal = null;
-  let $rootScope = null;
-  let explorationSaveService = null;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
-  let changeListService: ChangeListService = null;
-  let editabilityService: EditabilityService = null;
-  let ExplorationCategoryService = null;
-  let explorationLanguageCodeService: ExplorationLanguageCodeService = null;
-  let ExplorationObjectiveService = null;
-  let ExplorationRightsService = null;
-  let explorationTagsService: ExplorationTagsService = null;
-  let ExplorationTitleService = null;
-  let NgbModal = null;
+  'when there are no pending draft changes it', () => {
+  let explorationSaveService: ExplorationSaveService;
+  let autosaveInfoModalsService: AutosaveInfoModalsService;
+  let changeListService: ChangeListService;
+  let editabilityService: EditabilityService;
+  let explorationCategoryService: ExplorationCategoryService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
+  let explorationObjectiveService: ExplorationObjectiveService;
+  let explorationRightsService: ExplorationRightsService;
+  let explorationTagsService: ExplorationTagsService;
+  let explorationTitleService: ExplorationTitleService;
+  let ngbModal: NgbModal;
+  let mockConnectionServiceEmitter = new EventEmitter<boolean>();
+  let siteAnalyticsService: SiteAnalyticsService;
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
+  class MockInternetConnectivityService {
+    onInternetStateChange = mockConnectionServiceEmitter;
+
+    isOnline() {
+      return true;
+    }
+  }
+
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -204,163 +245,149 @@ describe('Exploration save service ' +
             }
           }
         },
+        ExplorationSaveService,
+        AutosaveInfoModalsService,
+        ChangeListService,
+        ExplorationRightsService,
+        ExplorationTitleService,
+        {
+          provide: InternetConnectivityService,
+          useClass: MockInternetConnectivityService
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: RouterService,
+          useClass: MockrouterService
+        },
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                reload() {}
+              }
+            }
+          }
+        }
       ]
     });
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
+  beforeEach(() => {
+    explorationSaveService = TestBed.inject(ExplorationSaveService);
+    autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
+    changeListService = TestBed.inject(ChangeListService);
+    editabilityService = TestBed.inject(EditabilityService);
+    explorationCategoryService = TestBed.inject(ExplorationCategoryService);
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService);
+    explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
+    explorationRightsService = TestBed.inject(ExplorationRightsService);
+    explorationTagsService = TestBed.inject(ExplorationTagsService);
+    explorationTitleService = TestBed.inject(ExplorationTitleService);
+    ngbModal = TestBed.inject(NgbModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
-  beforeEach(angular.mock.inject(function($injector) {
-    explorationSaveService = $injector.get('ExplorationSaveService');
-    $uibModal = $injector.get('$uibModal');
-    $rootScope = $injector.get('$rootScope');
-    autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
-    changeListService = $injector.get('ChangeListService');
-    editabilityService = $injector.get('EditabilityService');
-    ExplorationCategoryService = $injector.get('ExplorationCategoryService');
-    explorationLanguageCodeService = $injector.get(
-      'ExplorationLanguageCodeService');
-    ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
-    ExplorationRightsService = $injector.get('ExplorationRightsService');
-    explorationTagsService = $injector.get('ExplorationTagsService');
-    ExplorationTitleService = $injector.get('ExplorationTitleService');
-    NgbModal = $injector.get('NgbModal');
-  }));
+    spyOn(siteAnalyticsService, 'registerOpenPublishExplorationModalEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerPublishExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerCommitChangesToPublicExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerSavePlayableExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics')
+      .and.stub();
+  });
 
-  it('should not open version mismatch modal', fakeAsync(function() {
+  it('should not open version mismatch modal', fakeAsync(() => {
     let modalSpy = spyOn(
       autosaveInfoModalsService, 'showVersionMismatchModal')
       .and.returnValue(null);
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    spyOn(ExplorationRightsService, 'publish')
+    spyOn(explorationRightsService, 'publish')
       .and.resolveTo();
-    spyOn($uibModal, 'open').and.returnValue(
+    spyOn(ngbModal, 'open').and.returnValue(
       {
-        opened: Promise.resolve(),
         result: Promise.resolve([])
-      });
-    spyOn(ExplorationRightsService, 'isPrivate')
+      } as NgbModalRef);
+    spyOn(explorationRightsService, 'isPrivate')
       .and.returnValue(true);
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(modalSpy).not.toHaveBeenCalled();
   }));
 
-  it('should show congratulatory sharing modal', fakeAsync(function() {
+  it('should show congratulatory sharing modal', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(changeListService, 'discardAllChanges')
       .and.returnValue(Promise.reject(null));
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
       {
-        opened: Promise.resolve(),
         result: Promise.resolve(['1'])
-      });
-    spyOn(ExplorationRightsService, 'publish')
+      } as NgbModalRef);
+    spyOn(explorationRightsService, 'publish')
       .and.resolveTo();
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
   }));
 
   it('should not publish exploration in case of backend ' +
-    'error', fakeAsync(function() {
-    spyOn(NgbModal, 'open').and.returnValue({
+    'error', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('failure')
-    });
-    let publishSpy = spyOn(ExplorationRightsService, 'publish')
+    } as NgbModalRef);
+    let publishSpy = spyOn(explorationRightsService, 'publish')
       .and.resolveTo();
 
-    ExplorationTitleService.savedMemento = true;
-    ExplorationObjectiveService.savedMemento = true;
-    ExplorationCategoryService.savedMemento = true;
+    explorationTitleService.savedMemento = true;
+    explorationObjectiveService.savedMemento = true;
+    explorationCategoryService.savedMemento = true;
     explorationLanguageCodeService.savedMemento = 'afk';
     explorationTagsService.savedMemento = 'invalid';
 
-    explorationSaveService.showPublishExplorationModal();
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
+    explorationSaveService.showPublishExplorationModal(null, null);
     tick();
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(publishSpy).not.toHaveBeenCalled();
   }));
 
-  it('should mark exploaration as editable', fakeAsync(function() {
+  it('should mark exploaration as editable', fakeAsync(() => {
     let editableSpy = spyOn(editabilityService, 'markNotEditable')
       .and.returnValue(null);
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(changeListService, 'discardAllChanges')
       .and.returnValue(Promise.resolve(null));
-    spyOn($uibModal, 'open').and.returnValue(
+    spyOn(ngbModal, 'open').and.returnValue(
       {
-        opened: Promise.resolve(),
         result: Promise.resolve(['1'])
-      });
+      } as NgbModalRef);
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(editableSpy).toHaveBeenCalled();
   }));
 
-  it('should open publish exploration modal', fakeAsync(function() {
-    let modalSpy = spyOn($uibModal, 'open').and.callThrough();
-    let startLoadingCb = jasmine.createSpy('startLoadingCb');
-    let endLoadingCb = jasmine.createSpy('endLoadingCb');
-
-    explorationSaveService.showPublishExplorationModal(
-      startLoadingCb, endLoadingCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
-    tick();
-    $rootScope.$apply();
-    tick();
-    $rootScope.$apply();
-
-    expect(modalSpy).toHaveBeenCalled();
-  }));
-
-  it('should check whether the exploration is saveable', function() {
+  it('should check whether the exploration is saveable', () => {
     spyOn(changeListService, 'isExplorationLockedForEditing')
       .and.returnValue(false);
 
@@ -370,98 +397,142 @@ describe('Exploration save service ' +
   });
 });
 
+
 describe('Exploration save service ' +
   'in case of backend error while saving ' +
-  'exploration data it', function() {
-  let $uibModal = null;
-  let $rootScope = null;
-  let explorationSaveService = null;
-  let alertsService = null;
-  let errorResponse = {
-    error: {
-      error: 'Error Message'
+  'exploration data it', () => {
+  let explorationSaveService: ExplorationSaveService;
+  let ngbModal: NgbModal;
+  let changeListService: ChangeListService;
+  let mockConnectionServiceEmitter = new EventEmitter<boolean>();
+  let siteAnalyticsService: SiteAnalyticsService;
+
+    class MockInternetConnectivityService {
+      onInternetStateChange = mockConnectionServiceEmitter;
+
+      isOnline() {
+        return true;
+      }
     }
-  };
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
-        {
-          provide: ExplorationDataService,
-          useValue: {
-            save(changeList, message, successCb, errorCb) {
-              errorCb(errorResponse);
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        providers: [
+          {
+            provide: ExplorationDataService,
+            useValue: {
+              save(changeList, message, successCb, errorCb) {
+                successCb(true, []);
+                errorCb({error: {error: 'errorMessage'}});
+              },
+              discardDraftAsync() {}
+            }
+          },
+          ExplorationSaveService,
+          AutosaveInfoModalsService,
+          ChangeListService,
+          ExplorationRightsService,
+          ExplorationTitleService,
+          {
+            provide: InternetConnectivityService,
+            useClass: MockInternetConnectivityService
+          },
+          {
+            provide: NgbModal,
+            useClass: MockNgbModal
+          },
+          {
+            provide: RouterService,
+            useClass: MockrouterService
+          },
+          {
+            provide: WindowRef,
+            useValue: {
+              nativeWindow: {
+                location: {
+                  reload() {}
+                }
+              }
             }
           }
-        },
-      ]
-    });
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    explorationSaveService = $injector.get('ExplorationSaveService');
-    $uibModal = $injector.get('$uibModal');
-    $rootScope = $injector.get('$rootScope');
-    alertsService = $injector.get('AlertsService');
-  }));
-
-  it('should call error callback', fakeAsync(function() {
-    let successCb = jasmine.createSpy('success');
-    let errorCb = jasmine.createSpy('error');
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {
-        opened: Promise.resolve(),
-        result: Promise.resolve(['1'])
+        ]
       });
-    let alertsServiceSpy = spyOn(alertsService, 'addWarning');
+    });
 
-    explorationSaveService.showPublishExplorationModal(
-      successCb, errorCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    $rootScope.$apply();
-    tick();
-    $rootScope.$apply();
-    tick();
-    $rootScope.$apply();
+    beforeEach(() => {
+      explorationSaveService = TestBed.inject(ExplorationSaveService);
+      ngbModal = TestBed.inject(NgbModal);
+      siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+      changeListService = TestBed.inject(ChangeListService);
 
-    expect(errorCb).toHaveBeenCalled();
-    expect(modalSpy).toHaveBeenCalled();
-    expect(alertsServiceSpy).toHaveBeenCalled();
-  }));
+      spyOn(changeListService, 'discardAllChanges')
+        .and.returnValue(Promise.resolve(null));
+      spyOn(siteAnalyticsService, 'registerOpenPublishExplorationModalEvent')
+        .and.stub();
+      spyOn(siteAnalyticsService, 'registerPublishExplorationEvent')
+        .and.stub();
+      spyOn(
+        siteAnalyticsService,
+        'registerCommitChangesToPublicExplorationEvent')
+        .and.stub();
+      spyOn(siteAnalyticsService, 'registerSavePlayableExplorationEvent')
+        .and.stub();
+      spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics')
+        .and.stub();
+    });
+
+    it('should call error callback', fakeAsync(() => {
+      let successCb = jasmine.createSpy('success');
+      let errorCb = jasmine.createSpy('error');
+      let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: {
+          isExplorationPrivate: true,
+          diffData: null
+        },
+        result: Promise.resolve(['1'])
+      } as NgbModalRef);
+
+      explorationSaveService.showPublishExplorationModal(
+        successCb, errorCb);
+      tick();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalled();
+    }));
 });
 
 describe('Exploration save service ' +
-  'while saving changes', function() {
-  let $uibModal = null;
-  let $timeout = null;
-  let $rootScope = null;
-  let explorationSaveService = null;
-  let changeListService: ChangeListService = null;
-  let explorationDiffService = null;
-  let ExplorationRightsService = null;
-  let ExplorationStatesService = null;
-  let ExplorationWarningsService = null;
-  let RouterService = null;
-  let statesObjectFactory = null;
-  let focusManagerService: FocusManagerService = null;
+  'while saving changes', () => {
+  let explorationSaveService: ExplorationSaveService;
+  let changeListService: ChangeListService;
+  let explorationRightsService: ExplorationRightsService;
+  let ngbModal: NgbModal;
+  let statesObjectFactory: StatesObjectFactory;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let routerService: RouterService;
+  let explorationDiffService: ExplorationDiffService;
+  let explorationStatesService: ExplorationStatesService;
+  let explorationWarningsService: ExplorationWarningsService;
+  let mockConnectionServiceEmitter = new EventEmitter<boolean>();
+  let alertsService: AlertsService;
+  let changeListServiceSpy;
+  class MockInternetConnectivityService {
+    onInternetStateChange = mockConnectionServiceEmitter;
 
-  let statesBackendDict = {
+    isOnline() {
+      return true;
+    }
+  }
+
+  let statesBackendDict: StateObjectsBackendDict = {
     Hola: {
+      classifier_model_id: null,
+      solicit_answer_details: null,
+      card_is_checkpoint: null,
+      linked_skill_id: null,
+      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: '{{HtmlValue}}'
@@ -474,10 +545,19 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
+        confirmed_unclassified_answers: null,
+        customization_args: null,
+        solution: null,
         id: null,
         answer_groups: [{
           rule_specs: [],
+          training_data: null,
+          tagged_skill_misconception_id: null,
           outcome: {
+            labelled_as_correct: false,
+            param_changes: null,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
             dest: '',
             dest_if_really_stuck: null,
             feedback: {
@@ -487,6 +567,10 @@ describe('Exploration save service ' +
           },
         }],
         default_outcome: {
+          labelled_as_correct: false,
+          param_changes: null,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
           dest: 'Hola',
           dest_if_really_stuck: null,
           feedback: {
@@ -504,6 +588,11 @@ describe('Exploration save service ' +
       },
     },
     State: {
+      classifier_model_id: null,
+      solicit_answer_details: null,
+      card_is_checkpoint: null,
+      linked_skill_id: null,
+      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: 'content'
@@ -516,10 +605,19 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
+        confirmed_unclassified_answers: null,
+        customization_args: null,
+        solution: null,
         id: null,
         answer_groups: [{
           rule_specs: [],
+          training_data: null,
+          tagged_skill_misconception_id: null,
           outcome: {
+            labelled_as_correct: false,
+            param_changes: null,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
             dest: '',
             dest_if_really_stuck: null,
             feedback: {
@@ -529,6 +627,10 @@ describe('Exploration save service ' +
           },
         }],
         default_outcome: {
+          labelled_as_correct: false,
+          param_changes: null,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
           dest: 'State',
           dest_if_really_stuck: null,
           feedback: {
@@ -546,6 +648,11 @@ describe('Exploration save service ' +
       }
     },
     State2: {
+      classifier_model_id: null,
+      solicit_answer_details: null,
+      card_is_checkpoint: null,
+      linked_skill_id: null,
+      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: 'content'
@@ -558,10 +665,19 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
+        confirmed_unclassified_answers: null,
+        customization_args: null,
+        solution: null,
         id: null,
         answer_groups: [{
           rule_specs: [],
+          training_data: null,
+          tagged_skill_misconception_id: null,
           outcome: {
+            labelled_as_correct: false,
+            param_changes: null,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
             dest: '',
             dest_if_really_stuck: null,
             feedback: {
@@ -571,6 +687,10 @@ describe('Exploration save service ' +
           }
         }],
         default_outcome: {
+          labelled_as_correct: false,
+          param_changes: null,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
           dest: 'State2',
           dest_if_really_stuck: null,
           feedback: {
@@ -588,6 +708,11 @@ describe('Exploration save service ' +
       }
     },
     State3: {
+      classifier_model_id: null,
+      solicit_answer_details: null,
+      card_is_checkpoint: null,
+      linked_skill_id: null,
+      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: 'content'
@@ -600,10 +725,19 @@ describe('Exploration save service ' +
       },
       param_changes: [],
       interaction: {
+        confirmed_unclassified_answers: null,
+        customization_args: null,
+        solution: null,
         id: null,
         answer_groups: [{
           rule_specs: [],
+          training_data: null,
+          tagged_skill_misconception_id: null,
           outcome: {
+            labelled_as_correct: false,
+            param_changes: null,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
             dest: '',
             dest_if_really_stuck: null,
             feedback: {
@@ -613,6 +747,10 @@ describe('Exploration save service ' +
           }
         }],
         default_outcome: {
+          labelled_as_correct: false,
+          param_changes: null,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
           dest: 'State2',
           dest_if_really_stuck: null,
           feedback: {
@@ -631,9 +769,6 @@ describe('Exploration save service ' +
     }
   };
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -649,47 +784,82 @@ describe('Exploration save service ' +
             },
             save(changeList, message, successCb, errorCb) {
               successCb(true, []);
+              errorCb({error: {error: 'errorMessage'}});
+            },
+            discardDraftAsync() {}
+          }
+        },
+        FocusManagerService,
+        ExplorationSaveService,
+        AutosaveInfoModalsService,
+        ChangeListService,
+        ExplorationRightsService,
+        ExplorationTitleService,
+        {
+          provide: InternetConnectivityService,
+          useClass: MockInternetConnectivityService
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: RouterService,
+          useClass: MockrouterService
+        },
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                reload() {}
+              }
             }
           }
         },
-        FocusManagerService
+        ExplorationDiffService,
+        ExplorationStatesService,
+        FocusManagerService,
+        ExplorationWarningsService,
       ]
     });
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
+  beforeEach(() => {
+    explorationSaveService = TestBed.inject(ExplorationSaveService);
+    changeListService = TestBed.inject(ChangeListService);
+    explorationRightsService = TestBed.inject(ExplorationRightsService);
+    ngbModal = TestBed.inject(NgbModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    statesObjectFactory = TestBed.inject(StatesObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
+    routerService = TestBed.inject(RouterService);
+    explorationDiffService = TestBed.inject(ExplorationDiffService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    explorationWarningsService = TestBed.inject(ExplorationWarningsService);
 
-  beforeEach(angular.mock.inject(function($injector) {
-    explorationSaveService = $injector.get('ExplorationSaveService');
-    $uibModal = $injector.get('$uibModal');
-    $timeout = $injector.get('$timeout');
-    $rootScope = $injector.get('$rootScope');
-    changeListService = $injector.get('ChangeListService');
-    explorationDiffService = $injector.get('ExplorationDiffService');
-    ExplorationRightsService = $injector.get('ExplorationRightsService');
-    ExplorationStatesService = $injector.get('ExplorationStatesService');
-    ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    RouterService = $injector.get('RouterService');
-    statesObjectFactory = $injector.get('StatesObjectFactory');
-    focusManagerService = $injector.get('FocusManagerService');
-  }));
+    changeListServiceSpy = spyOn(changeListService, 'discardAllChanges');
+    changeListServiceSpy.and.returnValue(Promise.resolve(null));
+    spyOn(siteAnalyticsService, 'registerOpenPublishExplorationModalEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerPublishExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerCommitChangesToPublicExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, 'registerSavePlayableExplorationEvent')
+      .and.stub();
+    spyOn(siteAnalyticsService, '_sendEventToGoogleAnalytics')
+      .and.stub();
+  });
 
-  it('should open exploration save modal', fakeAsync(function() {
+  it('should open exploration save modal', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
-    spyOn(RouterService, 'savePendingChanges')
+    spyOn(routerService, 'savePendingChanges')
       .and.returnValue(null);
-    spyOn(ExplorationStatesService, 'getStates')
+    spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
@@ -698,105 +868,55 @@ describe('Exploration save service ' +
         finalStateIds: ['finalStaeIds'],
         originalStateIds: ['Hola'],
         stateIds: [],
-      });
-    let modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      } as unknown as ProcessedStateIdsAndData);
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {
+            isExplorationPrivate: true,
+            diffData: null,
+          },
+          result: Promise.resolve('commitMessage')
+        } as NgbModalRef);
 
     explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
+
     flush();
-    $rootScope.$apply();
-    $timeout.flush();
+    tick();
     flush();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
   }));
 
-  it('should remove focus after exploration save modal ' +
-    'is closed', fakeAsync(function() {
-    let startLoadingCb = jasmine.createSpy('startLoadingCb');
-    let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    let sampleStates = statesObjectFactory.createFromBackendDict(
-      statesBackendDict);
-    let mockEventEmitter = new EventEmitter();
-    spyOn(RouterService, 'savePendingChanges')
-      .and.returnValue(null);
-    spyOn(ExplorationStatesService, 'getStates')
-      .and.returnValue(sampleStates);
-    spyOn(explorationDiffService, 'getDiffGraphData')
-      .and.returnValue({
-        nodes: 'nodes',
-        links: ['links'],
-        finalStateIds: ['finalStaeIds'],
-        originalStateIds: ['Hola'],
-        stateIds: [],
-      });
-    spyOn($uibModal, 'open').and.callThrough();
-    let focusSpy = spyOnProperty(focusManagerService, 'onFocus')
-      .and.returnValue(mockEventEmitter);
-
-    explorationSaveService.saveChangesAsync(
-      startLoadingCb, endLoadingCb);
-    // We need multiple '$rootScope.$apply()' here since, the source code
-    // consists of nested promises.
-    flush();
-    $rootScope.$apply();
-    $timeout.flush();
-    flush();
-    $rootScope.$apply();
-
-    mockEventEmitter.emit('labelForClearingFocus');
-    tick();
-
-    expect(focusSpy).toHaveBeenCalled();
-  }));
-
   it('should not open exploration save modal in case of ' +
-    'backend error', fakeAsync(function() {
+    'backend error', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    let sampleStates = statesObjectFactory.createFromBackendDict(
-      statesBackendDict);
-    spyOn(RouterService, 'savePendingChanges')
-      .and.returnValue(null);
-    spyOn(ExplorationStatesService, 'getStates')
-      .and.returnValue(sampleStates);
-    spyOn(explorationDiffService, 'getDiffGraphData')
-      .and.returnValue({
-        nodes: 'nodes',
-        links: ['links'],
-        finalStateIds: ['finalStaeIds'],
-        originalStateIds: ['Hola'],
-        stateIds: [],
-      });
-    spyOn(ExplorationRightsService, 'isPrivate')
-      .and.returnValue(false);
-    spyOn(ExplorationWarningsService, 'countWarnings')
-      .and.returnValue(1);
-    spyOn(changeListService, 'discardAllChanges')
-      .and.returnValue(Promise.resolve(null));
-    let modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
-    expectAsync(
-      explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb)
-    ).toBeRejected();
+    spyOn(routerService, 'savePendingChanges').and.stub();
+    spyOn(alertsService, 'addWarning').and.stub();
+    spyOn(explorationRightsService, 'isPrivate').and.returnValue(false);
+    spyOn(explorationWarningsService, 'countWarnings').and.returnValue(1);
+    spyOn(explorationWarningsService, 'getWarnings')
+      .and.returnValue(['something']);
+
+    explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);
     flush();
-    $rootScope.$apply();
+    tick();
+    flush();
 
-    expect(modalSpy).not.toHaveBeenCalled();
+    expect(explorationWarningsService.countWarnings).toHaveBeenCalled();
   }));
 
   it('should not open exploration save modal if ' +
-    'it is already opened', fakeAsync(function() {
+    'it is already opened', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
-    spyOn(RouterService, 'savePendingChanges')
+    spyOn(routerService, 'savePendingChanges')
       .and.returnValue(null);
-    spyOn(ExplorationStatesService, 'getStates')
+    spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
@@ -805,8 +925,15 @@ describe('Exploration save service ' +
         finalStateIds: ['finalStaeIds'],
         originalStateIds: ['Hola'],
         stateIds: [],
-      });
-    let modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      } as unknown as ProcessedStateIdsAndData);
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {
+            isExplorationPrivate: true,
+            diffData: null,
+          },
+          result: Promise.resolve('commitMessage')
+        } as NgbModalRef);
 
     // Opening modal first time.
     explorationSaveService.saveChangesAsync(
@@ -817,22 +944,20 @@ describe('Exploration save service ' +
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
     flush();
-    $rootScope.$apply();
     flush();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalledTimes(1);
   }));
 
   it('should focus on the exploration save modal ' +
-    'when modal is opened', fakeAsync(function() {
+    'when modal is opened', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
-    spyOn(RouterService, 'savePendingChanges')
+    spyOn(routerService, 'savePendingChanges')
       .and.returnValue(null);
-    spyOn(ExplorationStatesService, 'getStates')
+    spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
@@ -841,40 +966,37 @@ describe('Exploration save service ' +
         finalStateIds: ['finalStaeIds'],
         originalStateIds: ['Hola'],
         stateIds: [],
-      });
-    spyOn(changeListService, 'discardAllChanges')
-      .and.returnValue(Promise.resolve(null));
-    let focusSpy = spyOn(focusManagerService, 'setFocus')
-      .and.returnValue(null);
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
+      } as unknown as ProcessedStateIdsAndData);
+    changeListServiceSpy.and.returnValue(Promise.resolve(null));
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
       {
-        opened: Promise.resolve(),
+        componentInstance: {
+          isExplorationPrivate: true,
+          diffData: null,
+        },
         result: Promise.resolve('commitMessage')
-      });
+      } as NgbModalRef);
 
     explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     // We need multiple '$rootScope.$apply()' here since, the source code
     // consists of nested promises.
     flush();
-    $rootScope.$apply();
-    $timeout.flush();
+    tick();
     flush();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(focusSpy).toHaveBeenCalled();
   }));
 
   it('should not focus on exploration save modal in case ' +
-    'of backend error', fakeAsync(function() {
+    'of backend error', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
       statesBackendDict);
-    spyOn(RouterService, 'savePendingChanges')
+    spyOn(routerService, 'savePendingChanges')
       .and.returnValue(null);
-    spyOn(ExplorationStatesService, 'getStates')
+    spyOn(explorationStatesService, 'getStates')
       .and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData')
       .and.returnValue({
@@ -883,21 +1005,20 @@ describe('Exploration save service ' +
         finalStateIds: ['finalStaeIds'],
         originalStateIds: ['Hola'],
         stateIds: [],
-      });
-    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
+      } as unknown as ProcessedStateIdsAndData);
+    let modalSpy = spyOn(ngbModal, 'open').and.returnValue(
       {
-        opened: Promise.resolve(),
+        componentInstance: {
+          isExplorationPrivate: true,
+          diffData: null,
+        },
         result: Promise.reject()
-      });
-    let focusSpy = spyOn(focusManagerService, 'setFocus')
-      .and.returnValue(null);
+      } as NgbModalRef);
 
     explorationSaveService.saveChangesAsync(
       startLoadingCb, endLoadingCb);
     tick();
-    $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(focusSpy).not.toHaveBeenCalled();
   }));
 });
