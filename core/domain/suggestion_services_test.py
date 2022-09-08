@@ -4834,7 +4834,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             suggestion_services
             .enqueue_contributor_ranking_notification_email_task(
                 user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
-                feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE, 'hi',
+                feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE, 'hi',
                 'Initial Contributor'
             ))
 
@@ -4858,7 +4858,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             feconf.CONTRIBUTION_TYPE_TRANSLATION)
         self.assertEqual(
             tasks[0].payload['contribution_sub_type'],
-            feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE)
+            feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE)
         self.assertEqual(tasks[0].payload['language_code'], 'hi')
         self.assertEqual(
             tasks[0].payload['rank_name'], 'Initial Contributor')

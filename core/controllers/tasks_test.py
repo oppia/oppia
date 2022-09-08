@@ -226,7 +226,7 @@ class TasksTests(test_utils.EmailTestBase):
                 'contributor_user_id': user_id,
                 'contribution_type': feconf.CONTRIBUTION_TYPE_TRANSLATION,
                 'contribution_sub_type': (
-                    feconf.CONTRIBUTION_SUB_TYPE_ACCEPTANCE),
+                    feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE),
                 'language_code': 'hi',
                 'rank_name': 'Initial Contributor',
             }
