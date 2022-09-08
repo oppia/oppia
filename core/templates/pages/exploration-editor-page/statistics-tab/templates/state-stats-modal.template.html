@@ -30,18 +30,18 @@
   <div ng-repeat="vizInfo in visualizationsInfo">
     <div ng-switch="vizInfo.id">
       <oppia-visualization-click-hexbins ng-switch-when="ClickHexbins"
-                                         data="vizInfo.data"
-                                         interaction-args="interactionArgs">
+                                         [data]="vizInfo.data"
+                                         [interaction-args]="interactionArgs">
       </oppia-visualization-click-hexbins>
       <oppia-visualization-enumerated-frequency-table ng-switch-when="EnumeratedFrequencyTable"
-                                                      data="vizInfo.data"
-                                                      options="vizInfo.options"
-                                                      addressed-info-is-supported="vizInfo.addressedInfoIsSupported">
+                                                      [data]="vizInfo.data"
+                                                      [options]="vizInfo.options"
+                                                      [addressed-info-is-supported]="vizInfo.addressedInfoIsSupported">
       </oppia-visualization-enumerated-frequency-table>
       <oppia-visualization-frequency-table ng-switch-when="FrequencyTable"
-                                           data="vizInfo.data"
-                                           options="vizInfo.options"
-                                           addressed-info-is-supported="vizInfo.addressedInfoIsSupported">
+                                           [data]="vizInfo.data"
+                                           [options]="vizInfo.options"
+                                           [addressed-info-is-supported]="vizInfo.addressedInfoIsSupported">
       </oppia-visualization-frequency-table>
       <oppia-visualization-sorted-tiles ng-switch-when="SortedTiles"
                                         [data]="vizInfo.data"

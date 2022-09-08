@@ -157,6 +157,9 @@ import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-t
 import { AnswerContentModalComponent } from './common-layout-directives/common-elements/answer-content-modal.component';
 import { VisualizationSortedTilesComponent } from 'visualizations/oppia-visualization-sorted-tiles.component';
 import { NeedsGuidingResponsesTaskComponent } from 'pages/exploration-editor-page/improvements-tab/needs-guiding-responses-task.component';
+import { OppiaVisualizationClickHexbinsComponent } from 'visualizations/oppia-visualization-click-hexbins.directive';
+import { OppiaVisualizationEnumeratedFrequencyTableComponent } from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
+import { OppiaVisualizationFrequencyTableComponent } from 'visualizations/oppia-visualization-frequency-table.directive';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -332,7 +335,10 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     ReviewTestPageComponent,
     AnswerContentModalComponent,
     VisualizationSortedTilesComponent,
-    NeedsGuidingResponsesTaskComponent
+    NeedsGuidingResponsesTaskComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent
   ],
 
   entryComponents: [
@@ -456,7 +462,10 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     ReviewTestPageComponent,
     AnswerContentModalComponent,
     VisualizationSortedTilesComponent,
-    NeedsGuidingResponsesTaskComponent
+    NeedsGuidingResponsesTaskComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent
   ],
 
   exports: [
@@ -591,7 +600,10 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     ReviewTestPageComponent,
     AnswerContentModalComponent,
     VisualizationSortedTilesComponent,
-    NeedsGuidingResponsesTaskComponent
+    NeedsGuidingResponsesTaskComponent,
+    OppiaVisualizationClickHexbinsComponent,
+    OppiaVisualizationEnumeratedFrequencyTableComponent,
+    OppiaVisualizationFrequencyTableComponent
   ],
 })
 
