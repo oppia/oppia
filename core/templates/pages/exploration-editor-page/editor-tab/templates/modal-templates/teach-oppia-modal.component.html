@@ -1,0 +1,86 @@
+<div class="modal-header">
+  <h3>Confirm Oppia's Responses</h3>
+  <p><em>Oppia was unable to determine which response to give to the following student answers. Help Oppia by clicking the 'tick mark' button to confirm a response, or the 'edit' button to select a better response!</em></p>
+</div>
+
+<div class="modal-body teach-oppia-modal">
+  <div class="unresolved-answers-list oppia-rule-details-header">
+    <p class="unresolved-answers-loading-text" [hidden]="!loadingDotsAreShown">Loading <loading-dots></loading-dots></p>
+    <div [hidden]="(unresolvedAnswers.length > 0)" class="oppia-unresolved-answers-container">
+      <div class="unresolved-answer" *ngFor="let answer of unresolvedAnswers; let index = index">
+        <p class="answer-header-label"><strong>Answer</strong></p>
+        <div>
+          <oppia-interaction-display [htmlData]="answer.answerTemplate"></oppia-interaction-display>
+        </div>
+        <div>
+          <p class="response-header-label"><strong>Response</strong></p>
+          <div class="unresolved-answer-btn">
+            <button type="button" class="btn response-edit-button" (click)="openTrainUnresolvedAnswerModal(index)" ngbTooltip="Edit this response" placement="bottom">
+              <i class="material-icons md-18"> edit </i>
+            </button>
+            <button type="button" class="btn confrim-respose-button" (click)="confirmAnswerAssignment(index)" ngbTooltip="Confirm this response" placement="bottom">
+              <i class="material-icons md-18"> done </i>
+            </button>
+          </div>
+          <span>
+            <oppia-rte-output-display [rteString]="answer.feedbackHtml"></oppia-rte-output-display>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div [hidden]="!(unresolvedAnswers.length === 0)">
+      <p>Congratulations! You've finished addressing important unresolved answers.</p>
+      <p>Please visit this page later for more unresolved answers.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Exit</button>
+</div>
+
+<style>
+  .teach-oppia-modal .unresolved-answers-loading-text {
+    font-size: 1.17em;
+    text-align: center;
+  }
+
+  .teach-oppia-modal .unresolved-answer {
+    border: black solid 1px;
+    border-radius: 5px;
+    margin-top: 1%;
+    padding: 1%;
+  }
+
+  .teach-oppia-modal .unresolved-answer-btn {
+    float: right;
+  }
+
+  .teach-oppia-modal .answer-header-label {
+    margin: 1% 0%;
+  }
+
+  .teach-oppia-modal .response-header-label {
+    display: inline-block;
+    margin: 1% 0%;
+  }
+
+  .teach-oppia-modal .response-edit-button {
+    background: white;
+    border-color: #f0ad4e;
+    color: #f0ad4e;
+  }
+
+  .teach-oppia-modal .response-edit-button:hover,  .teach-oppia-modal .confrim-respose-button:hover {
+    background: whitesmoke;
+  }
+
+  .teach-oppia-modal .confrim-respose-button {
+    background: white;
+    border-color: green;
+    color: green;
+  }
+  .teach-oppia-modal .oppia-unresolved-answers-container {
+    padding-top: 10px;
+  }
+</style>

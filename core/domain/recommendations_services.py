@@ -135,21 +135,20 @@ def save_topic_similarities(
     changed entity.
     """
 
-    topic_similarities_entity = (
+    retrieved_topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
             recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
-    if topic_similarities_entity is None:
-        topic_similarities_entity = (
-            recommendations_models.TopicSimilaritiesModel(
-                id=recommendations_models.TOPIC_SIMILARITIES_ID,
-                content=json.dumps(topic_similarities)))
-    else:
-        topic_similarities_entity.content = json.dumps(topic_similarities)
+    topic_similarities_entity = (
+        retrieved_topic_similarities_entity
+        if retrieved_topic_similarities_entity is not None
+        else recommendations_models.TopicSimilaritiesModel(
+            id=recommendations_models.TOPIC_SIMILARITIES_ID
+        )
+    )
+    topic_similarities_entity.content = json.dumps(topic_similarities)
     topic_similarities_entity.update_timestamps()
     topic_similarities_entity.put()
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert topic_similarities_entity is not None
     return topic_similarities_entity
 
 
