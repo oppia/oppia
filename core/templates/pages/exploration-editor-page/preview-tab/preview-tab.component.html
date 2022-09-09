@@ -1,20 +1,21 @@
 <div>
-  <div *ngIf="isExplorationPopulated">
-    <div *ngIf="previewWarning">
-      <div class="oppia-preview-state-warning">{{ previewWarning }}</div>
+  <div ng-if="$ctrl.isExplorationPopulated">
+    <div ng-if="$ctrl.previewWarning">
+      <div class="oppia-preview-state-warning"><[$ctrl.previewWarning]></div>
     </div>
     <oppia-conversation-skin></oppia-conversation-skin>
     <div class="navbar-fixed-bottom oppia-footer"></div>
+
   </div>
 
   <div class="oppia-preview-bottom-right-container">
-    <div class="oppia-parameter-summary" *ngIf="showParameterSummary()">
+    <div class="oppia-parameter-summary" ng-if="$ctrl.showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
-        <tr *ngFor="let item of allParams | keyvalue">
-          <td class="oppia-param-column">{{ item.key.paramName }}:</td>
+        <tr ng-repeat="(paramName, paramValue) in $ctrl.allParams">
+          <td class="oppia-param-column"><[paramName]>:</td>
           <td class="oppia-param-column">
-            {{ item.value.paramValue != "" ? item.value.paramValue : "[Not set]" }}
+            <[paramValue != "" ? paramValue : "[Not set]"]>
           </td>
         </tr>
       </table>
@@ -88,17 +89,14 @@
     white-space: normal;
     z-index: 1060;
   }
-
-  .oppia-param-column {
+  preview-tab .oppia-param-column {
     padding: 1px 5px;
   }
-
-  .oppia-reload-icon {
+  preview-tab .oppia-reload-icon {
     font-size: 18px;
     margin-bottom: 2px;
   }
-
-  .oppia-restart-text {
+  preview-tab .oppia-restart-text {
     margin-left: 10px;
     padding-top: 20px;
   }

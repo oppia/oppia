@@ -16,30 +16,23 @@
  * @fileoverview Component for the exploration objective/goal field in forms.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
+require(
+  'pages/exploration-editor-page/services/exploration-objective.service.ts');
 
-@Component({
-  selector: 'oppia-exploration-objective-editor',
-  templateUrl: './exploration-objective-editor.component.html'
-})
-export class ExplorationObjectiveEditorComponent {
-  @Input() labelText: string;
-  @Input() formStyle: string;
-  @Input() objectiveEditorClass: string;
-  @Output() onInputFieldBlur = new EventEmitter<void>();
-
-  constructor(
-    private explorationObjectiveService: ExplorationObjectiveService
-  ) {}
-
-  inputFieldBlur(): void {
-    this.onInputFieldBlur.emit();
-  }
-}
-
-angular.module('oppia').directive(
-  'oppiaExplorationObjectiveEditor', downgradeComponent({
-    component: ExplorationObjectiveEditorComponent
-  }));
+angular.module('oppia').component('explorationObjectiveEditor', {
+  bindings: {
+    // The text for the label of the field.
+    labelText: '@',
+    // Additional CSS style to define the width and font-weight.
+    formStyle: '@',
+    // The method to call when the input field is blurred.
+    onInputFieldBlur: '&'
+  },
+  template: require('./exploration-objective-editor.component.html'),
+  controller: [
+    '$scope', 'ExplorationObjectiveService',
+    function($scope, ExplorationObjectiveService) {
+      $scope.explorationObjectiveService = ExplorationObjectiveService;
+    }
+  ]
+});

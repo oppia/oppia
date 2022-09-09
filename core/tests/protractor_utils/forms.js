@@ -322,12 +322,9 @@ var UnicodeEditor = function(elem) {
 };
 
 var AutocompleteDropdownEditor = function(elem) {
-  var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
-  var searchInputLocator = by.css(
-    '.mat-select-search-input.mat-input-element');
-  var categorySelectorChoice = by.css(
-    '.e2e-test-exploration-category-selector-choice');
-
+  var containerLocator = by.css('.select2-container');
+  var dropdownElement = element(by.css('.select2-dropdown'));
+  var searchInputLocator = by.css('.select2-search input');
   return {
     setValue: async function(text) {
       await action.click('Container Element', elem.element(containerLocator));
@@ -337,20 +334,12 @@ var AutocompleteDropdownEditor = function(elem) {
       // field when it is 'activated', i.e. when the dropdown is clicked.
       await action.sendKeys(
         'Dropdown Element',
-        element(searchInputLocator),
-        text);
-
-      var searchInputLocatorText = element.all(by.cssContainingText(
-        '.e2e-test-exploration-category-selector-choice', text)).first();
-
-      await action.click(
-        'Dropdown Element Select',
-        searchInputLocatorText);
+        dropdownElement.element(searchInputLocator),
+        text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click('Container Element', elem.element(containerLocator));
-
-      var actualOptions = await element.all(categorySelectorChoice).map(
+      var actualOptions = await dropdownElement.all(by.tagName('li')).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
         }
@@ -359,7 +348,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // Re-close the dropdown.
       await action.sendKeys(
         'Dropdown Element',
-        element(searchInputLocator),
+        dropdownElement.element(searchInputLocator),
         '\n');
     }
   };

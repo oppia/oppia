@@ -44,32 +44,20 @@ var ExplorationEditorPage = function() {
   */
   var commitMessageInput = $('.e2e-test-commit-message-input');
   var confirmPublish = $('.e2e-test-confirm-publish');
-  var expCategoryDropdownElement = $(
-    '.e2e-test-exploration-category-metadata-modal');
+  var expCategoryDropdownElement = $('.e2e-test-exploration-category-dropdown');
   var expLanguageSelectorElement = $('.e2e-test-exploration-language-select');
-  var expLanguageSelectorElementModal = $(
-    '.e2e-test-exploration-language-select-modal');
   var explorationSaveModalElement = $('.e2e-test-exploration-save-modal');
   var expTagsSelectionChoiceElementsSelector = function() {
     return $$('.select2-selection__choice');
   };
   var expObjective = $('.e2e-test-exploration-objective-input');
-  var expInput = $('.e2e-test-chip-list-tags');
+  var expTags = $('.e2e-test-tags');
   var expTitle = $('.e2e-test-exploration-title-input');
-  var expTitleInPostPublishModal = $(
-    '.e2e-test-exploration-title-input-modal');
-  var expObjectiveInPostPublishModal = $(
-    '.e2e-test-exploration-objective-input-modal');
   var explorationMetadataModalHeaderElement = $(
     '.e2e-test-metadata-modal-header');
   var modalContentElement = $('.modal-content');
   var promptModalElement = $('.e2e-test-save-prompt-modal');
-  var languageChoiceOptionElement = function(language) {
-    return $$(
-      `.e2e-test-exploration-language-select-lan=${language}`);
-  };
-  var explorationCategoryDropdown = $(
-    '.e2e-test-exploration-category-dropdown');
+  var selectionRenderedElement = $('.select2-selection__rendered');
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
   var toastMessage = $('.e2e-test-toast-message');
 
@@ -153,15 +141,13 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
-    await action.setValue(
-      'Exploration title', expTitleInPostPublishModal, title);
+    await action.setValue('Exploration title', expTitle, title);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.setValue(
-      'Exploration objective', expObjectiveInPostPublishModal, objective);
+    await action.setValue('Exploration objective', expObjective, objective);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
@@ -178,18 +164,16 @@ var ExplorationEditorPage = function() {
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.click(
-      'Exploration Language', expLanguageSelectorElementModal);
-
-    var languageChoiceOption = await languageChoiceOptionElement(language)[0];
-    await action.click('Language input Choice', languageChoiceOption);
-
+    await action.select(
+      'Exploration Language', expLanguageSelectorElement,
+      language);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     for (var elem of tags) {
+      var expInput = expTags.$('<input>');
       await action.click('Exploration input', expInput);
       await action.setValue('Exploration input', expInput, elem + '\n');
       await action.click(
@@ -221,10 +205,10 @@ var ExplorationEditorPage = function() {
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
     var explorationCategory = await action.getText(
-      'Exploration Category Dropdown Element', explorationCategoryDropdown);
+      'Selection Rendered Element', selectionRenderedElement);
     var explorationLanguage = await action.getText(
       'Exploration Language Selector Element',
-      expLanguageSelectorElement);
+      expLanguageSelectorElement.$('option:checked'));
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
     var expTitleValue = await action.getValue(

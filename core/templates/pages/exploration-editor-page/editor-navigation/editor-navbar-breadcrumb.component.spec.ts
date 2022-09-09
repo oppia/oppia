@@ -16,98 +16,81 @@
  * @fileoverview Unit tests for editorNavbarBreadcrumb.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ExplorationTitleService } from '../services/exploration-title.service';
-import { RouterService } from '../services/router.service';
-import { EditorNavbarBreadcrumbComponent } from './editor-navbar-breadcrumb.component';
+import { EventEmitter } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-class MockNgbModal {
-  open(): { result: Promise<void> } {
-    return {
-      result: Promise.resolve()
-    };
-  }
-}
+describe('Editor Navbar Breadcrumb directive', function() {
+  var ctrl = null;
+  var $rootScope = null;
+  var $scope = null;
+  var ExplorationTitleService = null;
+  var FocusManagerService = null;
+  var RouterService = null;
 
-describe('Editor Navbar Breadcrumb component', () => {
-  let component: EditorNavbarBreadcrumbComponent;
-  let fixture: ComponentFixture<EditorNavbarBreadcrumbComponent>;
-  let explorationTitleService: ExplorationTitleService;
-  let focusManagerService: FocusManagerService;
-  let routerService: RouterService;
-  let mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+  var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [
-        EditorNavbarBreadcrumbComponent
-      ],
-      providers: [
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        },
-        ExplorationTitleService,
-        FocusManagerService,
-        RouterService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
+  importAllAngularServices();
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $rootScope = $injector.get('$rootScope');
+    ExplorationTitleService = $injector.get('ExplorationTitleService');
+    FocusManagerService = $injector.get('FocusManagerService');
+    RouterService = $injector.get('RouterService');
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(EditorNavbarBreadcrumbComponent);
-    component = fixture.componentInstance;
-
-    explorationTitleService = TestBed.inject(ExplorationTitleService);
-    focusManagerService = TestBed.inject(FocusManagerService);
-    routerService = TestBed.inject(RouterService);
-
-    explorationTitleService.init('Exploration Title Example Very Long');
+    ExplorationTitleService.init('Exploration Title Example Very Long');
 
     spyOnProperty(
-      explorationTitleService,
+      ExplorationTitleService,
       'onExplorationPropertyChanged').and.returnValue(
       mockExplorationPropertyChangedEventEmitter);
 
-    component.ngOnInit();
-  });
+    $scope = $rootScope.$new();
+    ctrl = $componentController('editorNavbarBreadcrumb', {
+      $scope: $scope
+    });
+    ctrl.$onInit();
+  }));
 
   afterEach(() => {
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
-  it('should initialize component properties after controller is initialized',
-    () => {
-      expect(component.navbarTitle).toBe(null);
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.navbarTitle).toBe(null);
     });
 
   it('should go to settings tabs and focus on exploration title input' +
-    ' when editing title', () => {
-    spyOn(routerService, 'navigateToSettingsTab');
-    spyOn(focusManagerService, 'setFocus');
+    ' when editing title', function() {
+    spyOn(RouterService, 'navigateToSettingsTab');
+    spyOn(FocusManagerService, 'setFocus');
 
-    component.editTitle();
+    $scope.editTitle();
 
-    expect(routerService.navigateToSettingsTab).toHaveBeenCalled();
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+    expect(RouterService.navigateToSettingsTab).toHaveBeenCalled();
+    expect(FocusManagerService.setFocus).toHaveBeenCalledWith(
       'explorationTitleInputFocusLabel');
   });
 
   it('should get an empty current tab name when there is no active tab',
-    () => {
-      spyOn(routerService, 'getActiveTabName').and.returnValue(null);
-      expect(component.getCurrentTabName()).toBe('');
+    function() {
+      spyOn(RouterService, 'getActiveTabName').and.returnValue(null);
+      expect($scope.getCurrentTabName()).toBe('');
     });
 
-  it('should get current tab name when there is an active tab', () => {
-    spyOn(routerService, 'getActiveTabName').and.returnValue('settings');
-    expect(component.getCurrentTabName()).toBe('Settings');
+  it('should get current tab name when there is an active tab', function() {
+    spyOn(RouterService, 'getActiveTabName').and.returnValue('settings');
+    expect($scope.getCurrentTabName()).toBe('Settings');
   });
 
   it('should update nav bar title when exploration property changes',
@@ -115,6 +98,6 @@ describe('Editor Navbar Breadcrumb component', () => {
       mockExplorationPropertyChangedEventEmitter.emit('title');
       tick();
 
-      expect(component.navbarTitle).toBe('Exploration Title...');
+      expect($scope.navbarTitle).toBe('Exploration Title...');
     }));
 });

@@ -17,44 +17,27 @@
  * text to speech data.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
-import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ChangeListService } from './change-list.service';
+require(
+  'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationAutomaticTextToSpeechService
-  extends ExplorationPropertyService {
-  propertyName: string = 'auto_tts_enabled';
+angular.module('oppia').factory('ExplorationAutomaticTextToSpeechService', [
+  'ExplorationPropertyService', function(ExplorationPropertyService) {
+    var child = Object.create(ExplorationPropertyService);
+    child.propertyName = 'auto_tts_enabled';
 
-  constructor(
-    protected alertsService: AlertsService,
-    protected changeListService: ChangeListService,
-    protected loggerService: LoggerService,
-  ) {
-    super(alertsService, changeListService, loggerService);
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
+    };
+
+    child.isAutomaticTextToSpeechEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleAutomaticTextToSpeech = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
+    };
+
+    return child;
   }
-
-  // TODO(#13015): Remove use of unknown as a type.
-  _isValid(value: unknown): boolean {
-    return (typeof value === 'boolean');
-  }
-
-  isAutomaticTextToSpeechEnabled(): boolean {
-    return (this.savedMemento as boolean);
-  }
-
-  toggleAutomaticTextToSpeech(): void {
-    this.displayed = !this.displayed;
-    this.saveDisplayedValue();
-  }
-}
-
-angular.module('oppia').factory(
-  'ExplorationAutomaticTextToSpeechService',
-  downgradeInjectable(
-    ExplorationAutomaticTextToSpeechService));
+]);

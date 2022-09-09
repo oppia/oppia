@@ -16,103 +16,97 @@
  * @fileoverview Component for the exploration graph.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { AlertsService } from 'services/alerts.service';
-import { GraphData } from 'services/compute-graph.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationGraphModalComponent } from '../templates/modal-templates/exploration-graph-modal.component';
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'exploration-graph-modal.controller.ts');
 
-@Component({
-  selector: 'oppia-exploration-graph',
-  templateUrl: './exploration-graph.component.html'
-})
-export class ExplorationGraphComponent {
-  checkpointCountWarning: string;
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/graph-data.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
+require('services/contextual/logger.service.ts');
 
-  constructor(
-    private alertsService: AlertsService,
-    private editabilityService: EditabilityService,
-    private explorationStatesService: ExplorationStatesService,
-    private explorationWarningsService: ExplorationWarningsService,
-    private graphDataService: GraphDataService,
-    private loggerService: LoggerService,
-    private ngbModal: NgbModal,
-    private routerService: RouterService,
-    private stateEditorService: StateEditorService,
-  ) { }
+angular.module('oppia').component('explorationGraph', {
+  template: require('./exploration-graph.component.html'),
+  controller: [
+    '$uibModal', 'AlertsService', 'EditabilityService',
+    'ExplorationStatesService', 'ExplorationWarningsService',
+    'GraphDataService', 'LoggerService', 'RouterService',
+    'StateEditorService',
+    function(
+        $uibModal, AlertsService, EditabilityService,
+        ExplorationStatesService, ExplorationWarningsService,
+        GraphDataService, LoggerService, RouterService,
+        StateEditorService) {
+      var ctrl = this;
+      // We hide the graph at the outset in order not to confuse new
+      // exploration creators.
+      ctrl.isGraphShown = function() {
+        return Boolean(ExplorationStatesService.isInitialized());
+      };
 
-  // We hide the graph at the outset in order not to confuse new
-  // exploration creators.
-  isGraphShown(): boolean {
-    return Boolean(this.explorationStatesService.isInitialized());
-  }
+      ctrl.deleteState = function(deleteStateName) {
+        ExplorationStatesService.deleteState(deleteStateName);
+      };
 
-  deleteState(deleteStateName: string): void {
-    this.explorationStatesService.deleteState(deleteStateName);
-  }
+      ctrl.onClickStateInMinimap = function(stateName) {
+        RouterService.navigateToMainTab(stateName);
+      };
 
-  onClickStateInMinimap(stateName: string): void {
-    this.routerService.navigateToMainTab(stateName);
-  }
+      ctrl.getActiveStateName = function() {
+        return StateEditorService.getActiveStateName();
+      };
 
-  getActiveStateName(): string {
-    return this.stateEditorService.getActiveStateName();
-  }
+      ctrl.getCheckpointCount = function() {
+        return ExplorationStatesService.getCheckpointCount();
+      };
 
-  getCheckpointCount(): number {
-    return this.explorationStatesService.getCheckpointCount();
-  }
+      ctrl.openStateGraphModal = function() {
+        AlertsService.clearWarnings();
 
-  openStateGraphModal(): void {
-    this.alertsService.clearWarnings();
+        $uibModal.open({
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
+            'modal-templates/exploration-graph-modal.template.html'),
+          backdrop: true,
+          resolve: {
+            isEditable: function() {
+              return ctrl.isEditable;
+            }
+          },
+          windowClass: 'oppia-large-modal-window exploration-graph-modal',
+          controller: 'ExplorationGraphModalController'
+        }).result.then(function(closeDict) {
+          if (closeDict.action === 'delete') {
+            ctrl.deleteState(closeDict.stateName);
+          } else if (closeDict.action === 'navigate') {
+            ctrl.onClickStateInMinimap(closeDict.stateName);
+          } else {
+            LoggerService.error(
+              'Invalid closeDict action: ' + closeDict.action);
+          }
+        }, function() {
+          AlertsService.clearWarnings();
+        });
+      };
 
-    const modalRef: NgbModalRef = this.ngbModal.open(
-      ExplorationGraphModalComponent, {
-        backdrop: true,
-        windowClass: 'oppia-large-modal-window exploration-graph-modal',
-      });
+      ctrl.getGraphData = function() {
+        return GraphDataService.getGraphData();
+      };
 
-    modalRef.componentInstance.isEditable = this.isEditable;
+      ctrl.isEditable = function() {
+        return EditabilityService.isEditable();
+      };
 
-    modalRef.result.then((closeDict) => {
-      if (closeDict.action === 'delete') {
-        this.deleteState(closeDict.stateName);
-      } else if (closeDict.action === 'navigate') {
-        this.onClickStateInMinimap(closeDict.stateName);
-      } else {
-        this.loggerService.error(
-          'Invalid closeDict action: ' + closeDict.action);
-      }
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
-  }
-
-  getGraphData(): GraphData {
-    return this.graphDataService.getGraphData();
-  }
-
-  isEditable(): boolean {
-    return this.editabilityService.isEditable();
-  }
-
-  showCheckpointCountWarningSign(): string {
-    this.checkpointCountWarning = (
-      this.explorationWarningsService.getCheckpointCountWarning());
-
-    return this.checkpointCountWarning;
-  }
-}
-
-angular.module('oppia').directive('oppiaExplorationGraph',
-  downgradeComponent({
-    component: ExplorationGraphComponent
-  }) as angular.IDirectiveFactory);
+      ctrl.showCheckpointCountWarningSign = function() {
+        ctrl.checkpointCountWarning = (
+          ExplorationWarningsService.getCheckpointCountWarning());
+        return ctrl.checkpointCountWarning;
+      };
+    }
+  ]
+});

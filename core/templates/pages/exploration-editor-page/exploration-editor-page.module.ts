@@ -24,7 +24,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -66,21 +65,6 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
 import { ExplorationMetadataDiffModalComponent } from './modal-templates/exploration-metadata-diff-modal.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { ExplorationTitleEditorComponent } from './exploration-title-editor/exploration-title-editor.component';
-import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor/exploration-objective-editor.component';
-import { ExplorationMetadataModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { ExplorationSaveModalComponent } from './modal-templates/exploration-save-modal.component';
-import { EditorNavbarBreadcrumbComponent } from './editor-navigation/editor-navbar-breadcrumb.component';
-import { ExplorationGraphModalComponent } from './editor-tab/templates/modal-templates/exploration-graph-modal.component';
-import { ExplorationGraphComponent } from './editor-tab/graph-directives/exploration-graph.component';
-import { StateNameEditorComponent } from './editor-tab/state-name-editor/state-name-editor.component';
-import { EditorNavigationComponent } from './editor-navigation/editor-navigation.component';
-import { TeachOppiaModalComponent } from './editor-tab/templates/modal-templates/teach-oppia-modal.component';
-import { SettingsTabComponent } from './settings-tab/settings-tab.component';
-import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
-import { PreviewTabComponent } from './preview-tab/preview-tab.component';
-import { HistoryTabComponent } from './history-tab/history-tab.component';
 
 @NgModule({
   imports: [
@@ -91,10 +75,6 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
-    MatAutocompleteModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatPaginatorModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -130,21 +110,7 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
-    ExplorationMetadataDiffModalComponent,
-    ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent,
-    EditorNavbarBreadcrumbComponent,
-    ExplorationGraphModalComponent,
-    ExplorationGraphComponent,
-    StateNameEditorComponent,
-    EditorNavigationComponent,
-    TeachOppiaModalComponent,
-    SettingsTabComponent,
-    UnresolvedAnswersOverviewComponent,
-    PreviewTabComponent,
-    HistoryTabComponent
+    ExplorationMetadataDiffModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -176,21 +142,7 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
-    ExplorationMetadataDiffModalComponent,
-    ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent,
-    EditorNavbarBreadcrumbComponent,
-    ExplorationGraphModalComponent,
-    ExplorationGraphComponent,
-    StateNameEditorComponent,
-    EditorNavigationComponent,
-    TeachOppiaModalComponent,
-    SettingsTabComponent,
-    UnresolvedAnswersOverviewComponent,
-    PreviewTabComponent,
-    HistoryTabComponent
+    ExplorationMetadataDiffModalComponent
   ],
   providers: [
     {
@@ -224,7 +176,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -13,22 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the component of the 'State Editor'.
+ * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, tick, ComponentFixture, flush } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { EditabilityService } from 'services/editability.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateNameService } from 'components/state-editor/state-editor-properties-services/state-name.service';
+import { StateEditorService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateNameService } from
+  'components/state-editor/state-editor-properties-services/state-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ExplorationImprovementsTaskRegistryService } from
+  'services/exploration-improvements-task-registry.service';
+import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateNameEditorComponent } from './state-name-editor.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 class MockExplorationDataService {
   explorationId: 0;
@@ -43,84 +46,85 @@ class MockExplorationDataService {
   }
 }
 
-describe('State Name Editor component', () => {
-  let component: StateNameEditorComponent;
-  let fixture: ComponentFixture<StateNameEditorComponent>;
-  let explorationStatesService: ExplorationStatesService;
-  let routerService: RouterService;
-  let stateEditorService: StateEditorService;
-  let stateNameService: StateNameService;
-  let mockExternalSaveEventEmitter = null;
+describe('State Name Editor component', function() {
+  var ctrl = null;
+  var $httpBackend = null;
+  var $rootScope = null;
+  var $scope = null;
+  var editabilityService = null;
+  var explorationStatesService = null;
+  var routerService = null;
+  var stateEditorService = null;
+  var stateNameService = null;
+  var mockExternalSaveEventEmitter = null;
+
   let explorationDataService: MockExplorationDataService;
   let autosaveChangeListSpy;
 
-  class MockNgbModal {
-    open() {
-      return {
-        result: Promise.resolve()
-      };
-    }
-  }
-  mockExternalSaveEventEmitter = new EventEmitter();
-  class MockExternalSaveService {
-    onExternalSave = mockExternalSaveEventEmitter;
-  }
 
-  beforeEach(() => {
+  var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+  var validAutosaveResponse = {
+    is_version_of_draft_valid: true
+  };
+
+  importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
+  beforeEach(angular.mock.module('directiveTemplates'));
+
+  beforeEach(function() {
     explorationDataService = new MockExplorationDataService();
-
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule
-      ],
-      declarations: [
-        StateNameEditorComponent
-      ],
+      imports: [HttpClientTestingModule],
       providers: [
-        EditabilityService,
-        ExplorationStatesService,
-        RouterService,
-        StateEditorService,
-        StateNameService,
         {
           provide: ExplorationDataService,
           useValue: explorationDataService
-        },
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        },
-        {
-          provide: ExternalSaveService,
-          useClass: MockExternalSaveService
         }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-  });
+      ]
+    });
 
+    editabilityService = TestBed.get(EditabilityService);
+    stateEditorService = TestBed.get(StateEditorService);
+    stateNameService = TestBed.get(StateNameService);
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(StateNameEditorComponent);
-    component = fixture.componentInstance;
-    stateEditorService = TestBed.inject(StateEditorService);
-    stateNameService = TestBed.inject(StateNameService);
-
-    explorationStatesService = TestBed.inject(ExplorationStatesService);
-    routerService = TestBed.inject(RouterService);
-
-    spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
     autosaveChangeListSpy = spyOn(
       explorationDataService, 'autosaveChangeListAsync');
+  });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
+      TestBed.get(ExplorationImprovementsTaskRegistryService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
+  }));
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $httpBackend = $injector.get('$httpBackend');
+    $rootScope = $injector.get('$rootScope');
+    explorationStatesService = $injector.get('ExplorationStatesService');
+    routerService = $injector.get('RouterService');
+    spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
 
     explorationStatesService.init({
       'First State': {
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'First State Content'
@@ -132,9 +136,6 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
-          solution: null,
           id: null,
           answer_groups: [],
           default_outcome: {
@@ -144,9 +145,6 @@ describe('State Name Editor component', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            labelled_as_correct: true,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
             param_changes: []
           },
           hints: []
@@ -161,10 +159,6 @@ describe('State Name Editor component', () => {
         },
       },
       'Second State': {
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'Second State Content'
@@ -176,9 +170,6 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
-          solution: null,
           id: null,
           answer_groups: [],
           default_outcome: {
@@ -188,9 +179,6 @@ describe('State Name Editor component', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            labelled_as_correct: true,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
             param_changes: []
           },
           hints: []
@@ -205,10 +193,6 @@ describe('State Name Editor component', () => {
         },
       },
       'Third State': {
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'This is some content.'
@@ -220,9 +204,6 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
-          solution: null,
           id: null,
           answer_groups: [],
           default_outcome: {
@@ -232,9 +213,6 @@ describe('State Name Editor component', () => {
               content_id: 'default_outcome',
               html: ''
             },
-            labelled_as_correct: true,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
             param_changes: []
           },
           hints: []
@@ -256,98 +234,104 @@ describe('State Name Editor component', () => {
         },
       }
     });
-    component.ngOnInit();
-  });
 
+    $scope = $rootScope.$new();
+    ctrl = $componentController('stateNameEditor', {
+      $scope: $scope,
+      EditabilityService: editabilityService,
+      StateEditorService: stateEditorService,
+      StateNameService: stateNameService
+    });
+    ctrl.$onInit();
+  }));
   afterEach(() => {
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should not save state name when it is longer than 50 characters',
-    () => {
-      expect(component.saveStateName(
+    function() {
+      expect(ctrl.saveStateName(
         'babababababababababababababababababababababababababab')).toBe(false);
     });
 
   it('should not save state names when it contains invalid characteres',
-    () => {
+    function() {
       stateEditorService.setActiveStateName('Third State');
-      component.initStateNameEditor();
-      expect(component.saveStateName('#')).toBe(false);
+      ctrl.initStateNameEditor();
+      expect(ctrl.saveStateName('#')).toBe(false);
     });
 
   it('should not save duplicate state names when trying to save a state' +
-    ' that already exists', () => {
-    expect(component.saveStateName('Second State')).toBe(false);
+    ' that already exists', function() {
+    expect(ctrl.saveStateName('Second State')).toBe(false);
   });
 
   it('should save state name and refresh to main tab when submitting' +
-    ' state name form', () => {
+    ' state name form', function() {
     spyOn(routerService, 'navigateToMainTab');
     stateEditorService.setActiveStateName('First State');
-    component.initStateNameEditor();
+    ctrl.initStateNameEditor();
 
-    component.saveStateNameAndRefresh('Fourth State');
+    ctrl.saveStateNameAndRefresh('Fourth State');
     expect(routerService.navigateToMainTab).toHaveBeenCalled();
   });
 
   it('should save state names independently when editting more than one state',
     fakeAsync(() => {
       stateEditorService.setActiveStateName('Third State');
-      component.saveStateName('Fourth State');
+      ctrl.saveStateName('Fourth State');
       tick(200);
       expect(explorationStatesService.getState('Fourth State')).toBeTruthy();
       expect(explorationStatesService.getState('Third State')).toBeFalsy();
 
       stateEditorService.setActiveStateName('First State');
-      component.saveStateName('Fifth State');
+      ctrl.saveStateName('Fifth State');
       tick(200);
       expect(explorationStatesService.getState('Fifth State')).toBeTruthy();
       expect(explorationStatesService.getState('First State')).toBeFalsy();
       expect(autosaveChangeListSpy).toHaveBeenCalled();
-
-      flush();
+      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
-  it('should not re-save state names when it did not changed', () => {
+  it('should not re-save state names when it did not changed', function() {
     stateEditorService.setActiveStateName('Second State');
-    component.initStateNameEditor();
-    component.openStateNameEditor();
-    expect(component.saveStateName('Second State')).toBe(false);
+    ctrl.initStateNameEditor();
+    ctrl.openStateNameEditor();
+    expect(ctrl.saveStateName('Second State')).toBe(false);
   });
 
-  it('should not change state name when state name edits fail', () => {
+  it('should not change state name when state name edits fail', function() {
     stateEditorService.setActiveStateName('Third State');
-    component.initStateNameEditor();
-    component.openStateNameEditor();
+    ctrl.initStateNameEditor();
+    ctrl.openStateNameEditor();
 
     // This is not a valid state name.
-    component.saveStateName('#!% State');
+    ctrl.saveStateName('#!% State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(autosaveChangeListSpy).not.toHaveBeenCalled();
 
     // Long state names will not save.
-    component.saveStateName(
+    ctrl.saveStateName(
       'This state name is too long to be saved. Try to be brief next time.'
     );
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(autosaveChangeListSpy).not.toHaveBeenCalled();
 
     // This will not save because it is an already existing state name.
-    component.saveStateName('First State');
+    ctrl.saveStateName('First State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(autosaveChangeListSpy).not.toHaveBeenCalled();
 
     // Will not save because the memento is the same as the new state name.
-    component.saveStateName('Third State');
+    ctrl.saveStateName('Third State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(autosaveChangeListSpy).not.toHaveBeenCalled();
   });
 
-  it('should save state name when ExternalSave event occurs', () => {
-    spyOn(component, 'saveStateName');
-    component.tmpStateName = 'SampleState';
+  it('should save state name when ExternalSave event occurs', function() {
+    spyOn(ctrl, 'saveStateName');
+    ctrl.tmpStateName = 'SampleState';
     mockExternalSaveEventEmitter.emit();
-    expect(component.saveStateName).toHaveBeenCalledWith('SampleState');
+    expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
   });
 });

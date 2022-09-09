@@ -127,12 +127,9 @@ var ExplorationEditorHistoryTab = function() {
        */
       selectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0.
-        await action.matSelect(
-          'Version Number1 Button', firstVersionDropdown, versionNumber1);
+        await firstVersionDropdown.selectByVisibleText(versionNumber1);
 
-        await action.matSelect(
-          'Version Number2 Button', secondVersionDropdown,
-          versionNumber2);
+        await secondVersionDropdown.selectByVisibleText(versionNumber2);
       },
       /*
        * This method compares the states in the history graph using each

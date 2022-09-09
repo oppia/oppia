@@ -13,123 +13,117 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the state name editor section of the state
+ * @fileoverview Directive for the state name editor section of the state
  * editor.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+require('domain/utilities/url-interpolation.service.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-name.service.ts');
+require('services/editability.service.ts');
+require('services/stateful/focus-manager.service.ts');
+require('services/external-save.service.ts');
+
+require('constants.ts');
+
 import { Subscription } from 'rxjs';
-import { AppConstants } from 'app.constants';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateNameService } from 'components/state-editor/state-editor-properties-services/state-name.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { EditabilityService } from 'services/editability.service';
 
-@Component({
-  selector: 'oppia-state-name-editor',
-  templateUrl: './state-name-editor.component.html'
-})
-export class StateNameEditorComponent
-  implements OnInit, OnDestroy {
-  directiveSubscriptions = new Subscription();
-  maxLen: number;
-  tmpStateName: string;
-  stateNameEditorIsShown: boolean;
+angular.module('oppia').component('stateNameEditor', {
+  template: require('./state-name-editor.component.html'),
+  controller: [
+    '$filter', 'EditabilityService',
+    'ExplorationStatesService',
+    'ExternalSaveService', 'FocusManagerService', 'RouterService',
+    'StateEditorService', 'StateNameService', 'MAX_STATE_NAME_LENGTH',
+    function(
+        $filter, EditabilityService,
+        ExplorationStatesService,
+        ExternalSaveService, FocusManagerService, RouterService,
+        StateEditorService, StateNameService, MAX_STATE_NAME_LENGTH) {
+      var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
 
-  constructor(
-    private editabilityService: EditabilityService,
-    private explorationStatesService: ExplorationStatesService,
-    private externalSaveService: ExternalSaveService,
-    private focusManagerService: FocusManagerService,
-    private normalizeWhitespacePipe: NormalizeWhitespacePipe,
-    private routerService: RouterService,
-    private stateEditorService: StateEditorService,
-    private stateNameService: StateNameService,
-  ) {}
+      ctrl.initStateNameEditor = function() {
+        StateNameService.init();
+      };
 
-  openStateNameEditor(): void {
-    let stateName = this.stateEditorService.getActiveStateName();
-    this.stateNameService.setStateNameEditorVisibility(true);
-    this.stateNameService.setStateNameSavedMemento(stateName);
-    this.maxLen = AppConstants.MAX_STATE_NAME_LENGTH;
-    this.tmpStateName = stateName;
-    this.focusManagerService.setFocus('stateNameEditorOpened');
-  }
+      ctrl.openStateNameEditor = function() {
+        var stateName = StateEditorService.getActiveStateName();
+        StateNameService.setStateNameEditorVisibility(true);
+        StateNameService.setStateNameSavedMemento(stateName);
+        ctrl.maxLen = MAX_STATE_NAME_LENGTH;
+        ctrl.tmpStateName = stateName;
+        FocusManagerService.setFocus('stateNameEditorOpened');
+      };
 
-  saveStateName(newStateName: string): boolean {
-    let normalizedNewName =
-      this._getNormalizedStateName(newStateName);
-    let savedMemento = this.stateNameService.getStateNameSavedMemento();
-    if (!this._isNewStateNameValid(normalizedNewName)) {
-      return false;
-    }
-    if (savedMemento === normalizedNewName) {
-      this.stateNameService.setStateNameEditorVisibility(false);
-      return false;
-    } else {
-      this.explorationStatesService.renameState(
-        this.stateEditorService.getActiveStateName(), normalizedNewName);
-      this.stateNameService.setStateNameEditorVisibility(false);
-      // Save the contents of other open fields.
-      this.externalSaveService.onExternalSave.emit();
-      this.initStateNameEditor();
-      return true;
-    }
-  }
-
-  saveStateNameAndRefresh(newStateName: string): void {
-    const normalizedStateName = (
-      this._getNormalizedStateName(newStateName));
-    const valid = this.saveStateName(normalizedStateName);
-
-    if (valid) {
-      this.routerService.navigateToMainTab(normalizedStateName);
-    }
-  }
-
-  _isNewStateNameValid(stateName: string): boolean {
-    if (stateName === this.stateEditorService.getActiveStateName()) {
-      return true;
-    }
-
-    return this.explorationStatesService.isNewStateNameValid(
-      stateName, true);
-  }
-
-  initStateNameEditor(): void {
-    this.stateNameService.init();
-  }
-
-  _getNormalizedStateName(newStateName: string): string {
-    return this.normalizeWhitespacePipe.transform(newStateName);
-  }
-
-  ngOnInit(): void {
-    this.directiveSubscriptions.add(
-      this.externalSaveService.onExternalSave.subscribe(
-        () => {
-          if (this.stateNameService.isStateNameEditorShown()) {
-            this.saveStateName(this.tmpStateName);
-          }
+      ctrl.saveStateName = function(newStateName) {
+        var normalizedNewName =
+          _getNormalizedStateName(newStateName);
+        var savedMemento = StateNameService.getStateNameSavedMemento();
+        if (!_isNewStateNameValid(normalizedNewName)) {
+          return false;
         }
-      )
-    );
+        if (savedMemento === normalizedNewName) {
+          StateNameService.setStateNameEditorVisibility(false);
+          return false;
+        } else {
+          ExplorationStatesService.renameState(
+            StateEditorService.getActiveStateName(), normalizedNewName);
+          StateNameService.setStateNameEditorVisibility(false);
+          // Save the contents of other open fields.
+          ExternalSaveService.onExternalSave.emit();
+          ctrl.initStateNameEditor();
+          return true;
+        }
+      };
 
-    this.stateNameService.init();
-    this.stateNameEditorIsShown = false;
-  }
+      var _getNormalizedStateName = function(newStateName) {
+        return $filter('normalizeWhitespace')(newStateName);
+      };
 
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
-  }
-}
+      var _isNewStateNameValid = function(stateName) {
+        if (stateName === StateEditorService.getActiveStateName()) {
+          return true;
+        }
+        return ExplorationStatesService.isNewStateNameValid(
+          stateName, true);
+      };
 
-angular.module('oppia').directive('oppiaStateNameEditor',
-  downgradeComponent({
-    component: StateNameEditorComponent
-  }) as angular.IDirectiveFactory);
+      ctrl.saveStateNameAndRefresh = function(newStateName) {
+        var normalizedStateName =
+          _getNormalizedStateName(newStateName);
+        var valid = ctrl.saveStateName(normalizedStateName);
+        if (valid) {
+          RouterService.navigateToMainTab(normalizedStateName);
+        }
+      };
+
+      ctrl.$onInit = function() {
+        ctrl.directiveSubscriptions.add(
+          ExternalSaveService.onExternalSave.subscribe(
+            () => {
+              if (StateNameService.isStateNameEditorShown()) {
+                ctrl.saveStateName(ctrl.tmpStateName);
+              }
+            }
+          )
+        );
+        StateNameService.init();
+        ctrl.EditabilityService = EditabilityService;
+        ctrl.StateEditorService = StateEditorService;
+        ctrl.StateNameService = StateNameService;
+        ctrl.stateNameEditorIsShown = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
+      };
+    }
+  ]
+});

@@ -26,7 +26,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +56,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string | boolean | ParamChange[]): void {
+  init(value: string | boolean): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }

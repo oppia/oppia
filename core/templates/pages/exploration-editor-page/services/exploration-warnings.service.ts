@@ -515,7 +515,7 @@ export class ExplorationWarningsService {
     return this.stateWarnings;
   }
 
-  getWarnings(): object[] | string[] {
+  getWarnings(): object[] {
     return this._warningsList;
   }
 

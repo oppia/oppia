@@ -42,7 +42,7 @@ interface LegendGraph {
   initStateId: string;
 }
 
-export interface DiffNodeData {
+interface DiffNodeData {
   nodes: NodesData;
   v2States: object;
   v1States: object;

@@ -37,7 +37,7 @@ export interface ExplorationGraphChangeList {
   directionForwards: boolean;
 }
 
-export interface StateData {
+interface StateData {
   [stateName: string]: {
     newestStateName: string;
     originalStateName: string;
@@ -45,7 +45,7 @@ export interface StateData {
   };
 }
 
-export interface StateIds {
+interface StateIds {
   [stateName: string]: number;
 }
 
@@ -54,7 +54,7 @@ interface StateIdsAndData {
   stateData: StateData;
 }
 
-export interface ProcessedStateIdsAndData {
+interface ProcessedStateIdsAndData {
   nodes: StateData;
   links: StateLink[];
   originalStateIds: StateIds;
@@ -73,7 +73,7 @@ interface ResultInterface {
   stateData: StateData;
 }
 
-export interface StateLink {
+interface StateLink {
   source: number;
   target: number;
   linkProperty: string;

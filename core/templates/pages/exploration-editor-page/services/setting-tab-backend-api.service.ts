@@ -21,11 +21,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 interface SettingTabBackendDict {
-  'draft_email_body': string;
+  'draftEmailBody': string;
 }
 
-export interface SettingTabResponse {
-  draft_email_body: string;
+interface SettingTabResponse {
+  draftEmailBody: string;
 }
 
 @Injectable({

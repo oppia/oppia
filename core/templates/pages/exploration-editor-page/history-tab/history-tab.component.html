@@ -1,20 +1,38 @@
 <div class="history-tab-container">
-  <mat-card class="oppia-editor-card history-table-card">
+  <md-card class="oppia-editor-card history-table-card">
     <div class="oppia-mobile-collapsible-card-header">
       <h3 class="history-card-header-text">History</h3>
     </div>
     <div class="oppia-mobile-collapsible-card-content">
       <div class="history-tab-header">
-        <mat-paginator [length]="versionCheckboxArray.length"
-                       [pageSize]="VERSIONS_PER_PAGE"
-                       class="pagination"
-                       [pageSizeOptions]="versionChoices"
-                       (page)="paginator($event)">
-        </mat-paginator>
+        <div>
+          Displaying <[$ctrl.startingIndex]>-<[$ctrl.endIndex]> of <[$ctrl.totalExplorationVersionMetadata.length]>
+        </div>
+        <div class="history-tab-pagination-container">
+          <div class="history-tab-select">
+            <span>View</span>
+            <select class="form-control" ng-model="$ctrl.VERSIONS_PER_PAGE"
+                    ng-change="$ctrl.changeItemsPerPage()"
+                    ng-options="choice as choice for choice in $ctrl.versionChoices">
+            </select>
+          </div>
+          <div uib-pagination
+               class="pagination"
+               boundary-link-numbers="true"
+               rotate="false"
+               max-size="5"
+               items-per-page="$ctrl.VERSIONS_PER_PAGE"
+               next-text=">"
+               previous-text="<"
+               total-items="$ctrl.versionCheckboxArray.length"
+               ng-model="$ctrl.displayedCurrentPageNumber"
+               ng-change="$ctrl.changeItemsPerPage()">
+          </div>
+        </div>
       </div>
       <div class="filter-container">
         <span>Filter</span>
-        <input class="oppia-autofocus" type="text" (change)="filterByUsername()" [(ngModel)]="username" placeholder="Search for a user" oppiaFocusOn="usernameInputField">
+        <input class="form-control oppia-autofocus" type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user" focus-on="usernameInputField">
         <i class="fa fa-search"></i>
       </div>
       <div class="history-table-header">
@@ -27,39 +45,39 @@
         <div class="history-table-header-profile">
           <span>User</span>
         </div>
-        <div class="history-table-header-date" (click)="reverseDateOrder()">
+        <div class="history-table-header-date" ng-click="$ctrl.reverseDateOrder()">
           <span>Date</span>
         </div>
       </div>
       <div class="display-container">
-        <span>Displaying {{ startingIndex }}-{{ endIndex }} of {{ totalExplorationVersionMetadata.length }}</span>
+        <span>Displaying <[$ctrl.startingIndex]>-<[$ctrl.endIndex]> of <[$ctrl.totalExplorationVersionMetadata.length]></span>
       </div>
-      <div *ngFor="let metadata of explorationVersionMetadata; index as index" class="history-list-item e2e-test-history-list-item">
+      <div ng-repeat="metadata in $ctrl.explorationVersionMetadata track by $index" class="history-list-item e2e-test-history-list-item">
         <div class="history-table-index">
-          {{ metadata.versionNumber }}.
+          <[metadata.versionNumber]>.
         </div>
         <div class="history-table-message">
-          {{ metadata.commitMessage }}
+          <[metadata.commitMessage]>
         </div>
         <div class="history-table-profile">
           <strong><profile-link-text [username]="metadata.committerId"></profile-link-text></strong>
         </div>
-        <div class="history-table-version" title="{{ metadata.tooltipText }}">
-          <em class="e2e-test-history-tab-commit-date">{{ metadata.createdOnMsecsStr }}</em>
+        <div class="history-table-version" title="<[metadata.tooltipText]>">
+          <em class="e2e-test-history-tab-commit-date"><[metadata.createdOnMsecsStr]></em>
         </div>
         <div class="history-table-options e2e-test-history-list-options">
           <div class="dropdown">
-            <div type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div type="button" id="<['dropdownMenuButton-' + $index]>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-ellipsis-v"></i>
             </div>
-            <div class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
+            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="<['dropdownMenuButton-' + $index]>">
               <a class="dropdown-item e2e-test-revert-version"
                  href="#"
-                 *ngIf="metadata.versionNumber !== currentVersion && isEditable()"
-                 (click)="showCheckRevertExplorationModal(metadata.versionNumber)">
+                 ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()"
+                 ng-click="$ctrl.showCheckRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
-              <a class="dropdown-item" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
+              <a class="dropdown-item" href="#" ng-click="$ctrl.downloadExplorationWithVersion(metadata.versionNumber)"
                  title="Download exploration as a zip file.">
                 Download
               </a>
@@ -69,148 +87,120 @@
       </div>
       <br>
       <div class="pagination-mobile">
-        <mat-paginator [length]="versionCheckboxArray.length"
-                       class="pagination"
-                       [pageSize]="VERSIONS_PER_PAGE"
-                       [pageSizeOptions]="versionChoices"
-                       (page)="paginator($event)">
-        </mat-paginator>
+        <div uib-pagination
+             class="pagination"
+             boundary-link-numbers="true"
+             rotate="false"
+             max-size="5"
+             items-per-page="$ctrl.VERSIONS_PER_PAGE"
+             next-text=">"
+             previous-text="<"
+             total-items="$ctrl.versionCheckboxArray.length"
+             ng-model="$ctrl.displayedCurrentPageNumber"
+             ng-change="$ctrl.changeItemsPerPage()">
+        </div>
       </div>
     </div>
-  </mat-card>
-  <mat-card class="oppia-editor-card oppia-mobile-collapsible-card">
+  </md-card>
+  <md-card class="oppia-editor-card oppia-mobile-collapsible-card">
     <div class="compare-revision-header oppia-mobile-collapsible-card-header">
       <h3 class="compare-header-text">Compare Revisions</h3>
       <i class="fa fa-caret-down"
-         *ngIf="!prerequisiteSkillIsShown"
+         ng-if="!prerequisiteSkillIsShown"
          aria-hidden="true">
       </i>
       <i class="fa fa-caret-up"
-         *ngIf="prerequisiteSkillIsShown"
+         ng-if="prerequisiteSkillIsShown"
          aria-hidden="true">
       </i>
     </div>
     <div class="oppia-mobile-collapsible-card-content">
       <div class="revision-container">
         <div class="revision-select-container">
-          <mat-form-field appearance="fill" class="e2e-test-history-version-dropdown-first">
-            <mat-label>Revision #1 :</mat-label>
-            <mat-select [(value)]="firstVersion" disableRipple>
-              <mat-option *ngFor="let choice of totalExplorationVersionMetadata ; index as index"
-                          [value]="choice"
-                          (click)="changeSelectedVersions(firstVersion, 1)">{{ choice.versionNumber }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <span>Revision #1</span>
+          <select class="form-control e2e-test-history-version-dropdown-first" ng-model="$ctrl.firstVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.firstVersion, 1)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
         </div>
         <div class="revision-select-container">
-          <mat-form-field appearance="fill" class="e2e-test-history-version-dropdown-second">
-            <mat-label>Revision #2 :</mat-label>
-            <mat-select [(value)]="secondVersion" disableRipple>
-              <mat-option *ngFor="let choice of totalExplorationVersionMetadata ; index as index"
-                          [value]="choice"
-                          (click)="changeSelectedVersions(secondVersion, 2)">{{ choice.versionNumber }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <span>Revision #2</span>
+          <select class="form-control e2e-test-history-version-dropdown-second" ng-model="$ctrl.secondVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.secondVersion, 2)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
         </div>
-        <button (click)="resetGraph()" class="btn btn-outline-secondary oppia-reset-button e2e-test-reset-graph">Reset</button>
+        <button ng-click="$ctrl.resetGraph()" class="btn btn-outline-secondary oppia-reset-button e2e-test-reset-graph">Reset</button>
       </div>
-      <div *ngIf="diffData && !hideHistoryGraph && explorationVersionMetadata" class="graph-diff-container">
+      <div ng-if="$ctrl.diffData && !$ctrl.hideHistoryGraph && $ctrl.explorationVersionMetadata" class="graph-diff-container">
         <h3>
-          Changes from version {{ compareVersionMetadata.earlierVersion.versionNumber }}
-          to version {{ compareVersionMetadata.laterVersion.versionNumber }}
+          Changes from version <[$ctrl.compareVersionMetadata.earlierVersion.versionNumber]>
+          to version <[$ctrl.compareVersionMetadata.laterVersion.versionNumber]>
         </h3>
         <div class="exploration-metadata-changes-container">
           Changes in exploration metadata (title, category etc.):
-          <a class="text-primary view-metadata-changes-button e2e-test-view-metadata-history" (click)="showExplorationMetadataDiffModal()">
+          <a class="text-primary view-metadata-changes-button e2e-test-view-metadata-history" ng-click="$ctrl.showExplorationMetadataDiffModal()">
             View metadata changes
           </a>
         </div>
         <div class="state-changes-container">
           <div>Changes in exploration states:</div>
-          <oppia-version-diff-visualization [diffData]="diffData"
-                                            [earlierVersionHeader]="earlierVersionHeader"
-                                            [laterVersionHeader]="laterVersionHeader">
+          <oppia-version-diff-visualization [diff-data]="$ctrl.diffData"
+                                            [earlier-version-header]="$ctrl.earlierVersionHeader"
+                                            [later-version-header]="$ctrl.laterVersionHeader">
           </oppia-version-diff-visualization>
         </div>
       </div>
     </div>
-  </mat-card>
+  </md-card>
 </div>
-
 <style>
-  .mat-form-field {
-    width: 100%;
-  }
-
-  .mat-paginator {
-    width: 100%;
-  }
-
-  .history-tab-container {
+  history-tab .history-tab-container {
     font-family: Roboto, Arial, sans-serif;
     word-wrap: break-word;
   }
-
-  .history-table-header {
+  history-tab .history-table-header {
     border-bottom: 2px solid #000;
     display: flex;
     padding-left: 0.5em;
   }
-
-  .history-table-header-date,
-  .history-table-header-message,
-  .history-table-header-profile,
-  .history-table-header-version {
+  history-tab .history-table-header-date,
+  history-tab .history-table-header-message,
+  history-tab .history-table-header-profile,
+  history-tab .history-table-header-version {
     font-weight: bold;
   }
-
-  .history-table-header-message {
+  history-tab  .history-table-header-message {
     width: 39%;
   }
-
-  .history-table-header-profile,
-  .history-table-header-date,
-  .history-table-header-version {
+  history-tab .history-table-header-profile,
+  history-tab .history-table-header-date,
+  history-tab .history-table-header-version {
     width: 20%;
   }
-
-  .history-table-header-date {
+  history-tab .history-table-header-date {
     cursor: pointer;
   }
-
-  .history-list-item {
+  history-tab .history-list-item {
     border-bottom: 1px solid #e6e6e6;
     display: flex;
     flex-wrap: wrap;
     padding: 16px 10px;
     position: relative;
   }
-
-  .history-table-message {
+  history-tab .history-table-message {
     width: 40%;
   }
-
-  .history-table-index,
-  .history-table-profile,
-  .history-table-version {
+  history-tab .history-table-index,
+  history-tab .history-table-profile,
+  history-tab .history-table-version {
     width: 20%;
   }
-
-  .pagination-page,
-  .pagination-prev,
-  .pagination-next {
+  history-tab .pagination-page,
+  history-tab .pagination-prev,
+  history-tab .pagination-next {
     padding: 0 10px;
   }
-
-  .pagination-page a {
+  history-tab .pagination-page a {
     color: #333;
     font-size: 14px;
     font-weight: bold;
   }
-
-  .active {
+  history-tab .active {
     align-items: center;
     background-color: rgba(65, 152, 137,0.2);
     border-radius: 50%;
@@ -219,202 +209,158 @@
     opacity: 0.8;
     text-align: center;
   }
-
-  .pagination-prev a,
-  .pagination-next a {
+  history-tab .pagination-prev a,
+  history-tab .pagination-next a {
     color: #000;
   }
-
-  .disabled {
+  history-tab .disabled {
     opacity: 0.4;
   }
-
-  .history-tab-header,
-  .history-tab-pagination-container {
+  history-tab .history-tab-header,
+  history-tab .history-tab-pagination-container {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
   }
-
-  .history-tab-header {
+  history-tab .history-tab-header {
     margin-bottom: 20px;
     margin-top: 20px;
-    position: absolute;
-    right: 0;
-    top: 0;
   }
-
-  .history-tab-pagination-container {
+  history-tab .history-tab-pagination-container {
     width: 47%;
   }
-
-  .history-tab-select {
+  history-tab .history-tab-select {
     align-items: center;
     display: flex;
     width: 30%;
   }
-
-  .history-tab-select span {
+  history-tab .history-tab-select span {
     margin-right: 5%;
   }
-
-  .history-table-options {
+  history-tab .history-table-options {
     position: absolute;
     right: 0;
   }
-
-  .filter-container {
-    margin-top: 20px;
+  history-tab .filter-container {
+    margin: 0 0 30px;
     position: relative;
     width: 35%;
   }
-
-  .filter-container i {
+  history-tab .filter-container i {
     bottom: 14%;
     color: #707070;
     position: absolute;
     right: 5%;
   }
-
-  .revision-container {
+  history-tab .revision-container {
     align-items: flex-end;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
   }
-
-  .revision-container .revision-select-container {
+  history-tab .revision-container .revision-select-container {
     width: 35%;
   }
-
-  .graph-diff-container {
+  history-tab .graph-diff-container {
     border-top: 1px solid #707070;
     margin-top: 30px;
   }
-
-  .history-card-header-text {
+  history-tab .history-card-header-text {
     font-size: 22px;
     margin-bottom: 0;
   }
-
-  .history-table-profile a {
+  history-tab .history-table-profile a {
     color: #00609c;
   }
-
-  .filter-container span {
+  history-tab .filter-container span {
     display: block;
     font-weight: bold;
   }
-
-  .compare-header-text {
+  history-tab .compare-header-text {
     font-size: 20px;
   }
-
-  .revision-select-container span {
+  history-tab .revision-select-container span {
     font-weight: bold;
   }
-
-  .pagination-mobile, .display-container {
+  history-tab .pagination-mobile, .display-container {
     display: none;
   }
-
-  .compare-revision-header i {
+  history-tab .compare-revision-header i {
     display: none;
   }
-
-  .oppia-reset-button {
+  history-tab .oppia-reset-button {
     height: 35px;
   }
-
-  .exploration-metadata-changes-container {
+  history-tab .exploration-metadata-changes-container {
     margin-bottom: 10px;
   }
-
-  .view-metadata-changes-button {
+  history-tab .view-metadata-changes-button {
     white-space: nowrap;
   }
   @media screen and (max-width: 768px) {
-    .revision-container .revision-select-container {
+    history-tab .revision-container .revision-select-container {
       width: 47%;
     }
-
-    .compare-revision-header {
+    history-tab .compare-revision-header {
       display: flex;
       justify-content: space-between;
     }
-
-    .compare-header-text {
+    history-tab .compare-header-text {
       margin: 0;
     }
-
-    .history-tab-select {
+    history-tab .history-tab-select {
       display: none;
     }
-
-    .history-table-card {
+    history-tab .history-table-card {
       padding: 0;
     }
-
-    .history-card-header-text {
+    history-tab .history-card-header-text {
       margin: 0;
     }
-
-    .history-table-message {
+    history-tab .history-table-message {
       order: 10;
       width: 100%;
     }
-
-    .history-table-profile {
+    history-tab .history-table-profile {
       order: 2;
       width: 90%;
     }
-
-    .history-table-version {
+    history-tab .history-table-version {
       color: #707070;
       order: 8;
       width: 100%;
     }
-
-    .history-table-header {
+    history-tab .history-table-header {
       display: none;
     }
-
-    .dropdown-menu-left {
+    history-tab .dropdown-menu-left {
       left: -140px;
     }
-
-    .history-table-options {
+    history-tab .history-table-options {
       right: 40px;
     }
-
-    .pagination-mobile {
+    history-tab .pagination-mobile {
       display: block;
       margin: 0 auto;
     }
-
-    .history-tab-header {
+    history-tab .history-tab-header {
       display: none;
     }
-
-    .history-list-item {
+    history-tab .history-list-item {
       margin: 0 auto;
       padding: 10px 0;
     }
-
-    .pagination {
+    history-tab .pagination {
       justify-content: center;
     }
-
-    .display-container {
+    history-tab .display-container {
       color: #707070;
     }
-
-    .filter-container {
+    history-tab .filter-container {
       margin: 0 0 20px;
     }
-
-    .compare-revision-header i {
+    history-tab .compare-revision-header i {
       display: block;
     }
   }

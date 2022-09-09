@@ -16,203 +16,160 @@
  * @fileoverview Unit tests for explorationGraph.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { NgbModule, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationGraphModalComponent } from '../templates/modal-templates/exploration-graph-modal.component';
-import { ExplorationGraphComponent } from './exploration-graph.component';
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Exploration Graph Component', () => {
-  let component: ExplorationGraphComponent;
-  let fixture: ComponentFixture<ExplorationGraphComponent>;
-  let alertsService: AlertsService;
-  let editabilityService: EditabilityService;
-  let explorationStatesService: ExplorationStatesService;
-  let explorationWarningsService: ExplorationWarningsService;
-  let loggerService: LoggerService;
-  let routerService: RouterService;
-  let stateEditorService: StateEditorService;
-  let ngbModal: NgbModal;
-  let isEditableSpy;
+describe('Exploration Graph Component', function() {
+  var ctrl = null;
+  var $q = null;
+  var $rootScope = null;
+  var $uibModal = null;
+  var alertsService = null;
+  var editabilityService = null;
+  var explorationStatesService = null;
+  var explorationWarningsService = null;
+  var loggerService = null;
+  var routerService = null;
+  var stateEditorService = null;
 
-  class MockNgbModal {
-    open() {
-      return {
-        result: Promise.resolve()
-      };
-    }
-  }
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModule
-      ],
-      declarations: [
-        ExplorationGraphComponent,
-        ExplorationGraphModalComponent,
-      ],
-      providers: [
-        StateEditorService,
-        RouterService,
-        LoggerService,
-        ExplorationWarningsService,
-        ExplorationStatesService,
-        EditabilityService,
-        AlertsService,
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
     });
-  });
+  }));
+  importAllAngularServices();
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
+    $uibModal = $injector.get('$uibModal');
+    alertsService = $injector.get('AlertsService');
+    editabilityService = $injector.get('EditabilityService');
+    explorationStatesService = $injector.get('ExplorationStatesService');
+    explorationWarningsService = $injector.get('ExplorationWarningsService');
+    loggerService = $injector.get('LoggerService');
+    routerService = $injector.get('RouterService');
+    stateEditorService = $injector.get('StateEditorService');
 
-  beforeEach(() => {
-    ngbModal = TestBed.inject(NgbModal);
-    alertsService = TestBed.inject(AlertsService);
-    editabilityService = TestBed.inject(EditabilityService);
-    explorationStatesService = TestBed.inject(ExplorationStatesService);
-    explorationWarningsService = TestBed.inject(ExplorationWarningsService);
-    loggerService = TestBed.inject(LoggerService);
-    routerService = TestBed.inject(RouterService);
-    stateEditorService = TestBed.inject(StateEditorService);
-
-    isEditableSpy = spyOn(editabilityService, 'isEditable');
-    isEditableSpy.and.returnValue(true);
-
-    fixture = TestBed.createComponent(ExplorationGraphComponent);
-    component = fixture.componentInstance;
-  });
-
+    ctrl = $componentController('explorationGraph', {
+      $uibModal: $uibModal,
+    });
+  }));
 
   it('should show graph when exploration states service is initialized',
-    () => {
-      expect(component.isGraphShown()).toBe(false);
+    function() {
+      expect(ctrl.isGraphShown()).toBe(false);
       explorationStatesService.init({});
-      expect(component.isGraphShown()).toBe(true);
+      expect(ctrl.isGraphShown()).toBe(true);
     });
 
-  it('should get name from the active state', () => {
+  it('should get name from the active state', function() {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
-    expect(component.getActiveStateName()).toBe('Introduction');
+    expect(ctrl.getActiveStateName()).toBe('Introduction');
   });
 
   it('should get null graph data from graph data service when it is not' +
-    ' recomputed', () => {
-    expect(component.isGraphShown()).toBe(false);
-    expect(component.getGraphData()).toBe(null);
+    ' recomputed', function() {
+    expect(ctrl.isGraphShown()).toBe(false);
+    expect(ctrl.getGraphData()).toBe(null);
   });
 
-  it('should evaluate if exploration graph is editable', () => {
+  it('should evaluate if exploration graph is editable', function() {
+    var isEditableSpy = spyOn(editabilityService, 'isEditable');
     isEditableSpy.and.returnValue(true);
-
-    expect(component.isEditable()).toBe(true);
-
+    expect(ctrl.isEditable()).toBe(true);
     isEditableSpy.and.returnValue(false);
-
-    expect(component.isEditable()).toBe(false);
+    expect(ctrl.isEditable()).toBe(false);
   });
 
+  it('should open state graph modal', function() {
+    var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
 
-  it('should delete state when closing state graph modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        isEditable: true,
-      },
-      result: Promise.resolve({
+    ctrl.openStateGraphModal();
+    $rootScope.$apply();
+
+    expect(modalOpenSpy).toHaveBeenCalled();
+  });
+
+  it('should delete state when closing state graph modal', function() {
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve({
         action: 'delete',
         stateName: 'Introduction'
       })
-    } as NgbModalRef);
+    });
     spyOn(explorationStatesService, 'deleteState');
 
-    component.openStateGraphModal();
-    tick();
+    ctrl.openStateGraphModal();
+    $rootScope.$apply();
 
     expect(explorationStatesService.deleteState).toHaveBeenCalledWith(
       'Introduction');
-  }));
+  });
 
   it('should navigate to main tab when closing state graph modal',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          isEditable: true,
-        },
-        result: Promise.resolve({
+    function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
           action: 'navigate',
           stateName: 'Introduction'
         })
-      } as NgbModalRef);
+      });
       spyOn(routerService, 'navigateToMainTab');
 
-      component.openStateGraphModal();
-      tick();
+      ctrl.openStateGraphModal();
+      $rootScope.$apply();
 
       expect(routerService.navigateToMainTab).toHaveBeenCalledWith(
         'Introduction');
-    }));
+    });
 
   it('should handle invalid actions when state graph modal is opened',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          isEditable: true,
-        },
-        result: Promise.resolve({
+    function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
           action: 'add',
           stateName: 'Introduction'
         })
-      } as NgbModalRef);
+      });
       spyOn(loggerService, 'error');
 
-      component.openStateGraphModal();
-      tick();
+      ctrl.openStateGraphModal();
+      $rootScope.$apply();
 
       expect(loggerService.error).toHaveBeenCalledWith(
         'Invalid closeDict action: add');
-    }));
+    });
 
-  it('should dismiss state graph modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        isEditable: true,
-      },
-      result: Promise.reject()
-    } as NgbModalRef);
+  it('should dismiss state graph modal', function() {
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
     spyOn(alertsService, 'clearWarnings');
 
-    component.openStateGraphModal();
-    tick();
+    ctrl.openStateGraphModal();
+    $rootScope.$apply();
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
-  }));
-
-  it('should return checkpoint count', () => {
-    spyOn(explorationStatesService, 'getCheckpointCount').and.returnValue(5);
-
-    expect(component.getCheckpointCount()).toEqual(5);
   });
 
-  it('should return checkpoint count warning', () => {
+  it('should return checkpoint count', function() {
+    spyOn(explorationStatesService, 'getCheckpointCount').and.returnValue(5);
+
+    expect(ctrl.getCheckpointCount()).toEqual(5);
+  });
+
+  it('should return checkpoint count warning', function() {
     spyOn(explorationWarningsService, 'getCheckpointCountWarning').and
       .returnValue('Only a maximum of 8 checkpoints are allowed per lesson.');
 
-    expect(component.showCheckpointCountWarningSign()).toEqual(
+    expect(ctrl.showCheckpointCountWarningSign()).toEqual(
       'Only a maximum of 8 checkpoints are allowed per lesson.');
-    expect(component.checkpointCountWarning).toEqual(
+    expect(ctrl.checkpointCountWarning).toEqual(
       'Only a maximum of 8 checkpoints are allowed per lesson.');
   });
 });

@@ -266,7 +266,8 @@ var _addExplorationRole = async function(roleName, username) {
     'Username input',
     $('.e2e-test-role-username'),
     username);
-  await action.matSelect('Role select', $('.e2e-test-role-select'), roleName);
+  await action.select(
+    'Role select', $('.e2e-test-role-select'), roleName);
   await action.click(
     'Save role', $('.e2e-test-save-role'));
 };
@@ -297,7 +298,7 @@ var addExplorationPlaytester = async function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
-  var explorationRoleNameLocator = '.e2e-test-' + roleName + '-role-names';
+  var explorationRoleNameLocator = '.e2e-test-role-' + roleName + '-name';
   return await $$(explorationRoleNameLocator).map(async function(elem) {
     return await elem.getText();
   });

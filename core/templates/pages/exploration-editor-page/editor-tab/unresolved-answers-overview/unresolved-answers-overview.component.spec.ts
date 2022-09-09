@@ -16,199 +16,207 @@
  * @fileoverview Unit tests for unresolvedAnswersOverview.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditabilityService } from 'services/editability.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ImprovementsService } from 'services/improvements.service';
-import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
-import { UnresolvedAnswersOverviewComponent } from './unresolved-answers-overview.component';
-import { ExternalSaveService } from 'services/external-save.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Unresolved Answers Overview Component', () => {
-  let component: UnresolvedAnswersOverviewComponent;
-  let fixture: ComponentFixture<UnresolvedAnswersOverviewComponent>;
-  let ngbModal: NgbModal;
-  let editabilityService: EditabilityService;
-  let explorationStatesService: ExplorationStatesService;
-  let improvementsService: ImprovementsService;
-  let stateInteractionIdService: StateInteractionIdService;
-  let stateEditorService: StateEditorService;
-  let stateTopAnswersStatsService: StateTopAnswersStatsService;
+describe('Unresolved Answers Overview Component', function() {
+  var $q = null;
+  var $rootScope = null;
+  var $scope = null;
+  var $uibModal = null;
+  var editabilityService = null;
+  var explorationStatesService = null;
+  var improvementsService = null;
+  var stateInteractionIdService = null;
+  var stateEditorService = null;
+  var stateTopAnswersStatsService = null;
 
-  let mockExternalSaveEventEmitter = new EventEmitter();
+  var mockExternalSaveEventEmitter = null;
 
-  let stateName = 'State1';
+  var stateName = 'State1';
 
-  class MockNgbModal {
-    open() {
-      return {
-        result: Promise.resolve()
-      };
-    }
-  }
+  importAllAngularServices();
 
-  class MockExternalSaveService {
-    onExternalSave = mockExternalSaveEventEmitter;
-  }
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [
-        UnresolvedAnswersOverviewComponent
-      ],
-      providers: [
-        EditabilityService,
-        ExplorationStatesService,
-        ImprovementsService,
-        StateInteractionIdService,
-        StateEditorService,
-        StateTopAnswersStatsService,
-        {
-          provide: ExternalSaveService,
-          useClass: MockExternalSaveService
-        },
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
   }));
-
-
   beforeEach(() => {
-    fixture = TestBed.createComponent(UnresolvedAnswersOverviewComponent);
-    component = fixture.componentInstance;
-
-    editabilityService = TestBed.inject(EditabilityService);
-    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    explorationStatesService = TestBed.inject(ExplorationStatesService);
-    improvementsService = TestBed.inject(ImprovementsService);
-    stateEditorService = TestBed.inject(StateEditorService);
-    stateTopAnswersStatsService = TestBed.inject(StateTopAnswersStatsService);
-    ngbModal = TestBed.inject(NgbModal);
-
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
-    spyOn(explorationStatesService, 'getState').and.returnValue(null);
-
-    component.ngOnInit();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
   });
 
-  it('should initialize component properties after controller is initialized',
-    () => {
-      expect(component.unresolvedAnswersOverviewIsShown).toBe(false);
-      expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
+  beforeEach(function() {
+    editabilityService = TestBed.get(EditabilityService);
+    stateInteractionIdService = TestBed.get(StateInteractionIdService);
+  });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+  }));
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
+    $uibModal = $injector.get('$uibModal');
+    explorationStatesService = $injector.get('ExplorationStatesService');
+    improvementsService = $injector.get('ImprovementsService');
+    stateEditorService = $injector.get('StateEditorService');
+    stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
+
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
+    spyOn(explorationStatesService, 'getState').and.returnValue({});
+
+    $scope = $rootScope.$new();
+    var ctrl = $componentController('unresolvedAnswersOverview', {
+      $rootScope: $rootScope,
+      $scope: $scope,
+      EditabilityService: editabilityService,
+      StateInteractionIdService: stateInteractionIdService
+    });
+    ctrl.$onInit();
+  }));
+
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.unresolvedAnswersOverviewIsShown).toBe(false);
+      expect($scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
     });
 
   it('should check unresolved answers overview are shown when it has' +
-    ' state stats', () => {
+    ' state stats', function() {
     spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
     spyOn(
       improvementsService,
       'isStateForcedToResolveOutstandingUnaddressedAnswers')
       .and.returnValue(true);
 
-    expect(component.isUnresolvedAnswersOverviewShown()).toBe(true);
+    expect($scope.isUnresolvedAnswersOverviewShown()).toBe(true);
   });
 
   it('should check unresolved answers overview are not shown when it' +
-    ' has no state stats', () => {
+    ' has no state stats', function() {
     spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(false);
     spyOn(
       improvementsService,
       'isStateForcedToResolveOutstandingUnaddressedAnswers');
 
-    expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
+    expect($scope.isUnresolvedAnswersOverviewShown()).toBe(false);
     expect(
       improvementsService.isStateForcedToResolveOutstandingUnaddressedAnswers)
       .not.toHaveBeenCalled();
   });
 
   it('should check unresolved answers overview are not shown when' +
-    ' the state is not forced to resolved unaddressed answers', () => {
+    ' the state is not forced to resolved unaddressed answers', function() {
     spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
     spyOn(
       improvementsService,
       'isStateForcedToResolveOutstandingUnaddressedAnswers')
       .and.returnValue(false);
 
-    expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
+    expect($scope.isUnresolvedAnswersOverviewShown()).toBe(false);
   });
 
   it('should check whenever the current interaction is trainable or not',
-    () => {
+    function() {
       stateInteractionIdService.init(stateName, 'CodeRepl');
-      expect(component.getCurrentInteractionId()).toBe('CodeRepl');
-      expect(component.isCurrentInteractionTrainable()).toBe(true);
+      expect($scope.getCurrentInteractionId()).toBe('CodeRepl');
+      expect($scope.isCurrentInteractionTrainable()).toBe(true);
 
       stateInteractionIdService.init(stateName, 'Continue');
-      expect(component.getCurrentInteractionId()).toBe('Continue');
-      expect(component.isCurrentInteractionTrainable()).toBe(false);
+      expect($scope.getCurrentInteractionId()).toBe('Continue');
+      expect($scope.isCurrentInteractionTrainable()).toBe(false);
     });
 
   it('should check whenever the current interaction is linear or not',
-    () => {
+    function() {
       stateInteractionIdService.init(stateName, 'Continue');
-      expect(component.getCurrentInteractionId()).toBe('Continue');
-      expect(component.isCurrentInteractionLinear()).toBe(true);
+      expect($scope.getCurrentInteractionId()).toBe('Continue');
+      expect($scope.isCurrentInteractionLinear()).toBe(true);
 
       stateInteractionIdService.init(stateName, 'PencilCodeEditor');
-      expect(component.getCurrentInteractionId()).toBe('PencilCodeEditor');
-      expect(component.isCurrentInteractionLinear()).toBe(false);
+      expect($scope.getCurrentInteractionId()).toBe('PencilCodeEditor');
+      expect($scope.isCurrentInteractionLinear()).toBe(false);
     });
 
-  it('should check editability when outside tutorial mode', () => {
-    let editabilitySpy = spyOn(
+  it('should check editability when outside tutorial mode', function() {
+    var editabilitySpy = spyOn(
       editabilityService, 'isEditableOutsideTutorialMode');
 
     editabilitySpy.and.returnValue(true);
-    expect(component.isEditableOutsideTutorialMode()).toBe(true);
+    expect($scope.isEditableOutsideTutorialMode()).toBe(true);
 
     editabilitySpy.and.returnValue(false);
-    expect(component.isEditableOutsideTutorialMode()).toBe(false);
+    expect($scope.isEditableOutsideTutorialMode()).toBe(false);
   });
 
-  it('should open teach oppia modal', () => {
-    spyOn(ngbModal, 'open').and.callThrough();
+  it('should open teach oppia modal', function() {
+    spyOn($uibModal, 'open').and.callThrough();
 
-    component.openTeachOppiaModal();
+    $scope.openTeachOppiaModal();
 
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('should emit externalSave when closing the modal', () => {
+  it('should emit externalSave when closing the modal', function() {
     spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    } as NgbModalRef);
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
 
-    component.openTeachOppiaModal();
+    $scope.openTeachOppiaModal();
+    $rootScope.$apply();
 
     expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
   });
 
   it('should broadcast externalSave flag when dismissing the modal',
-    () => {
+    function() {
       spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
-      } as NgbModalRef);
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
 
-      component.openTeachOppiaModal();
+      $scope.openTeachOppiaModal();
+      $rootScope.$apply();
 
       expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
     });
 
-  it('should fetch unresolved state stats from backend', () => {
+  it('should fetch unresolved state stats from backend', function() {
+    var unresolvedAnswers = [{
+      answer: {},
+      answerHtml: 'This is the answer html',
+      frequency: 2,
+      isAddressed: true
+    }];
     spyOn(stateTopAnswersStatsService, 'getUnresolvedStateStats').and
-      .returnValue(null);
-    expect(component.getUnresolvedStateStats()).toEqual(null);
+      .returnValue(unresolvedAnswers);
+    expect($scope.getUnresolvedStateStats()).toEqual(unresolvedAnswers);
   });
 });

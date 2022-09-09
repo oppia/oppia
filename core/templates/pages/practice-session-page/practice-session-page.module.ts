@@ -48,12 +48,6 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
-  declarations: [
-    PracticeSessionPageComponent
-  ],
-  entryComponents: [
-    PracticeSessionPageComponent
-  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
@@ -85,7 +79,6 @@ class PracticeSessionPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
-import { PracticeSessionPageComponent } from './practice-session-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
