@@ -453,11 +453,11 @@
 .save-progress-menu .uid-box .uid-copy .uid-btn-container .uid-btn-message-box {
   background-color: #00645c;
   border-radius: 4px;
-  color: white;
+  color: #fff;
   cursor: default;
   display: none;
   font-size: 14px;
-  font-style: Roboto, sans-serif;
+  font-style: Roboto, Arial, sans-serif;
   padding: 8px 10px;
   position: absolute;
   right: 0;
@@ -466,8 +466,7 @@
 
 .save-progress-menu .uid-box .uid-copy .uid-btn-container .uid-btn-message-arrow {
   background-color: #00645c;
-  color: white;
-  content: "";
+  color: #fff;
   cursor: default;
   display: none;
   height: 10px;
