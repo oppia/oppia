@@ -55,6 +55,15 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
                 'derived class.')):
             base_models.BaseModel.get_deletion_policy()
 
+    def test_apply_deletion_policy(self) -> None:
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            re.escape(
+                'The apply_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.')):
+            base_models.BaseModel.apply_deletion_policy('test_user_id')
+
     def test_has_reference_to_user_id(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
@@ -510,7 +519,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self) -> None:
         version_model = TestVersionedModel(id='version_model')
         model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
-            'model_id-1', 'committer_id', 'create', None, None)
+            'model_id-1', 'committer_id', 'create', None, [])
         model1.update_timestamps()
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
@@ -536,7 +545,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         version_model = TestVersionedModel(id='version_model')
         model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
             'model_id-1', 'committer_id', 'create',
-            'Test uid_abcdefghijabcdefghijabcdefghijab', None)
+            'Test uid_abcdefghijabcdefghijabcdefghijab', [])
         model1.update_timestamps()
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(

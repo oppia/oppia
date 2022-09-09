@@ -26,7 +26,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var explorationCategoryInput = $('.e2e-test-exploration-category-input');
+  var explorationCategory = $('.e2e-test-exploration-category');
   var explorationLanguageInput = $('.e2e-test-exploration-language-select');
   var explorationObjectiveInput = $('.e2e-test-exploration-objective-input');
   var explorationObjectiveWarning = $(
@@ -35,8 +35,10 @@ var ExplorationEditorSettingsTab = function() {
   var explorationTitleInput = $('.e2e-test-exploration-title-input');
   var initialStateSelect = $('.e2e-test-initial-state-select');
   var initialStateSelectOption = function(stateName) {
-    return initialStateSelect.$(`option=${stateName}`);
+    return $(`.e2e-test-initial-state-select-element=${stateName}`);
   };
+  var explorationCategoryDropdown = $(
+    '.e2e-test-exploration-category-dropdown');
   var neutralElement = $('.e2e-test-settings-container');
 
   /*
@@ -74,16 +76,27 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    var options = await initialStateSelect.$$('<option>')
-      .map(async function(elem) {
-        await waitFor.visibilityOf(
-          elem,
-          'option element taking too long to appear');
-        return await elem.getText();
-      });
+    let selectedStateName = await initialStateSelect.getText();
+
+    await action.click('State Dropdown element', initialStateSelect);
+
+    var options = await $$(
+      '.e2e-test-initial-state-select-element').map(async function(elem) {
+      await waitFor.visibilityOf(
+        elem,
+        'option element taking too long to appear');
+      return await elem.getText();
+    });
+
     expect(options.sort()).toEqual(names.sort());
+
+    // Now that we have opened the dropdown and
+    // checked all its available options, the below code closes the dropdown.
+    await action.click(
+      'State name option', initialStateSelectOption(selectedStateName));
+    await action.click('Neutral element', neutralElement);
   };
 
   this.openAndClosePreviewSummaryTile = async function() {
@@ -102,9 +115,9 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setCategory = async function(category) {
     await waitFor.presenceOf(
-      explorationCategoryInput, 'Category input takes too long to be visible.');
+      explorationCategory, 'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(explorationCategoryInput)
+      await forms.AutocompleteDropdownEditor(explorationCategory)
     ).setValue(category);
   };
 
@@ -112,14 +125,19 @@ var ExplorationEditorSettingsTab = function() {
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
+    await action.click('State Dropdown element', initialStateSelect);
+
     await action.click(
       'State name option', initialStateSelectOption(stateName));
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setLanguage = async function(language) {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    await explorationLanguageInput.selectByVisibleText(language);
+    await action.matSelect(
+      'Exploration Language', explorationLanguageInput, language);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setObjective = async function(objective) {
@@ -127,6 +145,7 @@ var ExplorationEditorSettingsTab = function() {
       'Exploration Objective input', explorationObjectiveInput);
     await action.setValue(
       'Exploration Objective input', explorationObjectiveInput, objective);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setTitle = async function(title) {
@@ -139,38 +158,41 @@ var ExplorationEditorSettingsTab = function() {
 
   this.expectCategoryToBe = async function(category) {
     await waitFor.presenceOf(
-      explorationCategoryInput,
+      explorationCategory,
       'Exploration category input takes too long to be visible.');
-    expect(await explorationCategoryInput.$('option:checked').getText()).
+    expect(await explorationCategoryDropdown.getText()).
       toEqual(category);
   };
 
   this.expectFirstStateToBe = async function(firstState) {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    expect(await initialStateSelect.$('option:checked').getText()).
-      toEqual(firstState);
+    await waitFor.textToBePresentInElement(
+      initialStateSelect,
+      firstState,
+      `Initial state is not set as ${firstState}`);
   };
 
   this.expectLanguageToBe = async function(language) {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    expect(await explorationLanguageInput.$('option:checked').getText()).
+    expect(await explorationLanguageInput.getText()).
       toEqual(language);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.expectObjectiveToBe = async function(objective) {
     await waitFor.presenceOf(
       explorationObjectiveInput,
       'Objective input takes too long to be visible.');
-    expect(await explorationObjectiveInput.getAttribute('value')).
+    expect(await explorationObjectiveInput.getValue()).
       toEqual(objective);
   };
 
   this.expectTitleToBe = async function(title) {
     await waitFor.presenceOf(
       explorationTitleInput, 'Title input takes too long to be visible.');
-    expect(await explorationTitleInput.getAttribute('value')).
+    expect(await explorationTitleInput.getValue()).
       toEqual(title);
   };
 
@@ -178,7 +200,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationObjectiveWarning,
       'Objective warning takes too long to be visible.');
-    expect(await explorationObjectiveWarning.getCSSProperty('color')).
+    expect((await explorationObjectiveWarning.getCSSProperty('color')).value).
       toEqual(color);
   };
 };
