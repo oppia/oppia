@@ -1771,15 +1771,19 @@ def update_translation_suggestion(
     Args:
         suggestion_id: str. The id of the suggestion to be updated.
         translation_html: str. The new translation_html string.
-    """
-    # Here we use cast because we are narrowing down the type from
-    # BaseSuggestion to SuggestionTranslateContent, because this function
-    # is called only for translate_content suggestions.
-    suggestion = cast(
-        suggestion_registry.SuggestionTranslateContent,
-        get_suggestion_by_id(suggestion_id)
-    )
 
+    Raises:
+        Exception. Expected SuggestionTranslateContent suggestion but found
+            different suggestion.
+    """
+    suggestion = get_suggestion_by_id(suggestion_id)
+    if not isinstance(
+        suggestion, suggestion_registry.SuggestionTranslateContent
+    ):
+        raise Exception(
+            'Expected SuggestionTranslateContent suggestion but found: %s.'
+            % type(suggestion).__name__
+        )
     suggestion.change.translation_html = (
         html_cleaner.clean(translation_html)
         if isinstance(translation_html, str)
@@ -1806,14 +1810,19 @@ def update_question_suggestion(
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
         is found.
+
+    Raises:
+        Exception. Expected SuggestionAddQuestion suggestion but found
+            different suggestion.
     """
-    # Here we use cast because we are narrowing down the type from
-    # BaseSuggestion to SuggestionAddQuestion, because this function
-    # is called only for add_question suggestions.
-    suggestion = cast(
-        suggestion_registry.SuggestionAddQuestion,
-        get_suggestion_by_id(suggestion_id)
-    )
+    suggestion = get_suggestion_by_id(suggestion_id)
+    if not isinstance(
+        suggestion, suggestion_registry.SuggestionAddQuestion
+    ):
+        raise Exception(
+            'Expected SuggestionAddQuestion suggestion but found: %s.'
+            % type(suggestion).__name__
+        )
     question_dict = suggestion.change.question_dict
     new_change_obj = (
         question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
