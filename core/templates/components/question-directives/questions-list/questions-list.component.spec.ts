@@ -374,9 +374,8 @@ describe('Questions List Component', () => {
 
       expect(component.misconceptionsBySkill).toEqual(undefined);
 
-      component.initiateQuestionCreation();
+      component.createQuestion();
       tick();
-
 
       expect(component.misconceptionsBySkill).toEqual({
         skillId1: [
