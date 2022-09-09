@@ -17,230 +17,286 @@
  * in editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-data-backend-api.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
-require('services/context.service.ts');
-require('services/exploration-improvements.service.ts');
-require('services/site-analytics.service.ts');
-require('services/user.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/internet-connectivity.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-   'user-exploration-permissions.service.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
-require('services/ngb-modal.service.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { HelpModalComponent } from 'pages/exploration-editor-page/modal-templates/help-modal.component';
+import { ContextService } from 'services/context.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
+import { ThreadDataBackendApiService } from '../feedback-tab/services/thread-data-backend-api.service';
+import { ChangeListService } from '../services/change-list.service';
+import { ExplorationRightsService } from '../services/exploration-rights.service';
+import { ExplorationSaveService } from '../services/exploration-save.service';
+import { ExplorationWarningsService } from '../services/exploration-warnings.service';
+import { RouterService } from '../services/router.service';
+import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
+import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
 
-angular.module('oppia').component('editorNavigation', {
-  template: require('./editor-navigation.component.html'),
-  controller: [
-    '$q', '$rootScope', '$scope', '$timeout', 'ChangeListService',
-    'ContextService', 'EditabilityService',
-    'ExplorationImprovementsService', 'ExplorationRightsService',
-    'ExplorationSaveService',
-    'ExplorationWarningsService',
-    'InternetConnectivityService', 'NgbModal', 'RouterService',
-    'SiteAnalyticsService', 'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService',
-    'UserExplorationPermissionsService', 'UserService',
-    'WindowDimensionsService',
-    function(
-        $q, $rootScope, $scope, $timeout, ChangeListService,
-        ContextService, EditabilityService,
-        ExplorationImprovementsService, ExplorationRightsService,
-        ExplorationSaveService,
-        ExplorationWarningsService,
-        InternetConnectivityService, NgbModal, RouterService,
-        SiteAnalyticsService, StateTutorialFirstTimeService,
-        ThreadDataBackendApiService,
-        UserExplorationPermissionsService, UserService,
-        WindowDimensionsService) {
-      this.directiveSubscriptions = new Subscription();
-      $scope.showUserHelpModal = () => {
-        var explorationId = ContextService.getExplorationId();
-        SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
-        var EDITOR_TUTORIAL_MODE = 'editor';
-        var TRANSLATION_TUTORIAL_MODE = 'translation';
-        NgbModal.open(HelpModalComponent, {
-          backdrop: true,
-          windowClass: 'oppia-help-modal'
-        }).result.then(mode => {
-          if (mode === EDITOR_TUTORIAL_MODE) {
-            StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
-          } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-            StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
-          }
-          $rootScope.$applyAsync();
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
+@Component({
+  selector: 'oppia-editor-navigation',
+  templateUrl: './editor-navigation.component.html'
+})
+export class EditorNavigationComponent
+  implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
+  screenIsLarge: boolean = false;
+  isPublishButtonEnabled: boolean = false;
+  postTutorialHelpPopoverIsShown: boolean = false;
+  connectedToInternet: boolean = false;
+  improvementsTabIsEnabled: boolean = false;
+  userIsLoggedIn: boolean = false;
+  mobileNavOptionsAreShown: boolean = false;
+  saveIsInProcess: boolean = false;
+  publishIsInProcess: boolean = false;
+  loadingDotsAreShown: boolean = false;
 
-      $scope.saveIsInProcess = false;
-      $scope.publishIsInProcess = false;
-      $scope.loadingDotsAreShown = false;
-      $scope.connectedToInternet = true;
+  constructor(
+    private changeListService: ChangeListService,
+    private contextService: ContextService,
+    private editabilityService: EditabilityService,
+    private explorationImprovementsService: ExplorationImprovementsService,
+    private explorationRightsService: ExplorationRightsService,
+    private explorationSaveService: ExplorationSaveService,
+    private explorationWarningsService: ExplorationWarningsService,
+    private internetConnectivityService: InternetConnectivityService,
+    private ngbModal: NgbModal,
+    private routerService: RouterService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
+    private threadDataBackendApiService: ThreadDataBackendApiService,
+    private userExplorationPermissionsService:
+      UserExplorationPermissionsService,
+    private userService: UserService,
+    private windowDimensionsService: WindowDimensionsService,
+  ) {}
 
-      $scope.isPrivate = function() {
-        return ExplorationRightsService.isPrivate();
-      };
+  getChangeListLength(): number {
+    return this.changeListService.getChangeList().length;
+  }
 
-      $scope.isExplorationLockedForEditing = function() {
-        return ChangeListService.isExplorationLockedForEditing();
-      };
+  isExplorationSaveable(): boolean {
+    return this.explorationSaveService.isExplorationSaveable();
+  }
 
-      $scope.isEditableOutsideTutorialMode = function() {
-        return EditabilityService.isEditableOutsideTutorialMode() ||
-            EditabilityService.isTranslatable();
-      };
+  isPrivate(): boolean {
+    return this.explorationRightsService.isPrivate();
+  }
 
-      $scope.discardChanges = function() {
-        ExplorationSaveService.discardChanges();
-      };
+  isExplorationLockedForEditing(): boolean {
+    return this.changeListService.isExplorationLockedForEditing();
+  }
 
-      $scope.getChangeListLength = function() {
-        return ChangeListService.getChangeList().length;
-      };
+  isEditableOutsideTutorialMode(): boolean {
+    return (
+      this.editabilityService.isEditableOutsideTutorialMode() ||
+      this.editabilityService.isTranslatable());
+  }
 
+  discardChanges(): void {
+    this.explorationSaveService.discardChanges();
+  }
 
-      $scope.isExplorationSaveable = function() {
-        return ExplorationSaveService.isExplorationSaveable();
-      };
+  showPublishExplorationModal(): void {
+    this.publishIsInProcess = true;
+    this.loadingDotsAreShown = true;
 
-      $scope.showLoadingDots = function() {
-        $scope.loadingDotsAreShown = true;
-      };
+    this.explorationSaveService.showPublishExplorationModal(
+      this.showLoadingDots.bind(this), this.hideLoadingDots.bind(this))
+      .then(() => {
+        this.publishIsInProcess = false;
+        this.loadingDotsAreShown = false;
+      });
+  }
 
-      $scope.hideLoadingDots = function() {
-        $scope.loadingDotsAreShown = false;
-      };
+  showLoadingDots(): void {
+    this.loadingDotsAreShown = true;
+  }
 
-      $scope.showPublishExplorationModal = function() {
-        $scope.publishIsInProcess = true;
-        $scope.loadingDotsAreShown = true;
+  hideLoadingDots(): void {
+    this.loadingDotsAreShown = false;
+  }
 
-        ExplorationSaveService.showPublishExplorationModal(
-          $scope.showLoadingDots, $scope.hideLoadingDots)
-          .then(function() {
-            $scope.publishIsInProcess = false;
-            $scope.loadingDotsAreShown = false;
-            $scope.$applyAsync();
-          });
-        $scope.$applyAsync();
-      };
+  saveChanges(): void {
+    this.saveIsInProcess = true;
+    this.loadingDotsAreShown = true;
 
-      $scope.saveChanges = function() {
-        $scope.saveIsInProcess = true;
-        $scope.loadingDotsAreShown = true;
+    this.explorationSaveService.saveChangesAsync(
+      this.showLoadingDots.bind(this), this.hideLoadingDots.bind(this))
+      .then(() => {
+        this.saveIsInProcess = false;
+        this.loadingDotsAreShown = false;
+      }, () => {});
+  }
 
-        ExplorationSaveService.saveChangesAsync(
-          $scope.showLoadingDots, $scope.hideLoadingDots)
-          .then(function() {
-            $scope.saveIsInProcess = false;
-            $scope.loadingDotsAreShown = false;
-            $scope.$applyAsync();
-          }, () => {});
-        $scope.$applyAsync();
-      };
+  toggleMobileNavOptions(): void {
+    this.mobileNavOptionsAreShown = !this.mobileNavOptionsAreShown;
+  }
 
-      $scope.toggleMobileNavOptions = function() {
-        $scope.mobileNavOptionsAreShown = !$scope.mobileNavOptionsAreShown;
-      };
-      $scope.countWarnings = () => ExplorationWarningsService.countWarnings();
-      $scope.getWarnings = () => ExplorationWarningsService.getWarnings();
-      $scope.hasCriticalWarnings = (
-        () => ExplorationWarningsService.hasCriticalWarnings);
-      $scope.getActiveTabName = () => RouterService.getActiveTabName();
-      $scope.selectMainTab = () => RouterService.navigateToMainTab();
-      $scope.selectTranslationTab = (
-        () => RouterService.navigateToTranslationTab());
-      $scope.selectPreviewTab = () => RouterService.navigateToPreviewTab();
-      $scope.selectSettingsTab = () => RouterService.navigateToSettingsTab();
-      $scope.selectStatsTab = () => RouterService.navigateToStatsTab();
-      $scope.selectImprovementsTab = (
-        () => RouterService.navigateToImprovementsTab());
-      $scope.selectHistoryTab = () => RouterService.navigateToHistoryTab();
-      $scope.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
-      $scope.getOpenThreadsCount = (
-        () => ThreadDataBackendApiService.getOpenThreadsCount());
+  countWarnings(): number {
+    return this.explorationWarningsService.countWarnings();
+  }
 
-      this.$onInit = () => {
-        $scope.ExplorationRightsService = ExplorationRightsService;
+  getWarnings(): string[] | object[] {
+    return this.explorationWarningsService.getWarnings();
+  }
 
-        UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
-            $scope.showPublishButton = function() {
-              return permissions.canPublish && (
-                ExplorationRightsService.isPrivate());
-            };
-          });
+  hasCriticalWarnings(): boolean {
+    return this.explorationWarningsService.hasCriticalWarnings();
+  }
 
-        this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
-        this.directiveSubscriptions.add(
-          WindowDimensionsService.getResizeEvent().subscribe(evt => {
-            this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
-            $scope.$applyAsync();
-          })
-        );
-        $scope.isScreenLarge = () => this.screenIsLarge;
+  getActiveTabName(): string {
+    return this.routerService.getActiveTabName();
+  }
 
-        this.postTutorialHelpPopoverIsShown = false;
-        this.directiveSubscriptions.add(
-          StateTutorialFirstTimeService.onOpenPostTutorialHelpPopover.subscribe(
-            () => {
-              if (this.screenIsLarge) {
-                this.postTutorialHelpPopoverIsShown = true;
-                $timeout(() => {
-                  this.postTutorialHelpPopoverIsShown = false;
-                }, 4000);
-              } else {
+  selectMainTab(value: string): void {
+    this.routerService.navigateToMainTab(value);
+  }
+
+  selectTranslationTab(): void {
+    this.routerService.navigateToTranslationTab();
+  }
+
+  selectPreviewTab(): void {
+    this.routerService.navigateToPreviewTab();
+  }
+
+  selectSettingsTab(): void {
+    this.routerService.navigateToSettingsTab();
+  }
+
+  selectStatsTab(): void {
+    this.routerService.navigateToStatsTab();
+  }
+
+  selectImprovementsTab(): void {
+    this.routerService.navigateToImprovementsTab();
+  }
+
+  selectHistoryTab(): void {
+    this.routerService.navigateToHistoryTab();
+  }
+
+  selectFeedbackTab(): void {
+    this.routerService.navigateToFeedbackTab();
+  }
+
+  getOpenThreadsCount(): number {
+    return this.threadDataBackendApiService.getOpenThreadsCount();
+  }
+
+  showUserHelpModal(): void {
+    const explorationId = this.contextService.getExplorationId();
+    this.siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+
+    const EDITOR_TUTORIAL_MODE = 'editor';
+    const TRANSLATION_TUTORIAL_MODE = 'translation';
+
+    this.ngbModal.open(HelpModalComponent, {
+      backdrop: true,
+      windowClass: 'oppia-help-modal'
+    }).result.then(mode => {
+      if (mode === EDITOR_TUTORIAL_MODE) {
+        this.stateTutorialFirstTimeService.onOpenEditorTutorial.emit();
+      } else if (mode === TRANSLATION_TUTORIAL_MODE) {
+        this.stateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
+      }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  isScreenLarge(): boolean {
+    return this.screenIsLarge;
+  }
+
+  isPostTutorialHelpPopoverShown(): boolean {
+    return this.postTutorialHelpPopoverIsShown;
+  }
+
+  isImprovementsTabEnabled(): boolean {
+    return this.improvementsTabIsEnabled;
+  }
+
+  isUserLoggedIn(): boolean {
+    return this.userIsLoggedIn;
+  }
+
+  showPublishButton(): boolean {
+    return (
+      this.isPublishButtonEnabled && (
+        this.explorationRightsService.isPrivate()));
+  }
+
+  ngOnInit(): void {
+    this.userExplorationPermissionsService.getPermissionsAsync()
+      .then((permissions) => {
+        this.isPublishButtonEnabled = (permissions.canPublish);
+      });
+
+    this.screenIsLarge = this.windowDimensionsService.getWidth() >= 1024;
+
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(evt => {
+        this.screenIsLarge = this.windowDimensionsService.getWidth() >= 1024;
+      })
+    );
+
+    this.postTutorialHelpPopoverIsShown = false;
+
+    this.directiveSubscriptions.add(
+      this.stateTutorialFirstTimeService
+        .onOpenPostTutorialHelpPopover.subscribe(
+          () => {
+            if (this.screenIsLarge) {
+              this.postTutorialHelpPopoverIsShown = true;
+              setTimeout(() => {
                 this.postTutorialHelpPopoverIsShown = false;
-              }
+              }, 4000);
+            } else {
+              this.postTutorialHelpPopoverIsShown = false;
             }
-          )
-        );
-        this.directiveSubscriptions.add(
-          InternetConnectivityService.onInternetStateChange.subscribe(
-            internetAccessible => {
-              $scope.connectedToInternet = internetAccessible;
-              $scope.$applyAsync();
-            })
-        );
+          }
+        )
+    );
 
-        $scope.isPostTutorialHelpPopoverShown = (
-          () => this.postTutorialHelpPopoverIsShown);
+    this.directiveSubscriptions.add(
+      this.internetConnectivityService.onInternetStateChange.subscribe(
+        internetAccessible => {
+          this.connectedToInternet = internetAccessible;
+        })
+    );
 
-        this.improvementsTabIsEnabled = false;
-        $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
-          .then(improvementsTabIsEnabled => {
-            this.improvementsTabIsEnabled = improvementsTabIsEnabled;
-          });
-        $scope.isImprovementsTabEnabled = () => this.improvementsTabIsEnabled;
+    this.connectedToInternet = this.internetConnectivityService.isOnline();
+    this.improvementsTabIsEnabled = false;
 
-        this.userIsLoggedIn = false;
-        $q.when(UserService.getUserInfoAsync())
-          .then(userInfo => {
-            this.userIsLoggedIn = userInfo.isLoggedIn();
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-        $scope.isUserLoggedIn = () => this.userIsLoggedIn;
-      };
-      this.$onDestroy = function() {
-        this.directiveSubscriptions.unsubscribe();
-      };
-    }
-  ]
-});
+    Promise.resolve(
+      this.explorationImprovementsService.isImprovementsTabEnabledAsync())
+      .then(improvementsTabIsEnabled => {
+        this.improvementsTabIsEnabled = improvementsTabIsEnabled;
+      });
+
+    this.userIsLoggedIn = false;
+
+    Promise.resolve(this.userService.getUserInfoAsync())
+      .then(userInfo => {
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaEditorNavigation',
+  downgradeComponent({
+    component: EditorNavigationComponent
+  }) as angular.IDirectiveFactory);
