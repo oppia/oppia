@@ -50,17 +50,17 @@ jobs:
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e profileMenu test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e profileFeatures test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
