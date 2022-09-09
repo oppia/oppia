@@ -256,6 +256,18 @@ class BaseTranslatableObject:
         """
         raise NotImplementedError('Must be implemented in subclasses.')
 
+    def get_translatable_content_ids(self) -> List[str]:
+        """Get all translatable content's Ids.
+
+        Returns:
+            list(str). A list of translatable content's Id.
+        """
+        content_collection = (
+            self.get_translatable_contents_collection())
+
+        return list(
+            content_collection.content_id_to_translatable_content.keys())
+
     def get_all_contents_which_need_translations(
         self,
         entity_translation: EntityTranslation = None

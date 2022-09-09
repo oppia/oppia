@@ -152,12 +152,13 @@ export class StateObjectFactory {
       card_is_checkpoint: newStateTemplate.card_is_checkpoint
     });
     newState.content.contentId = contentIdForContent;
+    let defaultOutcome = newState.interaction.defaultOutcome;
+    defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
+
     if (
       newState.interaction.defaultOutcome !== null &&
       newStateName !== null
     ) {
-      let defaultOutcome = newState.interaction.defaultOutcome;
-      defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
       defaultOutcome.dest = newStateName as string;
     }
     newState.recordedVoiceovers.addContentId(contentIdForContent);

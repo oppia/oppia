@@ -5990,22 +5990,12 @@ export default {
       "hints": [],
       "solution": null
     },
-    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
-      "voiceovers_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
+      "voiceovers_mapping": {}
     },
     "solicit_answer_details": false,
-    "card_is_checkpoint": false,
-    "written_translations": {
-      "translations_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
-    }
+    "card_is_checkpoint": false
   },
 
   // Data required for Google Analytics.
