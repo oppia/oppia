@@ -131,7 +131,7 @@ export class NumericInputValidationService {
           case 'IsInclusivelyBetween':
             var a = rule.inputs.a as number;
             var b = rule.inputs.b as number;
-            if (a > b) {
+            if (a >= b) {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
             setLowerAndUpperBounds(range, a, b, true, true);
@@ -169,6 +169,13 @@ export class NumericInputValidationService {
             var x = rule.inputs.x as number;
             var tol = rule.inputs.tol as number;
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
+            if (tol <= 0) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' tolerance must be a positive value.')
+              });
+            }
             if (
               (x + tol) < 0 &&
               customizationArgs.requireNonnegativeInput.value
