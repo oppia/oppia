@@ -31,7 +31,9 @@ from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
+from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import user_domain
@@ -306,6 +308,210 @@ def get_suggestion_by_id(
         )
 
     return get_suggestion_from_model(model) if model else None
+
+
+@overload
+def get_translation_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.TranslationContributionStatsModel]: ...
+
+
+@overload
+def get_translation_contribution_stats_models(
+    stats_ids: List[str]
+) -> List[suggestion_models.TranslationContributionStatsModel]: ...
+
+
+@overload
+def get_translation_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.TranslationContributionStatsModel]]: ...
+
+
+def get_translation_contribution_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.TranslationContributionStatsModel]]:
+    """Finds translation contribution stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(TranslationContributionStatsModel|None). The corresponding
+        translation contribution stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+    stats_models = (
+        suggestion_models.TranslationContributionStatsModel.get_multi(
+            list(stats_ids)))
+
+    if not strict:
+        return stats_models
+
+    for index, model in enumerate(stats_models):
+        if model is None:
+            raise Exception(
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
+
+    return stats_models
+
+
+@overload
+def get_translation_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.TranslationReviewStatsModel]: ...
+
+
+@overload
+def get_translation_review_stats_models(
+    stats_ids: List[str]
+) -> List[suggestion_models.TranslationReviewStatsModel]: ...
+
+
+@overload
+def get_translation_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.TranslationReviewStatsModel]]: ...
+
+
+def get_translation_review_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.TranslationReviewStatsModel]]:
+    """Finds translation review stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(TranslationReviewStatsModel|None). The corresponding translation
+        review stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+    stats_models = (
+        suggestion_models.TranslationReviewStatsModel.get_multi(
+            list(stats_ids)))
+
+    if not strict:
+        return stats_models
+
+    for index, model in enumerate(stats_models):
+        if model is None:
+            raise Exception(
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
+
+    return stats_models
+
+
+@overload
+def get_question_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.QuestionContributionStatsModel]: ...
+
+
+@overload
+def get_question_contribution_stats_models(
+    stats_ids: List[str]
+) -> List[suggestion_models.QuestionContributionStatsModel]: ...
+
+
+@overload
+def get_question_contribution_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.QuestionContributionStatsModel]]: ...
+
+
+def get_question_contribution_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.QuestionContributionStatsModel]]:
+    """Finds question contribution stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(QuestionContributionStatsModel|None). The corresponding question
+        contribution stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+    stats_models = (
+        suggestion_models.QuestionContributionStatsModel.get_multi(
+            list(stats_ids)))
+
+    if not strict:
+        return stats_models
+
+    for index, model in enumerate(stats_models):
+        if model is None:
+            raise Exception(
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
+
+    return stats_models
+
+
+@overload
+def get_question_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[True]
+) -> List[suggestion_models.QuestionReviewStatsModel]: ...
+
+
+@overload
+def get_question_review_stats_models(
+    stats_ids: List[str]
+) -> List[suggestion_models.QuestionReviewStatsModel]: ...
+
+
+@overload
+def get_question_review_stats_models(
+    stats_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[suggestion_models.QuestionReviewStatsModel]]: ...
+
+
+def get_question_review_stats_models(
+    stats_ids: List[str], strict: bool = True
+) -> Sequence[Optional[suggestion_models.QuestionReviewStatsModel]]:
+    """Finds question review stats by the IDs.
+
+    Args:
+        stats_ids: list(str). The IDs of the stats.
+        strict: bool. Whether to fail noisily if no stat with given ids exists.
+
+    Returns:
+        list(QuestionReviewStatsModel|None). The corresponding question review
+        stats for the given IDs.
+
+    Raises:
+        Exception. The stats models do not exist for the given IDs.
+    """
+    stats_models = (
+        suggestion_models.QuestionReviewStatsModel.get_multi(
+            list(stats_ids)))
+
+    if not strict:
+        return stats_models
+
+    for index, model in enumerate(stats_models):
+        if model is None:
+            raise Exception(
+                'The stats models do not exist for the stats_id %s.' % (
+                    stats_ids[index])
+            )
+
+    return stats_models
 
 
 def get_suggestions_by_ids(
@@ -1826,3 +2032,858 @@ def update_question_suggestion(
     _update_suggestion(suggestion)
 
     return suggestion
+
+
+def _create_translation_review_stats_from_model(
+    translation_review_stats_model: (
+        suggestion_models.TranslationReviewStatsModel
+    )
+) -> suggestion_registry.TranslationReviewStats:
+    """Creates a domain object representing the supplied
+    TranslationReviewStatsModel.
+
+    Args:
+        translation_review_stats_model: TranslationReviewStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        TranslationReviewStats. The corresponding TranslationReviewStats domain
+        object.
+    """
+    return suggestion_registry.TranslationReviewStats(
+        translation_review_stats_model.language_code,
+        translation_review_stats_model.reviewer_user_id,
+        translation_review_stats_model.topic_id,
+        translation_review_stats_model.reviewed_translations_count,
+        translation_review_stats_model.reviewed_translation_word_count,
+        translation_review_stats_model.accepted_translations_count,
+        (
+            translation_review_stats_model
+            .accepted_translations_with_reviewer_edits_count),
+        translation_review_stats_model.accepted_translation_word_count,
+        translation_review_stats_model.first_contribution_date,
+        translation_review_stats_model.last_contribution_date
+    )
+
+
+def _create_question_contribution_stats_from_model(
+    question_contribution_stats_model: (
+        suggestion_models.QuestionContributionStatsModel
+    )
+) -> suggestion_registry.QuestionContributionStats:
+    """Creates a domain object representing the supplied
+    QuestionContributionStatsModel.
+
+    Args:
+        question_contribution_stats_model: QuestionContributionStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        QuestionContributionStats. The corresponding QuestionContributionStats
+        domain object.
+    """
+    return suggestion_registry.QuestionContributionStats(
+        question_contribution_stats_model.contributor_user_id,
+        question_contribution_stats_model.topic_id,
+        question_contribution_stats_model.submitted_questions_count,
+        question_contribution_stats_model.accepted_questions_count,
+        (
+            question_contribution_stats_model
+            .accepted_questions_without_reviewer_edits_count),
+        question_contribution_stats_model.first_contribution_date,
+        question_contribution_stats_model.last_contribution_date
+    )
+
+
+def _create_question_review_stats_from_model(
+    question_review_stats_model: (
+        suggestion_models.QuestionReviewStatsModel
+    )
+) -> suggestion_registry.QuestionReviewStats:
+    """Creates a domain object representing the supplied
+    QuestionReviewStatsModel.
+
+    Args:
+        question_review_stats_model: QuestionReviewStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        QuestionReviewStats. The corresponding QuestionReviewStats domain
+        object.
+    """
+    return suggestion_registry.QuestionReviewStats(
+        question_review_stats_model.reviewer_user_id,
+        question_review_stats_model.topic_id,
+        question_review_stats_model.reviewed_questions_count,
+        question_review_stats_model.accepted_questions_count,
+        (
+            question_review_stats_model
+            .accepted_questions_with_reviewer_edits_count),
+        question_review_stats_model.first_contribution_date,
+        question_review_stats_model.last_contribution_date
+    )
+
+
+def _get_all_translation_review_stats(
+    user_id: str
+) -> List[suggestion_registry.TranslationReviewStats]:
+    """Gets all TranslationReviewStatsModels corresponding to the supplied
+    user and converts them to their corresponding domain objects.
+
+    Args:
+        user_id: str. User ID.
+
+    Returns:
+        list(TranslationReviewStats). TranslationReviewStats domain objects
+        corresponding to the supplied user.
+    """
+    translation_review_stats_models = (
+        suggestion_models.TranslationReviewStatsModel.get_all_by_user_id(
+            user_id
+        )
+    )
+    return [
+        _create_translation_review_stats_from_model(model)
+        for model in translation_review_stats_models
+    ]
+
+
+def _get_all_question_contribution_stats(
+    user_id: str
+) -> List[suggestion_registry.QuestionContributionStats]:
+    """Gets all QuestionContributionStatsModels corresponding to the supplied
+    user and converts them to their corresponding domain objects.
+
+    Args:
+        user_id: str. User ID.
+
+    Returns:
+        list(QuestionContributionStats). QuestionContributionStats domain
+        objects corresponding to the supplied user.
+    """
+    question_contribution_stats_models = (
+        suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
+            user_id
+        )
+    )
+    return [
+        _create_question_contribution_stats_from_model(model)
+        for model in question_contribution_stats_models
+    ]
+
+
+def _get_all_question_review_stats(
+    user_id: str
+) -> List[suggestion_registry.QuestionReviewStats]:
+    """Gets all QuestionReviewStatsModels corresponding to the supplied
+    user and converts them to their corresponding domain objects.
+
+    Args:
+        user_id: str. User ID.
+
+    Returns:
+        list(QuestionReviewStats). QuestionReviewStats domain objects
+        corresponding to the supplied user.
+    """
+    question_review_stats_models = (
+        suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
+            user_id
+        )
+    )
+    return [
+        _create_question_review_stats_from_model(model)
+        for model in question_review_stats_models
+    ]
+
+
+# TODO(#16019): Pre-fetching and caching of stats data should be done.
+def get_all_contributor_stats(
+    user_id: str
+) -> suggestion_registry.ContributorStatsSummary:
+    """Gets ContributorStatsSummary corresponding to the supplied user.
+
+    Args:
+        user_id: str. User ID.
+
+    Returns:
+        ContributorStatsSummary. ContributorStatsSummary domain objects
+        corresponding to the supplied user.
+    """
+    translation_contribution_stats = get_all_translation_contribution_stats(
+        user_id)
+    translation_review_stats = _get_all_translation_review_stats(user_id)
+    question_contribution_stats = _get_all_question_contribution_stats(user_id)
+    question_review_stats = _get_all_question_review_stats(user_id)
+
+    return suggestion_registry.ContributorStatsSummary(
+        user_id,
+        translation_contribution_stats,
+        question_contribution_stats,
+        translation_review_stats,
+        question_review_stats)
+
+
+def _update_translation_contribution_stats_models(
+    translation_contribution_stats: List[
+        suggestion_registry.TranslationContributionStats
+    ]
+) -> None:
+    """Updates TranslationContributionStatsModel models for given translation
+    contribution stats.
+
+    Args:
+        translation_contribution_stats: list(TranslationContributionStats).
+            A list of TranslationContributionStats domain objects.
+
+    Raises:
+        Exception. Language is None.
+        Exception. Contributor user ID is None.
+        Exception. Topic ID is None.
+    """
+    stats_dict = {}
+    for stat in translation_contribution_stats:
+        if stat.language_code is None:
+            raise Exception('Language code should not be None.')
+        if stat.contributor_user_id is None:
+            raise Exception('Contributor user ID should not be None.')
+        if stat.topic_id is None:
+            raise Exception('Topic ID should not be None.')
+        stat_id = (
+            suggestion_models.TranslationContributionStatsModel.construct_id(
+                stat.language_code,
+                stat.contributor_user_id,
+                stat.topic_id)
+        )
+        stats_dict[stat_id] = stat
+
+    stats_ids = stats_dict.keys()
+
+    stats_models = get_translation_contribution_stats_models(list(stats_ids))
+    stats_models_to_update: List[
+        suggestion_models.TranslationContributionStatsModel] = []
+    for stats_model in stats_models:
+        stat = stats_dict[stats_model.id]
+        stats_model.submitted_translations_count = (
+            stat.submitted_translations_count)
+        stats_model.submitted_translation_word_count = (
+            stat.submitted_translation_word_count)
+        stats_model.accepted_translations_count = (
+            stat.accepted_translations_count)
+        stats_model.accepted_translations_without_reviewer_edits_count = (
+            stat.accepted_translations_without_reviewer_edits_count)
+        stats_model.accepted_translation_word_count = (
+            stat.accepted_translation_word_count)
+        stats_model.rejected_translations_count = (
+            stat.rejected_translations_count)
+        stats_model.rejected_translation_word_count = (
+            stat.rejected_translation_word_count)
+        stats_model.contribution_dates = stat.contribution_dates
+        stats_models_to_update.append(stats_model)
+
+    suggestion_models.TranslationContributionStatsModel.update_timestamps_multi(
+        stats_models_to_update,
+        update_last_updated_time=True)
+    suggestion_models.TranslationContributionStatsModel.put_multi(
+        stats_models_to_update)
+
+
+def _update_translation_review_stats_models(
+    translation_review_stats: List[
+        suggestion_registry.TranslationReviewStats
+    ]
+) -> None:
+    """Updates TranslationReviewStatsModel models for given translation
+    review stats.
+
+    Args:
+        translation_review_stats: list(TranslationReviewStats). A list of
+            TranslationReviewStats domain objects.
+    """
+    stats_dict = {}
+    for stat in translation_review_stats:
+        stat_id = suggestion_models.TranslationReviewStatsModel.construct_id(
+            stat.language_code, stat.contributor_user_id, stat.topic_id)
+        stats_dict[stat_id] = stat
+
+    stats_ids = stats_dict.keys()
+
+    stats_models = get_translation_review_stats_models(list(stats_ids))
+    stats_models_to_update: List[
+        suggestion_models.TranslationReviewStatsModel] = []
+    for stats_model in stats_models:
+        stat = stats_dict[stats_model.id]
+        stats_model.reviewed_translations_count = (
+            stat.reviewed_translations_count)
+        stats_model.reviewed_translation_word_count = (
+            stat.reviewed_translation_word_count)
+        stats_model.accepted_translations_count = (
+            stat.accepted_translations_count)
+        stats_model.accepted_translation_word_count = (
+            stat.accepted_translation_word_count)
+        stats_model.accepted_translations_with_reviewer_edits_count = (
+            stat.accepted_translations_with_reviewer_edits_count)
+        stats_model.first_contribution_date = (
+            stat.first_contribution_date)
+        stats_model.last_contribution_date = (
+            stat.last_contribution_date)
+        stats_models_to_update.append(stats_model)
+
+    suggestion_models.TranslationReviewStatsModel.update_timestamps_multi(
+        stats_models_to_update,
+        update_last_updated_time=True)
+    suggestion_models.TranslationReviewStatsModel.put_multi(
+        stats_models_to_update)
+
+
+def _update_question_contribution_stats_models(
+    question_contribution_stats: List[
+        suggestion_registry.QuestionContributionStats
+    ]
+) -> None:
+    """Updates QuestionContributionStatsModel models for given question
+    contribution stats.
+
+    Args:
+        question_contribution_stats: list(QuestionContributionStats). A list of
+            QuestionContribution domain objects.
+    """
+    stats_dict = {}
+    for stat in question_contribution_stats:
+        stat_id = suggestion_models.QuestionContributionStatsModel.construct_id(
+            stat.contributor_user_id, stat.topic_id)
+        stats_dict[stat_id] = stat
+
+    stats_ids = stats_dict.keys()
+
+    stats_models = get_question_contribution_stats_models(list(stats_ids))
+    stats_models_to_update: List[
+        suggestion_models.QuestionContributionStatsModel] = []
+    for stats_model in stats_models:
+        stat = stats_dict[stats_model.id]
+        stats_model.submitted_questions_count = (
+            stat.submitted_questions_count)
+        stats_model.accepted_questions_count = (
+            stat.accepted_questions_count)
+        stats_model.accepted_questions_without_reviewer_edits_count = (
+            stat.accepted_questions_without_reviewer_edits_count)
+        stats_model.first_contribution_date = stat.first_contribution_date
+        stats_model.last_contribution_date = stat.last_contribution_date
+        stats_models_to_update.append(stats_model)
+
+    suggestion_models.QuestionContributionStatsModel.update_timestamps_multi(
+        stats_models_to_update,
+        update_last_updated_time=True)
+    suggestion_models.QuestionContributionStatsModel.put_multi(
+        stats_models_to_update)
+
+
+def _update_question_review_stats_models(
+    question_review_stats: List[
+        suggestion_registry.QuestionReviewStats
+    ]
+) -> None:
+    """Updates QuestionReviewStatsModel models for given question
+    review stats.
+
+    Args:
+        question_review_stats: list(QuestionReviewStats). A list of
+            QuestionReviewStats domain objects.
+    """
+    stats_dict = {}
+    for stat in question_review_stats:
+        stat_id = suggestion_models.QuestionReviewStatsModel.construct_id(
+            stat.contributor_user_id, stat.topic_id)
+        stats_dict[stat_id] = stat
+
+    stats_ids = stats_dict.keys()
+
+    stats_models = get_question_review_stats_models(list(stats_ids))
+    stats_models_to_update: List[
+        suggestion_models.QuestionReviewStatsModel] = []
+    for stats_model in stats_models:
+        stat = stats_dict[stats_model.id]
+        stats_model.reviewed_questions_count = (
+            stat.reviewed_questions_count)
+        stats_model.accepted_questions_count = (
+            stat.accepted_questions_count)
+        stats_model.accepted_questions_with_reviewer_edits_count = (
+            stat.accepted_questions_with_reviewer_edits_count)
+        stats_model.first_contribution_date = stat.first_contribution_date
+        stats_model.last_contribution_date = stat.last_contribution_date
+        stats_models_to_update.append(stats_model)
+
+    suggestion_models.QuestionReviewStatsModel.update_timestamps_multi(
+        stats_models_to_update,
+        update_last_updated_time=True)
+    suggestion_models.QuestionReviewStatsModel.put_multi(
+        stats_models_to_update)
+
+
+def update_translation_contribution_stats_at_submission(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> None:
+    """Creates/updates TranslationContributionStatsModel model for
+    given translation submitter when a translation is submitted.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            submitted.
+    """
+    exp_opportunity = (
+        opportunity_services.get_exploration_opportunity_summary_by_id(
+            suggestion.target_id))
+    # We can confirm that exp_opportunity will not be None since there should
+    # be an assigned opportunity for a given translation. Hence we can rule out
+    # the possibility of None for mypy type checking.
+    assert exp_opportunity is not None
+    topic_id = exp_opportunity.topic_id
+
+    content_plain_text = html_cleaner.strip_html_tags(
+        suggestion.change.translation_html)
+    content_word_count = len(content_plain_text.split())
+
+    translation_contribution_stat_model = (
+        suggestion_models.TranslationContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.author_id, topic_id
+        ))
+
+    if translation_contribution_stat_model is None:
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=suggestion.change.language_code,
+            contributor_user_id=suggestion.author_id,
+            topic_id=topic_id,
+            submitted_translations_count=1,
+            submitted_translation_word_count=content_word_count,
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[suggestion.last_updated.date()]
+        )
+    else:
+        translation_contribution_stat = (
+            create_translation_contribution_stats_from_model(
+                translation_contribution_stat_model))
+
+        translation_contribution_stat.submitted_translations_count += 1
+        translation_contribution_stat.submitted_translation_word_count += (
+            content_word_count)
+        translation_contribution_stat.contribution_dates.add(
+            suggestion.last_updated.date())
+
+        _update_translation_contribution_stats_models(
+            [translation_contribution_stat])
+
+
+def update_translation_contribution_stats_at_review(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> None:
+    """Creates/updates TranslationContributionStatsModel model for
+    given translation submitter when a translation is reviewed.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            reviewed.
+    """
+    exp_opportunity = (
+        opportunity_services.get_exploration_opportunity_summary_by_id(
+            suggestion.target_id))
+    # We can confirm that exp_opportunity will not be None since there should
+    # be an assigned opportunity for a given translation. Hence we can rule out
+    # the possibility of None for mypy type checking.
+    assert exp_opportunity is not None
+    topic_id = exp_opportunity.topic_id
+
+    content_plain_text = html_cleaner.strip_html_tags(
+        suggestion.change.translation_html)
+    content_word_count = len(content_plain_text.split())
+
+    translation_contribution_stat_model = (
+        suggestion_models.TranslationContributionStatsModel.get(
+            suggestion.change.language_code, suggestion.author_id, topic_id
+        ))
+
+    if translation_contribution_stat_model is None:
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=suggestion.change.language_code,
+            contributor_user_id=suggestion.author_id,
+            topic_id=topic_id,
+            submitted_translations_count=1,
+            submitted_translation_word_count=content_word_count,
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            contribution_dates=[suggestion.last_updated.date()]
+        )
+    else:
+        translation_contribution_stat = (
+            create_translation_contribution_stats_from_model(
+                translation_contribution_stat_model))
+
+        suggestion_is_accepted = (
+            suggestion.status == suggestion_models.STATUS_ACCEPTED
+        )
+
+        increment_translation_contribution_stats_at_review(
+            translation_contribution_stat, content_word_count,
+            suggestion_is_accepted, suggestion.edited_by_reviewer)
+        _update_translation_contribution_stats_models(
+            [translation_contribution_stat])
+
+
+def update_translation_review_stats(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> None:
+    """Creates/updates TranslationReviewStatsModel model for given translation
+    reviewer when a translation is reviewed.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            reviewed.
+
+    Raises:
+        Exception. The final_reviewer_id of the suggestion should not be None.
+    """
+    if suggestion.final_reviewer_id is None:
+        raise Exception(
+            'The final_reviewer_id in the suggestion should not be None.'
+        )
+    exp_opportunity = (
+        opportunity_services.get_exploration_opportunity_summary_by_id(
+            suggestion.target_id))
+    # We can confirm that exp_opportunity will not be None since there should
+    # be an assigned opportunity for a given translation. Hence we can rule out
+    # the possibility of None for mypy type checking.
+    assert exp_opportunity is not None
+    topic_id = exp_opportunity.topic_id
+    suggestion_is_accepted = (
+        suggestion.status == suggestion_models.STATUS_ACCEPTED
+    )
+
+    content_plain_text = html_cleaner.strip_html_tags(
+        suggestion.change.translation_html)
+    content_word_count = len(content_plain_text.split())
+
+    translation_review_stat_model = (
+        # This function is called when reviewing a translation and hence
+        # final_reviewer_id should not be None when the suggestion is
+        # up-to-date.
+        suggestion_models.TranslationReviewStatsModel.get(
+            suggestion.change.language_code, suggestion.final_reviewer_id,
+            topic_id
+        ))
+
+    if translation_review_stat_model is None:
+        # This function is called when reviewing a translation and hence
+        # final_reviewer_id should not be None when the suggestion is
+        # up-to-date.
+        accepted_translations_count = 0
+        accepted_translations_with_reviewer_edits_count = 0
+        accepted_translation_word_count = 0
+        if suggestion_is_accepted:
+            accepted_translations_count += 1
+            accepted_translation_word_count = content_word_count
+        if suggestion.edited_by_reviewer:
+            accepted_translations_with_reviewer_edits_count += 1
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code=suggestion.change.language_code,
+            reviewer_user_id=suggestion.final_reviewer_id,
+            topic_id=topic_id,
+            reviewed_translations_count=1,
+            reviewed_translation_word_count=content_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_with_reviewer_edits_count=(
+                accepted_translations_with_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            first_contribution_date=suggestion.last_updated.date(),
+            last_contribution_date=suggestion.last_updated.date()
+        )
+    else:
+        translation_review_stat = (
+            _create_translation_review_stats_from_model(
+                translation_review_stat_model))
+
+        increment_translation_review_stats(
+            translation_review_stat, content_word_count,
+            suggestion.last_updated, suggestion_is_accepted,
+            suggestion.edited_by_reviewer
+        )
+        _update_translation_review_stats_models([translation_review_stat])
+
+    update_translation_contribution_stats_at_review(suggestion)
+
+
+def update_question_contribution_stats_at_submission(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> None:
+    """Creates/updates QuestionContributionStatsModel model for given question
+    submitter when a question is submitted.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            submitted.
+    """
+    for topic in skill_services.get_all_topic_assignments_for_skill(
+        suggestion.target_id):
+        question_contribution_stat_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                suggestion.author_id, topic.topic_id
+            ))
+
+        if question_contribution_stat_model is None:
+            suggestion_models.QuestionContributionStatsModel.create(
+                contributor_user_id=suggestion.author_id,
+                topic_id=topic.topic_id,
+                submitted_questions_count=1,
+                accepted_questions_count=0,
+                accepted_questions_without_reviewer_edits_count=0,
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
+            )
+            continue
+
+        question_contribution_stat = (
+            _create_question_contribution_stats_from_model(
+                question_contribution_stat_model))
+
+        question_contribution_stat.submitted_questions_count += 1
+        question_contribution_stat.last_contribution_date = (
+            suggestion.last_updated.date())
+        _update_question_contribution_stats_models(
+            [question_contribution_stat])
+
+
+def update_question_contribution_stats_at_review(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> None:
+    """Creates/updates QuestionContributionStatsModel model for given question
+    submitter when a question is reviewed.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            reviewed.
+    """
+    for topic in skill_services.get_all_topic_assignments_for_skill(
+        suggestion.target_id):
+        question_contribution_stat_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                suggestion.author_id, topic.topic_id
+            ))
+
+        if question_contribution_stat_model is None:
+            suggestion_models.QuestionContributionStatsModel.create(
+                contributor_user_id=suggestion.author_id,
+                topic_id=topic.topic_id,
+                submitted_questions_count=1,
+                accepted_questions_count=0,
+                accepted_questions_without_reviewer_edits_count=0,
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
+            )
+            continue
+
+        question_contribution_stat = (
+            _create_question_contribution_stats_from_model(
+                question_contribution_stat_model))
+
+        suggestion_is_accepted = (
+            suggestion.status == suggestion_models.STATUS_ACCEPTED
+        )
+
+        if suggestion_is_accepted:
+            question_contribution_stat.accepted_questions_count += 1
+        if suggestion.edited_by_reviewer:
+            (
+                question_contribution_stat
+                .accepted_questions_without_reviewer_edits_count
+            ) += 1
+        _update_question_contribution_stats_models(
+            [question_contribution_stat])
+
+
+def update_question_review_stats(
+    suggestion: suggestion_registry.BaseSuggestion
+) -> None:
+    """Creates/updates QuestionReviewStatsModel model for given question
+    reviewer when a question is reviewed.
+
+    Args:
+        suggestion: Suggestion. The suggestion domain object that is being
+            reviewed.
+
+    Raises:
+        Exception. The final_reviewer_id of the suggestion should not be None.
+    """
+    if suggestion.final_reviewer_id is None:
+        raise Exception(
+            'The final_reviewer_id in the suggestion should not be None.'
+        )
+    suggestion_is_accepted = (
+        suggestion.status == suggestion_models.STATUS_ACCEPTED
+    )
+
+    for topic in skill_services.get_all_topic_assignments_for_skill(
+        suggestion.target_id):
+        question_review_stat_model = (
+            # This function is called when reviewing a question suggestion and
+            # hence final_reviewer_id should not be None when the suggestion is
+            # up-to-date.
+            suggestion_models.QuestionReviewStatsModel.get(
+                suggestion.final_reviewer_id, topic.topic_id
+            ))
+
+        if question_review_stat_model is None:
+            # This function is called when reviewing a question suggestion and
+            # hence final_reviewer_id should not be None when the suggestion is
+            # up-to-date.
+            accepted_questions_count = 0
+            accepted_questions_with_reviewer_edits_count = 0
+            if suggestion_is_accepted:
+                accepted_questions_count += 1
+            if suggestion.edited_by_reviewer:
+                accepted_questions_with_reviewer_edits_count += 1
+            suggestion_models.QuestionReviewStatsModel.create(
+                reviewer_user_id=suggestion.final_reviewer_id,
+                topic_id=topic.topic_id,
+                reviewed_questions_count=1,
+                accepted_questions_count=accepted_questions_count,
+                accepted_questions_with_reviewer_edits_count=(
+                    accepted_questions_with_reviewer_edits_count),
+                first_contribution_date=suggestion.last_updated.date(),
+                last_contribution_date=suggestion.last_updated.date()
+            )
+            continue
+
+        question_review_stat = (
+            _create_question_review_stats_from_model(
+                question_review_stat_model))
+
+        increment_question_review_stats(
+            question_review_stat, suggestion.last_updated,
+            suggestion_is_accepted,
+            suggestion.edited_by_reviewer)
+        _update_question_review_stats_models([question_review_stat])
+
+    update_question_contribution_stats_at_review(suggestion)
+
+
+def increment_translation_contribution_stats_at_review(
+    translation_contribution_stat: (
+        suggestion_registry.TranslationContributionStats),
+    content_word_count: int,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates TranslationContributionStats object.
+
+    Args:
+        translation_contribution_stat: TranslationContributionStats. The stats
+            object to update.
+        content_word_count: int. The number of words in the translation.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    if suggestion_is_accepted:
+        translation_contribution_stat.accepted_translations_count += 1
+        translation_contribution_stat.accepted_translation_word_count += (
+            content_word_count)
+    else:
+        translation_contribution_stat.rejected_translations_count += 1
+        translation_contribution_stat.rejected_translation_word_count += (
+            content_word_count)
+    if not edited_by_reviewer:
+        (
+            translation_contribution_stat
+            .accepted_translations_without_reviewer_edits_count
+        ) += 1
+
+
+def increment_translation_review_stats(
+    translation_review_stat: suggestion_registry.TranslationReviewStats,
+    content_word_count: int,
+    last_contribution_date: datetime.datetime,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates TranslationReviewStats object.
+
+    Args:
+        translation_review_stat: TranslationReviewStats. The stats
+            object to update.
+        content_word_count: int. The number of words in the translation.
+        last_contribution_date: datetime.datetime. The last updated date.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    translation_review_stat.reviewed_translations_count += 1
+    translation_review_stat.reviewed_translation_word_count += (
+        content_word_count)
+    if suggestion_is_accepted:
+        translation_review_stat.accepted_translations_count += 1
+        translation_review_stat.accepted_translation_word_count += (
+            content_word_count)
+    if edited_by_reviewer:
+        (
+            translation_review_stat
+            .accepted_translations_with_reviewer_edits_count
+        ) += 1
+    translation_review_stat.last_contribution_date = (
+        last_contribution_date.date())
+
+
+def increment_question_contribution_stats_at_review(
+    question_contribution_stat: (
+        suggestion_registry.QuestionContributionStats
+    ),
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates QuestionContributionStats object.
+
+    Args:
+        question_contribution_stat: QuestionContributionStats. The stats
+            object to update.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    if suggestion_is_accepted:
+        question_contribution_stat.accepted_questions_count += 1
+    if not edited_by_reviewer:
+        (
+            question_contribution_stat
+            .accepted_questions_without_reviewer_edits_count
+        ) += 1
+
+
+def increment_question_review_stats(
+    question_review_stat: suggestion_registry.QuestionReviewStats,
+    last_contribution_date: datetime.datetime,
+    suggestion_is_accepted: bool,
+    edited_by_reviewer: bool
+) -> None:
+    """Updates QuestionReviewStats object.
+
+    Args:
+        question_review_stat: QuestionReviewStats. The stats object to update.
+        last_contribution_date: datetime.datetime. The last updated date.
+        suggestion_is_accepted: bool. A flag that indicates whether the
+            suggestion is accepted.
+        edited_by_reviewer: bool. A flag that indicates whether the suggestion
+            is edited by the reviewer.
+    """
+    question_review_stat.reviewed_questions_count += 1
+    if suggestion_is_accepted:
+        question_review_stat.accepted_questions_count += 1
+    if edited_by_reviewer:
+        question_review_stat.accepted_questions_with_reviewer_edits_count += 1
+    question_review_stat.last_contribution_date = (
+        last_contribution_date.date())
