@@ -8,9 +8,8 @@
               ng-disabled="!isSkillSaveable()">
         <span ng-if="!isSaveInProgress()">
           <span title="Publish Changes">
-            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+            <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish Changes">
-              &#xE161;
             </i>
             <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
             <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
@@ -41,18 +40,18 @@
       <div class="skill-nav-dropdown-container">
         <div class="skill-nav-skill-nav-dropdown-options" ng-if="showNavigationOptions">
           <div class="skill-nav-dropdown-option" ng-click="selectMainTab()">
-            <i class="material-icons">&#xE254;</i><span>Editor</span>
+            <i class="fas fa-pen navbar-tab-icon"></i><span>Editor</span>
           </div>
           <div class="skill-nav-dropdown-option" ng-click="selectQuestionsTab()">
-            <i class="material-icons">&#xE254;</i><span>Questions</span>
+            <i class="fas fa-book-open navbar-tab-icon"></i><span>Questions</span>
           </div>
           <div class="skill-nav-dropdown-option" ng-click="selectPreviewTab()">
-            <i class="material-icons">&#xE037;</i><span>Preview</span>
+            <i class="fas fa-play navbar-tab-icon"></i><span>Preview</span>
           </div>
         </div>
         <div class="skill-nav-dropdown-content">
           <div class="skill-nav-dropdown-text" ng-click="toggleWarningText()">
-            <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
+            <i ng-if="!getTotalWarningsCount()" class="fas fa-pen"></i>
             <span><[activeTab]></span>
           </div>
           <div class="skill-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
@@ -63,7 +62,7 @@
       <div class="skill-nav-dropdown-container save-options-dropdown">
         <div class="skill-nav-skill-nav-dropdown-options" ng-if="showSkillEditOptions">
           <div class="skill-nav-dropdown-option" ng-click="saveChanges()">
-            <i class="material-icons">&#xE254;</i>
+            <i class="fas fa-save navbar-tab-icon"></i>
             <span>Save Changes</span>
           </div>
         </div>
@@ -164,6 +163,9 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
+    }
+    .skill-editor-nav-mobile .navbar-tab-icon {
+      padding: 5px;
     }
 
      .right-container {
