@@ -51,7 +51,7 @@ ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
 # MyPy type annotations completely, and still, we are using exceptional types
 # in these dirs which causes linters to throw an error. So, once these dirs
 # are annotated completely, we can remove these dirs from this list and fix
-# the lint errors accordingly.  
+# the lint errors accordingly.
 EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
     'core/controllers/',
     'extensions/',
