@@ -1,0 +1,91 @@
+<div class="modal-header e2e-test-metadata-modal-header">
+  <h3>Add Some Details</h3>
+</div>
+
+<div class="modal-body oppia-long-text" *ngIf="isValueHasbeenUpdated">
+  <p>
+    Just a few more things before you publish:
+  </p>
+  <oppia-exploration-title-editor *ngIf="requireTitleToBeSpecified"
+                                  [labelText]="'Add a title: what should your exploration be called?'"
+                                  [titleEditorClass]="'e2e-test-exploration-title-input-modal'"
+                                  [formStyle]="{'font-weight':'normal'}">
+  </oppia-exploration-title-editor>
+  <oppia-exploration-objective-editor *ngIf="requireObjectiveToBeSpecified"
+                                      [labelText]="'Add a goal: what does the exploration help people to do?'"
+                                      [objectiveEditorClass]="'e2e-test-exploration-objective-input-modal'"
+                                      [formStyle]="{'font-weight': 'normal'}">
+  </oppia-exploration-objective-editor>
+  <p *ngIf="requireCategoryToBeSpecified">
+    <mat-form-field class="e2e-test-exploration-category-metadata-modal" appearance="fill">
+      <mat-label>Add a category: How would you categorize your exploration?</mat-label>
+      <mat-select [(ngModel)]="explorationCategoryService.displayed" class="e2e-test-exploration-category-dropdown">
+        <mat-option class="e2e-test-exploration-new-category-add">
+          <ngx-mat-select-search ngModel
+                                 (ngModelChange)="filterChoices($event)"
+                                 (keydown.enter)="updateCategoryListWithUserData()"
+                                 placeholderLabel="Type new category here...">
+          </ngx-mat-select-search>
+        </mat-option>
+        <mat-option (click)="updateCategoryListWithUserData()"
+                    *ngFor="let option of filteredChoices"
+                    class="e2e-test-exploration-category-selector-choice"
+                    [value]="option.id">
+          {{ option.text }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </p>
+  <p *ngIf="askForLanguageCheck">
+    <mat-form-field appearance="fill">
+      <mat-label>Verify the language: Is your exploration written in this language</mat-label>
+      <mat-select class="e2e-test-exploration-language-select-modal" [(ngModel)]="explorationLanguageCodeService.displayed" name="language">
+        <mat-option *ngFor="let value of explorationLanguageCodeService.getSupportedContentLanguages()"
+                    [value]="value.code"
+                    class="e2e-test-exploration-language-select-lan">
+          {{value.description}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </p>
+  <p *ngIf="askForTags">
+    <mat-form-field appearance="fill">
+      <mat-label>Add tags to help learners discover your exploration.</mat-label>
+      <mat-chip-list #chipList>
+        <mat-chip *ngFor="let tags of explorationTags" (removed)="remove(tags)">
+          {{ tags }}
+          <mat-icon matChipRemove class="update-cross-icon">cancel</mat-icon>
+        </mat-chip>
+        <input placeholder="Add a new tag (using lowercase letters and spaces)..."
+               pattern="[a-z]"
+               class="e2e-test-chip-list-tags"
+               [matChipInputFor]="chipList"
+               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+               [matChipInputAddOnBlur]="addOnBlur"
+               (matChipInputTokenEnd)="add($event)">
+      </mat-chip-list>
+    </mat-form-field>
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary"
+          (click)="cancel()">
+    Cancel
+  </button>
+  <button class="btn btn-success e2e-test-confirm-pre-publication"
+          (click)="save()"
+          [disabled]="!isSavingAllowed()">
+    Save Changes
+  </button>
+</div>
+
+<style>
+  .mat-form-field {
+    width: 100%;
+  }
+
+  .example-chip-list {
+    width: 100%;
+  }
+</style>

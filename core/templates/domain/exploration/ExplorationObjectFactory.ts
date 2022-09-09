@@ -63,6 +63,7 @@ export interface ExplorationBackendDict {
   'draft_change_list_id': number;
   'version'?: number;
   'next_content_id_index': number;
+  'edits_allowed'?: boolean;
 }
 
 export class Exploration extends BaseTranslatableObject {

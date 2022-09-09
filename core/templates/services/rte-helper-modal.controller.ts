@@ -131,9 +131,10 @@ angular.module('oppia').controller('RteHelperModalController', [
       if (!$scope.currentRteIsMathExpressionEditor) {
         return false;
       } else {
+        const { value } = $scope.tmpCustomizationArgs[0];
         return (
-          $scope.tmpCustomizationArgs[0].value.
-            mathExpressionSvgIsBeingProcessed);
+          value.mathExpressionSvgIsBeingProcessed || value.raw_latex === ''
+        );
       }
     };
     $scope.save = function() {

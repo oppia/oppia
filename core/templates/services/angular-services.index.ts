@@ -111,6 +111,7 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
+import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
 import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -425,6 +426,10 @@ import { TranslationStatusService } from 'pages/exploration-editor-page/translat
 import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
+import { ExplorationSaveService } from 'pages/exploration-editor-page/services/exploration-save.service';
+import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
+import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
+import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -883,5 +888,11 @@ export const angularServices: [string, Type<{}>][] = [
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
   ['NumberConversionService', NumberConversionService],
   ['ParameterMetadataService', ParameterMetadataService],
-  ['ExplorationWarningsService', ExplorationWarningsService]
+  ['ExplorationWarningsService', ExplorationWarningsService],
+  ['PracticeSessionsBackendApiService', PracticeSessionsBackendApiService],
+  ['ExplorationSaveService', ExplorationSaveService],
+  ['ExplorationAutomaticTextToSpeechService',
+    ExplorationAutomaticTextToSpeechService],
+  ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
+  ['CompareVersionsService', CompareVersionsService]
 ];
