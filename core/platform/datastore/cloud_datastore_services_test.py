@@ -23,7 +23,7 @@ from core.platform import models
 from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
 
-from typing import Any, List, Sequence, Tuple
+from typing import Sequence, Tuple
 
 MYPY = False
 if MYPY:
