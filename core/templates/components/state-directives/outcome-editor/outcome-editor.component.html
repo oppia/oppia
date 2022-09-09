@@ -209,7 +209,11 @@
 
   <div class="oppia-outcome-container" *ngIf="isEditable">
     <div *ngIf="outcome">
-      <input class="mr-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+      <input class="mr-2 e2e-test-editor-correctness-toggle"
+             type="checkbox"
+             [disabled]="isSelfLoop(savedOutcome)"
+             [(ngModel)]="outcome.labelledAsCorrect"
+             (change)="onChangeCorrectnessLabel()">
     </div>
     <strong class="oppia-outcome-heading">The answers in this group are correct</strong>
   </div>

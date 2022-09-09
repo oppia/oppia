@@ -625,6 +625,35 @@ describe('Outcome Editor Component', () => {
     expect(component.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
+  it('should set labelled as correct to false on saving destination' +
+    ' when state is in self loop', () => {
+    component.savedOutcome = new Outcome(
+      'Saved Dest',
+      null,
+      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
+      false,
+      [],
+      'ExpId',
+      '',
+    );
+    component.outcome = new Outcome(
+      'Dest1',
+      null,
+      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Dest1');
+    const changeCorrectnessSpy = spyOn(component, 'onChangeCorrectnessLabel');
+
+    component.saveThisDestination();
+
+    expect(component.outcome.labelledAsCorrect).toBe(false);
+    expect(changeCorrectnessSpy).toHaveBeenCalled();
+  });
+
   it('should set the dest_if_really_stuck property correctly' +
     'when the destination for the stuck learner is saved.', () => {
     component.savedOutcome = new Outcome(
