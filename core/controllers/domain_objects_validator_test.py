@@ -161,7 +161,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id': 'default_outcome_1',
                         'html': ''
                     },
                     'dest': 'State A',
@@ -177,7 +177,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                     'placeholder': {
                         'value': {
                             'unicode_str': '',
-                            'content_id': 'ca_placeholder_0'
+                            'content_id': 'ca_placeholder_2'
                         }
                     }
                 },
@@ -188,20 +188,12 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
             'linked_skill_id': None,
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'ca_placeholder_0': {}
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
                 }
             },
             'classifier_model_id': None,
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'ca_placeholder_0': {}
-                }
-            },
-            'next_content_id_index': 1,
             'card_is_checkpoint': False,
             'solicit_answer_details': False
         }

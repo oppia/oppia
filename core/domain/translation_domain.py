@@ -52,8 +52,10 @@ class TranslatableContentFormat(enum.Enum):
     def is_data_format_list(cls, data_format: str) -> bool:
         """Checks whether the content of translation with given format is of
         a list type.
+
         Args:
             data_format: str. The format of the translation.
+
         Returns:
             bool. Whether the content of translation is a list.
         """
@@ -363,7 +365,6 @@ class BaseTranslatableObject:
         return translations_missing_count + translation_needs_update_count < (
                 min_non_displayable_translation_count)
 
-
     def get_content_count(self):
         """Returns the total number of distinct content fields available in the
         exploration which are user facing and can be translated into
@@ -430,7 +431,8 @@ class EntityTranslation:
 
     def to_dict(entity_translation):
         translations_dict = {}
-        for content_id, translated_content in entity_translation.translations.items():
+        for content_id, translated_content in (
+                entity_translation.translations.items()):
             translations_dict[content_id] = translated_content.to_dict()
 
         return {
@@ -443,7 +445,7 @@ class EntityTranslation:
 
     @classmethod
     def from_dict(cls, entity_translation_dict):
-        translations_dict = entity_translation_dict["translations"]
+        translations_dict = entity_translation_dict['translations']
         content_id_to_translated_content = {}
         for content_id, translated_content in translations_dict.items():
             content_id_to_translated_content[content_id] = (
@@ -534,7 +536,6 @@ class EntityTranslation:
         for content_id in content_ids:
             if content_id in self.translations:
                 self.translations[content_id].needs_update = True
-
 
     @classmethod
     def create_empty(
@@ -1061,6 +1062,7 @@ class WrittenTranslations:
                             conversion_fn(translation_dict['html']))
 
         return written_translations_dict
+
 
 class ContentIdGenerator:
     """Class to generate the content-id for a translatable content based on the

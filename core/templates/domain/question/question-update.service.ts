@@ -17,7 +17,6 @@
  */
 
 import { BackendChangeObject, Change, DomainObject } from 'domain/editor/undo_redo/change.model';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';

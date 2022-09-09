@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import email_manager
-from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -349,4 +348,3 @@ def create_new_voiceover_application(
         author_id, None, language_code, filename, content, None)
 
     _save_voiceover_applications([voiceover_application])
-

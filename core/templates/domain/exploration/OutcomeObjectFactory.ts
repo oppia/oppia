@@ -64,7 +64,7 @@ export class Outcome extends BaseTranslatableObject {
   }
 
   getTranslatableFields(): SubtitledHtml[] {
-    return [this.feedback]
+    return [this.feedback];
   }
 
   setDestination(newValue: string): void {

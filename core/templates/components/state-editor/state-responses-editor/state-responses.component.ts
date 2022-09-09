@@ -35,7 +35,6 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
 import { AlertsService } from 'services/alerts.service';
-import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';

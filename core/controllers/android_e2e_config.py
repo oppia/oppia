@@ -272,8 +272,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml(
-            content_id_generator.generate(translation_domain.ContentType.CONTENT),
-            question_content))
+            state.content.content_id, question_content))
 
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(

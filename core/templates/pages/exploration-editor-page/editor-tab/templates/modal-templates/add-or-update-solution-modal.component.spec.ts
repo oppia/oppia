@@ -22,14 +22,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { ShortAnswerResponse, Solution, SolutionBackendDict, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { AddOrUpdateSolutionModalComponent } from './add-or-update-solution-modal.component';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 

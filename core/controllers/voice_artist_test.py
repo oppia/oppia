@@ -57,8 +57,8 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
-            'ca_placeholder_0': {},
-            'content': {
+            'ca_placeholder_2': {},
+            'content_0': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
@@ -66,7 +66,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                     'duration_secs': 4.5
                 }
             },
-            'default_outcome': {}
+            'default_outcome_1': {}
         }
     }
 
@@ -171,8 +171,8 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
-            'ca_placeholder_0': {},
-            'content': {
+            'ca_placeholder_2': {},
+            'content_0': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
@@ -180,7 +180,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
                     'duration_secs': 4.5
                 }
             },
-            'default_outcome': {}
+            'default_outcome_1': {}
         }
     }
     VALID_DRAFT_CHANGELIST = [{

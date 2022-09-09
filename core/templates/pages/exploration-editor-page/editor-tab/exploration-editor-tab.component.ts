@@ -294,7 +294,6 @@ angular.module('oppia').component('explorationEditorTab', {
         var stateName = StateEditorService.getActiveStateName();
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
-        var writtenTranslations = state.writtenTranslations;
         const shouldPrompt = contentIds.some(contentId => {
           return recordedVoiceovers.hasUnflaggedVoiceovers(contentId);
         });

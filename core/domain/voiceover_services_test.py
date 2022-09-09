@@ -18,8 +18,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import question_services
 from core.domain import rights_manager

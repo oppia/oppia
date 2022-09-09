@@ -2640,7 +2640,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             {
                 'exp1': {
                     'chapter_title': 'Node1',
-                    'content_count': 2,
+                    'content_count': 1,
                     'id': 'exp1',
                     'story_title': 'A story',
                     'topic_name': 'topic',

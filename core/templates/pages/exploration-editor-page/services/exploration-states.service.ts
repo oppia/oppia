@@ -225,7 +225,7 @@ export class ExplorationStatesService {
 
       let intialContent = this.initalContentsMapping[content.contentId];
       if (
-          JSON.stringify(BaseTranslatableObject.getContentValue(content)) ===
+        JSON.stringify(BaseTranslatableObject.getContentValue(content)) ===
         JSON.stringify(BaseTranslatableObject.getContentValue(intialContent))) {
         continue;
       }

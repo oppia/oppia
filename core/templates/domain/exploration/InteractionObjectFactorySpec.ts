@@ -799,7 +799,7 @@ describe('Interaction object factory', () => {
     };
     let contentIds = Interaction.getCustomizationArgContents(ca).map(
       (content) => {
-      return content.contentId;
+        return content.contentId;
       });
     expect(contentIds).toEqual(
       ['ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1']);

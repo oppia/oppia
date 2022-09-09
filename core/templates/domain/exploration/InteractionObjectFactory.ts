@@ -220,7 +220,7 @@ export class Interaction extends BaseTranslatableObject {
       }
     };
 
-    if(customizationArgs) {
+    if (customizationArgs) {
       Object.values(customizationArgs).forEach(
         caValue => {
           traverseValueAndRetrieveContentIdsFromSubtitled(caValue.value);

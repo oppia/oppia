@@ -660,7 +660,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_question_state_dict_conversion_from_v27_to_v28(self) -> None:
         test_data = self.question_state_dict['recorded_voiceovers']
         # Here we are defining an older version dictionary of state which
-        # contains `content_ids_to_audio_translations` key, but self.question_state_dict
+        # contains `content_ids_to_audio_translations` key, but question_state
         # is of type StateDict ( latest version dictionary for state ) and
         # StateDict do not contain `content_ids_to_audio_translations` key,
         # due to this MyPy throws an `TypedDict "StateDict" has no key` error.
@@ -689,7 +689,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
 
-         # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         # Removing 'solicit_answer_details' from question_data.
         del self.question_state_dict['solicit_answer_details']  # type: ignore[misc]
 
@@ -752,7 +752,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # functions, keys are populated automatically or not. So, due to the
         # absence of keys MyPy throws an `Missing key` error. Thus to avoid
         # the error, we used ignore here.
-        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {
+        self.question_state_dict[
+            'recorded_voiceovers']['voiceovers_mapping'] = {
             'content': {
                 'audio_metadata': {}  # type: ignore[typeddict-item]
             }
@@ -940,7 +941,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         ]
-        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {
+        self.question_state_dict[
+            'recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
 
@@ -1109,7 +1111,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # for which we have to provide `html` key. So, due to this MyPy throws
         # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
         # we used ignore here.
-        self.question_state_dict['written_translations']['translations_mapping'] = {
+        self.question_state_dict[
+            'written_translations']['translations_mapping'] = {
             'temp_id_1': {
                 'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
@@ -1459,8 +1462,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
         self.question_state_dict['interaction']['customization_args'] = {}
-        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {}
-        self.question_state_dict['written_translations']['translations_mapping'] = {}
+        self.question_state_dict[
+            'recorded_voiceovers']['voiceovers_mapping'] = {}
+        self.question_state_dict[
+            'written_translations']['translations_mapping'] = {}
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1564,7 +1569,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         self.question_state_dict['next_content_id_index'] = 0
-        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {}
+        self.question_state_dict[
+            'recorded_voiceovers']['voiceovers_mapping'] = {}
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,
@@ -1989,7 +1995,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
-        self.question_state_dict['interaction']['id'] = 'AlgebraicExpressionInput'
+        self.question_state_dict['interaction']['id'] = (
+            'AlgebraicExpressionInput')
         self.question_state_dict['interaction']['customization_args'] = {
             'customOskLetters': {
                 'value': ['a', 'b', 'c']

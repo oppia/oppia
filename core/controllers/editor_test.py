@@ -370,7 +370,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_9
         unicode_str: ''
     rows:
       value: 1
@@ -391,7 +391,7 @@ linked_skill_id: null
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
+    ca_placeholder_9: {}
     content_3: {}
     default_outcome_4: {}
 solicit_answer_details: false
@@ -408,7 +408,7 @@ interaction:
   customization_args:
     placeholder:
       value:
-        content_id: ca_placeholder_0
+        content_id: ca_placeholder_10
         unicode_str: ''
     rows:
       value: 1
@@ -429,7 +429,7 @@ linked_skill_id: null
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-    ca_placeholder_0: {}
+    ca_placeholder_10: {}
     content_5: {}
     default_outcome_6: {}
 solicit_answer_details: false
@@ -580,11 +580,6 @@ solicit_answer_details: false
                     )
                 }),
                 exp_domain.ExplorationChange({
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index
-                }),
-                exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State A',
@@ -598,7 +593,11 @@ solicit_answer_details: false
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate(
+                                    translation_domain.ContentType
+                                    .CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                ),
                                 'unicode_str': ''
                             }
                         },
@@ -619,7 +618,11 @@ solicit_answer_details: false
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate(
+                                    translation_domain.ContentType
+                                    .CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                ),
                                 'unicode_str': ''
                             }
                         },
@@ -640,7 +643,11 @@ solicit_answer_details: false
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': 'ca_placeholder_0',
+                                'content_id': content_id_generator.generate(
+                                    translation_domain.ContentType
+                                    .CUSTOMIZATION_ARG,
+                                    extra_prefix='placeholder'
+                                ),
                                 'unicode_str': ''
                             }
                         },
@@ -655,6 +662,11 @@ solicit_answer_details: false
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'next_content_id_index',
+                    'new_value': content_id_generator.next_content_id_index
                 })], 'changes')
         response = self.get_html_response('/create/%s' % exp_id)
 
@@ -1245,6 +1257,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
 
         # In version 2, change the objective and the initial state content.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        init_state = exploration.states[exploration.init_state_name]
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -1255,7 +1268,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
                 'new_value': {
-                    'content_id': 'content_0',
+                    'content_id': init_state.content.content_id,
                     'html': '<p>ABC</p>'
                 },
             })], 'Change objective and init state content')

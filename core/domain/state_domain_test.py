@@ -34,7 +34,6 @@ from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import rules_registry
 from core.domain import state_domain
-from core.domain import translatable_object_registry
 from core.domain import translation_domain
 from core.tests import test_utils
 from extensions.interactions import base
