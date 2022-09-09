@@ -31,7 +31,9 @@ from typing import Any, Dict, List, Tuple
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = (
-    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST)
+    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST
+)
+
 
 def _get_blog_card_summary_dicts_for_homepage(summaries):
     """Creates summary dicts for use in blog homepage.
@@ -122,8 +124,8 @@ class BlogHomepageDataHandler(base.BaseHandler):
         # Total number of published blog posts is calculated only when we load
         # the blog home page for the first time. It is not required to load
         # other subsequent pages as the value is already loaded in the frontend.
-        # Similar for list of default tags. Therefore, we return 0 and empty list
-        # for these fields respectively.
+        # Similar for list of default tags. Therefore, we return 0 and empty
+        # list for these fields respectively.
         if offset == 0:
             number_of_published_blog_post_summaries = (
                 blog_services
@@ -184,26 +186,26 @@ class BlogPostDataHandler(base.BaseHandler):
             _get_matching_blog_card_summary_dicts(
                 '',
                 blog_post_dict['tags'],
-                feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST+1,
+                feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1,
                 None
             )
         )
         if (
             len(blog_post_summaries) <
-            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST+1
+            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1
         ):
             blog_post_summaries.extend(
                 blog_services.get_published_blog_post_summaries_by_user_id(
                     blog_post.author_id,
-                    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST  +
+                    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST +
                     len(blog_post_summaries)
                 )
             )
-            blog_post_summaries=list(set(blog_post_summaries))
+            blog_post_summaries = list(set(blog_post_summaries))
 
         if (
             len(blog_post_summaries) <
-            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST+1
+            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1
         ):
             blog_post_summaries.extend(
                 blog_services.get_published_blog_post_summaries(
@@ -211,7 +213,7 @@ class BlogPostDataHandler(base.BaseHandler):
                     len(blog_post_summaries)
                 )
             )
-            blog_post_summaries=list(set(blog_post_summaries))
+            blog_post_summaries = list(set(blog_post_summaries))
 
         summary_dicts = (
             _get_blog_card_summary_dicts_for_homepage(blog_post_summaries)

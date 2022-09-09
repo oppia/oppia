@@ -766,12 +766,13 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
 
 
 def get_published_blog_post_summaries(
-    offset: int = 0, size: Optional[int]=None
+    offset: int=0, size: Optional[int]=None
 ) -> List[blog_domain.BlogPostSummary]:
     """Returns published BlogPostSummaries list.
 
     Args:
         offset: int. Number of query results to skip from top.
+        size: int or None. Number of blog post summaries to return.
 
     Returns:
         list(BlogPostSummaries). These are sorted in order of the

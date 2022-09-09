@@ -121,7 +121,7 @@
           <h4 class="d-flex flex-grow-1 search-heading">
             {{ 'I18N_BLOG_HOME_PAGE_TAGS_SEARCH_HEADING' | translate }}
           </h4>
-          <oppia-tag-filter *ngIf = "listOfDefaultTags.length > 0"
+          <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0"
                             [(listOfDefaultTags)]="listOfDefaultTags"
                             [(selectedTags)]="selectedTags"
                             [smallScreenViewIsActive]="isSmallScreenViewActive()"

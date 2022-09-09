@@ -118,12 +118,10 @@ export class BlogHomePageBackendApiService {
   async fetchBlogPostPageDataAsync(
       blogPostUrl: string): Promise<BlogPostPageData> {
     return new Promise((resolve, reject) => {
-      console.log(blogPostUrl);
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
         BlogPostPageConstants.BLOG_POST_PAGE_DATA_URL_TEMPLATE, {
           blog_post_url: blogPostUrl
         });
-      console.log({1: blogPostDataUrl});
       this.http.get<BlogPostPageBackendResponse>(blogPostDataUrl).toPromise()
         .then(response => {
           resolve({

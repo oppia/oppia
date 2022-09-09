@@ -37,12 +37,11 @@
   </div>
 </mat-card>
 <style>
-
   @media (min-width: 900px) {
     .blog-card.recommendation-blog-card {
-      width: 33.5vw;
-      max-width: 455px;
       margin: 0;
+      max-width: 455px;
+      width: 33.5vw;
     }
   }
 
@@ -131,109 +130,108 @@
     margin-bottom: 0;
   }
 
-@media (min-width: 1024px) and (max-width: 1200px), (max-width: 768px) {
-  .blog-card {
-    margin-left: auto;
-    margin-right: auto;
-    min-height: unset;
-    width: 476px;
-  }
+  @media (min-width: 1024px) and (max-width: 1200px), (max-width: 768px) {
+    .blog-card {
+      margin-left: auto;
+      margin-right: auto;
+      min-height: unset;
+      width: 476px;
+    }
 
-  .mat-card-image.blog-card-thumbnail {
-    height: 119px;
-  }
-
-  .blog-card-thumbnail-container {
-    height: 119px;
-  }
-
-  .blog-card-title {
-    font-size: 1.6rem;
-    font-weight: 500;
-    line-height: 14px;
-  }
-
-  .blog-card-content .mat-card-avatar {
-    height: 29px;
-    width: 29px;
-  }
-
-  .mobile-published-date {
-    font-size: 10px;
-  }
-
-  .blog-card-summary {
-    font-size: 1.3rem;
-  }
-
-  .blog-card-content {
-    margin: 0;
-  }
-
-  .blog-card-content mat-card-subtitle {
-    font-size: 1rem;
-    line-height: 16px;
-  }
-
-  .blog-card-tag {
-    color: #555;
-    font-size: 13px;
-    letter-spacing: 0;
-    line-height: 15px;
-    opacity: 1;
-  }
-}
-
-@media(max-width: 550px) {
-
-  @media (max-width: 470px) {
     .mat-card-image.blog-card-thumbnail {
-      height: 85px;
+      height: 119px;
     }
 
     .blog-card-thumbnail-container {
-      height: 85px;
+      height: 119px;
+    }
+
+    .blog-card-title {
+      font-size: 1.6rem;
+      font-weight: 500;
+      line-height: 14px;
+    }
+
+    .blog-card-content .mat-card-avatar {
+      height: 29px;
+      width: 29px;
+    }
+
+    .mobile-published-date {
+      font-size: 10px;
+    }
+
+    .blog-card-summary {
+      font-size: 1.3rem;
+    }
+
+    .blog-card-content {
+      margin: 0;
+    }
+
+    .blog-card-content mat-card-subtitle {
+      font-size: 1rem;
+      line-height: 16px;
+    }
+
+    .blog-card-tag {
+      color: #555;
+      font-size: 13px;
+      letter-spacing: 0;
+      line-height: 15px;
+      opacity: 1;
     }
   }
 
-  @media (max-width: 440px) {
-    mat-card.blog-card {
-      width: 335px;
+  @media(max-width: 550px) {
+    @media (max-width: 470px) {
+      .mat-card-image.blog-card-thumbnail {
+        height: 85px;
+      }
+
+      .blog-card-thumbnail-container {
+        height: 85px;
+      }
+    }
+
+    @media (max-width: 440px) {
+      mat-card.blog-card {
+        width: 335px;
+      }
+    }
+
+    .blog-card {
+      margin-left: auto;
+      margin-right: auto;
+      width: 376px;
+    }
+
+    .blog-card-title {
+      font-size: 1.2rem;
+      font-weight: 500;
+      line-height: 14px;
+    }
+
+    .blog-card-content .mat-card-avatar {
+      height: 27px;
+      width: 27px;
+    }
+
+    .mobile-published-date {
+      font-size: 9px;
+    }
+
+    .blog-card-summary {
+      font-size: 1rem;
+    }
+
+    .blog-card-content {
+      margin: 0;
+    }
+
+    .blog-card-content mat-card-subtitle {
+      font-size: 0.9rem;
+      line-height: 16px;
     }
   }
-
-  .blog-card {
-    margin-left: auto;
-    margin-right: auto;
-    width: 376px;
-  }
-
-  .blog-card-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    line-height: 14px;
-  }
-
-  .blog-card-content .mat-card-avatar {
-    height: 27px;
-    width: 27px;
-  }
-
-  .mobile-published-date {
-    font-size: 9px;
-  }
-
-  .blog-card-summary {
-    font-size: 1rem;
-  }
-
-  .blog-card-content {
-    margin: 0;
-  }
-
-  .blog-card-content mat-card-subtitle {
-    font-size: 0.9rem;
-    line-height: 16px;
-  }
-}
 </style>
