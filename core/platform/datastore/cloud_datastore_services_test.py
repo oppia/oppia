@@ -171,9 +171,9 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(result, user_query_model1)
 
-        result: Tuple[List[Any], cloud_datastore_services.Cursor] = (
+        results: Tuple[List[Any], cloud_datastore_services.Cursor] = (
             user_models.UserQueryModel.query(
                 user_models.UserQueryModel.submitter_id == self.admin_user_id,
             ).fetch_page(2, cloud_datastore_services.make_cursor()))
 
-        self.assertEqual(result[0], [user_query_model1, user_query_model2])
+        self.assertEqual(results[0], [user_query_model1, user_query_model2])
