@@ -88,6 +88,8 @@ import { ExplorationSavePromptModalComponent } from './modal-templates/explorati
 import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
 import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
+import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
+import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
 
 @NgModule({
   imports: [
@@ -159,7 +161,9 @@ import { StateStatsModalComponent } from './statistics-tab/templates/state-stats
     ExplorationSavePromptModalComponent,
     ExplorationSaveAndPublishButtonsComponent,
     StatisticsTabComponent,
-    StateStatsModalComponent
+    StateStatsModalComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -212,7 +216,9 @@ import { StateStatsModalComponent } from './statistics-tab/templates/state-stats
     ExplorationSavePromptModalComponent,
     ExplorationSaveAndPublishButtonsComponent,
     StatisticsTabComponent,
-    StateStatsModalComponent
+    StateStatsModalComponent,
+    AddAudioTranslationModalComponent,
+    AudioTranslationBarComponent
   ],
   providers: [
     {

@@ -430,6 +430,7 @@ import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-edito
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
 import { SuggestionModalForExplorationEditorService } from 'pages/exploration-editor-page/suggestion-modal-for-editor-view/suggestion-modal-for-exploration-editor.service';
+import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -893,5 +894,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
   ['CompareVersionsService', CompareVersionsService],
   ['SuggestionModalForExplorationEditorService',
-    SuggestionModalForExplorationEditorService]
+    SuggestionModalForExplorationEditorService],
+  ['VoiceoverRecordingService', VoiceoverRecordingService]
 ];

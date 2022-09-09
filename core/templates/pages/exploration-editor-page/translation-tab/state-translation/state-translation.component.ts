@@ -19,9 +19,6 @@
 require(
   'components/state-directives/response-header/response-header.component.ts');
 require(
-  'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
-  'audio-translation-bar.directive.ts');
-require(
   'pages/exploration-editor-page/translation-tab/state-translation-editor/' +
   'state-translation-editor.component.ts'
 );
