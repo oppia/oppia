@@ -55,8 +55,7 @@ var ExplorationEditorMainTab = function() {
   var interaction = $('.e2e-test-interaction');
   var interactionEditor = $('.e2e-test-interaction-editor');
   var interactionHtmlElement = $('.e2e-test-interaction-html');
-  var leaveTranslationsAsIsButton = element(
-    by.css('.e2e-test-leave-translations-as-is'));
+  var leaveTranslationsAsIsButton = $('.e2e-test-leave-translations-as-is');
   var parameterElementButton = $('.e2e-test-main-html-select-selector');
   var interactionTab = function(tabId) {
     return $('.e2e-test-interaction-tab-' + tabId);
