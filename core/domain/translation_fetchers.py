@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from core.domain import translation_domain
 from core.platform import models
-from core import feconf
 
 from typing import Optional
 

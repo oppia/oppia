@@ -29,8 +29,8 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import translation_domain
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.tests import test_utils
 
 

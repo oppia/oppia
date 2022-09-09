@@ -29,7 +29,6 @@ from core.domain import story_fetchers
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
-from core.domain import translation_fetchers
 from core.domain import user_services
 
 
