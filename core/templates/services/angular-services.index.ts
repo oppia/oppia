@@ -57,6 +57,7 @@ import { StateWrittenTranslationsService } from 'components/state-editor/state-e
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
+import { BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
@@ -338,6 +339,7 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
 import { SearchBackendApiService } from 'services/search-backend-api.service';
 import { SearchService } from 'services/search.service';
+import { BlogPostSearchService } from 'services/blog-search.service';
 import { ServerConnectionBackendApiService } from 'services/server-connection-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -456,6 +458,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
   ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogHomePageBackendApiService', BlogHomePageBackendApiService],
   ['BlogDashboardPageService', BlogDashboardPageService],
   ['BlogPostEditorBackendApiService', BlogPostEditorBackendApiService],
   ['BottomNavbarStatusService', BottomNavbarStatusService],
@@ -745,6 +748,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SearchExplorationsBackendApiService', SearchExplorationsBackendApiService],
   ['SearchBackendApiService', SearchBackendApiService],
   ['SearchService', SearchService],
+  ['BlogPostSearchService', BlogPostSearchService],
   ['ServerConnectionBackendApiService', ServerConnectionBackendApiService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],

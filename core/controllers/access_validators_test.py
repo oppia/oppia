@@ -154,3 +154,40 @@ class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
         self.get_html_response( # type: ignore[no-untyped-call]
             '%s/can_manage_own_account' % ACCESS_VALIDATION_HANDLER_PREFIX)
         self.logout()
+
+
+class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the blog home page page and its rendering."""
+
+    def test_blog_home_page_access_without_logging_in(self):
+        self.get_json(
+            '%s/can_access_blog_home_page' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+
+    def test_blog_home_page_access_without_having_rights(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/can_access_blog_home_page' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=401)
+        self.logout()
+
+    def test_blog_home_page_access_as_blog_admin(self):
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.login(self.BLOG_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_blog_home_page' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
+        self.logout()
+
+    def test_blog_home_page_access_as_blog_post_editor(self):
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(self.BLOG_EDITOR_EMAIL)
+        self.get_html_response(
+            '%s/can_access_blog_home_page' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
+        self.logout()

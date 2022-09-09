@@ -113,8 +113,8 @@ describe('SharingLinksComponent', () => {
     component.shareType = 'not-exp-or-col';
 
     expect(() => component.ngOnInit()).toThrowError(
-      'SharingLinks component can only be used either in the' +
-      'collection player or the exploration player');
+      'SharingLinks component can only be used in the collection player' +
+      ', exploration player or the blog post page.');
   });
 
   it('should get font and flex class according to font size', () => {

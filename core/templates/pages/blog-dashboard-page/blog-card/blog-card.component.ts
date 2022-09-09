@@ -21,6 +21,7 @@ import { AppConstants } from 'app.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.constants';
 import dayjs from 'dayjs';
 
 @Component({
@@ -33,6 +34,7 @@ export class BlogCardComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
   @Input() authorProfilePicDataUrl!: string;
+  @Input() shownOnblogPostPage!: boolean;
   authorProfilePictureUrl!: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
@@ -64,5 +66,12 @@ export class BlogCardComponent implements OnInit {
   getDateStringInWords(naiveDate: string): string {
     return dayjs(
       naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
+  }
+
+  navigateToBlogPostPage(): void {
+    window.location.href = this.urlInterpolationService.interpolateUrl(
+      BlogPostPageConstants.BLOG_POST_PAGE_URL_TEMPLATE,
+      { blog_post_url: this.blogPostSummary.urlFragment }
+    );
   }
 }

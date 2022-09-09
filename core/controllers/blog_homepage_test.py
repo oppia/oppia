@@ -91,7 +91,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         )
 
 
-class BlogPostHandlerTest(test_utils.GenericTestBase):
+class BlogPostDataHandlerTest(test_utils.GenericTestBase):
     """Checks that the data of the blog post and other data on
     BlogPostPage is properly handled."""
 

@@ -44,9 +44,10 @@ export class SharingLinksComponent implements OnInit {
   @Input() explorationId!: string;
   @Input() collectionId!: string;
   @Input() smallFont!: boolean;
+  @Input() blogPostUrl!: string;
   classroomUrl!: string;
-  activityId!: string;
-  activityUrlFragment!: string;
+  activityId: string;
+  activityUrlFragment: string;
   serverName!: string;
   escapedTwitterText!: string;
 
@@ -64,13 +65,13 @@ export class SharingLinksComponent implements OnInit {
     } else if (this.shareType === 'collection') {
       this.activityId = this.collectionId;
       this.activityUrlFragment = 'collection';
-    } else {
+    } else if (this.shareType !== 'blog') {
       // TODO(#13122): Remove this code to throw error. Remove @Input to
       // this component and use ContextService directly to determine if the
       // collection or exploration page is active and render accordingly.
       throw new Error(
-        'SharingLinks component can only be used either in the' +
-        'collection player or the exploration player');
+        'SharingLinks component can only be used in the ' +
+        'collection player, exploration player or the blog post page.');
     }
 
     this.serverName = (
@@ -100,8 +101,15 @@ export class SharingLinksComponent implements OnInit {
 
   getUrl(network: SharingPlatform): string {
     let queryString: string;
-    const url = (
-      `${this.serverName}/${this.activityUrlFragment}/${this.activityId}`);
+    let url: string;
+    if (this.shareType === 'blog') {
+      url = (
+        `${this.serverName}/blog/${this.blogPostUrl}`
+      );
+    } else {
+      url = (
+        `${this.serverName}/${this.activityUrlFragment}/${this.activityId}`);
+    }
     switch (network) {
       case 'facebook':
         queryString = (
@@ -125,6 +133,12 @@ export class SharingLinksComponent implements OnInit {
           `url=${url}`
         );
         return `https://classroom.google.com/share?${queryString}`;
+
+      case 'linkedin':
+        queryString = (
+          `url=${url}`
+        );
+        return `https://www.linkedin.com/sharing/share-offsite/?${queryString.replace('http:', 'https:')}`;
     }
   }
 
@@ -140,14 +154,16 @@ export class SharingLinksComponent implements OnInit {
       this.siteAnalyticsService.registerShareExplorationEvent(network);
     } else if (this.shareType === 'collection') {
       this.siteAnalyticsService.registerShareCollectionEvent(network);
+    } else if (this.shareType === 'blog') {
+      this.siteAnalyticsService.registerShareBlogPostEvent(network);
     }
     this.windowRef.nativeWindow
       .open(this.getUrl(network), '', 'height=460, width=640');
   }
 }
 
-type ShareType = 'exploration' | 'collection';
-type SharingPlatform = 'facebook' | 'twitter' | 'classroom';
+type ShareType = 'exploration' | 'collection' | 'blog';
+type SharingPlatform = 'facebook' | 'twitter' | 'classroom' | 'linkedin';
 
 angular.module('oppia').directive('sharingLinks', downgradeComponent(
   {component: SharingLinksComponent}));

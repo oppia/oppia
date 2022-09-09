@@ -30,7 +30,8 @@ from typing import Any, Dict, List, Tuple
 
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
-
+MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = (
+    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST)
 
 def _get_blog_card_summary_dicts_for_homepage(summaries):
     """Creates summary dicts for use in blog homepage.
@@ -58,10 +59,10 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
 # `blog_post_summary_dicts` since we have to return a list with each element
 # being domain object converted to a dictionary in the tuple.
 def _get_matching_blog_card_summary_dicts(
-    query_string: str, tags: list[str], search_offset: int
+    query_string: str, tags: list[str], size: int, search_offset: int
 ) -> Tuple[List[Dict[str, Any]], int]:
     """Given the details of a query and a search offset, returns a list of
-    matching blog card summary dicts that satisfy the query.
+    matching blog card summary domain objects that satisfy the query.
 
     Args:
         query_string: str. The search query string (this is what the user
@@ -70,6 +71,8 @@ def _get_matching_blog_card_summary_dicts(
             tags filter is applied to the results. If it is not empty, then
             a result is considered valid if it matches at least one of these
             tags.
+        size: int. The maximum number of blog post summary domain objects to
+            be returned.
         search_offset: int or None. Offset indicating where, in the list of
             blog post summaries search results, to start the search from.
             If None, blog post summaries search results are returned from
@@ -77,25 +80,24 @@ def _get_matching_blog_card_summary_dicts(
 
     Returns:
         tuple. A tuple consisting of two elements:
-            - list(dict). Each element in this list is a blog post summary dict,
-            representing a search result to popoulate data on blog card.
+            - list(dict). Each element in this list is a blog post summary
+            domain object, representing a search result to popoulate data on
+            blog card.
             - int. The blog post search index offset from which to start the
                 next search.
     """
     blog_post_ids, new_search_offset = (
         blog_services.get_blog_post_ids_matching_query(
-            query_string, tags, offset=search_offset))
+            query_string, tags, size, offset=search_offset))
     blog_post_summaries = (
         blog_services.get_blog_post_summary_models_by_ids(blog_post_ids))
-    blog_post_summary_dicts = (
-        _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
-    if len(blog_post_summary_dicts) == feconf.DEFAULT_QUERY_LIMIT:
+    if len(blog_post_summaries) == feconf.DEFAULT_QUERY_LIMIT:
         logging.exception(
             '%s blog post summaries were fetched to load the search/filter by '
             'result page. You may be running up against the default query '
             'limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
-    return blog_post_summary_dicts, new_search_offset
+    return blog_post_summaries, new_search_offset
 
 
 class BlogHomepageDataHandler(base.BaseHandler):
@@ -104,29 +106,51 @@ class BlogHomepageDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
+        'GET': {
+            'offset': {
+                'schema': {
+                    'type': 'basestring'
+                },
+            }
+        }
     }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
+        offset = int(self.normalized_request.get('offset'))
+        # Total number of published blog posts is calculated only when we load
+        # the blog home page for the first time. It is not required to load
+        # other subsequent pages as the value is already loaded in the frontend.
+        # Similar for list of default tags. Therefore, we return 0 and empty list
+        # for these fields respectively.
+        if offset == 0:
+            number_of_published_blog_post_summaries = (
+                blog_services
+                    .get_total_number_of_published_blog_post_summaries())
+            list_of_default_tags = config_domain.Registry.get_config_property(
+            'list_of_default_tags_for_blog_post').value
+        else:
+            number_of_published_blog_post_summaries = 0
+            list_of_default_tags = []
         published_post_summaries = (
-            blog_services.get_published_blog_post_summaries())
+            blog_services.get_published_blog_post_summaries(offset))
         published_post_summary_dicts = []
         if published_post_summaries:
             published_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_homepage(
                     published_post_summaries))
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post').value
+
         self.values.update({
+            'no_of_blog_post_summaries': (
+                number_of_published_blog_post_summaries),
             'blog_post_summary_dicts': published_post_summary_dicts,
             'list_of_default_tags': list_of_default_tags
         })
         self.render_json(self.values)
 
 
-class BlogPostHandler(base.BaseHandler):
+class BlogPostDataHandler(base.BaseHandler):
     """Provides blog post data for the blog post page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -154,17 +178,54 @@ class BlogPostHandler(base.BaseHandler):
             blog_services.get_blog_post_from_model(blog_post).to_dict())
         blog_post_dict['author_name'] = user_settings.username
         del blog_post_dict['author_id']
-        blog_post_summaries = (
-            blog_services.get_published_blog_post_summaries_by_user_id(
-                blog_post.author_id,
-                feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST))
-        blog_post_summary_dicts = (
-            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
+        # We fetch 1 more than the required blog post summaries as the result
+        # might contain the blog post which is currently being viewed.
+        blog_post_summaries, _ = (
+            _get_matching_blog_card_summary_dicts(
+                '',
+                blog_post_dict['tags'],
+                feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST+1,
+                None
+            )
+        )
+        if (
+            len(blog_post_summaries) <
+            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST+1
+        ):
+            blog_post_summaries.extend(
+                blog_services.get_published_blog_post_summaries_by_user_id(
+                    blog_post.author_id,
+                    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST  +
+                    len(blog_post_summaries)
+                )
+            )
+            blog_post_summaries=list(set(blog_post_summaries))
+
+        if (
+            len(blog_post_summaries) <
+            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST+1
+        ):
+            blog_post_summaries.extend(
+                blog_services.get_published_blog_post_summaries(
+                    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST +
+                    len(blog_post_summaries)
+                )
+            )
+            blog_post_summaries=list(set(blog_post_summaries))
+
+        summary_dicts = (
+            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries)
+        )
+        summary_dicts = list(
+            filter(
+                lambda i: i['id'] != blog_post_dict['id'], summary_dicts
+            )
+        )
 
         self.values.update({
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'blog_post_dict': blog_post_dict,
-            'summary_dicts': blog_post_summary_dicts
+            'summary_dicts': summary_dicts
         })
         self.render_json(self.values)
 
@@ -268,17 +329,23 @@ class BlogPostSearchHandler(base.BaseHandler):
 
         search_offset = self.normalized_request.get('offset')
 
-        blog_post_summary_dicts, new_search_offset = (
+        blog_post_summaries, new_search_offset = (
             _get_matching_blog_card_summary_dicts(
                 query_string,
                 tags,
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
                 search_offset
             )
         )
+        blog_post_summary_dicts = (
+            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
+        list_of_default_tags = config_domain.Registry.get_config_property(
+            'list_of_default_tags_for_blog_post').value
 
         self.values.update({
-            'summary_dicts': blog_post_summary_dicts,
+            'blog_post_summaries_list': blog_post_summary_dicts,
             'search_offset': new_search_offset,
+            'list_of_default_tags': list_of_default_tags,
         })
 
         self.render_json(self.values)

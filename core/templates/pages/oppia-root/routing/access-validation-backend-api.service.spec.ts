@@ -111,4 +111,36 @@ describe('Access validation backend api service', () => {
     expect(successSpy).toHaveBeenCalled();
     expect(failSpy).not.toHaveBeenCalled();
   }));
+
+  it('should validate access to blog home page with invalid access', fakeAsync (
+    () => {
+      avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
+
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_blog_home_page');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Access Denied.'
+      }, {
+        status: 401, statusText: 'Access Denied.'
+      });
+
+      flushMicrotasks();
+      expect(successSpy).not.toHaveBeenCalled();
+      expect(failSpy).toHaveBeenCalled();
+    }));
+
+  it('should validate access to blog home page with valid access', fakeAsync (
+    () => {
+      avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
+
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_blog_home_page');
+      expect(req.request.method).toEqual('GET');
+      req.flush({});
+
+      flushMicrotasks();
+      expect(successSpy).toHaveBeenCalled();
+      expect(failSpy).not.toHaveBeenCalled();
+    }));
 });

@@ -58,7 +58,7 @@ describe('Blog Dashboard Tile Component', () => {
 
     sampleBlogPostSummary = {
       id: 'sampleId',
-      author_username: 'test_user',
+      author_name: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],
@@ -109,7 +109,7 @@ describe('Blog Dashboard Tile Component', () => {
   it('should throw error if published date is not defined', () => {
     const invalidBlogPostSummary: BlogPostSummaryBackendDict = {
       id: 'sampleId',
-      author_username: 'test_user',
+      author_name: 'test_user',
       title: 'Title',
       summary: 'Hello World',
       tags: ['news'],
