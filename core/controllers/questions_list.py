@@ -15,7 +15,6 @@
 """Controllers for the questions list in topic editors and skill editors."""
 
 from __future__ import annotations
-from msilib import schema
 
 from core import feconf
 from core import utils
@@ -60,13 +59,12 @@ class QuestionsListHandler(base.BaseHandler):
             }
         }
     }
+
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
-        try:
-            offset = int(self.request.get('offset'))
-        except Exception as e:
-            raise self.InvalidInputException('Invalid offset') from e
+
+        offset = self.normalized_request.get('offset')
 
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
