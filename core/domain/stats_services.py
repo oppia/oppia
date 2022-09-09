@@ -31,7 +31,7 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 
-from typing import List, Optional, overload
+from typing import List, Optional, Sequence, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -49,6 +49,57 @@ transaction_services = models.Registry.import_transaction_services()
 #   - get_top_state_answer_stats_multi()
 # were removed in #13021 as part of the migration to Apache Beam. Please refer
 # to that PR if you need to reinstate them.
+
+
+@overload
+def get_playthrough_models_by_ids(
+    playthrough_ids: List[str], *, strict: Literal[True]
+) -> List[stats_models.PlaythroughModel]: ...
+
+
+@overload
+def get_playthrough_models_by_ids(
+    playthrough_ids: List[str]
+) -> List[Optional[stats_models.PlaythroughModel]]: ...
+
+
+@overload
+def get_playthrough_models_by_ids(
+    playthrough_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[stats_models.PlaythroughModel]]: ...
+
+
+def get_playthrough_models_by_ids(
+    playthrough_ids: List[str], strict: bool = False
+) -> Sequence[Optional[stats_models.PlaythroughModel]]:
+    """Returns a list of playthrough models matching the IDs provided.
+
+    Args:
+        playthrough_ids: list(str). List of IDs to get playthrough models for.
+        strict: bool. Whether to fail noisily if no playthrough model exists
+            with a given ID exists in the datastore.
+
+    Returns:
+        list(PlaythroughModel|None). The list of playthrough models
+        corresponding to given ids.  If a PlaythroughModel does not exist,
+        the corresponding returned list element is None.
+
+    Raises:
+        Exception. No PlaythroughModel exists for the given playthrough_id.
+    """
+
+    playthrough_models = (
+            stats_models.PlaythroughModel.get_multi(playthrough_ids))
+
+    if strict:
+        for index, playthrough_model in enumerate(playthrough_models):
+            if playthrough_model is None:
+                raise Exception(
+                    'No PlaythroughModel exists for the playthrough_id: %s'
+                    % playthrough_ids[index]
+                )
+
+    return playthrough_models
 
 
 def _migrate_to_latest_issue_schema(
@@ -486,13 +537,12 @@ def update_exp_issues_for_new_exp_version(
 
     playthrough_ids = list(itertools.chain.from_iterable(
         issue.playthrough_ids for issue in exp_issues.unresolved_issues))
-    playthrough_models = (
-        stats_models.PlaythroughModel.get_multi(playthrough_ids))
+    playthrough_models = get_playthrough_models_by_ids(
+        playthrough_ids, strict=True
+    )
     updated_playthrough_models = []
 
     for playthrough_model in playthrough_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert playthrough_model is not None
         playthrough = get_playthrough_from_model(playthrough_model)
 
         if 'state_names' in playthrough.issue_customization_args:
@@ -950,13 +1000,11 @@ def delete_playthroughs_multi(playthrough_ids: List[str]) -> None:
     @transaction_services.run_in_transaction_wrapper
     def _delete_playthroughs_multi_transactional() -> None:
         """Implementation to be run in a transaction."""
-        playthrough_models = stats_models.PlaythroughModel.get_multi(
-            playthrough_ids
+        playthrough_models = get_playthrough_models_by_ids(
+            playthrough_ids, strict=True
         )
         filtered_playthrough_models = []
         for playthrough_model in playthrough_models:
-            # Ruling out the possibility of None for mypy type checking.
-            assert playthrough_model is not None
             filtered_playthrough_models.append(playthrough_model)
         stats_models.PlaythroughModel.delete_multi(filtered_playthrough_models)
 

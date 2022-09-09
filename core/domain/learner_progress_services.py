@@ -1671,19 +1671,14 @@ def get_displayable_story_summary_dicts(
     """
     summary_dicts: List[DisplayableStorySummaryDict] = []
     story_ids = [story_summary.id for story_summary in story_summaries]
-    stories = story_fetchers.get_stories_by_ids(story_ids)
+    stories = story_fetchers.get_stories_by_ids(story_ids, strict=True)
     topic_ids = []
     for story in stories:
-        # Ruling out the possibility of None for mypy type checking.
-        assert story is not None
         topic_ids.append(story.corresponding_topic_id)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
     for index, story_summary in enumerate(story_summaries):
         story = stories[index]
         topic = topics[index]
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
-        assert story is not None
         summary_dicts.append({
             'id': story_summary.id,
             'title': story_summary.title,
@@ -1732,10 +1727,8 @@ def get_displayable_untracked_topic_summary_dicts(
         str, List[DisplayableTopicSummaryDict]
     ] = collections.defaultdict(list)
     topic_ids = [topic.id for topic in untracked_topic_summaries]
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
     for index, topic in enumerate(topics):
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
         all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions = (
             skill_services.get_descriptions_of_skills(
@@ -1787,10 +1780,8 @@ def get_displayable_topic_summary_dicts(
     """
     summary_dicts: List[DisplayableTopicSummaryDict] = []
     topic_ids = [topic.id for topic in topic_summaries]
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
     for index, topic in enumerate(topics):
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
         all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions = (
             skill_services.get_descriptions_of_skills(

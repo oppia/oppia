@@ -6222,6 +6222,31 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
+    def test_without_language_code_email_not_sent_to_new_translation_reviewer(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The language_code cannot be None'
+        ):
+            with self.can_not_send_emails_ctx:
+                email_manager.send_email_to_new_contribution_reviewer(
+                    self.translation_reviewer_id,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+                )
+
+    def test_without_language_code_email_not_sent_to_removed_translation_reviewer(   # pylint: disable=line-too-long
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'The language_code cannot be None'
+        ):
+            with self.can_not_send_emails_ctx:
+                email_manager.send_email_to_removed_contribution_reviewer(
+                    self.translation_reviewer_id,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
+
     def test_assign_translation_reviewer_email_for_invalid_review_category(
         self
     ) -> None:

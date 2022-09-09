@@ -62,6 +62,17 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             self.exp_id, 'admin', title='Title 1', end_state_name='End',
             correctness_feedback_enabled=True)
 
+    def test_raises_error_if_playthrough_model_fetched_with_invalid_id_and_strict(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No PlaythroughModel exists for the playthrough_id: invalid_id'
+        ):
+            stats_services.get_playthrough_models_by_ids(
+                ['invalid_id'], strict=True
+            )
+
     def test_get_exploration_stats_with_new_exp_id(self) -> None:
         exploration_stats = stats_services.get_exploration_stats(
             'new_exp_id', 1)

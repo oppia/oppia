@@ -177,6 +177,15 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(stories), 1)
         self.assertEqual(stories[0].to_dict(), expected_story)
 
+    def test_raises_error_if_stories_fetched_with_invalid_id_and_strict(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No story model exists for the story_id: invalid_id'
+        ):
+            story_fetchers.get_stories_by_ids(['invalid_id'], strict=True)
+
     def test_get_stories_by_ids_for_non_existing_story_returns_none(
         self
     ) -> None:

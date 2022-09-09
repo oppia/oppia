@@ -70,42 +70,41 @@ class Registry:
             state_schema_version in
             cls._state_schema_version_to_html_field_types_to_rule_specs)
 
-        if not cached and state_schema_version is None:
-            specs_from_json = json.loads(
-                constants.get_package_file_contents(
-                    'extensions',
-                    feconf.
-                    HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH
-                )
-            )
-            cls._state_schema_version_to_html_field_types_to_rule_specs[
-                state_schema_version
-            ] = specs_from_json
-        elif not cached:
-            # Ruling out the possibility of None for mypy type checking.
-            assert state_schema_version is not None
-            file_name = 'html_field_types_to_rule_specs_state_v%i.json' % (
-                state_schema_version
-            )
-            spec_file = os.path.join(
-                feconf
-                .LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,
-                file_name
-            )
-
-            try:
+        if not cached:
+            if state_schema_version is None:
                 specs_from_json = json.loads(
                     constants.get_package_file_contents(
-                        'extensions', spec_file
+                        'extensions',
+                        feconf.
+                        HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH
                     )
                 )
-            except Exception as e:
-                raise Exception(
-                    'No specs json file found for state schema v%i' %
-                    state_schema_version) from e
+                cls._state_schema_version_to_html_field_types_to_rule_specs[
+                    state_schema_version
+                ] = specs_from_json
+            else:
+                file_name = 'html_field_types_to_rule_specs_state_v%i.json' % (
+                    state_schema_version
+                )
+                spec_file = os.path.join(
+                    feconf
+                    .LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,  # pylint: disable=line-too-long
+                    file_name
+                )
 
-            cls._state_schema_version_to_html_field_types_to_rule_specs[
-                state_schema_version] = specs_from_json
+                try:
+                    specs_from_json = json.loads(
+                        constants.get_package_file_contents(
+                            'extensions', spec_file
+                        )
+                    )
+                except Exception as e:
+                    raise Exception(
+                        'No specs json file found for state schema v%i' %
+                        state_schema_version) from e
+
+                cls._state_schema_version_to_html_field_types_to_rule_specs[
+                    state_schema_version] = specs_from_json
 
         return cls._state_schema_version_to_html_field_types_to_rule_specs[
             state_schema_version]
