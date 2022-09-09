@@ -119,8 +119,8 @@
     <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
     </translation-tab>
     <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-    <preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
-    </preview-tab>
+    <oppia-preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
+    </oppia-preview-tab>
 
     <statistics-tab ng-show="$ctrl.getActiveTabName() === 'stats'">
     </statistics-tab>
@@ -128,11 +128,11 @@
     <improvements-tab ng-if="$ctrl.isImprovementsTabEnabled()" ng-show="$ctrl.getActiveTabName() === 'improvements'">
     </improvements-tab>
 
-    <settings-tab ng-show="$ctrl.getActiveTabName() === 'settings'" current-user-is-admin="$ctrl.currentUserIsCurriculumAdmin" current-user-is-moderator="$ctrl.currentUserIsModerator">
-    </settings-tab>
+    <oppia-settings-tab ng-show="$ctrl.getActiveTabName() === 'settings'" [current-user-is-curriculum-admin]="$ctrl.currentUserIsCurriculumAdmin" [current-user-is-moderator]="$ctrl.currentUserIsModerator">
+    </oppia-settings-tab>
 
-    <history-tab ng-show="$ctrl.getActiveTabName() === 'history'">
-    </history-tab>
+    <oppia-history-tab ng-show="$ctrl.getActiveTabName() === 'history'">
+    </oppia-history-tab>
 
     <feedback-tab ng-show="$ctrl.getActiveTabName() === 'feedback'">
     </feedback-tab>
