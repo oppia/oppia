@@ -47,6 +47,11 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = [
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT = 15
 
+# TODO(#16024): Currently, the following directories are not annotated with
+# MyPy type annotations completely, and still, we are using exceptional types
+# in these dirs which causes linters to throw an error. So, once these dirs
+# are annotated completely, we can remove these dirs from this list and fix
+# the lint errors accordingly.  
 EXCLUDED_TYPE_COMMENT_DIRECTORIES = [
     'core/controllers/',
     'extensions/',
@@ -1947,9 +1952,10 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0045': (
-            'Please try to Rule out the possibility of \'type: ignore\'.'
-            ' If \'type: ignore\' is really necessary, then add a proper'
-            ' comment.',
+            'Please try to avoid the use of type: ignore where possible.'
+            ' If \'type: ignore\' is really necessary, then a proper comment'
+            ' with clear justification (see other parts of the codebase'
+            ' for examples).',
             'mypy-ignore-used',
             'MyPy ignores should be used with proper comments following'
             ' the established patterns in the codebase. Except for'
@@ -2086,19 +2092,21 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0047': (
-            'Any type is used. Please try to use a more specific type instead.',
+            'Any type is used. Please use a more specific type instead.',
             'any-type-used',
             'Annotations with Any type should only be done for exceptional'
             ' cases with proper comments.'
         ),
         'C0048': (
-            'cast function is used. Please add a proper comment if'
-            ' cast is needed.',
+            'cast function is used. If the cast is really needed, please add a'
+            ' proper comment with clear justification. Generally, casts should'
+            ' only be used immediately after an \'if\' condition in the code'
+            ' forces the object to be of the casted type.',
             'cast-func-used',
             'Casting of any value should be done with a proper comment.'
         ),
         'C0049': (
-            'object class is used. Please try to use a more specific'
+            'object class is used. Please use a more specific type instead.'
             ' type instead.',
             'object-class-used',
             'Annotations with object should only be done for exceptional'
