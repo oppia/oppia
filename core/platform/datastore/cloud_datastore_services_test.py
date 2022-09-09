@@ -23,6 +23,8 @@ from core.platform import models
 from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
 
+from typing import Any, List, Tuple
+
 MYPY = False
 if MYPY:
     from mypy_imports import datastore_services
@@ -106,8 +108,8 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         returned_models = (
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
-                (user_models.CompletedActivitiesModel, [self.admin_user_id]),
-                (user_models.UserQueryModel, ['query_id'])
+                ('CompletedActivitiesModel', [self.admin_user_id]),
+                ('UserQueryModel', ['query_id'])
             ])
         )
 
@@ -126,8 +128,8 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_msg):
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [
-                    (user_models.UserQueryModel, ['query_id']),
-                    (user_models.UserQueryModel, ['query_id'])
+                    ('UserQueryModel', ['query_id']),
+                    ('UserQueryModel', ['query_id'])
                 ]
             )
 
@@ -169,8 +171,9 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(result, user_query_model1)
 
-        result = user_models.UserQueryModel.query(
+        result: Tuple[List[Any], cloud_datastore_services.Cursor] = (
+            user_models.UserQueryModel.query(
                 user_models.UserQueryModel.submitter_id == self.admin_user_id,
-            ).fetch_page(2, cloud_datastore_services.make_cursor())
+            ).fetch_page(2, cloud_datastore_services.make_cursor()))
 
         self.assertEqual(result[0], [user_query_model1, user_query_model2])
