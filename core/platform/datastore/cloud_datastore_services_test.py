@@ -62,13 +62,13 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
             last_updated=self.curr_time
         )
-    
+
     def test_update_timestamps_multi(self) -> None:
         cloud_datastore_services.update_timestamps_multi(
             [self.completed_activities_model, self.user_query_model], False)
         cloud_datastore_services.put_multi(
             [self.completed_activities_model, self.user_query_model])
-        
+
         self.assertEqual(
             self.completed_activities_model.get_by_id(
                 self.admin_user_id).last_updated,
@@ -76,7 +76,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.user_query_model.get_by_id('query_id').last_updated,
             self.curr_time)
-    
+
     def test_delete_multi_transactional(self) -> None:
         cloud_datastore_services.update_timestamps_multi(
             [self.completed_activities_model, self.user_query_model], False)
@@ -96,13 +96,13 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
         self.assertIsNone(user_models.UserQueryModel.get_by_id('query_id'))
-    
+
     def test_fetch_multiple_entities_by_ids_and_models(self) -> None:
         cloud_datastore_services.update_timestamps_multi(
             [self.completed_activities_model, self.user_query_model], False)
         cloud_datastore_services.put_multi(
             [self.completed_activities_model, self.user_query_model])
-        
+
         returned_models = (
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
@@ -114,14 +114,14 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             returned_models,
             [[self.completed_activities_model], [self.user_query_model]])
-    
+
     def test_fetch_multiple_entities_throws_error_on_duplicate_parameters(
             self) -> None:
         cloud_datastore_services.update_timestamps_multi(
             [self.completed_activities_model, self.user_query_model], False)
         cloud_datastore_services.put_multi(
             [self.completed_activities_model, self.user_query_model])
-        
+
         error_msg = 'Model names should not be duplicated in input list.'
         with self.assertRaisesRegex(Exception, error_msg):
             cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -172,5 +172,5 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         result = user_models.UserQueryModel.query(
                 user_models.UserQueryModel.submitter_id == self.admin_user_id,
             ).fetch_page(2, cloud_datastore_services.make_cursor())
-        
+
         self.assertEqual(result[0], [user_query_model1, user_query_model2])
