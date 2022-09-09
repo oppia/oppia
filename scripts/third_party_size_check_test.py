@@ -53,7 +53,6 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
         skipped_files = ['random_file.py', 'new_file.py']
         expected_skipped_files_list = [
             os.path.join(os.getcwd(), file) for file in skipped_files]
-        print(expected_skipped_files_list)
         self.assertEqual(returned_list, expected_skipped_files_list)
 
         dummy_file_object.close()

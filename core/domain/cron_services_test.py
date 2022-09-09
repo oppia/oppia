@@ -23,6 +23,10 @@ from core.domain import cron_services
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY:
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
@@ -41,7 +45,7 @@ class CronServicesTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        completed_activities_model = user_models.CompletedActivitiesModel( # type: ignore[attr-defined]
+        completed_activities_model = user_models.CompletedActivitiesModel(
             id=admin_user_id,
             exploration_ids=[],
             collection_ids=[],
@@ -54,16 +58,19 @@ class CronServicesTests(test_utils.GenericTestBase):
             update_last_updated_time=False)
         completed_activities_model.put()
 
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+
         cron_services.delete_models_marked_as_deleted()
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(admin_user_id)) # type: ignore[attr-defined]
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
 
     def test_mark_outdated_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        user_query_model = user_models.UserQueryModel( # type: ignore[attr-defined]
+        user_query_model = user_models.UserQueryModel(
             id='query_id',
             user_ids=[],
             submitter_id=admin_user_id,
@@ -72,6 +79,8 @@ class CronServicesTests(test_utils.GenericTestBase):
         )
         user_query_model.update_timestamps(update_last_updated_time=False)
         user_query_model.put()
+
+        self.assertFalse(user_query_model.get_by_id('query_id').deleted)
 
         cron_services.mark_outdated_models_as_deleted()
 
