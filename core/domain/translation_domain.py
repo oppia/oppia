@@ -115,6 +115,15 @@ class TranslatableContent:
             'rule_type': self.rule_type
         }
 
+    def is_data_format_list(self) -> bool:
+        """Checks whether the content is of a list type.
+
+        Returns:
+            bool. Whether the content is a list.
+        """
+        return TranslatableContentFormat.is_data_format_list(
+            self.content_format.value)
+
 
 class TranslatedContent:
     """Class representing a translation of translatable content. For example,

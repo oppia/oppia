@@ -148,11 +148,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       14: {
-        text: '      content_id: default_outcome_1',
+        text: '      html: \'\'',
         highlighted: false
       },
       15: {
-        text: '      html: \'\'',
+        text: '      content_id: default_outcome_1',
         highlighted: false
       },
       16: {
@@ -279,11 +279,11 @@ describe('Exploration history', function() {
         highlighted: true
       },
       16: {
-        text: '          content_id: feedback_2',
+        text: '          html: \'\'',
         highlighted: true
       },
       17: {
-        text: '          html: \'\'',
+        text: '          content_id: feedback_2',
         highlighted: true
       },
       18: {
@@ -396,7 +396,7 @@ describe('Exploration history', function() {
       },
       45: {
         text: '    default_outcome_1: {}',
-        highlighted: false
+        highlighted: true
       },
       46: {
         text: '    feedback_2: {}',
@@ -429,7 +429,7 @@ describe('Exploration history', function() {
       '    buttonText:\n' +
       '      value:\n' +
       '        unicode_str: Continue\n' +
-      '        content_id: customization_arg_buttonText_5\n' +
+      '        content_id: ca_buttonText_5\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    dest_if_really_stuck: null\n' +
@@ -448,7 +448,7 @@ describe('Exploration history', function() {
       '  voiceovers_mapping:\n' +
       '    content_3: {}\n' +
       '    default_outcome_4: {}\n' +
-      '    customization_arg_buttonText_5: {}\n' +
+      '    ca_buttonText_5: {}\n' +
       'solicit_answer_details: false\n' +
       'card_is_checkpoint: false\n' +
       '';
@@ -579,7 +579,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 52\n' +
+      'states_schema_version: 53\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -597,7 +597,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 52\n' +
+      'states_schema_version: 53\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +

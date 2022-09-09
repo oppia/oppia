@@ -364,12 +364,13 @@ class TranslatableTextHandler(base.BaseHandler):
         language_code = self.normalized_request.get('language_code')
         exp_id = self.normalized_request.get('exp_id')
 
+        exp = exp_fetchers.get_exploration_by_id(exp_id)
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
         state_names_to_content_id_mapping = (
-            translation_services.get_translatable_text(exp_id, language_code))
+            translation_services.get_translatable_text(exp, language_code))
 
         contribution_rights = user_services.get_user_contribution_rights(
             self.user_id)
@@ -419,7 +420,7 @@ class TranslatableTextHandler(base.BaseHandler):
             content_id_to_not_set_translatable_item = {}
             for content_id, translatable_item in (
                     content_id_to_translatable_item.items()):
-                if not translatable_item.is_set_data_format():
+                if not translatable_item.is_data_format_list():
                     content_id_to_not_set_translatable_item[content_id] = (
                         translatable_item)
             if content_id_to_not_set_translatable_item:

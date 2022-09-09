@@ -231,12 +231,12 @@ def get_translation_counts(entity_type, entity_id, entity_version):
     return dict(exploration_translation_counts)
 
 
-def get_translatable_text(exp_id, language_code):
+def get_translatable_text(exploration, language_code):
         """Returns all the contents which needs translation in the given
         language.
 
         Args:
-            exp_id: str. The Id of the exploration.
+            exp_id: Exploration. The Exploration object.
             language_code: str. The language code in which translation is
                 required.
 
@@ -244,7 +244,6 @@ def get_translatable_text(exp_id, language_code):
             dict(str, list(TranslatableContent)). A dict with state names
             as keys and a list of TranslatableContent as values.
         """
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         entity_translations = (
             translation_fetchers.get_entity_translation(
                 feconf.TranslatableEntityType.EXPLORATION,
