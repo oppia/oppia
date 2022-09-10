@@ -34,20 +34,28 @@ from typing import Any, List
 class MockSocket:
     server_closed = False
     port = 8181
+
     def setsockopt(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
         pass
+
     def bind(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
         pass
+
     def listen(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
         pass
+
     def getsockname(self, *unused_args: Any) -> List[Any]: # pylint: disable=missing-docstring
         return ['Address', self.port]
+
     def recv(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
         pass
+
     def sendall(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
         pass
+
     def shutdown(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
         raise socket.error('Some error occurred.')
+
     def close(self) -> None: # pylint: disable=missing-docstring
         self.server_closed = True
 
@@ -55,6 +63,7 @@ class MockSocket:
 class MockServer:
     def run(self) -> None: # pylint: disable=missing-docstring
         pass
+
     def close(self) -> None: # pylint: disable=missing-docstring
         pass
 
@@ -164,6 +173,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_sock_bind_handles_error_while_getting_port_name(self) -> None:
         class FailingMockSocket(MockSocket):
+            """Socket that fails while invoking getsockname()."""
             def getsockname(self) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
@@ -335,6 +345,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_failure_to_start_server_throws_error(self) -> None:
         class FailingMockSocket(MockSocket):
+            """Socket that fails while invoking bind()."""
             def bind(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
@@ -352,7 +363,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_server_closes_gracefully(self) -> None:
         mock_socket = MockSocket()
         mock_socket.port = '\08181'
-        
+
         def dummy_handler(data: Any) -> str:
             return str(data)
         swap_hasattr = self.swap(
@@ -394,7 +405,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertIn(
             'No ports. Invalid port ranges in --portserver_static_pool?',
             self.terminal_err_logs)
-    
+
     def test_out_of_bound_port_ranges_while_calling_script_throws_error(
             self) -> None:
         swap_server = self.swap(
@@ -414,10 +425,12 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         with self.swap_log, swap_sys_exit, swap_server:
             run_portserver.main()
 
-        self.assertIn('Serving portserver on portserver.sock', self.terminal_logs)
+        self.assertIn(
+            'Serving portserver on portserver.sock', self.terminal_logs)
 
     def test_server_closes_on_keyboard_interrupt(self) -> None:
         class InterruptedMockServer(MockServer):
+            """Server that gets interrupted while invoking run()."""
             def run(self) -> None: # pylint: disable=missing-docstring
                 raise KeyboardInterrupt('^C pressed.')
 
