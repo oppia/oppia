@@ -76,7 +76,7 @@ export class PostPublishModalComponent
     selection.removeAllRanges();
     selection.addRange(range);
     document.execCommand('copy');
-    this.explorationLinkCopied = true;
+    this.exploratitranslationTabonLinkCopied = true;
   }
 }
 
