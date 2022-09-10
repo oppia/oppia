@@ -15,7 +15,7 @@
 /**
  * @fileoverview Component for the Social Sharing Links.
  */
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';

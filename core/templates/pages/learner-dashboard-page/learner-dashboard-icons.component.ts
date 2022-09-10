@@ -19,7 +19,7 @@
 import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerDashboardActivityBackendApiService } from

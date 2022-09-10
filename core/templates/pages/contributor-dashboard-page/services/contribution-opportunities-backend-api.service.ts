@@ -35,7 +35,7 @@ import {
 } from 'domain/opportunity/featured-translation-language.model';
 import { UserService } from 'services/user.service';
 
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 interface SkillContributionOpportunitiesBackendDict {
   'opportunities': SkillOpportunityBackendDict[];

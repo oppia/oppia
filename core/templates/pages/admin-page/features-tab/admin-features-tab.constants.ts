@@ -15,7 +15,7 @@
 import { ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 /**
  * @fileoverview Constants for the admin features tab.

@@ -32,7 +32,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { PageTitleService } from 'services/page-title.service';
 
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 type TopicLandingPageDataKey = (
   keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA);

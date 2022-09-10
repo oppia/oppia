@@ -45,7 +45,7 @@ import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const storyNodeConstants = require('constants.ts');
+import storyNodeConstants from 'assets/constants';
 
 angular.module('oppia').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

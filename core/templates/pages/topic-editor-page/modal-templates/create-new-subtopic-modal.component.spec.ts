@@ -23,7 +23,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 import { CreateNewSubtopicModalComponent } from './create-new-subtopic-modal.component';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';

@@ -16,7 +16,7 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
-const commonConstants = require('constants.ts');
+import commonConstants from 'assets/constants';
 
 export const AppConstants = {
   ...commonConstants,

@@ -15,7 +15,7 @@
 /**
  * @fileoverview Frontend Model for newly created story.
  */
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 export class NewlyCreatedStory {
   title: string;

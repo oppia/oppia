@@ -18,7 +18,7 @@
 
 import { Subscription } from 'rxjs';
 import { Subject } from 'rxjs';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';

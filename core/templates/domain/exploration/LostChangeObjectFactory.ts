@@ -32,7 +32,7 @@ import { ParamChangeBackendDict } from './ParamChangeObjectFactory';
 import { ParamSpecBackendDict } from './ParamSpecObjectFactory';
 import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
 import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFactory';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 interface LostChangeValues {
   'outcome'?: Outcome;

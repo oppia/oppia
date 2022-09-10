@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, TestBed } from
   '@angular/core/testing';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';

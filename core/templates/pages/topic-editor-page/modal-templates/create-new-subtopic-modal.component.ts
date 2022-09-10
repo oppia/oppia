@@ -20,7 +20,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-const AppConstants = require('constants.ts');
+import AppConstants from 'assets/constants';
 import { Topic } from 'domain/topic/TopicObjectFactory';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';

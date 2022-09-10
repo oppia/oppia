@@ -21,7 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { DeleteMisconceptionModalComponent } from './delete-misconception-modal.component';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 class MockActiveModal {
   close(value: string): void {

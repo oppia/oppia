@@ -20,7 +20,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 

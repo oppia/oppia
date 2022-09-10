@@ -40,7 +40,7 @@ import {
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 

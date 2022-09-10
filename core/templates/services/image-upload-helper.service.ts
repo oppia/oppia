@@ -22,7 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { SvgSanitizerService } from './svg-sanitizer.service';
 
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'

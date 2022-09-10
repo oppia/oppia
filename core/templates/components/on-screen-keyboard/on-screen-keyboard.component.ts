@@ -19,7 +19,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';

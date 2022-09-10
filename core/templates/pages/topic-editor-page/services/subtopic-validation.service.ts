@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { TopicEditorStateService } from './topic-editor-state.service';
-const subtopicValidationConstants = require('constants.ts');
+import subtopicValidationConstants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'

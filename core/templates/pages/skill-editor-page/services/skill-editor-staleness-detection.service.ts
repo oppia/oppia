@@ -29,7 +29,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StaleTabInfoModalComponent } from 'components/stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from 'components/unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
-const constants =  require('constants.ts');
+import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
