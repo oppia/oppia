@@ -1886,9 +1886,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change.question_dict = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -1940,9 +1940,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change.skill_difficulty = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -1988,9 +1988,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.pre_accept_validate()
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         suggestion.change.skill_id = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -2098,9 +2098,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'new_value': 'bn',
             'old_value': 'en'
         }
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change cmd must be equal to '
