@@ -63,9 +63,9 @@ class QuestionsListHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
-       
+
         offset = self.normalized_request.get('offset')
-            
+
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
 
