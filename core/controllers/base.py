@@ -334,7 +334,7 @@ class BaseHandler(webapp2.RequestHandler):
         if not schema_validation_succeeded:
             return
 
-        super(BaseHandler, self).dispatch()
+        super().dispatch()
 
     def validate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.
@@ -438,7 +438,7 @@ class BaseHandler(webapp2.RequestHandler):
                 handler_args, schema_for_request_method, extra_args_are_allowed,
                 allow_string_to_bool_conversion)
         )
-  
+
         self.normalized_payload = {
             arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
         }
@@ -468,7 +468,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
-       
+
     @property
     def current_user_is_site_maintainer(self):
         """Returns whether the current user is a site maintainer.

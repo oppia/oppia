@@ -56,14 +56,14 @@ class FooError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
     def __init__(self, model: Union[base_models.BaseModel, str]) -> None:
-        super(FooError, self).__init__('foo', model)
+        super().__init__('foo', model)
 
 
 class BarError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
     def __init__(self, model: Union[base_models.BaseModel, str]) -> None:
-        super(BarError, self).__init__('bar', model)
+        super().__init__('bar', model)
 
 
 class AuditErrorsTestBase(core_test_utils.TestBase):
@@ -91,7 +91,7 @@ class ErrorMessageTests(core_test_utils.TestBase):
 class BaseAuditErrorTests(AuditErrorsTestBase):
 
     def setUp(self) -> None:
-        super(BaseAuditErrorTests, self).setUp()
+        super().setUp()
         self.model = base_models.BaseModel(id='123')
 
     def test_message(self) -> None:
@@ -121,9 +121,9 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
                 # TODO(#13059): After we fully type the codebase we plan to get
                 # rid of the tests that intentionally test wrong inputs that we
                 # can normally catch by typing.
-                super(ErrorWithIntMessage, self).__init__(123, model)  # type: ignore[arg-type]
+                super().__init__(123, model)  # type: ignore[arg-type]
 
-        with self.assertRaisesRegex(TypeError, 'must be a string'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'must be a string'):
             ErrorWithIntMessage(self.model)
 
     def test_message_raises_value_error_if_assigned_an_empty_value(
@@ -135,9 +135,9 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             def __init__(
                 self, model: Union[base_models.BaseModel, str]
             ) -> None:
-                super(ErrorWithEmptyMessage, self).__init__('', model)
+                super().__init__('', model)
 
-        with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):
             ErrorWithEmptyMessage(self.model)
 
     def test_equality_between_different_types(self) -> None:

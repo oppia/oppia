@@ -22,6 +22,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
+import cloneDeep from 'lodash/cloneDeep';
 import { QuestionSummary } from 'domain/question/question-summary-object.model';
 import { QuestionSummaryForOneSkill } from 'domain/question/question-summary-for-one-skill-object.model';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
@@ -47,6 +48,7 @@ import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skil
 import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { RemoveQuestionSkillLinkModalComponent } from '../modal-templates/remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface GroupedSkillSummaries {
@@ -76,7 +78,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   editorIsOpen: boolean;
   isSkillDifficultyChanged: boolean;
   linkedSkillsWithDifficulty: SkillDifficulty[];
-  misconceptionIdsForSelectedSkill: unknown[];
+  misconceptionIdsForSelectedSkill: number[];
   misconceptionsBySkill: MisconceptionSkillMap;
   newQuestionIsBeingCreated: boolean;
   newQuestionSkillDifficulties: number[] | number;
@@ -117,7 +119,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.question =
       this.questionObjectFactory.createDefaultQuestion(skillIds);
     this.questionId = this.question.getId();
-    this.questionStateData = this.question?.getStateData();
+    this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
   }
@@ -220,7 +222,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
     if (!this.canEditQuestion) {
       this.alertsService.addWarning(
-        'User does not have enough rights to delete the question');
+        'User does not have enough rights to edit the question');
       return;
     }
     this.newQuestionSkillIds = [];
@@ -249,9 +251,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
                 skillDict.id, skillDict.description));
           });
         }
-        this.question = angular.copy(response.questionObject);
+        this.question = cloneDeep(response.questionObject);
         this.questionId = this.question.getId();
-        this.questionStateData = this.question?.getStateData();
+        this.questionStateData = this.question.getStateData();
         this.questionIsBeingUpdated = true;
         this.newQuestionIsBeingCreated = false;
         this.openQuestionEditor();
@@ -272,51 +274,42 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = this.questionId;
   }
 
-  deleteQuestionFromSkill(
-      questionId: string, skillDescription: string): void {
-    if (!this.canEditQuestion) {
-      this.alertsService.addWarning(
-        'User does not have enough rights to delete the question');
-      return;
-    }
+  removeQuestionSkillLinkAsync(questionId: string, skillId: string): void {
+    this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
+      questionId, [
+        {
+          id: skillId,
+          task: 'remove'
+        } as SkillLinkageModificationsArray
+      ]
+    ).then(() => {
+      this.questionsListService.resetPageNumber();
+      this.questionsListService.getQuestionSummariesAsync(
+        this.selectedSkillId, true, true);
+      this.alertsService.addSuccessMessage('Question Removed');
+      this._removeArrayElement(questionId);
+    });
+  }
 
-    this.deletedQuestionIds.push(questionId);
-    // For the case when, it is in the skill editor.
-    if (this.allSkillSummaries.length === 0) {
-      this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-        questionId, [
-          {
-            id: this.selectedSkillId,
-            task: 'remove'
-          } as SkillLinkageModificationsArray
-        ]
-      ).then(() => {
-        this.questionsListService.resetPageNumber();
-        this.questionsListService.getQuestionSummariesAsync(
-          this.selectedSkillId, true, true);
-        this.alertsService.addSuccessMessage('Deleted Question');
-        this._removeArrayElement(questionId);
+  removeQuestionFromSkill(questionId: string): void {
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(RemoveQuestionSkillLinkModalComponent, {
+        backdrop: 'static'
       });
-    } else {
-      this.allSkillSummaries.forEach((summary) => {
-        if (summary.getDescription() === skillDescription) {
-          this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-            questionId, [
-              {
-                id: summary.getId(),
-                task: 'remove'
-              } as SkillLinkageModificationsArray
-            ]
-          ).then(() => {
-            this.questionsListService.resetPageNumber();
-            this.questionsListService.getQuestionSummariesAsync(
-              this.selectedSkillId, true, true);
-            this.alertsService.addSuccessMessage('Deleted Question');
-            this._removeArrayElement(questionId);
-          });
-        }
-      });
-    }
+
+    modalRef.componentInstance.skillId = this.selectedSkillId;
+    modalRef.componentInstance.canEditQuestion = this.canEditQuestion;
+    modalRef.componentInstance.numberOfQuestions = (
+      this.questionSummariesForOneSkill.length);
+
+    modalRef.result.then(() => {
+      this.deletedQuestionIds.push(questionId);
+      this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId);
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   _removeArrayElement(questionId: string): void {
@@ -366,7 +359,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   showSolutionCheckpoint(): boolean {
-    const interactionId = this.question?.getStateData().interaction.id;
+    if (!this.question) {
+      return false;
+    }
+
+    const interactionId = this.question.getStateData().interaction.id;
     return (
       interactionId && INTERACTION_SPECS[
         interactionId].can_have_solution);
@@ -480,7 +477,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       this.editableQuestionBackendApiService.createQuestionAsync(
         this.newQuestionSkillIds, (
           this.newQuestionSkillDifficulties as number[]),
-        (this.question.toBackendDict(true) as unknown as Question), imagesData
+        (this.question.toBackendDict(true)), imagesData
       ).then((response) => {
         if (this.skillLinkageModificationsArray &&
             this.skillLinkageModificationsArray.length > 0) {
@@ -505,7 +502,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.editableQuestionBackendApiService.updateQuestionAsync(
             this.questionId, String(this.question.getVersion()), commitMessage,
             this.questionUndoRedoService
-              .getCommittableChangeList() as unknown as string[]).then(
+              .getCommittableChangeList()).then(
             () => {
               this.questionUndoRedoService.clearChanges();
               this.editorIsOpen = false;

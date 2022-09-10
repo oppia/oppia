@@ -1,8 +1,7 @@
 <div #dropdown class="oppia-translation-topic-selector-container e2e-test-topic-selector">
   <div class="oppia-translation-topic-selector-inner-container e2e-test-topic-selector-selected" (click)="toggleDropdown()">
     {{activeTopicName}}
-    <span class="material-icons oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-      arrow_drop_down
+    <span class="fas fa-caret-down oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
     </span>
   </div>
 
@@ -40,6 +39,7 @@
   .oppia-translation-topic-selector-inner-container-arrow {
     color: #009688;
     cursor: pointer;
+    padding-top: 3px;
   }
 
   .oppia-translation-topic-selector-dropdown-container {

@@ -17,10 +17,10 @@
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
   <div *ngIf="isContentEditable()"
-       class="e2e-test-edit-content oppia-editable-section"
+       class="e2e-test-edit-content oppia-editable-section e2e-test-edit-content-pencil-button"
        (click)="openStateContentEditor()">
-    <i class="material-icons oppia-editor-edit-icon e2e-test-edit-content-pencil-button"
-       title="Edit Card Content">&#xE254;
+    <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-position e2e-test-edit-content-pencil-button"
+       title="Edit Card Content">
     </i>
     <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
          title="Card Content">
@@ -104,5 +104,8 @@
     max-width: 560px;
     position: fixed;
     top: -30000px;
+  }
+  .oppia-editor-edit-icon-position {
+    top: 9px;
   }
 </style>

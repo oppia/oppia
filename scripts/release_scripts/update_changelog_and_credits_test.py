@@ -86,7 +86,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     """Test the methods for automatic update of changelog and credits."""
 
     def setUp(self):
-        super(ChangelogAndCreditsUpdateTests, self).setUp()
+        super().setUp()
         def mock_get_current_branch_name():
             return 'release-1.2.3'
         def mock_run_cmd(unused_cmd):

@@ -21,10 +21,12 @@ import datetime
 from core import feconf
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, 'change_domain' is imported only for type checking.
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -210,8 +212,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.author_id == user_id, cls.final_reviewer_id == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
             cls,
@@ -221,8 +221,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission: int,
             status: str,
             author_id: str,
-            final_reviewer_id: str,
-            change_cmd: Dict[str, Any],
+            final_reviewer_id: Optional[str],
+            change_cmd: Mapping[
+                str, change_domain.AcceptableChangeDictTypes
+            ],
             score_category: str,
             thread_id: str,
             language_code: Optional[str]
@@ -237,8 +239,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 entity at the time of creation of the suggestion.
             status: str. The status of the suggestion.
             author_id: str. The ID of the user who submitted the suggestion.
-            final_reviewer_id: str. The ID of the reviewer who has
-                accepted/rejected the suggestion.
+            final_reviewer_id: str|None. The ID of the reviewer who has
+                accepted/rejected the suggestion, or None if no reviewer is
+                assigned.
             change_cmd: dict. The actual content of the suggestion.
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
@@ -510,7 +513,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_in_review_translation_suggestions_with_exp_ids_by_offset(
         cls,
-        limit: int,
+        limit: Optional[int],
         offset: int,
         user_id: str,
         language_codes: List[str],
@@ -521,7 +524,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         given exploration IDs.
 
         Args:
-            limit: int. Maximum number of entities to be returned.
+            limit: int|None. Maximum number of entities to be returned. If None,
+                returns all matching entities.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             user_id: str. The id of the user trying to make this query.
@@ -550,6 +554,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)
+            if limit is not None
+            else suggestion_query.fetch(offset=offset)
         )
         next_offset = offset + len(results)
 
@@ -1132,7 +1138,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            language_code: str, contributor_user_id: str, topic_id: str
+        language_code: str, contributor_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a TranslationContributionStatsModel
         instance.
@@ -1290,5 +1296,653 @@ class TranslationContributionStatsModel(base_models.BaseModel):
                     model.rejected_translation_word_count),
                 'contribution_dates': [
                     date.isoformat() for date in model.contribution_dates]
+            }
+        return user_data
+
+
+class TranslationReviewStatsModel(base_models.BaseModel):
+    """Records the translation review stats. There is one instance of this model
+    per (language_code, reviewer_user_id, topic_id) tuple. Its IDs are in the
+    following structure: [language_code].[reviewer_user_id].[topic_id]
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
+    # The ISO 639-1 language code for which the translation reviews were
+    # made.
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The user ID of the translation reviewer.
+    reviewer_user_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID of the translation reviews.
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The number of reviewed translations.
+    reviewed_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total word count of reviewed translations. Excludes HTML tags and
+    # attributes.
+    reviewed_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations.
+    accepted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations with reviewer edits.
+    accepted_translations_with_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total word count of accepted translations. Excludes HTML tags and
+    # attributes.
+    accepted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The first date that the reviewer made a translation review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a translation review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        language_code: str,
+        reviewer_user_id: str,
+        topic_id: str,
+        reviewed_translations_count: int,
+        reviewed_translation_word_count: int,
+        accepted_translations_count: int,
+        accepted_translations_with_reviewer_edits_count: int,
+        accepted_translation_word_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new TranslationReviewStatsModel instance and returns
+        its ID.
+        """
+        entity_id = cls.generate_id(
+            language_code, reviewer_user_id, topic_id)
+        entity = cls(
+            id=entity_id,
+            language_code=language_code,
+            reviewer_user_id=reviewer_user_id,
+            topic_id=topic_id,
+            reviewed_translations_count=reviewed_translations_count,
+            reviewed_translation_word_count=reviewed_translation_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_with_reviewer_edits_count=(
+                accepted_translations_with_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def generate_id(
+        language_code: str, reviewer_user_id: str, topic_id: str
+    ) -> str:
+        """Generates a unique ID for a TranslationReviewStatsModel
+        instance.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            reviewer_user_id: str. User ID.
+            topic_id: str. Topic ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [language_code].[reviewer_user_id].[topic_id]
+        """
+        return (
+            '%s.%s.%s' % (language_code, reviewer_user_id, topic_id)
+        )
+
+    # Since signature of "get" incompatible with supertype "BaseModel" and
+    # there are no safety issues, the following line is skipped from Mypy
+    # checks.
+    @classmethod
+    def get( # type: ignore[override]
+        cls, language_code: str, reviewer_user_id: str, topic_id: str
+    ) -> Optional[TranslationReviewStatsModel]:
+        """Gets the TranslationReviewStatsModel matching the supplied
+        language_code, reviewer_user_id, topic_id.
+
+        Returns:
+            TranslationReviewStatsModel|None. The matching
+            TranslationReviewStatsModel, or None if no such model
+            instance exists.
+        """
+        entity_id = cls.generate_id(
+            language_code, reviewer_user_id, topic_id)
+        return cls.get_by_id(entity_id)
+
+    @classmethod
+    def get_all_by_user_id(
+        cls, user_id: str
+    ) -> Sequence[TranslationReviewStatsModel]:
+        """Gets all TranslationReviewStatsModel matching the supplied
+        user_id.
+
+        Returns:
+            list(TranslationReviewStatsModel). The matching
+            TranslationReviewStatsModel.
+        """
+        return cls.get_all().filter(
+            cls.reviewer_user_id == user_id
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether TranslationReviewStatsModel references the
+        supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.reviewer_user_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains corresponding to a user: reviewer_user_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages and topics relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'reviewer_user_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of TranslationReviewStatsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.reviewer_user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from TranslationReviewStatsModel into dict
+        format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from TranslationReviewStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[TranslationReviewStatsModel] = (
+            cls.get_all().filter(cls.reviewer_user_id == user_id).fetch())
+        for model in stats_models:
+            splitted_id = model.id.split('.')
+            id_without_user_id = '%s.%s' % (splitted_id[0], splitted_id[2])
+            user_data[id_without_user_id] = {
+                'language_code': model.language_code,
+                'topic_id': model.topic_id,
+                'reviewed_translations_count': (
+                    model.reviewed_translations_count),
+                'reviewed_translation_word_count': (
+                    model.reviewed_translation_word_count),
+                'accepted_translations_count': (
+                    model.accepted_translations_count),
+                'accepted_translations_with_reviewer_edits_count': (
+                    model.accepted_translations_with_reviewer_edits_count),
+                'accepted_translation_word_count': (
+                    model.accepted_translation_word_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
+class QuestionContributionStatsModel(base_models.BaseModel):
+    """Records the question contribution stats. There is one instance of this
+    model per (contributor_user_id, topic_id) tuple. Its IDs are in the
+    following structure: [contributor_user_id].[topic_id]
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
+    # The user ID of the question contributor.
+    contributor_user_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID of the question contribution.
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The number of submitted questions.
+    submitted_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions.
+    accepted_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions without reviewer edits.
+    accepted_questions_without_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The first date that the submitter made a question submission.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the submitter made a question submission.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        contributor_user_id: str,
+        topic_id: str,
+        submitted_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_without_reviewer_edits_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new QuestionContributionStatsModel instance and returns
+        its ID.
+        """
+        entity_id = cls.generate_id(
+            contributor_user_id, topic_id)
+        entity = cls(
+            id=entity_id,
+            contributor_user_id=contributor_user_id,
+            topic_id=topic_id,
+            submitted_questions_count=submitted_questions_count,
+            accepted_questions_count=accepted_questions_count,
+            accepted_questions_without_reviewer_edits_count=(
+                accepted_questions_without_reviewer_edits_count),
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def generate_id(
+        contributor_user_id: str, topic_id: str
+    ) -> str:
+        """Generates a unique ID for a QuestionContributionStatsModel
+        instance.
+
+        Args:
+            contributor_user_id: str. User ID.
+            topic_id: str. Topic ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [contributor_user_id].[topic_id]
+        """
+        return (
+            '%s.%s' % (contributor_user_id, topic_id)
+        )
+
+    # Since signature of "get" incompatible with supertype "BaseModel" and
+    # there are no safety issues, the following line is skipped from Mypy
+    # checks.
+    @classmethod
+    def get( # type: ignore[override]
+        cls, contributor_user_id: str, topic_id: str
+    ) -> Optional[QuestionContributionStatsModel]:
+        """Gets the QuestionContributionStatsModel matching the supplied
+        contributor_user_id, topic_id.
+
+        Returns:
+            QuestionContributionStatsModel|None. The matching
+            QuestionContributionStatsModel, or None if no such model
+            instance exists.
+        """
+        entity_id = cls.generate_id(
+            contributor_user_id, topic_id)
+        return cls.get_by_id(entity_id)
+
+    @classmethod
+    def get_all_by_user_id(
+        cls, user_id: str
+    ) -> Sequence[QuestionContributionStatsModel]:
+        """Gets all QuestionContributionStatsModel matching the supplied
+        user_id.
+
+        Returns:
+            list(QuestionContributionStatsModel). The matching
+            QuestionContributionStatsModel.
+        """
+        return cls.get_all().filter(
+            cls.contributor_user_id == user_id
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether QuestionContributionStatsModel references the
+        supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_user_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains corresponding to a user: contributor_user_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages and topics relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_user_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of QuestionContributionStatsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from QuestionContributionStatsModel into dict
+        format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from QuestionContributionStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[QuestionContributionStatsModel] = (
+            cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
+        for model in stats_models:
+            splitted_id = model.id.split('.')
+            id_without_user_id = '%s' % (splitted_id[1])
+            user_data[id_without_user_id] = {
+                'topic_id': model.topic_id,
+                'submitted_questions_count': (
+                    model.submitted_questions_count),
+                'accepted_questions_count': (
+                    model.accepted_questions_count),
+                'accepted_questions_without_reviewer_edits_count': (
+                    model.accepted_questions_without_reviewer_edits_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
+class QuestionReviewStatsModel(base_models.BaseModel):
+    """Records the question review stats. There is one instance of this model
+    per (reviewer_user_id, topic_id) tuple. Its IDs are in the following
+    structure: [reviewer_user_id].[topic_id]
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
+    # The user ID of the question reviewer.
+    reviewer_user_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID of the question.
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The number of reviewed questions.
+    reviewed_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions.
+    accepted_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions with reviewer edits.
+    accepted_questions_with_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The first date that the reviewer made a question review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a question review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        reviewer_user_id: str,
+        topic_id: str,
+        reviewed_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_with_reviewer_edits_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new QuestionReviewStatsModel instance and returns
+        its ID.
+        """
+        entity_id = cls.generate_id(
+            reviewer_user_id, topic_id)
+        entity = cls(
+            id=entity_id,
+            reviewer_user_id=reviewer_user_id,
+            topic_id=topic_id,
+            reviewed_questions_count=reviewed_questions_count,
+            accepted_questions_count=accepted_questions_count,
+            accepted_questions_with_reviewer_edits_count=(
+                accepted_questions_with_reviewer_edits_count),
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def generate_id(
+        reviewer_user_id: str, topic_id: str
+    ) -> str:
+        """Generates a unique ID for a QuestionReviewStatsModel
+        instance.
+
+        Args:
+            reviewer_user_id: str. User ID.
+            topic_id: str. Topic ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [reviewer_user_id].[topic_id]
+        """
+        return (
+            '%s.%s' % (reviewer_user_id, topic_id)
+        )
+
+    # Since signature of "get" incompatible with supertype "BaseModel" and
+    # there are no safety issues, the following line is skipped from Mypy
+    # checks.
+    @classmethod
+    def get( # type: ignore[override]
+        cls, reviewer_user_id: str, topic_id: str
+    ) -> Optional[QuestionReviewStatsModel]:
+        """Gets the QuestionReviewStatsModel matching the supplied
+        reviewer_user_id, topic_id.
+
+        Returns:
+            QuestionReviewStatsModel|None. The matching
+            QuestionReviewStatsModel, or None if no such model
+            instance exists.
+        """
+        entity_id = cls.generate_id(
+            reviewer_user_id, topic_id)
+        return cls.get_by_id(entity_id)
+
+    @classmethod
+    def get_all_by_user_id(
+        cls, user_id: str
+    ) -> Sequence[QuestionReviewStatsModel]:
+        """Gets all QuestionReviewStatsModel matching the supplied
+        user_id.
+
+        Returns:
+            list(QuestionReviewStatsModel). The matching
+            QuestionReviewStatsModel.
+        """
+        return cls.get_all().filter(
+            cls.reviewer_user_id == user_id
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether QuestionReviewStatsModel references the
+        supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.reviewer_user_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains corresponding to a user: reviewer_user_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages and topics relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            # User ID is not exported in order to keep internal ids private.
+            'reviewer_user_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of QuestionReviewStatsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.reviewer_user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from QuestionReviewStatsModel into dict
+        format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from QuestionReviewStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[QuestionReviewStatsModel] = (
+            cls.get_all().filter(cls.reviewer_user_id == user_id).fetch())
+        for model in stats_models:
+            splitted_id = model.id.split('.')
+            id_without_user_id = '%s' % (splitted_id[1])
+            user_data[id_without_user_id] = {
+                'topic_id': model.topic_id,
+                'reviewed_questions_count': (
+                    model.reviewed_questions_count),
+                'accepted_questions_count': (
+                    model.accepted_questions_count),
+                'accepted_questions_with_reviewer_edits_count': (
+                    model.accepted_questions_with_reviewer_edits_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
             }
         return user_data

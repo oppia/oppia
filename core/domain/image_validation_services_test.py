@@ -29,7 +29,7 @@ from typing import Union
 class ImageValidationServiceTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ImageValidationServiceTests, self).setUp()
+        super().setUp()
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None) as f:
@@ -42,7 +42,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
         expected_error_substring: str
     ) -> None:
         """Checks that the image passes validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             image_validation_services.validate_image_and_filename(
                 image, filename)

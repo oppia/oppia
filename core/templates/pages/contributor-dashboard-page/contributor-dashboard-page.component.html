@@ -6,7 +6,8 @@
             class="oppia-opportunities-tab-item"
             *ngFor="let item of tabsDetails | keyvalue"
             [attr.aria-label]="item.value.ariaLabel">
-          <div *ngIf="item.value.enabled">
+          <div *ngIf="item.value.enabled"
+               class="oppia-tabs-container">
             <a role="button"
                (click)="onTabClick(item.key)"
                href="#"
@@ -32,12 +33,12 @@
                        alt="User Avatar">
                 </span>
                 <span *ngIf="!profilePictureDataUrl">
-                  <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
+                  <i class="fas fa-user-circle oppia-profile-picture-icon"></i>
                 </span>
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
                 <div class="oppia-short-contributor-username-container"
-                     *ngIf="userIsLoggedIn || username?.length <= 8"
+                     *ngIf="userIsLoggedIn || username.length <= 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
@@ -46,7 +47,7 @@
                   </span>
                 </div>
                 <div class="oppia-long-contributor-username-container"
-                     *ngIf="userIsLoggedIn && username?.length > 8"
+                     *ngIf="userIsLoggedIn && username.length > 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
@@ -153,7 +154,7 @@
                      alt="User Avatar">
               </span>
               <span *ngIf="!profilePictureDataUrl">
-                <i class="material-icons oppia-profile-picture-icon collapsed-oppia-contributor-img">&#xE853;</i>
+                <i class="fas fa-user-circle oppia-profile-picture-icon collapsed-oppia-contributor-img"></i>
               </span>
             </div>
             <div class="collapsed-oppia-contributor-username-container">
@@ -246,6 +247,9 @@
   </div>
 </div>
 <style>
+  .oppia-tabs-container {
+    text-align: center;
+  }
   .oppia-language-container {
     display: flex;
     flex-direction: row;
@@ -430,6 +434,7 @@
     display: flex;
     flex-grow: 1;
     justify-content: start;
+    padding-left: 25px;
     width: 100%;
   }
   .oppia-opportunities-tab-customization-container {
@@ -453,6 +458,7 @@
     font-size: 18px;
     font-weight: bold;
     padding: 10px;
+    text-align: center;
     text-decoration: none;
     -webkit-transition: color 200ms ease-out;
     -ms-transition: color 200ms ease-out;
@@ -635,8 +641,8 @@
       width: 100%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
-      font-size: 18px;
-      margin-right: 10px;
+      font-size: 16px;
+      margin-right: 0;
       padding: auto 0;
       width: 175px;
     }
@@ -646,6 +652,7 @@
     }
     .oppia-opportunities-tabs-text {
       font-size: 18px;
+      text-align: center;
     }
     .oppia-contributor-username-and-review-rights-container {
       align-items: initial;
@@ -692,6 +699,7 @@
     .oppia-opportunities-tabs-text {
       font-size: 15px;
       padding: 10px 5px;
+      text-align: center;
     }
     .oppia-collapsed-opportunities-tab-header {
       align-items: center;
@@ -737,9 +745,12 @@
       width: 90%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
-      font-size: 18px;
+      font-size: 16px;
       margin-right: 2vw;
       width: 90px;
+    }
+    .oppia-dashboard-topic-container-label {
+      margin-right: 0;
     }
     .oppia-mascot-container {
       border-bottom: 1px solid rgba(151, 151, 151, 0.5);

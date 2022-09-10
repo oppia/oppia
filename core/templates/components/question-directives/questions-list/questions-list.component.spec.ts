@@ -483,7 +483,22 @@ describe('Questions List Component', () => {
     component.question = question;
     component.questionIsBeingUpdated = false;
     component.skillLinkageModificationsArray = (
-      [1, 2, 1] as unknown as SkillLinkageModificationsArray[]);
+      [
+        {
+          id: '1',
+          task: null,
+          difficulty: 1
+        },
+        {
+          id: '2',
+          task: null,
+          difficulty: 2
+        },
+        {
+          id: '1',
+          task: null,
+          difficulty: 1
+        }]);
 
     spyOn(component.question, 'getValidationErrorMessage').and.returnValue('');
     spyOn(component.question, 'getUnaddressedMisconceptionNames')
@@ -500,7 +515,22 @@ describe('Questions List Component', () => {
     expect(editableQuestionBackendApiService.editQuestionSkillLinksAsync)
       .toHaveBeenCalledWith(
         'qId',
-        [1, 2, 1] as unknown as SkillLinkageModificationsArray[]);
+        [
+          {
+            id: '1',
+            task: null,
+            difficulty: 1
+          },
+          {
+            id: '2',
+            task: null,
+            difficulty: 2
+          },
+          {
+            id: '1',
+            task: null,
+            difficulty: 1
+          }]);
   }));
 
   it('should save question when another question is being updated',
@@ -671,7 +701,7 @@ describe('Questions List Component', () => {
       component.editQuestion(null, null, null);
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'User does not have enough rights to delete the question');
+        'User does not have enough rights to edit the question');
     });
 
     it('should fetch question data from backend and set new ' +
@@ -738,45 +768,52 @@ describe('Questions List Component', () => {
       .toHaveBeenCalled();
   });
 
-  describe('when deleting question from skill', () => {
+  describe('when removing question from skill', () => {
     let questionId = 'qId';
-    let skillDescription = 'Skill Description';
 
-    it('should display warning when user does not have rights to delete' +
-      ' a question', () => {
-      component.canEditQuestion = (false);
-      spyOn(alertsService, 'addWarning');
-
-      component.deleteQuestionFromSkill(questionId, skillDescription);
-
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'User does not have enough rights to delete the question');
-    });
-
-    it('should delete question when user is in the skill editor',
+    it('should remove question when user is in the skill editor',
       fakeAsync(() => {
         component.selectedSkillId = 'skillId1';
         component.deletedQuestionIds = [];
-        component.canEditQuestion = true;
         spyOn(alertsService, 'addSuccessMessage');
+        spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: {
+              skillId: 'skillId',
+              canEditQuestion: true,
+              numberOfQuestions: 3
+            },
+            result: Promise.resolve()
+          } as NgbModalRef
+        );
         component.allSkillSummaries = [];
         spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
           .and.returnValue(Promise.resolve());
 
-        component.deleteQuestionFromSkill(questionId, skillDescription);
+        component.removeQuestionFromSkill(questionId);
         tick();
 
+        expect(ngbModal.open).toHaveBeenCalled();
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-          'Deleted Question'
+          'Question Removed'
         );
       }));
 
-    it('should delete question when user is not in the skill editor',
+    it('should remove question when user is not in the skill editor',
       fakeAsync(() => {
         component.selectedSkillId = 'skillId1';
         component.deletedQuestionIds = [];
-        component.canEditQuestion = true;
         spyOn(alertsService, 'addSuccessMessage');
+        spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: {
+              skillId: 'skillId',
+              canEditQuestion: true,
+              numberOfQuestions: 3
+            },
+            result: Promise.resolve()
+          } as NgbModalRef
+        );
         component.allSkillSummaries = ([
           ShortSkillSummary.createFromBackendDict({
             skill_id: '1',
@@ -786,13 +823,43 @@ describe('Questions List Component', () => {
         spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
           .and.returnValue(Promise.resolve());
 
-        component.deleteQuestionFromSkill(questionId, skillDescription);
+        component.removeQuestionFromSkill(questionId);
         tick();
 
+        expect(ngbModal.open).toHaveBeenCalled();
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-          'Deleted Question'
+          'Question Removed'
         );
       }));
+
+    it('should cancel remove question modal', fakeAsync(() => {
+      component.deletedQuestionIds = [];
+      spyOn(alertsService, 'addInfoMessage');
+      component.allSkillSummaries = ([
+        ShortSkillSummary.createFromBackendDict({
+          skill_id: '1',
+          skill_description: 'Skill Description'
+        })
+      ]);
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {
+            skillId: 'skillId',
+            canEditQuestion: true,
+            numberOfQuestions: 3
+          },
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+      spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(component, 'removeQuestionSkillLinkAsync');
+
+      component.removeQuestionFromSkill(questionId);
+      tick();
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.removeQuestionSkillLinkAsync).not.toHaveBeenCalled();
+    }));
   });
 
   it('should not remove skill if it is the only one', () => {
@@ -869,6 +936,9 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
+
+    component.question = null;
+    expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
   it('should show info message if skills is already linked to question',
@@ -1055,7 +1125,11 @@ describe('Questions List Component', () => {
 
     // If skillLinkageModificationsArray is present.
     component.skillLinkageModificationsArray = (
-      [1, 2] as unknown as SkillLinkageModificationsArray[]);
+      [{
+        id: '1',
+        task: null,
+        difficulty: 1,
+      }]);
 
     component.saveQuestion();
     tick();
@@ -1091,7 +1165,18 @@ describe('Questions List Component', () => {
       component.questionIsBeingUpdated = true;
       spyOn(component, 'saveAndPublishQuestion');
       component.skillLinkageModificationsArray = (
-        [1, 2] as unknown as SkillLinkageModificationsArray[]);
+        [
+          {
+            id: '1',
+            task: null,
+            difficulty: 1,
+          },
+          {
+            id: '2',
+            task: null,
+            difficulty: 2,
+          }
+        ]);
 
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.reject()

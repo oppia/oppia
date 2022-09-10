@@ -25,12 +25,8 @@
 <style>
   .create-or-upload-image-selector-container {
     background-color: #dcdcdc;
-    display: grid;
-    grid-column-gap: 0;
-    grid-row-gap: 0;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: 1fr;
-    height: 200px;
+    display: flex;
+    height: fit-content;
     justify-content: center;
     outline: 1px solid;
   }
@@ -47,5 +43,19 @@
   .create-image-button {
     background-color: #00645b;
     color: #fff;
+  }
+  @media screen and (max-width: 370px) {
+    .create-or-upload-image-selector-container {
+      flex-direction: column;
+    }
+    .upload-image-container, .create-image-container {
+      align-self: center;
+      font-family: "Roboto", Arial, sans-serif;
+      padding: 45px;
+      text-align: center;
+    }
+    .upload-image-container {
+      border-bottom: 1px solid #000;
+    }
   }
 </style>
