@@ -138,7 +138,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
             | 'Discard %s key' % self.property_name >> (
                 beam.Values()) # pylint: disable=no-value-for-parameter
             | 'Discard models with unique %s' % self.property_name >> (
-                beam.Filter(lambda models: len(models) > 1))
+                beam.Filter(lambda models: len(list(models)) > 1))
         )
 
     def get_property_value(

@@ -873,6 +873,16 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.unescape_encoded_uri_component('/El%20Ni%C3%B1o/'),
             '/El Niño/')
 
+    def test_get_formatted_query_string(self) -> None:
+        self.assertEqual(
+            utils.get_formatted_query_string('/El%20Ni%C3%B1o/'), 'El Niño'
+        )
+
+    def test_convert_filter_parameter_string_into_list(self) -> None:
+        filter_values_list = utils.convert_filter_parameter_string_into_list(
+            '("GSOC" OR "Math")')
+        self.assertEqual(filter_values_list.sort(), ['GSOC', 'Math'].sort())
+
     def test_compress_and_decompress_zlib(self) -> None:
         byte_instance = b'a' * 26
         byte_compressed = utils.compress_to_zlib(byte_instance)
