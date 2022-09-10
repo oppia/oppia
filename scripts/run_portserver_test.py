@@ -33,7 +33,7 @@ from typing import Any, List
 
 class MockSocket:
     server_closed = False
-    port = 8181
+    port: str|int = 8181
 
     def setsockopt(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
         pass
@@ -175,7 +175,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking getsockname()."""
 
-            def getsockname(self) -> None: # pylint: disable=missing-docstring
+            def getsockname(self, *unused_args: Any) -> List[Any]: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
         swap_socket = self.swap(
