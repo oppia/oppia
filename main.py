@@ -80,7 +80,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
-from typing import Any, Dict, Optional, Type, TypeVar, cast
+from typing import Any, Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
@@ -1124,10 +1124,7 @@ class NdbWsgiMiddleware:
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)
         with datastore_services.get_ndb_context(global_cache=global_cache):
-            # Here we use cast because webapp2.WSGIApplication is not
-            # correctly typed in it's stubs.
-            return cast(
-                webapp2.Response, self.wsgi_app(environ, start_response))
+            return self.wsgi_app(environ, start_response)
 
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
