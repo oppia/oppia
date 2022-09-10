@@ -120,7 +120,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     if (this.alertsService.warnings.length > 0) {
       this.loggerService.error(
         'Could not create new question due to warnings: ' +
-        this.alertsService.warnings[0]);
+        this.alertsService.warnings[0].content);
       return;
     }
 
