@@ -145,11 +145,14 @@ import { QuestionEditorComponent } from './question-directives/question-editor/q
 import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
 import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
 import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
+import { RemoveQuestionSkillLinkModalComponent } from './question-directives/modal-templates/remove-question-skill-link-modal.component';
 import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
 import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
 import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
 import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
+import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 
 // Pipes.
@@ -193,6 +196,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
+    MatProgressSpinnerModule,
     NgbModalModule
   ],
 
@@ -316,11 +320,13 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    ReviewTestPageComponent
   ],
 
   entryComponents: [
@@ -356,7 +362,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent,
     OnScreenKeyboardComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
@@ -434,11 +441,13 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    ReviewTestPageComponent
   ],
 
   exports: [
@@ -497,6 +506,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     InputResponsePairComponent,
     LazyLoadingComponent,
     ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
@@ -563,11 +573,13 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     QuestionPlayerConceptCardModalComponent,
     QuestionPlayerComponent,
     QuestionsListComponent,
+    RemoveQuestionSkillLinkModalComponent,
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    ReviewTestPageComponent
   ],
 })
 
