@@ -37,6 +37,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
+import { RouterService } from '../services/router.service';
 
 
 class MockNgbModalRef {
@@ -67,6 +68,7 @@ describe('Preview Tab Component', () => {
   let explorationParamChangesService: ExplorationParamChangesService;
   let explorationStatesService: ExplorationStatesService;
   let graphDataService: GraphDataService;
+  let routerService: RouterService;
   let stateEditorService: StateEditorService;
   let stateObjectFactory: StateObjectFactory;
   let paramChangeObjectFactory: ParamChangeObjectFactory;
@@ -129,6 +131,7 @@ describe('Preview Tab Component', () => {
     fixture = TestBed.createComponent(PreviewTabComponent);
     component = fixture.componentInstance;
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
+    routerService = TestBed.inject(RouterService);
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
@@ -236,6 +239,7 @@ describe('Preview Tab Component', () => {
     fakeAsync(() => {
       spyOn(explorationFeaturesService, 'areParametersEnabled')
         .and.returnValue(false);
+      spyOn(routerService, 'navigateToMainTab');
       component.allParams = {};
 
       expect(component.showParameterSummary()).toBe(false);
@@ -255,6 +259,7 @@ describe('Preview Tab Component', () => {
       flushMicrotasks();
 
       expect(ngbModal.open).toHaveBeenCalled();
+      expect(routerService.navigateToMainTab).toHaveBeenCalled();
     }));
 
   it('should getManualParamChanges', fakeAsync(() => {
