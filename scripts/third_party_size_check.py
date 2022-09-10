@@ -38,7 +38,7 @@ THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000
 
 
-def _get_skip_files_list() -> List[str]:
+def get_skip_files_list() -> List[str]:
     """This function returns the list of the files which are skipped when
     Oppia is deployed to GAE.
 
@@ -90,15 +90,15 @@ def _check_size_in_dir(dir_path: str, skip_files_list: List[str]) -> int:
             )
             if not matches_skip_files:
                 number_of_files_in_dir += 1
-        else:
+        elif os.path.isdir(file_path):
             number_of_files_in_dir += _check_size_in_dir(
                 file_path, skip_files_list)
     return number_of_files_in_dir
 
 
-def _check_third_party_size() -> None:
+def check_third_party_size() -> None:
     """Checks if the third-party size limit has been exceeded."""
-    skip_files_list = _get_skip_files_list()
+    skip_files_list = get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
         THIRD_PARTY_PATH, skip_files_list)
     print('')
@@ -123,6 +123,6 @@ def _check_third_party_size() -> None:
 
 if __name__ == '__main__': # pragma: no cover
     print('Running third-party size check')
-    _check_third_party_size()
+    check_third_party_size()
     print('Third-party folder size check passed.')
     print('')
