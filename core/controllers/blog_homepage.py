@@ -121,20 +121,6 @@ class BlogHomepageDataHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         offset = int(self.normalized_request.get('offset'))
-        # Total number of published blog posts is calculated only when we load
-        # the blog home page for the first time. It is not required to load
-        # other subsequent pages as the value is already loaded in the frontend.
-        # Similar for list of default tags. Therefore, we return 0 and empty
-        # list for these fields respectively.
-        if offset == 0:
-            number_of_published_blog_post_summaries = (
-                blog_services
-                    .get_total_number_of_published_blog_post_summaries())
-            list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post').value
-        else:
-            number_of_published_blog_post_summaries = 0
-            list_of_default_tags = []
         published_post_summaries = (
             blog_services.get_published_blog_post_summaries(offset))
         published_post_summary_dicts = []
@@ -142,14 +128,29 @@ class BlogHomepageDataHandler(base.BaseHandler):
             published_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_homepage(
                     published_post_summaries))
-
-        self.values.update({
-            'no_of_blog_post_summaries': (
-                number_of_published_blog_post_summaries),
-            'blog_post_summary_dicts': published_post_summary_dicts,
-            'list_of_default_tags': list_of_default_tags
-        })
-        self.render_json(self.values)
+        # Total number of published blog posts is calculated only when we load
+        # the blog home page for the first time (search offset will be 0).
+        # It is not required to load other subsequent pages as the value is
+        # already loaded in the frontend.
+        if offset != 0:
+            self.values.update({
+                'blog_post_summary_dicts': published_post_summary_dicts,
+            })
+            self.render_json(self.values)
+        else:
+            number_of_published_blog_post_summaries = (
+                blog_services
+                .get_total_number_of_published_blog_post_summaries()
+            )
+            list_of_default_tags = config_domain.Registry.get_config_property(
+            'list_of_default_tags_for_blog_post').value
+            self.values.update({
+                'no_of_blog_post_summaries': (
+                    number_of_published_blog_post_summaries),
+                'blog_post_summary_dicts': published_post_summary_dicts,
+                'list_of_default_tags': list_of_default_tags
+            })
+            self.render_json(self.values)
 
 
 class BlogPostDataHandler(base.BaseHandler):
@@ -325,7 +326,7 @@ class BlogPostSearchHandler(base.BaseHandler):
         )
 
         # If there is a tags parameter, it should be in the following form:
-        #     tags=("GSOC" OR "Math")
+        # tags=("GSOC" OR "Math")
         tags_string = self.normalized_request.get('tags')
         tags = utils.convert_filter_parameter_string_into_list(tags_string)
 

@@ -37,12 +37,24 @@ if MYPY: # pragma: no cover
 
 platform_search_services = models.Registry.import_search_services()
 
+# "NOTE TO DEVELOPERS: If you change any of these index names or add any new
+# indexes, please contact Sean to update permissions on the ElasticSearch
+# production servers, otherwise search operations will fail in production.
+# Please do this before merging the PR. Thanks!"
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS: Final = 'explorations'
 
+# "NOTE TO DEVELOPERS: If you change any of these index names or add any new
+# indexes, please contact Sean to update permissions on the ElasticSearch
+# production servers, otherwise search operations will fail in production.
+# Please do this before merging the PR. Thanks!"
 # Name for the collection search index.
 SEARCH_INDEX_COLLECTIONS: Final = 'collections'
 
+# "NOTE TO DEVELOPERS: If you change any of these index names or add any new
+# indexes, please contact Sean to update permissions on the ElasticSearch
+# production servers, otherwise search operations will fail in production.
+# Please do this before merging the PR. Thanks!"
 # Name for the blog post search index.
 SEARCH_INDEX_BLOG_POSTS: Final = 'blog-posts'
 
