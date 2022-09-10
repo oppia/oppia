@@ -174,6 +174,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_sock_bind_handles_error_while_getting_port_name(self) -> None:
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking getsockname()."""
+
             def getsockname(self) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
@@ -346,6 +347,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_failure_to_start_server_throws_error(self) -> None:
         class FailingMockSocket(MockSocket):
             """Socket that fails while invoking bind()."""
+
             def bind(self, *unused_args: Any) -> None: # pylint: disable=missing-docstring
                 raise socket.error('Some error occurred.')
 
@@ -431,6 +433,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
     def test_server_closes_on_keyboard_interrupt(self) -> None:
         class InterruptedMockServer(MockServer):
             """Server that gets interrupted while invoking run()."""
+
             def run(self) -> None: # pylint: disable=missing-docstring
                 raise KeyboardInterrupt('^C pressed.')
 

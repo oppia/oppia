@@ -367,7 +367,7 @@ def _parse_command_line(args=None):
         type=str,
         default='portserver.sock',
         help='Address of AF_UNIX socket on which to listen (first @ is a NUL).')
-    
+
     if not args:
         args = sys.argv[1:]
     return parser.parse_args(args=args)
