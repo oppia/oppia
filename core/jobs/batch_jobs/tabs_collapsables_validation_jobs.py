@@ -23,6 +23,7 @@ from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.domain import html_validation_service
@@ -40,8 +41,11 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-(exp_models, opportunity_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.opportunity])
+(exp_models, opportunity_models, suggestion_models) = (
+    models.Registry.import_models(
+        [models.NAMES.exploration,
+        models.NAMES.opportunity, models.NAMES.suggestion])
+)
 
 
 class TabsCollapsablesValidationJob(base_jobs.JobBase):
@@ -61,9 +65,13 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             if tag.name == 'oppia-noninteractive-image':
                 try:
                     if tag['alt-with-value'] in (
-                        '&quot;&quot;', '', "", '\'\'', '\"\"'):
+                        '&quot;&quot;', '', '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'alt attr is empty'
+                        )
+                    if len(tag['alt-with-value']) < 5:
+                        states_with_errored_values.append(
+                            'alt attr length is less than 5'
                         )
 
                 except Exception:
@@ -73,7 +81,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
 
                 try:
                     if tag['filepath-with-value'] in (
-                        '&quot;&quot;', '', "", '\'\'', '\"\"'):
+                        '&quot;&quot;', '', '\'\'', '\"\"'):
                         states_with_errored_values.append(
                             'filepath attr is empty'
                         )
@@ -84,7 +92,10 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     )
 
                 try:
-                    tag['caption-with-value']
+                    if len(tag['caption-with-value']) > 500:
+                        states_with_errored_values.append(
+                            'caption attr length is greater than 500'
+                        )
                 except Exception:
                     states_with_errored_values.append(
                         'caption attr not exists'
@@ -119,7 +130,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                             states_with_errored_values.append(
                                 'svg_filename attr empty'
                             )
-                        elif svg_filename.strip().split('&quot;')[1] != '.svg':
+                        elif svg_filename.strip()[-4:] != '.svg':
                             states_with_errored_values.append(
                                 'svg_filename attr does not have svg extension'
                             )
@@ -147,9 +158,23 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                         'text attr not in skillreview tag'
                     )
 
-            elif tag.name == 'oppia-noninteractive-video':
                 try:
-                    tag['start-with-value']
+                    if tag['skill_id-with-value'].strip() in (
+                        '&quot;&quot;', '', '\'\'', '\"\"'):
+                        states_with_errored_values.append(
+                            'skill_id attr empty in skillreview tag'
+                        )
+
+                except Exception:
+                    states_with_errored_values.append(
+                        'skill_id attr not in skillreview tag'
+                    )
+
+            elif tag.name == 'oppia-noninteractive-video':
+                start_value = 0
+                end_value = 0
+                try:
+                    start_value = tag['start-with-value']
 
                 except Exception:
                     states_with_errored_values.append(
@@ -157,7 +182,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     )
 
                 try:
-                    tag['end-with-value']
+                    end_value = tag['end-with-value']
 
                 except Exception:
                     states_with_errored_values.append(
@@ -165,7 +190,8 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     )
 
                 try:
-                    if tag['autoplay-with-value'] not in ('true', 'false'):
+                    if tag['autoplay-with-value'] not in (
+                        'true', 'false', '\"true\"', '\"false\"', True, False):
                         states_with_errored_values.append(
                             'autoplay value invalid'
                         )
@@ -186,6 +212,12 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                     states_with_errored_values.append(
                         'No video id'
                     )
+
+                if (start_value > end_value) and (
+                    start_value != 0 and end_value != 0):
+                    states_with_errored_values.append(
+                            'start value greater than end value'
+                        )
 
             elif tag.name == 'oppia-noninteractive-link':
                 try:
@@ -264,6 +296,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
 
             states_with_errored_values = list(set(states_with_errored_values))
             if len(states_with_errored_values) > 0:
+                states_with_errored_values.sort()
                 errored_values.append(
                     {
                         'state_name': state_name,
@@ -335,12 +368,48 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
 
             states_with_errored_values = list(set(states_with_errored_values))
             if len(states_with_errored_values) > 0:
+                states_with_errored_values.sort()
                 errored_values.append(
                     {
                         'state_name': state_name,
                         'errored_values': states_with_errored_values
                     }
                 )
+        return errored_values
+
+    @staticmethod
+    def filter_restricted_rte_tags(states_dict):
+        """In curated explorations only 3 tags are allowed other than
+        that are not allowed. This function filters all the restricted
+        tags that are present inside the states
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            errored_values: List[Dict[str, object]]. Returns the errored
+            states having restricted RTE tags.
+        """
+        errored_values = []
+        for state_name, state in states_dict.items():
+            state_with_errored_values = []
+            html = state.content.html
+            soup = bs4.BeautifulSoup(html, 'html.parser')
+            for tag in soup.find_all():
+                if tag.name not in (
+                    'p',
+                    'oppia-noninteractive-image',
+                    'oppia-noninteractive-math',
+                    'oppia-noninteractive-skillreview'):
+                    state_with_errored_values.append(tag)
+            if len(state_with_errored_values) > 0:
+                errored_values.append(
+                    {
+                        'state_name': state_name,
+                        'state_with_errored_values': state_with_errored_values
+                    }
+                )
+
         return errored_values
 
     @staticmethod
@@ -491,30 +560,12 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
           )
         )
 
-        filter_invalid_curated_tabs = (
-            curated_explorations
-            | 'Get invalid curated tabs values' >> beam.MapTuple(
-                lambda exp_id, exp_states, exp_date: (
-                    exp_id, self.invalid_tabs_rte_tag(exp_states),
-                    exp_date.date()
-                )
+        report_count_invalid_tabs = (
+            filter_invalid_tabs
+            | 'Report count for invalid tabs tag' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID TABS TAG')
             )
-            | 'Remove empty values in invalid curated tabs' >> beam.Filter(
-                lambda tabs: len(tabs[1]) > 0
-            )
-        )
-
-        report_invalid_curated_tabs = (
-          filter_invalid_curated_tabs
-          | 'Report invalid curated tabs value' >> beam.MapTuple(
-            lambda exp_id, tabs_errors, exp_created_on: (
-                job_run_result.JobRunResult.as_stderr(
-                    f'The id of the exp is {exp_id}, created on '
-                    f'{exp_created_on} and the invalid curated tabs values '
-                    f'are {tabs_errors}'
-                )
-            )
-          )
         )
 
         filter_invalid_collapsibles = (
@@ -526,7 +577,7 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                 )
             )
             | 'Remove empty values in invalid collapsibles' >> beam.Filter(
-                lambda tabs: len(tabs[1]) > 0
+                lambda collapsibles: len(collapsibles[1]) > 0
             )
         )
 
@@ -543,40 +594,59 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
           )
         )
 
-        filter_invalid_curated_collapsibles = (
-            curated_explorations
-            | 'Get invalid curated collapsibles values' >> beam.MapTuple(
-                lambda exp_id, exp_states, exp_date: (
-                    exp_id, self.invalid_collapsibles_rte_tag(exp_states),
-                    exp_date.date()
-                )
-            )
-            | 'Remove empty values in invalid curated collapsibles'
-            >> beam.Filter(
-                lambda tabs: len(tabs[1]) > 0
+        report_count_invalid_collapsibles = (
+            filter_invalid_collapsibles
+            | 'Report count for invalid collapsibles tag' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID COLLAPSIBLES TAG')
             )
         )
 
-        report_invalid_curated_collapsibles = (
-          filter_invalid_curated_collapsibles
-          | 'Report invalid curated collapsibles value' >> beam.MapTuple(
-            lambda exp_id, collapsibles_errors, exp_created_on: (
+        filter_curated_exps_having_restricted_tags = (
+            curated_explorations
+            | 'Get invalid RTE values' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_date: (
+                    exp_id, self.filter_restricted_rte_tags(exp_states),
+                    exp_date.date()
+                )
+            )
+            | 'Remove empty values in invalid curated exps'
+            >> beam.Filter(
+                lambda exps: len(exps[1]) > 0
+            )
+        )
+
+        report_curated_exps_having_restricted_tags = (
+            filter_curated_exps_having_restricted_tags
+            | 'Report invalid curated RTE value' >> beam.MapTuple(
+            lambda exp_id, rte_errors, exp_created_on: (
                 job_run_result.JobRunResult.as_stderr(
                     f'The id of the exp is {exp_id}, created on '
-                    f'{exp_created_on} and the invalid curated collapsibles '
-                    f'values are {collapsibles_errors}'
+                    f'{exp_created_on} and the invalid curated RTE '
+                    f'values are {rte_errors}'
                 )
             )
           )
         )
 
+        report_count_curated_exps_having_restricted_tags = (
+            filter_curated_exps_having_restricted_tags
+            | 'Report count for invalid curated RTE tag' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED RTE TAG')
+            )
+        )
+
         return (
             (
                 report_invalid_tabs,
-                report_invalid_curated_tabs,
+                report_count_invalid_tabs,
 
                 report_invalid_collapsibles,
-                report_invalid_curated_collapsibles
+                report_count_invalid_collapsibles,
+
+                report_curated_exps_having_restricted_tags,
+                report_count_curated_exps_having_restricted_tags
             )
             | 'Combine results' >> beam.Flatten()
         )
