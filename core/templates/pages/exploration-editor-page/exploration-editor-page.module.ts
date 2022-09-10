@@ -90,6 +90,8 @@ import { StatisticsTabComponent } from './statistics-tab/statistics-tab.componen
 import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
 import { AddAudioTranslationModalComponent } from './translation-tab/modal-templates/add-audio-translation-modal.component';
 import { AudioTranslationBarComponent } from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import { StateTranslationEditorComponent } from './translation-tab/state-translation-editor/state-translation-editor.component';
+import { StateTranslationComponent } from './translation-tab/state-translation/state-translation.component';
 
 @NgModule({
   imports: [
@@ -163,7 +165,9 @@ import { AudioTranslationBarComponent } from './translation-tab/audio-translatio
     StatisticsTabComponent,
     StateStatsModalComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent,
+    StateTranslationComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -218,7 +222,9 @@ import { AudioTranslationBarComponent } from './translation-tab/audio-translatio
     StatisticsTabComponent,
     StateStatsModalComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent
+    AudioTranslationBarComponent,
+    StateTranslationEditorComponent,
+    StateTranslationComponent
   ],
   providers: [
     {

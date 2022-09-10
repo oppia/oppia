@@ -223,6 +223,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
 
     this.cancelTimer();
 
+    // Shivam PTAL.
     this.voiceoverRecorder.getMp3Data().subscribe((audio) => {
       let fileType = 'audio/mp3';
       this.audioBlob = new Blob(audio, {type: fileType});
