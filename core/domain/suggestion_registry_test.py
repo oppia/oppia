@@ -565,12 +565,11 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `property_name` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute
-        # "property_name"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.property_name = 'invalid_property'  # type: ignore[attr-defined]
+        # Here we use MyPy ignore because 'property_name' can only accept
+        # 'content' string literal but here we are providing 'invalid_property'
+        # which causes MyPy to throw a error. Thus to avoid the error, we used
+        # ignore here.
+        suggestion.change.property_name = 'invalid_property'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected property_name to be content'
         ):
@@ -617,16 +616,11 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State A',
                 })
             ], 'Added state')
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `state_name` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute
-        # "state_name"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.state_name = 'State A'  # type: ignore[attr-defined]
+        suggestion.change.state_name = 'State A'
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
+        suggestion.change.state_name = 'invalid_state_name'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
@@ -645,12 +639,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `state_name` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute
-        # "state_name"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
+        suggestion.change.state_name = 'invalid_state_name'
 
         self.assertIsNone(suggestion.change.old_value)
 
@@ -681,7 +670,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'The following extra attributes are present: new_value, '
             'old_value, property_name'
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                exp_domain.EditExpStatePropertyContentCmd(change)
+            )
 
     def test_pre_update_validate_change_property_name(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -705,7 +696,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'The new change property_name must be equal to content'
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                exp_domain.EditExpStatePropertyContentCmd(change)
+            )
 
     def test_pre_update_validate_change_state_name(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -729,7 +722,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'The new change state_name must be equal to state_1'
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                exp_domain.EditExpStatePropertyContentCmd(change)
+            )
 
     def test_pre_update_validate_change_new_value(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -744,12 +739,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new suggestion html</p>').to_dict()
 
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `new_value` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute
-        # "new_value"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.new_value = new_content  # type: ignore[attr-defined]
+        suggestion.change.new_value = new_content
 
         change: Dict[
             str, Union[Optional[str], state_domain.SubtitledHtmlDict]
@@ -763,7 +753,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'The new html must not match the old html'
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                exp_domain.EditExpStatePropertyContentCmd(change)
+            )
 
     def test_pre_update_validate_non_equal_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -780,11 +772,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'The new change cmd must be equal to edit_state_property'
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Exploration 1 Albert title'
-            }))
+            suggestion.pre_update_validate(
+                exp_domain.EditExpStatePropertyContentCmd({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'Exploration 1 Albert title'
+                })
+            )
 
     def test_get_all_html_content_strings(self) -> None:
         change_dict: Dict[str, Union[Optional[str], Dict[str, str]]] = {
@@ -1476,12 +1470,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `language_code` as an attribute
-        # of change and throwing `"ExplorationChange" has no attribute
-        # "language_code"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.language_code = 'invalid_code'  # type: ignore[attr-defined]
+        suggestion.change.language_code = 'invalid_code'
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language_code: invalid_code'
         ):
@@ -1515,16 +1504,11 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State A',
                 })
             ], 'Added state')
-        # Here, change is of type ExplorationChange and all attributes
-        # on ExplorationChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `state_name` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute
-        # "state_name"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.state_name = 'State A'  # type: ignore[attr-defined]
+        suggestion.change.state_name = 'State A'
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
+        suggestion.change.state_name = 'invalid_state_name'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
@@ -1892,12 +1876,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `question_dict` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.question_dict = None  # type: ignore[attr-defined]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        suggestion.change.question_dict = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain question_dict'
@@ -1948,12 +1930,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_difficulty` as an attribute of
-        # change and throwing `"ExplorationChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_difficulty = None  # type: ignore[attr-defined]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        suggestion.change.skill_difficulty = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain skill_difficulty'
@@ -1972,12 +1952,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_difficulty` as an attribute of
-        # change and throwing `"QuestionSuggestionChange" has no attribute
-        # "skill_id"` error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_difficulty = 0.4  # type: ignore[attr-defined]
+        suggestion.change.skill_difficulty = 0.4
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -1999,16 +1974,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_id` as an attribute of change
-        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_id = skill_id  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.skill_id = None  # type: ignore[attr-defined]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        suggestion.change.skill_id = None  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected change to contain skill_id'
@@ -2029,16 +2002,11 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_id` as an attribute of change
-        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_id = skill_id  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_services.get_new_skill_id()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'The skill with the given id doesn\'t exist.'
@@ -2093,12 +2061,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        # Here, change is of type QuestionSuggestionChange and all attributes
-        # on QuestionSuggestionChange are created dynamically except cmd, so due
-        # this MyPy is unable to recognize `skill_id` as an attribute of change
-        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
-        # error. Thus to avoid the error, we used ignore here.
-        suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
+        suggestion.change.skill_id = skill_services.get_new_skill_id()
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -2124,13 +2087,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'new_value': 'bn',
             'old_value': 'en'
         }
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
             'The new change cmd must be equal to '
             'create_new_fully_specified_question'
         ):
             suggestion.pre_update_validate(
-                question_domain.QuestionChange(change))
+                question_domain.QuestionChange(change))  # type: ignore[arg-type]
 
     def test_pre_update_validate_change_skill_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -2161,7 +2127,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'The new change skill_id must be equal to skill_1'
         ):
             suggestion.pre_update_validate(
-                question_domain.QuestionChange(change))
+                question_domain.CreateNewFullySpecifiedQuestionCmd(
+                    change
+                )
+            )
 
     def test_pre_update_validate_complains_if_nothing_changed(self) -> None:
         change: ChangeType = {
@@ -2201,7 +2170,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'At least one of the new skill_difficulty or question_dict '
             'should be changed.'):
             suggestion.pre_update_validate(
-                question_domain.QuestionSuggestionChange(new_change))
+                question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+                    new_change
+                )
+            )
 
     def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
         self
@@ -2244,7 +2216,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # ignore here.
         self.assertEqual(
             suggestion.pre_update_validate(  # type: ignore[func-returns-value]
-                question_domain.QuestionSuggestionChange(new_change)), None)
+                question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+                    new_change
+                )
+            ),
+            None
+        )
 
     def test_pre_update_validate_accepts_a_change_in_state_data_only(
         self
@@ -2287,7 +2264,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # ignore here.
         self.assertEqual(
             suggestion.pre_update_validate(  # type: ignore[func-returns-value]
-                question_domain.QuestionSuggestionChange(new_change)), None)
+                question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+                    new_change
+                )
+            ),
+            None
+        )
 
     # TODO(#13059): After we fully type the codebase we plan to get
     # rid of the tests that intentionally test wrong inputs that we

@@ -57,6 +57,7 @@ if MYPY: # pragma: no cover
         List[state_domain.AnswerGroupDict],
         List[state_domain.HintDict],
         List[skill_domain.WorkedExampleDict],
+        state_domain.WrittenTranslationsDict,
         List[platform_parameter_domain.PlatformParameterRuleDict],
         question_domain.QuestionDict,
         state_domain.AnswerGroupDict,
