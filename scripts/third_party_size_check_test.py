@@ -58,7 +58,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
 
         self.dummy_file_object = open(
             'dummy_dir/file1.py', 'r', encoding='utf-8')
-    
+
     def tearDown(self) -> None:
         super().tearDown()
         self.dummy_file_object.close()

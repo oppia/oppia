@@ -23,8 +23,6 @@ import os
 from core import feconf
 from core.tests import test_utils
 
-from typing import Callable
-
 
 class FeconfTests(test_utils.GenericTestBase):
     """Unit tests for core/feconf.py."""

@@ -39,20 +39,20 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
             def __exit__(self, *unused_args: Any) -> None:
                 calls_made['exit_context'] = True
-        
+
         def mock_client_transaction() -> MockContextManager:
             return MockContextManager()
         swap_client = self.swap(
             cloud_transaction_services.CLIENT, 'transaction',
             mock_client_transaction)
-        
+
         def add(x: int, y: int) -> int:
             return x + y
         with swap_client:
-            wrapper_fn = cloud_transaction_services.run_in_transaction_wrapper(add)
+            wrapper_fn = cloud_transaction_services.run_in_transaction_wrapper(
+                add)
 
         result = wrapper_fn(1, 2)
         self.assertEqual(result, 3)
         self.assertTrue(calls_made['enter_context'])
         self.assertTrue(calls_made['exit_context'])
-
