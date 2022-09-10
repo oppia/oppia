@@ -397,7 +397,8 @@ class BlogPostSummary:
         tags: List[str],
         thumbnail_filename: Optional[str] = None,
         last_updated: Optional[datetime.datetime] = None,
-        published_on: Optional[datetime.datetime] = None
+        published_on: Optional[datetime.datetime] = None,
+        deleted: Optional[bool] = False,
     ) -> None:
         """Constructs a Blog Post Summary domain object.
 
@@ -414,6 +415,7 @@ class BlogPostSummary:
                 was last updated.
             published_on: datetime.datetime. Date and time when the blog post
                 is last published.
+            deleted: bool. Whether the blog post is deleted or not.
         """
         self.id = blog_post_id
         self.author_id = author_id
@@ -424,6 +426,7 @@ class BlogPostSummary:
         self.thumbnail_filename = thumbnail_filename
         self.last_updated = last_updated
         self.published_on = published_on
+        self.deleted = deleted
 
     @classmethod
     def require_valid_thumbnail_filename(
