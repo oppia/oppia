@@ -47,7 +47,9 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.check_dev_mode_is_true()
 
     def test_get_empty_ratings(self) -> None:
-        self.assertEqual(feconf.get_empty_ratings(), feconf._EMPTY_RATINGS) # pylint: disable=protected-access
+        self.assertEqual(
+            feconf.get_empty_ratings(),
+            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
     def test_callable_variables_return_correctly(self) -> None:
         recipient_username = 'Anshuman'
