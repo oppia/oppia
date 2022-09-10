@@ -68,3 +68,6 @@ class FeconfTests(test_utils.GenericTestBase):
             'unpublish_exploration_email_html_body')
         self.assertEqual(
             moderator_actions['email_intent'], 'unpublish_exploration')
+        self.assertEqual(
+            moderator_actions['email_subject_fn']('Test'),
+            'Your Oppia exploration "Test" has been unpublished')
