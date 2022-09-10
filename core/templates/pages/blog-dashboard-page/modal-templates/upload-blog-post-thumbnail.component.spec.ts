@@ -26,7 +26,7 @@ import { ImageUploaderComponent } from 'components/forms/custom-forms-directives
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { of } from 'rxjs';
 
-describe('Upload Blog Post Thumbnail Modal Component', () => {
+describe('Upload Blog Post Thumbnail Component', () => {
   let fixture: ComponentFixture<UploadBlogPostThumbnailComponent>;
   let componentInstance: UploadBlogPostThumbnailComponent;
   let windowDimensionsService: WindowDimensionsService;

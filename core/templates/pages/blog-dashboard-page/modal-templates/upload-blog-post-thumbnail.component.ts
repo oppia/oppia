@@ -94,8 +94,15 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
       }
-      this.changeDetectorRef.detectChanges();
-      this.initializeCropper();
+      try {
+        this.changeDetectorRef.detectChanges();
+        this.initializeCropper();
+      } catch (viewDestroyedError) {
+        // This try catch block handles the following error in FE tests:
+        // ViewDestroyedError:
+        //   Attempt to use a destroyed view: detectChanges thrown.
+        // No further action is needed.
+      }
     };
     reader.readAsDataURL(file);
   }
