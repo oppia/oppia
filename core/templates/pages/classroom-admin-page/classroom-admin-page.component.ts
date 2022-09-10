@@ -146,7 +146,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.classroomBackendApiService.doesClassroomWithUrlFragmentExist(
       this.urlFragment).then(response => {
       if (response && (
-          this.selectedClassroomDict.urlFragment !=
+        this.selectedClassroomDict.urlFragment !==
           this.updatedClassroomDict.urlFragment)
       ) {
         this.savingClassroomData = false;
