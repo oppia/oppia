@@ -230,29 +230,29 @@ def get_translation_counts(entity_type, entity_id, entity_version):
 
 
 def get_translatable_text(exploration, language_code):
-        """Returns all the contents which needs translation in the given
-        language.
+    """Returns all the contents which needs translation in the given
+    language.
 
-        Args:
-            exp_id: Exploration. The Exploration object.
-            language_code: str. The language code in which translation is
-                required.
+    Args:
+        exp_id: Exploration. The Exploration object.
+        language_code: str. The language code in which translation is
+            required.
 
-        Returns:
-            dict(str, list(TranslatableContent)). A dict with state names
-            as keys and a list of TranslatableContent as values.
-        """
-        entity_translations = (
-            translation_fetchers.get_entity_translation(
-                feconf.TranslatableEntityType.EXPLORATION,
-                exploration.id,
-                exploration.version,
-                language_code)
-        )
-        state_names_to_content_id_mapping = {}
-        for state_name, state in exploration.states.items():
-            state_names_to_content_id_mapping[state_name] = (
-                state.get_all_contents_which_need_translations(
-                    entity_translations))
+    Returns:
+        dict(str, list(TranslatableContent)). A dict with state names
+        as keys and a list of TranslatableContent as values.
+    """
+    entity_translations = (
+        translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration.id,
+            exploration.version,
+            language_code)
+    )
+    state_names_to_content_id_mapping = {}
+    for state_name, state in exploration.states.items():
+        state_names_to_content_id_mapping[state_name] = (
+            state.get_all_contents_which_need_translations(
+                entity_translations))
 
-        return state_names_to_content_id_mapping
+    return state_names_to_content_id_mapping

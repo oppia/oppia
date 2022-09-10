@@ -2689,7 +2689,7 @@ title: A title
                     'cmd': 'edit_exploration_property',
                     'property_name': 'next_content_id_index',
                     'new_value': content_id_generator.next_content_id_index
-                }),], 'Add state name')
+                }), ], 'Add state name')
 
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -2872,7 +2872,7 @@ title: A title
                         'content_id': (
                             content_id_generator.generate(
                                 translation_domain.ContentType.CUSTOMIZATION_ARG
-                                , extra_prefix='placeholder')
+                                 , extra_prefix='placeholder')
                         ),
                         'unicode_str': ''
                     }

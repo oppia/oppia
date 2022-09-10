@@ -178,6 +178,8 @@ title: Title
 # ElasticSearch stub, so MigrateExplorationJobTests also inherits from
 # GenericTestBase to successfully emulate the exploration publishing and
 # verify the migration.
+
+
 class MigrateExplorationJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase):
 
@@ -331,23 +333,24 @@ class MigrateExplorationJobTests(
     def test_unmigrated_exp_is_migrated(self) -> None:
         exp_model = exp_models.ExplorationModel(
             id=self.NEW_EXP_ID,
-            category=EXP_V46__DICT["category"],
-            title=EXP_V46__DICT["title"],
-            objective=EXP_V46__DICT["objective"],
-            language_code=EXP_V46__DICT["language_code"],
-            tags=EXP_V46__DICT["tags"],
-            blurb=EXP_V46__DICT["blurb"],
-            author_notes=EXP_V46__DICT["author_notes"],
-            states_schema_version=EXP_V46__DICT["states_schema_version"],
-            init_state_name=EXP_V46__DICT["init_state_name"],
-            states=EXP_V46__DICT["states"],
-            auto_tts_enabled=EXP_V46__DICT["auto_tts_enabled"],
-            correctness_feedback_enabled=EXP_V46__DICT["correctness_feedback_enabled"]
+            category=EXP_V46__DICT['category'],
+            title=EXP_V46__DICT['title'],
+            objective=EXP_V46__DICT['objective'],
+            language_code=EXP_V46__DICT['language_code'],
+            tags=EXP_V46__DICT['tags'],
+            blurb=EXP_V46__DICT['blurb'],
+            author_notes=EXP_V46__DICT['author_notes'],
+            states_schema_version=EXP_V46__DICT['states_schema_version'],
+            init_state_name=EXP_V46__DICT['init_state_name'],
+            states=EXP_V46__DICT['states'],
+            auto_tts_enabled=EXP_V46__DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46__DICT[
+                'correctness_feedback_enabled']
         )
         rights_manager.create_new_exploration_rights(
             self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, "", [])
-        exp_summary_model= exp_models.ExpSummaryModel(**{
+        exp_summary_model = exp_models.ExpSummaryModel(**{
             'id': self.NEW_EXP_ID,
             'title': exp_model.title,
             'category': exp_model.category,

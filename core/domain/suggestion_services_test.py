@@ -79,6 +79,7 @@ class BaseSuggestionServicesTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = [subtopic_skill_id]
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 subtopic_id, topic.id))
@@ -980,6 +981,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         content_id_generator = translation_domain.ContentIdGenerator()
+        state = self._create_valid_question_data(
+            'default_state', content_id_generator)
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -989,8 +992,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(
-                    'default_state', content_id_generator).to_dict(),
+                'question_state_data': state.to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
@@ -1002,12 +1004,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
+        solution_content_id = content_id_generator.generate(
+            translation_domain.ContentType.SOLUTION)
+        state.recorded_voiceovers.add_content_id_for_voiceover(
+            solution_content_id)
+
         new_solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION),
+                'content_id': solution_content_id,
                 'html': '<p>This is the updated solution.</p>',
             },
         }
@@ -1021,12 +1027,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_change['question_dict']
         )
 
-        question_state_data = test_question_dict[
-            'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
-        question_state_data['interaction'][
-            'solution'] = new_solution_dict
+        question_state_data = test_question_dict['question_state_data']
+        question_state_data['content']['html'] = '<p>Updated question</p>'
+        question_state_data['interaction']['solution'] = new_solution_dict
+        question_state_data['recorded_voiceovers'] = (
+            state.recorded_voiceovers.to_dict())
 
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(suggestion.change.skill_difficulty, float)
@@ -1990,10 +1995,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 correctness_feedback_enabled=True))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', '<p>old content</p>').to_dict()
+            'content_0', '<p>old content</p>').to_dict()
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
-                'content': {
+                'content_0': {
                     self.TRANSLATION_LANGUAGE_CODE: {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
@@ -2001,8 +2006,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                         'duration_secs': 42.43
                     }
                 },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
+                'default_outcome_1': {},
+                'ca_placeholder_6': {}
             }
         }
         self.old_recorded_voiceovers = (

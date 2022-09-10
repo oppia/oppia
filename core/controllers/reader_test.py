@@ -261,7 +261,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             [self.skill_id],
             content_id_generator.next_content_id_index)
         question_id_2 = question_services.get_new_question_id()
-        content_id_generator =translation_domain.ContentIdGenerator()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, 'user',
             self._create_valid_question_data('ABC', content_id_generator),

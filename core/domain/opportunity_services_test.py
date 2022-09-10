@@ -389,7 +389,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 2)
+        self.assertEqual(translation_opportunities[0].content_count, 1)
 
         answer_group_dict_inputs_value: Dict[str, Union[str, List[str]]] = {
             'contentId': 'rule_input_4',
@@ -515,32 +515,20 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Introduction',
                 'property_name': 'content',
-                'new_value': change_list_solution_dict
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'Introduction',
-                'content_id': 'content_0',
-                'language_code': 'hi',
-                'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>',
-                'data_format': 'html'
+                'new_value': {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content_0',
+                }
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'End State',
                 'property_name': 'content',
-                'new_value': change_list_solution_dict
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'End State',
-                'content_id': 'content_0',
-                'language_code': 'hi',
-                'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>',
-                'data_format': 'html'
-            }),
+                'new_value': {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content_3',
+                }
+            })
         ]
         exp_services.update_exploration(
             self.owner_id, '0', change_list, 'commit message')
@@ -550,7 +538,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
-        self.assertEqual(len(translation_opportunities), 0)
+        self.assertEqual(len(translation_opportunities), 1)
 
         # The translation opportunity should be returned after marking a
         # translation as stale.

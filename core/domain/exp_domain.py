@@ -1098,7 +1098,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_domain.RecordedVoiceovers.from_dict(
                     sdict['recorded_voiceovers']))
 
-
             state.linked_skill_id = sdict['linked_skill_id']
 
             state.solicit_answer_details = sdict['solicit_answer_details']

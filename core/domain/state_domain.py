@@ -2706,63 +2706,6 @@ class State(translation_domain.BaseTranslatableObject):
         if self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
-        content_id_list = []
-        content_id_list.append(self.content.content_id)
-        for answer_group in self.interaction.answer_groups:
-            feedback_content_id = answer_group.outcome.feedback.content_id
-            if feedback_content_id in content_id_list:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s' % feedback_content_id)
-            content_id_list.append(feedback_content_id)
-
-            for rule_spec in answer_group.rule_specs:
-                for param_name, value in rule_spec.inputs.items():
-                    param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
-                            self.interaction.id
-                        ).get_rule_param_type(rule_spec.rule_type, param_name))
-
-                    if issubclass(param_type, objects.BaseTranslatableObject):
-                        if value['contentId'] in content_id_list:
-                            raise utils.ValidationError(
-                                'Found a duplicate content '
-                                'id %s' % value['contentId'])
-                        content_id_list.append(value['contentId'])
-
-        if self.interaction.default_outcome:
-            default_outcome_content_id = (
-                self.interaction.default_outcome.feedback.content_id)
-            if default_outcome_content_id in content_id_list:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s'
-                    % default_outcome_content_id)
-            content_id_list.append(default_outcome_content_id)
-        for hint in self.interaction.hints:
-            hint_content_id = hint.hint_content.content_id
-            if hint_content_id in content_id_list:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s' % hint_content_id)
-            content_id_list.append(hint_content_id)
-        if self.interaction.solution:
-            solution_content_id = (
-                self.interaction.solution.explanation.content_id)
-            if solution_content_id in content_id_list:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s' % solution_content_id)
-            content_id_list.append(solution_content_id)
-
-        if self.interaction.id is not None:
-            for ca_name in self.interaction.customization_args:
-                content_id_list.extend(
-                    self.interaction.customization_args[ca_name]
-                    .get_content_ids()
-                )
-
-        if len(set(content_id_list)) != len(content_id_list):
-            raise utils.ValidationError(
-                'Expected all content_ids to be unique, '
-                'received %s' % content_id_list)
-
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
                 'Expected solicit_answer_details to be a boolean, '
@@ -2779,7 +2722,7 @@ class State(translation_domain.BaseTranslatableObject):
                 'Expected card_is_checkpoint to be a boolean, '
                 'received %s' % self.card_is_checkpoint)
 
-        self.recorded_voiceovers.validate(content_id_list)
+        self.recorded_voiceovers.validate(self.get_translatable_content_ids())
 
         if self.linked_skill_id is not None:
             if not isinstance(self.linked_skill_id, str):
@@ -3765,6 +3708,7 @@ class State(translation_domain.BaseTranslatableObject):
             self.get_translatable_contents_collection()
             .content_id_to_translatable_content)
         return bool(content_id in available_translate_content)
+
 
 class StateVersionHistory:
     """Class to represent an element of the version history list of a state.

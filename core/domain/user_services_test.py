@@ -2175,18 +2175,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_raises_error_if_none_destination_is_provided_for_checkpoint(
         self
     ) -> None:
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_answer_group: List[state_domain.AnswerGroup] = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     None, None, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'),
+                        'feedback_2', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_1',
+                                'contentId': 'rule_input_3',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],
@@ -2208,13 +2209,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'destination', None, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'),
+                        'feedback_4', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_1',
+                                'contentId': 'rule_input_5',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],

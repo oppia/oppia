@@ -213,7 +213,6 @@ def get_exploration_from_model(
     if next_content_id_index is not None:
         exploration_model.next_content_id_index = next_content_id_index
 
-
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
