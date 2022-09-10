@@ -1035,7 +1035,7 @@ describe('Questions List Component', () => {
       expect(component.skillLinkageModificationsArray).toEqual([{
         id: 'skillId1',
         task: 'add',
-        difficulty: 0.3
+        difficulty: 0.6
       }]);
     }));
 
