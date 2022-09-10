@@ -123,7 +123,7 @@ def sock_bind(port, socket_type, socket_protocol):
             sock = socket.socket(family, socket_type, socket_protocol)
             got_socket = True
         except socket.error:
-            return None
+            continue
         try:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind(('', port))
@@ -350,7 +350,7 @@ class PortServerRequestHandler:
             logging.info(stat)
 
 
-def _parse_command_line(): # pragma: no cover
+def _parse_command_line(args=None):
     """Configure and parse our command line flags.
 
     Returns:
@@ -367,10 +367,13 @@ def _parse_command_line(): # pragma: no cover
         type=str,
         default='portserver.sock',
         help='Address of AF_UNIX socket on which to listen (first @ is a NUL).')
-    return parser.parse_args(args=sys.argv[1:])
+    
+    if not args:
+        args = sys.argv[1:]
+    return parser.parse_args(args=args)
 
 
-def parse_port_ranges(pool_str) -> set(int):
+def _parse_port_ranges(pool_str) -> set(int):
     """Given a 'N-P,X-Y' description of port ranges, return a set of ints.
 
     Args:
@@ -510,10 +513,10 @@ class Server:
         return sock
 
 
-def main() -> None:
+def main(args=None) -> None:
     """Runs the portserver until ctrl-C, then shuts it down."""
-    config = _parse_command_line()
-    ports_to_serve = parse_port_ranges(config.portserver_static_pool)
+    config = _parse_command_line(args)
+    ports_to_serve = _parse_port_ranges(config.portserver_static_pool)
     if not ports_to_serve:
         logging.error(
             'No ports. Invalid port ranges in --portserver_static_pool?'
