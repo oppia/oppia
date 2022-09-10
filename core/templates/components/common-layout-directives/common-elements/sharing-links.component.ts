@@ -46,8 +46,8 @@ export class SharingLinksComponent implements OnInit {
   @Input() smallFont!: boolean;
   @Input() blogPostUrl!: string;
   classroomUrl!: string;
-  activityId: string;
-  activityUrlFragment: string;
+  activityId: string | null = null;
+  activityUrlFragment: string | null = null;
   serverName!: string;
   escapedTwitterText!: string;
 

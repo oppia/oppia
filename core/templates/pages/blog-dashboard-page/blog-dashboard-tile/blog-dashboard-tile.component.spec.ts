@@ -42,7 +42,7 @@ describe('Blog Dashboard Tile Component', () => {
   let alertsService: AlertsService;
   let sampleBlogPostBackendDict = {
     id: 'sampleId',
-    author_username: 'test_user',
+    author_name: 'test_user',
     title: 'Title',
     content: '<p>hello</p>',
     thumbnail_filename: 'image.png',

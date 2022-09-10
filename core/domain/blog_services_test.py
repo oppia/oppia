@@ -798,8 +798,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         (blog_post_ids, search_offset) = (
             blog_services.get_blog_post_ids_matching_query(
                 '',
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-                []
+                [],
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
             )
         )
         self.assertEqual(
@@ -817,8 +817,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         blog_post_ids = (
             blog_services.get_blog_post_ids_matching_query(
                 '',
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-                []
+                [],
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
             )
         )[0]
         self.assertEqual(
@@ -834,8 +834,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_services.get_blog_post_ids_matching_query(
                 '',
-                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-                []
+                [],
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
             ),
             ([], None)
         )
@@ -845,8 +845,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Search for blog posts containing 'Oppia'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
             'Oppia',
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-            []
+            [],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
         )
         self.assertEqual(
             sorted(blog_post_ids),
@@ -859,8 +859,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Search for blog posts containing 'Basic'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
             'Basic',
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-            []
+            [],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
         )
         self.assertEqual(
             sorted(blog_post_ids),
@@ -873,8 +873,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Search for blog posts containing tag 'Math' and 'Social'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
             '',
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-            ['Math', 'Social']
+            ['Math', 'Social'],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
         )
         self.assertEqual(
             sorted(blog_post_ids),
@@ -886,8 +886,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Search for blog posts containing 'Lessons'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
             'Lessons',
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-            []
+            [],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
         )
         self.assertEqual(
             sorted(blog_post_ids),
@@ -900,8 +900,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Search for blog posts containing 'Lessons' and tag 'Social'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
             'Lessons',
-            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-            ['Social']
+            ['Social'],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
         )
         self.assertEqual(
             sorted(blog_post_ids),
@@ -928,8 +928,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
                     '',
+                    [],
                     feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-                    []
                 )
             )
             self.assertEqual(len(blog_post_ids), 2)
@@ -940,8 +940,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
                     '',
-                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
                     [],
+                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
                     offset=search_offset
                 )
             )
@@ -953,8 +953,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
                     '',
-                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
                     [],
+                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
                     offset=search_offset
                 )
             )
@@ -1002,8 +1002,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             (blog_post_ids, _) = (
                 blog_services.get_blog_post_ids_matching_query(
                     '',
-                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-                    []
+                    [],
+                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
                 )
             )
 

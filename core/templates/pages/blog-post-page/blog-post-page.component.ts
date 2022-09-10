@@ -41,7 +41,7 @@ export class BlogPostPageComponent implements OnInit {
   MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST!: number;
   blogPostUrlFragment!: string;
   blogPost!: BlogPostData;
-  publishedDateString!: string;
+  publishedDateString: string = '';
   authorProfilePicUrl!: string;
   DEFAULT_PROFILE_PICTURE_URL!: string;
   postsToRecommend: BlogPostSummary[] = [];
@@ -62,9 +62,10 @@ export class BlogPostPageComponent implements OnInit {
     this.decodeAuthorProfilePicUrl(
       this.blogPostPageData.profilePictureDataUrl
     );
-    this.publishedDateString = this.getDateStringInWords(
-      this.blogPost.publishedOn
-    );
+    if (this.blogPost.publishedOn) {
+      this.publishedDateString = this.getDateStringInWords(
+        this.blogPost.publishedOn);
+    }
   }
 
   getPageUrl(): string {
