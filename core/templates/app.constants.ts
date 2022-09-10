@@ -16,7 +16,6 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
-// eslint-disable-next-line oppia/constant-declaration
 const commonConstants = require('constants.ts');
 
 export const AppConstants = {

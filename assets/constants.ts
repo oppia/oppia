@@ -6765,4 +6765,4 @@ module.exports = {
     "edits_allowed"
   ],
   "NON_METADATA_PROPERTIES": ["id", "states"]
-};
+}
