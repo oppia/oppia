@@ -184,7 +184,7 @@ describe('Create new topic modal', () => {
     'should enable error messgae when classroom name is empty',
     () => {
       expect(componentInstance.classroomNameIsValid).toBeFalse();
-      expect(componentInstance.emptyClassroomName).toBeTrue();
+      expect(componentInstance.emptyClassroomName).toBeFalse();
 
       componentInstance.newClassroomName = '';
 
@@ -214,7 +214,7 @@ describe('Create new topic modal', () => {
     'should not present any error when classroom name is valid', () => {
       expect(componentInstance.classroomNameIsValid).toBeFalse();
       expect(componentInstance.duplicateClassroomName).toBeFalse();
-      expect(componentInstance.emptyClassroomName).toBeTrue();
+      expect(componentInstance.emptyClassroomName).toBeFalse();
       expect(componentInstance.classroomNameExceedsMaxLen).toBeFalse();
 
       componentInstance.existingClassroomNames = ['physics', 'chemistry'];
@@ -232,7 +232,7 @@ describe('Create new topic modal', () => {
   it(
     'should present error messgae when clasroom url fragment is empty', () => {
       expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.emptyClassroomUrlFrgament).toBeTrue();
+      expect(componentInstance.emptyClassroomUrlFrgament).toBeFalse();
 
       componentInstance.newClassroomUrlFragment = '';
 
@@ -261,7 +261,7 @@ describe('Create new topic modal', () => {
     'should present error message when classroom url fragment is invalid',
     () => {
       expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.urlFragmentRegexMatched).toBeFalse();
+      expect(componentInstance.urlFragmentRegexMatched).toBeTrue();
 
       componentInstance.newClassroomUrlFragment = 'Incorrect-url';
       componentInstance.onClassroomUrlFragmentChange();
@@ -273,9 +273,9 @@ describe('Create new topic modal', () => {
   it(
     'should not present error for valid classroom url fragment', () => {
       expect(componentInstance.classroomUrlFragmentIsValid).toBeFalse();
-      expect(componentInstance.urlFragmentRegexMatched).toBeFalse();
+      expect(componentInstance.urlFragmentRegexMatched).toBeTrue();
       expect(componentInstance.classroomUrlFragmentExceedsmaxLen).toBeFalse();
-      expect(componentInstance.emptyClassroomUrlFrgament).toBeTrue();
+      expect(componentInstance.emptyClassroomUrlFrgament).toBeFalse();
 
       componentInstance.newClassroomUrlFragment = 'physics-url-fragment';
 

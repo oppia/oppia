@@ -12,13 +12,13 @@
                 (ngModelChange)="onClassroomNameChange()">
       </textarea>
       <p *ngIf="classroomNameExceedsMaxLen" class="oppia-warning-text">
-        A classroom name should contain at most 39 characters.
+        The classroom name should contain at most 39 characters.
       </p>
       <p *ngIf="emptyClassroomName" class="oppia-warning-text">
-        A classroom name should not be empty.
+        The classroom name should not be empty.
       </p>
       <p *ngIf="duplicateClassroomName" class="oppia-warning-text">
-        A classroom with this name already exists.
+        The classroom with this name already exists.
       </p>
     </div>
   </div>
@@ -31,16 +31,16 @@
                 (ngModelChange)="onClassroomUrlFragmentChange()">
       </textarea>
       <p *ngIf="classroomUrlFragmentExceedsmaxLen" class="oppia-warning-text">
-        A classroom url fragment should contain at most 20 characters.
+        The classroom url fragment should contain at most 20 characters.
       </p>
       <p *ngIf="emptyClassroomUrlFrgament" class="oppia-warning-text">
-        A classroom url fragment should not be empty.
+        The classroom url fragment should not be empty.
       </p>
       <p *ngIf="duplicateClassroomUrlFragment" class="oppia-warning-text">
-        A classroom with this url fragment already exists.
+        The classroom with this url fragment already exists.
       </p>
       <p *ngIf="!urlFragmentRegexMatched" class="oppia-warning-text">
-        A classroom url fragment should only contain hyphens seperated lowercase
+        The classroom url fragment should only contain hyphens seperated lowercase
         characters.
       </p>
     </div>

@@ -258,6 +258,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     if (this.classroomName === '') {
       this.emptyClassroomName = true;
       this.classroomNameIsValid = false;
+      this.classroomNameExceedsMaxLen = false;
       this.duplicateClassroomName = false;
       return;
     } else {
@@ -293,7 +294,9 @@ export class ClassroomAdminPageComponent implements OnInit {
     if (this.urlFragment === '') {
       this.emptyClassroomUrlFrgament = true;
       this.duplicateClassroomUrlFragment = false;
+      this.urlFragmentRegexMatched = true;
       this.classroomUrlFragmentIsValid = false;
+      this.classroomUrlFragmentExceedsmaxLen = false;
       return;
     } else {
       this.emptyClassroomUrlFrgament = false;
@@ -306,6 +309,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomUrlFragmentExceedsmaxLen = true;
       this.duplicateClassroomUrlFragment = false;
       this.classroomUrlFragmentIsValid = false;
+      this.urlFragmentRegexMatched = true;
       return;
     } else {
       this.classroomUrlFragmentExceedsmaxLen = false;
@@ -317,6 +321,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.urlFragmentRegexMatched = true;
     } else {
       this.urlFragmentRegexMatched = false;
+      this.duplicateClassroomUrlFragment = false;
       this.classroomUrlFragmentIsValid = false;
       return;
     }
