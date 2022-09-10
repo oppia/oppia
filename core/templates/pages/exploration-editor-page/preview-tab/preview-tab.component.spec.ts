@@ -232,7 +232,7 @@ describe('Preview Tab Component', () => {
         'Preview started from "state"');
     }));
 
-  it('should initialize open ngbModal and naviage to mainTab',
+  it('should initialize open ngbModal and navigate to mainTab',
     fakeAsync(() => {
       spyOn(explorationFeaturesService, 'areParametersEnabled')
         .and.returnValue(false);

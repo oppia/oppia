@@ -322,16 +322,17 @@ describe('Questions List Component', () => {
     expect(component.createQuestion).toHaveBeenCalled();
   });
 
-  it('should not start creating a question if there are alerts', () => {
-    component.question = question;
-    alertsService.addWarning('a warning');
-    spyOn(loggerService, 'error').and.stub();
+  it('should not start creating a question if there are alerts', fakeAsync(
+    () => {
+      alertsService.addWarning('a warning');
+      spyOn(loggerService, 'error').and.stub();
 
-    component.createQuestion();
+      component.createQuestion();
 
-    expect(loggerService.error).toHaveBeenCalledWith(
-      'Could not create new question due to warnings: a warning');
-  });
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Could not create new question due to warnings: a warning');
+    }
+  ));
 
   it('should get selected skill id when a question is created', () => {
     // When modal is not shown, then newQuestionSkillIds get the values of
