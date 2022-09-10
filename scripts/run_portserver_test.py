@@ -275,6 +275,12 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         port_pool = run_portserver.PortPool() # type: ignore[no-untyped-call]
         port_pool.add_port_to_free_pool(port1)
         port_pool.add_port_to_free_pool(port2)
+        # By default, all port pool have an initial start time of 0.
+        # Their start time gets updated later on with their corresponding
+        # process' start time, data regarding which is present in
+        # '/proc/<pid>/stat' file.
+        # To test all possible branches, here we are manually changing
+        # the port pool start time to 1 rather than 0.
         port = port_pool._port_queue.pop() # pylint: disable=protected-access
         port.start_time = 1
         port_pool._port_queue.append(port) # pylint: disable=protected-access
