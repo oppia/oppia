@@ -420,8 +420,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change: exp_domain.ExplorationChange = (
-            exp_domain.ExplorationChange(change)
+        self.change: exp_domain.EditExpStatePropertyContentCmd = (
+            exp_domain.EditExpStatePropertyContentCmd(change)
         )
         self.score_category = score_category
         # Here we use MyPy ignore because in BaseSuggestion, language_code
@@ -511,15 +511,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         old_content = (
             exploration.states[self.change.state_name].content.to_dict())
 
-        # Here we use MyPy ignore because change is of type ExplorationChange
-        # and all attributes on ExplorationChange are created dynamically except
-        # cmd, so because of this MyPy is unable to recognize `old_value` as an
-        # attribute of change and throwing `"ExplorationChange" has no
-        # attribute "old_value"` error. Thus to avoid the error, we used
-        # ignore here.
-        change.old_value = old_content  # type: ignore[attr-defined]
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(change.new_value, dict)
+        change.old_value = old_content
         change.new_value['content_id'] = old_content['content_id']
 
         return [change]
@@ -535,13 +527,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             old_content = (
                 exploration.states[self.change.state_name].content.to_dict())
 
-        # Here we use MyPy ignore because change is of type ExplorationChange
-        # and all attributes on ExplorationChange are created dynamically except
-        # cmd, so because of this MyPy is unable to recognize `old_value` as an
-        # attribute of change and throwing  `"ExplorationChange" has no
-        # attribute "old_value"` error. Thus to avoid the error, we used
-        # ignore here.
-        self.change.old_value = old_content  # type: ignore[attr-defined]
+        self.change.old_value = old_content
 
     def accept(self, commit_message: str) -> None:
         """Accepts the suggestion.
@@ -557,7 +543,9 @@ class SuggestionEditStateContent(BaseSuggestion):
             self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
 
-    def pre_update_validate(self, change: exp_domain.ExplorationChange) -> None:
+    def pre_update_validate(
+        self, change: exp_domain.EditExpStatePropertyContentCmd
+    ) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
 
@@ -579,8 +567,6 @@ class SuggestionEditStateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
                 self.change.state_name)
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.new_value, dict)
         if self.change.new_value['html'] == change.new_value['html']:
             raise utils.ValidationError(
                 'The new html must not match the old html')
@@ -591,11 +577,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.new_value, dict)
         html_string_list = [self.change.new_value['html']]
         if self.change.old_value is not None:
-            assert isinstance(self.change.old_value, dict)
             html_string_list.append(self.change.old_value['html'])
         return html_string_list
 
@@ -608,9 +591,6 @@ class SuggestionEditStateContent(BaseSuggestion):
             in the suggestion.
         """
         if self.change.old_value is not None:
-            # Ruling out the possibility of any other type for mypy type
-            # checking.
-            assert isinstance(self.change.old_value, dict)
             return [self.change.old_value['html']]
 
         return []
@@ -626,12 +606,8 @@ class SuggestionEditStateContent(BaseSuggestion):
                 HTML.
         """
         if self.change.old_value is not None:
-            # Ruling out the possibility of any other type for mypy type
-            # checking.
-            assert isinstance(self.change.old_value, dict)
             self.change.old_value['html'] = (
                 conversion_fn(self.change.old_value['html']))
-        assert isinstance(self.change.new_value, dict)
         self.change.new_value['html'] = (
             conversion_fn(self.change.new_value['html']))
 
@@ -667,8 +643,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change: exp_domain.ExplorationChange = (
-            exp_domain.ExplorationChange(change)
+        self.change: exp_domain.AddWrittenTranslationCmd = (
+            exp_domain.AddWrittenTranslationCmd(change)
         )
         self.score_category = score_category
         self.language_code = language_code
@@ -833,21 +809,9 @@ class SuggestionTranslateContent(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        # Here we use MyPy ignore because change is of type ExplorationChange
-        # and all attributes on ExplorationChange are created dynamically
-        # except cmd, so due this MyPy is unable to recognize `content_html`
-        # as an attribute of change and throwing `"ExplorationChange" has no
-        # attribute "content_html"` error. Thus to avoid the error, we used
-        # ignore here.
-        self.change.content_html = (  # type: ignore[attr-defined]
+        self.change.content_html = (
             conversion_fn(self.change.content_html))
-        # Here we use MyPy ignore because change is of type ExplorationChange
-        # and all attributes on ExplorationChange are created dynamically
-        # except cmd, so due this MyPy is unable to recognize `translation_html`
-        # as an attribute of change and throwing `"ExplorationChange" has
-        # no attribute "translation_html"` error. Thus to avoid the error,
-        # we used ignore here.
-        self.change.translation_html = (  # type: ignore[attr-defined]
+        self.change.translation_html = (
             conversion_fn(self.change.translation_html))
 
 
@@ -900,8 +864,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change: question_domain.QuestionSuggestionChange = (
-            question_domain.QuestionSuggestionChange(change)
+        self.change: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd = (  # pylint: disable=line-too-long
+            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(change)
         )
         self.score_category = score_category
         self.language_code = language_code
@@ -925,14 +889,13 @@ class SuggestionAddQuestion(BaseSuggestion):
             Exception. The state_schema_version of suggestion cannot be
                 processed.
         """
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.question_dict, dict)
         question_dict: question_domain.QuestionDict = self.change.question_dict
 
         state_schema_version = question_dict[
             'question_state_data_schema_version']
 
-        versioned_question_state = {
+        versioned_question_state: question_domain.VersionedQuestionStateDict = {
+            'state_schema_version': state_schema_version,
             'state': copy.deepcopy(
                 question_dict['question_state_data'])
         }
@@ -988,8 +951,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.question_dict, dict)
         question_dict: question_domain.QuestionDict = self.change.question_dict
 
         if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
@@ -1015,13 +976,22 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected change skill_difficulty to be one of %s, found %s '
                 % (skill_difficulties, self._get_skill_difficulty()))
 
+        # Here we use MyPy ignore because here we are building Question
+        # domain object only for validation purpose, so 'question_id' is
+        # provided as None which causes MyPy to throw 'invalid argument
+        # type' error. Thus, to avoid the error, we used ignore here.
         question = question_domain.Question(
-            None,
+            None,  # type: ignore[arg-type]
             state_domain.State.from_dict(
                 question_dict['question_state_data']
             ),
             question_dict['question_state_data_schema_version'],
-            question_dict['language_code'], None,
+            question_dict['language_code'],
+            # Here we use MyPy ignore because here we are building Question
+            # domain object only for validation purpose, so 'version' is
+            # provided as None which causes MyPy to throw 'invalid argument
+            # type' error. Thus, to avoid the error, we use ignore here.
+            None,  # type: ignore[arg-type]
             question_dict['linked_skill_ids'],
             question_dict['inapplicable_skill_misconception_ids'])
         question_state_data_schema_version = (
@@ -1067,8 +1037,6 @@ class SuggestionAddQuestion(BaseSuggestion):
                 consistency with the existing suggestions. As a default commit
                 message is used in the add_question function, the arg is unused.
         """
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.question_dict, dict)
         question_dict: question_domain.QuestionDict = self.change.question_dict
         question_dict['version'] = 1
         question_dict['id'] = (
@@ -1087,6 +1055,14 @@ class SuggestionAddQuestion(BaseSuggestion):
         # Drop Sort have ck editor that includes the images of the interactions
         # so that references for those images are included as html strings.
         if question.question_state_data.interaction.id == 'ImageClickInput':
+            # TODO(#15982): Currently, we have broader type for interaction
+            # customization args and due to this we have to use assert to
+            # narrow down the type. So, once each customization_arg is defined
+            # explicitly, we can remove this todo.
+            assert isinstance(
+                question.question_state_data.interaction.customization_args[
+                    'imageAndRegions'].value, dict
+            )
             new_image_filenames.append(
                 question.question_state_data.interaction.customization_args[
                     'imageAndRegions'].value['imagePath'])
@@ -1112,8 +1088,8 @@ class SuggestionAddQuestion(BaseSuggestion):
     def pre_update_validate(
         self,
         change: Union[
-            question_domain.QuestionChange,
-            question_domain.QuestionSuggestionChange
+            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd,
+            question_domain.CreateNewFullySpecifiedQuestionCmd
         ]
     ) -> None:
         """Performs the pre update validation. This functions need to be called
@@ -1142,10 +1118,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
     def _get_skill_difficulty(self) -> float:
         """Returns the suggestion's skill difficulty."""
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.skill_difficulty, float)
-        skill_difficulty = self.change.skill_difficulty
-        return skill_difficulty
+        return self.change.skill_difficulty
 
     def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this suggestion.
@@ -1153,8 +1126,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.question_dict, dict)
         question_dict: question_domain.QuestionDict = self.change.question_dict
         state_object = (
             state_domain.State.from_dict(
@@ -1178,8 +1149,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(self.change.question_dict, dict)
         question_dict: question_domain.QuestionDict = self.change.question_dict
         question_dict['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(

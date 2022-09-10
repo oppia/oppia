@@ -203,6 +203,14 @@ class ConfigPropertyChange(change_domain.BaseChange):
     }]
 
 
+class ChangePropertyValueCmd(ConfigPropertyChange):
+    """Class representing the ConfigPropertyChange's
+    CMD_CHANGE_PROPERTY_VALUE command.
+    """
+
+    new_value: str
+
+
 class ConfigProperty:
     """A property with a name and a default value.
 

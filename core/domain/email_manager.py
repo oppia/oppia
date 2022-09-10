@@ -2185,6 +2185,8 @@ def send_email_to_new_contribution_reviewer(
 
     Raises:
         Exception. The review category is not valid.
+        Exception. The language_code cannot be None if the review category is
+            'translation' or 'voiceover'.
     """
     if review_category not in NEW_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2196,8 +2198,11 @@ def send_email_to_new_contribution_reviewer(
     if review_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\' or \'voiceover\''
+            )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         review_category_description = (
@@ -2257,6 +2262,8 @@ def send_email_to_removed_contribution_reviewer(
 
     Raises:
         Exception. The review category is not valid.
+        Exception. The language_code cannot be None if the review category is
+            'translation' or 'voiceover'.
     """
     if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2268,8 +2275,11 @@ def send_email_to_removed_contribution_reviewer(
     if review_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\' or \'voiceover\''
+            )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         reviewer_role_description = (
