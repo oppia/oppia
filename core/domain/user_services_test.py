@@ -4062,6 +4062,15 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
+    def test_raise_error_if_no_language_code_provided_with_translation_category(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'The language_code cannot be None'):
+            user_services.get_contributor_usernames(
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+            )
+
     def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
         self
     ) -> None:

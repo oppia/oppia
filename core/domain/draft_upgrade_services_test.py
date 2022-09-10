@@ -1622,7 +1622,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1648,7 +1648,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_misconception_id': None
-                }
+                }]
             })
         ]
         # Version 30 replaces the tagged_misconception_id in version 29
@@ -1658,7 +1658,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1684,7 +1684,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_skill_misconception_id': None
-                }
+                }]
             })
         ]
         # Migrate exploration to state schema version 30.
