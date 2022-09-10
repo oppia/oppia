@@ -37,7 +37,7 @@
         A classroom url fragment should not be empty.
       </p>
       <p *ngIf="duplicateClassroomUrlFragment" class="oppia-warning-text">
-        A classroom url fragment with this name already exists.
+        A classroom with this url fragment already exists.
       </p>
       <p *ngIf="!urlFragmentRegexMatched" class="oppia-warning-text">
         A classroom url fragment should only contain hyphens seperated lowercase
@@ -48,7 +48,8 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary"
-          (click)="cancel()">
+          (click)="cancel()"
+          [disabled]="creatingNewClassroom">
     Cancel
   </button>
   <button class="btn btn-success"

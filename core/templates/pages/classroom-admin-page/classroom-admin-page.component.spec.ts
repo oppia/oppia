@@ -21,6 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { cloneDeep } from 'lodash';
 import { ClassroomAdminPageComponent } from 'pages/classroom-admin-page/classroom-admin-page.component';
 import { ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
 
@@ -352,6 +353,8 @@ describe('Classroom Admin Page component ', () => {
         topicIdToPrerequisiteTopicIds: {}
       };
       component.updatedClassroomDict = classroomDict;
+      component.selectedClassroomDict = cloneDeep(classroomDict);
+      component.selectedClassroomDict.urlFragment = 'discrete-math'
 
       expect(component.duplicateClassroomUrlFragment).toBeFalse();
       expect(component.classroomUrlFragmentIsValid).toBeTrue();

@@ -145,7 +145,10 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.updatedClassroomDict);
     this.classroomBackendApiService.doesClassroomWithUrlFragmentExist(
       this.urlFragment).then(response => {
-      if (response) {
+      if (response && (
+          this.selectedClassroomDict.urlFragment !=
+          this.updatedClassroomDict.urlFragment)
+      ) {
         this.savingClassroomData = false;
         this.duplicateClassroomUrlFragment = true;
         this.classroomUrlFragmentIsValid = false;
@@ -198,6 +201,8 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomViewerMode = true;
         this.updateClassroomPropertiesFromDict(this.selectedClassroomDict);
         this.classroomDataIsChanged = false;
+        this.duplicateClassroomUrlFragment = false;
+        this.classroomUrlFragmentIsValid = true;
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is
@@ -253,6 +258,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     if (this.classroomName === '') {
       this.emptyClassroomName = true;
       this.classroomNameIsValid = false;
+      this.duplicateClassroomName = false;
       return;
     } else {
       this.emptyClassroomName = false;
@@ -263,6 +269,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       AppConstants.MAX_CHARS_IN_CLASSROOM_NAME
     ) {
       this.classroomNameExceedsMaxLen = true;
+      this.duplicateClassroomName = false;
       this.classroomNameIsValid = false;
       return;
     } else {
@@ -285,6 +292,7 @@ export class ClassroomAdminPageComponent implements OnInit {
 
     if (this.urlFragment === '') {
       this.emptyClassroomUrlFrgament = true;
+      this.duplicateClassroomUrlFragment = false;
       this.classroomUrlFragmentIsValid = false;
       return;
     } else {
@@ -296,6 +304,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
       this.classroomUrlFragmentExceedsmaxLen = true;
+      this.duplicateClassroomUrlFragment = false;
       this.classroomUrlFragmentIsValid = false;
       return;
     } else {

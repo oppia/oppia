@@ -305,3 +305,23 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
             'given in the classroom payload dict.'
         )
         self.logout()
+
+    def test_duplicate_classroom_url_fragment_should_return_true(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        classroom_url_fragment_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'math')
+        json_response = self.get_json(classroom_url_fragment_handler_url)
+
+        self.assertTrue(json_response['classroom_url_fragment_exists'])
+        self.logout()
+
+    def test_non_duplicate_classroom_url_fragment_should_return_false(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        classroom_url_fragment_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'chemistry')
+        json_response = self.get_json(classroom_url_fragment_handler_url)
+
+        self.assertFalse(json_response['classroom_url_fragment_exists'])
+        self.logout()
