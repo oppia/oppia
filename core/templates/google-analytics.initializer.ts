@@ -16,7 +16,7 @@
  * @fileoverview Initialization of Google Analytics (gtag.js).
  */
 
-const constants =  require('constants.ts');
+const constants = require('constants.ts');
 
 export function initializeGoogleAnalytics() {
   if (!constants.CAN_SEND_ANALYTICS_EVENTS) {

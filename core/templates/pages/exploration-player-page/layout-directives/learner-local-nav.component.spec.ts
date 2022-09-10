@@ -22,7 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { NgbModal, NgbModalRef, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-const constants =  require('constants.ts');
+const constants = require('constants.ts');
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { AttributionService } from 'services/attribution.service';

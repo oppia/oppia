@@ -19,7 +19,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-const constants =  require('constants.ts');
+const constants = require('constants.ts');
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { AttributionService } from 'services/attribution.service';

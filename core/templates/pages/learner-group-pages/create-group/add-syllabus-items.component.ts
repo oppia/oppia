@@ -28,7 +28,7 @@ import { LanguageIdAndText, LanguageUtilService } from
   'domain/utilities/language-util.service';
 import { NavigationService } from 'services/navigation.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-const constants =  require('constants.ts');
+const constants = require('constants.ts');
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import {

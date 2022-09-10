@@ -23,7 +23,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
-const constants =  require('constants.ts');
+const constants = require('constants.ts');
 import { Subscription } from 'rxjs';
 
 type ExplorationOpportunitiesFetcherFunction = () => Promise<{

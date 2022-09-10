@@ -19,7 +19,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-const constants =  require('constants.ts');
+const constants = require('constants.ts');
 import { CollectionSummaryTileConstants } from 'components/summary-tile/collection-summary-tile.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
