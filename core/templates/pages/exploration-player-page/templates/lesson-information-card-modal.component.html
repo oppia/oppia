@@ -21,11 +21,11 @@
             *ngIf="isHackyExpDescTranslationDisplayed()">
           {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
         </h4>
-        <h4 class="progress-bar-label-text">
+        <h4 [ngClass]="(checkpointCount === 1) ? 'd-none' : 'progress-bar-label-text'">
           Learning Progress
         </h4>
         <div class="progress-bar-container"
-             [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
+             [ngClass]="{'d-none': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
           <div class="lesson-progress-bar"
                [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
             <div class="completed-progress-bar"
@@ -45,7 +45,6 @@
           <button type="button"
                   class="btn btn-secondary save-progress-btn"
                   *ngIf="!userIsLoggedIn"
-                  [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
                   (click)="saveLoggedOutProgress()">
             {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
           </button>
