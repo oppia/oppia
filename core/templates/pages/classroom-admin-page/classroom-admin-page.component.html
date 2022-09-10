@@ -52,30 +52,56 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Name</strong>
             </span>
-            <span *ngIf="classroomViewerMode" class="classroom-field">
-              {{classroomName}}
-            </span>
-            <textarea *ngIf="classroomEditorMode"
-                      [(ngModel)]="classroomName"
-                      (blur)="updateClassroomName(classroomName)"
-                      rows="1"
-                      class="classroom-field">
-            </textarea>
+            <div class="classroom-field">
+              <span *ngIf="classroomViewerMode">
+                {{classroomName}}
+              </span>
+              <textarea *ngIf="classroomEditorMode"
+                        [(ngModel)]="classroomName"
+                        (blur)="updateClassroomName(classroomName)"
+                        (ngModelChange)="onClassroomNameChange()"
+                        rows="1">
+              </textarea>
+              <p *ngIf="classroomNameExceedsMaxLen" class="oppia-warning-text">
+                A classroom name should contain at most 39 characters.
+              </p>
+              <p *ngIf="emptyClassroomName" class="oppia-warning-text">
+                A classroom name should not be empty.
+              </p>
+              <p *ngIf="duplicateClassroomName" class="oppia-warning-text">
+                A classroom with this name already exists.
+              </p>
+            </div>
           </div>
 
           <div class="row oppia-description-text-container">
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Url fragment</strong>
             </span>
-            <span *ngIf="classroomViewerMode" class="classroom-field">
-              {{urlFragment}}
-            </span>
-            <textarea *ngIf="classroomEditorMode"
-                      [(ngModel)]="urlFragment"
-                      (blur)="updateUrlFragment(urlFragment)"
-                      rows="1"
-                      class="classroom-field">
-            </textarea>
+            <div class="classroom-field">
+              <span *ngIf="classroomViewerMode">
+                {{urlFragment}}
+              </span>
+              <textarea *ngIf="classroomEditorMode"
+                        [(ngModel)]="urlFragment"
+                        (blur)="updateUrlFragment(urlFragment)"
+                        (ngModelChange)="onClassroomUrlFragmentChange()"
+                        rows="1">
+              </textarea>
+              <p *ngIf="classroomUrlFragmentExceedsmaxLen" class="oppia-warning-text">
+                A classroom url fragment should contain at most 20 characters.
+              </p>
+              <p *ngIf="emptyClassroomUrlFrgament" class="oppia-warning-text">
+                A classroom url fragment should not be empty.
+              </p>
+              <p *ngIf="duplicateClassroomUrlFragment" class="oppia-warning-text">
+                A classroom url fragment with this name already exists.
+              </p>
+              <p *ngIf="!urlFragmentRegexMatched" class="oppia-warning-text">
+                A classroom url fragment should only contain hyphens seperated lowercase
+                characters.
+              </p>
+            </div>
           </div>
 
           <div class="row oppia-description-text-container">
@@ -114,7 +140,7 @@
               Cancel
             </button>
             <button class="btn btn-success save-classroom-changes"
-                    [disabled]="!classroomDataIsChanged"
+                    [disabled]="(!classroomDataIsChanged) || !(classroomNameIsValid && classroomUrlFragmentIsValid)"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!savingClassroomData">Save</span>
               <mat-spinner *ngIf="savingClassroomData"
@@ -218,6 +244,14 @@
   }
   .add-new-classroom:hover {
     color: #fff;
+  }
+  .add-new-classroom:disabled {
+    background-color: #e8e7e3;
+    color: rgba(0,0,0,0.87);
+  }
+  .oppia-warning-text {
+    color: #f00;
+    font-size: 0.8em;
   }
   @media screen and (max-width: 768px) {
     .oppia-editor-card-with-avatar {

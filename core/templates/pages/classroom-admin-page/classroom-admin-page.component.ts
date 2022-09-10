@@ -20,9 +20,11 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomBackendApiService, ClassroomBackendDict, ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
 import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
 import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
 import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
@@ -35,6 +37,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
+    private editableTopicBackendApiService: EditableTopicBackendApiService,
     private ngbModal: NgbModal,
   ) {}
 
@@ -58,19 +61,31 @@ export class ClassroomAdminPageComponent implements OnInit {
   classroomEditorMode: boolean = false;
   savingClassroomData: boolean = false;
 
+  classroomNameExceedsMaxLen: boolean = false;
+  emptyClassroomName: boolean = false;
+  duplicateClassroomName: boolean = false;
+  classroomNameIsValid: boolean = true;
+
+  classroomUrlFragmentExceedsmaxLen: boolean = false;
+  emptyClassroomUrlFrgament: boolean = false;
+  duplicateClassroomUrlFragment: boolean = false;
+  urlFragmentRegexMatched: boolean = true;
+  classroomUrlFragmentIsValid: boolean = true;
+
   getClassroomData(classroomId: string): void {
+    if (this.classroomId === classroomId && this.classroomViewerMode) {
+      this.classroomDetailsIsShown = false;
+      this.classroomViewerMode = false;
+      return;
+    }
+    if (this.classroomEditorMode) {
+      return;
+    }
+    this.classroomDetailsIsShown = true;
+    this.classroomViewerMode = true;
+
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
-        if (this.classroomId === classroomId && this.classroomViewerMode) {
-          this.classroomDetailsIsShown = false;
-          this.classroomViewerMode = false;
-          return;
-        }
-
-        if (this.classroomEditorMode) {
-          return;
-        }
-
         this.selectedClassroomDict = cloneDeep(response.classroomDict);
         this.updatedClassroomDict = cloneDeep(response.classroomDict);
 
@@ -78,8 +93,6 @@ export class ClassroomAdminPageComponent implements OnInit {
           cloneDeep(this.selectedClassroomDict));
 
         this.classroomDataIsChanged = false;
-        this.classroomDetailsIsShown = true;
-        this.classroomViewerMode = true;
       }
     );
   }
@@ -130,14 +143,24 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.savingClassroomData = true;
     let backendDict = this.convertClassroomDictToBackendForm(
       this.updatedClassroomDict);
-    this.classroomBackendApiService.updateClassroomDataAsync(
-      classroomId, backendDict).then(() => {
+    this.classroomBackendApiService.doesClassroomWithUrlFragmentExist(
+      this.urlFragment).then(response => {
+      if (response) {
+        this.savingClassroomData = false;
+        this.duplicateClassroomUrlFragment = true;
+        this.classroomUrlFragmentIsValid = false;
+        return;
+      }
       this.classroomEditorMode = false;
       this.classroomViewerMode = true;
       this.classroomDataIsChanged = false;
-      this.classroomIdToClassroomName[this.classroomId] = this.classroomName;
-      this.selectedClassroomDict = cloneDeep(this.updatedClassroomDict);
-      this.savingClassroomData = false;
+
+      this.classroomBackendApiService.updateClassroomDataAsync(
+        classroomId, backendDict).then(() => {
+        this.classroomIdToClassroomName[this.classroomId] = this.classroomName;
+        this.selectedClassroomDict = cloneDeep(this.updatedClassroomDict);
+        this.savingClassroomData = false;
+      });
     });
   }
 
@@ -219,22 +242,80 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroomDict.topicIdToPrerequisiteTopicIds);
   }
 
-  getTopicDependencyByTopicName() {
-
-  }
-
-  getTopicDependencyByTopicId() {
-
-  }
-
-  getTopicNameToTopicId() {
-
-  }
-
-
-
   ngOnInit(): void {
     this.getAllClassroomIdToClassroomName();
+  }
+
+  onClassroomNameChange(): void {
+    this.classroomName = this.classroomName.replace(/\s+/g, ' ').trim();
+    this.classroomNameIsValid = true;
+
+    if (this.classroomName === '') {
+      this.emptyClassroomName = true;
+      this.classroomNameIsValid = false;
+      return;
+    } else {
+      this.emptyClassroomName = false;
+    }
+
+    if (
+      this.classroomName.length >
+      AppConstants.MAX_CHARS_IN_CLASSROOM_NAME
+    ) {
+      this.classroomNameExceedsMaxLen = true;
+      this.classroomNameIsValid = false;
+      return;
+    } else {
+      this.classroomNameExceedsMaxLen = false;
+    }
+
+    let existingClassroomNames: string[] = (
+      Object.values(this.classroomIdToClassroomName));
+
+    if (existingClassroomNames.indexOf(this.classroomName) !== -1) {
+      this.duplicateClassroomName = true;
+      this.classroomNameIsValid = false;
+    } else {
+      this.duplicateClassroomName = false;
+    }
+  }
+
+  onClassroomUrlFragmentChange(): void {
+    this.classroomUrlFragmentIsValid = true;
+
+    if (this.urlFragment === '') {
+      this.emptyClassroomUrlFrgament = true;
+      this.classroomUrlFragmentIsValid = false;
+      return;
+    } else {
+      this.emptyClassroomUrlFrgament = false;
+    }
+
+    if (
+      this.urlFragment.length >
+      AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+    ) {
+      this.classroomUrlFragmentExceedsmaxLen = true;
+      this.classroomUrlFragmentIsValid = false;
+      return;
+    } else {
+      this.classroomUrlFragmentExceedsmaxLen = false;
+    }
+
+    let validUrlFragmentRegex = new RegExp(
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
+    if (validUrlFragmentRegex.test(this.urlFragment)) {
+      this.urlFragmentRegexMatched = true;
+    } else {
+      this.urlFragmentRegexMatched = false;
+      this.classroomUrlFragmentIsValid = false;
+      return;
+    }
+
+    if (this.duplicateClassroomUrlFragment) {
+      this.duplicateClassroomUrlFragment = false;
+      this.classroomUrlFragmentIsValid = true;
+    }
   }
 }
 

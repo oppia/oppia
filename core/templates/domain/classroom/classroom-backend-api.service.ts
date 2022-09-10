@@ -86,7 +86,7 @@ interface ClassroomDataResponse {
 }
 
 interface DoesClassroomWithUrlFragmentExistBackendResponse {
-  'classoom_url_fragment_exists': boolean;
+  'classroom_url_fragment_exists': boolean;
 }
 
 @Injectable({
@@ -264,10 +264,11 @@ export class ClassroomBackendApiService {
       '/classroom_url_fragment_handler/<classroom_url_fragment>', {
         classroom_url_fragment: classroomUrlFragment
       });
+
     this.http.get<DoesClassroomWithUrlFragmentExistBackendResponse>(
-      classroomUrlFragment).toPromise().then((response) => {
+      classroomUrlFragmentUrl).toPromise().then((response) => {
       if (successCallback) {
-        successCallback(response.classoom_url_fragment_exists);
+        successCallback(response.classroom_url_fragment_exists);
       }
     }, (errorResponse) => {
       errorCallback(errorResponse);

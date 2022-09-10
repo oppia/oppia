@@ -1232,13 +1232,3 @@ def update_subtopic_thumbnail_filename(
         raise Exception(
             'The thumbnail %s for subtopic with topic_id %s does not exist'
             ' in the filesystem.' % (new_thumbnail_filename, topic.id))
-
-
-def get_topic_id_to_topic_name(topic_ids):
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
-    topic_id_to_topic_name = {}
-
-    for topic in topics:
-        topic_id_to_topic_name[topic.id] = topic.name
-
-    return topic_id_to_topic_name

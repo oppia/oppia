@@ -220,6 +220,7 @@ class ClassroomUrlFragmentHandler(base.BaseHandler):
     """A data handler for checking if a classroom with given url fragment
     exists.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -232,9 +233,10 @@ class ClassroomUrlFragmentHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self, classroom_url_fragment):
         """Get request to check whether a classroom with given exists."""
-        classroom_url_fragment_exists = True
-        if get_classroom_by_url_fragment(classroom_url_fragment):
-            classroom_url_fragment_exists = False
+        classroom_url_fragment_exists = False
+        if classroom_config_services.get_classroom_by_url_fragment(
+                classroom_url_fragment):
+            classroom_url_fragment_exists = True
 
         self.values.update({
             'classroom_url_fragment_exists': classroom_url_fragment_exists

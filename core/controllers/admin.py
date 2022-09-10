@@ -691,20 +691,88 @@ class AdminHandler(base.BaseHandler):
                     'User does not have enough rights to generate data.')
             logging.info(
                 '[ADMIN] %s generated dummy classroom.' % self.user_id)
-            new_classroom_id = classroom_config_services.get_new_classroom_id()
-            new_classroom_name = 'Dummy Classroom %s' % str(new_classroom_id)
-            classroom_dict = {
-                'classroom_id': new_classroom_id,
-                'name': new_classroom_name,
-                'url_fragment': '',
+
+            topic_id_1 = topic_fetchers.get_new_topic_id()
+            topic_id_2 = topic_fetchers.get_new_topic_id()
+            topic_id_3 = topic_fetchers.get_new_topic_id()
+            topic_id_4 = topic_fetchers.get_new_topic_id()
+            topic_id_5 = topic_fetchers.get_new_topic_id()
+            topic_id_6 = topic_fetchers.get_new_topic_id()
+
+            topic_1 = topic_domain.Topic.create_default_topic(
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
+                'fragm')
+            topic_2 = topic_domain.Topic.create_default_topic(
+                topic_id_2, 'Dummy Topic 2', 'dummy-topic-two', 'description',
+                'fragm')
+            topic_3 = topic_domain.Topic.create_default_topic(
+                topic_id_3, 'Dummy Topic 3', 'dummy-topic-three', 'description',
+                'fragm')
+            topic_4 = topic_domain.Topic.create_default_topic(
+                topic_id_4, 'Dummy Topic 4', 'dummy-topic-four', 'description',
+                'fragm')
+            topic_5 = topic_domain.Topic.create_default_topic(
+                topic_id_5, 'Dummy Topic 5', 'dummy-topic-five', 'description',
+                'fragm')
+            topic_6 = topic_domain.Topic.create_default_topic(
+                topic_id_6, 'Dummy Topic 6', 'dummy-topic-six', 'description',
+                'fragm')
+
+            topic_services.save_new_topic(self.user_id, topic_1)
+            topic_services.save_new_topic(self.user_id, topic_2)
+            topic_services.save_new_topic(self.user_id, topic_3)
+            topic_services.save_new_topic(self.user_id, topic_4)
+            topic_services.save_new_topic(self.user_id, topic_5)
+            topic_services.save_new_topic(self.user_id, topic_6)
+
+            classroom_id_1 = classroom_config_services.get_new_classroom_id()
+            classroom_id_2 = classroom_config_services.get_new_classroom_id()
+
+            classroom_name_1 = 'Dummy Classroom with 5 topics'
+            classroom_name_2 = 'Dummy Classroom with 1 topic'
+
+            classroom_url_fragment_1 = 'first-classroom'
+            classroom_url_fragment_2 = 'second-classroom'
+
+            topic_dependency_for_classroom_1 = {
+                topic_id_1: [],
+                topic_id_2: [topic_id_1],
+                topic_id_3: [topic_id_1],
+                topic_id_4: [topic_id_2],
+                topic_id_5: [topic_id_3]
+            }
+            topic_dependency_for_classroom_2 = {
+                topic_id_6: []
+            }
+
+            classroom_dict_1 = {
+                'classroom_id': classroom_id_1,
+                'name': classroom_name_1,
+                'url_fragment': classroom_url_fragment_1,
                 'course_details': '',
                 'topic_list_intro': '',
-                'topic_id_to_prerequisite_topic_ids': {}
+                'topic_id_to_prerequisite_topic_ids': (
+                    topic_dependency_for_classroom_1)
             }
-            classroom = classroom_config_domain.Classroom.from_dict(
-                classroom_dict)
+            classroom_dict_2 = {
+                'classroom_id': classroom_id_2,
+                'name': classroom_name_2,
+                'url_fragment': classroom_url_fragment_2,
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_id_to_prerequisite_topic_ids': (
+                    topic_dependency_for_classroom_2)
+            }
+
+            classroom_1 = classroom_config_domain.Classroom.from_dict(
+                classroom_dict_1)
+            classroom_2 = classroom_config_domain.Classroom.from_dict(
+                classroom_dict_2)
+
             classroom_config_services.update_or_create_classroom_model(
-                classroom)
+                classroom_1)
+            classroom_config_services.update_or_create_classroom_model(
+                classroom_2)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 
