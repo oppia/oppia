@@ -82,7 +82,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   misconceptionIdsForSelectedSkill: number[];
   misconceptionsBySkill: MisconceptionSkillMap;
   newQuestionIsBeingCreated: boolean;
-  newQuestionSkillDifficulties: number[] | number;
+  newQuestionSkillDifficulties: number[];
   newQuestionSkillIds: string[];
   question: Question;
   questionId: string;
@@ -127,14 +127,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.newQuestionSkillIds = [this.selectedSkillId];
     this.associatedSkillSummaries = [];
     this.linkedSkillsWithDifficulty = [
-      SkillDifficulty.create(this.selectedSkillId, '', null)];
-    this.newQuestionSkillDifficulties = this.linkedSkillsWithDifficulty.forEach(
-      (linkedSkillWithDifficulty) => {
-        if (linkedSkillWithDifficulty.getDifficulty()) {
-          (this.newQuestionSkillDifficulties as number[]).push(
-            linkedSkillWithDifficulty.getDifficulty());
-        }
-      }
+      SkillDifficulty.create(
+        this.selectedSkillId, '', AppConstants.DEFAULT_SKILL_DIFFICULTY)];
+    this.newQuestionSkillDifficulties = this.linkedSkillsWithDifficulty.map(
+      linkedSkillWithDifficulty => linkedSkillWithDifficulty.getDifficulty()
     );
     this.focusManagerService.setFocus('difficultySelectionDiv');
     this.showDifficultyChoices = true;
@@ -171,7 +167,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             linkedSkillWithDifficulty.getId())) {
             this.newQuestionSkillIds.push(
               linkedSkillWithDifficulty.getId());
-            (this.newQuestionSkillDifficulties as number[]).push(
+            this.newQuestionSkillDifficulties.push(
               linkedSkillWithDifficulty.getDifficulty());
           }
         });
@@ -341,7 +337,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       return Boolean(
         questionIdValid &&
         this.newQuestionSkillDifficulties &&
-        (this.newQuestionSkillDifficulties as number[]).length);
+        this.newQuestionSkillDifficulties.length);
     }
     return questionIdValid;
   }
@@ -463,8 +459,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       let imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.imageLocalStorageService.flushStoredImagesData();
       this.editableQuestionBackendApiService.createQuestionAsync(
-        this.newQuestionSkillIds, (
-          this.newQuestionSkillDifficulties as number[]),
+        this.newQuestionSkillIds, this.newQuestionSkillDifficulties,
         (this.question.toBackendDict(true)), imagesData
       ).then((response) => {
         if (this.skillLinkageModificationsArray &&
