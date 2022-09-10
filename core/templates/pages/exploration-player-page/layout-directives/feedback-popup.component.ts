@@ -23,7 +23,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UserService } from 'services/user.service';
 import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 
 @Component({
   selector: 'oppia-feedback-popup',

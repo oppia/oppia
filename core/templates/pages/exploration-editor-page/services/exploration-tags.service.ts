@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationPropertyService } from './exploration-property.service';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 import { AlertsService } from 'services/alerts.service';
 import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';

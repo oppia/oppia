@@ -40,7 +40,7 @@ import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
 import { Rubric, RubricBackendDict } from
   'domain/skill/rubric.model';
 import { ValidatorsService } from 'services/validators.service';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 
 export class Skill {
   _id: string;

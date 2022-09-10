@@ -23,7 +23,7 @@ import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-const CONSTANTS = require('constants.ts');
+const CONSTANTS =  require('constants.ts');
 
 describe('Create New Story Modal Controller', function() {
   var $scope = null;

@@ -19,7 +19,7 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface InvalidTagsAndAttributes {

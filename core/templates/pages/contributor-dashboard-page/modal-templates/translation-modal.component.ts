@@ -31,7 +31,7 @@ import { Status, TranslatableItem, TranslateTextService } from 'pages/contributo
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import {

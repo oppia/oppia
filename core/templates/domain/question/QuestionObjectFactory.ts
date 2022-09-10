@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 

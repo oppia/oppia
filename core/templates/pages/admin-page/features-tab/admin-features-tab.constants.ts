@@ -15,8 +15,7 @@
 import { ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 
-// eslint-disable-next-line oppia/constant-declaration
-const { constants } = require('constants.ts');
+const constants =  require('constants.ts');
 
 /**
  * @fileoverview Constants for the admin features tab.

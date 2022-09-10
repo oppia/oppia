@@ -19,7 +19,7 @@
 
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 
 export interface SubtopicBackendDict {
   'id': number;

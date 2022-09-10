@@ -29,7 +29,7 @@ import { Question, QuestionBackendDict, QuestionObjectFactory } from
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 
 interface PretestQuestionsBackendResponse {
   'pretest_question_dicts': QuestionBackendDict[];

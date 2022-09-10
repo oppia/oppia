@@ -19,7 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';

@@ -15,9 +15,7 @@
 /**
  * @fileoverview Constants for the topics and skills dashboard.
  */
-
-// eslint-disable-next-line oppia/constant-declaration
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 
 export enum ETopicSortOptions {
   IncreasingCreatedOn = 'Newly Created',

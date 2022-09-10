@@ -29,7 +29,7 @@ import { Rubric, RubricBackendDict } from
 import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
-const constants = require('constants.ts');
+const constants =  require('constants.ts');
 
 describe('Skill object factory', () => {
   let skillObjectFactory: SkillObjectFactory;
