@@ -704,6 +704,9 @@ DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
 DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
     lambda sender_username: (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
+DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = (
+    lambda exp_title: (
+        'Your Oppia exploration "%s" has been unpublished' % exp_title))
 
 VALID_MODERATOR_ACTIONS: Dict[
     str,
@@ -711,10 +714,7 @@ VALID_MODERATOR_ACTIONS: Dict[
 ] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been unpublished' % exp_title)
-        ),
+        'email_subject_fn': DEFAULT_EMAIL_SUBJECT_FN,
         'email_intent': 'unpublish_exploration',
         'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
         'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,

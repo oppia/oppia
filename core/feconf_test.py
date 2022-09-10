@@ -60,6 +60,11 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.DEFAULT_SIGNOFF_HTML_FN(sender_username),
             'Thanks!<br>%s (Oppia moderator)' % sender_username)
 
+        exploration_title = 'Test'
+        self.assertEqual(
+            feconf.DEFAULT_EMAIL_SUBJECT_FN(exploration_title),
+            'Your Oppia exploration "Test" has been unpublished')
+
         self.assertEqual(
             feconf.VALID_MODERATOR_ACTIONS[
                 'unpublish_exploration']['email_config'],
@@ -68,7 +73,3 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.VALID_MODERATOR_ACTIONS[
                 'unpublish_exploration']['email_intent'],
             'unpublish_exploration')
-        self.assertEqual(
-            feconf.VALID_MODERATOR_ACTIONS[
-                'unpublish_exploration']['email_subject_fn']('Test'),
-            'Your Oppia exploration "Test" has been unpublished')
