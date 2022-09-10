@@ -103,8 +103,23 @@ describe('SharingLinksComponent', () => {
     expect(component.classroomUrl).toBe('/assets/images/general/classroom.png');
   });
 
+  it('should set query fields for social platform APIs when a' +
+    ' blog post is shared', () => {
+    component.shareType = 'blog';
+    component.blogPostUrl = 'sample-blog-post-url';
+
+    component.ngOnInit();
+
+    expect(component.serverName).toBe('https://www.oppia.org');
+    expect(component.escapedTwitterText).toBe(
+      'Check out this new blog post on Oppia - a free platform for teaching' +
+      ' and learning!');
+  });
+
+
   it('should throw an error when SharingLink component is used' +
-    ' at any other place than exploration player or collection player', () => {
+    ' at any other place than exploration player, collection player or' +
+    ' blog post page', () => {
     // This throws "Type '"not-exp-or-col"' is not assignable to type
     // 'ShareType'". We need to suppress this error because 'shareType' can
     // only be equal to 'exploration' or 'collection', but we set an invalid
@@ -152,7 +167,7 @@ describe('SharingLinksComponent', () => {
     component.activityUrlFragment = 'explore';
     component.activityId = 'exp1';
     component.escapedTwitterText = 'Check out this interactive' +
-      ' lesson on Oppia - a free platform for teaching and learning!';
+    ' lesson on Oppia - a free platform for teaching and learning!';
 
     expect(component.getUrl('facebook')).toBe(
       'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/explore/exp1&display=popup&ref=plugin&src=share_button');
@@ -160,6 +175,18 @@ describe('SharingLinksComponent', () => {
       'https://twitter.com/share?text=Check out this interactive lesson on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/explore/exp1');
     expect(component.getUrl('classroom')).toBe(
       'https://classroom.google.com/share?url=https://www.oppia.org/explore/exp1');
+
+    component.serverName = 'https://www.oppia.org';
+    component.shareType = 'blog';
+    component.blogPostUrl = 'sample-blog-post-url';
+    component.escapedTwitterText = 'Check out this new blog post on Oppia - a' +
+    ' free platform for teaching and learning!';
+    expect(component.getUrl('facebook')).toBe(
+      'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/blog/sample-blog-post-url&display=popup&ref=plugin&src=share_button');
+    expect(component.getUrl('twitter')).toBe(
+      'https://twitter.com/share?text=Check out this new blog post on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/blog/sample-blog-post-url');
+    expect(component.getUrl('linkedin')).toBe(
+      'https://www.linkedin.com/sharing/share-offsite/?url=https://www.oppia.org/blog/sample-blog-post-url');
   });
 
   it('should show embed exploration modal when' +

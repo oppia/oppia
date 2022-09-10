@@ -112,8 +112,8 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
-  it('should validate access to blog home page with invalid access', fakeAsync (
-    () => {
+  it('should not validate access to blog home page with invalid access',
+    fakeAsync (() => {
       avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
 
       const req = httpTestingController.expectOne(
@@ -128,7 +128,8 @@ describe('Access validation backend api service', () => {
       flushMicrotasks();
       expect(successSpy).not.toHaveBeenCalled();
       expect(failSpy).toHaveBeenCalled();
-    }));
+    })
+  );
 
   it('should validate access to blog home page with valid access', fakeAsync (
     () => {
@@ -136,6 +137,44 @@ describe('Access validation backend api service', () => {
 
       const req = httpTestingController.expectOne(
         '/access_validation_handler/can_access_blog_home_page');
+      expect(req.request.method).toEqual('GET');
+      req.flush({});
+
+      flushMicrotasks();
+      expect(successSpy).toHaveBeenCalled();
+      expect(failSpy).not.toHaveBeenCalled();
+    }));
+
+  it('should not validate access to blog post page with invalid access',
+    fakeAsync (() => {
+      avbas.validateAccessToBlogPostPage('invalid-post').then(
+        successSpy, failSpy
+      );
+
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_blog_post_page?' +
+        'blog_post_url_fragment=invalid-post');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Access Denied.'
+      }, {
+        status: 401, statusText: 'Access Denied.'
+      });
+
+      flushMicrotasks();
+      expect(successSpy).not.toHaveBeenCalled();
+      expect(failSpy).toHaveBeenCalled();
+    })
+  );
+
+  it('should validate access to blog post page with valid access', fakeAsync (
+    () => {
+      avbas.validateAccessToBlogPostPage('sample-post').then(
+        successSpy, failSpy);
+
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_blog_post_page?' +
+        'blog_post_url_fragment=sample-post');
       expect(req.request.method).toEqual('GET');
       req.flush({});
 

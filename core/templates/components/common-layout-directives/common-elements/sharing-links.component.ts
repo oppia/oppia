@@ -78,9 +78,17 @@ export class SharingLinksComponent implements OnInit {
       this.windowRef.nativeWindow.location.protocol + '//' +
         this.windowRef.nativeWindow.location.host);
 
-    this.escapedTwitterText = (
-      this.htmlEscaperService.unescapedStrToEscapedStr(
-        constants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
+    if (this.shareType === 'blog') {
+      this.escapedTwitterText = (
+        this.htmlEscaperService.unescapedStrToEscapedStr(
+          constants.DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT
+        )
+      );
+    } else {
+      this.escapedTwitterText = (
+        this.htmlEscaperService.unescapedStrToEscapedStr(
+          constants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
+    }
 
     this.classroomUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/classroom.png');
