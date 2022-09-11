@@ -47,7 +47,7 @@
   <div class="oppia-content-wrapper">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-accessibility-translation-start-record"
             [ngbTooltip]="'Record'"
-            placement="above"
+            placement="bottom"
             (click)="checkAndStartRecording()"
             [hidden]="!canVoiceover || cannotRecord"
             aria-label="Start recording"
@@ -58,7 +58,7 @@
   <div class="oppia-content-wrapper">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-upload-audio-button e2e-test-accessibility-translation-upload-audio"
             [ngbTooltip]="'Upload'"
-            placement="above"
+            placement="bottom"
             (click)="openAddAudioTranslationModal(null)"
             [hidden]="!canVoiceover"
             aria-label="Upload voiceovered file">
@@ -97,7 +97,7 @@
   <div class="oppia-content-wrapper" *ngIf="voiceoverRecorder.status().isRecording">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-stop-record-button"
             [ngbTooltip]="'Stop'"
-            placement="above"
+            placement="bottom"
             (click)="stopRecording()"
             aria-label="Stop recording">
       <i class="fas fa-stop"></i>
@@ -178,7 +178,7 @@
   <div class="oppia-content-wrapper">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-upload-audio-button"
             [ngbTooltip]="'Upload audio'"
-            placement="above"
+            placement="bottom"
             [hidden]="!canVoiceover"
             (click)="openAddAudioTranslationModal()">
       <i class="fas fa-upload oppia-upload-icon"></i>
@@ -187,7 +187,7 @@
   <div class="oppia-content-wrapper">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-delete-record"
             [ngbTooltip]="'Delete'"
-            placement="above"
+            placement="bottom"
             [hidden]="!canVoiceover"
             (click)="openDeleteAudioTranslationModal()">
       <i class="fas fa-trash oppia-delete-icon"></i>
@@ -196,7 +196,7 @@
   <div class="oppia-content-wrapper" *ngIf="!audioNeedsUpdate">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
             [ngbTooltip]="'Audio needs update'"
-            placement="above"
+            placement="bottom"
             [hidden]="!canVoiceover"
             (click)="toggleAudioNeedsUpdate()">
       <i class="fas fa-exclamation-triangle"></i>
@@ -205,7 +205,7 @@
   <div class="oppia-content-wrapper" *ngIf="audioNeedsUpdate">
     <button class="btn oppia-audio-button audio-update-needed-button oppia-audio-bar-button-transition"
             [ngbTooltip]="'Audio does not need update'"
-            placement="top"
+            placement="bottom"
             [hidden]="!canVoiceover"
             (click)="toggleAudioNeedsUpdate()">
       <i class="fas fa-exclamation-triangle"></i>
