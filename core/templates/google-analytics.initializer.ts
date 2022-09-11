@@ -18,6 +18,11 @@
 
 import constants from 'assets/constants';
 
+declare var GA_ANALYTICS_ID: string;
+declare var UA_ANALYTICS_ID: string;
+
+initializeGoogleAnalytics();
+
 export function initializeGoogleAnalytics() {
   if (!constants.CAN_SEND_ANALYTICS_EVENTS) {
     // Mock gtag function will prevent sending analytics to google.
@@ -26,8 +31,8 @@ export function initializeGoogleAnalytics() {
   }
 
   if (
-    constants.GA_ANALYTICS_ID &&
-    constants.UA_ANALYTICS_ID &&
+    GA_ANALYTICS_ID &&
+    UA_ANALYTICS_ID &&
     constants.SITE_NAME_FOR_ANALYTICS
   ) {
     // Reference doc:
@@ -40,11 +45,11 @@ export function initializeGoogleAnalytics() {
       'domains': [constants.SITE_NAME_FOR_ANALYTICS]
     });
     gtag('js', new Date());
-    gtag('config', constants.GA_ANALYTICS_ID, {
+    gtag('config', GA_ANALYTICS_ID, {
       'anonymize_ip': true,
       'forceSSL': true,
     });
-    gtag('config', constants.UA_ANALYTICS_ID, {
+    gtag('config', UA_ANALYTICS_ID, {
       'anonymize_ip': true,
       'forceSSL': true,
     });

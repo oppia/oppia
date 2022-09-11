@@ -23,7 +23,6 @@ const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
-const constants = require('./assets/constants.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
@@ -38,6 +37,9 @@ var defaultMeta = {
   description: 'Oppia is a free, open-source learning platform. Join ' +
     'the community to create or try an exploration today!'
 };
+
+const GA_ANALYTICS_ID = '';
+const UA_ANALYTICS_ID = '';
 
 module.exports = {
   resolve: {
@@ -142,8 +144,8 @@ module.exports = {
   */
   plugins: [
     new webpack.DefinePlugin({
-      GA_ANALYTICS_ID: JSON.stringify(constants.GA_ANALYTICS_ID),
-      UA_ANALYTICS_ID: JSON.stringify(constants.UA_ANALYTICS_ID)
+      GA_ANALYTICS_ID: JSON.stringify(GA_ANALYTICS_ID),
+      UA_ANALYTICS_ID: JSON.stringify(UA_ANALYTICS_ID)
     }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],

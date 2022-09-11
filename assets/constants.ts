@@ -17,7 +17,7 @@
  * @fileoverview Initializes constants for the Oppia codebase.
  */
 
-module.exports = {
+export default {
   // Whether to allow custom event reporting to Google Analytics.
   // Mock gtag function is used when disabled.
   "CAN_SEND_ANALYTICS_EVENTS": false,
@@ -6005,10 +6005,6 @@ module.exports = {
       }
     }
   },
-
-  // Data required for Google Analytics.
-  "GA_ANALYTICS_ID": "",
-  "UA_ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
   // Data required for Firebase authentication.
@@ -6765,4 +6761,4 @@ module.exports = {
     "edits_allowed"
   ],
   "NON_METADATA_PROPERTIES": ["id", "states"]
-}
+} as const;
