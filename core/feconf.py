@@ -70,16 +70,22 @@ SUPPORTED_OBJ_TYPES = {
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# When DEV_MODE is true check that we are running in development environment.
-# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
-# need for an explicit check.
-if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
-    server_software = os.getenv('SERVER_SOFTWARE')
-    if (
-            server_software and
-            not server_software.startswith(('Development', 'gunicorn'))
-    ):
-        raise Exception('DEV_MODE can\'t be true on production.')
+
+def check_dev_mode_is_true() -> None:
+    """When DEV_MODE is true check that we are running in development
+    environment. The SERVER_SOFTWARE environment variable does not exist
+    in Travis, hence the need for an explicit check.
+    """
+    if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+        server_software = os.getenv('SERVER_SOFTWARE')
+        if (
+                server_software and
+                not server_software.startswith(('Development', 'gunicorn'))
+        ):
+            raise Exception('DEV_MODE can\'t be true on production.')
+
+
+check_dev_mode_is_true()
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -693,6 +699,9 @@ DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
 DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
     lambda sender_username: (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
+DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = (
+    lambda exp_title: (
+        'Your Oppia exploration "%s" has been unpublished' % exp_title))
 
 VALID_MODERATOR_ACTIONS: Dict[
     str,
@@ -700,10 +709,7 @@ VALID_MODERATOR_ACTIONS: Dict[
 ] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been unpublished' % exp_title)
-        ),
+        'email_subject_fn': DEFAULT_EMAIL_SUBJECT_FN,
         'email_intent': 'unpublish_exploration',
         'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
         'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
