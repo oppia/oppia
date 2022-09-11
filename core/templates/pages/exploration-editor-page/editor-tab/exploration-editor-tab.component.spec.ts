@@ -18,49 +18,32 @@
 
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, TestBed, tick, flush } from '@angular/core/testing';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
+import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { SolutionValidityService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateCardIsCheckpointService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from '../services/exploration-data.service';
 
-describe('Exploration editor tab component', function() {
+describe('Exploration editor tab component', () => {
   var ctrl;
   var $q = null;
   var $scope = null;
@@ -364,12 +347,12 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should initialize controller properties after its initialization',
-    function() {
+    () => {
       expect(ctrl.interactionIsShown).toBe(false);
     });
 
   it('should get state content placeholder text when init state name is equal' +
-    ' to active state name', function() {
+    ' to active state name', () => {
     stateEditorService.setActiveStateName('First State');
     explorationInitStateNameService.init('First State');
 
@@ -380,7 +363,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should get state content placeholder text when init state name is' +
-    ' different from active state name', function() {
+    ' different from active state name', () => {
     stateEditorService.setActiveStateName('First State');
     explorationInitStateNameService.init('Second State');
 
@@ -388,11 +371,11 @@ describe('Exploration editor tab component', function() {
       'You can speak to the learner here, then ask them a question.');
   });
 
-  it('should get state content save button placeholder', function() {
+  it('should get state content save button placeholder', () => {
     expect(ctrl.getStateContentSaveButtonPlaceholder()).toBe('Save Content');
   });
 
-  it('should add state in exploration states', function() {
+  it('should add state in exploration states', () => {
     spyOn(explorationStatesService, 'addState').and.callThrough();
 
     ctrl.addState('Fourth State');
@@ -401,7 +384,7 @@ describe('Exploration editor tab component', function() {
       'Fourth State', null);
   });
 
-  it('should refresh warnings', function() {
+  it('should refresh warnings', () => {
     spyOn(explorationWarningsService, 'updateWarnings');
 
     ctrl.refreshWarnings();
@@ -409,7 +392,7 @@ describe('Exploration editor tab component', function() {
     expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
   });
 
-  it('should save state content', function() {
+  it('should save state content', () => {
     stateEditorService.setActiveStateName('First State');
     expect(explorationStatesService.getState('First State').content).toEqual(
       SubtitledHtml.createFromBackendDict({
@@ -428,7 +411,7 @@ describe('Exploration editor tab component', function() {
     expect(ctrl.interactionIsShown).toBe(true);
   });
 
-  it('should save state interaction id', function() {
+  it('should save state interaction id', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -441,7 +424,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
 
-  it('should save state next content id index', function() {
+  it('should save state next content id index', () => {
     stateEditorService.setActiveStateName('First State');
     expect(
       explorationStatesService.getState('First State').nextContentIdIndex
@@ -453,7 +436,7 @@ describe('Exploration editor tab component', function() {
     ).toBe(2);
   });
 
-  it('should save linked skill id', function() {
+  it('should save linked skill id', () => {
     stateEditorService.setActiveStateName('First State');
     expect(
       explorationStatesService.getState('First State').linkedSkillId
@@ -465,7 +448,7 @@ describe('Exploration editor tab component', function() {
     ).toBe('skill_id1');
   });
 
-  it('should save interaction answer groups', function() {
+  it('should save interaction answer groups', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -507,7 +490,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.answerGroups).toEqual(displayedValue);
   });
 
-  it('should save interaction default outcome', function() {
+  it('should save interaction default outcome', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -542,7 +525,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction customization args', function() {
+  it('should save interaction customization args', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -566,7 +549,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction solution', function() {
+  it('should save interaction solution', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -595,7 +578,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction hints', function() {
+  it('should save interaction hints', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -614,7 +597,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save solicit answer details', function() {
+  it('should save solicit answer details', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setSolicitAnswerDetails(
       explorationStatesService.getState('First State').solicitAnswerDetails);
@@ -626,7 +609,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.solicitAnswerDetails).toBe(true);
   });
 
-  it('should save card is checkpoint on change', function() {
+  it('should save card is checkpoint on change', () => {
     stateEditorService.setActiveStateName('Second State');
     stateEditorService.setCardIsCheckpoint(
       explorationStatesService.getState('Second State').cardIsCheckpoint);
@@ -672,7 +655,7 @@ describe('Exploration editor tab component', function() {
     }));
 
   it('should not mark all audio as needing update when dismissing modal',
-    function() {
+    () => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.reject()
       } as NgbModalRef);
@@ -700,7 +683,7 @@ describe('Exploration editor tab component', function() {
         .toBe(false);
     });
 
-  it('should navigate to main tab in specific state name', function() {
+  it('should navigate to main tab in specific state name', () => {
     spyOn(routerService, 'navigateToMainTab');
 
     var stateName = 'Second State';
@@ -709,7 +692,7 @@ describe('Exploration editor tab component', function() {
     expect(routerService.navigateToMainTab).toHaveBeenCalledWith(stateName);
   });
 
-  it('should evaluate if parameters are enabled', function() {
+  it('should evaluate if parameters are enabled', () => {
     var areParametersEnabledSpy = spyOn(
       explorationFeaturesService, 'areParametersEnabled');
 
@@ -721,7 +704,7 @@ describe('Exploration editor tab component', function() {
   });
 
   it('should correctly broadcast the stateEditorInitialized flag with ' +
-      'the state data', function() {
+      'the state data', () => {
     stateEditorService.setActiveStateName('Second State');
     stateEditorService.updateStateInteractionEditorInitialised();
     stateEditorService.updateStateResponsesInitialised();
