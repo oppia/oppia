@@ -52,6 +52,5 @@
         "CURRENT_STORY_REFERENCE_SCHEMA_VERSION": ["TopicMigrationOneOffJob"]
     },
     "THIRD_PARTY_DIR": "third_party",
-    "UPDATE_CONFIGS_MODULE_TARGET": "scripts.release_scripts.update_configs",
-    "WEBPACK_CONFIG_PATH": "webpack.common.config.ts"
+    "UPDATE_CONFIGS_MODULE_TARGET": "scripts.release_scripts.update_configs"
 }
