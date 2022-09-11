@@ -31,7 +31,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -575,7 +575,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         expected_blog_post_tags = all_blog_post_tags[:-1]
 
         def mock_add_documents_to_index(
-            docs: List[Dict[str, Any]], index: int
+            docs: List[Dict[str, str]], index: int
         ) -> List[str]:
             self.assertEqual(index, blog_services.SEARCH_INDEX_BLOG_POSTS)
             ids = [doc['id'] for doc in docs]
@@ -635,7 +635,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         actual_docs = []
 
         def mock_add_documents_to_index(
-            docs: List[Dict[str, Any]], index: int
+            docs: List[Dict[str, str]], index: int
         ) -> None:
             self.assertEqual(index, blog_services.SEARCH_INDEX_BLOG_POSTS)
             actual_docs.extend(docs)
