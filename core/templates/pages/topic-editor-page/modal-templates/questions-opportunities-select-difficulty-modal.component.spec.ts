@@ -191,13 +191,13 @@ describe(
         component.linkedSkillsWithDifficulty = [{
           _id: '1',
           _description: 'desc',
-          _difficulty: 0.3,
+          _difficulty: 0.6,
 
           toBackendDict(): SkillDifficultyBackendDict {
             return {
               id: '1',
               description: 'desc',
-              difficulty: 0.3,
+              difficulty: 0.6,
             };
           },
 
@@ -206,7 +206,7 @@ describe(
           },
 
           getDifficulty(): number {
-            return 0.3;
+            return 0.6;
           },
 
           setDifficulty(): void {
@@ -228,7 +228,7 @@ describe(
 
         expect(ngbActiveModal.close).toHaveBeenCalledWith({
           skill: skill,
-          skillDifficulty: 0.3
+          skillDifficulty: 0.6
         });
       }));
     });
