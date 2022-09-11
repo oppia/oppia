@@ -471,6 +471,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_SEARCH_DATA_URL,
+        blog_homepage.BlogPostSearchHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
@@ -1078,6 +1081,8 @@ URLS.extend((
         cron.CronExplorationRecommendationsHandler),
     get_redirect_route(
         r'/cron/explorations/search_rank', cron.CronActivitySearchRankHandler),
+    get_redirect_route(
+        r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler),
     get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     get_redirect_route(
