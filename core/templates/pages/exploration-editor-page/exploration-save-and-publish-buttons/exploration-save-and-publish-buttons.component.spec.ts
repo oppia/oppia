@@ -16,408 +16,348 @@
  * @fileoverview Unit tests for explorationSaveAndPublishButtons.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
 import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { EditabilityService } from 'services/editability.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { ExplorationDiffService } from
-  'pages/exploration-editor-page/services/exploration-diff.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { ExplorationSaveAndPublishButtonsComponent } from './exploration-save-and-publish-buttons.component';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { ExplorationRightsService } from '../services/exploration-rights.service';
+import { ExplorationSaveService } from '../services/exploration-save.service';
+import { ExplorationWarningsService } from '../services/exploration-warnings.service';
+import { ExternalSaveService } from 'services/external-save.service';
+import { ExplorationSavePromptModalComponent } from '../modal-templates/exploration-save-prompt-modal.component';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 
-describe('Exploration save and publish buttons component', function() {
-  var ctrl = null;
-  var $q = null;
-  var $scope = null;
-  let changeListService: ChangeListService = null;
-  var $uibModal = null;
-  var contextService = null;
-  var ics = null;
-  var explorationRightsService = null;
-  var explorationSaveService = null;
-  var explorationWarningsService = null;
-  var editabilityService = null;
-  var userExplorationPermissionsService = null;
+describe('Exploration save and publish buttons component', () => {
+  let component: ExplorationSaveAndPublishButtonsComponent;
+  let fixture: ComponentFixture<ExplorationSaveAndPublishButtonsComponent>;
+  let changeListService: ChangeListService;
+  let ngbModal: NgbModal;
+  let contextService: ContextService;
+  let ics: InternetConnectivityService;
+  let explorationRightsService: ExplorationRightsService;
+  let explorationSaveService: ExplorationSaveService;
+  let explorationWarningsService: ExplorationWarningsService;
+  let editabilityService: EditabilityService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
 
-  var mockExternalSaveEventEmitter = null;
-  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
+  let mockExternalSaveEventEmitter = new EventEmitter();
+  let mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
-  beforeEach(angular.mock.module('oppia'));
+  class MockExternalSaveService {
+    onExternalSave = mockExternalSaveEventEmitter;
+  }
 
-  importAllAngularServices();
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve()
+      };
+    }
+  }
 
-  beforeEach(function() {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+        MatCardModule,
+        MatMenuModule,
+      ],
+      declarations: [
+        ExplorationSaveAndPublishButtonsComponent,
+        ExplorationSavePromptModalComponent
+      ],
       providers: [
-        ChangeListService
-      ]
-    });
-
-    changeListService = TestBed.inject(ChangeListService);
-    contextService = TestBed.get(ContextService);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-    editabilityService = TestBed.get(EditabilityService);
-    userExplorationPermissionsService = TestBed.get(
-      UserExplorationPermissionsService);
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'ExplorationDiffService', TestBed.get(ExplorationDiffService));
-    $provide.value(
-      'ExplorationImprovementsTaskRegistryService',
-      TestBed.get(ExplorationImprovementsTaskRegistryService));
-    $provide.value(
-      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
-    mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('ExternalSaveService', {
-      onExternalSave: mockExternalSaveEventEmitter
-    });
-    $provide.value(
-      'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
-    $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
-    $provide.value(
-      'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
+        ChangeListService,
+        {
+          provide: ExternalSaveService,
+          useClass: MockExternalSaveService
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
-    changeListService = $injector.get('ChangeListService');
-    ics = $injector.get('InternetConnectivityService');
-    explorationRightsService = $injector.get('ExplorationRightsService');
-    explorationSaveService = $injector.get('ExplorationSaveService');
-    explorationWarningsService = $injector.get('ExplorationWarningsService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ExplorationSaveAndPublishButtonsComponent);
+    component = fixture.componentInstance;
+
+    changeListService = TestBed.inject(ChangeListService);
+    contextService = TestBed.inject(ContextService);
+    ngbModal = TestBed.inject(NgbModal);
+    ics = TestBed.inject(InternetConnectivityService);
+    explorationRightsService = TestBed.inject(ExplorationRightsService);
+    explorationSaveService = TestBed.inject(ExplorationSaveService);
+    explorationWarningsService = TestBed.inject(ExplorationWarningsService);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    editabilityService = TestBed.inject(EditabilityService);
+    userExplorationPermissionsService = TestBed.inject(
+      UserExplorationPermissionsService);
 
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue($q.resolve({
+      .returnValue(Promise.resolve({
         canPublish: true
-      }));
+      } as ExplorationPermissions));
     spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
       mockConnectionServiceEmitter);
     spyOn(explorationSaveService, 'saveChangesAsync').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
         hideCallback();
-        return $q.resolve();
+        return Promise.resolve();
       });
     spyOn(explorationSaveService, 'showPublishExplorationModal').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
         hideCallback();
-        return $q.resolve();
+        return Promise.resolve();
       });
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('explorationSaveAndPublishButtons', {
-      $scope: $scope,
-      $uibModal: $uibModal,
-      InternetConnectivityService: ics,
-      EditabilityService: editabilityService,
-      UserExplorationPermissionsService: userExplorationPermissionsService
-    });
-    ctrl.$onInit();
-    $scope.$apply();
-  }));
+    component.ngOnInit();
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
-  it('should initialize $scope properties after controller initialization',
-    function() {
-      expect($scope.saveIsInProcess).toBe(false);
-      expect($scope.publishIsInProcess).toBe(false);
-      expect($scope.loadingDotsAreShown).toBe(false);
+  it('should initialize component properties after controller initialization',
+    () => {
+      expect(component.saveIsInProcess).toBe(false);
+      expect(component.publishIsInProcess).toBe(false);
+      expect(component.loadingDotsAreShown).toBe(false);
     });
 
-  it('should save exploration when saving changes', function() {
-    $scope.saveChanges();
+  it('should save exploration when saving changes', fakeAsync(() => {
+    component.saveChanges();
+    tick();
 
-    expect($scope.saveIsInProcess).toBe(true);
+    expect(component.saveIsInProcess).toBe(false);
+    expect(component.loadingDotsAreShown).toBe(false);
+  }));
 
-    $scope.$apply();
-
-    expect($scope.saveIsInProcess).toBe(false);
-    expect($scope.loadingDotsAreShown).toBe(false);
-  });
-
-  it('should check if exploration is editable', function() {
+  it('should check if exploration is editable', () => {
     spyOn(editabilityService, 'isLockedByAdmin').and.returnValue(true);
-    expect($scope.isLockedByAdmin()).toBe(true);
+    expect(component.isLockedByAdmin()).toBe(true);
   });
 
   it('should publish exploration when show publish exploration is shown',
-    function() {
-      $scope.showPublishExplorationModal();
+    fakeAsync(() => {
+      component.showPublishExplorationModal();
+      tick();
 
-      expect($scope.publishIsInProcess).toBe(true);
-
-      $scope.$apply();
-
-      expect($scope.publishIsInProcess).toBe(false);
-      expect($scope.loadingDotsAreShown).toBe(false);
-    });
+      expect(component.publishIsInProcess).toBe(false);
+      expect(component.loadingDotsAreShown).toBe(false);
+    }));
 
   it('should resolve the warnings before saving exploration when exploration' +
-    ' has critical warnings', function() {
-    spyOn(explorationWarningsService, 'hasCriticalWarnings').and.returnValue(1);
-    expect($scope.getSaveButtonTooltip()).toBe('Please resolve the warnings.');
+    ' has critical warnings', () => {
+    spyOn(explorationWarningsService, 'hasCriticalWarnings').and.returnValue(
+      true);
+
+    expect(component.getSaveButtonTooltip())
+      .toBe('Please resolve the warnings.');
   });
 
   it('should save exploration draft when it has no warnings and exploration' +
-    ' is private', function() {
-    spyOn(explorationWarningsService, 'hasCriticalWarnings').and.returnValue(0);
+    ' is private', () => {
+    spyOn(explorationWarningsService, 'hasCriticalWarnings')
+      .and.returnValue(false);
     spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
-    expect($scope.getSaveButtonTooltip()).toBe('Save Draft');
+
+    expect(component.getSaveButtonTooltip()).toBe('Save Draft');
   });
 
   it('should publish exploration changes when it has no warnings and it is' +
-    ' public', function() {
-    spyOn(explorationWarningsService, 'hasCriticalWarnings').and.returnValue(0);
+    ' public', () => {
+    spyOn(explorationWarningsService, 'hasCriticalWarnings').and
+      .returnValue(false);
     spyOn(explorationRightsService, 'isPrivate').and.returnValue(false);
-    expect($scope.getSaveButtonTooltip()).toBe('Publish Changes');
+    expect(component.getSaveButtonTooltip()).toBe('Publish Changes');
   });
 
   it('should ask user to resolve the warnings before publishing' +
-    ' exploration when exploration has warnings', function() {
+    ' exploration when exploration has warnings', () => {
     spyOn(explorationWarningsService, 'countWarnings').and.returnValue(1);
-    expect($scope.getPublishExplorationButtonTooltip()).toBe(
+    expect(component.getPublishExplorationButtonTooltip()).toBe(
       'Please resolve the warnings before publishing.');
   });
 
   it('should save exploration changes before publishing it when trying to' +
-    ' publish a changed exploration without saving it first', function() {
+    ' publish a changed exploration without saving it first', () => {
     spyOn(explorationWarningsService, 'countWarnings').and.returnValue(0);
     spyOn(changeListService, 'isExplorationLockedForEditing').and
       .returnValue(true);
-    expect($scope.getPublishExplorationButtonTooltip()).toBe(
+    expect(component.getPublishExplorationButtonTooltip()).toBe(
       'Please save your changes before publishing.');
   });
 
-  it('should publish exploration when it is already saved', function() {
+  it('should publish exploration when it is already saved', () => {
     spyOn(explorationWarningsService, 'countWarnings').and.returnValue(0);
     spyOn(changeListService, 'isExplorationLockedForEditing')
       .and.returnValue(false);
-    expect($scope.getPublishExplorationButtonTooltip()).toBe(
+    expect(component.getPublishExplorationButtonTooltip()).toBe(
       'Publish to Oppia Library');
   });
 
-  it('should discard changes when exploration is changed', function() {
+  it('should discard changes when exploration is changed', () => {
     spyOn(explorationSaveService, 'discardChanges');
-    $scope.discardChanges();
+    component.discardChanges();
     expect(explorationSaveService.discardChanges).toHaveBeenCalled();
   });
 
-  it('should get whether exploration is saveable', function() {
+  it('should get whether exploration is saveable', () => {
     spyOn(explorationSaveService, 'isExplorationSaveable')
       .and.returnValue(true);
-    expect($scope.isExplorationSaveable()).toBe(true);
+    expect(component.isExplorationSaveable()).toBe(true);
   });
 
-  it('should count changes made in an exploration', function() {
+  it('should count changes made in an exploration', () => {
     spyOn(changeListService, 'getChangeList').and.returnValue(
       [{}, {}] as ExplorationChange[]);
-    expect($scope.getChangeListLength()).toBe(2);
+    expect(component.getChangeListLength()).toBe(2);
   });
 
   it('should save or publish exploration when editing outside tutorial mode' +
-    ' and exploration is translatable', function() {
+    ' and exploration is translatable', () => {
     spyOn(editabilityService, 'isEditableOutsideTutorialMode').and
       .returnValue(false);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(true);
-    expect($scope.isEditableOutsideTutorialMode()).toBe(true);
+    expect(component.isEditableOutsideTutorialMode()).toBe(true);
   });
 
   it('should save or publish exploration when editing outside tutorial mode' +
-    ' and exploration is not translatable', function() {
+    ' and exploration is not translatable', () => {
     spyOn(editabilityService, 'isEditableOutsideTutorialMode').and
       .returnValue(true);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
-    expect($scope.isEditableOutsideTutorialMode()).toBe(true);
+    expect(component.isEditableOutsideTutorialMode()).toBe(true);
   });
 
   it('should not save and publish exploration when editing inside tutorial' +
-    ' mode and exploration is not translatable', function() {
+    ' mode and exploration is not translatable', () => {
     spyOn(editabilityService, 'isEditableOutsideTutorialMode').and
       .returnValue(false);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
-    expect($scope.isEditableOutsideTutorialMode()).toBe(false);
+    expect(component.isEditableOutsideTutorialMode()).toBe(false);
   });
 
   it('should display publish button when the exploration is unpublished',
-    function() {
-      $scope.explorationCanBePublished = false;
+    fakeAsync(() => {
+      component.explorationCanBePublished = false;
 
       userExplorationPermissionsService.
         onUserExplorationPermissionsFetched.emit();
-      $scope.$apply();
+      tick();
 
       expect(userExplorationPermissionsService.getPermissionsAsync)
         .toHaveBeenCalled();
-      expect($scope.explorationCanBePublished).toBe(true);
-    });
+      expect(component.explorationCanBePublished).toBe(true);
+    }));
 
   it('should fetch userExplorationPermissions when ' +
-    'showPublishExplorationModal is called', function() {
-    var userPermissions = {
+    'showPublishExplorationModal is called', fakeAsync(() => {
+    let userPermissions = {
       canPublish: true
     };
-    $scope.explorationCanBePublished = false;
+    component.explorationCanBePublished = false;
     spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
-      .returnValue($q.resolve(userPermissions));
+      .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
 
-    $scope.showPublishExplorationModal();
-    $scope.$apply();
+    component.showPublishExplorationModal();
+    tick();
 
-    expect($scope.publishIsInProcess).toBe(false);
-    expect($scope.loadingDotsAreShown).toBe(false);
+    expect(component.publishIsInProcess).toBe(false);
+    expect(component.loadingDotsAreShown).toBe(false);
     expect(userExplorationPermissionsService.fetchPermissionsAsync)
       .toHaveBeenCalled();
-    expect($scope.explorationCanBePublished).toBe(true);
-  });
+    expect(component.explorationCanBePublished).toBe(true);
+  }));
 
-  it('should unsubscribe when onDestroy runs', function() {
-    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
-
-    ctrl.$onDestroy();
-
-    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
-  });
-
-  it('should open a exploration save prompt modal', function() {
+  it('should open a exploration save prompt modal', fakeAsync(() => {
     spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
-    spyOn($scope, 'saveChanges');
-    $scope.saveIsInProcess = false;
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve()
+    } as NgbModalRef);
+    spyOn(component, 'saveChanges');
 
-    $scope.getChangeListLength();
-    $scope.$apply();
+    component.saveIsInProcess = false;
+    component.getChangeListLength();
+    tick();
 
-    expect($uibModal.open).toHaveBeenCalled();
-    expect($scope.saveChanges).toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.saveChanges).toHaveBeenCalled();
+  }));
 
   it('should open a exploration save prompt modal only once',
-    function() {
+    fakeAsync(() => {
       spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      spyOn($scope, 'saveChanges');
-      $scope.saveIsInProcess = false;
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
+      spyOn(component, 'saveChanges');
 
-      $scope.getChangeListLength();
-      $scope.$apply();
-      expect($uibModal.open).toHaveBeenCalledTimes(1);
-      expect($scope.saveChanges).not.toHaveBeenCalled();
-      $scope.getChangeListLength();
-      $scope.$apply();
+      component.saveIsInProcess = false;
+      component.getChangeListLength();
+      tick();
 
-      expect($uibModal.open).toHaveBeenCalledTimes(1);
-      expect($scope.saveChanges).not.toHaveBeenCalled();
-    });
+      expect(ngbModal.open).toHaveBeenCalledTimes(1);
+      expect(component.saveChanges).not.toHaveBeenCalled();
 
-  it('should open a confirmation modal with rejection', function() {
+      component.getChangeListLength();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalledTimes(1);
+      expect(component.saveChanges).not.toHaveBeenCalled();
+    }));
+
+  it('should open a confirmation modal with rejection', fakeAsync(() => {
     spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    spyOn($scope, 'saveChanges');
-    $scope.saveIsInProcess = false;
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
+    } as NgbModalRef);
+    spyOn(component, 'saveChanges');
+    component.saveIsInProcess = false;
 
-    $scope.getChangeListLength();
-    $scope.$apply();
+    component.getChangeListLength();
+    tick();
 
-    expect($uibModal.open).toHaveBeenCalled();
-    expect($scope.saveChanges).not.toHaveBeenCalled();
-  });
-
-  it('should open a confirmation modal when save is in progress', function() {
-    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    spyOn($scope, 'saveChanges');
-    $scope.saveIsInProcess = true;
-
-    $scope.getChangeListLength();
-    $scope.$apply();
-
-    expect($uibModal.open).not.toHaveBeenCalled();
-    expect($scope.saveChanges).not.toHaveBeenCalled();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.saveChanges).not.toHaveBeenCalled();
+  }));
 
   it('should change connnection status to ONLINE when internet is connected',
     () => {
-      $scope.connectedToInternet = false;
+      component.connectedToInternet = false;
       mockConnectionServiceEmitter.emit(true);
-      $scope.$apply();
-      expect($scope.connectedToInternet).toBe(true);
+
+      expect(component.connectedToInternet).toBe(true);
     });
 
   it('should change connnection status to OFFLINE when internet disconnects',
     () => {
-      $scope.connectedToInternet = true;
+      component.connectedToInternet = true;
       mockConnectionServiceEmitter.emit(false);
-      $scope.$apply();
-      expect($scope.connectedToInternet).toBe(false);
-      expect($scope.getSaveButtonTooltip()).toBe(
+
+      expect(component.connectedToInternet).toBe(false);
+      expect(component.getSaveButtonTooltip()).toBe(
         'You can not save the exploration when offline.');
-      expect($scope.getPublishExplorationButtonTooltip()).toBe(
+      expect(component.getPublishExplorationButtonTooltip()).toBe(
         'You can not publish the exploration when offline.');
     });
 });

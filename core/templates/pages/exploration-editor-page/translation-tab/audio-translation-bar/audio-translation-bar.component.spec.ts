@@ -37,10 +37,6 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
 
-require(
-  'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
-  'audio-translation-bar.directive.ts');
-
 describe('Audio translation bar directive', function() {
   var ctrl = null;
   var $interval = null;

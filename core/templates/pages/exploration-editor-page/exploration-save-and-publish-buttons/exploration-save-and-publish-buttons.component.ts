@@ -33,10 +33,10 @@ import { UserExplorationPermissionsService } from '../services/user-exploration-
   selector: 'exploration-save-and-publish-buttons',
   templateUrl: './exploration-save-and-publish-buttons.component.html'
 })
-
 export class ExplorationSaveAndPublishButtonsComponent
   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+
   isModalDisplayed: boolean = false;
   saveIsInProcess: boolean;
   publishIsInProcess: boolean;
