@@ -125,17 +125,18 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     this.ngbModal.open(CreateFeedbackThreadModalComponent, {
       backdrop: 'static'
     }).result.then(
-      result => this.threadDataBackendApiService.createNewThreadAsync(
-        result.newThreadSubject, result.newThreadText)
-    ).then(() => {
-      this.clearActiveThread();
-      this.alertsService.addSuccessMessage('Feedback thread created.');
-    },
-    () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+      (result) => this.threadDataBackendApiService.createNewThreadAsync(
+        result.newThreadSubject, result.newThreadText).then(() => {
+        this.clearActiveThread();
+        this.alertsService.addSuccessMessage('Feedback thread created.');
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }),
+      () => {}
+    );
   }
 
   getSuggestionButtonType(): string {
