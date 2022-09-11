@@ -39,7 +39,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
                 calls_made['exit_context'] = True
 
         class MockClient:
-            def transaction(self):
+            def transaction(self): # pylint: disable=missing-docstring
                 return MockTransaction()
 
         swap_client = self.swap(
