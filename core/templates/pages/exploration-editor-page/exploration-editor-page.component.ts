@@ -95,6 +95,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   currentUser;
   currentVersion;
   areExplorationWarningsVisible: boolean;
+  isModalOpenable: boolean = true;
 
   constructor(
     private alertsService: AlertsService,
@@ -364,18 +365,23 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 
   showWelcomeExplorationModal(): void {
-    this.ngbModal.open(WelcomeModalComponent, {
-      backdrop: true,
-      windowClass: 'oppia-welcome-modal'
-    }).result.then((explorationId) => {
-      this.siteAnalyticsService.registerAcceptTutorialModalEvent(
-        explorationId);
-      this.startEditorTutorial();
-    }, (explorationId) => {
-      this.siteAnalyticsService.registerDeclineTutorialModalEvent(
-        explorationId);
-      this.stateTutorialFirstTimeService.markEditorTutorialFinished();
-    });
+    if (this.isModalOpenable) {
+      this.isModalOpenable = false;
+      this.ngbModal.open(WelcomeModalComponent, {
+        backdrop: true,
+        windowClass: 'oppia-welcome-modal'
+      }).result.then((explorationId) => {
+        this.siteAnalyticsService.registerAcceptTutorialModalEvent(
+          explorationId);
+        this.startEditorTutorial();
+        this.isModalOpenable = true;
+      }, (explorationId) => {
+        this.siteAnalyticsService.registerDeclineTutorialModalEvent(
+          explorationId);
+        this.stateTutorialFirstTimeService.markEditorTutorialFinished();
+        this.isModalOpenable = true;
+      });
+    }
   }
 
   getNavbarText(): string {

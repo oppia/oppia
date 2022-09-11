@@ -378,6 +378,10 @@ export class ExplorationEditorTabComponent
       // element is visible in DOM.
       setTimeout(() => this.windowOnload(), 100);
     }
+
+    if (this.editabilityService.inTutorialMode()) {
+      this.startTutorial();
+    }
   }
 
   windowOnload(): void {
@@ -418,12 +422,6 @@ export class ExplorationEditorTabComponent
     this.directiveSubscriptions.add(
       this.stateEditorRefreshService.onRefreshStateEditor.subscribe(() => {
         this.initStateEditor();
-      })
-    );
-
-    this.directiveSubscriptions.add(
-      this.stateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(() => {
-        this.startTutorial();
       })
     );
 
