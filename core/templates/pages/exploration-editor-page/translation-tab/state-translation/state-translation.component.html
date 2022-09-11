@@ -88,46 +88,46 @@
   <div class="translation-nav" joyrideStep="translationTabCardOptions" [stepContent]="TranslationTabCardOptions">
     <ul id="tutorialTranslationState" class="oppia-translation-tabs">
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_CONTENT)}" class="e2e-test-accessibility-translation-content" aria-label="Content of the card" role="button">
-        <a (click)="onTabClick(TAB_ID_CONTENT)" href="" [ngStyle]="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text e2e-test-translation-content-tab">
+        <div (click)="onTabClick(TAB_ID_CONTENT)" [ngStyle]="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text e2e-test-translation-content-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_CONTENT)" class="oppia-tab-needs-update"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
           </span>Content
-        </a>
+        </div>
       </li>
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_CUSTOMIZATION_ARGS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_CUSTOMIZATION_ARGS)}" aria-label="Interaction content" role="button">
-        <a (click)="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" [ngStyle]="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)" href="" class="oppia-translation-tabs-text">
+        <div (click)="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" [ngStyle]="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-translation-tabs-text">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-tab-needs-update"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
           </span>Interaction
-        </a>
+        </div>
       </li>
       <li *ngIf="!isVoiceoverModeActive()" [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_RULE_INPUTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_RULE_INPUTS)}" aria-label="Rule Inputs" role="button">
-        <a (click)="onTabClick(TAB_ID_RULE_INPUTS)" [ngStyle]="tabStatusColorStyle(TAB_ID_RULE_INPUTS)" href="" class="oppia-translation-tabs-text">
+        <div (click)="onTabClick(TAB_ID_RULE_INPUTS)" [ngStyle]="tabStatusColorStyle(TAB_ID_RULE_INPUTS)" class="oppia-translation-tabs-text">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_RULE_INPUTS)" class="oppia-tab-needs-update"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
           </span>Rules
-        </a>
+        </div>
       </li>
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="e2e-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
-        <a (click)="onTabClick(TAB_ID_FEEDBACK)" [ngStyle]="tabStatusColorStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text e2e-test-translation-feedback-tab">
+        <div (click)="onTabClick(TAB_ID_FEEDBACK)" [ngStyle]="tabStatusColorStyle(TAB_ID_FEEDBACK)" class="oppia-translation-tabs-text e2e-test-translation-feedback-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" class="oppia-tab-needs-update"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
           </span>Feedback
-        </a>
+        </div>
       </li>
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}" class="e2e-test-accessibility-translation-hint" aria-label="Hints for the state" role="button">
-        <a (click)="onTabClick(TAB_ID_HINTS)" href="" [ngStyle]="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text e2e-test-translation-hints-tab">
+        <div (click)="onTabClick(TAB_ID_HINTS)" [ngStyle]="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text e2e-test-translation-hints-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_HINTS)" class="oppia-tab-needs-update"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
           </span>Hints
-        </a>
+        </div>
       </li>
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}" class="e2e-test-accessibility-translation-solution" aria-label="Solutions for the state" role="button">
-        <a (click)="onTabClick(TAB_ID_SOLUTION)" href="" [ngStyle]="tabStatusColorStyle(TAB_ID_SOLUTION)" class="oppia-translation-tabs-text e2e-test-translation-solution-tab" >
+        <div (click)="onTabClick(TAB_ID_SOLUTION)" [ngStyle]="tabStatusColorStyle(TAB_ID_SOLUTION)" class="oppia-translation-tabs-text e2e-test-translation-solution-tab" >
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_SOLUTION)" class="oppia-tab-needs-update"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
           </span>Solution
-        </a>
+        </div>
       </li>
     </ul>
   </div>

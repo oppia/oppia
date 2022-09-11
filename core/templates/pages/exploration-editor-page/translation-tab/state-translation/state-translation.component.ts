@@ -174,6 +174,10 @@ export class StateTranslationComponent
   }
 
   onTabClick(tabId: string): void {
+    if (this.isDisabled(tabId)) {
+      return;
+    }
+
     if (this.isTranslationTabBusy) {
       this.stateEditorService.onShowTranslationTabBusyModal.emit();
       return;

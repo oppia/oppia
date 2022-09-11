@@ -91,7 +91,7 @@
   </div>
   <div class="oppia-content-wrapper" *ngIf="voiceoverRecorder.status().isRecording">
     <div class="oppia-recording-timer">
-      {{ elapsedTime | date:'HH:mm:ss' }} / {{ recordingTimeLimit - 1 | date:'HH:mm:ss' }}
+      {{ recordingDate | date:'mm:ss' }} / {{ recordingTimeLimitInDateFormat | date:'mm:ss' }}
     </div>
   </div>
   <div class="oppia-content-wrapper" *ngIf="voiceoverRecorder.status().isRecording">
@@ -166,10 +166,10 @@
   </div>
   <div class="oppia-content-wrapper oppia-recording-timer">
     <div *ngIf="isAudioAvailable && audioIsLoading">
-      {{ 0 | date:'HH:mm:ss' }} / {{ durationSecs | date:'HH:mm:ss' }}
+      {{ startingDuration | date:'mm:ss' }} / {{ durationSecs | date:'mm:ss' }}
     </div>
     <div *ngIf="audioTimerIsShown && !audioIsLoading">
-      {{ audioPlayerService.getCurrentTime() | date:'HH:mm:ss' }} / {{ durationSecs | date:'HH:mm:ss' }}
+      {{ audioPlayerService.getCurrentTime() | date:'mm:ss' }} / {{ durationSecs | date:'mm:ss' }}
     </div>
     <div *ngIf="!audioTimerIsShown && !audioIsLoading">
        -- / --

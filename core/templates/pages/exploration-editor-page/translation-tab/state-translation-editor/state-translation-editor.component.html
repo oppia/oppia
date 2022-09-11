@@ -1,7 +1,7 @@
 <div class="oppia-translated-content-header">Translated content</div>
 <div class="oppia-state-translation-editor-section oppia-editor-card-section">
   <div *ngIf="!translationEditorIsOpen" class="clearfix">
-    <button class="btn oppia-translation-needs-update-button" *ngIf="activeWrittenTranslation.needsUpdate">
+    <button class="btn oppia-translation-needs-update-button" *ngIf="activeWrittenTranslation && activeWrittenTranslation.needsUpdate">
       <i class="material-icons md-18"
          [ngbTooltip]="'Translation needs update'"
          placement="top">warning
@@ -41,7 +41,7 @@
       <div class="oppia-translation-editable-mask oppia-editable-section-mask">
       </div>
     </div>
-    <button *ngIf="activeWrittenTranslation.needsUpdate === false"
+    <button *ngIf="activeWrittenTranslation && (activeWrittenTranslation.needsUpdate === false)"
             type="button"
             class="btn btn-secondary mt-4 float-right"
             (click)="markAsNeedingUpdate()">
