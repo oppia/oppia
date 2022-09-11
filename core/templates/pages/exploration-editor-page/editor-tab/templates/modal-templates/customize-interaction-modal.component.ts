@@ -92,15 +92,15 @@ interface DefaultValueGraph {
 interface CustomizationArgSpecsInterface {
   name: string;
   default_value: DefaultValueHtml[] |
-                 DefaultValueHtml |
-                 DefaultValueUnicode[] |
-                 DefaultValueUnicode |
-                 DefaultValueGraph |
-                 ImageWithRegions |
-                 [] |
-                 number |
-                 string |
-                 boolean;
+  DefaultValueHtml |
+  DefaultValueUnicode[] |
+  DefaultValueUnicode |
+  DefaultValueGraph |
+  ImageWithRegions |
+  [] |
+  number |
+  string |
+  boolean;
 }
 
 interface AllowedInteractionCategories {
@@ -224,7 +224,7 @@ export class CustomizeInteractionModalComponent
     } else {
       const customizationArgsBackendDict = {};
       this.customizationArgSpecs.forEach((
-          caSpec: { name: string | number; default_value: unknown }) => {
+        caSpec: { name: string | number; default_value: unknown }) => {
         customizationArgsBackendDict[caSpec.name] = {
           value: caSpec.default_value
         };
@@ -255,11 +255,12 @@ export class CustomizeInteractionModalComponent
 
   isSaveInteractionButtonEnabled(): boolean {
     return !!(
-      this.getTitle(this.stateInteractionIdService.displayed) === 'End Exploration' ||
+      this.getTitle(this.stateInteractionIdService.displayed)
+       === 'End Exploration' ||
       (
-      this.hasCustomizationArgs &&
-      this.stateInteractionIdService.displayed &&
-      this.getCustomizationArgsWarningsList().length === 0));
+        this.hasCustomizationArgs &&
+        this.stateInteractionIdService.displayed &&
+        this.getCustomizationArgsWarningsList().length === 0));
   }
 
   getSaveInteractionButtonTooltip(): string {
@@ -306,9 +307,9 @@ export class CustomizeInteractionModalComponent
     const interactionId = this.stateInteractionIdService.displayed;
 
     let traverseSchemaAndAssignContentIds = (
-        value: Object | Object[],
-        schema: Schema,
-        contentIdPrefix: string,
+      value: Object | Object[],
+      schema: Schema,
+      contentIdPrefix: string,
     ): void => {
       const schemaIsSubtitledHtml = (
         schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
@@ -319,10 +320,9 @@ export class CustomizeInteractionModalComponent
       );
 
       if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
-        if ((value as SubtitledHtml|SubtitledUnicode).contentId === null) {
-          (value as SubtitledHtml|SubtitledUnicode).contentId = (
-            `${contentIdPrefix}_${
-              this.stateNextContentIdIndexService.displayed}`
+        if ((value as SubtitledHtml | SubtitledUnicode).contentId === null) {
+          (value as SubtitledHtml | SubtitledUnicode).contentId = (
+            `${contentIdPrefix}_${this.stateNextContentIdIndexService.displayed}`
           );
           this.stateNextContentIdIndexService.displayed += 1;
         }
@@ -348,8 +348,7 @@ export class CustomizeInteractionModalComponent
         traverseSchemaAndAssignContentIds(
           caValues[name].value,
           caSpec.schema,
-          `${AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS}_${
-            name}`);
+          `${AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS}_${name}`);
       }
     }
   }
@@ -365,8 +364,8 @@ export class CustomizeInteractionModalComponent
     const contentIdToContent = {};
 
     let traverseSchemaAndCollectContent = (
-        value: Object | Object[],
-        schema: Schema
+      value: Object | Object[],
+      schema: Schema
     ): void => {
       const schemaIsSubtitledHtml = (
         schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
