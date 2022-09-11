@@ -428,6 +428,11 @@ class Server:
         Spawns a thread to handle each connection to the socket. Uses
         the handle_connection function to handle each connection.
         """
+        # We exit from this infinite loop using the KeyboardInterrupt
+        # (by pressing ^C) which stops the execution via sys.exit().
+        # However, while testing the code it is not possible to mock
+        # sys.exit() since it would totally stop the execution rather
+        # than simply breaking away from the loop.
         while True: # pragma: no cover
             connection, _ = self.socket.accept()
             thread = threading.Thread(
