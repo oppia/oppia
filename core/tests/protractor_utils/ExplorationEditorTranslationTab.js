@@ -56,7 +56,9 @@ var ExplorationEditorTranslationTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButton = element.all(by.buttonText('Finish'));
+    var finishTutorialButton = element.all(by.cssContainingText(
+      '.joyride-button', 'done'));
+
     var buttons = finishTutorialButton;
     if (await buttons.count() === 1) {
       await action.click('Finish tutorial stage button', buttons.get(0));

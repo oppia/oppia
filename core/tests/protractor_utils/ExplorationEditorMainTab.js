@@ -195,7 +195,9 @@ var ExplorationEditorMainTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButtons = element.all(by.buttonText('Finish'));
+    var finishTutorialButtons = element.all(by.cssContainingText(
+      '.joyride-button', 'done'));
+
     await waitFor.elementToBeClickable(
       finishTutorialButtons.first(),
       'Finish Tutorial Stage button is not clickable');
