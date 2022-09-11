@@ -321,6 +321,11 @@ def update_analytics_id_in_webpack_config(
         r'"GA_ANALYTICS_ID": "(.*)"', release_config_contents).group(1)
     ua_analytics_id = re.search(
         r'"UA_ANALYTICS_ID": "(.*)"', release_config_contents).group(1)
+    site_name_for_analytics = re.search(
+        r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', release_config_contents).group(1)
+    can_send_analytics_events = re.search(
+        r'"CAN_SEND_ANALYTICS_EVENTS": (.*)',
+        release_config_contents).group(1)
     common.inplace_replace_file(
         webpack_config_path,
         'const GA_ANALYTICS_ID = \'\';',
@@ -329,6 +334,14 @@ def update_analytics_id_in_webpack_config(
         webpack_config_path,
         'const UA_ANALYTICS_ID = \'\';',
         'const UA_ANALYTICS_ID = \'%s\';' % ua_analytics_id)
+    common.inplace_replace_file(
+        webpack_config_path,
+        'const SITE_NAME_FOR_ANALYTICS = \'\';',
+        'const SITE_NAME_FOR_ANALYTICS = \'%s\';' % site_name_for_analytics)
+    common.inplace_replace_file(
+        webpack_config_path,
+        'const CAN_SEND_ANALYTICS_EVENTS = false;',
+        'const CAN_SEND_ANALYTICS_EVENTS = %s;' % can_send_analytics_events)
 
 
 def main(args=None):

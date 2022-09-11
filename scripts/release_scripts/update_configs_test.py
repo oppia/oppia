@@ -764,14 +764,20 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         constants_text = (
             '  "UA_ANALYTICS_ID": "456"\n'
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
+            '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
         webpack_config_text = (
             'const GA_ANALYTICS_ID = \'\';\n'
             'const UA_ANALYTICS_ID = \'\';\n'
+            'const SITE_NAME_FOR_ANALYTICS = \'\';\n'
+            'const CAN_SEND_ANALYTICS_EVENTS = false;\n'
         )
         expected_webpack_config_text = (
             'const GA_ANALYTICS_ID = \'123\';\n'
             'const UA_ANALYTICS_ID = \'456\';\n'
+            'const SITE_NAME_FOR_ANALYTICS = \'site-name\';\n'
+            'const CAN_SEND_ANALYTICS_EVENTS = true;\n'
         )
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)

@@ -38,8 +38,11 @@ var defaultMeta = {
     'the community to create or try an exploration today!'
 };
 
+// These are populated during the deployment process. See update_configs.py.
 const GA_ANALYTICS_ID = '';
 const UA_ANALYTICS_ID = '';
+const SITE_NAME_FOR_ANALYTICS = '';
+const CAN_SEND_ANALYTICS_EVENTS = false;
 
 module.exports = {
   resolve: {
@@ -146,9 +149,14 @@ module.exports = {
   * once angularjs is removed from corresponding pages.
   */
   plugins: [
+    // This plugin performs a direct text replacement, so the value given to it
+    // must include the surrounding quotes. This is done using JSON.stringify.
+    // See https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
       GA_ANALYTICS_ID: JSON.stringify(GA_ANALYTICS_ID),
-      UA_ANALYTICS_ID: JSON.stringify(UA_ANALYTICS_ID)
+      UA_ANALYTICS_ID: JSON.stringify(UA_ANALYTICS_ID),
+      CAN_SEND_ANALYTICS_EVENTS: JSON.stringify(CAN_SEND_ANALYTICS_EVENTS),
+      SITE_NAME_FOR_ANALYTICS: JSON.stringify(SITE_NAME_FOR_ANALYTICS),
     }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],

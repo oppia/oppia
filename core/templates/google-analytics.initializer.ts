@@ -16,15 +16,15 @@
  * @fileoverview Initialization of Google Analytics (gtag.js).
  */
 
-import constants from 'assets/constants';
-
-declare var GA_ANALYTICS_ID: string;
-declare var UA_ANALYTICS_ID: string;
+declare const GA_ANALYTICS_ID: string;
+declare const UA_ANALYTICS_ID: string;
+declare const SITE_NAME_FOR_ANALYTICS: string;
+declare const CAN_SEND_ANALYTICS_EVENTS: boolean;
 
 initializeGoogleAnalytics();
 
 export function initializeGoogleAnalytics() {
-  if (!constants.CAN_SEND_ANALYTICS_EVENTS) {
+  if (!CAN_SEND_ANALYTICS_EVENTS) {
     // Mock gtag function will prevent sending analytics to google.
     window.gtag = function() {}
     return;
@@ -33,7 +33,7 @@ export function initializeGoogleAnalytics() {
   if (
     GA_ANALYTICS_ID &&
     UA_ANALYTICS_ID &&
-    constants.SITE_NAME_FOR_ANALYTICS
+    SITE_NAME_FOR_ANALYTICS
   ) {
     // Reference doc:
     // https://developers.google.com/analytics/devguides/collection/gtagjs
@@ -42,7 +42,7 @@ export function initializeGoogleAnalytics() {
       window.dataLayer.push(arguments);
     }
     gtag('set', 'linker', {
-      'domains': [constants.SITE_NAME_FOR_ANALYTICS]
+      'domains': [SITE_NAME_FOR_ANALYTICS]
     });
     gtag('js', new Date());
     gtag('config', GA_ANALYTICS_ID, {
