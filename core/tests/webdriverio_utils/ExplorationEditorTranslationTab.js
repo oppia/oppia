@@ -35,7 +35,7 @@ var ExplorationEditorTranslationTab = function() {
   };
   var translationTabStartTutorialElement = $(
     '.e2e-test-translation-tab-start-tutorial');
-  var titleElement = $('.ng-joyride-title');
+  var titleElement = $('.e2e-test-joyride-title');
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.

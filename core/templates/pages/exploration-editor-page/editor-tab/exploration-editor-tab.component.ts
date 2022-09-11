@@ -57,10 +57,8 @@ export class ExplorationEditorTabComponent
   directiveSubscriptions = new Subscription();
   TabName: string;
   interactionIsShown: boolean;
-  _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
   _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
   _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
-  _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
   tutorialInProgress: boolean;
   explorationId: string;
   stateName: string;

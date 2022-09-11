@@ -89,7 +89,7 @@ var ExplorationEditorMainTab = function() {
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.$(nodeLabelLocator);
   };
-  var titleElement = $('.ng-joyride-title');
+  var titleElement = $('.e2e-test-joyride-title');
 
   /*
    * Buttons

@@ -96,7 +96,7 @@ var ExplorationEditorMainTab = function() {
   var answerDescription = element(
     by.css('.e2e-test-answer-description'));
   var deleteNodeLocator = by.css('.e2e-test-delete-node');
-  var titleElement = element(by.css('.ng-joyride-title'));
+  var titleElement = element(by.css('.e2e-test-joyride-title'));
   var ckEditorElement = element(by.css('.e2e-test-ck-editor'));
   var interactionHtmlElement = element(
     by.css('.e2e-test-interaction-html'));

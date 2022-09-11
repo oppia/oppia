@@ -32,7 +32,7 @@ var ExplorationEditorTranslationTab = function() {
   var nextTutorialStageButton = element.all(by.css('.joyride-step__next-container'));
   var translationTabStartTutorialElement = element(by.css(
     '.e2e-test-translation-tab-start-tutorial'));
-  var titleElement = element(by.css('.ng-joyride-title'));
+  var titleElement = element(by.css('.e2e-test-joyride-title'));
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
