@@ -219,7 +219,7 @@ var ExplorationEditorMainTab = function() {
     for (const HEADING of tutorialTabHeadings) {
     // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
-        '.popover-title', HEADING));
+        '.e2e-test-joyride-title', HEADING));
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.

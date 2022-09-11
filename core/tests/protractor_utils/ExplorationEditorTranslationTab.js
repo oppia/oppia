@@ -28,8 +28,11 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.e2e-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
     by.css('.e2e-test-translation-tab-welcome-modal'));
+  // eslint-disable-next-line oppia/e2e-practices
   var buttons = element.all(by.css('.joyride-step__close'));
-  var nextTutorialStageButton = element.all(by.css('.joyride-step__next-container'));
+  var nextTutorialStageButton = element.all(
+    // eslint-disable-next-line oppia/e2e-practices
+    by.css('.joyride-step__next-container'));
   var translationTabStartTutorialElement = element(by.css(
     '.e2e-test-translation-tab-start-tutorial'));
   var titleElement = element(by.css('.e2e-test-joyride-title'));
@@ -73,7 +76,7 @@ var ExplorationEditorTranslationTab = function() {
     ];
     for (const HEADING of tutorialTabHeadings) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
-        '.popover-title', HEADING));
+        '.e2e-test-joyride-title', HEADING));
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.

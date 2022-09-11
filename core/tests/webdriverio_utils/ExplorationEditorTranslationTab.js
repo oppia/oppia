@@ -57,7 +57,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButton = await $$('button=Finish');
+    var finishTutorialButton = await $$('.joyride-button=done');
     var buttons = finishTutorialButton;
     if (buttons.length === 1) {
       await action.click('Finish tutorial stage button', buttons[0]);
@@ -76,7 +76,7 @@ var ExplorationEditorTranslationTab = function() {
       'Re-record/Re-upload audio'
     ];
     for (const HEADING of tutorialTabHeadings) {
-      var tutorialTabHeadingElement = $(`.popover-title=${HEADING}`);
+      var tutorialTabHeadingElement = $(`.e2e-test-joyride-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
