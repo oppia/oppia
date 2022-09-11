@@ -700,6 +700,13 @@ class AdminHandler(base.BaseHandler):
             topic_id_5 = topic_fetchers.get_new_topic_id()
             topic_id_6 = topic_fetchers.get_new_topic_id()
 
+            skill_id_1 = skill_services.get_new_skill_id()
+            skill_id_2 = skill_services.get_new_skill_id()
+            skill_id_3 = skill_services.get_new_skill_id()
+            skill_id_4 = skill_services.get_new_skill_id()
+            skill_id_5 = skill_services.get_new_skill_id()
+            skill_id_6 = skill_services.get_new_skill_id()
+
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
                 'fragm')
@@ -718,6 +725,33 @@ class AdminHandler(base.BaseHandler):
             topic_6 = topic_domain.Topic.create_default_topic(
                 topic_id_6, 'Dummy Topic 6', 'dummy-topic-six', 'description',
                 'fragm')
+
+            skill_1 = self._create_dummy_skill(
+                skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+            skill_2 = self._create_dummy_skill(
+                skill_id_2, 'Dummy Skill 2', '<p>Dummy Explanation 2</p>')
+            skill_3 = self._create_dummy_skill(
+                skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
+            skill_4 = self._create_dummy_skill(
+                skill_id_4, 'Dummy Skill 4', '<p>Dummy Explanation 4</p>')
+            skill_5 = self._create_dummy_skill(
+                skill_id_5, 'Dummy Skill 5', '<p>Dummy Explanation 5</p>')
+            skill_6 = self._create_dummy_skill(
+                skill_id_6, 'Dummy Skill 6', '<p>Dummy Explanation 6</p>')
+
+            skill_services.save_new_skill(self.user_id, skill_1)
+            skill_services.save_new_skill(self.user_id, skill_2)
+            skill_services.save_new_skill(self.user_id, skill_3)
+            skill_services.save_new_skill(self.user_id, skill_4)
+            skill_services.save_new_skill(self.user_id, skill_5)
+            skill_services.save_new_skill(self.user_id, skill_6)
+
+            topic_1.add_uncategorized_skill_id(skill_id_1)
+            topic_2.add_uncategorized_skill_id(skill_id_2)
+            topic_3.add_uncategorized_skill_id(skill_id_3)
+            topic_4.add_uncategorized_skill_id(skill_id_4)
+            topic_5.add_uncategorized_skill_id(skill_id_5)
+            topic_6.add_uncategorized_skill_id(skill_id_6)
 
             topic_services.save_new_topic(self.user_id, topic_1)
             topic_services.save_new_topic(self.user_id, topic_2)
