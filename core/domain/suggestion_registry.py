@@ -40,7 +40,7 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Sequence, Set, Type, Union
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type, Union
 )
 from typing_extensions import TypedDict
 
@@ -291,16 +291,6 @@ class BaseSuggestion:
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement accept.')
 
-    def get_change_list_for_accepting_suggestion(
-        self
-    ) -> Sequence[change_domain.BaseChange]:
-        """Before accepting the suggestion, a change_list needs to be generated
-        from the change. Each subclass must implement this function.
-        """
-        raise NotImplementedError(
-            'Subclasses of BaseSuggestion should implement '
-            'get_change_list_for_accepting_suggestion.')
-
     def pre_accept_validate(self) -> None:
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
@@ -430,12 +420,14 @@ class SuggestionEditStateContent(BaseSuggestion):
         # well. So, due to this conflict in types MyPy throws an `Incompatible
         # types in assignment` error. Thus to avoid the error, we used ignore.
         self.language_code = language_code  # type: ignore[assignment]
-        # Here we use MyPy ignore because in BaseSuggestion, last_updated
-        # is defined with only datetime type but here last_updated is of
-        # Optional[datetime] type because last_updated can accept None
-        # values as well. So, due to this conflict in types MyPy throws an
-        # `Incompatible types in assignment` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion,
+        # last_updated is defined with only datetime type but
+        # here last_updated is of Optional[datetime] type because
+        # while creating 'SuggestionEditStateContent' (through
+        # suggestion_services.create_suggestion()) last_updated can
+        # accept None values as well. So, due to this conflict in
+        # types, MyPy throws an `Incompatible types in assignment`
+        # error. Thus to avoid the error, we used ignore here.
         self.last_updated = last_updated  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
         # Here we use MyPy ignore because in BaseSuggestion, image_context
@@ -497,25 +489,6 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected %s to be a valid state name' %
                 self.change.state_name)
 
-    def get_change_list_for_accepting_suggestion(
-        self
-    ) -> List[exp_domain.ExplorationChange]:
-        """Gets a complete change for the suggestion.
-
-        Returns:
-            list(ExplorationChange). The change_list corresponding to the
-            suggestion.
-        """
-        change = self.change
-        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        old_content = (
-            exploration.states[self.change.state_name].content.to_dict())
-
-        change.old_value = old_content
-        change.new_value['content_id'] = old_content['content_id']
-
-        return [change]
-
     def populate_old_value_of_change(self) -> None:
         """Populates old value of the change."""
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
@@ -535,7 +508,15 @@ class SuggestionEditStateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
-        change_list = self.get_change_list_for_accepting_suggestion()
+        change = self.change
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        old_content = (
+            exploration.states[self.change.state_name].content.to_dict())
+
+        change.old_value = old_content
+        change.new_value['content_id'] = old_content['content_id']
+
+        change_list: List[exp_domain.ExplorationChange] = [change]
         # Before calling this accept method we are already checking if user
         # with 'final_reviewer_id' exists or not.
         assert self.final_reviewer_id is not None
@@ -648,12 +629,14 @@ class SuggestionTranslateContent(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # Here we use MyPy ignore because in BaseSuggestion, last_updated
-        # is defined with only datetime type but here last_updated is of
-        # Optional[datetime] type because last_updated can accept None
-        # values as well. So, due to this conflict in types MyPy throwing
-        # `Incompatible types in assignment` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion,
+        # last_updated is defined with only datetime type but
+        # here last_updated is of Optional[datetime] type because
+        # while creating 'SuggestionTranslateContent' (through
+        # suggestion_services.create_suggestion()) last_updated can
+        # accept None values as well. So, due to this conflict in
+        # types, MyPy throws an `Incompatible types in assignment`
+        # error. Thus to avoid the error, we used ignore here.
         self.last_updated = last_updated  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
@@ -869,12 +852,14 @@ class SuggestionAddQuestion(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # Here we use MyPy ignore because in BaseSuggestion, last_updated
-        # is defined with only datetime type but here last_updated is of
-        # Optional[datetime] type because last_updated can accept None
-        # values as well. So, due to this conflict in types MyPy throwing
-        # `Incompatible types in assignment` error. Thus to avoid the error,
-        # we used ignore here.
+        # Here we use MyPy ignore because in BaseSuggestion,
+        # last_updated is defined with only datetime type but
+        # here last_updated is of Optional[datetime] type because
+        # while creating 'SuggestionAddQuestion' (through
+        # suggestion_services.create_suggestion()) last_updated can
+        # accept None values as well. So, due to this conflict in
+        # types, MyPy throws an `Incompatible types in assignment`
+        # error. Thus to avoid the error, we used ignore here.
         self.last_updated = last_updated  # type: ignore[assignment]
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
@@ -1019,15 +1004,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         if skill is None:
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
-
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseSuggestion's method. In BaseSuggestion,
-    # this method returns a list of BaseChange classes but in this
-    # sub-class 'SuggestionAddQuestion', we are not returning anything
-    # which causes conflict in both function signatures, and due to this
-    # MyPy throws an error. Thus, to avoid the error, we used ignore here.
-    def get_change_list_for_accepting_suggestion(self) -> None:  # type: ignore[override]
-        pass
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion.

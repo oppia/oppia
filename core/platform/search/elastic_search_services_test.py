@@ -313,7 +313,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             'title': 'hello me'
         }], 'index')
         results, new_offset = elastic_search_services.search(
-            'hello', 'index', [], [], size=1)
+            'hello', 'index', [], [], offset=None, size=1, ids_only=False
+        )
         self.assertEqual(len(results), 1)
         # Letting mypy know that results[0] is a dict.
         assert isinstance(results[0], dict)
@@ -321,7 +322,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_offset, 1)
 
         results, new_offset = elastic_search_services.search(
-            'hello', 'index', [], [], offset=1, size=1)
+            'hello', 'index', [], [], offset=1, size=1, ids_only=False
+        )
         self.assertEqual(len(results), 1)
         # Letting mypy know that results[0] is a dict.
         assert isinstance(results[0], dict)
@@ -406,9 +408,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
     ) -> None:
         correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
 
-        # In the type annotation below Dict[str, Any] is used for body
-        # because this mocks the behavior of elastic_search_services.ES.search
-        # and in the type stubs the type is Any.
+        # Here we use type Any because this method mocks the behavior of
+        # elastic_search_services.ES.search, so to match the type annotations
+        # with 'search' method we defined the body as 'Dict[str, Any]' type,
+        # and also in the type stubs the type of body is mentioned as Any.
         def mock_search(
                 body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -463,9 +466,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
     ) -> None:
         correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
 
-        # In the type annotation below Dict[str, Any] is used for body
-        # because this mocks the behavior of elastic_search_services.ES.search
-        # and in the type stubs the type is Any.
+        # Here we use type Any because this method mocks the behavior of
+        # elastic_search_services.ES.search, so to match the type annotations
+        # with 'search' method we defined the body as 'Dict[str, Any]' type,
+        # and also in the type stubs the type of body is mentioned as Any.
         def mock_search(
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -530,7 +534,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         }], search_services.SEARCH_INDEX_BLOG_POSTS)
         results, new_offset = (
             elastic_search_services.blog_post_summaries_search(
-                'blog', [], size=1
+                'blog', [], offset=None, size=1, ids_only=False
             )
         )
         self.assertEqual(len(results), 1)
@@ -541,7 +545,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         results, new_offset = (
             elastic_search_services.blog_post_summaries_search(
-                'blog', [], offset=1, size=1
+                'blog', [], offset=1, size=1, ids_only=False
             )
         )
         self.assertEqual(len(results), 1)

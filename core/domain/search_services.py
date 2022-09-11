@@ -28,7 +28,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
-from typing import List, Optional, Tuple, cast
+from typing import List, Optional, Tuple
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -251,19 +251,11 @@ def search_explorations(
               fetch, None otherwise. If an offset is returned, it will be a
               web-safe string that can be used in URLs.
     """
-    # Here we use cast because the return type of 'search()' method is
-    # tuple with 2 elements. For the first tuple element, it's return type
-    # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
-    # the type of first element is always an List[str]. So, to narrow down
-    # the type from Union to List, we used cast here.
-    result_ids, result_offset = cast(
-        Tuple[List[str], Optional[int]],
-        platform_search_services.search(
-            query, SEARCH_INDEX_EXPLORATIONS,
-            categories, language_codes,
-            offset=offset, size=size,
-            ids_only=True
-        )
+    result_ids, result_offset = platform_search_services.search(
+        query, SEARCH_INDEX_EXPLORATIONS,
+        categories, language_codes,
+        offset=offset, size=size,
+        ids_only=True
     )
     return result_ids, result_offset
 
@@ -318,19 +310,11 @@ def search_collections(
               otherwise. If an offset is returned, it will be a web-safe string
               that can be used in URLs.
     """
-    # Here we use cast because the return type of 'search()' method is
-    # tuple with 2 elements. For the first tuple element, it's return type
-    # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
-    # the type of first element is always an List[str]. So, to narrow down
-    # the type from Union to List, we used cast here.
-    result_ids, result_offset = cast(
-        Tuple[List[str], Optional[int]],
-        platform_search_services.search(
-            query, SEARCH_INDEX_COLLECTIONS,
-            categories, language_codes,
-            offset=offset, size=size,
-            ids_only=True
-        )
+    result_ids, result_offset = platform_search_services.search(
+        query, SEARCH_INDEX_COLLECTIONS,
+        categories, language_codes,
+        offset=offset, size=size,
+        ids_only=True
     )
     return result_ids, result_offset
 
@@ -380,14 +364,8 @@ def index_blog_post_summaries(
         _blog_post_summary_to_search_dict(blog_post_summary)
         for blog_post_summary in blog_post_summaries
     ]
-    # The argument `documents` of add_documents_to_index() is annotated
-    # with List[Dict[str, Any]] because this method can accept any kind
-    # of dictionaries, but here we are providing a strict type
-    # `List[DomainSearchDict]` which causes a conflict in type assignment
-    # and due to this MyPy throws an error. So, to silent the error, we used
-    # ignore here.
     platform_search_services.add_documents_to_index([
-       doc for doc in docs_to_index if doc # type: ignore[misc]
+       doc for doc in docs_to_index if doc
     ], SEARCH_INDEX_BLOG_POSTS)
 
 
@@ -445,13 +423,7 @@ def search_blog_post_summaries(
               summaries to fetch, None otherwise. If an offset is returned, it
               will be a web-safe string that can be used in URLs.
     """
-    # The return type of 'platform_search_services.search()' method is
-    # tuple with 2 elements. For the first tuple element, it's return type
-    # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
-    # the type of first element is always an List[str]. So, to narrow down
-    # the type from Union to List, we used cast here.
-    result_ids, result_offset = cast(
-        Tuple[List[str], Optional[int]],
+    result_ids, result_offset = (
         platform_search_services.blog_post_summaries_search(
             query,
             tags,

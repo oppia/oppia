@@ -339,7 +339,7 @@ def save_original_and_compressed_versions_of_image(
 # protobuf's library.
 # Here we use object because the argument classifier_data_proto can accept
 # instances of `TextClassifierFrozenModel` class. But since we excluded
-# proto_files/ from the static type annotations, This argument is annotated
+# proto_files/ from the static type annotations, this argument is annotated
 # as general object type.
 def save_classifier_data(
     exp_id: str,
@@ -360,7 +360,7 @@ def save_classifier_data(
         # Here we use MyPy ignore because classifier_data_proto is of general
         # object type and general objects do not contain any extra methods and
         # properties but for implementation we are accessing 'SerializeToString'
-        # method on classifier_data_proto which causes MyPy to throw a error.
+        # method on classifier_data_proto which causes MyPy to throw an error.
         # Thus to avoid the error, we added an [attr-defined] ignore statement.
         classifier_data_proto.SerializeToString())  # type: ignore[attr-defined]
     fs.commit(

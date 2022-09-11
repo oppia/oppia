@@ -335,9 +335,10 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 invalid_text_size)
 
     def test_get_entry_point_from_json_returns_expected_entry_point_obj(
-            self) -> None:
+        self
+    ) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
-        entry_point_json = {
+        entry_point_json: app_feedback_report_domain.EntryPointDict = {
             'entry_point_name': '',
             'entry_point_topic_id': 'topic_id',
             'entry_point_story_id': 'story_id',
@@ -384,8 +385,66 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             isinstance(
                 crash_obj, app_feedback_report_domain.CrashEntryPoint))
 
+    def test_raises_error_with_invalid_entry_point_during_entry_point_from_json(
+        self
+    ) -> None:
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        entry_point_json: app_feedback_report_domain.EntryPointDict = {
+            'entry_point_name': '',
+            'entry_point_topic_id': 'topic_id',
+            'entry_point_story_id': 'story_id',
+            'entry_point_exploration_id': 'exploration_id',
+            'entry_point_subtopic_id': 'subtopic_id'
+        }
+
+        entry_point_json['entry_point_name'] = (
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value)
+
+        with self.assertRaisesRegex(
+            Exception, 'No story_id provided for LessonPlayerEntryPoint.'
+        ):
+            entry_point_json['entry_point_story_id'] = None
+            feedback_report.get_entry_point_from_json(entry_point_json)
+
+        with self.assertRaisesRegex(
+            Exception, 'No topic_id provided for LessonPlayerEntryPoint.'
+        ):
+            entry_point_json['entry_point_story_id'] = 'story_id'
+            entry_point_json['entry_point_topic_id'] = None
+            feedback_report.get_entry_point_from_json(entry_point_json)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No exploration_id provided for LessonPlayerEntryPoint.'
+        ):
+            entry_point_json['entry_point_topic_id'] = 'topic_id'
+            entry_point_json['entry_point_exploration_id'] = None
+            feedback_report.get_entry_point_from_json(entry_point_json)
+
+        entry_point_json['entry_point_name'] = (
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No topic_id provided for RevisionCardEntryPoint.'
+        ):
+            entry_point_json['entry_point_topic_id'] = None
+            feedback_report.get_entry_point_from_json(entry_point_json)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No subtopic_id provided for RevisionCardEntryPoint.'
+        ):
+            entry_point_json['entry_point_topic_id'] = 'topic_id'
+            entry_point_json['entry_point_subtopic_id'] = None
+            feedback_report.get_entry_point_from_json(entry_point_json)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_get_entry_point_from_json_with_invalid_json_raises_error(
-            self) -> None:
+        self
+    ) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_json = {
             'entry_point_name': 'invalid_entry_point_name'
@@ -395,7 +454,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'The given entry point %s is invalid.' % (
                 'invalid_entry_point_name')):
             feedback_report.get_entry_point_from_json(
-                invalid_json)
+                invalid_json)  # type: ignore[arg-type]
 
     def test_get_android_network_type_from_string_returns_expected_network_type(
             self) -> None:

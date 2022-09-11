@@ -1245,8 +1245,11 @@ def compute_list_difference(list_a: List[str], list_b: List[str]) -> List[str]:
     return list(sorted(set(list_a) - set(list_b)))
 
 
-# Here we use MyPy ignore because error thrown is 'Missing type parameters
-# for generic type "OrderedDict"' but here we don't need to specify this.
+# Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
+# in MyPy settings and this flag does not allow generic types to be defined
+# without type parameters, but here to count the order elements, we are
+# inheriting from OrderedDict type without providing type parameters which
+# cause MyPy to throw an error. Thus, to avoid the error, we used ignore here.
 class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
     """Counter that remembers the order elements are first encountered."""
 

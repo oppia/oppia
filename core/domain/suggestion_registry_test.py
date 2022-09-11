@@ -70,15 +70,6 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             'Subclasses of BaseSuggestion should implement accept.'):
             self.base_suggestion.accept('test_message')
 
-    def test_base_class_get_change_list_for_accepting_suggestion_raises_error(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            NotImplementedError,
-            'Subclasses of BaseSuggestion should implement '
-            'get_change_list_for_accepting_suggestion.'):
-            self.base_suggestion.get_change_list_for_accepting_suggestion()
-
     def test_base_class_pre_accept_validate_raises_error(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
@@ -567,7 +558,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         # Here we use MyPy ignore because 'property_name' can only accept
         # 'content' string literal but here we are providing 'invalid_property'
-        # which causes MyPy to throw a error. Thus to avoid the error, we used
+        # which causes MyPy to throw an error. Thus to avoid the error, we used
         # ignore here.
         suggestion.change.property_name = 'invalid_property'  # type: ignore[assignment]
         with self.assertRaisesRegex(
@@ -2022,25 +2013,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             utils.ValidationError, 'The skill with the given id doesn\'t exist.'
         ):
             suggestion.pre_accept_validate()
-
-    def test_get_change_list_for_accepting_suggestion(self) -> None:
-        expected_suggestion_dict = self.suggestion_dict
-
-        suggestion = suggestion_registry.SuggestionAddQuestion(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], False, self.fake_date)
-
-        # Here we use MyPy ignore because method
-        # `get_change_list_for_accepting_suggestion` does not return any value
-        # but for testing purposes we are still comparing it's return value with
-        # None which causes MyPy to throw error. Thus to avoid the error, we
-        # used ignore here.
-        self.assertIsNone(suggestion.get_change_list_for_accepting_suggestion())  # type: ignore[func-returns-value]
 
     def test_populate_old_value_of_change(self) -> None:
         expected_suggestion_dict = self.suggestion_dict

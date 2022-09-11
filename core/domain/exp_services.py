@@ -1135,19 +1135,6 @@ def update_states_version_history(
     for state_name, state_property_changed in (
         state_property_changed_data.items()):
         if state_property_changed:
-            old_state_dict = copy.deepcopy(old_states_dict[state_name])
-            new_state_dict = copy.deepcopy(new_states_dict[state_name])
-
-            # Deleting the attributes from the state dicts which are present
-            # in the ignore list.
-            for property_name in state_property_ignore_list:
-                # Here we use MyPy ignore because MyPy doesn't allow key
-                # deletion from TypedDict.
-                del new_state_dict[property_name]  # type: ignore[misc]
-                # Here we use MyPy ignore because MyPy doesn't allow key
-                # deletion from TypedDict.
-                del old_state_dict[property_name]  # type: ignore[misc]
-
             # The purpose of checking the diff_dict between the two state
             # dicts ensure that we do not change the version history of that
             # particular state if the overall changes (by EDIT_STATE_PROPERTY)

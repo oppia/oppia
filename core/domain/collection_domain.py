@@ -619,7 +619,7 @@ class Collection:
         # does not contain properties like created_on and last_updated but
         # MyPy expects collection_dict, a dictionary which contains all the
         # properties of domain object. That's why we are explicitly changing
-        # the type of collection_dict, here which causes MyPy to throw an error.
+        # the type of collection_dict here, which causes MyPy to throw an error.
         # Thus, to silence the error, we added an ignore here.
         collection_dict: SerializableCollectionDict = self.to_dict() # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our
@@ -653,7 +653,9 @@ class Collection:
         # The ID is the only property which should not be stored within the
         # YAML representation.
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
-        # from TypedDict.
+        # from TypedDict. Also, we cannot use dict comprehension here to
+        # remove the 'id' key from collection_dict because TypeDicts are
+        # not compatible with dict comprehensions.
         del collection_dict['id'] # type: ignore[misc]
 
         return utils.yaml_from_dict(collection_dict)

@@ -96,7 +96,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # Here we use MyPy ignore because the method 'run' is of
         # Callable type and Callable type does not contain any extra
         # attributes but here we are accessing 'assert_called' method
-        # on Callable which causes MyPy to throw a error. Thus to avoid
+        # on Callable which causes MyPy to throw an error. Thus to avoid
         # the error, we used ignore here.
         self.job.run.assert_called() # type: ignore[attr-defined]
 
@@ -114,7 +114,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # Here we use MyPy ignore because the method 'run' is of
         # Callable type and Callable type does not contain any extra
         # attributes but here we are accessing 'return_value' method
-        # on Callable which causes MyPy to throw a error. Thus to avoid
+        # on Callable which causes MyPy to throw an error. Thus to avoid
         # the error, we used ignore here.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce a non-empty PCollection.
@@ -126,7 +126,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         # Here we use MyPy ignore because the method 'run' is of
         # Callable type and Callable type does not contain any extra
         # attributes but here we are accessing 'return_value' method
-        # on Callable which causes MyPy to throw a error. Thus to avoid
+        # on Callable which causes MyPy to throw an error. Thus to avoid
         # the error, we used ignore here.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce an empty PCollection.

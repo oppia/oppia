@@ -255,17 +255,19 @@ def get_learner_collection_dict_by_id(
         completed_exp_ids = []
 
     # Here we use cast because the return type of 'to_dict' method
-    # is CollectionDict but for implementation purpose we are assigning
-    # LearnerCollectionDict which is inherited from CollectionDict. So,
-    # due to this difference in types MyPy throws an error. Thus to avoid
-    # the error, we used cast here.
+    # is CollectionDict but here we need a different dictionary
+    # that contains 'playthrough_dict' key. So, we have defined a
+    # LearnerCollectionDict which is inherited from CollectionDict
+    # and assigned it to collection_dict. So, due to this difference
+    # in types, MyPy throws an error. Thus to avoid the error,
+    # we used cast here.
     collection_dict: LearnerCollectionDict = cast(
         LearnerCollectionDict, collection.to_dict()
     )
     # Here we use MyPy ignore because expression has type List[
     # CollectionNodeDict] but for implementation purpose we are
     # assigning List[LearnerCollectionNodeDict]. So, due the
-    # difference in types MyPy throw a error. Thus to avoid the
+    # difference in types MyPy throw an error. Thus to avoid the
     # error, we used ignore here.
     collection_dict['nodes'] = [
         node.to_dict() for node in collection.nodes]  # type: ignore[misc]

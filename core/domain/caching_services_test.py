@@ -264,7 +264,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         # which can accept only keys of DESERIALIZATION_FUNCTIONS Dict and
         # 'invalid' is not one of them. So, we don't have any overload function
         # for 'invalid' key but still we are passing 'invalid' to function which
-        # causes MyPy to throw a error. Thus to avoid error, we used ignore.
+        # causes MyPy to throw an error. Thus to avoid error, we used ignore.
         with self.assertRaisesRegex(
             ValueError,
             'Invalid namespace: %s.' % invalid_namespace):
@@ -285,7 +285,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         ids exist or don't exist in the cache returns reasonable output.
         """
         # Key value mapping tests that strings, numbers, booleans, floats,
-        # lists, and Nonetypes are all correctly set and get from the cache.
+        # lists, and Nonetypes are all correctly set and fetched from the cache.
         key_value_mapping: Dict[
             str, Union[str, int, List[Optional[bool]], Dict[str, float]]
         ] = {

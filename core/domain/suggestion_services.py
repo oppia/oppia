@@ -90,7 +90,7 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[
     # attributes on BaseChange are created dynamically except cmd, and the
     # type of all dynamically created attributes are considered as string
     # (str) type. So, question_dict is also considered as string type but
-    # here we are using it as a Dict type which causes MyPy to throw a error.
+    # here we are using it as a Dict type which causes MyPy to throw an error.
     # Thus to avoid the error, we used ignore here.
     feconf.SUGGESTION_TYPE_ADD_QUESTION: (
         lambda suggestion: suggestion.change.question_dict[

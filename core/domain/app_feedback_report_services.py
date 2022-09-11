@@ -26,7 +26,7 @@ from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, cast, overload
+from typing import Dict, List, Optional, Sequence, cast, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -92,10 +92,8 @@ def get_report_models(
     return report_models
 
 
-# Here we use type Any because argument 'report_json' can accept JSON response
-# dicts and JSON response dictionaries are of type Dict[str, Any].
 def create_report_from_json(
-        report_json: Dict[str, Any]
+    report_json: app_feedback_report_domain.AndroidFeedbackReportDict
 ) -> app_feedback_report_domain.AppFeedbackReport:
     """Creates an AppFeedbackReport domain object instance from the incoming
     JSON request.

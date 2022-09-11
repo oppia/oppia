@@ -566,7 +566,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
             improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
         # Here we use MyPy ignore because `resolved_on` can only accept
         # datetime values but for testing purposes here we are providing
-        # string value which causes MyPy to throw a error. Thus to avoid
+        # string value which causes MyPy to throw an error. Thus to avoid
         # the error, we used ignore here.
         task_entry.resolved_on = self.owner_id  # type: ignore[assignment]
 

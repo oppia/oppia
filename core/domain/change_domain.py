@@ -101,7 +101,10 @@ def validate_cmd(
         'required_attribute_names']
     optional_attribute_names = valid_cmd_attribute_specs[
         'optional_attribute_names']
-    actual_attribute_names = list(actual_cmd_attributes.keys())
+    actual_attribute_names = [
+        key for key in actual_cmd_attributes.keys()
+        if key != 'cmd'
+    ]
 
     missing_attribute_names = [
         key for key in required_attribute_names if key not in (
@@ -249,17 +252,7 @@ class BaseChange:
         if not valid_cmd_attribute_specs:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
 
-        # Here we use MyPy ignore because we are deleting the 'name' key which
-        # cause MyPy to throw a error, because MyPy does not allow key deletion
-        # from TypedDict. So to silence the error, we added an ignore here.
-        valid_cmd_attribute_specs.pop('name', None)  # type: ignore[misc]
-
         actual_cmd_attributes = copy.deepcopy(change_dict)
-        # Here we use MyPy ignore because `actual_cmd_attributes` is of type
-        # Mapping and Mapping does not contain extra methods (e.g: .pop()).
-        # But here we are accessing `pop()` method, which causes MyPy to throw
-        # a error. Thus to avoid the error, we used ignore here.
-        actual_cmd_attributes.pop('cmd', None)  # type: ignore[attr-defined]
 
         validate_cmd(
             cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)

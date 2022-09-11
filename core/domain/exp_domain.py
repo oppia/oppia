@@ -3624,7 +3624,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # does not contain properties like created_on and last_updated but
         # MyPy expects exploration_dict, a dictionary which contains all the
         # properties of domain object. That's why we are explicitly changing
-        # the type of exploration_dict, here which causes MyPy to throw an
+        # the type of exploration_dict here, which causes MyPy to throw an
         # error. Thus, to silence the error, we added an ignore here.
         exploration_dict: SerializableExplorationDict = self.to_dict()  # type: ignore[assignment]
         # The only reason we add the version parameter separately is that our

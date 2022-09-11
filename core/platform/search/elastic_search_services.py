@@ -25,7 +25,10 @@ from core.domain import search_services
 
 import elasticsearch
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import (
+    Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, overload
+)
+from typing_extensions import Literal
 
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError
@@ -46,6 +49,12 @@ class SearchException(Exception):
     pass
 
 
+# Here we use type Any because this method returns the list of document
+# dictionaries and document dictionaries can have any value. So, that's why
+# return value have Dict[str, Any] type.
+# This can be seen from the type stubs of elastic search.
+# The type of 'body' here is 'Any'.
+# https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
 def _fetch_response_from_elastic_search(
     query_definition: Dict[str, Any],
     index_name: str,
@@ -212,6 +221,53 @@ def clear_index(index_name: str) -> None:
         })
 
 
+@overload
+def search(
+    query_string: str,
+    index_name: str,
+    categories: List[str],
+    language_codes: List[str],
+    *,
+    offset: Optional[int] = None,
+    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
+    ids_only: Literal[True]
+) -> Tuple[List[str], Optional[int]]: ...
+
+
+# Here we use type Any because this method returns the list of document
+# dictionaries and document dictionaries can have any value. So, that's why
+# return value have Dict[str, Any] type.
+# This can be seen from the type stubs of elastic search.
+# The type of 'body' here is 'Any'.
+# https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
+@overload
+def search(
+    query_string: str,
+    index_name: str,
+    categories: List[str],
+    language_codes: List[str]
+) -> Tuple[List[Dict[str, Any]], Optional[int]]: ...
+
+
+# Here we use type Any because this method returns the list of document
+# dictionaries and document dictionaries can have any value. So, that's why
+# return value have Dict[str, Any] type.
+# This can be seen from the type stubs of elastic search.
+# The type of 'body' here is 'Any'.
+# https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
+@overload
+def search(
+    query_string: str,
+    index_name: str,
+    categories: List[str],
+    language_codes: List[str],
+    *,
+    offset: Optional[int] = None,
+    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
+    ids_only: Literal[False]
+) -> Tuple[List[Dict[str, Any]], Optional[int]]: ...
+
+
 # Here we use type Any because this method returns the list of document
 # dictionaries and document dictionaries can have any value. So, that's why
 # return value have Dict[str, Any] type.
@@ -306,14 +362,55 @@ def search(
         )
 
     result_docs, resulting_offset = _fetch_response_from_elastic_search(
-        query_definition, index_name, offset, size, ids_only)
+        query_definition, index_name, offset, size, ids_only=ids_only)
 
     return result_docs, resulting_offset
 
 
-# In the type annotation below Dict[str, Any] is used in return type because
-# it returns the list of documents and document dictionaries can have
-# any value.
+@overload
+def blog_post_summaries_search(
+    query_string: str,
+    tags: List[str],
+    *,
+    offset: Optional[int] = None,
+    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
+    ids_only: Literal[True]
+) -> Tuple[List[str], Optional[int]]: ...
+
+
+# Here we use type Any because this method returns the list of document
+# dictionaries and document dictionaries can have any value. So, that's why
+# return value have Dict[str, Any] type.
+# This can be seen from the type stubs of elastic search.
+# The type of 'body' here is 'Any'.
+# https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
+@overload
+def blog_post_summaries_search(
+    query_string: str,
+    tags: List[str]
+) -> Tuple[List[Dict[str, Any]], Optional[int]]: ...
+
+
+# Here we use type Any because this method returns the list of document
+# dictionaries and document dictionaries can have any value. So, that's why
+# return value have Dict[str, Any] type.
+# This can be seen from the type stubs of elastic search.
+# The type of 'body' here is 'Any'.
+# https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
+@overload
+def blog_post_summaries_search(
+    query_string: str,
+    tags: List[str],
+    *,
+    offset: Optional[int] = None,
+    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
+    ids_only: Literal[False]
+) -> Tuple[List[Dict[str, Any]], Optional[int]]: ...
+
+
+# Here we use type Any because this method returns the list of document
+# dictionaries and document dictionaries can have any value. So, that's why
+# return value have Dict[str, Any] type.
 # This can be seen from the type stubs of elastic search.
 # The type of 'body' here is 'Any'.
 # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
@@ -360,6 +457,11 @@ def blog_post_summaries_search(
     if offset is None:
         offset = 0
 
+    # Here we use type Any because the query_definition is a dictionary having
+    # values of various types.
+    # This can be seen from the type stubs of elastic search.
+    # The type of 'body' is 'Any'.
+    # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
     query_definition: Dict[str, Any] = {
         'query': {
             'bool': {
@@ -389,6 +491,6 @@ def blog_post_summaries_search(
 
     index_name = search_services.SEARCH_INDEX_BLOG_POSTS
     result_docs, resulting_offset = _fetch_response_from_elastic_search(
-        query_definition, index_name, offset, size, ids_only)
+        query_definition, index_name, offset, size, ids_only=ids_only)
 
     return result_docs, resulting_offset

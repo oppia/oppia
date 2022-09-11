@@ -98,7 +98,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
     WEB_REPORT_INFO_SCHEMA_VERSION = 1
 
-    REPORT_JSON = {
+    REPORT_JSON: app_feedback_report_domain.AndroidFeedbackReportDict = {
         'platform_type': 'android',
         'android_report_info_schema_version': 1,
         'app_context': {
@@ -566,6 +566,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             report_obj.submitted_on_timestamp, self.REPORT_SUBMITTED_TIMESTAMP)
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_create_report_from_json_web_report_throws_error(self) -> None:
         web_dict = {
             'platform_type': 'web'
@@ -573,7 +576,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             NotImplementedError,
             'Domain objects for web reports must be implemented.'):
-            app_feedback_report_services.create_report_from_json(web_dict)
+            app_feedback_report_services.create_report_from_json(web_dict)  # type: ignore[arg-type]
 
     def test_save_new_android_report_from_json_saves_model_to_storage(
             self

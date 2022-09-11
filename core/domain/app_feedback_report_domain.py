@@ -27,7 +27,7 @@ from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
 
-from typing import Any, Dict, List, Mapping, Match, Optional, Union, cast
+from typing import Any, Dict, List, Match, Optional, Union
 from typing_extensions import TypedDict
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -60,18 +60,16 @@ class AppFeedbackReportDict(TypedDict):
 
 
 class AndroidFeedbackReportDict(TypedDict):
-    """Dictionary representing the android's AppFeedbackReport object."""
+    """Type for the android feedback report dictionary."""
 
-    report_id: str
-    schema_version: int
-    platform: str
-    submitted_on_timestamp: str
-    local_timezone_offset_hrs: int
-    ticket_id: Optional[str]
-    scrubbed_by: Optional[str]
-    user_supplied_feedback: UserSuppliedFeedbackDict
-    device_system_context: AndroidDeviceSystemContextDict
+    platform_type: str
+    android_report_info_schema_version: int
     app_context: AndroidAppContextDict
+    device_context: AndroidDeviceContextDict
+    report_submission_timestamp_sec: int
+    report_submission_utc_offset_hrs: int
+    system_context: AndroidSystemContextDict
+    user_supplied_feedback: UserSuppliedFeedbackDict
 
 
 class AppFeedbackReport:
@@ -258,10 +256,10 @@ class AppFeedbackReport:
             raise utils.ValidationError(
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
-    # Here we use type Any because this method can accept JSON response Dicts
-    # and JSON response dicts have type Dict[str, Any].
     @classmethod
-    def from_dict(cls, report_dict: Dict[str, Any]) -> AppFeedbackReport:
+    def from_dict(
+        cls, report_dict: AndroidFeedbackReportDict
+    ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict of the report sent in
         an incoming feedback report request.
 
@@ -278,12 +276,7 @@ class AppFeedbackReport:
         """
         if report_dict['platform_type'] == (
             app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
-            # Here we use cast because we are narrowing down the feedback report
-            # request dict to AndroidFeedbackReportDict.
-            android_report_dict = cast(
-                AndroidFeedbackReportDict, report_dict
-            )
-            return cls.get_android_report_from_dict(android_report_dict)
+            return cls.get_android_report_from_dict(report_dict)
         else:
             raise NotImplementedError(
                 'Domain objects for web reports must be implemented.')
@@ -312,16 +305,8 @@ class AppFeedbackReport:
                 user_supplied_feedback_json['user_feedback_selected_items'],
                 user_supplied_feedback_json['user_feedback_other_text_input']))
 
-        # Here we use MyPy ignore because 'system_context' key is not defined
-        # in AndroidFeedbackReportDict and to_dict() but still we are accessing
-        # this key which causes MyPy to throw a error. Thus to avoid the error,
-        # we used ignore here.
-        system_context_json = report_dict['system_context']  # type: ignore[misc]
-        # Here we use MyPy ignore because 'device_context' key is not defined
-        # in AndroidFeedbackReportDict and to_dict() but still we are accessing
-        # this key which causes MyPy to throw a error. Thus to avoid the error,
-        # we used ignore here.
-        device_context_json = report_dict['device_context']  # type: ignore[misc]
+        system_context_json = report_dict['system_context']
+        device_context_json = report_dict['device_context']
         device_system_context_obj = (
             AndroidDeviceSystemContext(
                 system_context_json['platform_version'],
@@ -348,34 +333,14 @@ class AppFeedbackReport:
             app_context_json['event_logs'], app_context_json['logcat_logs'])
 
         report_datetime = datetime.datetime.fromtimestamp(
-            # Here we use MyPy ignore because 'report_submission_timestamp_sec'
-            # key is not defined in AndroidFeedbackReportDict and to_dict() but
-            # still we are accessing this key which causes MyPy to throw error.
-            # Thus to avoid the error, we used ignore here.
-            report_dict['report_submission_timestamp_sec'])  # type: ignore[misc]
+            report_dict['report_submission_timestamp_sec'])
         report_id = (
-            # Here we use MyPy ignore because 'platform_type' key is not
-            # defined in AndroidFeedbackReportDict and to_dict() but still
-            # we are accessing this key which causes MyPy to throw error.
-            # Thus to avoid the error, we used ignore here.
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                report_dict['platform_type'], report_datetime))  # type: ignore[misc]
+                report_dict['platform_type'], report_datetime))
         report_obj = AppFeedbackReport(
-            # Here we use MyPy ignore because android_report_info_schema_version
-            # key is not defined in AndroidFeedbackReportDict and to_dict() but
-            # still we are accessing this key which causes MyPy to throw error.
-            # Thus to avoid the error, we used ignore here.
-            report_id, report_dict['android_report_info_schema_version'],  # type: ignore[misc]
-            # Here we use MyPy ignore because 'platform_type' key is not
-            # defined in AndroidFeedbackReportDict and to_dict() but still
-            # we are accessing this key which causes MyPy to throw error.
-            # Thus to avoid the error, we used ignore here.
-            report_dict['platform_type'], report_datetime,  # type: ignore[misc]
-            # Here we use MyPy ignore because 'report_submission_utc_offset_hrs'
-            # key is not defined in AndroidFeedbackReportDict and to_dict() but
-            # still we are accessing this key which causes MyPy to throw error.
-            # Thus to avoid the error, we used ignore here.
-            report_dict['report_submission_utc_offset_hrs'], None, None,  # type: ignore[misc]
+            report_id, report_dict['android_report_info_schema_version'],
+            report_dict['platform_type'], report_datetime,
+            report_dict['report_submission_utc_offset_hrs'], None, None,
             user_supplied_feedback_obj, device_system_context_obj,
             app_context_obj)
 
@@ -436,13 +401,11 @@ class AppFeedbackReport:
         raise utils.InvalidInputException(
             'The given Android app text size %s is invalid.' % text_size_name)
 
-    # Here we use type Any because this method can accept JSON response Dicts
-    # and JSON response dicts have type Dict[str, Any].
     @classmethod
     def get_entry_point_from_json(
-        cls, entry_point_json: Mapping[str, Any]
+        cls, entry_point_json: EntryPointDict
     ) -> EntryPoint:
-        """Determines the entry point type based on the rececived JSON.
+        """Determines the entry point type based on the received JSON.
 
         Args:
             entry_point_json: dict. The JSON data of the entry point.
@@ -453,6 +416,11 @@ class AppFeedbackReport:
 
         Raises:
             InvalidInputException. The given entry point is invalid.
+            Exception. No topic_id provided for LessonPlayerEntryPoint.
+            Exception. No story_id provided for LessonPlayerEntryPoint.
+            Exception. No exploration_id provided for LessonPlayerEntryPoint.
+            Exception. No topic_id provided for RevisionCardEntryPoint.
+            Exception. No subtopic_id provided for RevisionCardEntryPoint.
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
@@ -460,12 +428,32 @@ class AppFeedbackReport:
             return NavigationDrawerEntryPoint()
         elif entry_point_name == (
             app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value):
+            if entry_point_json['entry_point_topic_id'] is None:
+                raise Exception(
+                    'No topic_id provided for LessonPlayerEntryPoint.'
+                )
+            if entry_point_json['entry_point_story_id'] is None:
+                raise Exception(
+                    'No story_id provided for LessonPlayerEntryPoint.'
+                )
+            if entry_point_json['entry_point_exploration_id'] is None:
+                raise Exception(
+                    'No exploration_id provided for LessonPlayerEntryPoint.'
+                )
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
         elif entry_point_name == (
             app_feedback_report_constants.EntryPoint.REVISION_CARD.value):
+            if entry_point_json['entry_point_topic_id'] is None:
+                raise Exception(
+                    'No topic_id provided for RevisionCardEntryPoint.'
+                )
+            if entry_point_json['entry_point_subtopic_id'] is None:
+                raise Exception(
+                    'No subtopic_id provided for RevisionCardEntryPoint.'
+                )
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
@@ -722,6 +710,24 @@ class DeviceSystemContext:
             'validation.')
 
 
+class AndroidDeviceContextDict(TypedDict):
+    """Type for the android device context dictionary."""
+
+    android_device_model: str
+    android_sdk_version: int
+    build_fingerprint: str
+    network_type: str
+
+
+class AndroidSystemContextDict(TypedDict):
+    """Type for the android system context dictionary."""
+
+    platform_version: str
+    package_version_code: int
+    android_device_country_locale_code: str
+    android_device_language_locale_code: str
+
+
 class AndroidDeviceSystemContextDict(TypedDict):
     """Dictionary representing the AndroidDeviceSystemContext object."""
 
@@ -964,7 +970,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 class AppContextDict(TypedDict):
     """Dictionary representing the AppContext object."""
 
-    entry_point: AcceptableEntryPointClasses
+    entry_point: EntryPointDict
     text_language_code: str
     audio_language_code: str
 
@@ -1022,7 +1028,7 @@ class AppContext:
 class AndroidAppContextDict(TypedDict):
     """Dictionary representing the AndroidAppContext object."""
 
-    entry_point: AcceptableEntryPointClasses
+    entry_point: EntryPointDict
     text_language_code: str
     audio_language_code: str
     text_size: str
@@ -1207,6 +1213,16 @@ class AndroidAppContext(AppContext):
                 'App text size should be one of %s, received: %s' % (
                     app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES,
                     text_size))
+
+
+class EntryPointDict(TypedDict):
+    """Dictionary representing the EntryPoint object."""
+
+    entry_point_name: str
+    entry_point_exploration_id: Optional[str]
+    entry_point_story_id: Optional[str]
+    entry_point_topic_id: Optional[str]
+    entry_point_subtopic_id: Optional[str]
 
 
 class EntryPoint:
