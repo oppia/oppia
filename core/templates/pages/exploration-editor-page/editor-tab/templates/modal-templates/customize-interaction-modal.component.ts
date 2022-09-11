@@ -255,8 +255,10 @@ export class CustomizeInteractionModalComponent
 
   isSaveInteractionButtonEnabled(): boolean {
     return !!(
-      this.hasCustomizationArgs &&
-      this.stateInteractionIdService.displayed
+      (this.getTitle(this.stateInteractionIdService.displayed) === "End Exploration") || 
+      (this.hasCustomizationArgs &&
+      this.stateInteractionIdService.displayed &&
+      (this.getCustomizationArgsWarningsList().length === 0))  
     );
   }
 
