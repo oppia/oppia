@@ -22,6 +22,7 @@ import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import dayjs from 'dayjs';
 
 @Component({
@@ -41,6 +42,7 @@ export class BlogCardComponent implements OnInit {
   publishedDateString: string = '';
 
   constructor(
+    private windowRef: WindowRef,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
@@ -69,9 +71,11 @@ export class BlogCardComponent implements OnInit {
   }
 
   navigateToBlogPostPage(): void {
-    window.location.href = this.urlInterpolationService.interpolateUrl(
+    let blogPostUrl = this.urlInterpolationService.interpolateUrl(
       BlogPostPageConstants.BLOG_POST_PAGE_URL_TEMPLATE,
       { blog_post_url: this.blogPostSummary.urlFragment }
     );
+
+    this.windowRef.nativeWindow.open(blogPostUrl);
   }
 }

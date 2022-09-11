@@ -230,4 +230,17 @@ describe('SharingLinksComponent', () => {
     expect(shareCollectionEventSpy).toHaveBeenCalledWith('twitter');
     expect(windowRefSpy).toHaveBeenCalled();
   });
+
+  it('should register blog post share event when user clicks' +
+    ' on a social media icon', () => {
+    const shareBlogPostEventSpy =
+      spyOn(siteAnalyticsService, 'registerShareBlogPostEvent');
+    const windowRefSpy = spyOn(windowRef.nativeWindow, 'open');
+    component.shareType = 'blog';
+
+    component.registerShareEvent('twitter');
+
+    expect(shareBlogPostEventSpy).toHaveBeenCalledWith('twitter');
+    expect(windowRefSpy).toHaveBeenCalled();
+  });
 });
