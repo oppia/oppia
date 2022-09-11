@@ -40,49 +40,49 @@
       </li>
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'translation', 'oppia-disabled-tab': !connectedToInternet || editabilityService.isLockedByAdmin()}" id="tutorialTranslationTab" class="nav-item icon nav-list-item e2e-test-translation-tab"
-          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()" [ngbTooltip]="'Translations does not work when offline.'" placement="bottom">
+          (click)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()" [ngbTooltip]="'Translations does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link navbar-tab" [ngbTooltip]="'Translations'" placement="bottom" tabindex="0" >
           <i class="fas fa-microphone navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'translation'}"></i>
         </a>
       </li>
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
-          (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" placement="bottom">
+          (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab" [ngbTooltip]="'Preview'" placement="bottom" tabindex="0" >
           <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"></i>
         </a>
       </li>
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'settings', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-settings-tab"
-          (click)="!connectedToInternet || selectSettingsTab()" [ngbTooltip]="'Settings does not work when offline.'" placement="bottom">
+          (click)="!connectedToInternet || selectSettingsTab()" [ngbTooltip]="'Settings does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab" [ngbTooltip]="'Settings'" placement="bottom" tabindex="0" >
           <i class="fas fa-cog navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'settings'}"></i>
         </a>
       </li>
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'stats', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-stats-tab"
-          (click)="!connectedToInternet || selectStatsTab()" [ngbTooltip]="'Statistics does not work when offline.'" placement="bottom">
+          (click)="!connectedToInternet || selectStatsTab()" [ngbTooltip]="'Statistics does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab" [ngbTooltip]="'Statistics'" placement="bottom" tabindex="0" >
           <i class="fas fa-poll navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'stats'}"></i>
         </a>
       </li>
 
       <li *ngIf="isImprovementsTabEnabled() && screenIsLarge" [ngClass]="{'navbar-tab-active': getActiveTabName() === 'improvements', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-improvements-tab"
-          (click)="!connectedToInternet || selectImprovementsTab()"  [ngbTooltip]="'Improvements does not work when offline.'" placement="bottom">
+          (click)="!connectedToInternet || selectImprovementsTab()"  [ngbTooltip]="'Improvements does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab" [ngbTooltip]="'Improvements'" placement="bottom" tabindex="0" >
           <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
         </a>
       </li>
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'history', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-history-tab"
-          (click)="!connectedToInternet || selectHistoryTab()"  [ngbTooltip]="'History does not work when offline.'" placement="bottom">
+          (click)="!connectedToInternet || selectHistoryTab()"  [ngbTooltip]="'History does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab" [ngbTooltip]="'History'" placement="bottom" tabindex="0" >
           <i class="fas fa-clock navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'history'}"></i>
         </a>
       </li>
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'feedback', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-feedback-tab"
-          (click)="!connectedToInternet || selectFeedbackTab()" [ngbTooltip]="'Feedback does not work when offline.'" placement="bottom">
+          (click)="!connectedToInternet || selectFeedbackTab()" [ngbTooltip]="'Feedback does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab" [ngbTooltip]="'Feedback'" placement="bottom" tabindex="0" >
           <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
         </a>
@@ -94,7 +94,7 @@
       </li>
 
       <li [ngClass]="{'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item" (click)="!connectedToInternet || showUserHelpModal()"
-          [ngbTooltip]="'Help does not work when offline.'" placement="bottom">
+          [ngbTooltip]="'Help does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a href="#"
            [ngbTooltip]="'Help'"
            placement="bottom"
