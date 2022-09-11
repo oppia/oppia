@@ -584,8 +584,14 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         )
 
         self.new_state = state_domain.State.create_default_state(
-            'Introduction', is_initial_state=True)
-        self.set_interaction_for_state(self.new_state, 'TextInput')  # type: ignore[no-untyped-call]
+            'Introduction',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            self.new_state, 'TextInput', self.content_id_generator)
         self.exploration.init_state_name = 'Introduction'
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state
@@ -595,8 +601,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'TextInput', self.content_id_generator)
         self.init_state = (
             self.exploration.states[self.exploration.init_state_name])
-        self.end_state = state_domain.State.create_default_state('End')
-        self.set_interaction_for_state(self.end_state, 'EndExploration')  # type: ignore[no-untyped-call]
 
         self.end_state = state_domain.State.create_default_state(
             'End',
@@ -608,6 +612,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(  # type: ignore[no-untyped-call]
             self.end_state, 'EndExploration', self.content_id_generator)
         self.end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+
+        self.exploration.next_content_id_index = (
+            self.content_id_generator.next_content_id_index)
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
         self.init_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
@@ -661,7 +668,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.exploration.states['State%s' % i].card_is_checkpoint = True
             self.set_interaction_for_state(
                 self.exploration.states['State%s' % i],
-                'Continue')
+                'Continue', self.content_id_generator)
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected checkpoint count to be between 1 and 8 '
             'inclusive but found it to be 9'
@@ -691,10 +698,24 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #        │      End      │
         #        └───────────────┘.
 
-        second_state = state_domain.State.create_default_state('Second')
-        self.set_interaction_for_state(second_state, 'TextInput')  # type: ignore[no-untyped-call]
-        third_state = state_domain.State.create_default_state('Third')
-        self.set_interaction_for_state(third_state, 'TextInput')  # type: ignore[no-untyped-call]
+        second_state = state_domain.State.create_default_state(
+            'Second',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            second_state, 'TextInput', self.content_id_generator)
+        third_state = state_domain.State.create_default_state(
+            'Third',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            third_state, 'TextInput', self.content_id_generator)
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -874,14 +895,43 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                    │    End    │
         #                    └───────────┘.
 
-        a_state = state_domain.State.create_default_state('A')
-        self.set_interaction_for_state(a_state, 'TextInput')  # type: ignore[no-untyped-call]
-        b_state = state_domain.State.create_default_state('B')
-        self.set_interaction_for_state(b_state, 'TextInput')  # type: ignore[no-untyped-call]
-        c_state = state_domain.State.create_default_state('C')
-        self.set_interaction_for_state(c_state, 'TextInput')  # type: ignore[no-untyped-call]
-        d_state = state_domain.State.create_default_state('D')
-        self.set_interaction_for_state(d_state, 'TextInput')  # type: ignore[no-untyped-call]
+
+        a_state = state_domain.State.create_default_state(
+            'A',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            a_state, 'TextInput', self.content_id_generator)
+        b_state = state_domain.State.create_default_state(
+            'B',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            b_state, 'TextInput', self.content_id_generator)
+        c_state = state_domain.State.create_default_state(
+            'C',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            c_state, 'TextInput', self.content_id_generator)
+        d_state = state_domain.State.create_default_state(
+            'D',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            d_state, 'TextInput', self.content_id_generator)
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -1086,8 +1136,15 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                  │    End    │           │    End 2  │
         #                  └───────────┘           └───────────┘.
 
-        new_end_state = state_domain.State.create_default_state('End 2')
-        self.set_interaction_for_state(new_end_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        new_end_state = state_domain.State.create_default_state(
+            'End 2',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME)
+        )
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            new_end_state, 'EndExploration', self.content_id_generator)
         new_end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
 
         self.exploration.states = {
@@ -1195,10 +1252,22 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Invalid character / in a state name')
 
-        new_state = state_domain.State.create_default_state('ABC')
-        second_state = state_domain.State.create_default_state('BCD')
-        self.set_interaction_for_state(new_state, 'TextInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(second_state, 'TextInput')  # type: ignore[no-untyped-call]
+        new_state = state_domain.State.create_default_state(
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME))
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            new_state, 'TextInput', content_id_generator)
+        second_state = state_domain.State.create_default_state(
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME))
+        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+            second_state, 'TextInput', content_id_generator)
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -1315,7 +1384,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(  # type: ignore[no-untyped-call]
-            init_state, 'TextInput')
+            init_state, 'TextInput', content_id_generator)
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_groups)
             for answer_groups in old_answer_groups
@@ -1536,8 +1605,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
         interaction.id = 'PencilCodeEditor'
-
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
@@ -1582,7 +1654,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid customization arg name')
 
         interaction.customization_args = valid_text_input_cust_args
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
         exploration.validate()
 
         # TODO(#13059): After we fully type the codebase we plan to get
@@ -1597,18 +1673,22 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             for answer_group in old_answer_groups
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(init_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)  # type: ignore[no-untyped-call]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration,
             'Terminal interactions must not have a default outcome.')
 
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
         init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
-        self.set_interaction_for_state(init_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator # type: ignore[no-untyped-call]
+        )
         init_state.interaction.answer_groups = answer_groups
         self._assert_validation_error(
             exploration,
@@ -1620,7 +1700,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Restore a valid exploration.
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
         init_state.update_interaction_answer_groups(answer_groups)  # type: ignore[no-untyped-call]
         init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
         exploration.validate()
@@ -1732,7 +1813,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     is_initial_state=True))
         }
         self.set_interaction_for_state(  # type: ignore[no-untyped-call]
-            exploration.states[exploration.init_state_name], 'TextInput')
+            exploration.states[exploration.init_state_name], 'TextInput',
+            content_id_generator)
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -1770,7 +1852,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator)  # type: ignore[no-untyped-call]
         init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
         exploration.validate()
 
@@ -1974,258 +2057,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
-    def test_get_languages_with_complete_translation(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(
-            exploration.get_languages_with_complete_translation(), [])
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        })
-        exploration.states[  # type: ignore[no-untyped-call]
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
-
-        self.assertEqual(
-            exploration.get_languages_with_complete_translation(), ['hi'])
-
-    def test_get_translation_counts_with_no_needs_update(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(
-            exploration.get_translation_counts(), {})
-
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_content(  # type: ignore[no-untyped-call]
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
-        default_outcome = state_domain.Outcome(
-            'Introduction', None, state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
-            False, [], None, None
-        )
-
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
-
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                },
-                'default_outcome': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        })
-        init_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
-
-        exploration.add_states(['New state'])
-        new_state = exploration.states['New state']
-        new_state.update_content(  # type: ignore[no-untyped-call]
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        new_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
-        default_outcome = state_domain.Outcome(
-            'Introduction', None, state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
-            False, [], None, None)
-        new_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
-
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>New state translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                },
-                'default_outcome': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>New State translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        })
-        new_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
-
-        self.assertEqual(
-            exploration.get_translation_counts(), {'hi': 4})
-
-    def test_get_translation_counts_with_needs_update(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(
-            exploration.get_translation_counts(), {})
-
-        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
-        init_state.update_content(  # type: ignore[no-untyped-call]
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
-        default_outcome = state_domain.Outcome(
-            'Introduction', None, state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
-            False, [], None, None
-        )
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
-
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': True
-                    }
-                },
-                'default_outcome': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        })
-        init_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
-
-        self.assertEqual(
-            exploration.get_translation_counts(), {'hi': 1})
-
-    def test_get_translation_counts_with_translation_in_multiple_lang(
-        self
-    ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(
-            exploration.get_translation_counts(), {})
-        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
-        init_state.update_content(  # type: ignore[no-untyped-call]
-            state_domain.SubtitledHtml.from_dict({
-                'content_id': 'content',
-                'html': '<p>This is content</p>'
-            }))
-        init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
-        default_outcome = state_domain.Outcome(
-            'Introduction', None, state_domain.SubtitledHtml(
-                'default_outcome', '<p>The default outcome.</p>'),
-            False, [], None, None
-        )
-
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
-
-        written_translations = state_domain.WrittenTranslations.from_dict({
-            'translations_mapping': {
-                'content': {
-                    'hi-en': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                },
-                'default_outcome': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
-            }
-        })
-        init_state.update_written_translations(written_translations)  # type: ignore[no-untyped-call]
-
-        self.assertEqual(
-            exploration.get_translation_counts(), {
-                'hi': 2,
-                'hi-en': 1
-            })
-
-    def test_get_content_count(self) -> None:
-        # Adds 1 to content count to exploration (content, default_outcome).
-        exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(exploration.get_content_count(), 1)
-
-        # Adds 2 to content count to exploration (content default_outcome).
-        exploration.add_states(['New state'])
-        init_state = exploration.states[exploration.init_state_name]
-
-        # Adds 1 to content count to exploration (ca_placeholder_0)
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
-
-        state_answer_group = state_domain.AnswerGroup(
-            state_domain.Outcome(
-                exploration.init_state_name, None, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'),
-                False, [], None, None),
-            [
-                state_domain.RuleSpec(
-                    'Contains',
-                    {
-                        'x':
-                        {
-                            'contentId': 'rule_input_5',
-                            'normalizedStrSet': ['Test']
-                        }
-                    })
-            ],
-            [],
-            None
-        )
-        # Adds 1 to content count to exploration (feedback_1).
-        init_state.update_interaction_answer_groups([state_answer_group])  # type: ignore[no-untyped-call]
-
-        hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
-            )
-        ]
-        # Adds 1 to content count to exploration (hint_1).
-        init_state.update_interaction_hints(hints_list)  # type: ignore[no-untyped-call]
-
-        solution_dict: state_domain.SolutionDict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-        # Ruling out the possibility of None for mypy type checking.
-        assert init_state.interaction.id is not None
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict)
-        # Adds 1 to content count to exploration (solution).
-        init_state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
-
-        self.assertEqual(exploration.get_content_count(), 6)
-
     def test_get_metadata(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
         actual_metadata_dict = exploration.get_metadata().to_dict()
@@ -2255,7 +2086,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.next_content_id_index
         )
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -2280,7 +2112,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.next_content_id_index
         )
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            init_state, 'TextInput',content_id_generator)  # type: ignore[no-untyped-call]
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -2685,7 +2518,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['End'])
         end_state = exploration.states['End']
-        self.set_interaction_for_state(end_state, 'EndExploration')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            end_state, 'EndExploration', content_id_generator)  # type: ignore[no-untyped-call]
         end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
 
         with self.assertRaisesRegex(
@@ -2823,7 +2657,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rows': {'value': 1}
         }
-        state.update_next_content_id_index(3)  # type: ignore[no-untyped-call]
         state.update_content(  # type: ignore[no-untyped-call]
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
@@ -5920,10 +5753,14 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_content(
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
-        self.set_interaction_for_state(state1, 'TextInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(state2, 'MultipleChoiceInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(state3, 'ItemSelectionInput')  # type: ignore[no-untyped-call]
-        self.set_interaction_for_state(state4, 'DragAndDropSortInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            state1, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            state2, 'MultipleChoiceInput', content_id_generator)  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            state3, 'ItemSelectionInput', content_id_generator)  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
+            state4, 'DragAndDropSortInput', content_id_generator)  # type: ignore[no-untyped-call]
 
         customization_args_dict1: Dict[
             str, Dict[str, Union[Dict[str, str], int]]

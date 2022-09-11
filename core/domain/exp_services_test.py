@@ -139,8 +139,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         )
         exploration.objective = 'An objective'
         exploration.correctness_feedback_enabled = False
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], 'NumericInput'
+            exploration.states[exploration.init_state_name], 'NumericInput',
+            content_id_generator
         )
         exp_services.save_new_exploration(self.owner_id, exploration)
 

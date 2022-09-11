@@ -165,6 +165,9 @@ def migrate_state_schema(
             state: The State domain object representing the question
                 state data.
 
+    Returns:
+        int. The next content id index for generating content id.
+
     Raises:
         Exception. The given state_schema_version is invalid.
     """

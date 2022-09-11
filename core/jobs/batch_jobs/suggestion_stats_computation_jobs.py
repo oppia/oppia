@@ -25,7 +25,7 @@ from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
-from core.domain import state_domain
+from core.domain import translation_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.jobs import base_jobs
@@ -196,9 +196,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 # we can easily count words.
                 if (
                         change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                        state_domain.WrittenTranslation.is_data_format_list(
-                            change.data_format
-                        )
+                        translation_domain.TranslatableContentFormat
+                        .is_data_format_list(change.data_format)
                 ):
                     content_items: Union[str, List[str]] = change.content_html
                 else:

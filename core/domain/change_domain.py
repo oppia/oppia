@@ -35,6 +35,7 @@ if MYPY: # pragma: no cover
     from core.domain import question_domain
     from core.domain import skill_domain
     from core.domain import state_domain
+    from core.domain import translation_domain
 
     # After importing modules under the `if MYPY` clause they are not
     # executed at runtime. So, to avoid `attribute is not defined` error
@@ -57,7 +58,7 @@ if MYPY: # pragma: no cover
         List[state_domain.AnswerGroupDict],
         List[state_domain.HintDict],
         List[skill_domain.WorkedExampleDict],
-        state_domain.WrittenTranslationsDict,
+        translation_domain.WrittenTranslationsDict,
         List[platform_parameter_domain.PlatformParameterRuleDict],
         question_domain.QuestionDict,
         state_domain.AnswerGroupDict,

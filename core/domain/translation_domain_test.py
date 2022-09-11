@@ -293,7 +293,6 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
             translatable_content.content_type,
             translation_domain.ContentType.CONTENT)
 
-
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',

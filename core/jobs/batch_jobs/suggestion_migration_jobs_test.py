@@ -19,15 +19,19 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain, translation_domain, question_domain, suggestion_services, skill_services
+from core.domain import exp_domain
+from core.domain import question_domain
+from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import suggestion_services
+from core.domain import translation_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import suggestion_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Union
+from typing import Dict, Union
 from typing_extensions import Final
 
 MYPY = False

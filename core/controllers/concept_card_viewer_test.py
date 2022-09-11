@@ -15,14 +15,15 @@
 """Tests for the handler that returns concept card for a skill."""
 
 from __future__ import annotations
+
 import json
 
 from core import feconf
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import user_services
 from core.domain import translation_domain
+from core.domain import user_services
 from core.tests import test_utils
 
 

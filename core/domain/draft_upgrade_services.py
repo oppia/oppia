@@ -39,7 +39,6 @@ if MYPY:  # pragma: no cover
 AllowedDraftChangeListTypes = Union[
     state_domain.SubtitledHtmlDict,
     state_domain.CustomizationArgsDictType,
-    state_domain.WrittenTranslationsDict,
     state_domain.OutcomeDict,
     List[state_domain.HintDict],
     state_domain.SolutionDict,

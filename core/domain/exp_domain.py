@@ -566,18 +566,6 @@ class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
     old_value: state_domain.RecordedVoiceoversDict
 
 
-class EditExpStatePropertyWrittenTranslationsCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_WRITTEN_TRANSLATIONS as allowed value.
-    """
-
-    property_name: Literal['written_translations']
-    state_name: str
-    new_value: state_domain.WrittenTranslationsDict
-    old_value: state_domain.WrittenTranslationsDict
-
-
 class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
     """Class representing the ExplorationChange's
     CMD_EDIT_STATE_PROPERTY command with
@@ -2504,41 +2492,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         new_state_name)
 
         return trainable_states_dict
-
-    def get_languages_with_complete_translation(self) -> List[str]:
-        """Returns a list of language code in which the exploration translation
-        is 100%.
-
-        Returns:
-            list(str). A list of language code in which the translation for the
-            exploration is complete i.e, 100%.
-        """
-        content_count = self.get_content_count()
-        language_code_list = []
-        for language_code, count in self.get_translation_counts().items():
-            if count == content_count:
-                language_code_list.append(language_code)
-
-        return language_code_list
-
-    def get_translation_counts(self) -> Dict[str, int]:
-        """Returns a dict representing the number of translations available in a
-        language for which there exists at least one translation in the
-        exploration.
-
-        Returns:
-            dict(str, int). A dict with language code as a key and number of
-            translation available in that language as the value.
-        """
-        exploration_translation_counts: Dict[
-            str, int
-        ] = collections.defaultdict(int)
-        for state in self.states.values():
-            state_translation_counts = state.get_translation_counts()
-            for language, count in state_translation_counts.items():
-                exploration_translation_counts[language] += count
-
-        return dict(exploration_translation_counts)
 
     def get_metadata(self) -> ExplorationMetadata:
         """Gets the ExplorationMetadata domain object for the exploration."""

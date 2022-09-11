@@ -83,7 +83,7 @@ class SubtopicPageChange(change_domain.BaseChange):
 AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
     state_domain.SubtitledHtmlDict,
     state_domain.RecordedVoiceoversDict,
-    state_domain.WrittenTranslationsDict
+    translation_domain.WrittenTranslationsDict
 ]
 
 
@@ -142,8 +142,8 @@ class UpdateSubtopicPagePropertyPageWrittenTranslationsCmd(SubtopicPageChange):
 
     subtopic_id: int
     property_name: Literal['page_written_translations']
-    new_value: state_domain.WrittenTranslationsDict
-    old_value: state_domain.WrittenTranslationsDict
+    new_value: translation_domain.WrittenTranslationsDict
+    old_value: translation_domain.WrittenTranslationsDict
 
 
 class SubtopicPageContentsDict(TypedDict):
@@ -151,7 +151,7 @@ class SubtopicPageContentsDict(TypedDict):
 
     subtitled_html: state_domain.SubtitledHtmlDict
     recorded_voiceovers: state_domain.RecordedVoiceoversDict
-    written_translations: state_domain.WrittenTranslationsDict
+    written_translations: translation_domain.WrittenTranslationsDict
 
 
 class VersionedSubtopicPageContentsDict(TypedDict):
@@ -168,7 +168,7 @@ class SubtopicPageContents:
         self,
         subtitled_html: state_domain.SubtitledHtml,
         recorded_voiceovers: state_domain.RecordedVoiceovers,
-        written_translations: state_domain.WrittenTranslations
+        written_translations: translation_domain.WrittenTranslations
     ) -> None:
         """Constructs a SubtopicPageContents domain object.
 
@@ -481,7 +481,7 @@ class SubtopicPage:
 
     def update_page_contents_written_translations(
         self,
-        new_page_written_translations_dict: state_domain.WrittenTranslationsDict
+        new_page_written_translations_dict: translation_domain.WrittenTranslationsDict
     ) -> None:
         """The new value for the written_translations data field.
 

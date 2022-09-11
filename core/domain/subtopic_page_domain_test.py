@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
+from core.domain import translation_domain
 from core.tests import test_utils
 
 
@@ -209,7 +210,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_update_written_translations(self) -> None:
-        written_translations_dict: state_domain.WrittenTranslationsDict = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict) = {
             'translations_mapping': {
                 'content': {
                     'en': {
