@@ -66,10 +66,18 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         )
 
     def test_update_timestamps_multi(self) -> None:
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
+        self.assertIsNone(user_models.UserQueryModel.get_by_id('query_id'))
+
         cloud_datastore_services.update_timestamps_multi(
             [self.completed_activities_model, self.user_query_model], False)
         cloud_datastore_services.put_multi(
             [self.completed_activities_model, self.user_query_model])
+
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
+        self.assertIsNotNone(user_models.UserQueryModel.get_by_id('query_id'))
 
         self.assertEqual(
             self.completed_activities_model.get_by_id(

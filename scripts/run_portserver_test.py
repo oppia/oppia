@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import builtins
 import logging
+import io
 import os
 import socket
 import sys
@@ -68,7 +69,7 @@ class MockServer:
         pass
 
 
-class CloudTransactionServicesTests(test_utils.GenericTestBase):
+class RunPortserverTests(test_utils.GenericTestBase):
     """Unit tests for scripts/run_portserver.py"""
 
     def setUp(self) -> None:
@@ -100,10 +101,8 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertEqual(returned_time, 0)
 
     def test_get_process_start_time(self) -> None:
-        with open('dummy_file.txt', 'w', encoding='utf-8') as f:
-            f.write('A B C D E F G H I J K L M N O P Q R S T U 11 V')
-
-        dummy_file_object = open('dummy_file.txt', 'r', encoding='utf-8')
+        dummy_file_object = io.StringIO(
+            'A B C D E F G H I J K L M N O P Q R S T U 11 V')
         pid = 12345
 
         swap_open = self.swap_with_checks(
@@ -114,9 +113,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         with swap_open:
             returned_time = run_portserver.get_process_start_time(pid)
         self.assertEqual(returned_time, 11)
-
         dummy_file_object.close()
-        os.remove('dummy_file.txt')
 
     def test_get_process_command_line_handles_ioerror(self) -> None:
         def mock_open(*unused_args: Any, **unused_kwargs: Any) -> None:
@@ -132,10 +129,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertEqual(returned_text, '')
 
     def test_get_process_command_line(self) -> None:
-        with open('dummy_file.txt', 'w', encoding='utf-8') as f:
-            f.write('')
-
-        dummy_file_object = open('dummy_file.txt', 'r', encoding='utf-8')
+        dummy_file_object = io.StringIO('')
         expected_text = dummy_file_object.read()
         pid = 12345
 
@@ -149,7 +143,6 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertEqual(returned_text, expected_text)
 
         dummy_file_object.close()
-        os.remove('dummy_file.txt')
 
     def test_sock_bind_handles_error_while_creating_socket(self) -> None:
         port = 8181
@@ -308,19 +301,21 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
     def test_port_server_request_handler_handles_invalid_request(self) -> None:
         request_handler = run_portserver.PortServerRequestHandler((8181,)) # type: ignore[no-untyped-call]
-        request_handler.handle_port_request('abcd')
+        response = request_handler.handle_port_request('abcd')
         with self.swap_log:
             request_handler.dump_stats()
 
+        self.assertIsNone(response)
         self.assertIn('client-request-errors 1', self.terminal_logs)
 
     def test_port_server_request_handler_handles_denied_allocations(
             self) -> None:
         request_handler = run_portserver.PortServerRequestHandler((8181,)) # type: ignore[no-untyped-call]
-        request_handler.handle_port_request(0)
+        response = request_handler.handle_port_request(0)
         with self.swap_log:
             request_handler.dump_stats()
 
+        self.assertIsNone(response)
         self.assertIn('denied-allocations 1', self.terminal_logs)
 
     def test_port_server_request_handler_handles_no_free_ports(self) -> None:
@@ -331,9 +326,10 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_should_allocate_port = self.swap(
             run_portserver, 'should_allocate_port', lambda _: True)
         with self.swap_log, swap_get_port, swap_should_allocate_port:
-            request_handler.handle_port_request(1010)
+            response = request_handler.handle_port_request(1010)
             request_handler.dump_stats()
 
+        self.assertEqual(response, '')
         self.assertIn('denied-allocations 1', self.terminal_logs)
 
     def test_port_server_request_handler_allocates_port_to_client(
@@ -345,9 +341,10 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         swap_should_allocate_port = self.swap(
             run_portserver, 'should_allocate_port', lambda _: True)
         with self.swap_log, swap_get_port, swap_should_allocate_port:
-            request_handler.handle_port_request(1010)
+            response = request_handler.handle_port_request(1010)
             request_handler.dump_stats()
 
+        self.assertEqual(response, b'8080\n')
         self.assertIn('total-allocations 1', self.terminal_logs)
 
     def test_failure_to_start_server_throws_error(self) -> None:
@@ -374,14 +371,17 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
         def dummy_handler(data: Any) -> str:
             return str(data)
-        swap_hasattr = self.swap(
-            builtins, 'hasattr', lambda *unused_args: False)
+        swap_hasattr = self.swap_with_checks(
+            builtins, 'hasattr', lambda *unused_args: False,
+            expected_args=((socket, 'AF_UNIX'),))
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: mock_socket)
 
         with swap_socket, swap_hasattr:
             server = run_portserver.Server(dummy_handler, '\08181') # type: ignore[no-untyped-call]
             run_portserver.Server.handle_connection(MockSocket(), dummy_handler)
+
+            self.assertFalse(server.socket.server_closed)
             server.close()
 
         self.assertTrue(server.socket.server_closed)
@@ -390,8 +390,9 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         path = '8181'
         def dummy_handler(data: Any) -> str:
             return str(data)
-        swap_hasattr = self.swap(
-            builtins, 'hasattr', lambda *unused_args: False)
+        swap_hasattr = self.swap_with_checks(
+            builtins, 'hasattr', lambda *unused_args: False,
+            expected_args=((socket, 'AF_UNIX'),))
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: MockSocket())
         swap_remove = self.swap_with_checks(
@@ -399,6 +400,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
         with swap_socket, swap_hasattr, swap_remove:
             server = run_portserver.Server(dummy_handler, path) # type: ignore[no-untyped-call]
+            self.assertFalse(server.socket.server_closed)
             server.close()
 
         self.assertTrue(server.socket.server_closed)
