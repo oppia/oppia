@@ -31,9 +31,8 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             'exit_context': False,
         }
         class MockTransaction:
-            def __enter__(self) -> MockTransaction:
+            def __enter__(self) -> None:
                 calls_made['enter_context'] = True
-                return self
 
             def __exit__(self, *unused_args: Any) -> None:
                 calls_made['exit_context'] = True
