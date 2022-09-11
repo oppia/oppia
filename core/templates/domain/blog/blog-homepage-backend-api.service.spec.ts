@@ -121,9 +121,10 @@ describe('Blog home page backend api service', () => {
     let req = httpTestingController.expectOne(
       BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0');
     expect(req.request.method).toEqual('GET');
-    req.flush(blogHomePageBackendResponse);
 
+    req.flush(blogHomePageBackendResponse);
     flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalledWith(blogHomePageDataObject);
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -139,9 +140,10 @@ describe('Blog home page backend api service', () => {
       let req = httpTestingController.expectOne(
         BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0');
       expect(req.request.method).toEqual('GET');
-      req.flush(blogHomePageBackendResponse);
 
+      req.flush(blogHomePageBackendResponse);
       flushMicrotasks();
+
       expect(successHandler).toHaveBeenCalledWith(blogHomePageDataObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -154,6 +156,7 @@ describe('Blog home page backend api service', () => {
     let req = httpTestingController.expectOne(
       BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0');
     expect(req.request.method).toEqual('GET');
+
     req.flush({
       error: 'Some error in the backend.'
     }, {
@@ -173,9 +176,10 @@ describe('Blog home page backend api service', () => {
     let req = httpTestingController.expectOne(
       BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery);
     expect(req.request.method).toEqual('GET');
-    req.flush(searchResponseBackendDict);
 
+    req.flush(searchResponseBackendDict);
     flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalledWith(searchResponseData);
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -213,9 +217,10 @@ describe('Blog home page backend api service', () => {
     let req = httpTestingController.expectOne(
       BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery);
     expect(req.request.method).toEqual('GET');
-    req.flush(searchResponseBackendDict);
 
+    req.flush(searchResponseBackendDict);
     flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalledWith(searchResponseData);
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -228,9 +233,10 @@ describe('Blog home page backend api service', () => {
       let req = httpTestingController.expectOne(
         BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url');
       expect(req.request.method).toEqual('GET');
-      req.flush(blogPostPageBackendResponse);
 
+      req.flush(blogPostPageBackendResponse);
       flushMicrotasks();
+
       expect(successHandler).toHaveBeenCalledWith(blogPostPageDataObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -247,9 +253,10 @@ describe('Blog home page backend api service', () => {
     let req = httpTestingController.expectOne(
       BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url');
     expect(req.request.method).toEqual('GET');
-    req.flush(blogPostPageBackendResponse);
 
+    req.flush(blogPostPageBackendResponse);
     flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalledWith(blogPostPageDataObject);
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -262,6 +269,7 @@ describe('Blog home page backend api service', () => {
     let req = httpTestingController.expectOne(
       BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url');
     expect(req.request.method).toEqual('GET');
+
     req.flush({
       error: 'Some error in the backend.'
     }, {

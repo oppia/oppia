@@ -772,7 +772,10 @@ def get_published_blog_post_summaries(
 
     Args:
         offset: int. Number of query results to skip from top.
-        size: int or None. Number of blog post summaries to return.
+        size: int or None. Number of blog post summaries to return if there are
+            at least that many, otherwise it contains all remaining results. If
+            None, maximum number of blog post summaries to display on blog
+            homepage will be returned if there are atleast that many.
 
     Returns:
         list(BlogPostSummaries). These are sorted in order of the
@@ -884,7 +887,8 @@ def get_blog_post_ids_matching_query(
             filter is applied to the results. If it is not empty, then a result
             is considered valid if it matches at least one of these tags.
         size: int. The maximum number of blog post summary domain objects to
-            be returned.
+            be returned if there are at least that many, otherwise it contains
+            all results.
         offset: int or None. Optional offset from which to start the search
             query. If no offset is supplied, the first N results matching
             the query are returned.
@@ -903,7 +907,7 @@ def get_blog_post_ids_matching_query(
     search_offset: Optional[int] = offset
 
     for _ in range(MAX_ITERATIONS):
-        remaining_to_fetch = (size - len(valid_blog_post_ids))
+        remaining_to_fetch = size - len(valid_blog_post_ids)
 
         blog_post_ids, search_offset = (
             search_services.search_blog_post_summaries(

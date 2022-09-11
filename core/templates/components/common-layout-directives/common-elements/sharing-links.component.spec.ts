@@ -122,8 +122,8 @@ describe('SharingLinksComponent', () => {
     ' blog post page', () => {
     // This throws "Type '"not-exp-or-col"' is not assignable to type
     // 'ShareType'". We need to suppress this error because 'shareType' can
-    // only be equal to 'exploration' or 'collection', but we set an invalid
-    // value in order to test validations.
+    // only be equal to 'exploration', 'collection' or 'blog', but we set an
+    // invalid value in order to test validations.
     // @ts-expect-error
     component.shareType = 'not-exp-or-col';
 

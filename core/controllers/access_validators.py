@@ -191,7 +191,7 @@ class BlogPostPageAccessValidationHandler(base.BaseHandler):
 
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.can_access_blog_dashboard # type: ignore[misc]
     def get(self) -> None:
         # Please use type casting here instead of type ignore[union-attr] once
         # this attribute `normalized_request` has been type annotated in the
