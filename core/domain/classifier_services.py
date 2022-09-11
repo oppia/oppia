@@ -58,8 +58,6 @@ def generate_signature(
     Returns:
         str. The signature of the payload data.
     """
-    # Ruling out the possibility of Any other type for vm_id.
-    assert isinstance(vm_id, str)
     converted_vm_id = vm_id.encode('utf-8')
     if isinstance(message, str):
         message = message.encode('utf-8')

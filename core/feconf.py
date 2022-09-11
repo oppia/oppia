@@ -751,6 +751,10 @@ MAX_NUMBER_OF_SKILL_IDS = 20
 # homepage.
 MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
 
+# The maximum number of blog post cards to be visible on each page in blog
+# search results homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
+
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
 MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
@@ -903,6 +907,7 @@ BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
+BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
 AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
