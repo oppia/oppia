@@ -59,13 +59,13 @@ class ClassroomAdminPageTests(BaseClassroomControllerTests):
         """Tests access to the Classroom Admin page."""
         self.get_html_response('/classroom-admin', expected_status_int=302)
 
-    def test_classroom_admin_page_acess_without_being_curriculum_admin(self):
+    def test_classroom_admin_page_access_without_being_curriculum_admin(self):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response('/classroom-admin', expected_status_int=401)
         self.logout()
 
-    def test_classroom_admin_page_acess_as_curriculum_admin(self):
+    def test_classroom_admin_page_access_as_curriculum_admin(self):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -308,6 +308,8 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_duplicate_classroom_url_fragment_should_return_true(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        # The classroom with the names ‘math’ and ‘physics’ is already created
+        # in the setUp method of the test class.
 
         classroom_url_fragment_handler_url = '%s/%s' % (
             feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'math')
@@ -318,6 +320,8 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_non_duplicate_classroom_url_fragment_should_return_false(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        # The classroom with the names ‘math’ and ‘physics’ is already created
+        # in the setUp method of the test class.
 
         classroom_url_fragment_handler_url = '%s/%s' % (
             feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'chemistry')

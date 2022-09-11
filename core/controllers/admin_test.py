@@ -201,7 +201,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
         self.logout()
 
-    def test_cannot_classroom_data_in_production_mode(self):
+    def test_cannot_generate_classroom_data_in_production_mode(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 

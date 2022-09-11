@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the classroom component.
+ * @fileoverview Tests for the classroom admin component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';

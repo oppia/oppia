@@ -152,8 +152,8 @@ describe('Create new topic modal', () => {
     }));
 
   it(
-    'should not save new classroom if given classroom name matches with the ' +
-    'existing classroom name', fakeAsync(() => {
+    'should not be able to save new classroom if given classroom name ' +
+    'matches with the existing classroom name', fakeAsync(() => {
       spyOn(ngbActiveModal, 'close');
       spyOn(classroomBackendApiService, 'updateClassroomDataAsync')
         .and.returnValue(Promise.resolve());
