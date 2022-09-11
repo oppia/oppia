@@ -2523,7 +2523,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """Converts from version 51 to 52. Version 52 fixes all the backend
         validation checks for explorations errored data which are
         categorized as -
-            - Explorarion states
+            - Exploration states
             - Exploration interaction
             - Exploration RTE
 
@@ -2559,8 +2559,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         following -
             - If destination is `try again` and the value of labelled_as_correct
             is True, replaces it with False
-            - If refresher_exploration_id is not None for lesson, marks it as
-            None
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2577,17 +2575,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if answer_group['outcome']['dest'] == state_name:
                     answer_group['outcome']['labelled_as_correct'] = False
 
-                # refresher_exploration_id be None for all lessons.
-                answer_group['outcome']['refresher_exploration_id'] = None
-
             state_dict['interaction']['answer_groups'] = answer_groups
-
-            # refresher_exploration_id be None for all lessons(def outcome).
-            # TODO:Sean - Manual changes needs to be done.
-            default_outcome = state_dict['interaction']['default_outcome']
-            if default_outcome is not None:
-                state_dict['interaction']['default_outcome'][
-                    'refresher_exploration_id'] = None
 
         return states_dict
 
@@ -2615,9 +2603,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             choices_to_save: List[str]. The list of valid choices.
         """
-        # TODO: 8 curated exps reported where after removing the invalid
-        # choices the total will be less than 4, waiting on Sean's suggestion
-        # to decide what to do.
         empty_choices = []
         seen_choices = []
         choices_to_remove = []
@@ -2666,8 +2651,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
                 for invalid_rule in invalid_rules:
                     answer_group['rule_specs'].remove(invalid_rule)
-                # TODO: Removal of answer group can result in state
-                # disconnection, need audit.
+                if len(answer_group['rule_specs']) == 0:
+                    answer_groups.remove(answer_group)
 
         # Remove rules of MultipleChoice interaction whose choice
         # has been deleted.
@@ -2679,8 +2664,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
-            # TODO: Removal of rules/answer group will report in disconnection
-            # of State, 1 exp reported. Waiting on Sean's suggestion.
+            if len(answer_group['rule_specs']) == 0:
+                    answer_groups.remove(answer_group)
 
         return (choices, answer_groups)
 
@@ -2943,16 +2928,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _numeric_ans_group_should_not_be_subset(
-        cls, answer_groups: List[state_domain.AnswerGroup]
+        cls, answer_groups: List[state_domain.AnswerGroup],
+        content_ids_to_remove: List[str]
     ) -> List[state_domain.AnswerGroup]:
         """An answer group should not be a subset of another answer group in
         NumericInput interaction otherwise the later answer group will be
         redundant and will never be matched. Simply the invalid rule will be
         removed and if only one rule is present then the complete answer group
-        is removed
+        is removed. As this interaction is only for the numeric values, all
+        the values present inside the rule should not be string, the rule will
+        be considered as invalid
 
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The answer group.
+            content_ids_to_remove: List[str]. The list of content ids that
+                needs to be removed.
 
         Returns:
             List[state_domain.AnswerGroup]. The modified answer group.
@@ -3049,9 +3039,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
                 ranges.append(range_var)
 
-        # TODO: Waiting on response from Sean, whether to remove the
-        # invalid rules or not because at some places it resulted in
-        # state disconnection.
+        # Removing all the invalid rules.
+        empty_ans_groups = []
         for invalid_rule in invalid_rules:
             for answer_group in answer_groups:
                 for rule_spec in answer_group['rule_specs']:
@@ -3059,7 +3048,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         answer_group['rule_specs'].remove(rule_spec)
 
                 if len(answer_group['rule_specs']) == 0:
-                    answer_groups.remove(answer_group)
+                    empty_ans_groups.append(answer_group)
+
+        # Removing empty answer groups.
+        for empty_ans_group in empty_ans_groups:
+            content_ids_to_remove.append(
+                empty_ans_group['outcome']['feedback']['content_id'])
+            answer_groups.remove(empty_ans_group)
+
         return answer_groups
 
     @classmethod
@@ -3302,27 +3298,81 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if state_dict['interaction']['id'] == 'Continue':
                 text_value = state_dict['interaction'][
                     'customization_args']['buttonText']['value']['unicode_str']
-                # TODO: For other language codes, need to add the translated value.
                 if len(text_value) > 20:
                     if language_code == 'en':
                         state_dict['interaction']['customization_args'][
                             'buttonText']['value']['unicode_str'] = 'Continue'
 
+                    elif language_code == 'es':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continuar'
+
+                    elif language_code == 'nl':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Doorgaan'
+
+                    elif language_code == 'ru':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Продолжить'
+
+                    elif language_code == 'sr':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continue'
+
+                    elif language_code == 'bg':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continue'
+
+                    elif language_code == 'fr':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continuer'
+
+                    elif language_code == 'ca':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continua'
+
+                    elif language_code == 'hu':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Folytatás'
+
+                    elif language_code == 'zh':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = '继续'
+
+                    elif language_code == 'it':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continua'
+
+                    elif language_code == 'fi':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Jatka'
+
+                    elif language_code == 'pt':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continuar'
+
+                    elif language_code == 'de':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Fortfahren'
+
+                    elif language_code == 'ar':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'استمرار'
+
+                    elif language_code == 'cs':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continue'
+
+                    elif language_code == 'tr':
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'İlerle'
+
+                    else:
+                        state_dict['interaction']['customization_args'][
+                            'buttonText']['value']['unicode_str'] = 'Continue'
+
             # End Interaction.
             if state_dict['interaction']['id'] == 'EndExploration':
-                # Exp ids are required to verify if all the recommended
-                # explorations are valid or not.
-                exploration_rights = exp_models.ExplorationRightsModel.get_all(
-                    include_deleted=False)
-                all_exp_ids = [
-                    exp.id for exp in exploration_rights]
-
-                # All recommended explorations should be valid.
-                recc_exp_ids = state_dict['interaction'][
-                    'customization_args']['recommendedExplorationIds']['value']
-                valid_recc_exp_ids = [
-                    exp_id for exp_id in recc_exp_ids if exp_id in all_exp_ids]
-
                 # Should be at most 3 recommended explorations.
                 if len(valid_recc_exp_ids) > 3:
                     valid_recc_exp_ids = valid_recc_exp_ids[0:3]
@@ -3332,11 +3382,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             # NumericInput Interaction.
             if state_dict['interaction']['id'] == 'NumericInput':
+                content_ids_to_remove = []
                 answer_groups = state_dict['interaction']['answer_groups']
                 # Each answer group should not be a subset of any answer
                 # group that comes before it.
                 answer_groups = cls._numeric_ans_group_should_not_be_subset(
-                    answer_groups)
+                    answer_groups, content_ids_to_remove)
                 for answer_group in answer_groups:
                     for rule_spec in answer_group['rule_specs']:
                         # For x in [a-b, a+b], b must be a positive value.
@@ -3354,6 +3405,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                                 rule_spec['inputs']['a'], rule_spec[
                                     'inputs']['b'] = rule_spec['inputs'][
                                         'b'], rule_spec['inputs']['a']
+
+                # Content id removal from translations and voiceovers.
+                written_translations = state_dict['written_translations'][
+                    'translations_mapping']
+                recorded_voiceovers = state_dict['recorded_voiceovers'][
+                    'voiceovers_mapping']
+                for content_id_to_remove in content_ids_to_remove:
+                    try:
+                        del written_translations[content_id_to_remove]
+                        del recorded_voiceovers[content_id_to_remove]
+                    except Exception:
+                        pass
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
