@@ -25,6 +25,8 @@ import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { MatMenuModule} from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { JoyrideModule } from 'ngx-joyride';
+
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -95,6 +97,8 @@ import { StateTranslationComponent } from './translation-tab/state-translation/s
 import { StateTranslationStatusGraphComponent } from './translation-tab/state-translation-status-graph/state-translation-status-graph.component';
 import { TranslatorOverviewComponent } from './translation-tab/translator-overview/translator-overview.component';
 import { TranslationTabComponent } from './translation-tab/translation-tab.component';
+import { ExplorationEditorTabComponent } from './editor-tab/exploration-editor-tab.component';
+import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
 
 @NgModule({
   imports: [
@@ -110,6 +114,7 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     FormsModule,
     MatMenuModule,
     MatPaginatorModule,
+    JoyrideModule.forRoot(),
     RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -173,7 +178,9 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     StateTranslationComponent,
     StateTranslationStatusGraphComponent,
     TranslatorOverviewComponent,
-    TranslationTabComponent
+    TranslationTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationEditorPageComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -233,7 +240,9 @@ import { TranslationTabComponent } from './translation-tab/translation-tab.compo
     StateTranslationComponent,
     StateTranslationStatusGraphComponent,
     TranslatorOverviewComponent,
-    TranslationTabComponent
+    TranslationTabComponent,
+    ExplorationEditorTabComponent,
+    ExplorationEditorPageComponent
   ],
   providers: [
     {

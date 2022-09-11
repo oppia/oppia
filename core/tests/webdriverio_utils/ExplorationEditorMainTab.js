@@ -142,7 +142,7 @@ var ExplorationEditorMainTab = function() {
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    var skipButtons = await $$('.ng-joyride .skipBtn');
+    var skipButtons = await $$('.joyride-step__close');
     if (await skipButtons.length === 1) {
       await action.click('Skip button', skipButtons[0]);
     } else if (await skipButtons.length !== 0) {
@@ -180,7 +180,7 @@ var ExplorationEditorMainTab = function() {
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButtons = await $$('.ng-joyride .nextBtn');
+      var nextTutorialStageButtons = await $$('.joyride-step__next-container');
       await waitFor.elementToBeClickable(
         nextTutorialStageButtons[0],
         'Next Tutorial Stage button is not clickable');

@@ -62,6 +62,27 @@ export interface ExplorationBackendDict {
   'draft_change_list_id': number;
   'version'?: number;
   'edits_allowed'?: boolean;
+  'show_state_editor_tutorial_on_load'?: boolean;
+  'show_state_translation_tutorial_on_load'?: boolean;
+  'rights'?: {
+    'owner_names': string[];
+    'editor_names': string[];
+    'voice_artist_names': string[];
+    'viewer_names': string[];
+    'status': string;
+    'cloned_from': string;
+    'community_owned': boolean;
+    'viewable_if_private': boolean;
+  };
+  'email_preferences'?: {
+    'mute_feedback_notifications': boolean;
+    'mute_suggestion_notifications': boolean;
+  };
+  'exploration_is_linked_to_story'?: boolean;
+  'category'?: string;
+  'objective'?: string;
+  'tags'?: ParamChange[];
+  'user'?: string;
 }
 
 export class Exploration {

@@ -183,6 +183,7 @@
     "ng-infinite-scroll": "^1.3.0",
     "ngx-cookie": "^5.0.2",
     "ngx-infinite-scroll": "^10.0.1",
+    "ngx-joyride": "2.3.1",
     "ngx-mat-select-search": "^3.3.0",
     "ngx-toastr": "^13.2.1",
     "ngx-translate-cache": "^9.0.2",

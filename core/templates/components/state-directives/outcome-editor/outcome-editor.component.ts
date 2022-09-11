@@ -30,6 +30,7 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
 
 interface AddOutcomeModalResponse {
@@ -79,7 +80,8 @@ export class OutcomeEditorComponent implements OnInit {
     private stateInteractionIdService: StateInteractionIdService,
     private ngbModal: NgbModal,
     private changeDetectorRef: ChangeDetectorRef,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private explorationStatesService: ExplorationStatesService,
   ) {}
 
   isInQuestionMode(): boolean {

@@ -28,10 +28,10 @@ var ExplorationEditorTranslationTab = function() {
     '.e2e-test-translation-tab-dismiss-welcome-modal');
   var translationWelcomeModal = $('.e2e-test-translation-tab-welcome-modal');
   var buttonsSelector = function() {
-    return $$('.ng-joyride .skipBtn');
+    return $$('.joyride-step__close');
   };
   var nextTutorialStageButtonSelector = function() {
-    return $$('.ng-joyride .nextBtn');
+    return $$('.joyride-step__next-container');
   };
   var translationTabStartTutorialElement = $(
     '.e2e-test-translation-tab-start-tutorial');

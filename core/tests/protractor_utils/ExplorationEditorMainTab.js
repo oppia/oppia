@@ -155,9 +155,11 @@ var ExplorationEditorMainTab = function() {
     by.css('.e2e-test-state-name-submit'));
   var answerCorrectnessToggle = element(
     by.css('.e2e-test-editor-correctness-toggle'));
-  var skipButtons = element.all(by.css('.ng-joyride .skipBtn'));
+  // eslint-disable-next-line oppia/e2e-practices
+  var skipButtons = element.all(by.css('.joyride-step__close'));
   var nextTutorialStageButtons = element.all(
-    by.css('.ng-joyride .nextBtn'));
+    // eslint-disable-next-line oppia/e2e-practices
+    by.css('.joyride-step__next-container'));
   var startTutorialButton = element(
     by.css('.e2e-test-start-tutorial'));
   var submitSolutionButton = element(

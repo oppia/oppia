@@ -28,8 +28,8 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.e2e-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
     by.css('.e2e-test-translation-tab-welcome-modal'));
-  var buttons = element.all(by.css('.ng-joyride .skipBtn'));
-  var nextTutorialStageButton = element.all(by.css('.ng-joyride .nextBtn'));
+  var buttons = element.all(by.css('.joyride-step__close'));
+  var nextTutorialStageButton = element.all(by.css('.joyride-step__next-container'));
   var translationTabStartTutorialElement = element(by.css(
     '.e2e-test-translation-tab-start-tutorial'));
   var titleElement = element(by.css('.ng-joyride-title'));
