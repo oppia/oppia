@@ -5870,7 +5870,7 @@ export default {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "DEFAULT_SKILL_DIFFICULTY": 0.3,
+  "DEFAULT_SKILL_DIFFICULTY": 0.6,
 
   "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
 

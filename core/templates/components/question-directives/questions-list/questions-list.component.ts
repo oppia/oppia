@@ -46,6 +46,7 @@ import { QuestionsListService } from 'services/questions-list.service';
 import { QuestionValidationService } from 'services/question-validation.service';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { UtilsService } from 'services/utils.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { RemoveQuestionSkillLinkModalComponent } from '../modal-templates/remove-question-skill-link-modal.component';
@@ -81,10 +82,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   misconceptionIdsForSelectedSkill: number[];
   misconceptionsBySkill: MisconceptionSkillMap;
   newQuestionIsBeingCreated: boolean;
-  newQuestionSkillDifficulties: number[] | number;
+  newQuestionSkillDifficulties: number[];
   newQuestionSkillIds: string[];
   question: Question;
-  questionEditorIsShown: boolean;
   questionId: string;
   questionIsBeingSaved: boolean;
   questionIsBeingUpdated: boolean;
@@ -102,6 +102,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       EditableQuestionBackendApiService,
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
+    private loggerService: LoggerService,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
@@ -115,26 +116,38 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
   ) { }
 
-  initializeNewQuestionCreation(skillIds: string[]): void {
-    this.question =
-      this.questionObjectFactory.createDefaultQuestion(skillIds);
+  createQuestion(): void {
+    if (this.alertsService.warnings.length > 0) {
+      this.loggerService.error(
+        'Could not create new question due to warnings: ' +
+        this.alertsService.warnings[0].content);
+      return;
+    }
+
+    this.newQuestionSkillIds = [this.selectedSkillId];
+    this.associatedSkillSummaries = [];
+    this.linkedSkillsWithDifficulty = [
+      SkillDifficulty.create(
+        this.selectedSkillId, '', AppConstants.DEFAULT_SKILL_DIFFICULTY)];
+    this.newQuestionSkillDifficulties = this.linkedSkillsWithDifficulty.map(
+      linkedSkillWithDifficulty => linkedSkillWithDifficulty.getDifficulty()
+    );
+    this.focusManagerService.setFocus('difficultySelectionDiv');
+    this.showDifficultyChoices = true;
+    this.populateMisconceptions(this.newQuestionSkillIds);
+
+    this.imageLocalStorageService.flushStoredImagesData();
+    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.question = this.questionObjectFactory.createDefaultQuestion(
+      this.newQuestionSkillIds);
     this.questionId = this.question.getId();
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
-  }
+    this.editorIsOpen = true;
 
-  createQuestion(): void {
-    this.newQuestionSkillIds = [];
-    this.newQuestionSkillIds = [this.selectedSkillId];
-    this.linkedSkillsWithDifficulty = [];
-    this.newQuestionSkillIds.forEach((skillId) => {
-      this.linkedSkillsWithDifficulty.push(
-        SkillDifficulty.create(
-          skillId, '', null));
-    });
-    this.showDifficultyChoices = true;
-    this.initiateQuestionCreation();
+    this.skillLinkageModificationsArray = [];
+    this.isSkillDifficultyChanged = false;
   }
 
   updateSkillWithDifficulty(event: SkillDifficulty, index: number): void {
@@ -154,7 +167,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             linkedSkillWithDifficulty.getId())) {
             this.newQuestionSkillIds.push(
               linkedSkillWithDifficulty.getId());
-            (this.newQuestionSkillDifficulties as number[]).push(
+            this.newQuestionSkillDifficulties.push(
               linkedSkillWithDifficulty.getDifficulty());
           }
         });
@@ -167,35 +180,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           difficulty: linkedSkillWithDifficulty.getDifficulty()
         });
       });
-  }
-
-  initiateQuestionCreation(): void {
-    this.showDifficultyChoices = true;
-    this.newQuestionSkillIds = [];
-    this.associatedSkillSummaries = [];
-    this.newQuestionSkillDifficulties = [];
-    this.linkedSkillsWithDifficulty.forEach(
-      (linkedSkillWithDifficulty) => {
-        this.newQuestionSkillIds.push(
-          linkedSkillWithDifficulty.getId());
-        if (linkedSkillWithDifficulty.getDifficulty()) {
-          (this.newQuestionSkillDifficulties as number[]).push(
-            linkedSkillWithDifficulty.getDifficulty());
-        }
-        this.focusManagerService.setFocus('difficultySelectionDiv');
-      });
-
-    this.populateMisconceptions(this.newQuestionSkillIds);
-
-    if (this.alertsService.warnings.length === 0) {
-      this.imageLocalStorageService.flushStoredImagesData();
-      this.contextService.setImageSaveDestinationToLocalStorage();
-      this.initializeNewQuestionCreation(
-        this.newQuestionSkillIds);
-      this.editorIsOpen = true;
-    }
-    this.skillLinkageModificationsArray = [];
-    this.isSkillDifficultyChanged = false;
   }
 
   populateMisconceptions(skillIds: string[]): void {
@@ -353,7 +337,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       return Boolean(
         questionIdValid &&
         this.newQuestionSkillDifficulties &&
-        (this.newQuestionSkillDifficulties as number[]).length);
+        this.newQuestionSkillDifficulties.length);
     }
     return questionIdValid;
   }
@@ -475,8 +459,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       let imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.imageLocalStorageService.flushStoredImagesData();
       this.editableQuestionBackendApiService.createQuestionAsync(
-        this.newQuestionSkillIds, (
-          this.newQuestionSkillDifficulties as number[]),
+        this.newQuestionSkillIds, this.newQuestionSkillDifficulties,
         (this.question.toBackendDict(true)), imagesData
       ).then((response) => {
         if (this.skillLinkageModificationsArray &&
@@ -617,7 +600,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   _initTab(resetHistoryAndFetch: boolean): void {
-    this.questionEditorIsShown = false;
     this.question = null;
     this.questionIsBeingUpdated = false;
     this.misconceptionsBySkill = {};
