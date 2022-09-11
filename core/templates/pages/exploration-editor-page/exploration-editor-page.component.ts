@@ -147,13 +147,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       UserExplorationPermissionsService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-  ) {
-    window.addEventListener('hashchange', (value) => {
-      if (value.newURL.split('#')[1] !== '') {
-        // this.routerService._changeTab(value.newURL.split('#')[1]);
-      }
-    });
-  }
+  ) { }
 
   setDocumentTitle(): void {
     if (this.explorationTitleService.savedMemento) {
