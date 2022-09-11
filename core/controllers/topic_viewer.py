@@ -31,6 +31,9 @@ from core.domain import topic_fetchers
 class TopicViewerPage(base.BaseHandler):
     """Renders the topic viewer page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
         """Handles GET requests."""
