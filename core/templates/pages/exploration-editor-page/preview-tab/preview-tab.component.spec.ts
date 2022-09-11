@@ -117,7 +117,8 @@ describe('Preview Tab Component', () => {
                 paramChangeObjectFactory
                   .createEmpty(changeObjectName).toBackendDict()
               ],
-              states: [stateObjectFactory.createDefaultState(stateName)],
+              states: [stateObjectFactory.createDefaultState(
+                stateName, 'content_0', 'default_outcome_1')],
               init_state_name: stateName
             })
           }

@@ -532,7 +532,6 @@ describe('Exploration save service ' +
       solicit_answer_details: null,
       card_is_checkpoint: null,
       linked_skill_id: null,
-      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: '{{HtmlValue}}'
@@ -579,20 +578,13 @@ describe('Exploration save service ' +
           },
         },
         hints: [],
-      },
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
+      }
     },
     State: {
       classifier_model_id: null,
       solicit_answer_details: null,
       card_is_checkpoint: null,
       linked_skill_id: null,
-      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: 'content'
@@ -639,12 +631,6 @@ describe('Exploration save service ' +
           },
         },
         hints: []
-      },
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-        }
       }
     },
     State2: {
@@ -652,7 +638,6 @@ describe('Exploration save service ' +
       solicit_answer_details: null,
       card_is_checkpoint: null,
       linked_skill_id: null,
-      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: 'content'
@@ -699,12 +684,6 @@ describe('Exploration save service ' +
           },
         },
         hints: []
-      },
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-        }
       }
     },
     State3: {
@@ -712,7 +691,6 @@ describe('Exploration save service ' +
       solicit_answer_details: null,
       card_is_checkpoint: null,
       linked_skill_id: null,
-      next_content_id_index: null,
       content: {
         content_id: 'content',
         html: 'content'
@@ -759,12 +737,6 @@ describe('Exploration save service ' +
           },
         },
         hints: []
-      },
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-        }
       }
     }
   };

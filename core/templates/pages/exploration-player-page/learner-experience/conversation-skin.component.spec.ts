@@ -160,7 +160,7 @@ describe('Conversation skin component', () => {
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
       [], [], null, null, [], '', null),
-    [], null, null, '', null);
+    [], null, '', null);
 
   let explorationDict = {
     states: {
@@ -176,15 +176,6 @@ describe('Conversation skin component', () => {
           }
         },
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            ca_placeholder_0: {},
-            feedback_1: {},
-            rule_input_2: {},
-            content: {},
-            default_outcome: {}
-          }
-        },
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -246,7 +237,6 @@ describe('Conversation skin component', () => {
           }
         },
         param_changes: [],
-        next_content_id_index: 3,
         card_is_checkpoint: true,
         linked_skill_id: null,
         content: {
@@ -262,11 +252,6 @@ describe('Conversation skin component', () => {
           }
         },
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {}
-          }
-        },
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -281,7 +266,6 @@ describe('Conversation skin component', () => {
           default_outcome: null
         },
         param_changes: [],
-        next_content_id_index: 0,
         card_is_checkpoint: false,
         linked_skill_id: null,
         content: {
@@ -301,15 +285,6 @@ describe('Conversation skin component', () => {
           }
         },
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            ca_placeholder_0: {},
-            feedback_1: {},
-            rule_input_2: {},
-            content: {},
-            default_outcome: {}
-          }
-        },
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -371,7 +346,6 @@ describe('Conversation skin component', () => {
           }
         },
         param_changes: [],
-        next_content_id_index: 3,
         card_is_checkpoint: false,
         linked_skill_id: null,
         content: {
@@ -664,7 +638,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
     componentInstance.isLoggedIn = false;
     componentInstance.hasInteractedAtLeastOnce = true;
     componentInstance.displayedCard = displayedCard;
@@ -763,7 +737,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.hasInteractedAtLeastOnce = true;
@@ -856,7 +830,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
     componentInstance.isLoggedIn = false;
     componentInstance.isIframed = false;
     componentInstance.hasInteractedAtLeastOnce = true;
@@ -949,7 +923,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.hasInteractedAtLeastOnce = true;
@@ -1188,7 +1162,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, null, '', null);
+        [], null, '', null);
       componentInstance.isLoggedIn = true;
       spyOn(componentInstance, 'isSupplementalCardNonempty')
         .and.returnValues(false, true, true, false);
@@ -1295,7 +1269,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
 
     expect(componentInstance.isOnTerminalCard()).toBeTrue();
   });
@@ -1429,14 +1403,14 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'Continue', null),
-      [], null, null, '', null);
+      [], null, '', null);
 
     expect(componentInstance.isLearnAgainButton()).toBeFalse();
 
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'ImageClickInput', null),
-      [], null, null, '', null);
+      [], null, '', null);
 
     componentInstance.pendingCardWasSeenBefore = true;
     componentInstance.answerIsCorrect = false;
@@ -1544,7 +1518,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'NumberWithUnits', null),
-      [], null, null, '', null);
+      [], null, '', null);
     spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValues(
       false, true);
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript')
@@ -1613,7 +1587,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
     componentInstance.isLoggedIn = true;
     spyOn(componentInstance, 'isSupplementalCardNonempty')
       .and.returnValues(false, true, true, false);
@@ -1708,7 +1682,7 @@ describe('Conversation skin component', () => {
     let stateCard = new StateCard(
       'stateName', null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, null, '', null);
+      [], null, '', null);
     stateCard.markAsCompleted();
     componentInstance.displayedCard = stateCard;
     componentInstance.nextCard = stateCard;
@@ -1817,7 +1791,7 @@ describe('Conversation skin component', () => {
       let stateCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, null, '', null);
+        [], null, '', null);
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', '', false, '', true,
         false, true, '');
@@ -1836,7 +1810,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'ImageClickInput', null),
-        [], null, null, '', null);
+        [], null, '', null);
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', 'skill_id', true,
         '', true, false, false, '');
@@ -1923,7 +1897,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, null, '', null);
+        [], null, '', null);
 
       componentInstance.nextCard = displayedCard;
       componentInstance.showPendingCard();
@@ -1950,7 +1924,7 @@ describe('Conversation skin component', () => {
     () => {
       let mockStateCard = new StateCard(
         'Temp2', '', '', new Interaction([], [], null, null, [], null, null)
-        , [], null, null, '', null);
+        , [], null, '', null);
       componentInstance.displayedCard = mockStateCard;
       componentInstance.prevSessionStatesProgress = ['Temp1', 'Temp2'];
       expect(componentInstance.isDisplayedCardCompletedInPrevSession()).

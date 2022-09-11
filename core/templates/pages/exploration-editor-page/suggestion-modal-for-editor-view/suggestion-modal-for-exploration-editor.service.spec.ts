@@ -131,15 +131,7 @@ describe('Suggestion Modal For Exploration Editor', () => {
       hints: []
     },
     param_changes: [],
-    solicit_answer_details: false,
-    written_translations: {
-      translations_mapping: {
-        content: {},
-        default_outcome: {},
-        feedback_1: {},
-        feedback_2: {}
-      }
-    }
+    solicit_answer_details: false
   };
 
   beforeEach(angular.mock.module('oppia', function($provide) {

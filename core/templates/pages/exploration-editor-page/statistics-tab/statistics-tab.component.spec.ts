@@ -111,15 +111,11 @@ describe('Statistics Tab Component', function() {
       }
     },
     linked_skill_id: null,
-    next_content_id_index: 0,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {}
     },
-    solicit_answer_details: true,
-    written_translations: {
-      translations_mapping: {}
-    }
+    solicit_answer_details: true
   };
 
   beforeEach(angular.mock.module('oppia'));

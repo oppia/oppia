@@ -147,10 +147,7 @@ describe('Exploration editor page component', function() {
         },
         recorded_voiceovers: {
           voiceovers_mapping: {}
-        },
-        written_translations: {
-          translations_mapping: {}
-        },
+        }
       },
       Final: {
         param_changes: [],
@@ -177,10 +174,7 @@ describe('Exploration editor page component', function() {
         },
         recorded_voiceovers: {
           voiceovers_mapping: {}
-        },
-        written_translations: {
-          translations_mapping: {}
-        },
+        }
       }
     },
     title: 'Exploration Title',

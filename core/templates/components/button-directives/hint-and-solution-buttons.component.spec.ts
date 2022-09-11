@@ -144,7 +144,6 @@ describe('HintAndSolutionButtonsComponent', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
   });
 
@@ -172,7 +171,6 @@ describe('HintAndSolutionButtonsComponent', () => {
     let oldCard: StateCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null, RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
@@ -264,7 +262,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         hints: [],
         solution: null,
       }), RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content',
+      'content',
       audioTranslationLanguageService);
 
     expect(component.isHintButtonVisible(0)).toBe(false);

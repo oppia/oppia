@@ -255,10 +255,7 @@ describe('Question Suggestion Editor Modal Component', () => {
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {}
-        },
-        written_translations: {
-          translations_mapping: {}
-        },
+        }
       },
       inapplicable_skill_misconception_ids: ['1-2']
     });

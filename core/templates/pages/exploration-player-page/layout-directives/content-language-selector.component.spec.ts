@@ -133,7 +133,6 @@ describe('Content language selector component', () => {
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(imagePreloaderService, 'restartImagePreloader');
@@ -155,7 +154,6 @@ describe('Content language selector component', () => {
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     card.addInputResponsePair({
       learnerInput: '',

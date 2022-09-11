@@ -98,9 +98,6 @@ describe('Editable question backend API service', function() {
           },
           param_changes: [],
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {}
-          },
         },
         language_code: 'en',
         version: 1

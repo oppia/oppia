@@ -106,15 +106,7 @@ describe('Extracting Image file names in the state service', () => {
             hints: []
           },
           linked_skill_id: null,
-          next_content_id_index: 1,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_buttonText_0: {},
-              default_outcome: {}
-            }
-          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -144,14 +136,7 @@ describe('Extracting Image file names in the state service', () => {
             hints: []
           },
           linked_skill_id: null,
-          next_content_id_index: 0,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -250,18 +235,7 @@ describe('Extracting Image file names in the state service', () => {
             solution: null
           },
           linked_skill_id: null,
-          next_content_id_index: 5,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_choices_3: {},
-              ca_choices_4: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
-            }
-          },
           card_is_checkpoint: false
         },
         'State 4': {
@@ -377,18 +351,7 @@ describe('Extracting Image file names in the state service', () => {
             ]
           },
           linked_skill_id: null,
-          next_content_id_index: 5,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_choices_3: {},
-              ca_choices_4: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
-            }
-          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -594,20 +557,8 @@ describe('Extracting Image file names in the state service', () => {
             solution: null
           },
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              feedback_3: {},
-              feedback_4: {},
-              feedback_5: {}
-            }
-          },
           linked_skill_id: null,
           card_is_checkpoint: false,
-          next_content_id_index: 0
         },
         'State 6': {
           param_changes: [],
@@ -721,19 +672,7 @@ describe('Extracting Image file names in the state service', () => {
             },
           },
           linked_skill_id: null,
-          next_content_id_index: 4,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_placeholder_3: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              hint_1: {},
-              solution: {}
-            }
-          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -857,18 +796,7 @@ describe('Extracting Image file names in the state service', () => {
               }
             ]
           },
-          next_content_id_index: 5,
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              ca_choices_3: {},
-              ca_choices_4: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
-            }
-          },
           classifier_model_id: null,
           card_is_checkpoint: false,
           linked_skill_id: null

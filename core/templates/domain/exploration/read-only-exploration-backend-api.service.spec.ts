@@ -33,12 +33,14 @@ describe('Read only exploration backend API service', () => {
     is_logged_in: true,
     session_id: 'KERH',
     draft_change_list_id: 0,
+    displayable_language_codes: [],
     exploration: {
       init_state_name: 'Introduction',
       param_changes: [],
       param_specs: {},
       title: 'Exploration',
       language_code: 'en',
+      next_content_id_index: 5,
       correctness_feedback_enabled: true,
       objective: 'To learn',
       states: {
@@ -59,19 +61,7 @@ describe('Read only exploration backend API service', () => {
           },
           solicit_answer_details: true,
           card_is_checkpoint: true,
-          written_translations: {
-            translations_mapping: {
-              content: {
-                en: {
-                  data_format: '',
-                  needs_update: false,
-                  translation: ''
-                }
-              }
-            }
-          },
           linked_skill_id: null,
-          next_content_id_index: 0,
           content: {
             html: '',
             content_id: 'content'
@@ -314,7 +304,8 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false
+        correctness_feedback_enabled: false,
+        next_content_id_index: 1
       },
       exploration_metadata: {
         title: '',
@@ -339,6 +330,7 @@ describe('Read only exploration backend API service', () => {
       preferred_audio_language_code: 'en',
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
+      displayable_language_codes: [],
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       preferred_language_codes: [],
@@ -417,7 +409,8 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false
+        correctness_feedback_enabled: false,
+        next_content_id_index: 1
       },
       exploration_metadata: {
         title: '',
@@ -449,7 +442,8 @@ describe('Read only exploration backend API service', () => {
       furthest_reached_checkpoint_exp_version: 1,
       furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
-      most_recently_reached_checkpoint_exp_version: 1
+      most_recently_reached_checkpoint_exp_version: 1,
+      displayable_language_codes: []
     });
     expect(roebas.isCached('0')).toBe(true);
 

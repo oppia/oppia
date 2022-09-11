@@ -114,20 +114,10 @@ describe('Exploration Player State Service', () => {
     question_state_data: {
       classifier_model_id: null,
       param_changes: [],
-      next_content_id_index: 1,
       solicit_answer_details: false,
       content: {
         content_id: '1',
         html: 'Question 1'
-      },
-      written_translations: {
-        translations_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
       },
       interaction: {
         answer_groups: [{

@@ -31,7 +31,6 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplayHintModalComponent } from './display-hint-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
@@ -96,7 +95,7 @@ describe('Display hint modal', () => {
     let hint = new SubtitledHtml('html', contentId);
     let displayedCard = new StateCard(
       'test_name', 'content', 'interaction', {} as Interaction, [],
-      recordedVoiceovers, {} as WrittenTranslations, contentId,
+      recordedVoiceovers, contentId,
       {} as AudioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'displayHint').and.returnValue(hint);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
@@ -129,7 +128,7 @@ describe('Display hint modal', () => {
     let hint = new SubtitledHtml('html', null);
     let displayedCard = new StateCard(
       'test_name', 'content', 'interaction', {} as Interaction, [],
-      recordedVoiceovers, {} as WrittenTranslations, contentId,
+      recordedVoiceovers, contentId,
       {} as AudioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'displayHint').and.returnValue(hint);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);

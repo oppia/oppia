@@ -17,7 +17,6 @@
  */
 
 export interface TranslatableItemBackendDict {
-  'content_id': string;
   'content_value': string | string[];
   'content_format': string;
   'content_type': string;
@@ -27,7 +26,6 @@ export interface TranslatableItemBackendDict {
 
 export class TranslatableItem {
   constructor(
-    readonly contentId: string,
     readonly content: string | string[],
     readonly dataFormat: string,
     readonly contentType: string,
@@ -38,7 +36,6 @@ export class TranslatableItem {
   static createFromBackendDict(
       backendDict: TranslatableItemBackendDict): TranslatableItem {
     return new TranslatableItem(
-      backendDict.content_id,
       backendDict.content_value,
       backendDict.content_format,
       backendDict.content_type,

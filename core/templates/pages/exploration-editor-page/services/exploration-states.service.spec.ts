@@ -140,19 +140,10 @@ describe('ExplorationStatesService', () => {
         },
         linked_skill_id: null,
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            rule_input: {}
-          },
-        },
         classifier_model_id: '0',
         card_is_checkpoint: false,
-        next_content_id_index: 1
       },
-    });
+    }, false);
   });
 
   describe('Callback Registration', () => {

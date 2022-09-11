@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { HintBackendDict } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -204,22 +204,8 @@ describe('State Solution Editor Component', () => {
 
   it('should return the number of displayed hints', () => {
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0'))
     ];
 
     expect(component.displayedHintsLength()).toBe(2);

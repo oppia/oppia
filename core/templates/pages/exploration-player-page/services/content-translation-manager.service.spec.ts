@@ -200,7 +200,6 @@ describe('Content translation manager service', () => {
         ),
         interaction,
         RecordedVoiceovers.createEmpty(),
-        writtenTranslations,
         'content',
         atls
       )
@@ -322,8 +321,7 @@ describe('Content translation manager service', () => {
       }
     });
     let content = new SubtitledHtml('<p>en content</p>', 'content');
-    let translatedHtml = ctms.getTranslatedHtml(
-      writtenTranslations, 'fr', content);
+    let translatedHtml = ctms.getTranslatedHtml('fr', content);
     expect(translatedHtml).toEqual('<p>en content</p>');
   });
 
@@ -341,10 +339,10 @@ describe('Content translation manager service', () => {
     });
     let content = new SubtitledHtml('<p>en content</p>', null);
     expect(() => {
-      ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
+      ctms.getTranslatedHtml('fr', content);
     }).toThrowError('Content ID does not exist');
     expect(() => {
-      ctms._swapContent(writtenTranslations, 'fr', content);
+      ctms._swapContent('fr', content);
     }).toThrowError('Content ID does not exist');
   });
 
@@ -379,47 +377,11 @@ describe('Content translation manager service', () => {
       }
     });
     let content = new SubtitledHtml('<p>en content</p>', 'content');
-    let translatedHtml = ctms.getTranslatedHtml(
-      writtenTranslations, 'fr', content);
+    let translatedHtml = ctms.getTranslatedHtml('fr', content);
     expect(translatedHtml).toEqual('<p>fr content</p>');
   });
 
   it('should not switch rules if the replacement is empty', () => {
-    // This simulates the invalid case where the "fr" translation for the rule
-    // input is an empty list.
-    let newWrittenTranslations = wtof.createFromBackendDict({
-      translations_mapping: {
-        content: {
-          fr: {
-            data_format: 'html',
-            translation: '<p>fr content</p>',
-            needs_update: false
-          }
-        },
-        ca_placeholder_0: {
-          fr: {
-            data_format: 'html',
-            translation: 'fr placeholder',
-            needs_update: false
-          }
-        },
-        outcome_1: {
-          fr: {
-            data_format: 'html',
-            translation: '<p>fr feedback</p>',
-            needs_update: false
-          }
-        },
-        rule_input_3: {
-          fr: {
-            data_format: 'set_of_normalized_string',
-            translation: [],
-            needs_update: false
-          }
-        }
-      }
-    });
-
     let newInteractionDict = {
       answer_groups: [{
         rule_specs: [{
@@ -476,7 +438,6 @@ describe('Content translation manager service', () => {
           null),
         newInteraction,
         RecordedVoiceovers.createEmpty(),
-        newWrittenTranslations,
         'content',
         atls
       )

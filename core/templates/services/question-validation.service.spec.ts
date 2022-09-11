@@ -130,15 +130,6 @@ describe('Question Validation Service', () => {
             content_5: {}
           }
         },
-        written_translations: {
-          translations_mapping: {
-            content_1: {},
-            content_2: {},
-            content_3: {},
-            content_4: {},
-            content_5: {}
-          }
-        },
         solicit_answer_details: false
       },
       language_code: 'en',

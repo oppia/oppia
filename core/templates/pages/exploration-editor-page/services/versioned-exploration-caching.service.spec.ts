@@ -44,11 +44,7 @@ describe('Versioned exploration caching service', () => {
           },
           solicit_answer_details: true,
           card_is_checkpoint: true,
-          written_translations: {
-            translations_mapping: {}
-          },
           linked_skill_id: null,
-          next_content_id_index: 0,
           content: {
             html: '',
             content_id: 'content'

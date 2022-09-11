@@ -232,7 +232,6 @@ describe('Exploration editor tab component', function() {
           hints: []
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         recorded_voiceovers: {
@@ -245,18 +244,6 @@ describe('Exploration editor tab component', function() {
                 file_size_bytes: 120000,
                 needs_update: false,
                 duration_secs: 1.2
-              }
-            }
-          }
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {
-              en: {
-                html: 'This is a html',
-                needs_update: false
               }
             }
           }
@@ -312,18 +299,10 @@ describe('Exploration editor tab component', function() {
           hints: []
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
+        solicit_answer_details: false
       }
-    });
+    }, false);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationEditorTab', {

@@ -142,7 +142,7 @@ export class PreviewTabComponent
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
         explorationId).then((returnDict) => {
         this.explorationEngineService.init(
-          returnDict, null, null, null, null,
+          returnDict, null, null, null, null, [],
           () => {
             this.loadPreviewState(initStateNameForPreview, []);
           });

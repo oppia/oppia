@@ -143,7 +143,6 @@ describe('InputResponsePairComponent', () => {
           }
         }),
         RecordedVoiceovers.createEmpty(),
-        writtenTranslationsObjectFactory.createEmpty(),
         'content', audioTranslationLanguageService
       ));
   });

@@ -138,15 +138,12 @@ describe('Current Interaction Service', () => {
   it('should throw error on submitting when submitAnswerFn is null', () => {
     let interaction = new Interaction([], [], {}, null, [], null, null);
     let recordedVoiceovers = new RecordedVoiceovers({});
-    let writtenTranslations = new WrittenTranslations(
-      {}, new WrittenTranslationObjectFactory());
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       StateCard.createNewCard(
         'First State', 'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
-        interaction, recordedVoiceovers, writtenTranslations, '',
-        audioTranslationLanguageService));
+        interaction, recordedVoiceovers, '', audioTranslationLanguageService));
     spyOn(contextService, 'getExplorationId').and.returnValue('abc');
     spyOn(contextService, 'getPageContext').and.returnValue('learner');
 

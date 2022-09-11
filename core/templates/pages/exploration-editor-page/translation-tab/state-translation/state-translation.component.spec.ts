@@ -182,25 +182,10 @@ describe('State translation component', function() {
         }]
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
         voiceovers_mapping: {}
-      },
-      written_translations: {
-        translations_mapping: {
-          content_1: {
-            en: {
-              data_format: 'html',
-              translation: 'Translation',
-              needs_update: false
-            }
-          },
-          ca_placeholder: {},
-          rule_input_4: {},
-          rule_input_5: {}
-        }
       }
     }
   };
@@ -253,7 +238,6 @@ describe('State translation component', function() {
         }]
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
@@ -307,7 +291,6 @@ describe('State translation component', function() {
         }]
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
@@ -338,7 +321,6 @@ describe('State translation component', function() {
         hints: []
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       recorded_voiceovers: {
@@ -459,7 +441,7 @@ describe('State translation component', function() {
         .returnValue(true);
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
-      explorationStatesService.init(explorationState1);
+      explorationStatesService.init(explorationState1, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -793,7 +775,7 @@ describe('State translation component', function() {
         'Introduction');
       spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
         .returnValue(showTranslationTabBusyModalEmitter);
-      explorationStatesService.init(explorationState1);
+      explorationStatesService.init(explorationState1, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1012,14 +994,13 @@ describe('State translation component', function() {
             }]
           },
           linked_skill_id: null,
-          next_content_id_index: 0,
           param_changes: [],
           solicit_answer_details: false,
           recorded_voiceovers: {
             voiceovers_mapping: {}
           }
         }
-      });
+      }, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1059,7 +1040,7 @@ describe('State translation component', function() {
 
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
-      explorationStatesService.init(explorationState2);
+      explorationStatesService.init(explorationState2, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1102,7 +1083,7 @@ describe('State translation component', function() {
 
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
-      explorationStatesService.init(explorationState3);
+      explorationStatesService.init(explorationState3, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
@@ -1172,7 +1153,7 @@ describe('State translation component', function() {
           }
         }
       });
-      explorationStatesService.init(explorationState4);
+      explorationStatesService.init(explorationState4, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           {
@@ -1245,7 +1226,7 @@ describe('State translation component', function() {
       entityTranslationsService.entityTranslation = {
         getWrittenTranslation: () => {}
       };
-      explorationStatesService.init(explorationState2);
+      explorationStatesService.init(explorationState2, false);
       stateRecordedVoiceoversService.init(
         'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));

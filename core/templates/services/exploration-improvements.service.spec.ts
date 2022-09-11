@@ -202,7 +202,7 @@ describe('Exploration Improvements Service', () => {
       new Map()));
 
     explorationImprovementsService.ngOnInit();
-    explorationStatesService.init(statesBackendDict);
+    explorationStatesService.init(statesBackendDict, false);
   });
 
   it('should enable improvements tab based on back-end response',

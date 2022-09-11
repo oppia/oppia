@@ -200,18 +200,15 @@ describe('Questions List Component', () => {
         recorded_voiceovers: {
           voiceovers_mapping: {}
         },
-        written_translations: {
-          translations_mapping: {}
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: null,
       },
       inapplicable_skill_misconception_ids: null,
       language_code: 'en',
       linked_skill_ids: [],
+      next_content_id_index: 5,
       question_state_data_schema_version: 44,
       version: 45
     });

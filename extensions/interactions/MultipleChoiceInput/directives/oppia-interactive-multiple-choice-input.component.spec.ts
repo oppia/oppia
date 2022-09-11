@@ -24,7 +24,6 @@ import { InteractiveMultipleChoiceInputComponent } from './oppia-interactive-mul
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -88,12 +87,11 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
     let contentId: string = 'content_id';
     let interaction = {} as Interaction;
-    let writtenTranslations = {} as WrittenTranslations;
     let recordedVoiceovers = new RecordedVoiceovers({});
     let audioTranslation = {} as AudioTranslationLanguageService;
     displayedCard = new StateCard(
       'test_name', 'content', 'interaction', interaction, [],
-      recordedVoiceovers, writtenTranslations, contentId, audioTranslation);
+      recordedVoiceovers, contentId, audioTranslation);
 
 
     component.choicesWithValue = '[' +

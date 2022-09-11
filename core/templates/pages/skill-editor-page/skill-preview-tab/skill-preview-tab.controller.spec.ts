@@ -133,11 +133,6 @@ describe('Skill preview tab', function() {
           content_1: {}
         }
       },
-      written_translations: {
-        translations_mapping: {
-          content_1: {}
-        }
-      },
       solicit_answer_details: false
     },
     language_code: 'en',

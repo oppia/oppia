@@ -154,17 +154,8 @@ describe('Learner answer info service', () =>{
       param_changes: [],
       solicit_answer_details: true,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
-        }
-      },
       linked_skill_id: null,
       classifier_model_id: '',
-      next_content_id_index: null
     };
 
     sof = TestBed.get(StateObjectFactory);

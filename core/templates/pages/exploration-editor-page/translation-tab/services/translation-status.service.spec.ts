@@ -274,11 +274,6 @@ describe('Translation status service', () => {
           html: 'Congratulations, you have finished!',
           content_id: 'content'
         },
-        written_translations: {
-          translations_mapping: {
-            content: {}
-          }
-        },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {

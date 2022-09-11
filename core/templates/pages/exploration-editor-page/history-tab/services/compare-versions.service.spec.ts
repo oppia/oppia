@@ -93,13 +93,7 @@ describe('Compare versions service', () => {
           hints: []
         },
         param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
+        solicit_answer_details: false
       };
       newStateData.interaction.answer_groups =
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {
@@ -193,7 +187,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 5,
     committer_id: 'admin',
@@ -233,7 +229,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 8,
     committer_id: 'admin',
@@ -253,7 +251,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 10,
     committer_id: 'admin',

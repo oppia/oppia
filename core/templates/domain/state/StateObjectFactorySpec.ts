@@ -135,18 +135,9 @@ describe('State Object Factory', () => {
         id: 'TextInput'
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
-      card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {}
-        }
-      }
+      card_is_checkpoint: false
     };
   });
 
@@ -179,7 +170,8 @@ describe('State Object Factory', () => {
 
   it('should create a default state object', () => {
     const stateName = 'Default state';
-    const stateObjectDefault = sof.createDefaultState(stateName);
+    const stateObjectDefault = sof.createDefaultState(
+      stateName, 'content_0', 'default_outcome_1');
 
     const outcome = (
       stateObject.interaction.default_outcome as DefaultOutcome);
@@ -205,26 +197,5 @@ describe('State Object Factory', () => {
 
     expect(stateObjectDefault).toEqual(otherState);
     expect(stateObjectDefault.name).toEqual('Other state');
-  });
-
-  it('should correctly get required written translation content ids', () => {
-    const state = sof.createFromBackendDict('State name', stateObject);
-    state.interaction.id = null;
-    expect(
-      state.getRequiredWrittenTranslationContentIds()
-    ).toEqual(new Set(['content', 'rule_input_2']));
-
-    state.writtenTranslations.addContentId('feedback_1');
-    state.writtenTranslations.addWrittenTranslation(
-      'feedback_1', 'fr', 'html', '<p>Translation</p>');
-    expect(
-      state.getRequiredWrittenTranslationContentIds()
-    ).toEqual(new Set(['content', 'rule_input_2', 'feedback_1']));
-
-    state.interaction.id = 'TextInput';
-    expect(
-      state.getRequiredWrittenTranslationContentIds()
-    ).toEqual(new Set([
-      'content', 'rule_input_2', 'feedback_1', 'hint_1', 'default_outcome']));
   });
 });

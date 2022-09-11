@@ -57,6 +57,7 @@ describe('Image preloader service', () => {
     language_code: 'en',
     title: 'My Title',
     draft_change_list_id: 0,
+    next_content_id_index: 5,
     init_state_name: initStateName,
     states: {
       'State 1': {
@@ -100,15 +101,8 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
       },
       'State 3': {
         param_changes: [],
@@ -136,14 +130,8 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
       },
       [initStateName]: {
         classifier_model_id: null,
@@ -243,16 +231,7 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: true,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          }
-        },
         linked_skill_id: null,
-        next_content_id_index: null,
       },
       'State 6': {
         param_changes: [],
@@ -352,18 +331,8 @@ describe('Image preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-            hint_1: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: null,
       }
     },
     param_specs: {},
@@ -413,7 +382,7 @@ describe('Image preloader service', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
     spyOn(ctms, 'getTranslatedHtml').and.callFake(
-      (unusedWrittenTranslations, unusedLanguageCode, content) => {
+      (unusedLanguageCode, content) => {
         return content.html;
       });
 
