@@ -344,7 +344,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'state 1',
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, self.target_id, change_list, 'Add state.')
 
         new_suggestion_content = state_domain.SubtitledHtml(
@@ -870,7 +870,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
+        exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -881,7 +881,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'html': '<p>old content html</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -983,6 +983,94 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'solution'],
             new_solution_dict)
 
+    def test_wrong_suggestion_raise_error_while_updating_translation_suggestion(
+        self
+    ) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected SuggestionTranslateContent suggestion'
+            ' but found: SuggestionAddQuestion.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id, 'test_translation'
+            )
+
+    def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
+        self
+    ) -> None:
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['state 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state 1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>old content html</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'state 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exploration1', self.target_version_at_submission,
+            self.author_id, add_translation_change_dict, 'test description')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected SuggestionAddQuestion suggestion but '
+            'found: SuggestionTranslateContent.'
+        ):
+            suggestion_services.update_question_suggestion(
+                suggestion.suggestion_id,
+                0.1,
+                exploration.states['state 1'].to_dict()
+            )
+
     def test_update_question_suggestion_to_change_skill_difficulty(
         self
     ) -> None:
@@ -1039,7 +1127,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
-        exploration.states['state 1'].update_content(  # type: ignore[no-untyped-call]
+        exploration.states['state 1'].update_content(
             state_domain.SubtitledHtml.from_dict(old_content))
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1050,7 +1138,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'html': '<p>old content html</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.author_id, exploration.id, change_list, '')
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -1074,7 +1162,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.accept_suggestion(
             suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
         )
-        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(  # type: ignore[no-untyped-call]
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             'exploration1')
 
         self.assertEqual(
@@ -1941,7 +2029,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'new_value': recorded_voiceovers_dict,
         })
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.editor_id, exploration.id,
             [content_change, recorded_voiceovers_change], '')
 
@@ -1974,7 +2062,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             description='Description', notes='Notes')
 
         # Adds the story to the topic.
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
 
         # Adds the exploration to the story.
@@ -2169,7 +2257,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.author_id, suggestion_change, 'test description')
         self.assert_created_suggestion_is_valid(skill_id, self.author_id)
 
-        skill_services.delete_skill(self.author_id, skill_id)  # type: ignore[no-untyped-call]
+        skill_services.delete_skill(self.author_id, skill_id)
 
         # Suggestion should be rejected after corresponding skill is deleted.
         suggestions = suggestion_services.query_suggestions(
@@ -2183,7 +2271,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.EXP_ID, self.author_id)
         self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
 
-        topic_services.delete_topic(self.author_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
+        topic_services.delete_topic(self.author_id, self.TOPIC_ID)
 
         # Suggestion should be rejected after the topic is deleted.
         suggestions = suggestion_services.query_suggestions(
@@ -2263,9 +2351,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Delete the exploration state corresponding to the translation
         # suggestion.
         init_state = exploration.states[exploration.init_state_name]
-        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        outcome_object = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert outcome_object is not None
+        default_outcome_dict = outcome_object.to_dict()
         default_outcome_dict['dest'] = 'End State'
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

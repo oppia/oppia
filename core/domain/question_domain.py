@@ -37,8 +37,8 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Any, Dict, List, Optional, Set
-from typing_extensions import Final, TypedDict
+from typing import Dict, List, Optional, Set, Union
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -124,6 +124,78 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
+class CreateNewQuestionCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class UpdateQuestionPropertyQuestionStateDataCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_QUESTION_STATE_DATA as allowed value.
+    """
+
+    property_name: Literal['question_state_data']
+    new_value: state_domain.StateDict
+    old_value: state_domain.StateDict
+
+
+class UpdateQuestionPropertyLanguageCodeCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class UpdateQuestionPropertyLinkedSkillIdsCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_LINKED_SKILL_IDS as allowed value.
+    """
+
+    property_name: Literal['linked_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateQuestionPropertySkillMisconceptionIdsCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
+    as allowed value.
+    """
+
+    property_name: Literal['inapplicable_skill_misconception_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class CreateNewFullySpecifiedQuestionCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
+    """
+
+    question_dict: QuestionDict
+    skill_id: str
+    topic_name: str
+
+
+class MigrateStateSchemaToLatestVersion(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
 class QuestionSuggestionChange(change_domain.BaseChange):
     """Domain object for changes made to question suggestion object.
 
@@ -143,6 +215,16 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'deprecated_values': {}
         }
     ]
+
+
+class CreateNewFullySpecifiedQuestionSuggestionCmd(QuestionSuggestionChange):
+    """Class representing the QuestionSuggestionChange's
+    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
+    """
+
+    question_dict: QuestionDict
+    skill_id: str
+    skill_difficulty: float
 
 
 class QuestionDict(TypedDict):
@@ -430,7 +512,7 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        question_state_dict = state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
+        question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.add_math_content_to_math_rte_components,
             state_uses_old_interaction_cust_args_schema=True,
@@ -557,6 +639,15 @@ class Question(translation_domain.BaseTranslatableObject):
                 question_state_dict['interaction']['answer_groups'] = (
                     new_answer_groups)
                 if question_state_dict['interaction']['solution'] is not None:
+                    # Ruling out the possibility of any other type for MyPy type
+                    # checking, because for 'ExpressionInput' interactions, the
+                    # correct_answer is formatted as a Dict type.
+                    assert isinstance(
+                        question_state_dict['interaction']['solution'][
+                            'correct_answer'
+                        ],
+                        dict
+                    )
                     correct_answer = question_state_dict['interaction'][
                         'solution']['correct_answer']['ascii']
                     correct_answer = exp_domain.clean_math_expression(
@@ -888,7 +979,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 'interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
                 rule_type_to_inputs: Dict[
-                    str, Set[state_domain.AllowedInputValueTypes]
+                    str, Set[state_domain.AllowedRuleSpecInputTypes]
                 ] = collections.defaultdict(set)
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']
@@ -1018,11 +1109,17 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
-        def migrate_rule_inputs_and_answers(
+        # Here we use MyPy ignore because MyPy expects a return value in
+        # every condition when we define a return type but here we are
+        # returning only in if-else conditions and we are not returning
+        # when none of the condition matches which causes MyPy to throw
+        # a 'Missing return statement' error. Thus to avoid the error,
+        # we used ignore here.
+        def migrate_rule_inputs_and_answers(  # type: ignore[return]
             new_type: str,
-            value: Any,
+            value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict]
-        ) -> Any:
+        ) -> Union[List[str], str]:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -1059,16 +1156,31 @@ class Question(translation_domain.BaseTranslatableObject):
                 return feconf.INVALID_CONTENT_ID
 
             if new_type == 'TranslatableHtmlContentId':
+                # Here 'TranslatableHtmlContentId' can only be of str type, thus
+                # to narrow down the type we used assert here.
+                assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes it's type as
+                # recursive, like if this method returns List[str] then MyPy
+                # assumes it's type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
-                    migrate_rule_inputs_and_answers(
+                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
+                # Here 'migrate_rule_inputs_and_answers' method calls itself
+                # recursively and because of this MyPy assumes its type as
+                # recursive, like if this method returns List[str] then MyPy
+                # assumes it's type as List[List[str]]. So, because of this,
+                # MyPy throws an error. Thus to avoid the error, we used
+                # ignore here.
                 return [
-                    migrate_rule_inputs_and_answers(
+                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
                         'SetOfTranslatableHtmlContentIds', html_set, choices
                     ) for html_set in value
                 ]
@@ -1083,20 +1195,36 @@ class Question(translation_domain.BaseTranslatableObject):
                 # The solution type will be migrated from SetOfHtmlString to
                 # SetOfTranslatableHtmlContentIds.
                 if solution is not None:
+                    # Ruling out the possibility of any other type for MyPy type
+                    # checking because for interaction 'ItemSelectionInput',
+                    # the correct_answer is formatted as List[str] type.
+                    assert isinstance(solution['correct_answer'], list)
+                    list_of_html_contents = []
+                    for html_content in solution['correct_answer']:
+                        assert isinstance(html_content, str)
+                        list_of_html_contents.append(html_content)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
                             'SetOfTranslatableHtmlContentIds',
-                            solution['correct_answer'],
+                            list_of_html_contents,
                             choices)
                     )
             if interaction_id == 'DragAndDropSortInput':
                 # The solution type will be migrated from ListOfSetsOfHtmlString
                 # to ListOfSetsOfTranslatableHtmlContentIds.
                 if solution is not None:
+                    # Ruling out the possibility of any other type for MyPy type
+                    # checking because for interaction 'DragAndDropSortInput',
+                    # the correct_answer is formatted as List[List[str]] type.
+                    assert isinstance(solution['correct_answer'], list)
+                    list_of_html_content_list = []
+                    for html_content_list in solution['correct_answer']:
+                        assert isinstance(html_content_list, list)
+                        list_of_html_content_list.append(html_content_list)
                     solution['correct_answer'] = (
                         migrate_rule_inputs_and_answers(
                             'ListOfSetsOfTranslatableHtmlContentIds',
-                            solution['correct_answer'],
+                            list_of_html_content_list,
                             choices)
                     )
 
@@ -1111,9 +1239,18 @@ class Question(translation_domain.BaseTranslatableObject):
                         # All rule inputs for ItemSelectionInput will be
                         # migrated from SetOfHtmlString to
                         # SetOfTranslatableHtmlContentIds.
+                        # Ruling out the possibility of any other type
+                        # for MyPy type checking because for interaction
+                        # 'ItemSelectionInput', the rule inputs are formatted
+                        # as List[str] type.
+                        assert isinstance(rule_inputs['x'], list)
+                        list_of_html_contents = []
+                        for html_content in rule_inputs['x']:
+                            assert isinstance(html_content, str)
+                            list_of_html_contents.append(html_content)
                         rule_inputs['x'] = migrate_rule_inputs_and_answers(
                             'SetOfTranslatableHtmlContentIds',
-                            rule_inputs['x'],
+                            list_of_html_contents,
                             choices)
                     if interaction_id == 'DragAndDropSortInput':
                         rule_types_with_list_of_sets = [
@@ -1126,9 +1263,20 @@ class Question(translation_domain.BaseTranslatableObject):
                             # the x input will be migrated from
                             # ListOfSetsOfHtmlStrings to
                             # ListOfSetsOfTranslatableHtmlContentIds.
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
+                            # 'DragAndDropSortInput', the rule inputs are
+                            # formatted as List[List[str]] type.
+                            assert isinstance(rule_inputs['x'], list)
+                            list_of_html_content_list = []
+                            for html_content_list in rule_inputs['x']:
+                                assert isinstance(html_content_list, list)
+                                list_of_html_content_list.append(
+                                    html_content_list
+                                )
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'ListOfSetsOfTranslatableHtmlContentIds',
-                                rule_inputs['x'],
+                                list_of_html_content_list,
                                 choices)
                         elif rule_type == 'HasElementXAtPositionY':
                             # For rule type HasElementXAtPositionY,
@@ -1136,6 +1284,11 @@ class Question(translation_domain.BaseTranslatableObject):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId, and the y input will
                             # remain as DragAndDropPositiveInt.
+                            # Ruling out the possibility of any other type
+                            # for MyPy type checking because for interaction
+                            # 'HasElementXAtPositionY', the rule inputs are
+                            # formatted as str type.
+                            assert isinstance(rule_inputs['x'], str)
                             rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'TranslatableHtmlContentId',
                                 rule_inputs['x'],
@@ -1146,10 +1299,16 @@ class Question(translation_domain.BaseTranslatableObject):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId.
                             for rule_input_name in ['x', 'y']:
+                                rule_input_value = rule_inputs[rule_input_name]
+                                # Ruling out the possibility of any other type
+                                # for MyPy type checking because for interaction
+                                # 'HasElementXBeforeElementY', the rule inputs
+                                # are formatted as str type.
+                                assert isinstance(rule_input_value, str)
                                 rule_inputs[rule_input_name] = (
                                     migrate_rule_inputs_and_answers(
                                         'TranslatableHtmlContentId',
-                                        rule_inputs[rule_input_name],
+                                        rule_input_value,
                                         choices))
 
         return question_state_dict
@@ -1260,7 +1419,7 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
-        state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
+        state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.convert_svg_diagram_tags_to_image_tags,
             state_schema_version=46)
@@ -1282,7 +1441,7 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
-        state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
+        state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.fix_incorrectly_encoded_chars,
             state_schema_version=48)
@@ -1522,6 +1681,12 @@ class Question(translation_domain.BaseTranslatableObject):
             if answer_group.outcome.dest_if_really_stuck is not None:
                 dest_if_stuck_is_specified = True
 
+        # Ruling out the possibility of None for MyPy type checking, because
+        # interaction.default_outcome can be None in the case of explorations
+        # but while creating the questions we are always providing default
+        # outcome. So, we are sure that here interaction.default_outcome is
+        # never going to be None, that's why we used assert here.
+        assert interaction.default_outcome is not None
         if interaction.default_outcome.labelled_as_correct:
             at_least_one_correct_answer = True
 
@@ -1562,7 +1727,7 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)  # type: ignore[no-untyped-call]
+        self.question_state_data.validate({}, False)
 
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""

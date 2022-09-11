@@ -236,3 +236,11 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 interaction_registry.Registry
                 .get_all_specs_for_state_schema_version(10)
             )
+
+    def test_get_interaction_by_id_raises_error_for_none_interaction_id(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'No interaction exists for the None interaction_id.'
+        ):
+            interaction_registry.Registry.get_interaction_by_id(None)

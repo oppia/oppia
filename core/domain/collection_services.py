@@ -47,7 +47,7 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, overload
+    Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, cast, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 
@@ -772,34 +772,90 @@ def apply_change_list(
         ]
         for change in changes:
             if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
-                collection.add_node(change.exploration_id)
+                # Here we use cast because we are narrowing down the type from
+                # CollectionChange to a specific change command.
+                add_collection_node_cmd = cast(
+                    collection_domain.AddCollectionNodeCmd,
+                    change
+                )
+                collection.add_node(add_collection_node_cmd.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
-                collection.delete_node(change.exploration_id)
+                # Here we use cast because we are narrowing down the type from
+                # CollectionChange to a specific change command.
+                delete_collection_node_cmd = cast(
+                    collection_domain.DeleteCollectionNodeCmd,
+                    change
+                )
+                collection.delete_node(
+                    delete_collection_node_cmd.exploration_id
+                )
             elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.first_index, int)
-                assert isinstance(change.second_index, int)
-                collection.swap_nodes(change.first_index, change.second_index)
+                # Here we use cast because we are narrowing down the type from
+                # CollectionChange to a specific change command.
+                swap_collection_nodes_cmd = cast(
+                    collection_domain.SwapCollectionNodesCmd,
+                    change
+                )
+                collection.swap_nodes(
+                    swap_collection_nodes_cmd.first_index,
+                    swap_collection_nodes_cmd.second_index
+                )
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
-                    collection.update_title(change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditCollectionPropertyTitleCmd.
+                    edit_collection_property_title_cmd = cast(
+                        collection_domain.EditCollectionPropertyTitleCmd,
+                        change
+                    )
+                    collection.update_title(
+                        edit_collection_property_title_cmd.new_value
+                    )
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_CATEGORY):
-                    collection.update_category(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditCollectionPropertyCategoryCmd.
+                    edit_collection_property_category_cmd = cast(
+                        collection_domain.EditCollectionPropertyCategoryCmd,
+                        change
+                    )
+                    collection.update_category(
+                        edit_collection_property_category_cmd.new_value
+                    )
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
-                    collection.update_objective(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditCollectionPropertyObjectiveCmd.
+                    edit_collection_property_objective_cmd = cast(
+                        collection_domain.EditCollectionPropertyObjectiveCmd,
+                        change
+                    )
+                    collection.update_objective(
+                        edit_collection_property_objective_cmd.new_value
+                    )
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
-                    collection.update_language_code(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditCollectionPropertyLanguageCodeCmd.
+                    edit_collection_property_language_code_cmd = cast(
+                        collection_domain.EditCollectionPropertyLanguageCodeCmd,
+                        change
+                    )
+                    collection.update_language_code(
+                        edit_collection_property_language_code_cmd.new_value
+                    )
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_TAGS):
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.new_value, list)
-                    collection.update_tags(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditCollectionPropertyTagsCmd.
+                    edit_collection_property_tags_cmd = cast(
+                        collection_domain.EditCollectionPropertyTagsCmd,
+                        change
+                    )
+                    collection.update_tags(
+                        edit_collection_property_tags_cmd.new_value
+                    )
             elif (change.cmd ==
                   collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
@@ -1200,6 +1256,10 @@ def _compute_summary_of_collection(
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
+
+    Raises:
+        Exception. No data available for when the collection was last_updated.
+        Exception. No data available for when the collection was created.
     """
     collection_rights = collection_models.CollectionRightsModel.get_by_id(
         collection.id)
@@ -1216,9 +1276,16 @@ def _compute_summary_of_collection(
     collection_model_created_on = collection.created_on
     collection_model_node_count = len(collection.nodes)
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert collection_model_last_updated is not None
-    assert collection_model_created_on is not None
+    if collection_model_last_updated is None:
+        raise Exception(
+            'No data available for when the collection was last_updated.'
+        )
+
+    if collection_model_created_on is None:
+        raise Exception(
+            'No data available for when the collection was created.'
+        )
+
     collection_summary = collection_domain.CollectionSummary(
         collection.id, collection.title, collection.category,
         collection.objective, collection.language_code, collection.tags,

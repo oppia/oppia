@@ -65,7 +65,7 @@ class MigrateExplorationJobTests(
     def test_migrated_exp_is_not_migrated(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             self.NEW_EXP_ID, title=self.EXP_TITLE, category='category')
-        exp_services.save_new_exploration( # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
 
         self.assertEqual(
@@ -95,7 +95,7 @@ class MigrateExplorationJobTests(
         with swap_states_schema_48, swap_exp_schema_55:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration( # type: ignore[no-untyped-call]
+            exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
             self.assertEqual(exploration.states_schema_version, 48)
@@ -170,16 +170,17 @@ class MigrateExplorationJobTests(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
-        topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID) # type: ignore[no-untyped-call]
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+        topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
 
         story = story_domain.Story.create_default_story(
             story_id, 'A story title', 'description', topic_id,
             'story-one')
         story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
-        topic_services.add_canonical_story( # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             feconf.SYSTEM_COMMITTER_ID, topic_id, story_id)
-        topic_services.publish_story( # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
         change_list = [
             story_domain.StoryChange({
@@ -209,12 +210,12 @@ class MigrateExplorationJobTests(
         with swap_states_schema_48, swap_exp_schema_53:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration( # type: ignore[no-untyped-call]
+            exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
             owner_action = user_services.get_user_actions_info(
                 feconf.SYSTEM_COMMITTER_ID)
-            exp_services.publish_exploration_and_update_user_profiles( # type: ignore[no-untyped-call]
+            exp_services.publish_exploration_and_update_user_profiles(
                 owner_action, self.NEW_EXP_ID)
             opportunity_model = (
                 opportunity_models.ExplorationOpportunitySummaryModel(

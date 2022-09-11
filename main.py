@@ -348,6 +348,13 @@ URLS = [
         r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
         skill_editor.SkillDescriptionHandler),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER,
+        skill_editor.DiagnosticTestSkillAssignmentHandler),
+    get_redirect_route(
+        r'%s/' %
+        feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
+        topics_and_skills_dashboard.TopicIdToDiagnosticTestSkillIdsHandler),
+    get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
@@ -463,6 +470,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_SEARCH_DATA_URL,
+        blog_homepage.BlogPostSearchHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
@@ -972,8 +982,11 @@ URLS = [
         r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
+        r'/learner_group_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSyllabusHandler),
+    get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
-        learner_group.LearnerGroupStudentProgressHandler),
+        learner_group.LearnerGroupLearnerProgressHandler),
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
@@ -981,8 +994,19 @@ URLS = [
         r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
         learner_group.CreateLearnerGroupPage),
     get_redirect_route(
-        r'/learner_group_search_student_handler',
-        learner_group.LearnerGroupSearchStudentHandler)
+        r'/learner_group_search_learner_handler',
+        learner_group.LearnerGroupSearchLearnerHandler),
+    get_redirect_route(
+        r'/learner_group_learners_info_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnersInfoHandler),
+    get_redirect_route(
+        r'/learner_group_learner_invitation_handler/<learner_group_id>',
+        learner_group.LearnerGroupLearnerInvitationHandler),
+    get_redirect_route(
+        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
+    get_redirect_route(
+        r'/user_progress_in_stories_chapters_handler/<username>',
+        learner_group.LearnerStoriesChaptersProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -1056,6 +1080,8 @@ URLS.extend((
         cron.CronExplorationRecommendationsHandler),
     get_redirect_route(
         r'/cron/explorations/search_rank', cron.CronActivitySearchRankHandler),
+    get_redirect_route(
+        r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler),
     get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     get_redirect_route(

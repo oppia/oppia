@@ -31,6 +31,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Any, Dict, List
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -38,8 +39,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import user_models
 
-(base_models, exp_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
+(base_models, exp_models, user_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user
+])
 
 
 class ExplorationSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -62,7 +64,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration('id', exploration)
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
@@ -76,7 +78,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration('id', exploration)
         exp_model = exp_models.ExplorationModel.get_by_id('id')
         snapshot_dict = exp_model.compute_snapshot()
         snapshot_dict['skill_tags'] = ['tag1', 'tag2']
@@ -101,10 +103,10 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
 
 class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    EXP_ID_1 = '1'
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_COMMITTER = 'id_committer'
+    EXP_ID_1: Final = '1'
+    USER_ID_1: Final = 'id_1'
+    USER_ID_2: Final = 'id_2'
+    USER_ID_COMMITTER: Final = 'id_committer'
 
     def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
         self.assertEqual(
@@ -144,26 +146,26 @@ class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
 
-    EXPLORATION_ID_1 = '1'
-    EXPLORATION_ID_2 = '2'
-    EXPLORATION_ID_3 = '3'
-    EXPLORATION_ID_4 = '4'
+    EXPLORATION_ID_1: Final = '1'
+    EXPLORATION_ID_2: Final = '2'
+    EXPLORATION_ID_3: Final = '3'
+    EXPLORATION_ID_4: Final = '4'
     # Related to all three explorations.
-    USER_ID_1 = 'id_1'
+    USER_ID_1: Final = 'id_1'
     # Related to a subset of the three explorations.
-    USER_ID_2 = 'id_2'
+    USER_ID_2: Final = 'id_2'
     # Related to no explorations.
-    USER_ID_3 = 'id_3'
+    USER_ID_3: Final = 'id_3'
     # Related to one collection and then removed from it.
-    USER_ID_4 = 'id_4'
+    USER_ID_4: Final = 'id_4'
     # User id used in commits.
-    USER_ID_COMMITTER = 'id_5'
-    USER_ID_4_OLD = 'id_4_old'
-    USER_ID_4_NEW = 'id_4_new'
-    USER_ID_5_OLD = 'id_5_old'
-    USER_ID_5_NEW = 'id_5_new'
-    USER_ID_6_OLD = 'id_6_old'
-    USER_ID_6_NEW = 'id_6_new'
+    USER_ID_COMMITTER: Final = 'id_5'
+    USER_ID_4_OLD: Final = 'id_4_old'
+    USER_ID_4_NEW: Final = 'id_4_new'
+    USER_ID_5_OLD: Final = 'id_5_old'
+    USER_ID_5_NEW: Final = 'id_5_new'
+    USER_ID_6_OLD: Final = 'id_6_old'
+    USER_ID_6_NEW: Final = 'id_6_new'
 
     def setUp(self) -> None:
         super().setUp()
@@ -373,12 +375,12 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     """Test the revert method on ExplorationRightsModel class."""
 
-    EXPLORATION_ID_1 = '1'
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_3 = 'id_3'
+    EXPLORATION_ID_1: Final = '1'
+    USER_ID_1: Final = 'id_1'
+    USER_ID_2: Final = 'id_2'
+    USER_ID_3: Final = 'id_3'
     # User id used in commits.
-    USER_ID_COMMITTER = 'id_4'
+    USER_ID_COMMITTER: Final = 'id_4'
 
     def setUp(self) -> None:
         super().setUp()
@@ -444,7 +446,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_all_viewer_ids_field_successful(
-            self
+        self
     ) -> None:
         # TODO(#13523): Use of Any in the type-annotation below will be
         # removed when the snapshot of ExplorationRightsModel
@@ -609,15 +611,15 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the ExpSummaryModel."""
 
-    EXPLORATION_ID_1 = '1'
-    EXPLORATION_ID_2 = '2'
-    EXPLORATION_ID_3 = '3'
-    USER_ID_1_OLD = 'id_1_old'
-    USER_ID_1_NEW = 'id_1_new'
-    USER_ID_2_OLD = 'id_2_old'
-    USER_ID_2_NEW = 'id_2_new'
-    USER_ID_3_OLD = 'id_3_old'
-    USER_ID_3_NEW = 'id_3_new'
+    EXPLORATION_ID_1: Final = '1'
+    EXPLORATION_ID_2: Final = '2'
+    EXPLORATION_ID_3: Final = '3'
+    USER_ID_1_OLD: Final = 'id_1_old'
+    USER_ID_1_NEW: Final = 'id_1_new'
+    USER_ID_2_OLD: Final = 'id_2_old'
+    USER_ID_2_NEW: Final = 'id_2_new'
+    USER_ID_3_OLD: Final = 'id_3_old'
+    USER_ID_3_NEW: Final = 'id_3_new'
 
     def setUp(self) -> None:
         super().setUp()

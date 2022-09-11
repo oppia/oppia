@@ -68,7 +68,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 2, 1, self.EXP_ID)
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -78,7 +78,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -90,7 +90,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     def test_try_upgrade_failure_due_to_unimplemented_upgrade_methods(
         self
     ) -> None:
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
             'Ran Exploration Migration job.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -147,7 +147,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
 
             # Create and migrate the exploration.
             self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 self.USER_ID, self.EXP_ID, exp_migration_change_list,
                 'Ran Exploration Migration job.')
 
@@ -1179,22 +1179,29 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'written_translations',
                 'new_value': {
                     'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # a error. To avoid the error, we used ignore here.
                         'content1': {
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': True
                             },
-                            'hi': {
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
-                            'hi': {
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': html_content,
                                 'needs_update': False
                             },
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False
                             }
@@ -1382,22 +1389,29 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': 'written_translations',
                 'new_value': {
                     'translations_mapping': {
+                        # Here we use MyPy ignore because we are testing convert
+                        # function and in convert function we are working with
+                        # previous versions of the domain object and in previous
+                        # versions of the domain object there are some fields
+                        # (eg: html) that are discontinued in the latest domain
+                        # object. So, while defining these old keys MyPy throw
+                        # a error. To avoid the error, we used ignore here.
                         'content1': {
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': True
                             },
-                            'hi': {
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
-                            'hi': {
+                            'hi': {  # type: ignore[typeddict-item]
                                 'html': expected_html_content,
                                 'needs_update': False
                             },
-                            'en': {
+                            'en': {  # type: ignore[typeddict-item]
                                 'html': 'hello!',
                                 'needs_update': False
                             }
@@ -1681,7 +1695,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1707,7 +1721,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_misconception_id': None
-                }
+                }]
             })
         ]
         # Version 30 replaces the tagged_misconception_id in version 29
@@ -1717,7 +1731,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': 'answer_groups',
                 'state_name': 'State 1',
-                'new_value': {
+                'new_value': [{
                     'rule_specs': [{
                         'rule_type': 'Equals',
                         'inputs': {'x': [
@@ -1743,7 +1757,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     },
                     'training_data': [],
                     'tagged_skill_misconception_id': None
-                }
+                }]
             })
         ]
         # Migrate exploration to state schema version 30.

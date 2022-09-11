@@ -31,6 +31,7 @@ from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import learner_group_services
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -39,7 +40,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Sequence, Tuple
+from typing import List, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -139,95 +140,222 @@ def apply_change_list(
             if not isinstance(change, story_domain.StoryChange):
                 raise Exception('Expected change to be of type StoryChange')
             if change.cmd == story_domain.CMD_ADD_STORY_NODE:
-                story.add_node(change.node_id, change.title)
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                add_story_node_cmd = cast(
+                    story_domain.AddStoryNodeCmd,
+                    change
+                )
+                story.add_node(
+                    add_story_node_cmd.node_id,
+                    add_story_node_cmd.title
+                )
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
-                story.delete_node(change.node_id)
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                delete_story_node_cmd = cast(
+                    story_domain.DeleteStoryNodeCmd,
+                    change
+                )
+                story.delete_node(delete_story_node_cmd.node_id)
             elif (change.cmd ==
                   story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
-                if change.new_value:
-                    story.mark_node_outline_as_finalized(change.node_id)
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                update_story_node_outline_status = cast(
+                    story_domain.UpdateStoryNodeOutlineStatusCmd,
+                    change
+                )
+                if update_story_node_outline_status.new_value:
+                    story.mark_node_outline_as_finalized(
+                        update_story_node_outline_status.node_id
+                    )
                 else:
-                    story.mark_node_outline_as_unfinalized(change.node_id)
+                    story.mark_node_outline_as_unfinalized(
+                        update_story_node_outline_status.node_id
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
-                    story.update_node_outline(change.node_id, change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateStoryNodePropertyOutlineCmd.
+                    update_node_outline_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyOutlineCmd,
+                        change
+                    )
+                    story.update_node_outline(
+                        update_node_outline_cmd.node_id,
+                        update_node_outline_cmd.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_TITLE):
-                    story.update_node_title(change.node_id, change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateStoryNodePropertyTitleCmd.
+                    update_node_title_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyTitleCmd,
+                        change
+                    )
+                    story.update_node_title(
+                        update_node_title_cmd.node_id,
+                        update_node_title_cmd.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateStoryNodePropertyDescriptionCmd.
+                    update_node_description_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyDescriptionCmd,
+                        change
+                    )
                     story.update_node_description(
-                        change.node_id, change.new_value)
+                        update_node_description_cmd.node_id,
+                        update_node_description_cmd.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyThumbnailFilenameCmd.
+                    update_node_thumbnail_filename_cmd = cast(
+                       story_domain.UpdateStoryNodePropertyThumbnailFilenameCmd,
+                       change
+                    )
                     story.update_node_thumbnail_filename(
-                        change.node_id, change.new_value)
+                        update_node_thumbnail_filename_cmd.node_id,
+                        update_node_thumbnail_filename_cmd.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyThumbnailBGColorCmd.
+                    update_node_thumbnail_bg_color = cast(
+                        story_domain.UpdateStoryNodePropertyThumbnailBGColorCmd,
+                        change
+                    )
                     story.update_node_thumbnail_bg_color(
-                        change.node_id, change.new_value)
+                        update_node_thumbnail_bg_color.node_id,
+                        update_node_thumbnail_bg_color.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyAcquiredSkillIdsCmd.
+                    update_node_acquired_skill_ids_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyAcquiredSkillIdsCmd,
+                        change
+                    )
                     story.update_node_acquired_skill_ids(
-                        change.node_id, change.new_value)
+                        update_node_acquired_skill_ids_cmd.node_id,
+                        update_node_acquired_skill_ids_cmd.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyPrerequisiteSkillIdsCmd.
+                    update_prerequisite_skill_ids_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyPrerequisiteSkillIdsCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     story.update_node_prerequisite_skill_ids(
-                        change.node_id, change.new_value)
+                        update_prerequisite_skill_ids_cmd.node_id,
+                        update_prerequisite_skill_ids_cmd.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyDestinationNodeIdsCmd.
+                    update_node_destination_node_ids_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyDestinationNodeIdsCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     story.update_node_destination_node_ids(
-                        change.node_id, change.new_value)
+                        update_node_destination_node_ids_cmd.node_id,
+                        update_node_destination_node_ids_cmd.new_value
+                    )
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyExplorationIdCmd.
+                    update_node_exploration_id_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyExplorationIdCmd,
+                        change
+                    )
                     story.update_node_exploration_id(
-                        change.node_id, change.new_value)
+                        update_node_exploration_id_cmd.node_id,
+                        update_node_exploration_id_cmd.new_value
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
-                if (change.property_name ==
+                # Here we use cast because we are narrowing down the type from
+                # StoryChange to a specific change command.
+                update_story_property_cmd = cast(
+                    story_domain.UpdateStoryPropertyCmd,
+                    change
+                )
+                if (update_story_property_cmd.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
-                    story.update_title(change.new_value)
-                elif (change.property_name ==
+                    story.update_title(update_story_property_cmd.new_value)
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
-                    story.update_thumbnail_filename(change.new_value)
-                elif (change.property_name ==
+                    story.update_thumbnail_filename(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
-                    story.update_thumbnail_bg_color(change.new_value)
-                elif (change.property_name ==
+                    story.update_thumbnail_bg_color(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_DESCRIPTION):
-                    story.update_description(change.new_value)
-                elif (change.property_name ==
+                    story.update_description(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_NOTES):
-                    story.update_notes(change.new_value)
-                elif (change.property_name ==
+                    story.update_notes(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_LANGUAGE_CODE):
-                    story.update_language_code(change.new_value)
-                elif (change.property_name ==
+                    story.update_language_code(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_URL_FRAGMENT):
-                    story.update_url_fragment(change.new_value)
-                elif (change.property_name ==
+                    story.update_url_fragment(
+                        update_story_property_cmd.new_value
+                    )
+                elif (update_story_property_cmd.property_name ==
                       story_domain.STORY_PROPERTY_META_TAG_CONTENT):
-                    story.update_meta_tag_content(change.new_value)
+                    story.update_meta_tag_content(
+                        update_story_property_cmd.new_value
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
-                    story.update_initial_node(change.new_value)
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateStoryContentsPropertyInitialNodeIdCmd.
+                    update_initial_node_id_cmd = cast(
+                       story_domain.UpdateStoryContentsPropertyInitialNodeIdCmd,
+                       change
+                    )
+                    story.update_initial_node(
+                        update_initial_node_id_cmd.new_value
+                    )
                 if change.property_name == story_domain.NODE:
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.old_value, int)
-                    assert isinstance(change.new_value, int)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateStoryContentsPropertyNodeCmd.
+                    update_node_cmd = cast(
+                        story_domain.UpdateStoryContentsPropertyNodeCmd,
+                        change
+                    )
                     story.rearrange_node_in_story(
-                        change.old_value, change.new_value)
+                        update_node_cmd.old_value, update_node_cmd.new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -433,7 +561,7 @@ def validate_explorations_for_story(
                 validation_error_messages.append(error_string)
             try:
                 validation_error_messages.extend(
-                    exp_services.validate_exploration_for_story(exp, strict))  # type: ignore[no-untyped-call]
+                    exp_services.validate_exploration_for_story(exp, strict))
             except Exception as e:
                 logging.exception(
                     'Exploration validation failed for exploration with ID: '
@@ -708,6 +836,9 @@ def delete_story(
     opportunity_services.delete_exp_opportunities_corresponding_to_story(
         story_id)
 
+    # Delete references of the story from all related learner groups.
+    learner_group_services.remove_story_reference_from_learner_groups(story_id)
+
 
 def delete_story_summary(story_id: str) -> None:
     """Delete a story summary model.
@@ -731,12 +862,17 @@ def compute_summary_of_story(
 
     Returns:
         StorySummary. The computed summary for the given story.
+
+    Raises:
+        Exception. No data available for when the story was last_updated on.
     """
     story_model_node_titles = [
         node.title for node in story.story_contents.nodes]
-    # Ruling out the possibility of None for mypy type checking.
-    assert story.created_on is not None
-    assert story.last_updated is not None
+
+    if story.created_on is None or story.last_updated is None:
+        raise Exception(
+            'No data available for when the story was last_updated on.'
+        )
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
         story.version, story_model_node_titles, story.thumbnail_bg_color,

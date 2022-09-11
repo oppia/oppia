@@ -1,7 +1,7 @@
 <div class="list-group">
   <div class="form-group">
     <div class="selected-topics-list" *ngIf="topicsSelected.length !== 0"><b>Topics selected:</b> {{ topicsSelected.join(", ") }}</div>
-    <span><input type="text" placeholder="Search topics" [(ngModel)]="topicFilterText"><i class="material-icons">&#xe8b6;</i></span>
+    <span><input type="text" placeholder="Search topics" [(ngModel)]="topicFilterText"><i class="fas fa-search topic-search-icon"></i></span>
     <br>
   </div>
   <a class="list-group-item e2e-test-topics-list-item"
@@ -18,5 +18,8 @@
     border-radius: 3px;
     margin-bottom: 15px;
     padding: 5px 0;
+  }
+  .topic-search-icon {
+    padding-left: 5px;
   }
 </style>

@@ -22,7 +22,8 @@ from core.domain import learner_group_domain
 from core.domain import learner_group_services
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, Sequence, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -87,28 +88,80 @@ def get_learner_groups_of_facilitator(
     ]
 
 
-def can_multi_students_share_progress(
+@overload
+def get_learner_group_models_by_ids(
+    user_ids: List[str], *, strict: Literal[True]
+) -> List[user_models.LearnerGroupsUserModel]: ...
+
+
+@overload
+def get_learner_group_models_by_ids(
+    user_ids: List[str]
+) -> List[Optional[user_models.LearnerGroupsUserModel]]: ...
+
+
+@overload
+def get_learner_group_models_by_ids(
+    user_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[user_models.LearnerGroupsUserModel]]: ...
+
+
+def get_learner_group_models_by_ids(
+    user_ids: List[str], strict: bool = False
+) -> Sequence[Optional[user_models.LearnerGroupsUserModel]]:
+    """Returns a list of learner_groups_user models matching the IDs provided.
+
+    Args:
+        user_ids: list(str). The user ids of the learners of the group.
+        strict: bool. Whether to fail noisily if no LearnerGroupsUserModel
+            exists with a given ID exists in the datastore.
+
+    Returns:
+        list(LearnerGroupsUserModel|None). The list of learner_groups_user
+        models corresponding to given ids.  If a LearnerGroupsUserModel does
+        not exist, the corresponding returned list element is None.
+
+    Raises:
+        Exception. No LearnerGroupsUserModel exists for the given user_id.
+    """
+
+    learner_group_user_models = user_models.LearnerGroupsUserModel.get_multi(
+        user_ids
+    )
+
+    if strict:
+        for index, learner_group_user_model in enumerate(
+            learner_group_user_models
+        ):
+            if learner_group_user_model is None:
+                raise Exception(
+                    'No LearnerGroupsUserModel exists for the user_id: %s'
+                    % user_ids[index]
+                )
+
+    return learner_group_user_models
+
+
+def can_multi_learners_share_progress(
     user_ids: List[str], group_id: str
 ) -> List[bool]:
     """Returns the progress sharing permissions of the given users in the given
     group.
 
     Args:
-        user_ids: list(str). The user ids of the students of the group.
+        user_ids: list(str). The user ids of the learners of the group.
         group_id: str. The id of the learner group.
 
     Returns:
         list(bool). True if a user has progress sharing permission of the
         given group as True, False otherwise.
     """
-    learner_group_user_models = user_models.LearnerGroupsUserModel.get_multi(
-        user_ids
+    learner_group_user_models = get_learner_group_models_by_ids(
+        user_ids, strict=True
     )
 
     progress_sharing_permissions: List[bool] = []
     for model in learner_group_user_models:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         for group_details in model.learner_groups_user_details:
             if group_details['group_id'] == group_id:
                 progress_sharing_permissions.append(

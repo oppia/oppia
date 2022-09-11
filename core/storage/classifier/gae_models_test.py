@@ -30,11 +30,14 @@ from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'classifier_services' only for type checking.
+    from core.domain import classifier_services
     from mypy_imports import base_models
     from mypy_imports import classifier_models
 
-(base_models, classifier_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.classifier])
+(base_models, classifier_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.classifier
+])
 
 
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
@@ -145,7 +148,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 2)
 
     def test_query_new_and_pending_training_jobs_with_non_zero_offset(
-            self
+        self
     ) -> None:
         with self.swap(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
@@ -234,7 +237,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_multi_jobs(self) -> None:
         next_scheduled_check_time = datetime.datetime.utcnow()
-        job_dicts_list = []
+        job_dicts_list: List[classifier_services.JobInfoDict] = []
         job_dicts_list.append({
             'exp_id': u'1',
             'exp_version': 1,

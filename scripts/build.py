@@ -145,6 +145,8 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
+MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
+
 _PARSER = argparse.ArgumentParser(
     description="""
 Creates a third-party directory where all the JS and CSS dependencies are
@@ -686,7 +688,8 @@ def build_using_webpack(config_path: str) -> None:
 
     print('Building webpack')
     managed_webpack_compiler = servers.managed_webpack_compiler(
-        config_path=config_path, max_old_space_size=8192)
+        config_path=config_path,
+        max_old_space_size=MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD)
     with managed_webpack_compiler as p:
         p.wait()
     assert get_file_count('backend_prod_files/webpack_bundles/') > 0, (

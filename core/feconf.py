@@ -28,8 +28,10 @@ from core.constants import constants
 from typing import Callable, Dict, List, Union
 from typing_extensions import Final, TypedDict
 
-CommandType = (
-    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
+MYPY = False
+if MYPY:  # pragma: no cover
+    # Here, we are importing 'state_domain' only for type checking.
+    from core.domain import state_domain
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -414,14 +416,14 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_RECORDED_VOICEOVERS: state_domain.RecordedVoiceoversDict = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
 }
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_WRITTEN_TRANSLATIONS: state_domain.WrittenTranslationsDict = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
@@ -576,7 +578,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.7'
+OPPIA_VERSION = '3.2.8'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -675,6 +677,9 @@ EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
 )
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
+EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
+    'notify_contributor_dashboard_achievements'
+)
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -750,6 +755,10 @@ MAX_NUMBER_OF_SKILL_IDS = 20
 # The maximum number of blog post cards to be visible on each page in blog
 # homepage.
 MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in blog
+# search results homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
 
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
@@ -903,6 +912,7 @@ BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
+BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
 AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
@@ -1018,6 +1028,8 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
+DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
+    '/diagnostic_test_skill_assignment_handler')
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
@@ -1052,6 +1064,8 @@ TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPIC_URL_FRAGMENT_HANDLER = '/topic_url_fragment_handler'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 UNASSIGN_SKILL_DATA_HANDLER_URL = '/topics_and_skills_dashboard/unassign_skill'
+TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER = (
+    '/topic_id_to_diagnostic_test_skill_ids_handler')
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
@@ -1062,6 +1076,7 @@ VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
+EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
@@ -1571,6 +1586,12 @@ CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
 SUGGESTION_TYPE_EDIT_STATE_CONTENT: Final = 'edit_exploration_state_content'
 SUGGESTION_TYPE_TRANSLATE_CONTENT: Final = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION: Final = 'add_question'
+
+CONTRIBUTION_TYPE_TRANSLATION: Final = 'translation'
+CONTRIBUTION_TYPE_QUESTION: Final = 'question'
+CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
+CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
+CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
