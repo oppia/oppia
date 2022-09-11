@@ -154,15 +154,11 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.e2e-test-language-selector-label'));
   var progressBarLabelElement = element(
     by.css('.e2e-test-progress-info'));
-  var translationModeButton = element(
-    by.css('.e2e-test-translation-mode'));
   var voiceoverModeButton = element(by.css('.e2e-test-voiceover-mode'));
   var saveTranslationButton = element(
     by.css('.e2e-test-save-translation'));
   var editTranslationButtton = element(
     by.css('.e2e-test-edit-translation'));
-  var translationDisplay = element(
-    by.css('.e2e-test-translation-display'));
   var stateGraph = element(
     by.css('.e2e-test-translation-graph'));
   var feedbackList = element.all(

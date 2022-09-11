@@ -239,7 +239,7 @@ export class TranslationStatusService implements OnInit {
 
     if (availableContentIds.length > 0) {
       var searchKey = componentName + '_';
-      availableContentIds.forEach(function (contentId) {
+      availableContentIds.forEach(function(contentId) {
         if (contentId.indexOf(searchKey) > -1) {
           contentIdList.push(contentId);
         }
@@ -331,11 +331,11 @@ export class TranslationStatusService implements OnInit {
       this.loaderService.showLoadingScreen('Loading');
       this.entityTranslationsService.refreshEntityTranslationsAsync(
         this.langCode).then((entityTranslationObject) => {
-          this.loaderService.hideLoadingScreen();
-          this.entityTranslation = entityTranslationObject;
-          this._computeAllStatesStatus();
-          this.stateEditorService.onRefreshStateTranslation.emit();
-        });
+        this.loaderService.hideLoadingScreen();
+        this.entityTranslation = entityTranslationObject;
+        this._computeAllStatesStatus();
+        this.stateEditorService.onRefreshStateTranslation.emit();
+      });
     } else {
       this._computeAllStatesStatus();
     }

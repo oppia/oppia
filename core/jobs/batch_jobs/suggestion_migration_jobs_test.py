@@ -151,7 +151,7 @@ class MigrateQuestionSuggestionsJobTests(
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(  # type: ignore[no-untyped-call]
             skill_id, self.author_id, description='description')
-        content_id_generator =  translation_domain.ContentIdGenerator()
+        content_id_generator = translation_domain.ContentIdGenerator()
         state = self._create_valid_question_data(None, content_id_generator)
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
@@ -195,4 +195,3 @@ class MigrateQuestionSuggestionsJobTests(
             job_run_result.JobRunResult(
                 stdout='SUGGESTION MIGRATED SUCCESS: 1')
         ])
-

@@ -430,6 +430,7 @@ import { ExplorationSaveService } from 'pages/exploration-editor-page/services/e
 import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
+import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -561,9 +562,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationImprovementsService', ExplorationImprovementsService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
-  [
-    'ExplorationNextContentIdIndexService',
-    ExplorationNextContentIdIndexService],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
@@ -894,5 +892,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationAutomaticTextToSpeechService',
     ExplorationAutomaticTextToSpeechService],
   ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
-  ['CompareVersionsService', CompareVersionsService]
+  ['CompareVersionsService', CompareVersionsService],
+  ['EntityTranslationBackendApiService', EntityTranslationBackendApiService],
+  ['ExplorationNextContentIdIndexService',
+    ExplorationNextContentIdIndexService],
 ];

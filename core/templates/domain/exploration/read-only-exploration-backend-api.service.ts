@@ -38,6 +38,7 @@ export interface ReadOnlyExplorationBackendDict {
   'title': string;
   'language_code': string;
   'objective': string;
+  'next_content_id_index': number;
   'correctness_feedback_enabled': boolean;
 }
 
@@ -55,7 +56,6 @@ export interface FetchExplorationBackendResponse {
   'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;
   'draft_change_list_id': number;
-  'next_content_id_index': number;
   'has_viewed_lesson_info_modal_once': boolean;
   'furthest_reached_checkpoint_exp_version': number;
   'furthest_reached_checkpoint_state_name': string;

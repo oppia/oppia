@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import isEqual from 'lodash/isEqual';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -52,7 +52,7 @@ export class Rule extends BaseTranslatableObject {
     this.inputTypes = inputTypes;
   }
 
-  getTranslatableFields(): any {
+  getTranslatableFields(): TranslatableField[] {
     let translatableFields = [];
     Object.keys(this.inputs).forEach(inputName => {
       const ruleInput = this.inputs[inputName];

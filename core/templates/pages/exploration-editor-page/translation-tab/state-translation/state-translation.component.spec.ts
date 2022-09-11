@@ -1243,7 +1243,7 @@ describe('State translation component', function() {
 
       contextService.explorationId = 'expId';
       entityTranslationsService.entityTranslation = {
-          getWrittenTranslation: () => {}
+        getWrittenTranslation: () => {}
       };
       explorationStatesService.init(explorationState2);
       stateRecordedVoiceoversService.init(

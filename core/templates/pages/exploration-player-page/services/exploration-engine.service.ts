@@ -376,7 +376,6 @@ export class ExplorationEngineService {
       preferredContentLanguageCodes,
       this.exploration.getLanguageCode()
     );
-
   }
 
   moveToExploration(successCallback: (StateCard, string) => void): void {

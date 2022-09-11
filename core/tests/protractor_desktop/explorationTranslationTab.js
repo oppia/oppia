@@ -32,9 +32,6 @@ describe('Exploration translation and voiceover tab', function() {
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorTranslationTab = null;
-  var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233, 179, 48)';
-  var GREEN_STATE_PROGRESS_COLOR = 'rgb(22, 167, 101)';
-  var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
 
   beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();

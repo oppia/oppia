@@ -30,7 +30,7 @@ export type TranslatableField = (
 );
 
 export class BaseTranslatableObject {
-  static getContentValue(content) {
+  static getContentValue(content: TranslatableField): string | string[] | null {
     if (content instanceof SubtitledHtml) {
       return content.html;
     }
@@ -40,16 +40,19 @@ export class BaseTranslatableObject {
     }
 
     if (content.hasOwnProperty('normalizedStrSet')) {
+      content = content as TranslatableSetOfNormalizedString;
       return content.normalizedStrSet;
     }
 
     if (content.hasOwnProperty('unicodeStrSet')) {
+      content = content as TranslatableSetOfUnicodeString;
       return content.unicodeStrSet;
     }
 
     return null;
   }
-  getTranslatableFields(): (SubtitledUnicode | SubtitledHtml)[] {
+
+  getTranslatableFields(): TranslatableField[] {
     return [];
   }
 
@@ -79,7 +82,8 @@ export class BaseTranslatableObject {
           if (translatableField instanceof SubtitledHtml) {
             translatableField.html = writtenTranslation.translation as string;
           } else if (translatableField instanceof SubtitledUnicode) {
-            translatableField.unicode = writtenTranslation.translation as string;
+            translatableField.unicode = (
+              writtenTranslation.translation as string);
           }
         }
       }

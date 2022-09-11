@@ -177,7 +177,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         return updated_exp_summary_model
 
-
     @staticmethod
     def _extract_required_translation_model(
         exp_translation_models, exp_version):

@@ -417,7 +417,7 @@ class EntityTranslationHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'entity_type': {
-            'schema':{
+            'schema': {
                 'type': 'basestring',
                 'choices': [
                     feconf.ENTITY_TYPE_EXPLORATION,
@@ -426,7 +426,7 @@ class EntityTranslationHandler(base.BaseHandler):
             }
         },
         'entity_id': {
-            'schema':{
+            'schema': {
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
@@ -435,7 +435,7 @@ class EntityTranslationHandler(base.BaseHandler):
             }
         },
         'entity_version': {
-            'schema':{
+            'schema': {
                 'type': 'int',
                 'validators': [{
                     'id': 'is_at_least',
@@ -445,7 +445,7 @@ class EntityTranslationHandler(base.BaseHandler):
             }
         },
         'language_code': {
-            'schema':{
+            'schema': {
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'

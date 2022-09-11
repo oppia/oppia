@@ -475,7 +475,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state': state_domain.State.create_default_state(
-                    'state',  'content_0', 'default_outcome_1',
+                    'state', 'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict()
             },
@@ -564,7 +564,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state1': state_domain.State.create_default_state(
-                    'state1',  'content_0', 'default_outcome_1',
+                    'state1', 'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state(
@@ -824,7 +824,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state1': state_domain.State.create_default_state(
-                    'state1',  'content_0', 'default_outcome_1',
+                    'state1', 'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state(

@@ -463,7 +463,7 @@ var ExplorationEditorMainTab = function() {
     }
   };
 
-  this.leaveTranslationsAsIs = async function () {
+  this.leaveTranslationsAsIs = async function() {
     await waitFor.visibilityOf(
       updateTranslationsModalElement,
       'Update translations modal takes too long to appear');

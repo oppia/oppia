@@ -1054,4 +1054,3 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
                 language_codes_with_assigned_voice_artists=[]
             ))
         self.opportunity_model.put()
-
