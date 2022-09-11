@@ -53,17 +53,17 @@
     <div *ngIf="activeWrittenTranslation.isHtml()">
       <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
       <schema-based-editor [schema]="HTML_SCHEMA"
-                           [ngModel]="activeWrittenTranslation.translation">
+                           [(ngModel)]="activeWrittenTranslation.translation">
       </schema-based-editor>
     </div>
     <div *ngIf="activeWrittenTranslation.isUnicode()">
       <schema-based-editor [schema]="UNICODE_SCHEMA"
-                           [ngModel]="activeWrittenTranslation.translation">
+                           [(ngModel)]="activeWrittenTranslation.translation">
       </schema-based-editor>
     </div>
     <div *ngIf="activeWrittenTranslation.isSetOfStrings()">
       <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
-                           [ngModel]="activeWrittenTranslation.translation">
+                           [(ngModel)]="activeWrittenTranslation.translation">
       </schema-based-editor>
     </div>
     <div *ngIf="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
