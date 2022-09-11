@@ -305,6 +305,32 @@ def add_mailchimp_api_key(release_feconf_path):
             f.write(line)
 
 
+def update_analytics_id_in_webpack_config(
+    webpack_config_path,
+    release_constants_path
+):
+    """Updates the GA4 and UA IDs in the webpack config file.
+
+    Args:
+        webpack_config_path: str. The path to webpack config file.
+        release_constants_path: str. The path to release constants file.
+    """
+    with utils.open_file(release_constants_path, 'r') as release_config_file:
+        release_config_contents = release_config_file.read()
+    ga_analytics_id = re.search(
+        r'"GA_ANALYTICS_ID": "(.*)"', release_config_contents).group(1)
+    ua_analytics_id = re.search(
+        r'"UA_ANALYTICS_ID": "(.*)"', release_config_contents).group(1)
+    common.inplace_replace_file(
+        webpack_config_path,
+        'const GA_ANALYTICS_ID = \'\';',
+        'const GA_ANALYTICS_ID = \'%s\';' % ga_analytics_id)
+    common.inplace_replace_file(
+        webpack_config_path,
+        'const UA_ANALYTICS_ID = \'\';',
+        'const UA_ANALYTICS_ID = \'%s\';' % ua_analytics_id)
+
+
 def main(args=None):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
@@ -323,6 +349,8 @@ def main(args=None):
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
     release_app_dev_yaml_path = os.path.join(
         options.release_dir_path, common.APP_DEV_YAML_PATH)
+    release_webpack_config_path = os.path.join(
+        options.release_dir_path, common.WEBPACK_COMMON_CONFIG)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
@@ -339,6 +367,9 @@ def main(args=None):
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
     update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
+    update_analytics_id_in_webpack_config(
+        release_webpack_config_path,
+        constants_config_path)
     verify_config_files(
         release_feconf_path,
         release_app_dev_yaml_path,
