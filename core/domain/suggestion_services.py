@@ -1843,7 +1843,27 @@ def enqueue_contributor_ranking_notification_email_task(
             i.e. submissions/acceptances/reviews/edits.
         language_code: str. The language code of the suggestion.
         rank_name: str. The name of the rank that the contributor achieved.
+
+    Raises:
+        Exception. The contribution type must be offered on the Contributor
+            Dashboard.
+        Exception. The contribution subtype must be offered on the Contributor
+            Dashboard.
     """
+    if contribution_type not in [
+        feconf.CONTRIBUTION_TYPE_TRANSLATION,
+        feconf.CONTRIBUTION_TYPE_QUESTION
+    ]:
+        raise Exception(
+            'Invalid contribution type: %s' % contribution_type)
+    if contribution_sub_type not in [
+        feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE,
+        feconf.CONTRIBUTION_SUBTYPE_REVIEW,
+        feconf.CONTRIBUTION_SUBTYPE_EDIT,
+    ]:
+        raise Exception(
+            'Invalid contribution subtype: %s' % contribution_sub_type)
+
     payload = {
         'contributor_user_id': contributor_user_id,
         'contribution_type': contribution_type,
@@ -1851,6 +1871,7 @@ def enqueue_contributor_ranking_notification_email_task(
         'language_code': language_code,
         'rank_name': rank_name,
     }
+
     taskqueue_services.enqueue_task(
         feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
         payload, 0)

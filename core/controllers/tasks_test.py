@@ -241,7 +241,7 @@ class TasksTests(test_utils.EmailTestBase):
                 self.USER_A_EMAIL)
             self.assertEqual(len(messages), 1)
 
-            # Check that user B received correct message.
+            # Check that user A received correct message.
             expected_email_subject = 'Oppia Translator Rank Achievement!'
             expected_email_html_body = (
                 'Hi userA,<br><br>'
@@ -254,7 +254,7 @@ class TasksTests(test_utils.EmailTestBase):
                 'Contributor Dashboard</a>.<br><br>'
                 'Best wishes and we hope you can continue to contribute!'
                 '<br><br>'
-                'Best wishes,<br>The Oppia Contributor Dashboard Team')
+                'The Oppia Contributor Dashboard Team')
             self.assertEqual(messages[0].html, expected_email_html_body)
             self.assertEqual(messages[0].subject, expected_email_subject)
 

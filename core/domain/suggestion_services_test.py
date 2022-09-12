@@ -4862,3 +4862,33 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         self.assertEqual(tasks[0].payload['language_code'], 'hi')
         self.assertEqual(
             tasks[0].payload['rank_name'], 'Initial Contributor')
+
+    def test_create_email_task_raises_exception_fr_invalid_contribution_type(
+        self
+    ) -> None:
+        user_id = 'user'
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid contribution type: test'):
+            (
+                suggestion_services
+                .enqueue_contributor_ranking_notification_email_task)(
+                    user_id, 'test',
+                    feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE, 'hi',
+                    'Initial Contributor'
+                )
+
+    def test_create_email_task_raises_exception_fr_invalid_contribution_subtype(
+        self
+    ) -> None:
+        user_id = 'user'
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid contribution subtype: test'):
+            (
+                suggestion_services
+                .enqueue_contributor_ranking_notification_email_task)(
+                    user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
+                    'test', 'hi',
+                    'Initial Contributor'
+                )
