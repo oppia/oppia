@@ -828,19 +828,21 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
 
 
 def _get_complete_stats(
-        stats_data, stats_are_translation_contribution):
+    stats_data, stats_are_translation_contribution
+):
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 
     Args:
-        stats_data: list(TranslationContributionStats). Stats domain
+        stats_data: list(TranslationContributionStats|TranslationReviewStats
+            |QuestionContributionStats|QuestionReviewStats). Stats domain
             objects.
         stats_are_translation_contribution: bool. A flag that indicates whether
             stats are translation contributions.
 
     Returns:
-        list(dict(TranslationContributionStats|TranslationReviewStats|
-        QuestionContributionStats|QuestionReviewStats)). Dict
+        list(dict(TranslationContributionStats|TranslationReviewStats
+        |QuestionContributionStats|QuestionReviewStats)). Dict
         representations of TranslationContributionStats/
         TranslationReviewStats/QuestionContributionStats/
         QuestionReviewStats domain objects with additional keys:
