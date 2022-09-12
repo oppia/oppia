@@ -59,12 +59,12 @@ if MYPY: # pragma: no cover
     story_models,
     topic_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration,
-    models.NAMES.opportunity,
-    models.NAMES.question,
-    models.NAMES.skill,
-    models.NAMES.story,
-    models.NAMES.topic
+    models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY,
+    models.Names.QUESTION,
+    models.Names.SKILL,
+    models.Names.STORY,
+    models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -331,7 +331,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             for story in stories:
                 for exp_id in story.story_contents.get_all_linked_exp_ids():
                     exploration_opportunity_summary_list.append(
-                        opportunity_services.create_exp_opportunity_summary( # type: ignore[no-untyped-call]
+                        opportunity_services.create_exp_opportunity_summary(
                             topic, story, exps_dict[exp_id]))
 
             exploration_opportunity_summary_model_list = []

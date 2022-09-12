@@ -70,12 +70,12 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
         for obj in constants_languages_list:
             language_ids_in_constants.append(obj['code'])
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             interaction_ids_in_constants,
             android_validation_constants.VALID_INTERACTION_IDS)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             constants.VALID_RTE_COMPONENTS_FOR_ANDROID,
             android_validation_constants.VALID_RTE_COMPONENTS)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             language_ids_in_constants,
             android_validation_constants.SUPPORTED_LANGUAGES)

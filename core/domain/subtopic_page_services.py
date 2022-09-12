@@ -22,19 +22,20 @@ import copy
 
 from core import feconf
 from core.domain import change_domain
+from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import subtopic_page_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, overload
+from typing import Dict, List, Optional, Sequence, overload
 from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
-(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
+(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
 def _migrate_page_contents_to_latest_schema(
@@ -247,8 +248,8 @@ def get_subtopic_page_contents_by_id(
 def save_subtopic_page(
     committer_id: str,
     subtopic_page: subtopic_page_domain.SubtopicPage,
-    commit_message: str,
-    change_list: List[change_domain.BaseChange]
+    commit_message: Optional[str],
+    change_list: Sequence[change_domain.BaseChange]
 ) -> None:
     """Validates a subtopic page and commits it to persistent storage. If
     successful, increments the version number of the incoming subtopic page
@@ -258,7 +259,8 @@ def save_subtopic_page(
         committer_id: str. ID of the given committer.
         subtopic_page: SubtopicPage. The subtopic page domain object to be
             saved.
-        commit_message: str. The commit message.
+        commit_message: str|None. The commit description message, for
+            unpublished topics, it may be equal to None.
         change_list: list(SubtopicPageChange). List of changes applied to a
             subtopic page.
 
@@ -324,6 +326,8 @@ def delete_subtopic_page(
     subtopic_models.SubtopicPageModel.get(subtopic_page_id).delete(
         committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED,
         force_deletion=force_deletion)
+    learner_group_services.remove_subtopic_page_reference_from_learner_groups(
+        topic_id, subtopic_id)
 
 
 def get_topic_ids_from_subtopic_page_ids(
@@ -363,7 +367,7 @@ def get_multi_users_subtopic_pages_progress(
     """
 
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
 
     all_skill_ids_lists = [
         topic.get_all_skill_ids() for topic in topics if topic
@@ -385,8 +389,6 @@ def get_multi_users_subtopic_pages_progress(
         str, List[subtopic_page_domain.SubtopicPageSummaryDict]
     ] = {user_id: [] for user_id in user_ids}
     for topic in topics:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
         for subtopic in topic.subtopics:
             subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
             if subtopic_page_id not in subtopic_page_ids:
@@ -421,3 +423,39 @@ def get_multi_users_subtopic_pages_progress(
                 })
 
     return all_users_subtopic_prog_summaries
+
+
+def get_learner_group_syllabus_subtopic_page_summaries(
+    subtopic_page_ids: List[str]
+) -> List[subtopic_page_domain.SubtopicPageSummaryDict]:
+    """Returns summary dicts corresponding to the given subtopic page ids.
+
+    Args:
+        subtopic_page_ids: list(str). The ids of the subtopic pages.
+
+    Returns:
+        list(SubtopicPageSummaryDict). The summary dicts corresponding to the
+        given subtopic page ids.
+    """
+    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+
+    all_learner_group_subtopic_page_summaries: List[
+        subtopic_page_domain.SubtopicPageSummaryDict
+    ] = []
+    for topic in topics:
+        for subtopic in topic.subtopics:
+            subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
+            if subtopic_page_id not in subtopic_page_ids:
+                continue
+            all_learner_group_subtopic_page_summaries.append({
+                'subtopic_id': subtopic.id,
+                'subtopic_title': subtopic.title,
+                'parent_topic_id': topic.id,
+                'parent_topic_name': topic.name,
+                'thumbnail_filename': subtopic.thumbnail_filename,
+                'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                'subtopic_mastery': None
+            })
+
+    return all_learner_group_subtopic_page_summaries

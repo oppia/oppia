@@ -4952,7 +4952,7 @@ export default {
   },
 
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
-  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "link", "math", "skillreview"],
+  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
   // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
   "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
@@ -5870,7 +5870,7 @@ export default {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "DEFAULT_SKILL_DIFFICULTY": 0.3,
+  "DEFAULT_SKILL_DIFFICULTY": 0.6,
 
   "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
 
@@ -5901,6 +5901,8 @@ export default {
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
+
+  "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 2,
 
   "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
 

@@ -23,8 +23,8 @@
           <div class="oppia-rule-preview">
             <div class="oppia-click-to-start-editing" (click)="this.openExplanationEditor(this.rubric.getDifficulty(), idx)">
               <i *ngIf="this.isEditable()"
-                 class="material-icons oppia-editor-edit-icon float-right e2e-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
-                 title="Edit Rubric Explanation">&#xE254;
+                 class="fas fa-pen oppia-editor-edit-icon float-right e2e-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
+                 title="Edit Rubric Explanation">
               </i>
             </div>
             <span *ngIf="this.isExplanationEmpty(explanation) && this.selectedRubricIndex === 1 && idx === 0 && this.newSkillBeingCreated()"

@@ -27,7 +27,6 @@ import { ContributionAndReviewService } from './services/contribution-and-review
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { LocalStorageService } from 'services/local-storage.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { UserService } from 'services/user.service';
@@ -61,7 +60,6 @@ export class ContributorDashboardPageComponent
     private focusManagerService: FocusManagerService,
     private languageUtilService: LanguageUtilService,
     private localStorageService: LocalStorageService,
-    private svgSanitizerService: SvgSanitizerService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
@@ -119,7 +117,7 @@ export class ContributorDashboardPageComponent
   }
 
   scrollFunction(): void {
-    if (this.windowRef.nativeWindow.pageYOffset >= 5) {
+    if (this.windowRef.nativeWindow.pageYOffset >= 80) {
       this.defaultHeaderVisible = false;
     } else {
       this.defaultHeaderVisible = true;
@@ -138,7 +136,7 @@ export class ContributorDashboardPageComponent
 
   ngOnInit(): void {
     this.profilePictureDataUrl = null;
-    this.username = null;
+    this.username = '';
     this.userInfoIsLoading = true;
     this.userIsLoggedIn = false;
     this.userIsReviewer = false;
@@ -193,24 +191,25 @@ export class ContributorDashboardPageComponent
 
     this.userService.getProfileImageDataUrlAsync().then(
       (dataUrl) => {
-        this.profilePictureDataUrl = this.svgSanitizerService
-          .getTrustedSvgResourceUrl(dataUrl);
+        this.profilePictureDataUrl = decodeURIComponent(dataUrl);
       });
-
-    this.topicName = (
-      ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
-    this.translationTopicService.setActiveTopicName(this.topicName);
 
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((topicNames) => {
+        // TODO(#15710): Set default active topic to 'All'.
+        if (topicNames.length <= 0) {
+          return;
+        }
+        this.topicName = topicNames[0];
         if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
           this.topicName = prevSelectedTopicName;
-          this.translationTopicService.setActiveTopicName(this.topicName);
         }
+        this.translationTopicService.setActiveTopicName(this.topicName);
       });
 
     this.activeTabName = 'myContributionTab';
 
+    // TODO(#13015): Remove use of unknown as a type.
     this.tabsDetails = {
       ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
     } as unknown as ContributorDashboardTabsDetails;

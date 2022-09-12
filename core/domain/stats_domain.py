@@ -66,6 +66,10 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
+IssuesCustomizationArgsDictType = Dict[
+    str, Dict[str, Union[str, int, List[str]]]
+]
+
 
 class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""
@@ -86,7 +90,7 @@ class ExplorationIssueDict(TypedDict):
     """Dictionary representing the ExplorationIssue object."""
 
     issue_type: str
-    issue_customization_args: Dict[str, Dict[str, Union[str, int]]]
+    issue_customization_args: IssuesCustomizationArgsDictType
     playthrough_ids: List[str]
     schema_version: int
     is_valid: bool
@@ -98,7 +102,7 @@ class PlaythroughDict(TypedDict):
     exp_id: str
     exp_version: int
     issue_type: str
-    issue_customization_args: Dict[str, Dict[str, Union[str, int]]]
+    issue_customization_args: IssuesCustomizationArgsDictType
     actions: List[LearnerActionDict]
 
 
@@ -986,7 +990,7 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        issue_customization_args: Dict[str, Dict[str, Union[str, int]]],
+        issue_customization_args: IssuesCustomizationArgsDictType,
         actions: List[LearnerAction]
     ):
         """Constructs a Playthrough domain object.
@@ -1104,7 +1108,7 @@ class ExplorationIssue:
     def __init__(
         self,
         issue_type: str,
-        issue_customization_args: Dict[str, Dict[str, Union[str, int]]],
+        issue_customization_args: IssuesCustomizationArgsDictType,
         playthrough_ids: List[str],
         schema_version: int,
         is_valid: bool
@@ -1680,7 +1684,7 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
-        super(AnswerFrequencyList, self).__init__(
+        super().__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
         self.answer_occurrences = (
             answer_occurrences if answer_occurrences else [])
@@ -1738,7 +1742,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         """Initialize domain object for categorized answer frequency lists for
         a given dict (default is empty).
         """
-        super(CategorizedAnswerFrequencyLists, self).__init__(
+        super().__init__(
             CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)
         self.categorized_answer_freq_lists = (
             categorized_answer_freq_lists

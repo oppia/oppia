@@ -47,7 +47,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 BASE_MODEL_ID_PATTERN: str = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS: Final = datetime.timedelta(seconds=1)
@@ -110,7 +110,7 @@ class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
     """
 
     def __init__(self) -> None:
-        super(ValidateBaseModelId, self).__init__()
+        super().__init__()
         # IMPORTANT: Only picklable objects can be stored on DoFns! This is
         # because DoFns are serialized with pickle when run on a pipeline (and
         # might be run on many different machines). Any other types assigned to

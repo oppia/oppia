@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
 (base_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration])
+    [models.Names.BASE_MODEL, models.Names.EXPLORATION])
 
 
 class ValidateExplorationSnapshotMetadataModelTests(
@@ -273,15 +273,15 @@ class ValidateExplorationSnapshotMetadataModelTests(
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_exploration_context_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExplorationContextModel', 'story_id'), ['StoryModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExplorationContextModel', 'id'), ['ExplorationModel'])
 
     def test_exp_summary_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'ExpSummaryModel', 'id'),
             ['ExplorationRightsModel', 'ExplorationModel'])

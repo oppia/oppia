@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT])
 
 
 USER_1_EMAIL = 'some@email.com'
@@ -55,8 +55,8 @@ TICKET_ID = '%s.%s.%s' % (
 REPORT_TYPE_SUGGESTION = app_feedback_report_constants.ReportType.SUGGESTION
 REPORT_TYPE_ISSUE = app_feedback_report_constants.ReportType.ISSUE
 CATEGORY_SUGGESTION_OTHER = (
-    app_feedback_report_constants.CATEGORY.other_suggestion)
-CATEGORY_ISSUE_TOPICS = app_feedback_report_constants.CATEGORY.topics_issue
+    app_feedback_report_constants.Category.OTHER_SUGGESTION)
+CATEGORY_ISSUE_TOPICS = app_feedback_report_constants.Category.TOPICS_ISSUE
 ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
 COUNTRY_LOCALE_CODE_INDIA = 'in'
 ANDROID_DEVICE_MODEL = 'Pixel 4a'
@@ -101,7 +101,7 @@ WEB_PLATFORM_VERSION = '3.0.8'
 class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportDomainTests, self).setUp()
+        super().setUp()
         self.android_report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
@@ -160,8 +160,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'ticket_id': TICKET_ID,
             'scrubbed_by': None,
             'user_supplied_feedback': {
-                'report_type': REPORT_TYPE_SUGGESTION.name,
-                'category': CATEGORY_SUGGESTION_OTHER.name,
+                'report_type': REPORT_TYPE_SUGGESTION.value,
+                'category': CATEGORY_SUGGESTION_OTHER.value,
                 'user_feedback_selected_items': USER_SELECTED_ITEMS,
                 'user_feedback_other_text_input': USER_TEXT_INPUT
             },
@@ -192,7 +192,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(expected_dict, self.android_report_obj.to_dict())
 
     def test_report_web_platform_validation_fails(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Domain objects for web reports have not been implemented yet.'):
             self.web_report_obj.validate()
@@ -275,7 +275,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_report_type = 'invalid_report_type'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'The given report type %s is invalid.' % invalid_report_type):
             feedback_report.get_report_type_from_string(
@@ -286,13 +286,13 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         for category in app_feedback_report_constants.ALLOWED_CATEGORIES:
             self.assertEqual(
                 feedback_report.get_category_from_string(
-                    category.name), category)
+                    category.value), category)
 
     def test_get_category_from_string_with_invalid_string_raises_error(
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_category = 'invalid_category'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'The given category %s is invalid.' % invalid_category):
             feedback_report.get_category_from_string(
@@ -311,7 +311,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_text_size = 'invalid_text_size'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'The given Android app text size %s is invalid.' % (
                 invalid_text_size)):
@@ -330,7 +330,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         }
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value)
         navigation_drawer_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -340,7 +340,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.NavigationDrawerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.lesson_player.name)
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value)
         lesson_player_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -350,7 +350,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.LessonPlayerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.revision_card.name)
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value)
         revision_card_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -360,7 +360,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.RevisionCardEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.ENTRY_POINT.crash.name)
+            app_feedback_report_constants.EntryPoint.CRASH.value)
         crash_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
@@ -374,7 +374,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         invalid_json = {
             'entry_point_name': 'invalid_entry_point_name'
         }
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'The given entry point %s is invalid.' % (
                 'invalid_entry_point_name')):
@@ -393,7 +393,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             self) -> None:
         feedback_report = app_feedback_report_domain.AppFeedbackReport
         invalid_network_type = 'invalid_text_size'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'The given Android network type %s is invalid.' % (
                 invalid_network_type)):
@@ -412,7 +412,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             report_obj.validate()
 
@@ -428,7 +428,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError, expected_error_substring):
             report_obj.validate()
 
@@ -436,7 +436,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(UserSuppliedFeedbackDomainTests, self).setUp()
+        super().setUp()
         self.user_supplied_feedback = (
             app_feedback_report_domain.UserSuppliedFeedback(
                 REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER,
@@ -444,8 +444,8 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_dict = {
-            'report_type': REPORT_TYPE_SUGGESTION.name,
-            'category': CATEGORY_SUGGESTION_OTHER.name,
+            'report_type': REPORT_TYPE_SUGGESTION.value,
+            'category': CATEGORY_SUGGESTION_OTHER.value,
             'user_feedback_selected_items': USER_SELECTED_ITEMS,
             'user_feedback_other_text_input': USER_TEXT_INPUT
         }
@@ -541,7 +541,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             feedback_obj.validate()
 
@@ -549,7 +549,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(DeviceSystemContextDomainTests, self).setUp()
+        super().setUp()
         self.device_system_context = (
             app_feedback_report_domain.DeviceSystemContext(
                 WEB_PLATFORM_VERSION, COUNTRY_LOCALE_CODE_INDIA))
@@ -563,7 +563,7 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
             expected_dict, self.device_system_context.to_dict())
 
     def test_validation_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of DeviceSystemContext should implement domain '
             'validation.'):
@@ -573,7 +573,7 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
 class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AndroidDeviceSystemContextTests, self).setUp()
+        super().setUp()
         self.device_system_context = (
             app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
@@ -728,7 +728,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             context_obj.validate()
 
@@ -736,20 +736,20 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 class EntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(EntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.EntryPoint(
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer,
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER,
                 'topic_id', 'story_id', 'exploration_id', 'subtopic_id'))
 
     def test_to_dict_raises_exception(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of EntryPoint should implement their own dict'):
             self.entry_point.to_dict()
 
     def test_validation_raises_exception(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of EntryPoint should implement their own validation'):
             self.entry_point.validate()
@@ -758,14 +758,14 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
 class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(NavigationDrawerEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.NavigationDrawerEntryPoint())
 
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name) # pylint: disable=line-too-long
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value) # pylint: disable=line-too-long
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -774,7 +774,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         # Using type ignore[assignment] because we assign type None to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'No entry point name supplied.'):
             self.entry_point.validate()
@@ -783,24 +783,24 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         # Using type ignore[assignment] because we assign type int to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Entry point name must be a string,'):
             self.entry_point.validate()
 
     def test_validation_name_is_invalid_fails(self) -> None:
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name)): # pylint: disable=line-too-long
+                app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value)): # pylint: disable=line-too-long
             self.entry_point.validate()
 
 
 class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(LessonPlayerEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.LessonPlayerEntryPoint(
                 'topic_id', 'story_id', 'exploration_id'))
@@ -808,7 +808,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player.name),
+                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -839,7 +839,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player.name))
+                app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -896,7 +896,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             entry_point_obj.validate()
 
@@ -904,7 +904,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(RevisionCardEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.RevisionCardEntryPoint(
                 'topic_id', 'subtopic_id'))
@@ -912,7 +912,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.revision_card.name),
+                app_feedback_report_constants.EntryPoint.REVISION_CARD.value),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -940,7 +940,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.revision_card.name))
+                app_feedback_report_constants.EntryPoint.REVISION_CARD.value))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -967,7 +967,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             entry_point_obj.validate()
 
@@ -975,14 +975,14 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
 class CrashEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(CrashEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.CrashEntryPoint())
 
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.crash.name)
+                app_feedback_report_constants.EntryPoint.CRASH.value)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -991,7 +991,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         # Using type ignore[assignment] because we assign type None to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = None # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'No entry point name supplied.'):
             self.entry_point.validate()
@@ -1000,24 +1000,24 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         # Using type ignore[assignment] because we assign type int to
         # type str. This is done to test that the validation fails.
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Entry point name must be a string,'):
             self.entry_point.validate()
 
     def test_validation_name_is_invalid_fails(self) -> None:
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.crash.name)):
+                app_feedback_report_constants.EntryPoint.CRASH.value)):
             self.entry_point.validate()
 
 
 class AppContextDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppContextDomainTests, self).setUp()
+        super().setUp()
         entry_point = (
             app_feedback_report_domain.NavigationDrawerEntryPoint())
         self.app_context = (
@@ -1029,7 +1029,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name), # pylint: disable=line-too-long
+                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
@@ -1038,7 +1038,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
             expected_dict, self.app_context.to_dict())
 
     def test_validation_raises_exception(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             'Subclasses of AppContext should implement their own validation'):
             self.app_context.validate()
@@ -1047,7 +1047,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
 class AndroidAppContextDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AndroidAppContextDomainTests, self).setUp()
+        super().setUp()
         entry_point = (
             app_feedback_report_domain.NavigationDrawerEntryPoint())
         self.app_context = (
@@ -1060,7 +1060,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name), # pylint: disable=line-too-long
+                    app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value), # pylint: disable=line-too-long
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -1159,7 +1159,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             app_context_obj.validate()
 
@@ -1167,7 +1167,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
 class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportTicketDomainTests, self).setUp()
+        super().setUp()
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1304,7 +1304,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             ticket_obj.validate()
 
@@ -1312,7 +1312,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportDailyStatsDomainTests, self).setUp()
+        super().setUp()
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1325,8 +1325,8 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
         app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, PLATFORM_ANDROID,
-            REPORT_SUBMITTED_TIMESTAMP, 0, REPORT_TYPE_SUGGESTION.name,
-            CATEGORY_SUGGESTION_OTHER.name, ANDROID_PLATFORM_VERSION,
+            REPORT_SUBMITTED_TIMESTAMP, 0, REPORT_TYPE_SUGGESTION.value,
+            CATEGORY_SUGGESTION_OTHER.value, ANDROID_PLATFORM_VERSION,
             COUNTRY_LOCALE_CODE_INDIA, ANDROID_SDK_VERSION,
             ANDROID_DEVICE_MODEL, ENTRY_POINT_NAVIGATION_DRAWER, None, None,
             None, None, LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -1339,7 +1339,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             ),
             'report_type': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
-                    REPORT_TYPE_SUGGESTION.name: 1})
+                    REPORT_TYPE_SUGGESTION.value: 1})
             ),
             'country_locale_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
@@ -1383,7 +1383,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             'total_reports_submitted': 1,
             'daily_param_stats': {
                 'platform': {PLATFORM_ANDROID: 1},
-                'report_type': {REPORT_TYPE_SUGGESTION.name: 1},
+                'report_type': {REPORT_TYPE_SUGGESTION.value: 1},
                 'country_locale_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
                 'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
                 'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
@@ -1464,7 +1464,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             stats_obj.validate()
 
@@ -1516,7 +1516,7 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             counts_obj.validate()
 
@@ -1524,15 +1524,15 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
 class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportFilterDomainTests, self).setUp()
+        super().setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
-            app_feedback_report_constants.FILTER_FIELD_NAMES.platform,
+            app_feedback_report_constants.FilterFieldNames.PLATFORM,
             ['web', 'android'])
 
     def test_to_dict(self) -> None:
         app_feedback_report_constants.PLATFORM_CHOICES.sort()
         expected_dict = {
-            'filter_field': 'platform',
+            'filter_field': 'PLATFORM',
             'filter_options': app_feedback_report_constants.PLATFORM_CHOICES
         }
         self.assertDictEqual(
@@ -1571,6 +1571,6 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             filter_obj.validate()

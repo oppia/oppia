@@ -29,7 +29,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -80,7 +80,7 @@ class ModelPropertyTests(test_utils.TestBase):
     def test_init_raises_type_error_when_model_is_not_a_class(self) -> None:
         model = SubclassOfBaseModel()
 
-        with self.assertRaisesRegex(TypeError, 'not a model class'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not a model class'):
             # ModelProperty has model_class argument, which can only accept
             # classes that are inherited from BaseModel. But here we are
             # passing an object of SubclassOfBaseModel. So, to avoid mypy
@@ -90,7 +90,7 @@ class ModelPropertyTests(test_utils.TestBase):
     def test_init_raises_type_error_when_model_is_unrelated_to_base_model(
         self
     ) -> None:
-        with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):
             # ModelProperty has model_class argument, which can only accept
             # classes that are inherited from BaseModel. But here we are
             # passing a class that is inherited from datastore_services.Model.
@@ -103,13 +103,13 @@ class ModelPropertyTests(test_utils.TestBase):
     ) -> None:
         model = SubclassOfBaseModel(value='123')
 
-        with self.assertRaisesRegex(TypeError, 'not an NDB Property'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not an NDB Property'):
             model_property.ModelProperty(SubclassOfBaseModel, model.value)
 
     def test_init_raises_value_error_when_property_is_not_in_model(
         self
     ) -> None:
-        with self.assertRaisesRegex(ValueError, 'not a property of'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'not a property of'):
             model_property.ModelProperty(
                 SubclassOfBaseModel, SubclassOfNdbModel.value)
 
@@ -229,9 +229,10 @@ class ModelPropertyTests(test_utils.TestBase):
     ) -> None:
         model = RepeatedValueModel(values=['123', '456', '789'])
 
-        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            TypeError, 'not an instance of SubclassOfBaseModel',
-            lambda: list(self.ndb_property.yield_value_from_model(model)))
+        with self.assertRaisesRegex(
+            TypeError, 'not an instance of SubclassOfBaseModel'
+        ):
+            list(self.ndb_property.yield_value_from_model(model))
 
     def test_pickle_id_property(self) -> None:
         pickle_value = pickle.loads(pickle.dumps(self.id_property))

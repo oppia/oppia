@@ -20,37 +20,6 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
-
-    additionalEditorFeatures: [
-      'protractor_desktop/additionalEditorFeatures.js'
-    ],
-
-    additionalEditorFeaturesModals: [
-      'protractor_desktop/additionalEditorFeaturesModals.js'
-    ],
-
-    additionalPlayerFeatures: [
-      'protractor_desktop/additionalPlayerFeatures.js'
-    ],
-
-    adminPage: [
-      'protractor_desktop/adminTabFeatures.js'
-    ],
-
-    classroomPage: [
-      'protractor_desktop/classroomPage.js'
-    ],
-
-    classroomPageFileUploadFeatures: [
-      'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
-    coreEditorAndPlayerFeatures: [
-      'protractor_desktop/coreEditorAndPlayerFeatures.js'
-    ],
 
     embedding: [
       'protractor_desktop/embedding.js'
@@ -96,10 +65,6 @@ var suites = {
       'protractor/libraryFlow.js'
     ],
 
-    navigation: [
-      'protractor_desktop/navigation.js'
-    ],
-
     playVoiceovers: [
       'protractor_desktop/playVoiceovers.js'
     ],
@@ -107,18 +72,6 @@ var suites = {
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
     ],
-
-    topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
-    ],
-
-    skillEditor: [
-      'protractor_desktop/skillEditor.js'
-    ],
-
-    wipeout: [
-      'protractor_desktop/wipeout.js',
-    ]
   };
 
 // A reference configuration file.

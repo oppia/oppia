@@ -34,7 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class FindDuplicateBlogPostTitlesJob(base_jobs.JobBase):
@@ -121,7 +121,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
     """Helper class to retrieve models with duplicate properties."""
 
     def __init__(self, property_name: str) -> None:
-        super(GetModelsWithDuplicatePropertyValues, self).__init__()
+        super().__init__()
         self.property_name = property_name
 
     def expand(
@@ -138,7 +138,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
             | 'Discard %s key' % self.property_name >> (
                 beam.Values()) # pylint: disable=no-value-for-parameter
             | 'Discard models with unique %s' % self.property_name >> (
-                beam.Filter(lambda models: len(models) > 1))
+                beam.Filter(lambda models: len(list(models)) > 1))
         )
 
     def get_property_value(

@@ -25,6 +25,7 @@ from core import feconf
 from core import schema_utils
 from core import utils
 from core.constants import constants
+from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
@@ -34,7 +35,9 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
-from typing import Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import (
+    Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
+)
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -45,8 +48,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (email_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.email,
-    models.NAMES.suggestion
+    models.Names.EMAIL,
+    models.Names.SUGGESTION
 ])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -351,6 +354,118 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
         'Review')
 }
 
+CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION: Dict[
+    str, Dict[str, Dict[str, str]]] = {
+    feconf.CONTRIBUTION_TYPE_TRANSLATION: {
+        feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for submitting translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Translator Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUBTYPE_REVIEW: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for reviewing translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Translation Reviewer Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUBTYPE_EDIT: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for correcting translations in %s. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Translation Reviewer Rank Achievement!'
+            )
+        }
+    },
+    feconf.CONTRIBUTION_TYPE_QUESTION: {
+        feconf.CONTRIBUTION_SUBTYPE_ACCEPTANCE: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully achieved '
+                'the %s rank for submitting practice questions. Your efforts '
+                'help Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Question Submitter Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUBTYPE_REVIEW: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully '
+                'achieved the %s '
+                'rank for reviewing  practice questions. Your efforts help '
+                'Oppia grow better every day and support students around the '
+                'world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to contribute!'
+                '<br><br>'
+                'The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Question Reviewer Rank Achievement!'
+            )
+        },
+        feconf.CONTRIBUTION_SUBTYPE_EDIT: {
+            'email_body_template': (
+                'Hi %s,<br><br>'
+                'This is to let you know that you have successfully '
+                'achieved the %s '
+                'rank for correcting practice questions. Your efforts help '
+                'Oppia grow better every day and support students around '
+                'the world.<br><br>'
+                'You can check all the achievements you earned in the '
+                '<a href="%s%s">Contributor Dashboard</a>.<br><br>'
+                'Best wishes and we hope you can continue to '
+                'contribute!<br><br>'
+                'The Oppia Contributor Dashboard Team'
+            ),
+            'email_subject': (
+                'Oppia Question Reviewer Rank Achievement!'
+            )
+        }
+    }
+}
+
 SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: user_services.is_moderator,
@@ -380,6 +495,8 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
     feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1843,6 +1960,63 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
             recipient_email=reviewer_emails[index])
 
 
+def send_mail_to_notify_contributor_ranking_achievement(
+    contributor_ranking_email_info: (
+        suggestion_registry.ContributorMilestoneEmailInfo)) -> None:
+    """Sends an email to translation/question submitters and reviewers when
+    they achieve a new rank.
+
+    Args:
+        contributor_ranking_email_info:
+            ContributorMilestoneEmailInfo. An object with contributor ranking
+            email information.
+    """
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+
+    recipient_username = user_services.get_username(
+        contributor_ranking_email_info.contributor_user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        contributor_ranking_email_info.contributor_user_id
+    ).can_receive_email_updates
+
+    if can_user_receive_email:
+        email_template = CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION[
+            contributor_ranking_email_info.contribution_type][
+                contributor_ranking_email_info.contribution_subtype]
+        email_body = ''
+        if contributor_ranking_email_info.contribution_type == (
+            feconf.CONTRIBUTION_TYPE_TRANSLATION):
+            # Ruling out the possibility of None for mypy type checking. It is
+            # obvious that for the contribution_type
+            # CONTRIBUTION_TYPE_TRANSLATION the language_code will not be None.
+            assert contributor_ranking_email_info.language_code is not None
+            language = utils.get_supported_audio_language_description(
+                contributor_ranking_email_info.language_code)
+            email_body = email_template['email_body_template'] % (
+                    recipient_username,
+                    contributor_ranking_email_info.rank_name,
+                    language,
+                    feconf.OPPIA_SITE_URL,
+                    feconf.CONTRIBUTOR_DASHBOARD_URL
+                )
+        else:
+            email_body = email_template['email_body_template'] % (
+                    recipient_username,
+                    contributor_ranking_email_info.rank_name,
+                    feconf.OPPIA_SITE_URL,
+                    feconf.CONTRIBUTOR_DASHBOARD_URL
+                )
+
+        _send_email(
+            contributor_ranking_email_info.contributor_user_id,
+            feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
+            email_template['email_subject'], email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)
+
+
 def send_accepted_voiceover_application_email(
     recipient_id: str,
     lesson_title: str,
@@ -2003,6 +2177,8 @@ def send_email_to_new_contribution_reviewer(
 
     Raises:
         Exception. The review category is not valid.
+        Exception. The language_code cannot be None if the review category is
+            'translation' or 'voiceover'.
     """
     if review_category not in NEW_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2014,8 +2190,11 @@ def send_email_to_new_contribution_reviewer(
     if review_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\' or \'voiceover\''
+            )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         review_category_description = (
@@ -2075,6 +2254,8 @@ def send_email_to_removed_contribution_reviewer(
 
     Raises:
         Exception. The review category is not valid.
+        Exception. The language_code cannot be None if the review category is
+            'translation' or 'voiceover'.
     """
     if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
         raise Exception('Invalid review_category: %s' % review_category)
@@ -2086,8 +2267,11 @@ def send_email_to_removed_contribution_reviewer(
     if review_category in [
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
             constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER]:
-        # Ruling out the possibility of None for mypy type checking.
-        assert language_code is not None
+        if language_code is None:
+            raise Exception(
+                'The language_code cannot be None if the review category is'
+                ' \'translation\' or \'voiceover\''
+            )
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         reviewer_role_description = (
@@ -2134,7 +2318,9 @@ def send_not_mergeable_change_list_to_admin_for_review(
     exp_id: str,
     frontend_version: int,
     backend_version: int,
-    change_list_dict: Dict[str, str]
+    change_list_dict: Sequence[
+        Mapping[str, change_domain.AcceptableChangeDictTypes]
+    ]
 ) -> None:
     """Sends an email to the admin to review the not mergeable change list
     to improve the functionality in future if possible.
