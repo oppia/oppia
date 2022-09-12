@@ -2503,7 +2503,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                suggestion.change.new_value = (  # pylint disable=no-docstring type: ignore[attr-defined]
+                suggestion.change.new_value = (  # pylint: disable=line-too-long type: ignore[attr-defined]
                     new_content
                 )
                 #@
