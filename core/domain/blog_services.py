@@ -38,7 +38,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 # The maximum number of iterations allowed for populating the results of a
 # search query.
