@@ -257,7 +257,7 @@ class AppFeedbackReport:
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
     @classmethod
-    def from_dict(
+    def from_submitted_feedback_dict(
         cls, report_dict: AndroidFeedbackReportDict
     ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict of the report sent in

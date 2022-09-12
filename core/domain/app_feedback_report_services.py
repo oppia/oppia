@@ -104,7 +104,11 @@ def create_report_from_json(
     Returns:
         AppFeedbackReport. The domain object for an Android feedback report.
     """
-    return app_feedback_report_domain.AppFeedbackReport.from_dict(report_json)
+    return (
+        app_feedback_report_domain.AppFeedbackReport.from_submitted_feedback_dict(  # pylint: disable=line-too-long
+            report_json
+        )
+    )
 
 
 def store_incoming_report_stats(
