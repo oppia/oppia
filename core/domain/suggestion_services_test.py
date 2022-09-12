@@ -2801,7 +2801,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self,
         skill_id: str
     ) -> suggestion_registry.SuggestionAddQuestion:
-        """Creates a topic for a question.
+        """Creates a question suggestion corresponding to the supplied skill.
 
         Args:
             skill_id: str. ID of the skill.
@@ -2834,10 +2834,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.author_id, suggestion_change, 'test description')
 
     def _create_skill(self) -> str:
-        """Creates a topic for a question.
+        """Creates a skill for a question.
 
         Returns:
-            str. A topic ID.
+            str. A skill ID.
         """
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
