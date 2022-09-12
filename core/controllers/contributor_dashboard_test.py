@@ -1520,7 +1520,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
                             0),
                         'accepted_translation_word_count': 50,
                         'rejected_translations_count': 0,
-                        'rejected_translation_word_count':0,
+                        'rejected_translation_word_count': 0,
                         'first_contribution_date': 'Mar 2021',
                         'last_contribution_date': 'Mar 2021'
                     }
@@ -1789,7 +1789,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                             0),
                         'accepted_translation_word_count': 50,
                         'rejected_translations_count': 0,
-                        'rejected_translation_word_count':0,
+                        'rejected_translation_word_count': 0,
                         'first_contribution_date': 'Mar 2021',
                         'last_contribution_date': 'Mar 2021'
                     }
