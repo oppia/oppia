@@ -193,7 +193,8 @@ describe('Blog Post Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.TITLE,
+      { blogPostTitle: 'sampleTitle' });
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       'I18N_BLOG_POST_PAGE_TITLE',
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.META
