@@ -848,9 +848,7 @@ def _get_complete_stats(
             stats are translation contributions.
 
     Returns:
-        list(dict(TranslationContributionStats | TranslationReviewStats
-        | QuestionContributionStats | QuestionReviewStats)). Dict
-        representations of TranslationContributionStats/
+        list. Dict representations of TranslationContributionStats/
         TranslationReviewStats/QuestionContributionStats/
         QuestionReviewStats domain objects with additional keys:
             topic_name: str. Topic name.
