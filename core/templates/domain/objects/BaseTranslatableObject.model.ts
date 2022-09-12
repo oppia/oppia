@@ -21,6 +21,7 @@ import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFacto
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
+import { StringDecoder } from 'string_decoder';
 
 export type TranslatableField = (
   SubtitledHtml |
@@ -94,7 +95,7 @@ export class BaseTranslatableObject {
     });
   }
 
-  getAllContents(): (SubtitledHtml | SubtitledUnicode)[] {
+  getAllContents(): TranslatableField[] {
     let translatableFields = this.getTranslatableFields();
 
     this.getTranslatableObjects().forEach((translatableObject) => {
@@ -105,11 +106,12 @@ export class BaseTranslatableObject {
     return translatableFields;
   }
 
-  getAllHTMLs(): SubtitledHtml[] {
-    return this.getAllContents().map((content) => {
-      if (content instanceof SubtitledHtml) {
-        return content;
-      }
+  getAllHTMLs(): string[] {
+    return this.getAllContents().filter((content) => {
+      return content instanceof SubtitledHtml;
+    }).map((content) => {
+      content = content as SubtitledHtml;
+      return content.html
     });
   }
 

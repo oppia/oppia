@@ -20,11 +20,13 @@ from __future__ import annotations
 
 import enum
 
+from constants import constants
+from core.domain import translatable_object_registry
 from core import feconf
 from core import utils
 
-from typing import Dict, List, Union
-from typing_extensions import TypedDict
+from typing import Callable, Dict, List, Optional, Union
+from typing_extensions import Final, TypedDict
 
 
 class ContentType(enum.Enum):
@@ -70,7 +72,10 @@ class TranslatableContentDict(TypedDict):
 
     content_id: str
     content_value: feconf.ContentValueType
-    content_type: TranslatableContentFormat
+    content_type: str
+    content_format: str
+    interaction_id: Union[str, None]
+    rule_type: Union[str, None]
 
 
 class TranslatableContent:
@@ -91,8 +96,8 @@ class TranslatableContent:
         content_type: ContentType,
         content_format: TranslatableContentFormat,
         content_value: feconf.ContentValueType,
-        interaction_id: str = None,
-        rule_type: str = None
+        interaction_id: Union[str, None] = None,
+        rule_type: Union[str, None] = None
     ) -> None:
         self.content_id = content_id
         self.content_type = content_type
@@ -165,7 +170,10 @@ class TranslatedContent:
         }
 
     @classmethod
-    def from_dict(cls, translated_content_dict) -> TranslatedContent:
+    def from_dict(
+        cls,
+        translated_content_dict: feconf.TranslatedContentDict
+    ) -> TranslatedContent:
         """Returns the TranslatedContent object."""
         return cls(
             translated_content_dict['content_value'],
@@ -192,8 +200,8 @@ class TranslatableContentsCollection:
         content_type: ContentType,
         content_format: TranslatableContentFormat,
         content_value: feconf.ContentValueType,
-        interaction_id: str = None,
-        rule_type: str = None
+        interaction_id: Union[str, None] = None,
+        rule_type: Union[str, None] = None
     ) -> None:
         """Adds translatable field parameter to
         'content_id_to_translatable_content' dict.
@@ -227,7 +235,7 @@ class TranslatableContentsCollection:
     def add_fields_from_translatable_object(
         self,
         translatable_object: BaseTranslatableObject,
-        **kwargs
+        **kwargs: Dict
     ) -> None:
         """Adds translatable fields from a translatable object parameter to
         'content_id_to_translatable_content' dict.
@@ -256,7 +264,8 @@ class BaseTranslatableObject:
     """
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Dict
     ) -> TranslatableContentsCollection:
         """Get all translatable fields in a translatable object.
 
@@ -398,6 +407,16 @@ class BaseTranslatableObject:
                 )
 
 
+class EntityTranslationDict(TypedDict):
+    """Dictionary representing the EntityTranslation object."""
+
+    entity_id: str
+    entity_type: str
+    entity_version: str
+    language_code: str
+    translations: dict(str, feconf.TranslatedContentDict)
+
+
 class EntityTranslation:
     """A domain object to store all translations for a given versioned-entity
     in a given language.
@@ -429,7 +448,10 @@ class EntityTranslation:
         self.language_code = language_code
         self.translations = translations
 
-    def to_dict(entity_translation):
+    def to_dict(
+        self,
+        entity_translation: EntityTranslation
+    ) -> EntityTranslationDict:
         translations_dict = {}
         for content_id, translated_content in (
                 entity_translation.translations.items()):
@@ -444,7 +466,10 @@ class EntityTranslation:
         }
 
     @classmethod
-    def from_dict(cls, entity_translation_dict):
+    def from_dict(
+        cls,
+        entity_translation_dict: EntityTranslationDict
+    ) -> EntityTranslation:
         translations_dict = entity_translation_dict['translations']
         content_id_to_translated_content = {}
         for content_id, translated_content in translations_dict.items():
@@ -460,7 +485,7 @@ class EntityTranslation:
             content_id_to_translated_content
         )
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the EntityTranslation object."""
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
@@ -502,13 +527,13 @@ class EntityTranslation:
         content_id: str,
         content_value: feconf.ContentValueType,
         content_format: TranslatableContentFormat,
-        needs_update: bool):
+        needs_update: bool) -> None:
         """Adds new TranslatedContent in the object."""
         self.translations[content_id] = TranslatedContent(
             content_value, content_format, needs_update)
 
-    def get_translation_count(self):
-        """"""
+    def get_translation_count(self) -> int:
+        """Returs the number of updated translations avialable."""
         count = 0
         for translated_content in self.translations.values():
             if not translated_content.needs_update:
@@ -516,8 +541,8 @@ class EntityTranslation:
 
         return count
 
-    def get_translation_needs_update_count(self):
-        """"""
+    def get_translation_needs_update_count(self) -> int:
+        """Returs the number of translations needs update."""
         count = 0
         for translated_content in self.translations.values():
             if translated_content.needs_update:
@@ -525,13 +550,13 @@ class EntityTranslation:
 
         return count
 
-    def remove_translations(self, content_ids):
+    def remove_translations(self, content_ids: List[str]) -> None:
         """Remove translations for the given list of content Ids."""
         for content_id in content_ids:
             if content_id in self.translations:
                 del self.translations[content_id]
 
-    def mark_translations_needs_update(self, content_ids):
+    def mark_translations_needs_update(self, content_ids: List[str]) -> None:
         """Marks translation needs update for the given list of content Ids."""
         for content_id in content_ids:
             if content_id in self.translations:
@@ -539,7 +564,13 @@ class EntityTranslation:
 
     @classmethod
     def create_empty(
-            cls, entity_type, entity_id, language_code, entity_version=0):
+        cls,
+        entity_type: str,
+        entity_id: str,
+        language_code: str,
+        entity_version: int = 0
+    ) -> EntityTranslation:
+        """Creates new and empty EntityTranslation object."""
         return cls(
             entity_id=entity_id,
             entity_type=entity_type,
@@ -649,12 +680,14 @@ class WrittenTranslation:
     of strings in the original object.
     """
 
-    DATA_FORMAT_HTML = 'html'
-    DATA_FORMAT_UNICODE_STRING = 'unicode'
-    DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
-    DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+    DATA_FORMAT_HTML: Final = 'html'
+    DATA_FORMAT_UNICODE_STRING: Final = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING: Final = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING: Final = 'set_of_unicode_string'
 
-    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE = {
+    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE: Dict[
+        str, translatable_object_registry.TranslatableObjectNames
+    ] = {
         DATA_FORMAT_HTML: 'TranslatableHtml',
         DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
         DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
@@ -663,7 +696,7 @@ class WrittenTranslation:
     }
 
     @classmethod
-    def is_data_format_list(cls, data_format):
+    def is_data_format_list(cls, data_format: str) -> bool:
         """Checks whether the content of translation with given format is of
         a list type.
 
@@ -730,7 +763,7 @@ class WrittenTranslation:
             written_translation_dict['translation'],
             written_translation_dict['needs_update'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates properties of the WrittenTranslation, normalizing the
         translation if needed.
 
@@ -748,7 +781,7 @@ class WrittenTranslation:
         translatable_obj_class = (
             translatable_object_registry.Registry.get_object_class(
                 translatable_class_name))
-        self.translation = translatable_obj_class.normalize_value(
+        self.translation = translatable_obj_class.normalize_value(  # type: ignore[no-untyped-call]
             self.translation)
 
         if not isinstance(self.needs_update, bool):
@@ -788,7 +821,7 @@ class WrittenTranslations:
         Returns:
             dict. A dict, mapping all fields of WrittenTranslations instance.
         """
-        translations_mapping = {}
+        translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]] = {}
         for (content_id, language_code_to_written_translation) in (
                 self.translations_mapping.items()):
             translations_mapping[content_id] = {}
@@ -796,7 +829,7 @@ class WrittenTranslations:
                     language_code_to_written_translation.items()):
                 translations_mapping[content_id][language_code] = (
                     written_translation.to_dict())
-        written_translations_dict = {
+        written_translations_dict: WrittenTranslationsDict = {
             'translations_mapping': translations_mapping
         }
 
@@ -816,7 +849,7 @@ class WrittenTranslations:
             WrittenTranslations. The corresponding WrittenTranslations domain
             object.
         """
-        translations_mapping = {}
+        translations_mapping: Dict[str, Dict[str, WrittenTranslation]] = {}
         for (content_id, language_code_to_written_translation) in (
                 written_translations_dict['translations_mapping'].items()):
             translations_mapping[content_id] = {}
@@ -827,7 +860,9 @@ class WrittenTranslations:
 
         return cls(translations_mapping)
 
-    def get_content_ids_that_are_correctly_translated(self, language_code):
+    def get_content_ids_that_are_correctly_translated(
+        self, language_code: str
+    ) -> List[str]:
         """Returns a list of content ids in which a correct translation is
         available in the given language.
 
@@ -848,7 +883,12 @@ class WrittenTranslations:
 
         return correctly_translated_content_ids
 
-    def add_translation(self, content_id, language_code, html):
+    def add_translation(
+        self,
+        content_id: str,
+        language_code: str,
+        html: str
+    ) -> None:
         """Adds a translation for the given content id in a given language.
 
         Args:
@@ -862,7 +902,8 @@ class WrittenTranslations:
             written_translation)
 
     def mark_written_translation_as_needing_update(
-            self, content_id, language_code):
+        self, content_id: str, language_code: str
+    ) -> None:
         """Marks translation as needing update for the given content id and
         language code.
 
@@ -874,7 +915,9 @@ class WrittenTranslations:
             True
         )
 
-    def mark_written_translations_as_needing_update(self, content_id):
+    def mark_written_translations_as_needing_update(
+        self, content_id: str
+    ) -> None:
         """Marks translation as needing update for the given content id in all
         languages.
 
@@ -887,12 +930,12 @@ class WrittenTranslations:
             self.translations_mapping[content_id][language_code] = (
                 written_translation)
 
-    def validate(self, expected_content_id_list: List[str]) -> None:
+    def validate(self, expected_content_id_list: Optional[List[str]]) -> None:
         """Validates properties of the WrittenTranslations.
 
         Args:
-            expected_content_id_list: list(str). A list of content id which are
-                expected to be inside they WrittenTranslations.
+            expected_content_id_list: list(str)|None. A list of content id which
+                are expected to be inside they WrittenTranslations.
 
         Raises:
             ValidationError. One or more attributes of the WrittenTranslations
@@ -935,7 +978,7 @@ class WrittenTranslations:
 
                 written_translation.validate()
 
-    def get_content_ids_for_text_translation(self):
+    def get_content_ids_for_text_translation(self) -> List[str]:
         """Returns a list of content_id available for text translation.
 
         Returns:
@@ -962,8 +1005,12 @@ class WrittenTranslations:
         """
         if content_id in self.translations_mapping:
             if language_code in self.translations_mapping[content_id]:
-                return self.translations_mapping[
+                translation = self.translations_mapping[
                     content_id][language_code].translation
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(translation, str)
+                return translation
             else:
                 raise Exception(
                     'Translation for the given content_id %s does not exist in '
@@ -971,7 +1018,7 @@ class WrittenTranslations:
         else:
             raise Exception('Invalid content_id: %s' % content_id)
 
-    def add_content_id_for_translation(self, content_id):
+    def add_content_id_for_translation(self, content_id: str) -> None:
         """Adds a content id as a key for the translation into the
         content_translation dict.
 
@@ -990,7 +1037,7 @@ class WrittenTranslations:
 
         self.translations_mapping[content_id] = {}
 
-    def delete_content_id_for_translation(self, content_id):
+    def delete_content_id_for_translation(self, content_id: str) -> None:
         """Deletes a content id from the content_translation dict.
 
         Args:
@@ -1008,7 +1055,7 @@ class WrittenTranslations:
 
         self.translations_mapping.pop(content_id, None)
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in the WrittenTranslations.
 
         Returns:
@@ -1019,12 +1066,17 @@ class WrittenTranslations:
             for written_translation in translations.values():
                 if (written_translation.data_format ==
                         WrittenTranslation.DATA_FORMAT_HTML):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(written_translation.translation, str)
                     html_string_list.append(written_translation.translation)
         return html_string_list
 
     @staticmethod
     def convert_html_in_written_translations(
-            written_translations_dict, conversion_fn):
+        written_translations_dict: WrittenTranslationsDict,
+        conversion_fn: Callable[[str], str]
+    ) -> WrittenTranslationsDict:
         """Checks for HTML fields in the written translations and converts it
         according to the conversion function.
 
@@ -1045,11 +1097,15 @@ class WrittenTranslations:
                 if 'data_format' in translation_dict:
                     if (translation_dict['data_format'] ==
                             WrittenTranslation.DATA_FORMAT_HTML):
+                        translation = written_translations_dict[
+                                'translations_mapping'
+                            ][content_id][language_code]['translation']
+                        # Ruling out the possibility of any other type for mypy
+                        # type checking.
+                        assert isinstance(translation, str)
                         written_translations_dict['translations_mapping'][
                             content_id][language_code]['translation'] = (
-                                conversion_fn(written_translations_dict[
-                                    'translations_mapping'][content_id][
-                                        language_code]['translation'])
+                                conversion_fn(translation)
                             )
                 elif 'html' in translation_dict:
                     # TODO(#11950): Delete this once old schema migration
@@ -1057,9 +1113,16 @@ class WrittenTranslations:
                     # This "elif" branch is needed because, in states schema
                     # v33, this function is called but the dict is still in the
                     # old format (that doesn't have a "data_format" key).
+                    # In convert functions, we allow less strict typing
+                    # because here we are working with previous versions of
+                    # the domain object and in previous versions of the domain
+                    # object there are some fields that are discontinued in
+                    # the latest domain object (eg. html). So, while accessing
+                    # these discontinued fields MyPy throws an error. Thus to
+                    # avoid the error, we used ignore here.
                     written_translations_dict['translations_mapping'][
-                        content_id][language_code]['html'] = (
-                            conversion_fn(translation_dict['html']))
+                        content_id][language_code]['html'] = (  # type: ignore[misc]
+                            conversion_fn(translation_dict['html']))  # type: ignore[misc]
 
         return written_translations_dict
 
@@ -1072,7 +1135,11 @@ class ContentIdGenerator:
         """Constructs an ContentIdGenerator object."""
         self.next_content_id_index = start_index
 
-    def generate(self, content_type: ContentType, extra_prefix=None) -> str:
+    def generate(
+        self,
+        content_type: ContentType,
+        extra_prefix: Union[str, None] = None
+    ) -> str:
         """Generates the new content-id from the next content id."""
         content_id = content_type.value + '_'
         if extra_prefix:

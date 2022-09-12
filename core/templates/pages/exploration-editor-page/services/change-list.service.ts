@@ -363,24 +363,6 @@ export class ChangeListService {
 
   /**
    * Saves a change dict that represents marking a translation as needing
-   * update in a particular language.
-   *
-   * @param {string} contentId - The content id of the translated content.
-   * @param {string} languageCode - The language code.
-   * @param {string} stateName - The current state name.
-   */
-  markTranslationAsNeedingUpdate(
-      contentId: string, languageCode: string, stateName: string): void {
-    this.addChange({
-      cmd: 'mark_written_translation_as_needing_update',
-      content_id: contentId,
-      language_code: languageCode,
-      state_name: stateName
-    });
-  }
-
-  /**
-   * Saves a change dict that represents marking a translation as needing
    * update in all languages.
    *
    * @param {string} contentId - The content id of the translated content.

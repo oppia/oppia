@@ -363,6 +363,7 @@ describe('Conversation skin component', () => {
     correctness_feedback_enabled: true,
     init_state_name: 'Start',
     param_changes: [],
+    next_content_id_index: 4,
     param_specs: null,
     draft_changes: null,
   };
@@ -371,6 +372,7 @@ describe('Conversation skin component', () => {
     exploration_id: 'exp_id',
     is_logged_in: true,
     session_id: 'KERH',
+    displayable_language_codes: [],
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
@@ -379,7 +381,8 @@ describe('Conversation skin component', () => {
       language_code: 'en',
       correctness_feedback_enabled: true,
       objective: 'To learn',
-      states: explorationDict.states
+      states: explorationDict.states,
+      next_content_id_index: explorationDict.next_content_id_index
     },
     exploration_metadata: {
       title: 'Exploration',
@@ -416,6 +419,7 @@ describe('Conversation skin component', () => {
     exploration_id: 'exp_id',
     is_logged_in: true,
     session_id: 'KERH',
+    displayable_language_codes: [],
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
@@ -424,7 +428,8 @@ describe('Conversation skin component', () => {
       language_code: 'en',
       correctness_feedback_enabled: true,
       objective: 'To learn',
-      states: explorationDict.states
+      states: explorationDict.states,
+      next_content_id_index: explorationDict.next_content_id_index
     },
     exploration_metadata: {
       title: 'Exploration',
@@ -1043,7 +1048,7 @@ describe('Conversation skin component', () => {
         stateName,
         '<p>Testing</p>', null, new Interaction(
           [], [], null, null, [], 'Continue', null),
-        [], null, null, 'content', null)
+        [], null, 'content', null)
       );
     }
     let alertMessageElement = document.createElement('div');

@@ -298,9 +298,7 @@ describe('Preview Tab Component', () => {
     explorationInitStateNameService.savedMemento = 'state';
     spyOn(numberAttemptsService, 'reset').and.stub();
     spyOn(explorationEngineService, 'init').and.callFake(
-      (value, value1, value2, value3, value4, callback) => {
-        callback(null, null);
-      });
+      (value, value1, value2, value3, value4, callback) => {});
 
     // Get data from exploration data service and resolve promise in open
     // modal.

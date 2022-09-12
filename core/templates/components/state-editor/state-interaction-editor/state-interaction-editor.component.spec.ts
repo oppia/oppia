@@ -29,7 +29,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { EditabilityService } from 'services/editability.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
-import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
 import { StateContentService } from '../state-editor-properties-services/state-content.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -98,7 +97,6 @@ describe('State Interaction component', () => {
   let stateCustomizationArgsService: StateCustomizationArgsService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
-  let stateNextContentIdIndexService: StateNextContentIdIndexService;
   let stateSolutionService: StateSolutionService;
   let urlInterpolationService: UrlInterpolationService;
 
@@ -125,7 +123,6 @@ describe('State Interaction component', () => {
         StateCustomizationArgsService,
         StateEditorService,
         StateInteractionIdService,
-        StateNextContentIdIndexService,
         StateSolutionService,
         UrlInterpolationService
       ],
@@ -150,8 +147,6 @@ describe('State Interaction component', () => {
       TestBed.inject(StateCustomizationArgsService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    stateNextContentIdIndexService =
-      TestBed.inject(StateNextContentIdIndexService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
@@ -280,7 +275,6 @@ describe('State Interaction component', () => {
         }
       ) as NgbModalRef;
     });
-    spyOn(stateNextContentIdIndexService, 'restoreFromMemento').and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
@@ -289,20 +283,12 @@ describe('State Interaction component', () => {
     tick();
     mockEventEmitter.emit();
 
-    expect(stateNextContentIdIndexService.restoreFromMemento)
-      .toHaveBeenCalled();
-
     component.interactionIsDisabled = true;
     tick();
     component.openInteractionCustomizerModal();
-
-    expect(stateNextContentIdIndexService.restoreFromMemento)
-      .toHaveBeenCalledTimes(1);
   }));
 
   it('should save interaction when user click save', fakeAsync(() => {
-    stateNextContentIdIndexService.displayed = 2;
-    stateNextContentIdIndexService.savedMemento = 1;
     stateInteractionIdService.displayed = 'EndExploration';
     stateInteractionIdService.savedMemento = 'InteractiveMap';
     component.DEFAULT_TERMINAL_STATE_CONTENT = 'HTML Content';
@@ -340,9 +326,7 @@ describe('State Interaction component', () => {
     });
 
     spyOn(interactionDetailsCacheService, 'set').and.stub();
-    spyOn(stateNextContentIdIndexService, 'saveDisplayedValue').and.stub();
     spyOn(stateContentService, 'saveDisplayedValue').and.stub();
-    spyOn(stateNextContentIdIndexService, 'restoreFromMemento').and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();

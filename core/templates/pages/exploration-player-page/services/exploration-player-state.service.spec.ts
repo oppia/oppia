@@ -75,7 +75,8 @@ describe('Exploration Player State Service', () => {
       title: '',
       language_code: '',
       objective: '',
-      correctness_feedback_enabled: false
+      correctness_feedback_enabled: false,
+      next_content_id_index: 0
     },
     exploration_metadata: {
       title: '',
@@ -101,6 +102,7 @@ describe('Exploration Player State Service', () => {
     preferred_language_codes: [],
     auto_tts_enabled: false,
     correctness_feedback_enabled: true,
+    displayable_language_codes: [],
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
@@ -216,6 +218,7 @@ describe('Exploration Player State Service', () => {
     },
     question_state_data_schema_version: 2,
     language_code: '',
+    next_content_id_index: 4,
     version: 1,
     linked_skill_ids: [],
     inapplicable_skill_misconception_ids: []
@@ -436,7 +439,8 @@ describe('Exploration Player State Service', () => {
         states: null,
         title: '',
         draft_change_list_id: 0,
-        language_code: ''
+        language_code: '',
+        next_content_id_index: 0
       }));
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
       .and.returnValue(Promise.resolve({

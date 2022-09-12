@@ -101,16 +101,9 @@ describe('Exploration object factory', () => {
       },
       param_changes: [],
       solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
       classifier_model_id: null,
       card_is_checkpoint: false,
       linked_skill_id: null,
-      next_content_id_index: 1
     };
     secondState = {
       content: {
@@ -151,16 +144,9 @@ describe('Exploration object factory', () => {
       },
       param_changes: [],
       solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
       classifier_model_id: null,
       card_is_checkpoint: false,
       linked_skill_id: null,
-      next_content_id_index: 1
     };
 
     const explorationDict: ExplorationBackendDict = {
@@ -176,7 +162,8 @@ describe('Exploration object factory', () => {
       is_version_of_draft_valid: true,
       version: 1,
       draft_change_list_id: 0,
-      correctness_feedback_enabled: false
+      correctness_feedback_enabled: false,
+      next_content_id_index: 4
     };
 
     exploration = eof.createFromBackendDict(explorationDict);

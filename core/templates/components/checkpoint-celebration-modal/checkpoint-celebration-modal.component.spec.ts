@@ -159,7 +159,8 @@ const dummyExplorationBackendDict = {
   title: 'Dummy Title',
   language_code: 'en',
   objective: 'Dummy Objective',
-  correctness_feedback_enabled: true
+  correctness_feedback_enabled: true,
+  next_content_id_index: 4
 };
 
 const dummyExplorationMetadata = {
@@ -198,6 +199,7 @@ const dummyExplorationBackendResponse = {
   furthest_reached_checkpoint_state_name: '',
   most_recently_reached_checkpoint_state_name: 'Introduction',
   most_recently_reached_checkpoint_exp_version: 0,
+  displayable_language_codes: []
 };
 
 describe('Checkpoint celebration modal component', function() {

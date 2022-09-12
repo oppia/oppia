@@ -85,7 +85,9 @@ describe('Exploration save service ' +
               successCb(false, [
                 {
                   cmd: 'add_state',
-                  state_name: 'StateName'
+                  state_name: 'StateName',
+                  content_id_for_state_content: 'content_0',
+                  content_id_for_default_outcome: 'default_outcome_1'
                 }]);
             }
           }

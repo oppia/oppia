@@ -20,12 +20,12 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {
   StateEditorService,
@@ -36,6 +36,7 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import {
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService = null;
@@ -266,38 +267,23 @@ describe('Responses Service', () => {
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
 
-    const updatedAnswerGroup = {
-      rules: [
-        {
-          type: 'Contains',
-          inputs: {
+    const updatedAnswerGroup = new AnswerGroup(
+      [
+        new Rule(
+          'Contains', {
             x: {
               contentId: 'rule_input_Contains',
               normalizedStrSet: ['correct']
             },
           },
-          inputTypes: {},
-          toBackendDict: jasmine.createSpy('toBackendDict'),
-        },
+          {})
       ],
-      outcome: {
-        dest: 'State',
-        destIfReallyStuck: null,
-        feedback: new SubtitledHtml('', 'This is a new feedback text'),
-        refresherExplorationId: 'test',
-        missingPrerequisiteSkillId: 'test_skill_id',
-        labelledAsCorrect: true,
-        paramChanges: [],
-        toBackendDict: jasmine.createSpy('toBackendDict'),
-        setDestination: jasmine.createSpy('setDestination'),
-        hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
-        isConfusing: jasmine.createSpy('isConfusing'),
-      },
-      destIfReallyStuck: null,
-      trainingData: ['This is training data text'],
-      taggedSkillMisconceptionId: '',
-      toBackendDict: jasmine.createSpy('toBackendDict'),
-    };
+      new Outcome(
+        'State', null, new SubtitledHtml('', 'This is a new feedback text'),
+        true, [], 'test',null
+      ),
+      [], null)
+
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.updateAnswerGroup(0, updatedAnswerGroup, callbackSpy);
 

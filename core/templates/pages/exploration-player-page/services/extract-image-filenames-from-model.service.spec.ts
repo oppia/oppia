@@ -53,7 +53,7 @@ describe('Extracting Image file names in the state service', () => {
     sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     spyOn(ctms, 'getTranslatedHtml').and.callFake(
-      (unusedWrittenTranslations, unusedLanguageCode, content) => {
+      (unusedLanguageCode, content) => {
         return content.html;
       });
 
@@ -64,6 +64,7 @@ describe('Extracting Image file names in the state service', () => {
       language_code: 'en',
       draft_change_list_id: 0,
       title: 'My Title',
+      next_content_id_index: 3,
       init_state_name: 'Introduction',
       states: {
         'State 1': {

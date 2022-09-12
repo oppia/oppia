@@ -56,10 +56,10 @@ import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-p
 import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
 
 interface ContentsMapping {
-  [contentId: string]: SubtitledHtml | SubtitledUnicode;
+  [contentId: string]: TranslatableField;
 }
 
 @Injectable({

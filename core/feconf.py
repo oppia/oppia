@@ -1647,3 +1647,4 @@ class TranslatedContentDict(TypedDict):
 
     content_value: ContentValueType
     needs_update: bool
+    content_format: str

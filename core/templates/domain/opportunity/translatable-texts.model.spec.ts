@@ -27,8 +27,8 @@ describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
   const getTranslatableItem = (text: string) => {
     return {
-      data_format: 'html',
-      content: text,
+      content_format: 'html',
+      content_value: text,
       content_type: 'content',
       interaction_id: null,
       rule_type: null
@@ -39,11 +39,11 @@ describe('Translatable Texts model', () => {
     const sampleBackendDict: TranslatableTextsBackendDict = {
       state_names_to_content_id_mapping: {
         state1: {
-          1: getTranslatableItem('text1'),
-          2: getTranslatableItem('text2')
+          '1': getTranslatableItem('text1'),
+          '2': getTranslatableItem('text2')
         },
         state2: {
-          1: getTranslatableItem('text3')
+          '1': getTranslatableItem('text3')
         }
       },
       version: '1'
