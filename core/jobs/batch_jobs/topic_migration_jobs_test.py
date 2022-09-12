@@ -45,7 +45,6 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
     ] = topic_migration_jobs.MigrateTopicJob
 
     TOPIC_1_ID: Final = 'topic_1_id'
-    STORY_1_ID: Final = 'story_1_id'
 
     def setUp(self) -> None:
         super().setUp()

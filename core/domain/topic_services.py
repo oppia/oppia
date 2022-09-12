@@ -1366,7 +1366,10 @@ def get_topic_id_to_diagnostic_test_skill_ids(
     return topic_id_to_diagnostic_test_skill_ids
 
 
-def populate_topic_model_fields(topic_model, topic):
+def populate_topic_model_fields(
+    topic_model: topic_models.TopicModel,
+    topic: topic_domain.Topic
+) -> topic_models.TopicModel:
     """Populate topic model with the data from topic object.
 
     Args:
@@ -1405,7 +1408,10 @@ def populate_topic_model_fields(topic_model, topic):
     return topic_model
 
 
-def populate_topic_summary_model_fields(topic_summary_model, topic_summary):
+def populate_topic_summary_model_fields(
+    topic_summary_model: topic_models.TopicSummaryModel,
+    topic_summary: topic_domain.TopicSummary
+) -> topic_models.TopicSummaryModel:
     """Populate topic summary model with the data from topic summary object.
 
     Args:
