@@ -16,73 +16,118 @@
  * @fileoverview Unit tests for the component of the 'State Editor'.
  */
 
-import { EventEmitter } from '@angular/core';
-import { fakeAsync, TestBed, tick, flush } from '@angular/core/testing';
-import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { fakeAsync, TestBed, tick, flush, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementsService } from 'services/improvements.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { ExplorationWarningsService } from '../services/exploration-warnings.service';
+import { RouterService } from '../services/router.service';
+import { StateEditorRefreshService } from '../services/state-editor-refresh.service';
+import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
+import { ExplorationEditorTabComponent } from './exploration-editor-tab.component';
+import { DomRefService, JoyrideDirective, JoyrideOptionsService, JoyrideService, JoyrideStepsContainerService, JoyrideStepService, LoggerService, TemplatesService } from 'ngx-joyride';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
+import { Router } from '@angular/router';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { State } from 'domain/state/StateObjectFactory';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { TranslationBackendDict } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Exploration editor tab component', () => {
-  var ctrl;
-  var $q = null;
-  var $scope = null;
-  var $rootScope = null;
-  var ngbModal: NgbModal;
-  var $timeout = null;
-  var answerGroupObjectFactory = null;
-  var editabilityService = null;
-  var explorationFeaturesService = null;
-  var explorationInitStateNameService = null;
-  var explorationStatesService = null;
-  var explorationWarningsService = null;
-  var hintObjectFactory = null;
-  var outcomeObjectFactory = null;
-  var routerService = null;
-  var siteAnalyticsService = null;
-  var stateEditorRefreshService = null;
-  var solutionObjectFactory = null;
-  var stateCardIsCheckpointService = null;
-  var stateEditorService = null;
-  var userExplorationPermissionsService = null;
-  var focusManagerService = null;
-  var mockRefreshStateEditorEventEmitter = null;
+  let component: ExplorationEditorTabComponent;
+  let fixture: ComponentFixture<ExplorationEditorTabComponent>;
+  let ngbModal: NgbModal;
+  let answerGroupObjectFactory: AnswerGroupObjectFactory;
+  let editabilityService: EditabilityService;
+  let explorationFeaturesService: ExplorationFeaturesService;
+  let explorationInitStateNameService: ExplorationInitStateNameService;
+  let explorationStatesService: ExplorationStatesService;
+  let explorationWarningsService: ExplorationWarningsService;
+  let hintObjectFactory: HintObjectFactory;
+  let outcomeObjectFactory: OutcomeObjectFactory;
+  let routerService: RouterService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let stateEditorRefreshService: StateEditorRefreshService;
+  let solutionObjectFactory: SolutionObjectFactory;
+  let stateCardIsCheckpointService: StateCardIsCheckpointService;
+  let stateEditorService: StateEditorService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let focusManagerService: FocusManagerService;
+  let mockRefreshStateEditorEventEmitter = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve()
+      };
+    }
+  }
 
-  importAllAngularServices();
+  class MockJoyrideService {
+    startTour() {
+      return {
+        subscribe: (value1, value2, value3) => {
+          value1({number: 2});
+          value1({number: 4});
+          value1({number: 6});
+          value1({number: 8});
+          value2();
+          value3();
+        }
+      };
+    }
 
-  beforeEach(() => {
+    closeTour() {}
+  }
+
+  class MockRouter {}
+
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+      ],
+      declarations: [
+        JoyrideDirective,
+        ExplorationEditorTabComponent,
+        MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+      ],
       providers: [
+        JoyrideStepService,
+        {
+          provide: Router,
+          useClas: MockRouter,
+        },
+        TemplatesService,
+        JoyrideOptionsService,
+        JoyrideStepsContainerService,
+        LoggerService,
+        DomRefService,
+        {
+          provide: JoyrideService,
+          useClass: MockJoyrideService,
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
         {
           provide: ExplorationDataService,
           useValue: {
@@ -92,79 +137,50 @@ describe('Exploration editor tab component', () => {
             }
           }
         }
-      ]
-    });
-
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
-    explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
-    hintObjectFactory = TestBed.get(HintObjectFactory);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    solutionObjectFactory = TestBed.get(SolutionObjectFactory);
-    focusManagerService = TestBed.get(FocusManagerService);
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'AnswerGroupObjectFactory', answerGroupObjectFactory);
-    $provide.value(
-      'ExplorationFeaturesService', explorationFeaturesService);
-    $provide.value('HintObjectFactory', hintObjectFactory);
-    $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value(
-      'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
-    $provide.value(
-      'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
-    $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
-    $provide.value(
-      'SolutionValidityService', TestBed.get(SolutionValidityService));
-    $provide.value(
-      'StateClassifierMappingService',
-      TestBed.get(StateClassifierMappingService));
-    $provide.value(
-      'StateCardIsCheckpointService',
-      TestBed.get(StateCardIsCheckpointService));
-    $provide.value(
-      'StateEditorService', TestBed.get(StateEditorService));
-    $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      TestBed.get(WrittenTranslationsObjectFactory));
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    ngbModal = $injector.get('NgbModal');
-    $timeout = $injector.get('$timeout');
-    stateEditorService = $injector.get('StateEditorService');
-    stateCardIsCheckpointService = $injector.get(
-      'StateCardIsCheckpointService');
-    editabilityService = $injector.get('EditabilityService');
-    focusManagerService = $injector.get('FocusManagerService');
-    explorationInitStateNameService = $injector.get(
-      'ExplorationInitStateNameService');
-    explorationStatesService = $injector.get('ExplorationStatesService');
-    explorationWarningsService = $injector.get('ExplorationWarningsService');
-    routerService = $injector.get('RouterService');
-    siteAnalyticsService = $injector.get('SiteAnalyticsService');
-    stateEditorRefreshService = $injector.get('StateEditorRefreshService');
-    userExplorationPermissionsService = $injector.get(
-      'UserExplorationPermissionsService'
-    );
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ExplorationEditorTabComponent);
+    component = fixture.componentInstance;
+
+    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
+    explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
+    hintObjectFactory = TestBed.inject(HintObjectFactory);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    ngbModal = TestBed.inject(NgbModal);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateCardIsCheckpointService = TestBed.inject(
+      StateCardIsCheckpointService);
+    editabilityService = TestBed.inject(EditabilityService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    explorationInitStateNameService = TestBed.inject(
+      ExplorationInitStateNameService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    explorationWarningsService = TestBed.inject(ExplorationWarningsService);
+    routerService = TestBed.inject(RouterService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    stateEditorRefreshService = TestBed.inject(StateEditorRefreshService);
+    userExplorationPermissionsService = TestBed.inject(
+      UserExplorationPermissionsService);
+
     mockRefreshStateEditorEventEmitter = new EventEmitter();
+    spyOn(stateEditorService, 'checkEventListenerRegistrationStatus')
+      .and.returnValue(true);
+    spyOn(document, 'getElementById').and.returnValue({
+      offsetTop: 400
+    } as HTMLElement);
     spyOnProperty(
       stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
       mockRefreshStateEditorEventEmitter);
 
     explorationStatesService.init({
       'First State': {
+        classifier_model_id: null,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -172,6 +188,7 @@ describe('Exploration editor tab component', () => {
         },
         interaction: {
           id: 'TextInput',
+          confirmed_unclassified_answers: null,
           customization_args: {
             placeholder: {value: {
               content_id: 'ca_placeholder',
@@ -181,8 +198,11 @@ describe('Exploration editor tab component', () => {
           },
           answer_groups: [{
             rule_specs: [],
+            training_data: null,
+            tagged_skill_misconception_id: null,
             outcome: {
               dest: 'unused',
+              missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
@@ -196,6 +216,7 @@ describe('Exploration editor tab component', () => {
           default_outcome: {
             dest: 'default',
             dest_if_really_stuck: null,
+            missing_prerequisite_skill_id: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -237,15 +258,13 @@ describe('Exploration editor tab component', () => {
             content: {},
             default_outcome: {},
             feedback_1: {
-              en: {
-                html: 'This is a html',
-                needs_update: false
-              }
+              en: {} as TranslationBackendDict
             }
           }
         }
       },
       'Second State': {
+        classifier_model_id: null,
         card_is_checkpoint: false,
         content: {
           content_id: 'content',
@@ -260,6 +279,8 @@ describe('Exploration editor tab component', () => {
         },
         interaction: {
           id: 'TextInput',
+          confirmed_unclassified_answers: null,
+          solution: null,
           customization_args: {
             placeholder: {value: {
               content_id: 'ca_placeholder',
@@ -269,7 +290,10 @@ describe('Exploration editor tab component', () => {
           },
           answer_groups: [{
             rule_specs: [],
+            training_data: null,
+            tagged_skill_misconception_id: null,
             outcome: {
+              missing_prerequisite_skill_id: null,
               dest: 'unused',
               dest_if_really_stuck: null,
               feedback: {
@@ -288,6 +312,7 @@ describe('Exploration editor tab component', () => {
               content_id: 'default_outcome',
               html: ''
             },
+            missing_prerequisite_skill_id: null,
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null
@@ -308,47 +333,51 @@ describe('Exploration editor tab component', () => {
       }
     });
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('explorationEditorTab', {
-      $scope: $scope
-    });
-    ctrl.$onInit();
-  }));
+    component.ngOnInit();
+  });
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
   it('should apply autofocus to elements in active tab', () => {
     spyOn(routerService, 'getActiveTabName').and.returnValues(
       'main', 'feedback', 'history');
     spyOn(focusManagerService, 'setFocus');
-    ctrl.windowOnload();
-    expect(ctrl.TabName).toBe('main');
+
+    component.windowOnload();
+
+    expect(component.TabName).toBe('main');
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'oppiaEditableSection');
-    ctrl.windowOnload();
-    expect(ctrl.TabName).toBe('feedback');
+
+    component.windowOnload();
+
+    expect(component.TabName).toBe('feedback');
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'newThreadButton');
-    ctrl.windowOnload();
-    expect(ctrl.TabName).toBe('history');
+
+    component.windowOnload();
+
+    expect(component.TabName).toBe('history');
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
       'usernameInputField');
   });
 
-  it('should call focus method when window loads', () => {
+  it('should call focus method when window loads', fakeAsync(() => {
     stateEditorService.setActiveStateName('First State');
-    var ctrlSpy = spyOn(ctrl, 'windowOnload');
-    ctrl.initStateEditor();
-    $scope.$apply();
-    $timeout.flush();
+    let ctrlSpy = spyOn(component, 'windowOnload');
+    component.initStateEditor();
+
+    tick();
+    flush();
+
     expect(ctrlSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should initialize controller properties after its initialization',
     () => {
-      expect(ctrl.interactionIsShown).toBe(false);
+      expect(component.interactionIsShown).toBe(false);
     });
 
   it('should get state content placeholder text when init state name is equal' +
@@ -356,7 +385,7 @@ describe('Exploration editor tab component', () => {
     stateEditorService.setActiveStateName('First State');
     explorationInitStateNameService.init('First State');
 
-    expect(ctrl.getStateContentPlaceholder()).toBe(
+    expect(component.getStateContentPlaceholder()).toBe(
       'This is the first card of your exploration. Use this space ' +
       'to introduce your topic and engage the learner, then ask ' +
       'them a question.');
@@ -367,18 +396,19 @@ describe('Exploration editor tab component', () => {
     stateEditorService.setActiveStateName('First State');
     explorationInitStateNameService.init('Second State');
 
-    expect(ctrl.getStateContentPlaceholder()).toBe(
+    expect(component.getStateContentPlaceholder()).toBe(
       'You can speak to the learner here, then ask them a question.');
   });
 
   it('should get state content save button placeholder', () => {
-    expect(ctrl.getStateContentSaveButtonPlaceholder()).toBe('Save Content');
+    expect(
+      component.getStateContentSaveButtonPlaceholder()).toBe('Save Content');
   });
 
   it('should add state in exploration states', () => {
     spyOn(explorationStatesService, 'addState').and.callThrough();
 
-    ctrl.addState('Fourth State');
+    component.addState('Fourth State');
 
     expect(explorationStatesService.addState).toHaveBeenCalledWith(
       'Fourth State', null);
@@ -387,7 +417,7 @@ describe('Exploration editor tab component', () => {
   it('should refresh warnings', () => {
     spyOn(explorationWarningsService, 'updateWarnings');
 
-    ctrl.refreshWarnings();
+    component.refreshWarnings();
 
     expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
   });
@@ -400,15 +430,15 @@ describe('Exploration editor tab component', () => {
         html: 'First State Content'
       }));
 
-    var displayedValue = SubtitledHtml.createFromBackendDict({
+    let displayedValue = SubtitledHtml.createFromBackendDict({
       content_id: 'content',
       html: 'First State Content Changed'
     });
-    ctrl.saveStateContent(displayedValue);
+    component.saveStateContent(displayedValue);
 
     expect(explorationStatesService.getState('First State').content).toEqual(
       displayedValue);
-    expect(ctrl.interactionIsShown).toBe(true);
+    expect(component.interactionIsShown).toBe(true);
   });
 
   it('should save state interaction id', () => {
@@ -418,8 +448,8 @@ describe('Exploration editor tab component', () => {
 
     expect(stateEditorService.interaction.id).toBe('TextInput');
 
-    var newInteractionId = 'Continue';
-    ctrl.saveInteractionId(newInteractionId);
+    let newInteractionId = 'Continue';
+    component.saveInteractionId(newInteractionId);
 
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
@@ -430,7 +460,7 @@ describe('Exploration editor tab component', () => {
       explorationStatesService.getState('First State').nextContentIdIndex
     ).toEqual(0);
 
-    ctrl.saveNextContentIdIndex(2);
+    component.saveNextContentIdIndex(2);
     expect(
       explorationStatesService.getState('First State').nextContentIdIndex
     ).toBe(2);
@@ -442,7 +472,7 @@ describe('Exploration editor tab component', () => {
       explorationStatesService.getState('First State').linkedSkillId
     ).toEqual(null);
 
-    ctrl.saveLinkedSkillId('skill_id1');
+    component.saveLinkedSkillId('skill_id1');
     expect(
       explorationStatesService.getState('First State').linkedSkillId
     ).toBe('skill_id1');
@@ -456,7 +486,10 @@ describe('Exploration editor tab component', () => {
     expect(stateEditorService.interaction.answerGroups).toEqual([
       answerGroupObjectFactory.createFromBackendDict({
         rule_specs: [],
+        training_data: null,
+        tagged_skill_misconception_id: null,
         outcome: {
+          missing_prerequisite_skill_id: null,
           dest: 'unused',
           dest_if_really_stuck: null,
           feedback: {
@@ -467,11 +500,12 @@ describe('Exploration editor tab component', () => {
           param_changes: [],
           refresher_exploration_id: null
         }
-      })]);
+      }, null)]);
 
-    var displayedValue = [answerGroupObjectFactory.createFromBackendDict({
+    let displayedValue = [answerGroupObjectFactory.createFromBackendDict({
       rule_specs: [],
       outcome: {
+        missing_prerequisite_skill_id: null,
         dest: 'Second State',
         dest_if_really_stuck: null,
         feedback: {
@@ -482,10 +516,10 @@ describe('Exploration editor tab component', () => {
         param_changes: [],
         refresher_exploration_id: null
       },
-      training_data: {},
+      training_data: null,
       tagged_skill_misconception_id: ''
-    })];
-    ctrl.saveInteractionAnswerGroups(displayedValue);
+    }, null)];
+    component.saveInteractionAnswerGroups(displayedValue);
 
     expect(stateEditorService.interaction.answerGroups).toEqual(displayedValue);
   });
@@ -505,21 +539,23 @@ describe('Exploration editor tab component', () => {
         },
         labelled_as_correct: false,
         param_changes: [],
+        missing_prerequisite_skill_id: null,
         refresher_exploration_id: null
       }));
 
-    var displayedValue = outcomeObjectFactory.createFromBackendDict({
+    let displayedValue = outcomeObjectFactory.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
         content_id: 'default_outcome_changed',
         html: 'This is the default outcome changed'
       },
+      missing_prerequisite_skill_id: null,
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });
-    ctrl.saveInteractionDefaultOutcome(displayedValue);
+    component.saveInteractionDefaultOutcome(displayedValue);
 
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
       displayedValue);
@@ -535,7 +571,7 @@ describe('Exploration editor tab component', () => {
       placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') }
     });
 
-    var displayedValue = {
+    let displayedValue = {
       placeholder: {
         value: new SubtitledUnicode('Placeholder value', 'ca_placeholder')
       },
@@ -543,7 +579,7 @@ describe('Exploration editor tab component', () => {
         value: 2
       }
     };
-    ctrl.saveInteractionCustomizationArgs(displayedValue);
+    component.saveInteractionCustomizationArgs(displayedValue);
 
     expect(stateEditorService.interaction.customizationArgs).toEqual(
       displayedValue);
@@ -564,7 +600,7 @@ describe('Exploration editor tab component', () => {
         }
       }));
 
-    var displayedValue = solutionObjectFactory.createFromBackendDict({
+    let displayedValue = solutionObjectFactory.createFromBackendDict({
       correct_answer: 'This is the second correct answer',
       answer_is_exclusive: true,
       explanation: {
@@ -572,7 +608,7 @@ describe('Exploration editor tab component', () => {
         content_id: 'content_4'
       }
     });
-    ctrl.saveSolution(displayedValue);
+    component.saveSolution(displayedValue);
 
     expect(stateEditorService.interaction.solution).toEqual(
       displayedValue);
@@ -585,13 +621,13 @@ describe('Exploration editor tab component', () => {
 
     expect(stateEditorService.interaction.hints).toEqual([]);
 
-    var displayedValue = [hintObjectFactory.createFromBackendDict({
+    let displayedValue = [hintObjectFactory.createFromBackendDict({
       hint_content: {
         content_id: '',
         html: 'This is a hint'
       }
     })];
-    ctrl.saveHints(displayedValue);
+    component.saveHints(displayedValue);
 
     expect(stateEditorService.interaction.hints).toEqual(
       displayedValue);
@@ -604,7 +640,7 @@ describe('Exploration editor tab component', () => {
 
     expect(stateEditorService.solicitAnswerDetails).toBe(false);
 
-    ctrl.saveSolicitAnswerDetails(true);
+    component.saveSolicitAnswerDetails(true);
 
     expect(stateEditorService.solicitAnswerDetails).toBe(true);
   });
@@ -617,7 +653,7 @@ describe('Exploration editor tab component', () => {
     expect(stateEditorService.cardIsCheckpoint).toBe(false);
 
     stateCardIsCheckpointService.displayed = true;
-    ctrl.onChangeCardIsCheckpoint();
+    component.onChangeCardIsCheckpoint();
 
     expect(stateEditorService.cardIsCheckpoint).toBe(true);
   });
@@ -636,11 +672,10 @@ describe('Exploration editor tab component', () => {
       expect(
         explorationStatesService.getState('First State')
           .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
+        .toBe(undefined);
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
+      component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       tick();
-      $scope.$apply();
 
       expect(
         explorationStatesService.getState('First State')
@@ -655,7 +690,7 @@ describe('Exploration editor tab component', () => {
     }));
 
   it('should not mark all audio as needing update when dismissing modal',
-    () => {
+    fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.reject()
       } as NgbModalRef);
@@ -663,15 +698,10 @@ describe('Exploration editor tab component', () => {
 
       expect(
         explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        false);
-      expect(
-        explorationStatesService.getState('First State')
           .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
+        .toBe(undefined);
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
-      $scope.$apply();
+      component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
 
       expect(
         explorationStatesService.getState('First State')
@@ -680,314 +710,124 @@ describe('Exploration editor tab component', () => {
       expect(
         explorationStatesService.getState('First State')
           .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
-    });
+        .toBe(undefined);
+    }));
 
   it('should navigate to main tab in specific state name', () => {
     spyOn(routerService, 'navigateToMainTab');
 
-    var stateName = 'Second State';
-    ctrl.navigateToState(stateName);
+    let stateName = 'Second State';
+    component.navigateToState(stateName);
 
     expect(routerService.navigateToMainTab).toHaveBeenCalledWith(stateName);
   });
 
   it('should evaluate if parameters are enabled', () => {
-    var areParametersEnabledSpy = spyOn(
+    let areParametersEnabledSpy = spyOn(
       explorationFeaturesService, 'areParametersEnabled');
 
     areParametersEnabledSpy.and.returnValue(true);
-    expect(ctrl.areParametersEnabled()).toBe(true);
+    expect(component.areParametersEnabled()).toBe(true);
 
     areParametersEnabledSpy.and.returnValue(false);
-    expect(ctrl.areParametersEnabled()).toBe(false);
+    expect(component.areParametersEnabled()).toBe(false);
   });
 
   it('should correctly broadcast the stateEditorInitialized flag with ' +
-      'the state data', () => {
+      'the state data', fakeAsync(() => {
+    const state = new State(
+      'stateName', 'id', 'some', null,
+      new Interaction([], [], null, null, [], 'id', null),
+      null, null, true, true, null, 7);
+    component.stateName = 'stateName';
+
+    spyOn(explorationStatesService, 'getState').and.returnValues(
+      state
+    );
+    spyOn(explorationStatesService, 'isInitialized')
+      .and.returnValue(true);
     stateEditorService.setActiveStateName('Second State');
     stateEditorService.updateStateInteractionEditorInitialised();
     stateEditorService.updateStateResponsesInitialised();
     stateEditorService.updateStateEditorDirectiveInitialised();
+    spyOn(component, 'initStateEditor').and.stub();
 
     mockRefreshStateEditorEventEmitter.emit();
+    tick();
+    component.initStateEditor();
+    tick();
 
-    const stateEditorInitializedSpy = jasmine.createSpy(
-      'stateEditorInitialized');
-    let testsubscription =
-      stateEditorService.onStateEditorInitialized.subscribe(
-        stateEditorInitializedSpy);
-
-    $scope.$apply();
-
-    expect(stateEditorInitializedSpy).toHaveBeenCalledWith(
-      explorationStatesService.getState('Second State')
-    );
-
-    testsubscription.unsubscribe();
-  });
+    expect(component.initStateEditor).toHaveBeenCalled();
+  }));
 
   it('should start tutorial if in tutorial mode on page load', () => {
-    spyOn(ctrl, 'startTutorial');
+    const state = new State(
+      'stateName', 'id', 'some', null,
+      new Interaction([], [], null, null, [], 'id', null),
+      null, null, true, true, null, 7);
+    component.stateName = 'stateName';
+    spyOn(explorationStatesService, 'getState').and.returnValues(
+      state
+    );
+    spyOn(explorationStatesService, 'isInitialized')
+      .and.returnValue(true);
+    spyOn(component, 'startTutorial');
     editabilityService.onStartTutorial();
-    $scope.$apply();
-    ctrl.initStateEditor();
-    $scope.$apply();
-    expect(ctrl.startTutorial).toHaveBeenCalled();
+
+    component.initStateEditor();
+    mockRefreshStateEditorEventEmitter.emit();
+
+    expect(component.startTutorial).toHaveBeenCalled();
   });
 
   it('should check if exploration is editable', () => {
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
-    expect(ctrl.isEditable()).toBe(true);
+    expect(component.isEditable()).toBe(true);
   });
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
-    spyOn(ctrl, 'startTutorial');
+    spyOn(component, 'startTutorial');
     editabilityService.onEndTutorial();
-    $scope.$apply();
-    ctrl.initStateEditor();
-    $scope.$apply();
-    expect(ctrl.startTutorial).not.toHaveBeenCalled();
+
+    component.initStateEditor();
+
+    expect(component.startTutorial).not.toHaveBeenCalled();
   });
 
-  it('should finish tutorial if finish tutorial button is clicked', () => {
-    var registerFinishTutorialEventSpy = (
-      spyOn(siteAnalyticsService, 'registerFinishTutorialEvent'));
-    spyOn(editabilityService, 'onEndTutorial');
-    editabilityService.onStartTutorial();
-    $scope.$apply();
-    ctrl.initStateEditor();
-    $scope.$apply();
-    ctrl.onFinishTutorial();
-    expect(registerFinishTutorialEventSpy).toHaveBeenCalled();
-    expect(editabilityService.onEndTutorial).toHaveBeenCalled();
-    expect(ctrl.tutorialInProgress).toBe(false);
-  });
+  it('should finish tutorial if finish tutorial button is clicked',
+    fakeAsync(() => {
+      let registerFinishTutorialEventSpy = (
+        spyOn(siteAnalyticsService, 'registerFinishTutorialEvent'));
+      spyOn(editabilityService, 'onEndTutorial');
+      editabilityService.onStartTutorial();
+
+      component.initStateEditor();
+      component.leaveTutorial();
+      tick();
+
+      expect(registerFinishTutorialEventSpy).toHaveBeenCalled();
+      expect(editabilityService.onEndTutorial).toHaveBeenCalled();
+      expect(component.tutorialInProgress).toBe(false);
+
+      flush();
+      flush();
+    }));
 
   it('should skip tutorial if skip tutorial button is clicked', () => {
-    var registerSkipTutorialEventSpy = (
-      spyOn(siteAnalyticsService, 'registerSkipTutorialEvent'));
     spyOn(editabilityService, 'onEndTutorial');
-    editabilityService.onStartTutorial();
-    $scope.$apply();
-    ctrl.initStateEditor();
-    $scope.$apply();
-    ctrl.onSkipTutorial();
-    expect(registerSkipTutorialEventSpy).toHaveBeenCalled();
-    expect(editabilityService.onEndTutorial).toHaveBeenCalled();
-    expect(ctrl.tutorialInProgress).toBe(false);
-  });
-
-  // The describe block below tests all the possible functions
-  // included on ctrl.EDITOR_TUTORIAL_OPTIONS array, which manipulates
-  // with JQuery the 'save from tutorial' button.
-  describe('when testing functions for JQuery manipulation from' +
-    ' ctrl.EDITOR_TUTORIAL_OPTIONS array', () => {
-    it('should change element scroll top when calling fn property' +
-      ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
-    () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(false);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: 20
-      }, 1000);
-    });
-
-    it('should not change element scroll top when calling fn property' +
-      ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[1].fn(true);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: 0
-      }, 1000);
-    });
-
-    it('should change state interaction element scroll top when calling' +
-      ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-    () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-      spyOn(angular, 'element')
-        .withArgs('#tutorialStateContent').and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'.". We need to suppress this error because
-          // the actual 'offset' functions returns more properties than the
-          // function we've defined. We have only returned the properties we
-          // need in 'offset' function.
-          // @ts-expect-error
-          offset: () => ({
-            top: 5
-          })
-        });
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(false);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: (5 - 200)
-      }, 1000);
-    });
-
-    it('should change state content element scroll top when calling fn' +
-      ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
-    () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-      spyOn(angular, 'element')
-        .withArgs('#tutorialStateInteraction').and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'.". We need to suppress this error because
-          // the actual 'offset' functions returns more properties than the
-          // function we've defined. We have only returned the properties we
-          // need in 'offset' function.
-          // @ts-expect-error
-          offset: () => ({
-            top: 20
-          })
-        });
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[3].fn(true);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: (20 - 200)
-      }, 1000);
-    });
-
-    it('should change preview tab element scroll top when calling fn' +
-      ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-    () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-      spyOn(angular, 'element')
-        .withArgs('#tutorialPreviewTab').and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'.". We need to suppress this error because
-          // the actual 'offset' functions returns more properties than the
-          // function we've defined. We have only returned the properties we
-          // need in 'offset' function.
-          // @ts-expect-error
-          offset: () => ({
-            top: 5
-          })
-        });
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(true);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: (5 - 200)
-      }, 1000);
-    });
-
-    it('should change state interaction element scroll top when calling' +
-      ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
-    () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-      spyOn(angular, 'element')
-        .withArgs('#tutorialStateInteraction').and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'.". We need to suppress this error because
-          // the actual 'offset' functions returns more properties than the
-          // function we've defined. We have only returned the properties we
-          // need in 'offset' function.
-          // @ts-expect-error
-          offset: () => ({
-            top: 20
-          })
-        });
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[5].fn(false);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: (20 - 200)
-      }, 1000);
-    });
-
-    it('should change preview tabn element scroll top when calling fn' +
-      ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-    () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-      spyOn(angular, 'element')
-        .withArgs('#tutorialPreviewTab').and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'.". We need to suppress this error because
-          // the actual 'offset' functions returns more properties than the
-          // function we've defined. We have only returned the properties we
-          // need in 'offset' function.
-          // @ts-expect-error
-          offset: () => ({
-            top: 5
-          })
-        });
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(true);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: (5 - 200)
-      }, 1000);
-    });
-
-    it('should change state interaction element scroll top when calling' +
-      ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
-    () => {
-      var element = angular.element('div');
-      spyOn(window, '$').and.returnValue(element);
-      var animateSpy = spyOn(element, 'animate').and.callThrough();
-      spyOn(angular, 'element')
-        .withArgs('#tutorialStateInteraction').and.returnValue({
-          // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'.". We need to suppress this error because
-          // the actual 'offset' functions returns more properties than the
-          // function we've defined. We have only returned the properties we
-          // need in 'offset' function.
-          // @ts-expect-error
-          offset: () => ({
-            top: 20
-          })
-        });
-
-      ctrl.EDITOR_TUTORIAL_OPTIONS[7].fn(false);
-
-      expect(animateSpy).toHaveBeenCalledWith({
-        scrollTop: (20 - 200)
-      }, 1000);
-    });
-
-    it('should not remove save button element at index 9 when the user' +
-      ' does have edit permissions', () => {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
-          canEdit: true
-        }));
-      ctrl.removeTutorialSaveButtonIfNoPermissions();
-      $scope.$apply();
-      expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).toBe('Save');
-    });
-
-    it('should remove save button element at index 9 when the user does' +
-      ' not have edit permissions', () => {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync')
+      .and.returnValue(
+        Promise.resolve({
           canEdit: false
-        }));
-      ctrl.removeTutorialSaveButtonIfNoPermissions();
-      $scope.$apply();
-      expect(ctrl.EDITOR_TUTORIAL_OPTIONS[9].heading).not.toBe('Save');
-    });
+        } as ExplorationPermissions)
+      );
+    editabilityService.onStartTutorial();
+
+    component.initStateEditor();
+    component.leaveTutorial();
+    component.removeTutorialSaveButtonIfNoPermissions();
+
+    expect(editabilityService.onEndTutorial).toHaveBeenCalled();
+    expect(component.tutorialInProgress).toBe(false);
   });
 });

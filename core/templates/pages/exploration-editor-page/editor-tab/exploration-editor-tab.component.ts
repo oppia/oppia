@@ -118,7 +118,7 @@ export class ExplorationEditorTabComponent
             this._ID_TUTORIAL_STATE_INTERACTION);
 
           $('html, body').animate({
-            scrollTop: angular.element(idToScrollTo).offset().top - 200
+            scrollTop: document.getElementById(idToScrollTo).offsetTop - 200
           }, 1000);
         }
 
@@ -128,7 +128,7 @@ export class ExplorationEditorTabComponent
             this._ID_TUTORIAL_STATE_INTERACTION);
 
           $('html, body').animate({
-            scrollTop: angular.element(idToScrollTo).offset().top - 200
+            scrollTop: document.getElementById(idToScrollTo).offsetTop - 200
           }, 1000);
         }
       },
