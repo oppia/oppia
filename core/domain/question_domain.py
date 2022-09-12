@@ -37,7 +37,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Union, cast, overload
 from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -1121,6 +1121,27 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: str,
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> str: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[str],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[str]: ...
+
+        @overload
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: List[List[str]],
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> List[List[str]]: ...
+
         # Here we use MyPy ignore because MyPy expects a return value in
         # every condition when we define a return type but here we are
         # returning only in if-else conditions and we are not returning
@@ -1131,7 +1152,7 @@ class Question(translation_domain.BaseTranslatableObject):
             new_type: str,
             value: Union[List[List[str]], List[str], str],
             choices: List[state_domain.SubtitledHtmlDict]
-        ) -> Union[List[str], str]:
+        ) -> Union[List[List[str]], List[str], str]:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -1173,30 +1194,24 @@ class Question(translation_domain.BaseTranslatableObject):
                 assert isinstance(value, str)
                 return extract_content_id_from_choices(value)
             elif new_type == 'SetOfTranslatableHtmlContentIds':
-                # Here we use MyPy ignore because
-                # 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes it's return
-                # type as recursive, like if this method returns List[str]
-                # then MyPy assumes it's type as List[List[str]]. So,
-                # because of this, MyPy throws an 'incompatible return type'
-                # error. Thus to avoid the error, we used ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[str].
+                set_of_content_ids = cast(List[str], value)
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'TranslatableHtmlContentId', html, choices
-                    ) for html in value
+                    ) for html in set_of_content_ids
                 ]
             elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
-                # Here we use MyPy ignore because
-                # 'migrate_rule_inputs_and_answers' method calls itself
-                # recursively and because of this MyPy assumes it's return
-                # type as recursive, like if this method returns List[str]
-                # then MyPy assumes it's type as List[List[str]]. So,
-                # because of this, MyPy throws an 'incompatible return type'
-                # error. Thus to avoid the error, we used ignore here.
+                # Here we use cast because this 'elif' condition forces value
+                # to have type List[List[str]].
+                list_of_set_of_content_ids = cast(
+                    List[List[str]], value
+                )
                 return [
-                    migrate_rule_inputs_and_answers(  # type: ignore[misc]
+                    migrate_rule_inputs_and_answers(
                         'SetOfTranslatableHtmlContentIds', html_set, choices
-                    ) for html_set in value
+                    ) for html_set in list_of_set_of_content_ids
                 ]
 
         interaction_id = question_state_dict['interaction']['id']
