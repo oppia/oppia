@@ -1542,7 +1542,7 @@ class AppFeedbackReportTicketDict(TypedDict):
     github_issue_repo_name: Optional[str]
     github_issue_number: Optional[int]
     archived: bool
-    newest_report_creation_timestamp: Optional[str]
+    newest_report_creation_timestamp_isoformat: Optional[str]
     reports: List[str]
 
 
@@ -1602,7 +1602,7 @@ class AppFeedbackReportTicket:
             'github_issue_repo_name': self.github_issue_repo_name,
             'github_issue_number': self.github_issue_number,
             'archived': self.archived,
-            'newest_report_creation_timestamp': (
+            'newest_report_creation_timestamp_isoformat': (
                 self.newest_report_creation_timestamp.isoformat()
                 if self.newest_report_creation_timestamp else None
             ),

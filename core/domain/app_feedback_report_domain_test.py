@@ -1379,7 +1379,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             'github_issue_repo_name': None,
             'github_issue_number': None,
             'archived': False,
-            'newest_report_creation_timestamp': (
+            'newest_report_creation_timestamp_isoformat': (
                 REPORT_SUBMITTED_TIMESTAMP.isoformat()),
             'reports': [self.android_report_id]
         }
