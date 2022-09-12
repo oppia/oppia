@@ -1983,8 +1983,8 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         self._process_module_tokens(tokens, node)
 
     def _process_module_tokens(self, tokens, node):
-        """Checks if the MyPy type ignores present in a module properly documented
-        by a code comment or not.
+        """Checks if the MyPy type ignores present in a module properly
+        documented by a code comment or not.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
@@ -2032,7 +2032,8 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                 ):
                     self.add_message(
                         'redundant-type-comment',
-                        line=previous_comment_line_number
+                        line=previous_comment_line_number,
+                        node=node
                     )
 
         if type_ignore_comment_present:
