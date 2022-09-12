@@ -1944,7 +1944,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
 
     __implements__ = interfaces.IAstroidChecker
 
-    EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = copy.deepcopy(
+    EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = (
         EXCLUDED_TYPE_COMMENT_DIRECTORIES
     )
 
@@ -1953,9 +1953,9 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
     msgs = {
         'C0045': (
             'Please try to avoid the use of type: ignore where possible.'
-            ' If \'type: ignore\' is really necessary, then a proper comment'
-            ' with clear justification (see other parts of the codebase'
-            ' for examples).',
+            ' If \'type: ignore\' is really necessary, then add a proper'
+            ' comment with clear justification (see other parts of the'
+            ' codebase for examples).',
             'mypy-ignore-used',
             'MyPy ignores should be used with proper comments following'
             ' the established patterns in the codebase. Except for'
@@ -1965,8 +1965,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
             'Extra comment is present for MyPy type: ignore. Please'
             ' remove it.',
             'redundant-type-comment',
-            'No corresponding \'type: ignore\' is found for the type'
-            'ignore comment.'
+            'No corresponding \'type: ignore\' is found for the comment.'
         )
     }
 
@@ -1977,18 +1976,15 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        module_excluded_from_comment_checks = False
         for directory in self.EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS:
-            if re.search(directory, node.root().file):
-                module_excluded_from_comment_checks = True
-        if not module_excluded_from_comment_checks:
-            tokens = pylint_utils.tokenize_module(node)
-            self._process_module_tokens(tokens, node)
+            if directory in node.root().file:
+                return
+        tokens = pylint_utils.tokenize_module(node)
+        self._process_module_tokens(tokens, node)
 
     def _process_module_tokens(self, tokens, node):
-        """Custom pylint checker which allows only those MyPy type ignores
-        that are properly documented by a comment in the code. The comment
-        must be close to the actually ignore.
+        """Checks if the MyPy type ignores present in a module properly documented
+        by a code comment or not.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
@@ -1996,18 +1992,25 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         """
         type_ignore_comment_regex = r'Here we use MyPy ignore because'
         type_ignore_comment_present = False
+        no_of_type_ignore_comments = 0
+        previous_comment_line_number = 0
         comment_line_number = 0
 
         for (token_type, _, (line_num, _), _, line) in tokens:
             if token_type == tokenize.COMMENT:
                 line = line.lstrip()
 
-                if re.search(type_ignore_comment_regex, line):
+                if type_ignore_comment_regex in line:
                     type_ignore_comment_present = True
+                    no_of_type_ignore_comments += 1
+
+                    if no_of_type_ignore_comments > 1:
+                        previous_comment_line_number = comment_line_number
+
                     comment_line_number = line_num
 
-                if re.search(r'(#\s*type:)', line):
-                    if '# type: ignore[no-untyped-call]' in line:
+                if re.search(r'(\s*type:\s*ignore)', line):
+                    if 'type: ignore[no-untyped-call]' in line:
                         continue
                     if (
                         type_ignore_comment_present and
@@ -2017,10 +2020,20 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                         )
                     ):
                         type_ignore_comment_present = False
+                        no_of_type_ignore_comments = 0
                     else:
                         self.add_message(
                             'mypy-ignore-used', line=line_num, node=node
                         )
+
+                if (
+                    type_ignore_comment_regex in line and
+                    no_of_type_ignore_comments > 1
+                ):
+                    self.add_message(
+                        'redundant-type-comment',
+                        line=previous_comment_line_number
+                    )
 
         if type_ignore_comment_present:
             self.add_message(
@@ -2071,7 +2084,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     """
 
     EXCEPTIONAL_TYPE_STATUS_DICT = {
-        'type_comment_present': False,
+        'type_comment_no_longer_pending': False,
         'type_comment_line_num': 0,
         'outside_function_signature_block': True,
         'outside_args_section': True,
@@ -2082,7 +2095,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         'func_def_start_line': 0,
     }
 
-    EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = copy.deepcopy(
+    EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = (
         EXCLUDED_TYPE_COMMENT_DIRECTORIES
     )
 
@@ -2095,7 +2108,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             'Any type is used. Please use a more specific type instead.',
             'any-type-used',
             'Annotations with Any type should only be done for exceptional'
-            ' cases with proper comments.'
+            ' cases with proper explanation in the code comment.'
         ),
         'C0048': (
             'cast function is used. If the cast is really needed, please add a'
@@ -2103,14 +2116,15 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             ' only be used immediately after an \'if\' condition in the code'
             ' forces the object to be of the casted type.',
             'cast-func-used',
-            'Casting of any value should be done with a proper comment.'
+            'Casting of any value should be done with a proper explanation in'
+            ' the code comment.'
         ),
         'C0049': (
             'object class is used. Please use a more specific type instead.'
             ' type instead.',
             'object-class-used',
             'Annotations with object should only be done for exceptional'
-            ' cases with proper comments.'
+            ' cases with proper explanation in the code comment.'
         )
     }
 
@@ -2121,18 +2135,16 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        module_excluded_from_comment_checks = False
         for directory in self.EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS:
-            if re.search(directory, node.root().file):
-                module_excluded_from_comment_checks = True
-        if not module_excluded_from_comment_checks:
-            tokens = pylint_utils.tokenize_module(node)
-            self._process_module_tokens(tokens, node)
+            if directory in node.root().file:
+                return
+        tokens = pylint_utils.tokenize_module(node)
+        self._process_module_tokens(tokens, node)
 
     def _process_module_tokens(self, tokens, node):
-        """Custom pylint checker which makes sure that every exceptional type
-        should be documented properly by a comment in the code. The comment
-        must be close to the actually ignore.
+        """Checks whether an exceptional type in backend type annotations is
+        documented. If exceptional type is not documented, then it adds a
+        message accordingly.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
@@ -2145,7 +2157,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     def _check_import_status(
         self, import_status_dict, token_type, token, line_num
     ):
-        """Checks whether the single-line import or multi-line import
+        """Checks whether the single-line import or multi-line import is
         present inside the module. If multi-line import is present then
         it checks whether the linters are currently inside multi-line
         import's scope or not.
@@ -2211,28 +2223,6 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                 is called, Possible values can be 'Any' or 'object'.
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        # Here, we are defining new variables so that we don't have to fetch
-        # the values from 'type_status_dict' dictionary again and again.
-        outside_function_signature_block = type_status_dict[
-            'outside_function_signature_block'
-        ]
-        outside_args_section = type_status_dict['outside_args_section']
-        args_section_end_line_num = type_status_dict[
-            'args_section_end_line_num'
-        ]
-        type_present_inside_arg_section = type_status_dict[
-            'type_present_inside_arg_section'
-        ]
-        type_present_inside_return_section = type_status_dict[
-            'type_present_inside_return_section'
-        ]
-        type_present_in_function_signature = type_status_dict[
-            'type_present_in_function_signature'
-        ]
-        type_comment_present = type_status_dict['type_comment_present']
-        type_comment_line_num = type_status_dict['type_comment_line_num']
-        func_def_start_line = type_status_dict['func_def_start_line']
-
         # Checking if linters are in argument-section, return-section or
         # outside of the function signature.
         # Eg:
@@ -2241,53 +2231,53 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         #       <outside function signature block>.
         if token_type == tokenize.NAME:
             if token == 'def':
-                outside_function_signature_block = False
-                func_def_start_line = line_num
-                outside_args_section = False
+                type_status_dict['outside_function_signature_block'] = False
+                type_status_dict['func_def_start_line'] = line_num
+                type_status_dict['outside_args_section'] = False
 
         if token_type == tokenize.OP:
             if token == '->':
-                outside_args_section = True
-                args_section_end_line_num = line_num
-            if outside_args_section and token == ':':
-                outside_function_signature_block = True
+                type_status_dict['outside_args_section'] = True
+                type_status_dict['args_section_end_line_num'] = line_num
+            if type_status_dict['outside_args_section'] and token == ':':
+                type_status_dict['outside_function_signature_block'] = True
 
         # Checking if exceptional_type is present in function definition or not.
         if token_type == tokenize.NAME and token == exceptional_type:
-            if not outside_args_section:
-                type_present_inside_arg_section = True
+            if not type_status_dict['outside_args_section']:
+                type_status_dict['type_present_inside_arg_section'] = True
             elif (
-                outside_args_section and
-                args_section_end_line_num == line_num
+                type_status_dict['outside_args_section'] and
+                type_status_dict['args_section_end_line_num'] == line_num
             ):
-                type_present_inside_return_section = True
+                type_status_dict['type_present_inside_return_section'] = True
 
         if (
-            type_present_inside_arg_section or
-            type_present_inside_return_section
+            type_status_dict['type_present_inside_arg_section'] or
+            type_status_dict['type_present_inside_return_section']
         ):
-            type_present_in_function_signature = True
+            type_status_dict['type_present_in_function_signature'] = True
 
-        if outside_function_signature_block:
-            if type_present_in_function_signature:
+        if type_status_dict['outside_function_signature_block']:
+            if type_status_dict['type_present_in_function_signature']:
                 if (
-                    type_comment_present and
-                    func_def_start_line <= (
-                        type_comment_line_num +
+                    type_status_dict['type_comment_no_longer_pending'] and
+                    type_status_dict['func_def_start_line'] <= (
+                        type_status_dict['type_comment_line_num'] +
                         ALLOWED_LINES_OF_GAP_IN_COMMENT
                     )
                 ):
-                    type_comment_present = False
+                    type_status_dict['type_comment_no_longer_pending'] = False
                 else:
                     self._add_exceptional_type_error_message(
                         exceptional_type,
-                        func_def_start_line,
+                        type_status_dict['func_def_start_line'],
                         node
                     )
 
-                type_present_in_function_signature = False
-                type_present_inside_arg_section = False
-                type_present_inside_return_section = False
+                type_status_dict['type_present_in_function_signature'] = False
+                type_status_dict['type_present_inside_arg_section'] = False
+                type_status_dict['type_present_inside_return_section'] = False
             if token_type == tokenize.NAME and token == exceptional_type:
                 if exceptional_type == 'object':
                     # Excluding the case when object is called:
@@ -2304,47 +2294,25 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     elif import_status_dict['inside_multi_line_import_scope']:
                         return
                 # Checking if comment for exceptional_type is present and it's
-                # with in the range (minimum 10 line of gaps).
+                # with in the range (minimum 15 line of gaps).
                 if (
-                    type_comment_present and
+                    type_status_dict['type_comment_no_longer_pending'] and
                     line_num <= (
-                        type_comment_line_num +
+                        type_status_dict['type_comment_line_num'] +
                         ALLOWED_LINES_OF_GAP_IN_COMMENT
                     )
                 ):
-                    type_comment_present = False
+                    type_status_dict['type_comment_no_longer_pending'] = False
                 else:
                     self._add_exceptional_type_error_message(
                         exceptional_type, line_num, node
                     )
 
-        # Updating the 'type_status_dict' dictionary so that previous data of
-        # exceptional types don't get lost.
-        type_status_dict['outside_function_signature_block'] = (
-            outside_function_signature_block
-        )
-        type_status_dict['outside_args_section'] = outside_args_section
-        type_status_dict['args_section_end_line_num'] = (
-            args_section_end_line_num
-        )
-        type_status_dict['type_present_inside_arg_section'] = (
-            type_present_inside_arg_section
-        )
-        type_status_dict['type_present_inside_return_section'] = (
-            type_present_inside_return_section
-        )
-        type_status_dict['type_present_in_function_signature'] = (
-            type_present_in_function_signature
-        )
-        type_status_dict['type_comment_present'] = type_comment_present
-        type_status_dict['type_comment_line_num'] = type_comment_line_num
-        type_status_dict['func_def_start_line'] = func_def_start_line
-
     def _add_exceptional_type_error_message(
         self, exceptional_type, line_num, node
     ):
         """This method should be called only when an exceptional type error is
-        encountered. If exceptional type is Any then 'any-type-used' error
+        encountered. If the exceptional type is Any then 'any-type-used' error
         message is added, for object 'object-class-used' is added and for cast
         'cast-func-used' is added.
 
@@ -2386,8 +2354,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
-                if re.search(object_type_regex, line):
-                    object_class_status_dict['type_comment_present'] = True
+                if object_type_regex in line:
+                    object_class_status_dict[
+                        'type_comment_no_longer_pending'
+                    ] = True
                     object_class_status_dict['type_comment_line_num'] = line_num
 
             self._check_exceptional_type_is_documented(
@@ -2417,7 +2387,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
-                if re.search(cast_type_regex, line):
+                if cast_type_regex in line:
                     cast_comment_present = True
                     cast_comment_line_num = line_num
 
@@ -2474,8 +2444,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
-                if re.search(any_type_regex, line):
-                    any_type_status_dict['type_comment_present'] = True
+                if any_type_regex in line:
+                    any_type_status_dict[
+                        'type_comment_no_longer_pending'
+                    ] = True
                     any_type_status_dict['type_comment_line_num'] = line_num
 
             self._check_import_status(

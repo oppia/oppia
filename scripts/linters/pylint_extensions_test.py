@@ -2419,16 +2419,24 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we use MyPy ignore because attributes on BaseChange
-                # class are defined dynamically.
-                suggestion.change.new_value = (  # type: ignore[attr-defined]
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (   # type: ignore[attr-defined]
                     new_content
                 )
 
-                # Here we use MyPy ignore because currently this function is
-                # not type annotated and because of this MyPy is not able to
-                # fetch argument's type.
-                func_only_accept_str('hi') #@
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (
+                    new_content
+                )
+
+                # Here we use MyPy ignore because ...
+                func_only_accept_str('hi')   # type: ignore[attr-defined]
+
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (
+                    new_content
+                )
+                #@
                 """
             )
         node_function_with_extra_comment.file = filename
@@ -2436,9 +2444,80 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.visit_module(
             node_function_with_extra_comment
         )
+        message1 = testutils.Message(
+            msg_id='redundant-type-comment',
+            line=7
+        )
+        message2 = testutils.Message(
+            msg_id='redundant-type-comment',
+            line=15
+        )
+        with self.checker_test_object.assertAddsMessages(message1, message2):
+            temp_file.close()
+
+        node_function_with_extra_comment2 = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (   # type: ignore[attr-defined]
+                    new_content
+                )
+
+                # Here we use MyPy ignore because ...
+                suggestion.change.new_value = (
+                    new_content
+                )
+
+                # Here we use MyPy ignore because ...
+                func_only_accept_str('hi')   # type: ignore[attr-defined]
+                #@
+                """
+            )
+        node_function_with_extra_comment2.file = filename
+
+        self.checker_test_object.checker.visit_module(
+            node_function_with_extra_comment2
+        )
         message = testutils.Message(
             msg_id='redundant-type-comment',
-            line=8
+            line=7
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_raises_error_if_type_ignore_is_in_second_place(self):
+        node_with_type_ignore = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                suggestion.change.new_value = (  # pylint disable=no-docstring type: ignore[attr-defined]
+                    new_content
+                )
+                #@
+                """
+            )
+        node_with_type_ignore.file = filename
+
+        self.checker_test_object.checker.visit_module(
+            node_with_type_ignore
+        )
+        message = testutils.Message(
+            msg_id='mypy-ignore-used',
+            line=2,
+            node=node_with_type_ignore
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()

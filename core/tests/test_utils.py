@@ -545,9 +545,9 @@ class ElasticSearchStub:
             'deleted': index_size
         }
 
-    # Here we use type Any because argument 'body' can accept dictionaries
-    # that can possess different types of values like int, List[...]. nested
-    # dictionary and other types too.
+    # Here we use type Any because the argument 'body' can accept dictionaries
+    # that can possess different types of values like int, List[...], nested
+    # dictionaries and other types too.
     def mock_search(
         self,
         body: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
@@ -1187,7 +1187,7 @@ class TestBase(unittest.TestCase):
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
-    # Here we use type Any because argument 'item' can accept any kind of
+    # Here we use type Any because the argument 'item' can accept any kind of
     # object to validate.
     def _assert_validation_error(
         self, item: Any, error_substring: str
@@ -1364,8 +1364,9 @@ class TestBase(unittest.TestCase):
             logger.removeHandler(list_stream_handler)
 
     # Here we use type Any because argument 'obj' can accept any kind
-    # of object on which attribute needs to be replaced and 'newvalue' can
-    # accept any type of value to replace it with the old value.
+    # of object on which attribute needs to be replaced, and argument
+    # 'newvalue' can accept any type of value to replace it with the
+    # old value.
     @contextlib.contextmanager
     def swap(self, obj: Any, attr: str, newvalue: Any) -> Iterator[None]:
         """Swap an object's attribute value within the context of a 'with'
@@ -1401,23 +1402,24 @@ class TestBase(unittest.TestCase):
             setattr(obj, attr, original)
 
     # Here we use type Any because argument 'obj' can accept any kind
-    # of object on which attribute needs to be replaced and 'value'
-    # can accept any type of value to replace it with the old value.
+    # of object on which attribute needs to be replaced, and argument
+    # 'value' can accept any type of value to replace it with the old
+    # value.
     @contextlib.contextmanager
     def swap_to_always_return(
         self, obj: Any, attr: str, value: Optional[Any] = None
     ) -> Iterator[None]:
         """Swap obj.attr with a function that always returns the given value."""
         # Here we use type Any because this function returns the newly
-        # replaced return value and that value can be of any type.
+        # replaced return value, and that value can be of any type.
         def function_that_always_returns(*_: str, **__: str) -> Any:
             """Returns the input value."""
             return value
         with self.swap(obj, attr, function_that_always_returns):
             yield
 
-    # Here we use type Any because argument 'obj' can accept any kind
-    # of object on which attribute needs to be replaced.
+    # Here we use type Any because the argument 'obj' can accept any
+    # kind of object on which attribute needs to be replaced.
     @contextlib.contextmanager
     def swap_to_always_raise(
         self,
@@ -1433,9 +1435,9 @@ class TestBase(unittest.TestCase):
             yield
 
     # Here we use type Any because argument 'obj' can accept any kind
-    # of object on which attribute needs to be replaced and 'returns'
-    # can accept any type of value to replace it with the old function's
-    # return value.
+    # of object on which attribute needs to be replaced, and argument
+    # 'returns' can accept any type of value to replace it with the old
+    # function's return value.
     @contextlib.contextmanager
     def swap_with_call_counter(
         self,
@@ -1465,7 +1467,7 @@ class TestBase(unittest.TestCase):
             impl = obj.attr
         else:
             # Here we use type Any because this method returns the return value
-            # of swapped function and that value can be of any type.
+            # of the swapped function, and that value can be of any type.
             def impl(*_: str, **__: str) -> Any:
                 """Behaves according to the given values."""
                 if raises is not None:
@@ -1477,8 +1479,8 @@ class TestBase(unittest.TestCase):
         with self.swap(obj, attr, call_counter):
             yield call_counter
 
-    # Here we use type Any because argument 'obj' can accept any kind
-    # of object on which attribute needs to be replaced.
+    # Here we use type Any because the argument 'obj' can accept any
+    # kind of object on which attribute needs to be replaced.
     @contextlib.contextmanager
     def swap_with_checks(
         self,
@@ -1535,8 +1537,8 @@ class TestBase(unittest.TestCase):
         expected_args_iter = iter(expected_args or ())
         expected_kwargs_iter = iter(expected_kwargs or ())
 
-        # Here we use type Any because, args and kwargs are the arguments
-        # of swapped function and swapped function can have arbitrary number
+        # Here we use type Any because args and kwargs are the arguments of the
+        # swapped functions and swapped functions can have an arbitrary number
         # of arguments with different types.
         @functools.wraps(original_function)
         def new_function_with_checks(*args: Any, **kwargs: Any) -> Any:
@@ -1550,8 +1552,8 @@ class TestBase(unittest.TestCase):
             Returns:
                 *. Result of `new_function`.
             """
-            # Here we use MyPy ignore because we are defining new attribute
-            # 'call_num' on a function and MyPy does not allow addition of
+            # Here we use MyPy ignore because we are defining a new attribute
+            # 'call_num' on a function and MyPy does not allow the addition of
             # new attributes on a function ( or a function class ). So, because
             # of this, MyPy throws an '"Callable" has no attribute "call_num"'
             # error. Thus to avoid the error, we used ignore here.
@@ -1560,7 +1562,7 @@ class TestBase(unittest.TestCase):
             # Includes assertion error information in addition to the message.
             self.longMessage = True
 
-            # Here we use MyPy ignore because we are accessing 'call_num'
+            # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
             # of type 'callable' does not contain 'call_num' attribute. So,
             # because of this, MyPy throws an '"Callable" has no attribute
@@ -1571,7 +1573,7 @@ class TestBase(unittest.TestCase):
                     args, next_args, msg='*args to call #%d of %s' % (
                         new_function_with_checks.call_num, msg))  # type: ignore[attr-defined]
 
-            # Here we use MyPy ignore because we are accessing 'call_num'
+            # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
             # of type 'callable' does not contain 'call_num' attribute. So,
             # because of this, MyPy throws an '"Callable" has no attribute
@@ -1587,11 +1589,11 @@ class TestBase(unittest.TestCase):
 
             return new_function(*args, **kwargs)
 
-            # Here we use MyPy ignore because we are accessing 'call_num'
-            # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' does not contain 'call_num' attribute. So,
-            # because of this, MyPy throws an '"Callable" has no attribute
-            # "call_num"' error. Thus to avoid the error, we used ignore here.
+        # Here we use MyPy ignore because we are accessing the 'call_num'
+        # attribute on a function which is of type 'callable' and functions
+        # of type 'callable' does not contain 'call_num' attribute. So,
+        # because of this, MyPy throws an '"Callable" has no attribute
+        # "call_num"' error. Thus to avoid the error, we used ignore here.
         new_function_with_checks.call_num = 0  # type: ignore[attr-defined]
         setattr(obj, attr, new_function_with_checks)
 
@@ -1599,7 +1601,7 @@ class TestBase(unittest.TestCase):
             yield
             # Includes assertion error information in addition to the message.
             self.longMessage = True
-            # Here we use MyPy ignore because we are accessing 'call_num'
+            # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
             # of type 'callable' does not contain 'call_num' attribute. So,
             # because of this, MyPy throws an '"Callable" has no attribute
@@ -1614,7 +1616,7 @@ class TestBase(unittest.TestCase):
                     expected_args_iter, expected_kwargs_iter, fillvalue={})
             ]
 
-            # Here we use MyPy ignore because we are accessing 'call_num'
+            # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
             # of type 'callable' does not contain 'call_num' attribute. So,
             # because of this, MyPy throws an '"Callable" has no attribute
@@ -1625,7 +1627,7 @@ class TestBase(unittest.TestCase):
                 missing_call_summary = '\n'.join(
                     '\tCall %d of %d: %s(%s)' % (
                         i, num_expected_calls, attr, call_args)
-                    # Here we use MyPy ignore because we are accessing
+                    # Here we use MyPy ignore because we are accessing the
                     # 'call_num' attribute on a function which is of type
                     # 'callable' and functions of type 'callable' does not
                     # contain 'call_num' attribute. So, because of this,
@@ -1634,7 +1636,7 @@ class TestBase(unittest.TestCase):
                     for i, call_args in enumerate(
                         pretty_unused_args,
                         start=new_function_with_checks.call_num + 1))  # type: ignore[attr-defined]
-                # Here we use MyPy ignore because we are accessing
+                # Here we use MyPy ignore because we are accessing the
                 # 'call_num' attribute on a function which is of type
                 # 'callable' and functions of type 'callable' does not
                 # contain 'call_num' attribute. So, because of this,
@@ -1653,8 +1655,8 @@ class TestBase(unittest.TestCase):
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestCase's assertRaises().
-    # Here we use type Any because, args and kwargs can have arbitrary
-    # number of arguments with different types of values.
+    # Here we use type Any because args and kwargs can have an arbitrary number
+    # of arguments with different types of values.
     def assertRaises(self, *args: Any, **kwargs: Any) -> None:  # type: ignore[override]
         raise NotImplementedError(
             'self.assertRaises should not be used in these tests. Please use '
@@ -1726,9 +1728,9 @@ class TestBase(unittest.TestCase):
         # type` error. Thus to avoid the error, we used ignore here.
         super().assertDictEqual(dict_one, dict_two, msg=msg)  # type: ignore[arg-type]
 
-    # Here we use type Any because method 'assertItemsEqual' can accept any kind
-    # of iterables to compare them against each other, these iterables can be of
-    # type List, Dict, Tuple and etc.
+    # Here we use type Any because the method 'assertItemsEqual' can accept any
+    # kind of iterables to compare them against each other, these iterables can
+    # be of type List, Dict, Tuple and etc.
     def assertItemsEqual(  # pylint: disable=invalid-name
         self, *args: Iterable[Any], **kwargs: Iterable[Any]
     ) -> None:
@@ -1809,18 +1811,18 @@ class AppEngineTestBase(TestBase):
     SERVER_PORT: Final = '8080'
     DEFAULT_VERSION_HOSTNAME: Final = '%s:%s' % (HTTP_HOST, SERVER_PORT)
 
-    # Here we use type Any because in subclasses derived from this class
-    # we can provide arbitrary number of arguments with different types.
-    # So, to allow every type of argument we used Any here.
+    # Here we use type Any because in subclasses derived from this class we
+    # can provide an arbitrary number of arguments with different types. So,
+    # to allow every type of argument we used Any here.
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         # Defined outside of setUp() because we access it from methods, but can
         # only install it during the run() method. Defining it in __init__
         # satisfies pylint's attribute-defined-outside-init warning.
-        # TODO(#15922): Here we use cast because, TaskqueueServicesStub can only
+        # TODO(#15922): Here we use cast because TaskqueueServicesStub can only
         # accept 'GenericTestBase' class but here we are providing super class
         # (AppEngineTestBase) which causes MyPy to throw `incompatible argument
-        # type` error. Thus to avoid the error, we used cast here.
+        # type` error. Thus, to avoid the error, we used cast here.
         self._platform_taskqueue_services_stub = TaskqueueServicesStub(
             cast(GenericTestBase, self)
         )
@@ -1977,11 +1979,11 @@ class GenericTestBase(AppEngineTestBase):
     }
 
     # Here we use MyPy ignore because we are defining an older version
-    # dictionary of State which do contain 'content_ids_to_audio_translations'
-    # key but we are assigning this dict to the latest version StateDict
-    # which do not contain 'content_ids_to_audio_translations' key. So,
-    # because of this MyPy to throw a error. Thus to avoid the error, we
-    # used ignore here.
+    # dictionary of State which does contain 'content_ids_to_audio_translations'
+    # key but we are assigning this dict to the latest version of State
+    # which does not contain the 'content_ids_to_audio_translations' key.
+    # So, because of this MyPy throws an error. Thus, to avoid the error,
+    # we used ignore here.
     VERSION_27_STATE_DICT: state_domain.StateDict = {  # type: ignore[typeddict-item]
         'content': {'content_id': 'content', 'html': ''},
         'param_changes': [],
@@ -3030,9 +3032,9 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
-        # Here we use type Any because response is a JSON response dict
-        # which can contain different types of values. So, to allow every
-        # type of value we used Any here.
+        # Here we use type Any because the 'response' is a JSON response dict
+        # that can contain different types of values. So, to allow every type
+        # of value we used Any here.
         response: Dict[str, Any] = self._parse_json_response(
             json_response,
             expect_errors
@@ -4412,9 +4414,9 @@ class ClassifierTestBase(GenericEmailTestBase):
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
 
         self.assertEqual(response.status_int, expected_status_int)
-        # Here we use type Any because result is a JSON result dict
-        # which can contain different types of values. So, to allow every
-        # type of value we used Any here.
+        # Here we use type Any because the 'result' is a JSON result dict
+        # that can contain different types of values. So, to allow every type
+        # of value we used Any here.
         result: Dict[str, Any] = self._parse_json_response(
             response,
             expect_errors
@@ -4422,10 +4424,9 @@ class ClassifierTestBase(GenericEmailTestBase):
         return result
 
     # TODO(#15451): Here we use type Any because currently, the stubs of
-    # protobuf in typeshed is not fully type annotated yet and the main
-    # repository is also not type annotated yet, because of this MyPy is
-    # not able to fetch the return type of this method and assuming it as
-    # Any type.
+    # protobuf in typeshed are not fully type annotated yet and because of
+    # this MyPy is not able to fetch the return type of this method and
+    # assuming it as Any type.
     def _get_classifier_data_from_classifier_training_job(
         self, classifier_training_job: classifier_domain.ClassifierTrainingJob
     ) -> Any:
@@ -4471,9 +4472,9 @@ class FunctionWrapper:
         # Here we use object because '_instance' can be a object of any class.
         self._instance: Optional[object] = None
 
-    # Here we use type Any because this method can accept arguments of wrapped
-    # function and wrapped function can have arbitrary number of arguments with
-    # different types.
+    # Here we use type Any because this method can accept arguments of the
+    # wrapped function, and the wrapped function can have an arbitrary number
+    # of arguments with different types.
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         """Overrides the call method for the function to call pre_call_hook
         method which would be called before the function is executed and
