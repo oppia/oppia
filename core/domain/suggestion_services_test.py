@@ -58,7 +58,8 @@ if MYPY:  # pragma: no cover
             models.Names.SUGGESTION,
             models.Names.FEEDBACK,
             models.Names.OPPORTUNITY,
-            models.Names.USER]
+            models.Names.USER
+        ]
     )
 )
 
