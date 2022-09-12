@@ -834,8 +834,8 @@ def _get_complete_stats(
     information for the frontend.
 
     Args:
-        stats_data: list(TranslationContributionStats|TranslationReviewStats
-            |QuestionContributionStats|QuestionReviewStats). Stats domain
+        stats_data: list(TranslationContributionStats|TranslationReviewStats|
+        QuestionContributionStats|QuestionReviewStats). Stats domain
             objects.
         stats_are_translation_contribution: bool. A flag that indicates whether
             stats are translation contributions.
