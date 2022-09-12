@@ -37,7 +37,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 search_services = models.Registry.import_search_services()
 
