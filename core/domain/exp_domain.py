@@ -3023,6 +3023,87 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _remove_unwanted_content_ids_from_translations_and_voiceovers(
+        cls, state_dict: state_domain.StateDict):
+        """
+        """
+        interaction = state_dict['interaction']
+        content_id_list = [state_dict['content']['content_id']]
+
+        for answer_group in interaction['answer_groups']:
+            content_id_list.append(
+                answer_group['outcome']['feedback']['content_id']
+            )
+
+            for rule_spec in answer_group['rule_specs']:
+                for param_name, value in rule_spec['inputs'].items():
+                    interaction_id = interaction['id']
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
+                            interaction_id
+                        ).get_rule_param_type(
+                            rule_spec['rule_type'], param_name
+                        )
+                    )
+
+                    if issubclass(
+                        param_type, objects.BaseTranslatableObject
+                    ):
+                        # We can assume that the value will be a dict,
+                        # as the param_type is BaseTranslatableObject.
+                        assert isinstance(value, dict)
+                        content_id = value['contentId']
+                        # We can assume the contentId will be str,
+                        # as the param_type is BaseTranslatableObject.
+                        assert isinstance(content_id, str)
+                        content_id_list.append(content_id)
+
+        default_outcome = interaction['default_outcome']
+        if default_outcome:
+            content_id_list.append(
+                default_outcome['feedback']['content_id'])
+
+        for hint in interaction['hints']:
+            content_id_list.append(hint['hint_content']['content_id'])
+
+        interaction_solution = interaction['solution']
+        if interaction_solution:
+            content_id_list.append(
+                interaction_solution['explanation']['content_id'])
+
+        if interaction['id'] is not None:
+            customisation_args = (
+                state_domain.InteractionInstance
+                .convert_customization_args_dict_to_customization_args(
+                    interaction['id'],
+                    interaction['customization_args'],
+                    state_schema_version=51
+                )
+            )
+            for ca_name in customisation_args:
+                content_id_list.extend(
+                    customisation_args[ca_name].get_content_ids()
+                )
+
+        translations_mapping = (
+            state_dict['written_translations']['translations_mapping'])
+        new_translations_mapping = {}
+        for content_id, translation_item in translations_mapping.items():
+            if content_id in content_id_list:
+                new_translations_mapping[content_id] = translation_item
+        state_dict['written_translations']['translations_mapping'] = (
+            new_translations_mapping)
+
+        voiceovers_mapping = (
+            state_dict['recorded_voiceovers']['voiceovers_mapping'])
+        new_voiceovers_mapping = {}
+        for content_id, voiceover_item in voiceovers_mapping.items():
+            if content_id in content_id_list:
+                new_voiceovers_mapping[content_id] = voiceover_item
+        state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
+            new_voiceovers_mapping)
+
+    @classmethod
     def _convert_states_v51_dict_to_v52_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
@@ -3039,81 +3120,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            content_id_list = [state_dict['content']['content_id']]
-
-            for answer_group in interaction['answer_groups']:
-                content_id_list.append(
-                    answer_group['outcome']['feedback']['content_id']
-                )
-
-                for rule_spec in answer_group['rule_specs']:
-                    for param_name, value in rule_spec['inputs'].items():
-                        interaction_id = interaction['id']
-                        param_type = (
-                            interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
-                                interaction_id
-                            ).get_rule_param_type(
-                                rule_spec['rule_type'], param_name
-                            )
-                        )
-
-                        if issubclass(
-                            param_type, objects.BaseTranslatableObject
-                        ):
-                            # We can assume that the value will be a dict,
-                            # as the param_type is BaseTranslatableObject.
-                            assert isinstance(value, dict)
-                            content_id = value['contentId']
-                            # We can assume the contentId will be str,
-                            # as the param_type is BaseTranslatableObject.
-                            assert isinstance(content_id, str)
-                            content_id_list.append(content_id)
-
-            default_outcome = interaction['default_outcome']
-            if default_outcome:
-                content_id_list.append(
-                    default_outcome['feedback']['content_id'])
-
-            for hint in interaction['hints']:
-                content_id_list.append(hint['hint_content']['content_id'])
-
-            interaction_solution = interaction['solution']
-            if interaction_solution:
-                content_id_list.append(
-                    interaction_solution['explanation']['content_id'])
-
-            if interaction['id'] is not None:
-                customisation_args = (
-                    state_domain.InteractionInstance
-                    .convert_customization_args_dict_to_customization_args(
-                        interaction['id'],
-                        interaction['customization_args'],
-                        state_schema_version=51
-                    )
-                )
-                for ca_name in customisation_args:
-                    content_id_list.extend(
-                        customisation_args[ca_name].get_content_ids()
-                    )
-
-            translations_mapping = (
-                state_dict['written_translations']['translations_mapping'])
-            new_translations_mapping = {}
-            for content_id, translation_item in translations_mapping.items():
-                if content_id in content_id_list:
-                    new_translations_mapping[content_id] = translation_item
-            state_dict['written_translations']['translations_mapping'] = (
-                new_translations_mapping)
-
-            voiceovers_mapping = (
-                state_dict['recorded_voiceovers']['voiceovers_mapping'])
-            new_voiceovers_mapping = {}
-            for content_id, voiceover_item in voiceovers_mapping.items():
-                if content_id in content_id_list:
-                    new_voiceovers_mapping[content_id] = voiceover_item
-            state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
-                new_voiceovers_mapping)
+            cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
+                state_dict)
 
         return states_dict
 
@@ -3919,87 +3927,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return answer_groups
 
-    @classmethod
-    def _remove_unwanted_content_ids_from_translations_and_voiceovers(
-        cls, state_dict: state_domain.StateDict):
-        """
-        """
-        interaction = state_dict['interaction']
-        content_id_list = [state_dict['content']['content_id']]
-
-        for answer_group in interaction['answer_groups']:
-            content_id_list.append(
-                answer_group['outcome']['feedback']['content_id']
-            )
-
-            for rule_spec in answer_group['rule_specs']:
-                for param_name, value in rule_spec['inputs'].items():
-                    interaction_id = interaction['id']
-                    param_type = (
-                        interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
-                            interaction_id
-                        ).get_rule_param_type(
-                            rule_spec['rule_type'], param_name
-                        )
-                    )
-
-                    if issubclass(
-                        param_type, objects.BaseTranslatableObject
-                    ):
-                        # We can assume that the value will be a dict,
-                        # as the param_type is BaseTranslatableObject.
-                        assert isinstance(value, dict)
-                        content_id = value['contentId']
-                        # We can assume the contentId will be str,
-                        # as the param_type is BaseTranslatableObject.
-                        assert isinstance(content_id, str)
-                        content_id_list.append(content_id)
-
-        default_outcome = interaction['default_outcome']
-        if default_outcome:
-            content_id_list.append(
-                default_outcome['feedback']['content_id'])
-
-        for hint in interaction['hints']:
-            content_id_list.append(hint['hint_content']['content_id'])
-
-        interaction_solution = interaction['solution']
-        if interaction_solution:
-            content_id_list.append(
-                interaction_solution['explanation']['content_id'])
-
-        if interaction['id'] is not None:
-            customisation_args = (
-                state_domain.InteractionInstance
-                .convert_customization_args_dict_to_customization_args(
-                    interaction['id'],
-                    interaction['customization_args'],
-                    state_schema_version=51
-                )
-            )
-            for ca_name in customisation_args:
-                content_id_list.extend(
-                    customisation_args[ca_name].get_content_ids()
-                )
-
-        translations_mapping = (
-            state_dict['written_translations']['translations_mapping'])
-        new_translations_mapping = {}
-        for content_id, translation_item in translations_mapping.items():
-            if content_id in content_id_list:
-                new_translations_mapping[content_id] = translation_item
-        state_dict['written_translations']['translations_mapping'] = (
-            new_translations_mapping)
-
-        voiceovers_mapping = (
-            state_dict['recorded_voiceovers']['voiceovers_mapping'])
-        new_voiceovers_mapping = {}
-        for content_id, voiceover_item in voiceovers_mapping.items():
-            if content_id in content_id_list:
-                new_voiceovers_mapping[content_id] = voiceover_item
-        state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
-            new_voiceovers_mapping)
-
     # ########################################################.
     # Fix validation errors for exploration state interaction.
     # ########################################################.
@@ -4019,7 +3946,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted state dictionary.
         """
-        for state_dict in states_dict.values():
+        for state_name, state_dict in states_dict.items():
             # Continue Interaction.
             # Text should have a max-length of 20.
             if state_dict['interaction']['id'] == 'Continue':
@@ -4217,11 +4144,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         # `==` should have between min and max
                         # number of selections.
                         if rule_spec['rule_type'] == 'Equals':
+                            rule_value = rule_spec['inputs']['x']
                             if (
-                                len(rule_spec['inputs']['x']) < min_value or
-                                len(rule_spec['inputs']['x']) > max_value
+                                len(rule_value) < min_value or
+                                len(rule_value) > max_value
                             ):
-                                invalid_rules.append(rule_spec)
+                                if answer_group['outcome'][
+                                    'dest'] == state_name:
+                                    invalid_rules.append(rule_spec)
+                                else:
+                                    if len(rule_value) < min_value:
+                                        min_value = len(rule_value)
+                                    elif len(rule_value) > max_value:
+                                        max_value = len(rule_value)
 
                     for invalid_rule in invalid_rules:
                         answer_group['rule_specs'].remove(invalid_rule)
