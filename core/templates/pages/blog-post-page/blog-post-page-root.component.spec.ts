@@ -195,7 +195,7 @@ describe('Blog Post Page Root', () => {
     expect(translateService.instant).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.TITLE);
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.TITLE,
+      'I18N_BLOG_POST_PAGE_TITLE',
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.META
     );
     expect(pageTitleService.addMetaTag).toHaveBeenCalledWith({

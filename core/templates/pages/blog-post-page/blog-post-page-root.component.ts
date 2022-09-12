@@ -74,7 +74,9 @@ export class BlogPostPageRootComponent implements OnDestroy, OnInit {
     let blogPostPage =
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE;
     const translatedTitle = this.translateService.instant(
-      blogPostPage.TITLE);
+      blogPostPage.TITLE, {
+        blogPostTitle: this.blogPost.title
+      });
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle, blogPostPage.META);
     this.pageTitleService.addMetaTag({
