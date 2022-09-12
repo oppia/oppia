@@ -39,7 +39,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (config_models, suggestion_models,) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.suggestion])
+    [models.Names.CONFIG, models.Names.SUGGESTION])
 
 AllowedDefaultValueTypes = Union[
     str,
