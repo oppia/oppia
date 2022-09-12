@@ -2403,6 +2403,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.update_translation_contribution_stats_at_submission(
             latest_suggestion
         )
+
+        # Base verification of contributor stats before the review is made.
         translation_contribution_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 'hi', self.author_id, '0'
@@ -2436,6 +2438,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.accept_suggestion(
             latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
+
         suggestion_services.update_translation_review_stats(
             suggestion_services.get_suggestion_by_id(
                 initial_suggestion.suggestion_id)
@@ -2444,6 +2447,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services.get_suggestion_by_id(
                 latest_suggestion.suggestion_id)
         )
+
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
                 'hi', self.reviewer_id, '0'
@@ -2518,6 +2522,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.update_translation_contribution_stats_at_submission(
             latest_suggestion
         )
+
+        # Base verification of contributor stats before the review is made.
         translation_contribution_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 'hi', self.author_id, '0'
@@ -2549,6 +2555,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             initial_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
         suggestion_services.reject_suggestion(
             latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+
         suggestion_services.update_translation_review_stats(
             suggestion_services.get_suggestion_by_id(
                 initial_suggestion.suggestion_id)
@@ -2557,6 +2564,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services.get_suggestion_by_id(
                 latest_suggestion.suggestion_id)
         )
+
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
                 'hi', self.reviewer_id, '0'
@@ -2670,6 +2678,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.update_translation_contribution_stats_at_submission(
             latest_suggestion
         )
+
+        # Base verification of contributor stats before the review is made.
         translation_contribution_stats_model = (
             suggestion_models.TranslationContributionStatsModel.get(
                 'hi', self.author_id, '0'
@@ -2712,6 +2722,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.accept_suggestion(
             latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
+
         suggestion_services.update_translation_review_stats(
             suggestion_services.get_suggestion_by_id(
                 initial_suggestion.suggestion_id)
@@ -2720,6 +2731,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services.get_suggestion_by_id(
                 latest_suggestion.suggestion_id)
         )
+
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
                 'hi', self.reviewer_id, '0'
@@ -2863,6 +2875,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
+
+        # Action to update question contribution stats.
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -2888,43 +2902,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_contribution_stats_model.accepted_questions_count,
             0
-        )
-
-        suggestion_services.accept_suggestion(
-            initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
-            'Accepted')
-        suggestion_services.accept_suggestion(
-            latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
-            'Accepted')
-        suggestion_services.update_question_review_stats(
-            suggestion_services.get_suggestion_by_id(
-                initial_suggestion.suggestion_id)
-        )
-        suggestion_services.update_question_review_stats(
-            suggestion_services.get_suggestion_by_id(
-                latest_suggestion.suggestion_id)
-        )
-        question_review_stats_model = (
-            suggestion_models.QuestionReviewStatsModel.get(
-                self.reviewer_id, topic_id
-            )
-        )
-        # Assert question review stats after the review.
-        # At this point we can confirm that there should be an associated
-        # question review stat object for the given IDs since we have
-        # called update_question_review_stats function to create/update question
-        # review stats.
-        assert question_review_stats_model is not None
-        self.assertEqual(
-            question_review_stats_model.accepted_questions_count,
-            2
-        )
-        self.assertEqual(
-            (
-                question_review_stats_model
-                .reviewed_questions_count
-            ),
-            2
         )
 
     def test_update_question_stats_when_suggestion_is_accepted(
@@ -2940,6 +2917,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
+
+        # Since this test case checks for a review, we need to make a base
+        # verification of the contributor's stats before performing the actual
+        # action.
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -2973,6 +2954,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_services.accept_suggestion(
             latest_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
+
+        # Action to update stats when reviewing.
         suggestion_services.update_question_review_stats(
             suggestion_services.get_suggestion_by_id(
                 initial_suggestion.suggestion_id)
@@ -3037,6 +3020,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
+
+        # Since this test case checks for a review, we need to make a base
+        # verification of the contributor's stats before performing the actual
+        # action.
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -3068,6 +3055,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             initial_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
         suggestion_services.reject_suggestion(
             latest_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
+
+        # Action to update stats when revieweing.
         suggestion_services.update_question_review_stats(
             suggestion_services.get_suggestion_by_id(
                 initial_suggestion.suggestion_id)
@@ -3139,6 +3128,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         latest_suggestion = self._create_question_suggestion(skill_id_2)
         question_state_data = self._create_valid_question_data(
             'default_state').to_dict()
+
+        # Since this test case checks for a review, we need to make a base
+        # verification of the contributor's stats before performing the actual
+        # action.
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
@@ -3181,6 +3174,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'Accepted')
         suggestion_services.update_question_suggestion(
             initial_suggestion.suggestion_id, 0.6, question_state_data)
+
+        # Actual action to update stats when reviewing.
         suggestion_services.update_question_review_stats(
             suggestion_services.get_suggestion_by_id(
                 initial_suggestion.suggestion_id)
