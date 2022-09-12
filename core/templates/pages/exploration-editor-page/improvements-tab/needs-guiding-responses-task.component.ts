@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the improvements tab of the exploration editor.
+ * @fileoverview Component for the improvements tab of the exploration editor.
  */
 
 
