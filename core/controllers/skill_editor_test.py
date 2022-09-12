@@ -25,11 +25,12 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 
 class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
@@ -483,3 +484,49 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
         # Skill description exists since we've already published it.
         json_response = self.get_json(self.url)
         self.assertEqual(json_response['skill_description_exists'], True)
+
+
+class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for DiagnosticTestSkillAssignmentHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.url = '%s/%s' % (
+            feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER, 'skill_id_1')
+
+        self.topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'topic', 'abbrev', 'description', 'fragm')
+        self.topic.thumbnail_filename = 'thumbnail.svg'
+        self.topic.thumbnail_bg_color = '#C6DCDA'
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        self.topic.next_subtopic_id = 2
+
+        topic_services.save_new_topic(self.admin_id, self.topic)
+
+    def test_skill_assignment_handler_for_diagnostic_test_returns_correctly(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['topic_names'], [])
+
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': ['skill_id_1']
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id, self.topic.id, changelist,
+            'Adds skill for the diagnostic test.')
+
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['topic_names'], ['topic'])
+        self.logout()

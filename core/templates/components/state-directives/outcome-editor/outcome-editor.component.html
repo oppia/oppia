@@ -181,7 +181,6 @@
   </div>
 </div>
 
-
 <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
   <div *ngIf="!isEditable"
        title="{{ isEditable ? 'Edit correctness setting' : '' }}"
@@ -210,8 +209,65 @@
 
   <div class="oppia-outcome-container" *ngIf="isEditable">
     <div *ngIf="outcome">
-      <input class="mr-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+      <input class="mr-2 e2e-test-editor-correctness-toggle"
+             type="checkbox"
+             [disabled]="isSelfLoop(savedOutcome)"
+             [(ngModel)]="outcome.labelledAsCorrect"
+             (change)="onChangeCorrectnessLabel()">
     </div>
     <strong class="oppia-outcome-heading">The answers in this group are correct</strong>
+  </div>
+</div>
+
+<div *ngIf="destIfStuckFeatEnabled && !destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome && !outcome.labelledAsCorrect"
+     class="h-100"
+     title="{{ isEditable ? 'Change the if stuck destination card' : '' }}">
+  <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-if-stuck-button"
+       [ngClass]="{'oppia-editable-section': isEditable}">
+    <div class="oppia-rule-preview oppia-transition-200">
+      <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-if-stuck-editor"
+           *ngIf="isEditable" (click)="openDestinationIfStuckEditor()">
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
+           title="Edit If Stuck Destination">&#xE254;
+        </i>
+      </div>
+
+      <div>
+        <strong *ngIf="displayFeedback">(Optional) Direct the stuck learner to...</strong>
+        <strong *ngIf="!displayFeedback">(Optional) Oppia directs the stuck learner to...</strong>
+        <span *ngIf="outcome && !isSelfLoopDestStuck(outcome)" class="position-relative">
+          {{ outcome.destIfReallyStuck }}
+        </span>
+        <span *ngIf="isSelfLoopDestStuck(outcome)" class="position-relative"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="destIfStuckFeatEnabled && isEditable && destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome && !outcome.labelledAsCorrect">
+  <form role="form"
+        class="form-inline protractor-test-edit-outcome-dest-if-stuck"
+        name="editOutcomeForm.editDestIfStuckForm"
+        (submit)="saveThisIfStuckDestination()">
+    <oppia-outcome-if-stuck-destination-editor [outcome]="outcome"
+                                               (addState)="addState($event)">
+    </oppia-outcome-if-stuck-destination-editor>
+  </form>
+
+  <div class="oppia-rule-save-cancel-buttons">
+    <div class="float-right">
+      <button type="button"
+              class="btn btn-secondary mr-2 protractor-test-cancel-outcome-dest-if-stuck"
+              (click)="cancelThisIfStuckDestinationEdit()">
+        Cancel
+      </button>
+      <button type="button"
+              class="btn btn-success protractor-test-save-outcome-dest-if-stuck"
+              (click)="saveThisIfStuckDestination()">
+        Save Destination
+      </button>
+    </div>
+
+    <div class="oppia-clear"></div>
   </div>
 </div>

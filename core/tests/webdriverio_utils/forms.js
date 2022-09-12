@@ -324,9 +324,13 @@ var UnicodeEditor = function(elem) {
 };
 
 var AutocompleteDropdownEditor = function(elem) {
-  var containerLocator = '.select2-container';
-  var searchInputLocator = '.select2-search input';
-  var dropdownElement = '.select2-dropdown';
+  var containerLocator = '.e2e-test-exploration-category-dropdown';
+  var searchInputLocator = '.mat-select-search-input.mat-input-element';
+  var categorySelectorChoice = '.e2e-test-exploration-category-selector-choice';
+  var searchInputLocatorTextElement = function(text) {
+    return $$(`.e2e-test-exploration-category-selector-choice=${text}`);
+  };
+
   return {
     setValue: async function(text) {
       await action.click('Container Element', elem.$(containerLocator));
@@ -334,14 +338,20 @@ var AutocompleteDropdownEditor = function(elem) {
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
+
       await action.setValue(
-        'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
-        text + '\n');
+        'Dropdown Element Search', $(searchInputLocator), text);
+
+      var searchInputLocatorTextOption = await searchInputLocatorTextElement(
+        text)[0];
+      await action.click(
+        'Dropdown Element Select',
+        searchInputLocatorTextOption);
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await action.click('Container Element', await elem.$(containerLocator));
-      var actualOptions = await dropdownElement.$$('<li>').map(
+      await action.click(
+        'Container Element', await elem.$(containerLocator));
+      var actualOptions = await $$(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
         }
@@ -350,7 +360,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // Re-close the dropdown.
       await action.setValue(
         'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
+        $(searchInputLocator),
         '\n');
     }
   };
