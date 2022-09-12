@@ -835,7 +835,7 @@ def _get_complete_stats(
 
     Args:
         stats_data: list(TranslationContributionStats|TranslationReviewStats|
-        QuestionContributionStats|QuestionReviewStats). Stats domain
+            QuestionContributionStats|QuestionReviewStats). Stats domain
             objects.
         stats_are_translation_contribution: bool. A flag that indicates whether
             stats are translation contributions.
