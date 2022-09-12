@@ -128,7 +128,7 @@ describe('Full exploration editor', function() {
 
     await explorationEditorMainTab.moveToState('card 2');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'this is card 2 with non-inline interaction'));
+      'this is card 2 with non-inline interaction'), true);
     await explorationEditorMainTab.setInteraction('CodeRepl');
     await explorationEditorMainTab.addResponse(
       'CodeRepl', await forms.toRichText('Nice. Press continue button'),
