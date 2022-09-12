@@ -44,7 +44,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.Names.STORY, models.Names.USER])
 
 
 class StoryServicesUnitTests(test_utils.GenericTestBase):

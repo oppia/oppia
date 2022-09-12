@@ -26,7 +26,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import improvements_models
 
 (improvements_models,) = models.Registry.import_models(
-    [models.NAMES.improvements])
+    [models.Names.IMPROVEMENTS])
 
 
 class InvalidCompositeEntityError(base_validation_errors.BaseAuditError):

@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import stats_models
 
 (base_models, stats_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.statistics
+    models.Names.BASE_MODEL, models.Names.STATISTICS
 ])
 
 

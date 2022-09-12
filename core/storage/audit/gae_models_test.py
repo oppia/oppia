@@ -30,7 +30,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
 (audit_models, base_models) = models.Registry.import_models(
-    [models.NAMES.audit, models.NAMES.base_model])
+    [models.Names.AUDIT, models.Names.BASE_MODEL])
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):

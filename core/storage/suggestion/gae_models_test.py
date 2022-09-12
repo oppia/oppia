@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (base_models, suggestion_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.suggestion, models.NAMES.user
+    models.Names.BASE_MODEL, models.Names.SUGGESTION, models.Names.USER
 ])
 
 

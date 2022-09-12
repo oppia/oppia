@@ -31,7 +31,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import beam_job_models
     from mypy_imports import datastore_services
 
-(beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
+(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 datastore_services = models.Registry.import_datastore_services()
 

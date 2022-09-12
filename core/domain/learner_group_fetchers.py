@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (learner_group_models, user_models) = models.Registry.import_models(
-    [models.NAMES.learner_group, models.NAMES.user])
+    [models.Names.LEARNER_GROUP, models.Names.USER])
 
 
 def get_new_learner_group_id() -> str:

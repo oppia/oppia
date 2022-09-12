@@ -30,7 +30,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
-(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
+(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
 @validation_decorators.AuditsExisting(

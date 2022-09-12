@@ -35,7 +35,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
 
-(audit_models,) = models.Registry.import_models([models.NAMES.audit])
+(audit_models,) = models.Registry.import_models([models.Names.AUDIT])
 
 # Actions that can be performed in the system.
 ACTION_ACCEPT_ANY_SUGGESTION = 'ACCEPT_ANY_SUGGESTION'

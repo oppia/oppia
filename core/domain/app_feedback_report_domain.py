@@ -40,7 +40,7 @@ if MYPY: # pragma: no cover
 # with 'invalid-import-from'.
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT])
 
 
 class AppFeedbackReport:
@@ -1715,13 +1715,13 @@ class AppFeedbackReportFilter:
 
     def __init__(
         self,
-        filter_field: app_feedback_report_constants.FILTER_FIELD_NAMES,
+        filter_field: app_feedback_report_constants.FilterFieldNames,
         filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
-            filter_field: FILTER_FIELD_NAMES. The enum type for the filter
+            filter_field: FilterFieldNames. The enum type for the filter
                 category, correponding to a field in the AppFeedbackReport
                 object.
             filter_options: list(str). The possible values for the given filter.

@@ -37,7 +37,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import blog_models
     from mypy_imports import search_services as platform_search_services
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 platform_search_services = models.Registry.import_search_services()
 

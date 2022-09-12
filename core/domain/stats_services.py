@@ -39,7 +39,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import transaction_services
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 transaction_services = models.Registry.import_transaction_services()
 
 # NOTE TO DEVELOPERS: The functions:

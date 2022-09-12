@@ -50,7 +50,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 def _create_topic(

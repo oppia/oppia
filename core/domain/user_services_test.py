@@ -52,9 +52,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (auth_models, user_models, audit_models) = (models.Registry.import_models([
-    models.NAMES.auth,
-    models.NAMES.user,
-    models.NAMES.audit
+    models.Names.AUTH,
+    models.Names.USER,
+    models.Names.AUDIT
 ]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
