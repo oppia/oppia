@@ -46,7 +46,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (base_models, story_models, topic_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.story, models.NAMES.topic
+    models.Names.BASE_MODEL, models.Names.STORY, models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -168,10 +168,10 @@ class MigrateStoryJob(base_jobs.JobBase):
                 additional_models={}
             )
         models_to_put_values = []
-        for _, value in models_to_put.items():
+        for model in models_to_put.values():
             # Here, we are narrowing down the type from object to BaseModel.
-            assert isinstance(value, base_models.BaseModel)
-            models_to_put_values.append(value)
+            assert isinstance(model, base_models.BaseModel)
+            models_to_put_values.append(model)
         datastore_services.update_timestamps_multi(models_to_put_values)
         return models_to_put_values
 

@@ -347,7 +347,7 @@ def get_exp_metadata_dicts_matching_query(
             - new_search_offset (int). New search offset location.
     """
     exp_ids, new_search_offset = (
-        exp_services.get_exploration_ids_matching_query(  # type: ignore[no-untyped-call]
+        exp_services.get_exploration_ids_matching_query(
             query_string, [], [], offset=search_offset))
 
     exploration_list = get_exploration_metadata_dicts(
@@ -500,7 +500,7 @@ def get_displayable_exp_summary_dicts(
     exp_version_references = [
         exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
         for exp_summary in exploration_summaries]
-    exp_stats_list = stats_services.get_exploration_stats_multi(  # type: ignore[no-untyped-call]
+    exp_stats_list = stats_services.get_exploration_stats_multi(
         exp_version_references)
     view_counts = [exp_stats.num_starts for exp_stats in exp_stats_list]
 
@@ -821,7 +821,7 @@ def get_top_rated_exploration_summary_dicts(
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
-        exp_services.get_top_rated_exploration_summaries(limit).values()  # type: ignore[no-untyped-call]
+        exp_services.get_top_rated_exploration_summaries(limit).values()
         if exp_summary.language_code in language_codes and
         sum(exp_summary.ratings.values()) > 0]
 
@@ -864,13 +864,16 @@ def get_recently_published_exp_summary_dicts(
         }, ]
     """
     recently_published_exploration_summaries = list(
-        exp_services.get_recently_published_exp_summaries(limit).values())  # type: ignore[no-untyped-call]
+        exp_services.get_recently_published_exp_summaries(limit).values())
 
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.
     sort_fnc: Callable[
-        [exp_domain.ExplorationSummary], int
-    ] = lambda exp_summary: exp_summary.first_published_msec
+        [exp_domain.ExplorationSummary], float
+    ] = lambda exp_summary: (
+        exp_summary.first_published_msec
+        if exp_summary.first_published_msec else 0
+    )
     summaries = sorted(
         recently_published_exploration_summaries,
         key=sort_fnc,

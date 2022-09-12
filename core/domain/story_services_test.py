@@ -44,7 +44,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.Names.STORY, models.Names.USER])
 
 
 class StoryServicesUnitTests(test_utils.GenericTestBase):
@@ -61,13 +61,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.topic = self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.topic = self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
             abbreviated_name='topic-one', url_fragment='topic-one',
             description='A new topic',
@@ -75,7 +75,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         self.save_new_valid_exploration(
             self.EXP_ID, self.user_id_admin, end_state_name='End',
@@ -100,8 +100,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'Added node.')
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
-        self.set_topic_managers(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
@@ -118,6 +118,17 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.node_titles, ['Title 1'])
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
+
+    def test_raises_error_when_the_story_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        self.story.created_on = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'No data available for when the story was last_updated'
+        ):
+            story_services.compute_summary_of_story(self.story)
 
     def test_get_new_story_id(self) -> None:
         new_story_id = story_services.get_new_story_id()
@@ -212,7 +223,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New Title'
             })
         ]
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin
             )
         story_services.update_story(
@@ -411,7 +422,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         expected_error_string = (
             'The skills with ids skill_4 were specified as prerequisites for '
             'Chapter Title 3, but were not taught in any chapter before it')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_string):
             story_services.validate_prerequisite_skills_in_story_contents(
                 self.topic.get_all_skill_ids(), self.story.story_contents)
@@ -469,7 +480,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_3)
         ]
         expected_error_string = 'Loops are not allowed in stories.'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_string):
             story_services.validate_prerequisite_skills_in_story_contents(
                 self.topic.get_all_skill_ids(), self.story.story_contents)
@@ -481,9 +492,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_id_1, self.USER_ID, self.TOPIC_ID, url_fragment='story-one')
         self.save_new_story(
             story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two')
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story_id_1)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story_id_2)
         self.assertTrue(
             story_services.does_story_exist_with_url_fragment('story-one'))
@@ -506,7 +517,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected story to only belong to a valid topic, but '
                 'found no topic with ID: %s' % topic_id)):
@@ -516,7 +527,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_update_story_which_not_corresponding_topic_id(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.USER_ID, name='A New Topic',
             abbreviated_name='new-topic', url_fragment='new-topic',
             description='A new topic description.',
@@ -532,7 +543,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, (
                 'Expected story to belong to the topic %s, but it is '
                 'neither a part of the canonical stories or the '
@@ -543,7 +554,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_update_story_schema(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.USER_ID, name='A New Topic',
             abbreviated_name='new-topic', url_fragment='new-topic',
             description='A new topic description.',
@@ -588,7 +599,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_model.story_contents_schema_version = 0
         story_model.commit(self.USER_ID, 'change schema version', [])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
@@ -616,7 +627,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Expected change to be of type StoryChange')
 
         # TODO(#13059): After we fully type the codebase we plan to get
@@ -666,7 +677,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_outline'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -686,7 +697,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'New description.'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected a commit message but received none.'):
             story_services.update_story(
@@ -861,7 +872,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             exp_services.get_story_id_linked_to_exploration('2'))
 
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
 
         # Creates node 1 -> node 2 -> node 3, links exp IDs 0, 1 and 2 with them
@@ -965,7 +976,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_exploration_story_link_collision(self) -> None:
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
@@ -997,7 +1008,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': '0'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The exploration with ID 0 is already linked to story '
             'with ID %s' % self.STORY_ID):
@@ -1017,7 +1028,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': ['skill_id']
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1093,13 +1104,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'original'
         })]
         exception_message = 'Story Url Fragment is not unique across the site.'
-        with self.assertRaisesRegex(Exception, exception_message):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, exception_message):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list,
                 'Updated story url_fragment.')
 
     def test_cannot_update_story_with_no_change_list(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save story'):
@@ -1107,7 +1118,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, [], 'Commit message')
 
     def test_cannot_update_story_with_invalid_exploration_id(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -1118,7 +1129,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'invalid_exp_id'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected story to only reference valid explorations'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
@@ -1146,17 +1157,17 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 category='Algebra', correctness_feedback_enabled=True)
             self.publish_exploration(self.user_id_a, 'exp_id_1')
 
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 Exception, 'Error in exploration'):
                 story_services.validate_explorations_for_story(
                     ['exp_id_1'], False)
-                self.assertItemsEqual(  # type: ignore[no-untyped-call]
+                self.assertItemsEqual(
                     observed_log_messages, [
                         'Exploration validation failed for exploration with '
                         'ID: exp_id_1. Error: Error in exploration'])
 
     def test_validate_exploration_returning_error_messages(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1174,7 +1185,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(validation_error_messages, [message_1, message_2])
 
     def test_cannot_update_story_with_private_exploration_id(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1188,13 +1199,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'exp_id_1'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Exploration with ID exp_id_1 is not public'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_blank_exp_id(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
 
         change_list = [story_domain.StoryChange({
@@ -1206,7 +1217,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': None
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Story node with id node_1 does not contain an '
             'exploration id.'):
             story_services.update_story(
@@ -1215,7 +1226,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_different_categories(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1268,7 +1279,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'All explorations in a story should be of the same category. '
                 'The explorations with ID exp_id_2 and exp_id_1 have different '
                 'categories.'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'All explorations in a story should be of the '
             'same category'):
             story_services.update_story(
@@ -1277,7 +1288,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_invalid_categories(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
@@ -1305,7 +1316,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'The exploration with ID exp_id_1 has an invalid '
                 'category Category 1.', 'Expected all explorations in a story '
                 'to be of a default category. Invalid exploration: exp_id_1'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'All explorations in a story should be of a '
                 'default category. The exploration with ID exp_id_1 '
                 'has an invalid category Category 1.'):
@@ -1313,7 +1324,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_other_languages(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1338,7 +1349,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Invalid language es found for exploration with ID exp_id_1.'
                 ' This language is not supported for explorations in a story'
                 ' on the mobile app.'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid language es found for exploration with '
             'ID exp_id_1. This language is not supported for explorations '
             'in a story on the mobile app.'):
@@ -1348,7 +1359,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_without_correctness_feedback(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1373,7 +1384,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Expected all explorations in a story to '
                 'have correctness feedback enabled. Invalid '
                 'exploration: exp_id_1'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected all explorations in a story to '
             'have correctness feedback enabled. Invalid exploration: exp_id_1'):
             story_services.update_story(
@@ -1382,7 +1393,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_invalid_interactions(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1407,7 +1418,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Invalid interaction GraphInput in exploration with ID: '
                 'exp_id_1. This interaction is not supported for explorations '
                 'in a story on the mobile app.'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid interaction GraphInput in exploration with '
             'ID: exp_id_1. This interaction is not supported for explorations '
             'in a story on the mobile app.'):
@@ -1415,7 +1426,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_recommended_exps(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
@@ -1423,7 +1434,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
@@ -1455,7 +1466,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'exploration recommendations. Exploration with ID: exp_id_1 '
                 'contains exploration recommendations in its EndExploration '
                 'interaction.'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Explorations in a story are not expected to contain '
             'exploration recommendations. Exploration with ID: exp_id_1 '
             'contains exploration recommendations in its EndExploration '
@@ -1466,13 +1477,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_invalid_rte_content(
         self
     ) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
             end_state_name='End', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1507,7 +1518,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'RTE content in state Introduction of exploration with '
                 'ID exp_id_1 is not supported on mobile for explorations '
                 'in a story.'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'RTE content in state Introduction of exploration with '
             'ID exp_id_1 is not supported on mobile for explorations '
             'in a story.'):
@@ -1515,12 +1526,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_parameter_values(self) -> None:
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Algebra',
             correctness_feedback_enabled=True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
@@ -1549,7 +1560,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             validation_error_messages, [
                 'Expected no exploration in a story to have parameter '
                 'values in it. Invalid exploration: exp_id_1'])
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: exp_id_1'):
             story_services.update_story(
@@ -1558,7 +1569,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id_2', self.user_id_a, title='title 2', category='Algebra',
             interaction_id='GraphInput', correctness_feedback_enabled=True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_specs',
@@ -1573,8 +1584,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': [
                     # Here, the expected type for 3rd argument of paramChange is
                     # CustomizationArgsDict, but for testing purposes here we
-                    # are providing a empty dict which causes MyPy to throw
-                    # missing keys error. Thus to avoid error, we used ignore.
+                    # are providing an empty dict which causes MyPy to throw an
+                    # 'incompatible argument type' error. Thus to avoid error,
+                    # we used ignore.
                     param_domain.ParamChange('param1', 'Copier', {}).to_dict()]  # type: ignore[arg-type]
             })],
             '')
@@ -1591,7 +1603,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected no exploration in a story to have parameter '
             'values in it. Invalid exploration: exp_id_2'):
             story_services.update_story(
@@ -1615,7 +1627,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_model.version = 0
         story_model.commit(self.user_id_a, 'Changed version', [])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 1 of story '
             'from version 2. Please reload the page and try again.'):
@@ -1626,7 +1638,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_model.version = 10
         story_model.commit(self.user_id_a, 'Changed version', [])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Trying to update version 11 of story from version 2, '
             'which is too old. Please reload the page and try again.'):
@@ -1636,7 +1648,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_get_story_by_version(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.USER_ID, name='A different topic',
             abbreviated_name='different-topic', url_fragment='different-topic',
             description='A new topic',
@@ -1645,7 +1657,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, topic_id, title='new title')
-        topic_services.add_canonical_story(self.USER_ID, topic_id, story_id)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(self.USER_ID, topic_id, story_id)
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
@@ -1672,7 +1684,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_initial_node_id'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id new_initial_node_id is not part of this story'):
             story_services.update_story(
@@ -1716,7 +1728,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'exp_id'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1765,7 +1777,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'A node with exploration id exp_id already exists.'):
             story_services.update_story(
@@ -1785,7 +1797,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': new_value
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1805,7 +1817,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': new_value
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1822,7 +1834,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': ''
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1839,7 +1851,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_value'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1855,7 +1867,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_title'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1870,7 +1882,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_description'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1889,7 +1901,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'new_image.svg'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1908,7 +1920,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'new_value': '#F8BF74'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1921,7 +1933,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'node_id': 'invalid_node'
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id invalid_node is not part of this story'):
             story_services.update_story(
@@ -1964,7 +1976,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'node_id': self.NODE_ID_2
         })]
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The node with id %s is the starting node for the story, '
             'change the starting node before deleting it.' % self.NODE_ID_2):
@@ -2024,7 +2036,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = 'owner'
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='New Topic',
             abbreviated_name='topic-two', url_fragment='topic-two',
             description='A new topic',
@@ -2104,7 +2116,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_5'
         story_services.save_new_story(self.USER_ID, story)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story.id)
 
     def test_get_completed_node_ids(self) -> None:
@@ -2238,7 +2250,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
         self.save_new_story(self.STORY_ID_1, self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID_1)
         story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_ID_1, self.NODE_ID_1)
@@ -2272,7 +2284,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         user_id = 'user_id'
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, user_id, name='Topic',
             abbreviated_name='topic-three', url_fragment='topic-three',
             description='A new topic',

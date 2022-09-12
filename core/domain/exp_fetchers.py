@@ -44,7 +44,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user
+    models.Names.EXPLORATION, models.Names.USER
 ])
 datastore_services = models.Registry.import_datastore_services()
 
@@ -258,7 +258,7 @@ def get_exploration_summary_by_id(
 
 
 def get_exploration_summaries_from_models(
-    exp_summary_models: List[exp_models.ExpSummaryModel]
+    exp_summary_models: Sequence[exp_models.ExpSummaryModel]
 ) -> Dict[str, exp_domain.ExplorationSummary]:
     """Returns a dict with ExplorationSummary domain objects as values,
     keyed by their exploration id.

@@ -71,24 +71,17 @@ jobs:
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="adminPage"
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Uploading protractor-video as Artifacts
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: protractor-video
-          path: /home/runner/work/oppia/protractor-video
+      - name: Run e2e Checkpoint Features Test
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="checkpointFeatures" --prod_env
+        env:
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: webdriverio-video
           path: /home/runner/work/oppia/webdriverio-video
-      - name: Uploading protractor screenshots as Artifacts
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: protractor-screenshots
-          path: /home/runner/work/oppia/protractor-screenshots
       - name: Uploading webdriverio screenshots as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
@@ -101,3 +94,9 @@ jobs:
         with:
           name: webpack-bundles
           path: /home/runner/work/oppia/oppia/build
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "An E2E test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

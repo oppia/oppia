@@ -25,44 +25,55 @@ from core import utils
 from core.platform import models
 from core.tests import test_utils
 
-from mypy_imports import app_feedback_report_models, base_models # isort:skip
+from typing import List
+from typing_extensions import Final
 
-from typing import List, Any # isort:skip # pylint: disable=unused-import
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_feedback_report_models
+    from mypy_imports import base_models
 
-(base_models, app_feedback_report_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.app_feedback_report])
+(base_models, app_feedback_report_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.APP_FEEDBACK_REPORT
+])
 
 
 class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportModel class."""
 
-    PLATFORM_ANDROID = 'android'
-    PLATFORM_WEB = 'web'
+    PLATFORM_ANDROID: Final = 'android'
+    PLATFORM_WEB: Final = 'web'
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
-    REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
-    REPORT_SUBMITTED_TIMESTAMP_1_MSEC = (
+    REPORT_SUBMITTED_TIMESTAMP_1: Final = datetime.datetime.fromtimestamp(
+        1615151836
+    )
+    REPORT_SUBMITTED_TIMESTAMP_1_MSEC: Final = (
         utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP_1))
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
-    REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615519337)
-    REPORT_SUBMITTED_TIMESTAMP_2_MSEC = (
+    REPORT_SUBMITTED_TIMESTAMP_2: Final = datetime.datetime.fromtimestamp(
+        1615519337
+    )
+    REPORT_SUBMITTED_TIMESTAMP_2_MSEC: Final = (
         utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP_2))
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
-    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
-    TICKET_CREATION_TIMESTAMP_MSEC = (
+    TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
+        1616173836
+    )
+    TICKET_CREATION_TIMESTAMP_MSEC: Final = (
         utils.get_time_in_millisecs(TICKET_CREATION_TIMESTAMP))
-    TICKET_ID = '%s.%s.%s' % (
+    TICKET_ID: Final = '%s.%s.%s' % (
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
-    REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'other'
-    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
-    DEVICE_COUNTRY_LOCALE_CODE_INDIA = 'in'
-    ANDROID_DEVICE_MODEL = 'Pixel 4a'
-    ANDROID_SDK_VERSION = 28
-    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
-    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
-    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
-    ANDROID_REPORT_INFO = {
+    REPORT_TYPE_SUGGESTION: Final = 'suggestion'
+    CATEGORY_OTHER: Final = 'other'
+    PLATFORM_VERSION: Final = '0.1-alpha-abcdef1234'
+    DEVICE_COUNTRY_LOCALE_CODE_INDIA: Final = 'in'
+    ANDROID_DEVICE_MODEL: Final = 'Pixel 4a'
+    ANDROID_SDK_VERSION: Final = 28
+    ENTRY_POINT_NAVIGATION_DRAWER: Final = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH: Final = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH: Final = 'en'
+    ANDROID_REPORT_INFO: Final = {
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
         'logcat_logs': ['logcat1', 'logcat2'],
@@ -76,18 +87,18 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
-    WEB_REPORT_INFO = {
+    WEB_REPORT_INFO: Final = {
         'user_feedback_other_text_input': 'add an admin'
     }
-    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
-    WEB_REPORT_INFO_SCHEMA_VERSION = 1
+    ANDROID_REPORT_INFO_SCHEMA_VERSION: Final = 1
+    WEB_REPORT_INFO_SCHEMA_VERSION: Final = 1
 
     def setUp(self) -> None:
         """Set up  models in datastore for use in testing."""
         super().setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL) # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
@@ -171,7 +182,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # Test Exception for AppFeedbackReportModel.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The id generator for AppFeedbackReportModel is '
             'producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -312,28 +323,31 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertFalse(model_class.has_reference_to_user_id('id_x'))
 
     def test_get_filter_options_with_invalid_field_throws_exception(
-            self) -> None:
+        self
+    ) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportModel
+
         class InvalidFilter(enum.Enum):
             """Invalid filter."""
 
             INVALID_FIELD = 'invalid_field'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'The field %s is not a valid field to filter reports on' % (
                 InvalidFilter.INVALID_FIELD.name)
         ):
             with self.swap(
                 model_class, 'query',
-                self._mock_query_filters_returns_empy_list):
+                self._mock_query_filters_returns_empty_list):
                 # Using type ignore[arg-type] because we passes arg of type
                 # InvalidFilter to type class filter_field_names. This is done
                 # to ensure that InvalidInputException is thrown.
                 model_class.get_filter_options_for_field(
                     InvalidFilter.INVALID_FIELD) # type: ignore[arg-type]
 
-    def _mock_query_filters_returns_empy_list(
-            self, projection: bool, distinct: bool) -> List[Any]: # pylint: disable=unused-argument
+    def _mock_query_filters_returns_empty_list(
+        self, projection: bool, distinct: bool  # pylint: disable=unused-argument
+    ) -> List[str]:
         """Mock the model query to test for an invalid filter field. Named
         parameters 'projection' and 'distinct' are required to mock the
         query function.
@@ -345,23 +359,27 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportTicketModel class."""
 
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
-    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
-    REPORT_SUBMITTED_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+    REPORT_SUBMITTED_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
+        1615151836
+    )
+    REPORT_SUBMITTED_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP)
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
-    NEWEST_REPORT_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    NEWEST_REPORT_TIMESTAMP: Final = datetime.datetime.fromtimestamp(1615151836)
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
-    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
-    TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+    TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
+        1616173836
+    )
+    TICKET_CREATION_TIMESTAMP_MSEC: Final = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP)
 
-    PLATFORM = 'android'
-    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
-    TICKET_NAME = 'example ticket name'
-    TICKET_ID = '%s.%s.%s' % (
+    PLATFORM: Final = 'android'
+    PLATFORM_VERSION: Final = '0.1-alpha-abcdef1234'
+    TICKET_NAME: Final = 'example ticket name'
+    TICKET_ID: Final = '%s.%s.%s' % (
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
-    REPORT_IDS = ['%s.%s.%s' % (
+    REPORT_IDS: Final = ['%s.%s.%s' % (
         PLATFORM, int(REPORT_SUBMITTED_TIMESTAMP_MSEC),
         'randomInteger123')]
 
@@ -390,7 +408,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportTicketModel
         # Test Exception for AppFeedbackReportTicketModel.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The id generator for AppFeedbackReportTicketModel is producing too'
             'many collisions.'
@@ -422,18 +440,20 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     """Tests for the AppFeedbackReportStatsModel class."""
 
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
-    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
-    TICKET_CREATION_TIMESTAMP_MSEC = (
+    TICKET_CREATION_TIMESTAMP: Final = datetime.datetime.fromtimestamp(
+        1616173836
+    )
+    TICKET_CREATION_TIMESTAMP_MSEC: Final = (
         utils.get_time_in_millisecs(TICKET_CREATION_TIMESTAMP))
-    TICKET_ID = '%s.%s.%s' % (
+    TICKET_ID: Final = '%s.%s.%s' % (
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
-    STATS_DATE = datetime.date.fromtimestamp(1616173836)
-    DAILY_STATS = {
+    STATS_DATE: Final = datetime.date.fromtimestamp(1616173836)
+    DAILY_STATS: Final = {
         'report_type': {
             'suggestion': 1, 'issue': 1, 'crash': 1}}
-    TOTAL_REPORTS_SUBMITTED = 3
+    TOTAL_REPORTS_SUBMITTED: Final = 3
 
     def test_create_and_get_stats_model(self) -> None:
         entity_id = (

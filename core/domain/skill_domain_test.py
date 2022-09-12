@@ -78,7 +78,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     # doesn't match with TestBase._assert_validation_error().
     def _assert_validation_error(self, expected_error_substring: str) -> None:  # type: ignore[override]
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.skill.validate()
 
@@ -86,14 +86,14 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     # rid of the tests that intentionally test wrong inputs that we
     # can normally catch by typing.
     def test_skill_id_validation_fails_with_invalid_skill_id_type(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Skill id should be a string'):
             skill_domain.Skill.require_valid_skill_id(10)  # type: ignore[arg-type]
 
     def test_skill_id_validation_fails_with_invalid_skill_id_length(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid skill id'):
             skill_domain.Skill.require_valid_skill_id('abc')
 
@@ -118,7 +118,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'There is no misconception with the given id.'
         ):
@@ -298,7 +298,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             0, feedback)
         self.skill.validate()
         self.assertEqual(self.skill.misconceptions[0].feedback, feedback)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'There is no misconception with the given id.'
         ):
@@ -310,7 +310,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             0, new_notes)
         self.skill.validate()
         self.assertEqual(self.skill.misconceptions[0].notes, new_notes)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'There is no misconception with the given id.'
         ):
@@ -325,7 +325,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             self.skill.misconceptions[0].must_be_addressed,
             must_be_addressed
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'There is no misconception with the given id.'
         ):
@@ -335,7 +335,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_misconceptions(self) -> None:
         self.skill.delete_misconception(0)
         self.assertEqual(len(self.skill.misconceptions), 0)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'There is no misconception with the given id.'
         ):
@@ -350,7 +350,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.skill.misconceptions[1], misconception)
 
     def test_delete_prerequisite_skill(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'The skill to remove is not a prerequisite skill.'
         ):
@@ -362,7 +362,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.add_prerequisite_skill('skill_id_3')
         self.assertEqual(len(self.skill.prerequisite_skill_ids), 2)
         self.assertEqual(self.skill.prerequisite_skill_ids[1], 'skill_id_3')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'The skill is already a prerequisite skill.'
         ):
@@ -395,7 +395,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         difficulty = constants.SKILL_DIFFICULTIES[0]
         explanations = ['explanation1']
         self.skill.update_rubric(difficulty, explanations)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'There is no rubric for the given difficulty.'
         ):
@@ -418,7 +418,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_valid_misconception_must_be_addressed(self) -> None:
         self.skill.validate()
         must_be_addressed = 'False'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'must_be_addressed should be a bool value'):
             self.skill.update_misconception_must_be_addressed(
                 0, must_be_addressed)  # type: ignore[arg-type]
@@ -830,7 +830,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_require_valid_description_with_empty_description_raise_error(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Description field should not be empty'):
             self.skill.require_valid_description('')
 
@@ -958,17 +958,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 class SkillChangeTests(test_utils.GenericTestBase):
 
     def test_skill_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             skill_domain.SkillChange({'invalid': 'data'})
 
     def test_skill_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             skill_domain.SkillChange({'cmd': 'invalid'})
 
     def test_skill_change_object_with_missing_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'new_value, old_value')):
@@ -978,7 +978,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
             })
 
     def test_skill_change_object_with_extra_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             skill_domain.SkillChange({
@@ -990,7 +990,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
             })
 
     def test_skill_change_object_with_invalid_skill_property(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd update_skill_property: '
                 'invalid is not allowed')):
@@ -1004,7 +1004,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
     def test_skill_change_object_with_invalid_skill_misconception_property(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd '
                 'update_skill_misconceptions_property: invalid is not '
@@ -1020,7 +1020,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
     def test_skill_change_object_with_invalid_skill_contents_property(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd '
                 'update_skill_contents_property: invalid is not allowed')):
@@ -1210,13 +1210,13 @@ class SkillSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_description(self) -> None:
         self.skill_summary.description = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Description should be a string.'):
             self.skill_summary.validate()
 
     def test_validation_fails_with_empty_description(self) -> None:
         self.skill_summary.description = ''
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Description field should not be empty'):
             self.skill_summary.validate()
 
@@ -1225,14 +1225,14 @@ class SkillSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_language_code(self) -> None:
         self.skill_summary.language_code = 0  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected language code to be a string, received 0'):
             self.skill_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.skill_summary.language_code = 'invalid'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.skill_summary.validate()
 
@@ -1241,14 +1241,14 @@ class SkillSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_misconception_count(self) -> None:
         self.skill_summary.misconception_count = '10'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected misconception_count to be an int, received \'10\''):
             self.skill_summary.validate()
 
     def test_validation_fails_with_negative_misconception_count(self) -> None:
         self.skill_summary.misconception_count = -1
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Expected misconception_count to be non-negative, '
                 'received \'-1\'')):
@@ -1259,14 +1259,14 @@ class SkillSummaryTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_validation_fails_with_invalid_worked_examples_count(self) -> None:
         self.skill_summary.worked_examples_count = '10'  # type: ignore[assignment]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected worked_examples_count to be an int, received \'10\''):
             self.skill_summary.validate()
 
     def test_validation_fails_with_negative_worked_examples_count(self) -> None:
         self.skill_summary.worked_examples_count = -1
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Expected worked_examples_count to be non-negative, '
                 'received \'-1\'')):
@@ -1314,7 +1314,7 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
             'topic_id': 'topic_id1',
             'topic_name': 'Topic1',
             'topic_version': 2,
-            'subtopic_id': 1,
+            'subtopic_id': 1
         }
         self.assertEqual(
             self.topic_assignments.to_dict(),
@@ -1330,7 +1330,7 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
         self.categorized_skills.add_topic('Topic Name', self.subtopic_titles)
 
     def test_validation_fails_with_duplicate_topic_name(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Topic name \'Topic Name\' is already added.'):
             self.categorized_skills.add_topic('Topic Name', [])
@@ -1351,7 +1351,7 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
         })
 
     def test_validation_fails_with_topic_name_not_added(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Topic name \'Topic Name 1\' is not added.'):
             self.categorized_skills.add_uncategorized_skill(
@@ -1378,7 +1378,7 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
         })
 
     def test_validation_fails_with_subtopic_title_not_added(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Subtopic title \'Subtopic Title 3\' is not added.'):
             self.categorized_skills.add_subtopic_skill(

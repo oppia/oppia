@@ -33,8 +33,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import blog_models
 
-(base_models, blog_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.blog, models.NAMES.user])
+(base_models, blog_models, user_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.BLOG, models.Names.USER
+])
 
 
 class BlogPostModelTest(test_utils.GenericTestBase):
@@ -107,7 +108,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         blog_post_model_cls = blog_models.BlogPostModel
 
         # Test create method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'A blog post with the given blog post ID exists'
             ' already.'):
 
@@ -121,7 +122,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                     'blog_post_id', self.USER_ID)
 
         # Test generate_new_blog_post_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New blog post id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -456,7 +457,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         blog_post_rights_model_cls = blog_models.BlogPostRightsModel
 
         # Test create method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Blog Post ID conflict on creating new blog post rights model.'):
             #  Swap dependent method get_by_id to simulate collision every time.

@@ -20,6 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedCustomEditorComponent } from './schema-based-custom-editor.component';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 
 describe('Schema Based Custom Editor Component', () => {
   let component: SchemaBasedCustomEditorComponent;
@@ -41,7 +42,7 @@ describe('Schema Based Custom Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: unknown) {
+    let mockFunction = function(value: SchemaDefaultValue) {
       return value;
     };
 

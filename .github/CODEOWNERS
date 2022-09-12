@@ -201,6 +201,7 @@
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/button-directives/hint-and-solution-buttons.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/checkpoint-celebration-modal/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
 /core/templates/components/on-screen-keyboard/ @oppia/interaction-and-rte-reviewers
@@ -468,7 +469,7 @@
 /core/templates/pages/learner-group-pages/ @oppia/lace-frontend-reviewers
 
 # Beam jobs
-/setup.py @oppia/data-and-stability-reviewers
+/setup*.py @oppia/data-and-stability-reviewers
 /MANIFEST.in @oppia/data-and-stability-reviewers
 /core/jobs/ @oppia/data-and-stability-reviewers
 /core/jobs/transforms @oppia/data-and-stability-reviewers
@@ -481,7 +482,7 @@
 /core/controllers/cron*.py @oppia/data-and-stability-reviewers
 /core/domain/cron_services*.py @oppia/data-and-stability-reviewers
 /main*.py @oppia/data-and-stability-reviewers
-/core/feconf.py @oppia/data-and-stability-reviewers
+/core/feconf*.py @oppia/data-and-stability-reviewers
 /core/constants*.py @oppia/data-and-stability-reviewers
 /assets/constants.ts @oppia/data-and-stability-reviewers
 /core/controllers/tasks*.py @oppia/lace-backend-reviewers

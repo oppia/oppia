@@ -35,14 +35,14 @@ from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
 (classifier_models,) = models.Registry.import_models([
-    models.NAMES.classifier
+    models.Names.CLASSIFIER
 ])
 
 
@@ -65,9 +65,9 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[str] = []
+        assets_list: List[Tuple[str, bytes]] = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+            exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
                 assets_list)
 
@@ -140,7 +140,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -158,7 +158,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and three mappings in the data store now.
@@ -179,7 +179,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_state_name': 'Home3'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should still be only two jobs and four mappings in the data
@@ -229,7 +229,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -247,7 +247,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', False):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -267,7 +267,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be three jobs and three mappings in the data store now.
@@ -306,7 +306,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
         exploration.states['Home'].interaction.id = 'Invalid_id'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No classifier algorithm found for Invalid_id interaction'
         ):
@@ -328,7 +328,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         # Test that Exception is raised if this method is called with version
         # number 1.
         exploration.version = 1
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
             classifier_services.handle_non_retrainable_states(
@@ -380,7 +380,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_retrieval_of_classifier_training_jobs(self) -> None:
         """Test the get_classifier_training_job_by_id method."""
 
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'Entity for class ClassifierTrainingJobModel with id fake_id '
             'not found')):
             classifier_services.get_classifier_training_job_by_id('fake_id')
@@ -408,7 +408,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         self.assertEqual(classifier_training_job.training_data, [])
 
         classifier_data = (
-            self._get_classifier_data_from_classifier_training_job(  # type: ignore[no-untyped-call]
+            self._get_classifier_data_from_classifier_training_job(
                 classifier_training_job))
         self.assertEqual(
             json.loads(classifier_data.model_json), {})
@@ -432,7 +432,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'Entity for class ClassifierTrainingJobModel '
             'with id %s not found' % (
                 job_id))):
@@ -465,7 +465,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_COMPLETE,
                 feconf.TRAINING_JOB_STATUS_COMPLETE))):
@@ -498,7 +498,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_PENDING)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_PENDING,
                 feconf.TRAINING_JOB_STATUS_PENDING))):
@@ -533,7 +533,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_FAILED)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_FAILED,
                 feconf.TRAINING_JOB_STATUS_FAILED))):
@@ -585,7 +585,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         classifier_data = (
-            self._get_classifier_data_from_classifier_training_job(  # type: ignore[no-untyped-call]
+            self._get_classifier_data_from_classifier_training_job(
                 classifier_training_job))
         self.assertEqual(json.loads(classifier_data.model_json), {})
 
@@ -598,7 +598,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         classifier_data = (
-            self._get_classifier_data_from_classifier_training_job(  # type: ignore[no-untyped-call]
+            self._get_classifier_data_from_classifier_training_job(
                 classifier_training_job))
         self.assertDictEqual(
             json.loads(classifier_data.model_json),
@@ -644,7 +644,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_complete('invalid_job_id')
@@ -652,7 +652,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_can_not_mark_training_jobs_failed_due_to_invalid_job_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_jobs_failed(['invalid_job_id'])
@@ -660,13 +660,13 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_can_not_mark_training_jobs_pending_due_to_invalid_job_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_pending('invalid_job_id')
 
     def test_can_not_store_classifier_data_due_to_invalid_job_id(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.store_classifier_data('invalid_job_id', {})
@@ -823,6 +823,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         interaction_id = exploration.states[
             state_name].interaction.id
+        # Ruling out the possibility of None for mypy type checking.
         assert interaction_id is not None
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
@@ -834,7 +835,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'A new title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -847,7 +848,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         old_job_id = old_job.job_id
         # Revert the exploration.
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.revert_exploration(  # type: ignore[no-untyped-call]
+            exp_services.revert_exploration(
                 feconf.SYSTEM_COMMITTER_ID,
                 self.exp_id,
                 current_exploration.version,
@@ -884,12 +885,12 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': None
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration.id, change_list, '')
         state_training_jobs_mapping = (
             classifier_domain.StateTrainingJobsMapping('44', 2, 'New state', {})
         )
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Interaction id does not exist.'):
             classifier_services.migrate_state_training_jobs(
                 state_training_jobs_mapping

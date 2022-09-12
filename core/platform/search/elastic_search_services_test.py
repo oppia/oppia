@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.domain import search_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
@@ -70,7 +71,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'id': correct_id
             }
         ]
-        assert_raises_ctx = self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        assert_raises_ctx = self.assertRaisesRegex(
             Exception,
             'Failed to add document to index.')
         with assert_raises_ctx, self.swap(
@@ -101,7 +102,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             ['not_a_real_id'], 'index1')
 
     def test_delete_returns_without_error_when_index_does_not_exist(
-            self
+        self
     ) -> None:
         elastic_search_services.delete_documents_from_index(
             ['doc_id'], 'nonexistent_index')
@@ -188,7 +189,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
 
     def test_search_constructs_query_with_categories_and_languages(
-            self
+        self
     ) -> None:
         correct_index_name = 'index1'
 
@@ -196,7 +197,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # because this mocks the behavior of elastic_search_services.ES.search
         # and in the type stubs the type is Any.
         def mock_search(
-                body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -242,7 +243,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_search_constructs_nonempty_query_with_categories_and_langs(
-            self
+        self
     ) -> None:
         correct_index_name = 'index1'
 
@@ -250,7 +251,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # because this mocks the behavior of elastic_search_services.ES.search
         # and in the type stubs the type is Any.
         def mock_search(
-                body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -300,7 +301,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_search_returns_the_right_number_of_docs_even_if_more_exist(
-            self
+        self
     ) -> None:
         elastic_search_services.add_documents_to_index([{
             'id': 'doc_id1',
@@ -326,9 +327,234 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(new_offset)
 
     def test_search_returns_without_error_when_index_does_not_exist(
-            self
+        self
     ) -> None:
         result, new_offset = elastic_search_services.search(
             'query', 'nonexistent_index', [], [])
+        self.assertEqual(result, [])
+        self.assertEqual(new_offset, None)
+
+    def test_blog_post_summaries_search_returns_ids_only(self) -> None:
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
+        elastic_search_services.add_documents_to_index([{
+            'id': 1,
+            'source': {
+                'param1': 1,
+                'param2': 2
+            }
+        }, {
+            'id': 12,
+            'source': {
+                'param1': 3,
+                'param2': 4
+            }
+        }], correct_index_name)
+
+        result, new_offset = (
+            elastic_search_services.blog_post_summaries_search(
+                '', [], offset=0, size=50, ids_only=True
+            )
+        )
+        self.assertEqual(result, [1, 12])
+        self.assertIsNone(new_offset)
+
+    def test_blog_post_summaries_search_returns_full_response(self) -> None:
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
+        elastic_search_services.add_documents_to_index([{
+            'id': 1,
+            'source': {
+                'param1': 1,
+                'param2': 2
+            }
+        }, {
+            'id': 12,
+            'source': {
+                'param1': 3,
+                'param2': 4
+            }
+        }], correct_index_name)
+
+        result, new_offset = elastic_search_services.blog_post_summaries_search(
+            '', [], offset=0, size=50, ids_only=False)
+        self.assertEqual(result, [{
+            'id': 1,
+            'source': {
+                'param1': 1,
+                'param2': 2
+            }
+        }, {
+            'id': 12,
+            'source': {
+                'param1': 3,
+                'param2': 4
+            }
+        }])
+        self.assertIsNone(new_offset)
+
+    def test_blog_post_summaries_search_returns_none_when_response_is_empty(
+        self
+    ) -> None:
+        result, new_offset = elastic_search_services.blog_post_summaries_search(
+            '', [], offset=0, size=50, ids_only=False)
+        self.assertEqual(new_offset, None)
+        self.assertEqual(result, [])
+
+    def test_blog_post_summaries_search_constructs_query_with_tags(
+        self
+    ) -> None:
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
+
+        # In the type annotation below Dict[str, Any] is used for body
+        # because this mocks the behavior of elastic_search_services.ES.search
+        # and in the type stubs the type is Any.
+        def mock_search(
+                body: Dict[str, Any], index: str, params: Dict[str, int]
+        ) -> Dict[str, Dict[str, List[str]]]:
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'filter': [{
+                            'match': {
+                                'tags': 'tag1',
+                            }
+                        }, {
+                            'match': {
+                                'tags': 'tag2',
+                            }
+                        }],
+                        'must': [],
+                    }
+                },
+                'sort': [{
+                    'rank': {
+                        'order': 'desc',
+                        'missing': '_last',
+                        'unmapped_type': 'float'
+                    }
+                }]
+            })
+            self.assertEqual(index, correct_index_name)
+            self.assertEqual(params, {
+                'from': 0,
+                'size': 21
+            })
+            return {
+                'hits': {
+                    'hits': []
+                }
+            }
+
+        swap_search = self.swap(
+            elastic_search_services.ES, 'search', mock_search)
+        with swap_search:
+            result, new_offset = (
+                elastic_search_services.blog_post_summaries_search(
+                    '',
+                    ['tag1', 'tag2']
+                )
+            )
+        self.assertEqual(result, [])
+        self.assertIsNone(new_offset)
+
+    def test_blog_post_summaries_search_constructs_nonempty_query_with_tags(
+        self
+    ) -> None:
+        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
+
+        # In the type annotation below Dict[str, Any] is used for body
+        # because this mocks the behavior of elastic_search_services.ES.search
+        # and in the type stubs the type is Any.
+        def mock_search(
+            body: Dict[str, Any], index: str, params: Dict[str, int]
+        ) -> Dict[str, Dict[str, List[str]]]:
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'must': [{
+                            'multi_match': {
+                                'query': 'query'
+                            }
+                        }],
+                        'filter': [{
+                            'match': {
+                                'tags': 'tag1',
+                            }
+                        }, {
+                            'match': {
+                                'tags': 'tag2',
+                            }
+                        }]
+                    }
+                },
+                'sort': [{
+                    'rank': {
+                        'order': 'desc',
+                        'missing': '_last',
+                        'unmapped_type': 'float'
+                    }
+                }]
+            })
+            self.assertEqual(index, correct_index_name)
+            self.assertEqual(params, {
+                'from': 0,
+                'size': 21
+            })
+            return {
+                'hits': {
+                    'hits': []
+                }
+            }
+
+        swap_search = self.swap(
+            elastic_search_services.ES, 'search', mock_search)
+        with swap_search:
+            result, new_offset = (
+                elastic_search_services.blog_post_summaries_search(
+                    'query', ['tag1', 'tag2']
+                )
+            )
+        self.assertEqual(result, [])
+        self.assertIsNone(new_offset)
+
+    def test_blog_post_search_returns_the_right_num_of_docs_even_if_more_exist(
+        self
+    ) -> None:
+        elastic_search_services.add_documents_to_index([{
+            'id': 'doc_id1',
+            'title': 'blog post world'
+        }, {
+            'id': 'doc_id2',
+            'title': 'hello blog'
+        }], search_services.SEARCH_INDEX_BLOG_POSTS)
+        results, new_offset = (
+            elastic_search_services.blog_post_summaries_search(
+                'blog', [], size=1
+            )
+        )
+        self.assertEqual(len(results), 1)
+        # Letting mypy know that results[0] is a dict.
+        assert isinstance(results[0], dict)
+        self.assertEqual(results[0]['id'], 'doc_id1')
+        self.assertEqual(new_offset, 1)
+
+        results, new_offset = (
+            elastic_search_services.blog_post_summaries_search(
+                'blog', [], offset=1, size=1
+            )
+        )
+        self.assertEqual(len(results), 1)
+        # Letting mypy know that results[0] is a dict.
+        assert isinstance(results[0], dict)
+        self.assertEqual(results[0]['id'], 'doc_id2')
+        self.assertIsNone(new_offset)
+
+    def test_blog_post_search_returns_without_error_when_index_does_not_exist(
+        self
+    ) -> None:
+        # We perform search without adding any document to index. Therefore blog
+        # post search index doesn't exist.
+        result, new_offset = elastic_search_services.blog_post_summaries_search(
+            'query', []
+        )
         self.assertEqual(result, [])
         self.assertEqual(new_offset, None)

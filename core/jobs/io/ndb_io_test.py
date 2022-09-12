@@ -31,7 +31,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -64,7 +64,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         ]
         self.put_multi(model_list)
 
-        self.assertItemsEqual(self.get_base_models(), model_list) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(self.get_base_models(), model_list)
 
         model_pcoll = (
             self.pipeline | ndb_io.GetModels(base_models.BaseModel.get_all())
@@ -79,11 +79,11 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
             self.create_model(base_models.BaseModel, id='c'),
         ]
 
-        self.assertItemsEqual(self.get_base_models(), []) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(self.get_base_models(), [])
 
         self.assert_pcoll_empty(
             self.pipeline | beam.Create(model_list) | ndb_io.PutModels())
-        self.assertItemsEqual(self.get_base_models(), model_list) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(self.get_base_models(), model_list)
 
     def test_delete_from_datastore(self) -> None:
         model_list = [
@@ -93,11 +93,11 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         ]
         self.put_multi(model_list)
 
-        self.assertItemsEqual(self.get_base_models(), model_list) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(self.get_base_models(), model_list)
 
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create([model.key for model in model_list])
             | ndb_io.DeleteModels())
 
-        self.assertItemsEqual(self.get_base_models(), []) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(self.get_base_models(), [])

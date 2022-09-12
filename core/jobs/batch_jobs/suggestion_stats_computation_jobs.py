@@ -48,7 +48,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (opportunity_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.opportunity, models.NAMES.suggestion
+    models.Names.OPPORTUNITY, models.Names.SUGGESTION
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -196,7 +196,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 # we can easily count words.
                 if (
                         change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                        state_domain.WrittenTranslation.is_data_format_list(  # type: ignore[no-untyped-call]
+                        state_domain.WrittenTranslation.is_data_format_list(
                             change.data_format
                         )
                 ):

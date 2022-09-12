@@ -40,8 +40,8 @@ if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
 (base_models, exp_models) = models.Registry.import_models([
-    models.NAMES.base_model,
-    models.NAMES.exploration
+    models.Names.BASE_MODEL,
+    models.Names.EXPLORATION
 ])
 
 
@@ -649,7 +649,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             post_commit_status='',
             commit_cmds=[{}])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'The _get_change_domain_class() method is missing from the '

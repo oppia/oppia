@@ -27,8 +27,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import activity_models
     from mypy_imports import base_models
 
-(base_models, activity_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.activity])
+(base_models, activity_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.ACTIVITY
+])
 
 
 class ActivityListModelTest(test_utils.GenericTestBase):
@@ -61,7 +62,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         self.assertEqual(featured_model_instance.activity_references, [])
 
     def test_retrieving_non_existent_list(self) -> None:
-        with self.assertRaisesRegex(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid ActivityListModel'):
             activity_models.ActivityReferencesModel.get_or_create(
                 'nonexistent_key')
 

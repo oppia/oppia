@@ -42,7 +42,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
 (collection_models, exp_models) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration
+    models.Names.COLLECTION, models.Names.EXPLORATION
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -160,7 +160,7 @@ def _update_exploration_summary(
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
-    exp_services.regenerate_exploration_and_contributors_summaries(  # type: ignore[no-untyped-call]
+    exp_services.regenerate_exploration_and_contributors_summaries(
         activity_rights.id)
 
 
