@@ -52,7 +52,8 @@
     <div class="oppia-new-tab-button-container">
       <button [style.opacity]="(!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 1 : 0"
               *ngIf="!len && (maxListLength === null || localValue && localValue.length < maxListLength)"
-              type="button" (click)="addElement()" [disabled]="disabled">
+              type="button" class="btn btn-secondary btn-sm ml-0 e2e-test-add-list-entry" (click)="addElement()"
+              [disabled]="disabled">
         {{ addElementText | translate }}
       </button>
     </div>
