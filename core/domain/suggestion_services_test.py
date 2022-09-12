@@ -128,8 +128,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.mock_pre_accept_validate_does_nothing):
                     with self.swap(
                         suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
+                        '_get_change_list_for_accepting_edit_state_content_suggestion',  # pylint: disable=line-too-long
+                        self.mock_get_change_list_does_nothing
+                    ):
                         suggestion_services.accept_suggestion(
                             suggestion_id, reviewer_id,
                             commit_message, review_message)

@@ -489,6 +489,25 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected %s to be a valid state name' %
                 self.change.state_name)
 
+    def _get_change_list_for_accepting_edit_state_content_suggestion(
+        self
+    ) -> List[exp_domain.ExplorationChange]:
+        """Gets a complete change for the SuggestionEditStateContent.
+
+        Returns:
+            list(ExplorationChange). The change_list corresponding to the
+            suggestion.
+        """
+        change = self.change
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+        old_content = (
+            exploration.states[self.change.state_name].content.to_dict())
+
+        change.old_value = old_content
+        change.new_value['content_id'] = old_content['content_id']
+
+        return [change]
+
     def populate_old_value_of_change(self) -> None:
         """Populates old value of the change."""
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
@@ -508,15 +527,9 @@ class SuggestionEditStateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
-        change = self.change
-        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
-        old_content = (
-            exploration.states[self.change.state_name].content.to_dict())
-
-        change.old_value = old_content
-        change.new_value['content_id'] = old_content['content_id']
-
-        change_list: List[exp_domain.ExplorationChange] = [change]
+        change_list = (
+            self._get_change_list_for_accepting_edit_state_content_suggestion()
+        )
         # Before calling this accept method we are already checking if user
         # with 'final_reviewer_id' exists or not.
         assert self.final_reviewer_id is not None
