@@ -2516,11 +2516,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(
+    def _convert_states_v52_dict_to_v53_dict(
         cls, states_dict: Dict[str, state_domain.StateDict],
         language_code: str
     ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 51 to 52. Version 52 fixes all the backend
+        """Converts from version 52 to 53. Version 53 fixes all the backend
         validation checks for explorations errored data which are
         categorized as -
             - Exploration states
@@ -3886,7 +3886,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
-        elif current_states_schema_version == 51:
+        elif current_states_schema_version == 52:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], language_code
             )
@@ -3899,7 +3899,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 57
+    CURRENT_EXP_SCHEMA_VERSION = 58
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -4149,7 +4149,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v56_dict_to_v57_dict(
+    def _convert_v57_dict_to_v58_dict(
         cls, exploration_dict: VersionedExplorationDict
     ) -> VersionedExplorationDict:
         """Converts a v56 exploration dict into a v57 exploration dict.
@@ -4165,11 +4165,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The dict representation of the Exploration domain object,
             following schema version v57.
         """
-        exploration_dict['schema_version'] = 57
+        exploration_dict['schema_version'] = 58
 
-        exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
+        exploration_dict['states'] = cls._convert_states_v52_dict_to_v53_dict(
             exploration_dict['states'], exploration_dict['language_code'])
-        exploration_dict['states_schema_version'] = 52
+        exploration_dict['states_schema_version'] = 53
 
         return exploration_dict
 
@@ -4265,10 +4265,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 exploration_dict)
             exploration_schema_version = 56
 
-        if exploration_schema_version == 56:
-            exploration_dict = cls._convert_v56_dict_to_v57_dict(
+        if exploration_schema_version == 57:
+            exploration_dict = cls._convert_v57_dict_to_v58_dict(
                 exploration_dict)
-            exploration_schema_version = 57
+            exploration_schema_version = 58
 
         return exploration_dict
 
