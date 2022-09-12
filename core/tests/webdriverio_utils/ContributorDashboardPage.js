@@ -57,6 +57,7 @@ var ContributorDashboardPage = function() {
     let width = (await browser.getWindowSize()).width;
     await browser.url('/contributor-dashboard');
     if (width > 700) {
+      await waitFor.pageToFullyLoad();
       await waitFor.visibilityOf(
         usernameContainer, 'Username takes too much time to load');
     }
