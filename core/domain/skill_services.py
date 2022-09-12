@@ -50,8 +50,8 @@ if MYPY: # pragma: no cover
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
-        models.NAMES.skill, models.NAMES.user, models.NAMES.question,
-        models.NAMES.topic]))
+        models.Names.SKILL, models.Names.USER, models.Names.QUESTION,
+        models.Names.TOPIC]))
 
 
 # Repository GET methods.

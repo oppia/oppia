@@ -52,7 +52,7 @@ import webtest
 
 auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
