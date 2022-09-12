@@ -43,7 +43,7 @@
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
                         [hidden]="userInfoIsLoading">
-                    {{userIsLoggedIn ? username : 'Guest'}}
+                    {{ username }}
                   </span>
                 </div>
                 <div class="oppia-long-contributor-username-container"
@@ -52,7 +52,16 @@
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
                         [hidden]="userInfoIsLoading">
-                    {{userIsLoggedIn ? username : 'Guest'}}
+                    {{ username }}
+                  </span>
+                </div>
+                <div class="oppia-short-contributor-username-container"
+                     *ngIf="!userIsLoggedIn"
+                     [attr.data-tab-name]="'username'">
+                  <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
+                  <span class="e2e-test-username"
+                        [hidden]="userInfoIsLoading">
+                    Guest
                   </span>
                 </div>
                 <div class="oppia-review-right-details-container e2e-test-review-rights"
