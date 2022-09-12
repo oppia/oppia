@@ -477,32 +477,7 @@ def _save_topic(
             'which is too old. Please reload the page and try again.'
             % (topic_model.version, topic.version))
 
-    topic_model.description = topic.description
-    topic_model.name = topic.name
-    topic_model.canonical_name = topic.canonical_name
-    topic_model.abbreviated_name = topic.abbreviated_name
-    topic_model.url_fragment = topic.url_fragment
-    topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
-    topic_model.thumbnail_filename = topic.thumbnail_filename
-    topic_model.thumbnail_size_in_bytes = topic.thumbnail_size_in_bytes
-    topic_model.canonical_story_references = [
-        reference.to_dict() for reference in topic.canonical_story_references
-    ]
-    topic_model.additional_story_references = [
-        reference.to_dict() for reference in topic.additional_story_references
-    ]
-    topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
-    topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
-    topic_model.subtopic_schema_version = topic.subtopic_schema_version
-    topic_model.story_reference_schema_version = (
-        topic.story_reference_schema_version)
-    topic_model.next_subtopic_id = topic.next_subtopic_id
-    topic_model.language_code = topic.language_code
-    topic_model.meta_tag_content = topic.meta_tag_content
-    topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
-    topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
-    topic_model.skill_ids_for_diagnostic_test = (
-        topic.skill_ids_for_diagnostic_test)
+    topic_model = populate_topic_model_fields(topic_model, topic)
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
@@ -982,37 +957,12 @@ def save_topic_summary(topic_summary: topic_domain.TopicSummary) -> None:
         topic_summary: TopicSummary. The topic summary object to be saved
             in the datastore.
     """
-    topic_summary_dict = {
-        'name': topic_summary.name,
-        'description': topic_summary.description,
-        'canonical_name': topic_summary.canonical_name,
-        'language_code': topic_summary.language_code,
-        'version': topic_summary.version,
-        'additional_story_count': topic_summary.additional_story_count,
-        'canonical_story_count': topic_summary.canonical_story_count,
-        'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
-        'subtopic_count': topic_summary.subtopic_count,
-        'total_skill_count': topic_summary.total_skill_count,
-        'total_published_node_count':
-            topic_summary.total_published_node_count,
-        'thumbnail_filename': topic_summary.thumbnail_filename,
-        'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
-        'topic_model_last_updated': topic_summary.topic_model_last_updated,
-        'topic_model_created_on': topic_summary.topic_model_created_on,
-        'url_fragment': topic_summary.url_fragment
-    }
-
-    topic_summary_model = (
+    existing_topic_summary_model = (
         topic_models.TopicSummaryModel.get_by_id(topic_summary.id))
-    if topic_summary_model is not None:
-        topic_summary_model.populate(**topic_summary_dict)
-        topic_summary_model.update_timestamps()
-        topic_summary_model.put()
-    else:
-        topic_summary_dict['id'] = topic_summary.id
-        model = topic_models.TopicSummaryModel(**topic_summary_dict)
-        model.update_timestamps()
-        model.put()
+    topic_summary_model = populate_topic_summary_model_fields(
+    existing_topic_summary_model, topic_summary)
+    topic_summary_model.update_timestamps()
+    topic_summary_model.put()
 
 
 def publish_topic(topic_id: str, committer_id: str) -> None:
@@ -1414,3 +1364,83 @@ def get_topic_id_to_diagnostic_test_skill_ids(
         )
         raise Exception(error_msg)
     return topic_id_to_diagnostic_test_skill_ids
+
+
+def populate_topic_model_fields(topic_model, topic):
+    """Populate topic model with the data from topic object.
+
+    Args:
+        topic_model: TopicModel. The model to populate.
+        topic: Topic. The topic domain object which should be used to
+            populate the model.
+
+    Returns:
+        TopicModel. Populated model.
+    """
+    topic_model.description = topic.description
+    topic_model.name = topic.name
+    topic_model.canonical_name = topic.canonical_name
+    topic_model.abbreviated_name = topic.abbreviated_name
+    topic_model.url_fragment = topic.url_fragment
+    topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
+    topic_model.thumbnail_filename = topic.thumbnail_filename
+    topic_model.thumbnail_size_in_bytes = topic.thumbnail_size_in_bytes
+    topic_model.canonical_story_references = [
+        reference.to_dict() for reference in topic.canonical_story_references
+    ]
+    topic_model.additional_story_references = [
+        reference.to_dict() for reference in topic.additional_story_references
+    ]
+    topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
+    topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
+    topic_model.subtopic_schema_version = topic.subtopic_schema_version
+    topic_model.story_reference_schema_version = (
+        topic.story_reference_schema_version)
+    topic_model.next_subtopic_id = topic.next_subtopic_id
+    topic_model.language_code = topic.language_code
+    topic_model.meta_tag_content = topic.meta_tag_content
+    topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
+    topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
+
+    return topic_model
+
+
+def populate_topic_summary_model_fields(topic_summary_model, topic_summary):
+    """Populate topic summary model with the data from topic summary object.
+
+    Args:
+        topic_summary_model: TopicSummaryModel. The model to populate.
+        topic_summary: TopicSummary. The topic summary domain object which
+            should be used to populate the model.
+
+    Returns:
+        TopicSummaryModel. Populated model.
+    """
+    topic_summary_dict = {
+        'name': topic_summary.name,
+        'description': topic_summary.description,
+        'canonical_name': topic_summary.canonical_name,
+        'language_code': topic_summary.language_code,
+        'version': topic_summary.version,
+        'additional_story_count': topic_summary.additional_story_count,
+        'canonical_story_count': topic_summary.canonical_story_count,
+        'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
+        'subtopic_count': topic_summary.subtopic_count,
+        'total_skill_count': topic_summary.total_skill_count,
+        'total_published_node_count':
+            topic_summary.total_published_node_count,
+        'thumbnail_filename': topic_summary.thumbnail_filename,
+        'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
+        'topic_model_last_updated': topic_summary.topic_model_last_updated,
+        'topic_model_created_on': topic_summary.topic_model_created_on,
+        'url_fragment': topic_summary.url_fragment
+    }
+
+    if topic_summary_model is not None:
+        topic_summary_model.populate(**topic_summary_dict)
+    else:
+        topic_summary_dict['id'] = topic_summary.id
+        topic_summary_model = topic_models.TopicSummaryModel(
+            **topic_summary_dict)
+
+    return topic_summary_model
