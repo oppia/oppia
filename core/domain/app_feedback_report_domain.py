@@ -43,6 +43,7 @@ if MYPY: # pragma: no cover
     [models.Names.APP_FEEDBACK_REPORT]
 )
 
+
 class AppFeedbackReportDict(TypedDict):
     """Dictionary representing the AppFeedbackReport object."""
 
