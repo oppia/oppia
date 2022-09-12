@@ -485,7 +485,7 @@
 /core/controllers/cron*.py @oppia/data-and-stability-reviewers
 /core/domain/cron_services*.py @oppia/data-and-stability-reviewers
 /main*.py @oppia/data-and-stability-reviewers
-/core/feconf.py @oppia/data-and-stability-reviewers
+/core/feconf*.py @oppia/data-and-stability-reviewers
 /core/constants*.py @oppia/data-and-stability-reviewers
 /assets/constants.ts @oppia/data-and-stability-reviewers
 /core/controllers/tasks*.py @oppia/lace-backend-reviewers
