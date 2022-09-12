@@ -13,8 +13,8 @@
     opacity: 1;
   }
   .schema-based-list-editor .oppia-new-tab-button-container {
-    height: auto;
-    margin: 4px 0;
+    height: 30px;
+    margin-top: 4px;
   }
 </style>
 <div class="schema-based-list-editor">
@@ -48,9 +48,9 @@
       Please ensure that the list has no duplicates.
     </div>
 
+    <!-- The margin-left is added here to left-align the button with the previous list items. -->
     <div class="oppia-new-tab-button-container">
-      <button
-              [ngClass]="(!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 'btn btn-secondary btn-sm ml-0 e2e-test-add-list-entry' : 'd-none'"
+      <button [style.opacity]="(!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 1 : 0"
               *ngIf="!len && (maxListLength === null || localValue && localValue.length < maxListLength)"
               type="button" (click)="addElement()" [disabled]="disabled">
         {{ addElementText | translate }}
