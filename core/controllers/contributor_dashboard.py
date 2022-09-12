@@ -26,10 +26,13 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import story_fetchers
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
+
+from typing import List, Union
 
 
 class ContributorDashboardPage(base.BaseHandler):
@@ -828,21 +831,27 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
 
 
 def _get_complete_stats(
-    stats_data, stats_are_translation_contribution
+    stats_data: List[Union[
+        suggestion_registry.TranslationContributionStats,
+        suggestion_registry.TranslationReviewStats,
+        suggestion_registry.QuestionContributionStats,
+        suggestion_registry.QuestionReviewStats
+    ]],
+    stats_are_translation_contribution
 ):
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 
     Args:
-        stats_data: list(TranslationContributionStats|TranslationReviewStats|
-            QuestionContributionStats|QuestionReviewStats). Stats domain
+        stats_data: list(TranslationContributionStats | TranslationReviewStats |
+            QuestionContributionStats | QuestionReviewStats). Stats domain
             objects.
         stats_are_translation_contribution: bool. A flag that indicates whether
             stats are translation contributions.
 
     Returns:
-        list(dict(TranslationContributionStats|TranslationReviewStats
-        |QuestionContributionStats|QuestionReviewStats)). Dict
+        list(dict(TranslationContributionStats | TranslationReviewStats
+        | QuestionContributionStats | QuestionReviewStats)). Dict
         representations of TranslationContributionStats/
         TranslationReviewStats/QuestionContributionStats/
         QuestionReviewStats domain objects with additional keys:
