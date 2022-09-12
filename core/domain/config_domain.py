@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (config_models, suggestion_models,) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.suggestion])
+    [models.Names.CONFIG, models.Names.SUGGESTION])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
@@ -179,6 +179,14 @@ class ConfigPropertyChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class ChangePropertyValueCmd(ConfigPropertyChange):
+    """Class representing the ConfigPropertyChange's
+    CMD_CHANGE_PROPERTY_VALUE command.
+    """
+
+    new_value: str
 
 
 class ConfigProperty:

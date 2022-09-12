@@ -46,7 +46,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+    models.Names.SUGGESTION, models.Names.FEEDBACK])
 
 
 class SuggestionUnitTests(test_utils.GenericTestBase):

@@ -53,11 +53,13 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (suggestion_models, feedback_models, opportunity_models, user_models) = (
-    models.Registry.import_models([
-        models.NAMES.suggestion, models.NAMES.feedback,
-        models.NAMES.opportunity,
-        models.NAMES.user
-    ])
+    models.Registry.import_models(
+        [
+            models.Names.SUGGESTION,
+            models.Names.FEEDBACK,
+            models.Names.OPPORTUNITY,
+            models.Names.USER]
+    )
 )
 
 
@@ -988,6 +990,94 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             new_question_state_data['interaction'][
                 'solution'],
             new_solution_dict)
+
+    def test_wrong_suggestion_raise_error_while_updating_translation_suggestion(
+        self
+    ) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected SuggestionTranslateContent suggestion'
+            ' but found: SuggestionAddQuestion.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id, 'test_translation'
+            )
+
+    def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
+        self
+    ) -> None:
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['state 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state 1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>old content html</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'state 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exploration1', self.target_version_at_submission,
+            self.author_id, add_translation_change_dict, 'test description')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected SuggestionAddQuestion suggestion but '
+            'found: SuggestionTranslateContent.'
+        ):
+            suggestion_services.update_question_suggestion(
+                suggestion.suggestion_id,
+                0.1,
+                exploration.states['state 1'].to_dict()
+            )
 
     def test_update_question_suggestion_to_change_skill_difficulty(
         self
