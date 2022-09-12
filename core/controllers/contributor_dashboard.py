@@ -744,7 +744,7 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid contribution subtype %s.' % (contribution_subtype)
             )
-    
+
         user_id = user_services.get_user_id_from_username(username)
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_TRANSLATION:
@@ -753,24 +753,30 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
                     suggestion_services.get_all_translation_contribution_stats(
                         user_id))
                 self.values = {
-                    'translation_contribution_stats': _get_complete_stats(stats, True)
+                    'translation_contribution_stats': _get_complete_stats(
+                        stats, True)
                 }
 
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
-                stats = suggestion_services.get_all_translation_review_stats(user_id)
+                stats = suggestion_services.get_all_translation_review_stats(
+                    user_id)
                 self.values = {
-                    'translation_review_stats': _get_complete_stats(stats, False)
+                    'translation_review_stats': _get_complete_stats(
+                        stats, False)
                 }
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_QUESTION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
-                stats = suggestion_services.get_all_question_contribution_stats(user_id)
+                stats = suggestion_services.get_all_question_contribution_stats(
+                    user_id)
                 self.values = {
-                    'question_contribution_stats': _get_complete_stats(stats, False)
+                    'question_contribution_stats': _get_complete_stats(
+                        stats, False)
                 }
 
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
-                stats = suggestion_services.get_all_question_review_stats(user_id)
+                stats = suggestion_services.get_all_question_review_stats(
+                    user_id)
                 self.values = {
                     'question_review_stats': _get_complete_stats(stats, False)
                 }
@@ -796,23 +802,27 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username):
         """Handles GET requests."""
-    
+
         user_id = user_services.get_user_id_from_username(username)
 
         stats = suggestion_services.get_all_contributor_stats(user_id)
         response = {}
 
-        if stats.translation_contribution_stats != None:
-            response['translation_contribution_stats'] = _get_complete_stats(stats.translation_contribution_stats, True)
+        if stats.translation_contribution_stats is not None:
+            response['translation_contribution_stats'] = _get_complete_stats(
+                stats.translation_contribution_stats, True)
 
-        if stats.translation_review_stats != None:
-            response['translation_review_stats'] = _get_complete_stats(stats.translation_review_stats, False)
+        if stats.translation_review_stats is not None:
+            response['translation_review_stats'] = _get_complete_stats(
+                stats.translation_review_stats, False)
 
-        if stats.question_contribution_stats != None:
-            response['question_contribution_stats'] = _get_complete_stats(stats.question_contribution_stats, False)
+        if stats.question_contribution_stats is not None:
+            response['question_contribution_stats'] = _get_complete_stats(
+                stats.question_contribution_stats, False)
 
-        if stats.question_review_stats != None:
-            response['question_review_stats'] = _get_complete_stats(stats.question_review_stats, False)
+        if stats.question_review_stats is not None:
+            response['question_review_stats'] = _get_complete_stats(
+                stats.question_review_stats, False)
 
         self.render_json(response)
 
@@ -826,6 +836,8 @@ def _get_complete_stats(
         stats_data: list(TranslationContributionStats|TranslationReviewStats
             |QuestionContributionStats|QuestionReviewStats). Stats domain
             objects.
+        stats_are_translation_contribution: bool. A flag that indicates whether
+            stats are translation contributions.
 
     Returns:
         list(dict(TranslationContributionStats|TranslationReviewStats
@@ -855,7 +867,7 @@ def _get_complete_stats(
     for stats_dict in translation_review_stats_dicts:
         stats_dict['topic_name'] = topic_name_by_topic_id.get(
             stats_dict['topic_id'], 'UNKNOWN')
-        
+
         if stats_are_translation_contribution:
             sorted_contribution_dates = sorted(stats_dict['contribution_dates'])
             first_contribution_date = sorted_contribution_dates[0]

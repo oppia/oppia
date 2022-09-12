@@ -3804,8 +3804,8 @@ def can_fetch_contributor_dashboard_stats(handler):
                 'The user, %s is not allowed fetch other stats of other '
                 'users' % (user_services.get_username(self.user_id)))
 
-        return handler(self, contribution_type, contribution_subtype,
-            username, **kwargs)
+        return handler(
+            self, contribution_type, contribution_subtype, username, **kwargs)
 
     test_can_fetch_contributor_dashboard_stats.__wrapped__ = True
     return test_can_fetch_contributor_dashboard_stats

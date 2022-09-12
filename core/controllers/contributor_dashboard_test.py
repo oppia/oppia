@@ -1503,7 +1503,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         )
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json('/contributorstatssummaries/translation/submission/%s' % self.OWNER_USERNAME)
+        response = self.get_json(
+            '/contributorstatssummaries/translation/submission/%s' % (
+                self.OWNER_USERNAME))
 
         self.assertEqual(
             response, {
@@ -1546,7 +1548,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         )
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json('/contributorstatssummaries/translation/review/%s' % self.OWNER_USERNAME)
+        response = self.get_json(
+            '/contributorstatssummaries/translation/review/%s' % (
+                self.OWNER_USERNAME))
 
         self.assertEqual(
             response, {
@@ -1583,7 +1587,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         )
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json('/contributorstatssummaries/question/submission/%s' % self.OWNER_USERNAME)
+        response = self.get_json(
+            '/contributorstatssummaries/question/submission/%s' % (
+                self.OWNER_USERNAME))
 
         self.assertEqual(
             response, {
@@ -1767,7 +1773,8 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
     def test_get_all_stats(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json('/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
+        response = self.get_json(
+            '/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
 
         self.assertEqual(
             response, {
@@ -1835,8 +1842,9 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
     def test_get_all_stats_of_other_users_raises_error(self):
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_json('/contributorallstatssummaries/abc',
-            expected_status_int=401)
+        response = self.get_json(
+            '/contributorallstatssummaries/abc', expected_status_int=401
+        )
 
         self.assertEqual(
             response['error'],
