@@ -67,11 +67,11 @@ if MYPY:  # pragma: no cover
     recommendations_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback,
-    models.NAMES.exploration,
-    models.NAMES.opportunity,
-    models.NAMES.recommendations,
-    models.NAMES.user
+    models.Names.FEEDBACK,
+    models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY,
+    models.Names.RECOMMENDATIONS,
+    models.Names.USER
 ])
 
 search_services = models.Registry.import_search_services()
