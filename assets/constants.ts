@@ -6174,7 +6174,7 @@ export default {
   "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
 
   // eslint-disable-next-line max-len
-  "DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT": "Check out this new blog post on Oppia - a free platform for teaching and learning!",
+  "DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT": "Check out this new blog post on Oppia",
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
@@ -6685,13 +6685,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         }
       ]
     },
@@ -6703,13 +6703,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         }
       ]
     },
@@ -6725,13 +6725,13 @@ export default {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         },
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+          "CONTENT": "Read the latest on what's new and exciting with Oppia."
         }
       ]
     },

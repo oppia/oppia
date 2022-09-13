@@ -183,52 +183,53 @@ class BlogPostDataHandler(base.BaseHandler):
         del blog_post_dict['author_id']
         # We fetch 1 more than the required blog post summaries as the result
         # might contain the blog post which is currently being viewed.
-        blog_post_summaries, _ = (
+        summaries, _ = (
             _get_matching_blog_card_summary_dicts(
                 '',
                 blog_post_dict['tags'],
-                feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1,
+                MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1,
                 None
             )
         )
-        if (
-            len(blog_post_summaries) <
-            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1
-        ):
-            blog_post_summaries.extend(
+
+        if len(summaries) < MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1:
+            summary_ids = [summary.id for summary in summaries]
+            # We fetch more blog post summaries than the deficit as the result
+            # might contain the blog post summaries which are already fetched.
+            size = MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + len(summaries)
+            resultant_summaries = (
                 blog_services.get_published_blog_post_summaries_by_user_id(
-                    blog_post.author_id,
-                    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST +
-                    len(blog_post_summaries)
+                    blog_post.author_id, size
                 )
             )
-            blog_post_summaries = list(set(blog_post_summaries))
-
-        if (
-            len(blog_post_summaries) <
-            feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1
-        ):
-            blog_post_summaries.extend(
-                blog_services.get_published_blog_post_summaries(
-                    feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST +
-                    len(blog_post_summaries)
+            summaries.extend(list(
+                filter(
+                    lambda i: i.id not in summary_ids, resultant_summaries
                 )
-            )
-            blog_post_summaries = list(set(blog_post_summaries))
+            ))
+        if len(summaries) < MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1:
+            summary_ids = [summary.id for summary in summaries]
+            # We fetch more blog post summaries than the deficit as the result
+            # might contain the blog post summaries which are already fetched.
+            size = MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + len(summaries)
+            resultant_summaries = (
+                blog_services.get_published_blog_post_summaries(0, size))
+            summaries.extend(list(
+                filter(
+                    lambda i: i.id not in summary_ids, resultant_summaries
+                )
+            ))
 
-        summary_dicts = (
-            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries)
-        )
-        summary_dicts = list(
-            filter(
-                lambda i: i['id'] != blog_post_dict['id'], summary_dicts
-            )
-        )
+        for summary in summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST]:
+            if summary.id == blog_post_dict['id']:
+                summaries.remove(summary)
+                break
 
         self.values.update({
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'blog_post_dict': blog_post_dict,
-            'summary_dicts': summary_dicts
+            'summary_dicts': _get_blog_card_summary_dicts_for_homepage(
+                summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST])
         })
         self.render_json(self.values)
 
@@ -326,7 +327,8 @@ class BlogPostSearchHandler(base.BaseHandler):
         )
 
         # If there is a tags parameter, it should be in the following form:
-        # tags=("GSOC" OR "Math")
+        # tags=("GSOC" OR "Math"), tags=("Algebra" OR "Geometry" OR "Maths")
+        # tags=("GSOC")
         tags_string = self.normalized_request.get('tags')
         tags = utils.convert_filter_parameter_string_into_list(tags_string)
 

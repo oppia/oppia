@@ -150,6 +150,20 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             1
         )
 
+    def test_get_total_number_of_published_blog_post_summaries(self) -> None:
+        number_of_published_blogs = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(number_of_published_blogs, 0)
+        blog_services.update_blog_post(
+            self.blog_post_a_id,
+            self.change_dict_two)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+        number_of_published_blogs = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(number_of_published_blogs, 1)
+
     def test_get_published_blog_post_summaries_by_user_id(self) -> None:
         self.assertEqual(
             len(blog_services.get_published_blog_post_summaries_by_user_id(
