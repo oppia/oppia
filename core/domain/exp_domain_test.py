@@ -2792,7 +2792,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.android_proto_size_in_bytes, 148)
 
     def test_android_proto_conversion_is_correct(self):
-        """Test exploration proto is correct"""
+        """Test exploration proto is correct."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exp_proto = exploration.to_android_exploration_proto()
 

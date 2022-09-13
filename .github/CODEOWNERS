@@ -733,6 +733,7 @@
 /.github/stale.yml @oppia/data-and-stability-reviewers
 /.github/workflows/ @oppia/dev-workflow-reviewers @oppia/automated-qa-reviewers
 # Files needed by the Android team.
+/buf_gen_backend.yaml @BenHenning
 /core/controllers/android_e2e_config*.py @oppia/web-android-compatibility-reviewers
 /core/android_validation_constants*.py @oppia/web-android-compatibility-reviewers
 /extensions/interactions/rule_templates.json @oppia/web-android-compatibility-reviewers

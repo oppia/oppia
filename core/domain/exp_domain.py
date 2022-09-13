@@ -39,6 +39,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
+from proto_files import exploration_pb2
 
 from typing import (
     Callable, Dict, List, Mapping, Optional, Sequence,
@@ -50,7 +51,6 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from # is
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
-from proto_files import exploration_pb2
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -4604,6 +4604,8 @@ class ExplorationMetadata:
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
+        self._cached_android_proto_size_is_stale = True
+        self._cached_android_proto_size_in_bytes = 0
 
     def to_dict(self) -> ExplorationMetadataDict:
         """Gets the dict representation of ExplorationMetadata domain object.
