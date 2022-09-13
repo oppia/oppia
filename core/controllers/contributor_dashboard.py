@@ -706,8 +706,7 @@ class TranslationPreferenceHandler(base.BaseHandler):
 
 
 class ContributorStatsSummariesHandler(base.BaseHandler):
-    """Provides data about submitter and reviewer statistics."""
-
+    """Returns contribution statistics for the supplied contribution type."""
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
@@ -756,16 +755,16 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
                     suggestion_services.get_all_translation_contribution_stats(
                         user_id))
                 self.values = {
-                    'translation_contribution_stats': _get_complete_stats(
-                        stats, True)
+                    'translation_contribution_stats': _get_client_side_stats(
+                        stats)
                 }
 
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 stats = suggestion_services.get_all_translation_review_stats(
                     user_id)
                 self.values = {
-                    'translation_review_stats': _get_complete_stats(
-                        stats, False)
+                    'translation_review_stats': _get_client_side_stats(
+                        stats)
                 }
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_QUESTION:
@@ -773,22 +772,22 @@ class ContributorStatsSummariesHandler(base.BaseHandler):
                 stats = suggestion_services.get_all_question_contribution_stats(
                     user_id)
                 self.values = {
-                    'question_contribution_stats': _get_complete_stats(
-                        stats, False)
+                    'question_contribution_stats': _get_client_side_stats(
+                        stats)
                 }
 
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 stats = suggestion_services.get_all_question_review_stats(
                     user_id)
                 self.values = {
-                    'question_review_stats': _get_complete_stats(stats, False)
+                    'question_review_stats': _get_client_side_stats(stats)
                 }
 
         self.render_json(self.values)
 
 
 class ContributorAllStatsSummariesHandler(base.BaseHandler):
-    """Provides all data about submitter and reviewer statistics."""
+    """Returns all contribution statistics associated with the user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -805,47 +804,43 @@ class ContributorAllStatsSummariesHandler(base.BaseHandler):
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username):
         """Handles GET requests."""
-
         user_id = user_services.get_user_id_from_username(username)
 
         stats = suggestion_services.get_all_contributor_stats(user_id)
         response = {}
 
         if stats.translation_contribution_stats is not None:
-            response['translation_contribution_stats'] = _get_complete_stats(
-                stats.translation_contribution_stats, True)
+            response['translation_contribution_stats'] = _get_client_side_stats(
+                stats.translation_contribution_stats)
 
         if stats.translation_review_stats is not None:
-            response['translation_review_stats'] = _get_complete_stats(
-                stats.translation_review_stats, False)
+            response['translation_review_stats'] = _get_client_side_stats(
+                stats.translation_review_stats)
 
         if stats.question_contribution_stats is not None:
-            response['question_contribution_stats'] = _get_complete_stats(
-                stats.question_contribution_stats, False)
+            response['question_contribution_stats'] = _get_client_side_stats(
+                stats.question_contribution_stats)
 
         if stats.question_review_stats is not None:
-            response['question_review_stats'] = _get_complete_stats(
-                stats.question_review_stats, False)
+            response['question_review_stats'] = _get_client_side_stats(
+                stats.question_review_stats)
 
         self.render_json(response)
 
 
-def _get_complete_stats(
-    stats_data: List[Union[
+def _get_client_side_stats(
+    backend_stats: List[Union[
         suggestion_registry.TranslationContributionStats,
         suggestion_registry.TranslationReviewStats,
         suggestion_registry.QuestionContributionStats,
         suggestion_registry.QuestionReviewStats
-    ]],
-    stats_are_translation_contribution
+    ]]
 ):
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
 
     Args:
-        stats_data: list. Stats domain objects.
-        stats_are_translation_contribution: bool. A flag that indicates whether
-            stats are translation contributions.
+        backend_stats: list. Stats domain objects.
 
     Returns:
         list. Dict representations of TranslationContributionStats/
@@ -857,12 +852,12 @@ def _get_complete_stats(
         Unnecessary keys topic_id, contribution_dates, contributor_user_id
         are consequently deleted.
     """
-    translation_review_stats_dicts = [
-        stats.to_dict() for stats in stats_data
+    stats_dicts = [
+        stats.to_dict() for stats in backend_stats
     ]
     topic_ids = [
         stats_dict['topic_id']
-        for stats_dict in translation_review_stats_dicts
+        for stats_dict in stats_dicts
     ]
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
     topic_name_by_topic_id = {}
@@ -870,11 +865,13 @@ def _get_complete_stats(
         if topic_summary is None:
             continue
         topic_name_by_topic_id[topic_summary.id] = topic_summary.name
-    for stats_dict in translation_review_stats_dicts:
+    for stats_dict in stats_dicts:
         stats_dict['topic_name'] = topic_name_by_topic_id.get(
             stats_dict['topic_id'], 'UNKNOWN')
 
-        if stats_are_translation_contribution:
+        # TODO(#16051): TranslationContributionStats to use
+        # first_contribution_date and last_contribution_date.
+        if 'contribution_dates' in stats_dict.keys():
             sorted_contribution_dates = sorted(stats_dict['contribution_dates'])
             first_contribution_date = sorted_contribution_dates[0]
             last_contribution_date = sorted_contribution_dates[-1]
@@ -889,4 +886,4 @@ def _get_complete_stats(
 
         del stats_dict['topic_id']
         del stats_dict['contributor_user_id']
-    return translation_review_stats_dicts
+    return stats_dicts
