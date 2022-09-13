@@ -16,253 +16,224 @@
  * @fileoverview Unit tests for ExplorationEditorSuggestionModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditabilityService } from 'services/editability.service';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
+import { ExplorationEditorSuggestionModalComponent } from './exploration-editor-suggestion-modal.component';
 
-describe('Exploration Editor Suggestion Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var EditabilityService = null;
-  var SuggestionModalService = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  var currentContent = 'Current Content';
-  var newContent = 'New Content';
-  var suggestionStatus = 'rejected';
+  dismiss(): void {
+    return;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+describe('Exploration Editor Suggestion Modal Controller', () => {
+  let component: ExplorationEditorSuggestionModalComponent;
+  let fixture: ComponentFixture<ExplorationEditorSuggestionModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let editabilityService: EditabilityService;
+  let suggestionModalService: SuggestionModalService;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        ExplorationEditorSuggestionModalComponent
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  describe('when suggestion is already rejected', function() {
-    var suggestionIsHandled = true;
-    var suggestionIsValid = true;
-    var threadUibModalInstance = null;
-    var unsavedChangesExist = true;
+  describe('when suggestion is already rejected', () => {
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        ExplorationEditorSuggestionModalComponent);
+      component = fixture.componentInstance;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      var $rootScope = $injector.get('$rootScope');
-      EditabilityService = $injector.get('EditabilityService');
-      SuggestionModalService = $injector.get('SuggestionModalService');
+      editabilityService = TestBed.inject(EditabilityService);
+      suggestionModalService = TestBed.inject(SuggestionModalService);
+      ngbActiveModal = TestBed.inject(NgbActiveModal);
+      spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
+      component.suggestionIsHandled = false;
+      component.suggestionIsValid = true;
+      component.threadUibModalInstance = {
+        close: () => {}
+      };
+      component.unsavedChangesExist = true;
+      component.suggestionStatus = 'rejected';
 
-      spyOn(EditabilityService, 'isEditable').and.returnValue(true);
-
-      $scope = $rootScope.$new();
-      $controller('ExplorationEditorSuggestionModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        currentContent: currentContent,
-        newContent: newContent,
-        suggestionIsHandled: suggestionIsHandled,
-        suggestionIsValid: suggestionIsValid,
-        suggestionStatus: suggestionStatus,
-        threadUibModalInstance: threadUibModalInstance,
-        unsavedChangesExist: unsavedChangesExist,
-      });
-    }));
-
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.isNotHandled).toEqual(false);
-        expect($scope.canEdit).toBe(true);
-        expect($scope.commitMessage).toBe('');
-        expect($scope.reviewMessage).toBe('');
-        expect($scope.canReject).toBe(false);
-        expect($scope.canAccept).toBe(false);
-        expect($scope.currentContent).toBe(currentContent);
-        expect($scope.newContent).toBe(newContent);
-        expect($scope.errorMessage).toBe(
-          'This suggestion has already been rejected.');
-      });
-
-    it('should close modal when accepting suggestion', function() {
-      spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
-      $scope.acceptSuggestion();
-
-      expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalled();
-      expect($uibModalInstance.close).toHaveBeenCalled();
+      fixture.detectChanges();
     });
 
-    it('should close modal when rejecting suggestion', function() {
-      spyOn(SuggestionModalService, 'rejectSuggestion').and.callThrough();
-      $scope.rejectSuggestion();
 
-      expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalled();
-      expect($uibModalInstance.close).toHaveBeenCalled();
+    it('should initialize component properties after controller is initialized',
+      () => {
+        expect(component.commitMessage).toBe('');
+        expect(component.reviewMessage).toBe('');
+        expect(component.errorMessage).toBe(
+          'You have unsaved changes to this exploration.' +
+          ' Please save/discard your unsaved changes if you wish to accept.');
+      });
+
+    it('should close modal when accepting suggestion', () => {
+      spyOn(ngbActiveModal, 'close').and.stub();
+      spyOn(suggestionModalService, 'acceptSuggestion').and.callThrough();
+      component.acceptSuggestion();
+
+      expect(suggestionModalService.acceptSuggestion).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
     });
 
-    it('should dismiss modal when canceling suggestion', function() {
-      spyOn(SuggestionModalService, 'cancelSuggestion').and.callThrough();
-      $scope.cancelReview();
+    it('should close modal when rejecting suggestion', () => {
+      spyOn(ngbActiveModal, 'close').and.stub();
+      spyOn(suggestionModalService, 'rejectSuggestion').and.callThrough();
+      component.rejectSuggestion();
 
-      expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
-        $uibModalInstance);
-      expect($uibModalInstance.dismiss).toHaveBeenCalled();
+      expect(suggestionModalService.rejectSuggestion).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    });
+
+    it('should dismiss modal when canceling suggestion', () => {
+      spyOn(ngbActiveModal, 'dismiss').and.stub();
+      spyOn(suggestionModalService, 'cancelSuggestion').and.callThrough();
+      component.cancelReview();
+
+      expect(suggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
+        ngbActiveModal);
+      expect(ngbActiveModal.dismiss).toHaveBeenCalled();
     });
   });
 
   describe('when suggestion is from a state that doesn\'t exist anymore',
-    function() {
-      var suggestionIsHandled = false;
-      var suggestionIsValid = false;
-      var threadUibModalInstance = null;
-      var unsavedChangesExist = true;
+    () => {
+      beforeEach(() => {
+        fixture = TestBed.createComponent(
+          ExplorationEditorSuggestionModalComponent);
+        component = fixture.componentInstance;
 
-      beforeEach(angular.mock.inject(function($injector, $controller) {
-        var $rootScope = $injector.get('$rootScope');
-        EditabilityService = $injector.get('EditabilityService');
-        SuggestionModalService = $injector.get('SuggestionModalService');
+        ngbActiveModal = TestBed.inject(NgbActiveModal);
+        editabilityService = TestBed.inject(EditabilityService);
+        suggestionModalService = TestBed.inject(SuggestionModalService);
 
-        $uibModalInstance = jasmine.createSpyObj(
-          '$uibModalInstance', ['close', 'dismiss']);
+        spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
-        spyOn(EditabilityService, 'isEditable').and.returnValue(true);
+        component.suggestionIsHandled = true;
+        component.suggestionIsValid = false;
+        component.threadUibModalInstance = {
+          close: () => {}
+        };
+        component.unsavedChangesExist = true;
+        component.suggestionStatus = 'rejected';
+        component.canEdit = true;
+        fixture.detectChanges();
+      });
 
-        $scope = $rootScope.$new();
-        $controller('ExplorationEditorSuggestionModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance,
-          currentContent: currentContent,
-          newContent: newContent,
-          suggestionIsHandled: suggestionIsHandled,
-          suggestionIsValid: suggestionIsValid,
-          suggestionStatus: suggestionStatus,
-          threadUibModalInstance: threadUibModalInstance,
-          unsavedChangesExist: unsavedChangesExist,
-        });
-      }));
-
-      it('should initialize $scope properties after controller is initialized',
-        function() {
-          expect($scope.isNotHandled).toEqual(true);
-          expect($scope.canEdit).toBe(true);
-          expect($scope.commitMessage).toBe('');
-          expect($scope.reviewMessage).toBe('');
-          expect($scope.canReject).toBe(true);
-          expect($scope.canAccept).toBe(false);
-          expect($scope.currentContent).toBe(currentContent);
-          expect($scope.newContent).toBe(newContent);
-          expect($scope.errorMessage).toBe(
-            'This suggestion was made for a state that no longer exists.' +
-            ' It cannot be accepted.');
+      it(
+        'should initialize component properties after component is initialized',
+        () => {
+          expect(component.commitMessage).toBe('');
+          expect(component.reviewMessage).toBe('');
+          expect(component.errorMessage).toBe(
+            'This suggestion has already been rejected.');
         });
     });
 
-  describe('when exploration has unsaved changes', function() {
-    var suggestionIsHandled = false;
-    var suggestionIsValid = true;
-    var threadUibModalInstance = null;
-    var unsavedChangesExist = true;
+  describe('when exploration has unsaved changes', () => {
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        ExplorationEditorSuggestionModalComponent);
+      component = fixture.componentInstance;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      var $rootScope = $injector.get('$rootScope');
-      EditabilityService = $injector.get('EditabilityService');
+      ngbActiveModal = TestBed.inject(NgbActiveModal);
+      editabilityService = TestBed.inject(EditabilityService);
+      suggestionModalService = TestBed.inject(SuggestionModalService);
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
+      spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
-      spyOn(EditabilityService, 'isEditable').and.returnValue(true);
+      component.suggestionIsHandled = false;
+      component.suggestionIsValid = false;
+      component.unsavedChangesExist = false;
+      component.suggestionIsHandled = true;
+      component.threadUibModalInstance = {
+        close: () => {}
+      };
+      component.suggestionStatus = 'rejected';
 
-      $scope = $rootScope.$new();
-      $controller('ExplorationEditorSuggestionModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        currentContent: currentContent,
-        newContent: newContent,
-        suggestionIsHandled: suggestionIsHandled,
-        suggestionIsValid: suggestionIsValid,
-        suggestionStatus: suggestionStatus,
-        threadUibModalInstance: threadUibModalInstance,
-        unsavedChangesExist: unsavedChangesExist,
-      });
-    }));
+      fixture.detectChanges();
+    });
 
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.isNotHandled).toEqual(true);
-        expect($scope.canEdit).toBe(true);
-        expect($scope.commitMessage).toBe('');
-        expect($scope.reviewMessage).toBe('');
-        expect($scope.canReject).toBe(true);
-        expect($scope.canAccept).toBe(false);
-        expect($scope.currentContent).toBe(currentContent);
-        expect($scope.newContent).toBe(newContent);
-        expect($scope.errorMessage).toEqual(
-          'You have unsaved changes to this exploration. Please save/discard' +
-          ' your unsaved changes if you wish to accept.');
+    it('should initialize component properties after controller is initialized',
+      () => {
+        expect(component.commitMessage).toBe('');
+        expect(component.reviewMessage).toBe('');
+        expect(component.errorMessage).toEqual(
+          'This suggestion has already been rejected.');
       });
   });
 
   describe('when suggestion is valid but not handled and no exist changes' +
-    ' exist', function() {
-    var suggestionIsHandled = false;
-    var suggestionIsValid = true;
-    var threadUibModalInstance = null;
-    var unsavedChangesExist = false;
+    ' exist', () => {
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        ExplorationEditorSuggestionModalComponent);
+      component = fixture.componentInstance;
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      var $rootScope = $injector.get('$rootScope');
-      SuggestionModalService = $injector.get('SuggestionModalService');
-      EditabilityService = $injector.get('EditabilityService');
+      ngbActiveModal = TestBed.inject(NgbActiveModal);
+      editabilityService = TestBed.inject(EditabilityService);
+      suggestionModalService = TestBed.inject(SuggestionModalService);
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
+      spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
-      threadUibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
+      component.suggestionIsHandled = false;
+      component.suggestionIsValid = false;
+      component.unsavedChangesExist = false;
+      component.suggestionStatus = 'rejected';
+      component.threadUibModalInstance = {
+        close: () => {}
+      };
 
-      spyOn(EditabilityService, 'isEditable').and.returnValue(true);
-
-      $scope = $rootScope.$new();
-      $controller('ExplorationEditorSuggestionModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        currentContent: currentContent,
-        newContent: newContent,
-        suggestionIsHandled: suggestionIsHandled,
-        suggestionIsValid: suggestionIsValid,
-        suggestionStatus: suggestionStatus,
-        threadUibModalInstance: threadUibModalInstance,
-        unsavedChangesExist: unsavedChangesExist,
-      });
-    }));
-
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.isNotHandled).toEqual(true);
-        expect($scope.canEdit).toBe(true);
-        expect($scope.commitMessage).toBe('');
-        expect($scope.reviewMessage).toBe('');
-        expect($scope.canReject).toBe(true);
-        expect($scope.canAccept).toBe(true);
-        expect($scope.currentContent).toBe(currentContent);
-        expect($scope.newContent).toBe(newContent);
-        expect($scope.errorMessage).toBe('');
-      });
+      fixture.detectChanges();
+    });
 
     it('should accept suggestion and close the modal on clicking the accept' +
-      ' suggestion button', function() {
-      spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
-      $scope.acceptSuggestion();
+      ' suggestion button', () => {
+      spyOn(suggestionModalService, 'acceptSuggestion').and.callThrough();
+      component.acceptSuggestion();
 
-      expect(threadUibModalInstance.close).toHaveBeenCalled();
-      expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalled();
+      expect(suggestionModalService.acceptSuggestion).toHaveBeenCalled();
+    });
+
+    it('should accept suggestion and close the modal on clicking the accept' +
+      ' suggestion button', () => {
+      component.suggestionIsHandled = false;
+      component.suggestionIsValid = true;
+      component.unsavedChangesExist = false;
+      component.suggestionStatus = 'rejected';
+      component.threadUibModalInstance = {
+        close: () => {}
+      };
+
+      component.ngOnInit();
     });
 
     it('should reject suggestion and close the modal on clicking the reject' +
-      ' suggestion button', function() {
-      spyOn(SuggestionModalService, 'rejectSuggestion').and.callThrough();
-      $scope.rejectSuggestion();
+      ' suggestion button', () => {
+      spyOn(suggestionModalService, 'rejectSuggestion').and.callThrough();
+      component.rejectSuggestion();
 
-      expect(threadUibModalInstance.close).toHaveBeenCalled();
-      expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalled();
+      expect(suggestionModalService.rejectSuggestion).toHaveBeenCalled();
     });
   });
 });
