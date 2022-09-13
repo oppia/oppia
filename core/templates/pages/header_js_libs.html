@@ -1,6 +1,7 @@
-<script async src="https://www.googletagmanager.com/gtag/js?id=<%= GA_ANALYTICS_ID %>"></script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=<%= UA_ANALYTICS_ID %>"></script>
-
+<% if (CAN_SEND_ANALYTICS_EVENTS) { %>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<%= GA_ANALYTICS_ID %>"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<%= UA_ANALYTICS_ID %>"></script>
+<% } %>
 <!-- This code is used for inserting webpack bundles
     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>

@@ -23,9 +23,7 @@ const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
-const webpackConfigConstants = require(
-  './assets/webpack-config-constants.json'
-);
+const analyticsConstants = require('./assets/analytics-constants.json');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
@@ -150,13 +148,13 @@ module.exports = {
     // must include the surrounding quotes. This is done using JSON.stringify.
     // See https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
-      GA_ANALYTICS_ID: JSON.stringify(webpackConfigConstants.GA_ANALYTICS_ID),
-      UA_ANALYTICS_ID: JSON.stringify(webpackConfigConstants.UA_ANALYTICS_ID),
+      GA_ANALYTICS_ID: JSON.stringify(analyticsConstants.GA_ANALYTICS_ID),
+      UA_ANALYTICS_ID: JSON.stringify(analyticsConstants.UA_ANALYTICS_ID),
       CAN_SEND_ANALYTICS_EVENTS: (
-        webpackConfigConstants.CAN_SEND_ANALYTICS_EVENTS
+        analyticsConstants.CAN_SEND_ANALYTICS_EVENTS
       ),
       SITE_NAME_FOR_ANALYTICS: JSON.stringify(
-        webpackConfigConstants.SITE_NAME_FOR_ANALYTICS
+        analyticsConstants.SITE_NAME_FOR_ANALYTICS
       ),
     }),
     new HtmlWebpackPlugin({
