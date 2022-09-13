@@ -42,7 +42,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
+        '/pages/skill-editor-page/navbar/skill-editor-navbar.component.html'),
       controller: [
         '$rootScope', '$scope', 'AlertsService', 'NgbModal',
         'SkillEditorRoutingService', 'SkillEditorStateService',

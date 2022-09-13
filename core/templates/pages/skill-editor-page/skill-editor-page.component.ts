@@ -28,7 +28,7 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-editor-main-tab.directive.ts');
-require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
+require('pages/skill-editor-page/navbar/skill-editor-navbar.component.ts');
 require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require(
   'pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts');
