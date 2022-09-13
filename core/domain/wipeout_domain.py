@@ -91,6 +91,6 @@ class PendingDeletionRequest:
                 contains wrong key.
         """
         for key in self.pseudonymizable_entity_mappings.keys():
-            if key not in [name.value for name in feconf.VALID_MODEL_NAMES]:
+            if key not in [name.value for name in feconf.ValidModelNames]:
                 raise utils.ValidationError(
                     'pseudonymizable_entity_mappings contain wrong key')
