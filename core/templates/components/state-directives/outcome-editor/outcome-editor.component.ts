@@ -45,6 +45,7 @@ export class OutcomeEditorComponent implements OnInit {
   EventEmitter<string[]> = new EventEmitter();
 
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveDestIfStuck: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
@@ -61,7 +62,11 @@ export class OutcomeEditorComponent implements OnInit {
   canAddPrerequisiteSkill: boolean = false;
   correctnessLabelEditorIsOpen: boolean = false;
   destinationEditorIsOpen: boolean = false;
+  destinationIfStuckEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
+  destIfStuckFeatEnabled: boolean = (
+    AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
+
   onMobile: boolean = false;
   resizeSubscription!: Subscription;
   // The value of this variable should match the breapoint used in
@@ -121,12 +126,23 @@ export class OutcomeEditorComponent implements OnInit {
         this.cancelThisDestinationEdit();
       }
     }
+
+    if (this.destinationIfStuckEditorIsOpen) {
+      this.saveThisIfStuckDestination();
+    }
   }
 
   isSelfLoop(outcome: Outcome): boolean {
     return Boolean (
       outcome &&
       outcome.dest === this.stateEditorService.getActiveStateName());
+  }
+
+  isSelfLoopDestStuck(outcome: Outcome): boolean {
+    return Boolean (
+      outcome &&
+      outcome.destIfReallyStuck === (
+        this.stateEditorService.getActiveStateName()));
   }
 
   getCurrentInteractionId(): string {
@@ -183,6 +199,12 @@ export class OutcomeEditorComponent implements OnInit {
     }
   }
 
+  openDestinationIfStuckEditor(): void {
+    if (this.isEditable) {
+      this.destinationIfStuckEditorIsOpen = true;
+    }
+  }
+
   saveThisFeedback(fromClickSaveFeedbackButton: boolean): void {
     this.feedbackEditorIsOpen = false;
     let contentHasChanged = (
@@ -223,6 +245,11 @@ export class OutcomeEditorComponent implements OnInit {
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
     if (!this.isSelfLoop(this.outcome)) {
       this.outcome.refresherExplorationId = null;
+    } else {
+      if (this.outcome.labelledAsCorrect) {
+        this.outcome.labelledAsCorrect = false;
+        this.onChangeCorrectnessLabel();
+      }
     }
     this.savedOutcome.refresherExplorationId = (
       this.outcome.refresherExplorationId);
@@ -230,6 +257,14 @@ export class OutcomeEditorComponent implements OnInit {
       this.outcome.missingPrerequisiteSkillId;
 
     this.saveDest.emit(this.savedOutcome);
+  }
+
+  saveThisIfStuckDestination(): void {
+    this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
+    this.destinationIfStuckEditorIsOpen = false;
+    this.savedOutcome.destIfReallyStuck = (
+      cloneDeep(this.outcome.destIfReallyStuck));
+    this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
   onChangeCorrectnessLabel(): void {
@@ -252,6 +287,12 @@ export class OutcomeEditorComponent implements OnInit {
     this.outcome.missingPrerequisiteSkillId =
       this.savedOutcome.missingPrerequisiteSkillId;
     this.destinationEditorIsOpen = false;
+  }
+
+  cancelThisIfStuckDestinationEdit(): void {
+    this.outcome.destIfReallyStuck = (
+      cloneDeep(this.savedOutcome.destIfReallyStuck));
+    this.destinationIfStuckEditorIsOpen = false;
   }
 
   ngOnInit(): void {

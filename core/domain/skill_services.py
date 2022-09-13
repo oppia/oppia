@@ -38,7 +38,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import Callable, Dict, List, Optional, Set, Tuple, overload
+from typing import Callable, Dict, List, Optional, Set, Tuple, cast, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -50,8 +50,8 @@ if MYPY: # pragma: no cover
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
-        models.NAMES.skill, models.NAMES.user, models.NAMES.question,
-        models.NAMES.topic]))
+        models.Names.SKILL, models.Names.USER, models.Names.QUESTION,
+        models.Names.TOPIC]))
 
 
 # Repository GET methods.
@@ -488,6 +488,27 @@ def get_all_topic_assignments_for_skill(
     return topic_assignments
 
 
+def get_topic_names_with_given_skill_in_diagnostic_test(
+    skill_id: str
+) -> List[str]:
+    """Returns a list of topic names for which the given skill is assigned
+    to that topic's diagnostic test.
+
+    Args:
+        skill_id: str. ID of the skill.
+
+    Returns:
+        list(str). A list of topic names for which the given skill is assigned
+        to that topic's diagnostic test.
+    """
+    topics = topic_fetchers.get_all_topics()
+    topic_names = []
+    for topic in topics:
+        if skill_id in topic.skill_ids_for_diagnostic_test:
+            topic_names.append(topic.name)
+    return topic_names
+
+
 def replace_skill_id_in_all_topics(
     user_id: str, old_skill_id: str, new_skill_id: str
 ) -> None:
@@ -537,7 +558,7 @@ def replace_skill_id_in_all_topics(
                         'skill_id': new_skill_id
                     })])
                     break
-            topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+            topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
                 'Replace skill id %s with skill id %s in the topic' % (
                     old_skill_id, new_skill_id))
@@ -568,7 +589,7 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
                 'uncategorized_skill_id': skill_id
             }))
             skill_name = get_skill_summary_by_id(skill_id).description
-            topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+            topic_services.update_topic_and_subtopic_pages(
                 user_id, topic.id, change_list,
                 'Removed skill with id %s and name %s from the topic' % (
                     skill_id, skill_name))
@@ -732,97 +753,189 @@ def apply_change_list(
                         raise Exception(
                             'The user does not have enough rights to edit the '
                             'skill description.')
-                    skill.update_description(change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateSkillPropertyDescriptionCmd.
+                    update_description_cmd = cast(
+                        skill_domain.UpdateSkillPropertyDescriptionCmd,
+                        change
+                    )
+                    skill.update_description(update_description_cmd.new_value)
                     (
                         opportunity_services
                         .update_skill_opportunity_skill_description(
-                            skill.id, change.new_value))
+                            skill.id, update_description_cmd.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
-                    skill.update_language_code(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type UpdateSkillPropertyLanguageCodeCmd.
+                    update_language_code_cmd = cast(
+                        skill_domain.UpdateSkillPropertyLanguageCodeCmd,
+                        change
+                    )
+                    skill.update_language_code(
+                        update_language_code_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
-                    skill.update_superseding_skill_id(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillPropertySupersedingSkillIdCmd.
+                    update_superseding_skill_id_cmd = cast(
+                        skill_domain.UpdateSkillPropertySupersedingSkillIdCmd,
+                        change
+                    )
+                    skill.update_superseding_skill_id(
+                        update_superseding_skill_id_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.new_value, bool)
-                    skill.record_that_all_questions_are_merged(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillPropertyAllQuestionsMergedCmd.
+                    update_all_questions_merged_cmd = cast(
+                        skill_domain.UpdateSkillPropertyAllQuestionsMergedCmd,
+                        change
+                    )
+                    skill.record_that_all_questions_are_merged(
+                        update_all_questions_merged_cmd.new_value
+                    )
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.new_value, dict)
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateSkillContentsPropertyExplanationCmd.
+                    update_explanation_cmd = cast(
+                        skill_domain.UpdateSkillContentsPropertyExplanationCmd,
+                        change
+                    )
                     explanation = (
-                        state_domain.SubtitledHtml.from_dict(change.new_value))
+                        state_domain.SubtitledHtml.from_dict(
+                            update_explanation_cmd.new_value
+                        )
+                    )
                     explanation.validate()
                     skill.update_explanation(explanation)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillContentsPropertyWorkedExamplesCmd.
+                    update_worked_examples_cmd = cast(
+                        skill_domain.UpdateSkillContentsPropertyWorkedExamplesCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     worked_examples_list: List[skill_domain.WorkedExample] = []
-                    for worked_example in change.new_value:
-                        # Ruling out the possibility of any other type for mypy
-                        # type checking.
-                        assert isinstance(worked_example, dict)
+                    for worked_example in update_worked_examples_cmd.new_value:
                         worked_examples_list.append(
                             skill_domain.WorkedExample.from_dict(worked_example)
                         )
                     skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.new_misconception_dict, dict)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                add_skill_misconception_cmd = cast(
+                    skill_domain.AddSkillMisconceptionCmd,
+                    change
+                )
                 misconception = skill_domain.Misconception.from_dict(
-                    change.new_misconception_dict)
+                    add_skill_misconception_cmd.new_misconception_dict)
                 skill.add_misconception(misconception)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.misconception_id, int)
-                skill.delete_misconception(change.misconception_id)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                delete_misconception_cmd = cast(
+                    skill_domain.DeleteSkillMisconceptionCmd,
+                    change
+                )
+                skill.delete_misconception(
+                    delete_misconception_cmd.misconception_id
+                )
             elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
-                skill.add_prerequisite_skill(change.skill_id)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                add_prerequisite_skill_cmd = cast(
+                    skill_domain.AddPrerequisiteSkillCmd,
+                    change
+                )
+                skill.add_prerequisite_skill(
+                    add_prerequisite_skill_cmd.skill_id
+                )
             elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
-                skill.delete_prerequisite_skill(change.skill_id)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                delete_prerequisite_skill_cmd = cast(
+                    skill_domain.DeletePrerequisiteSkillCmd,
+                    change
+                )
+                skill.delete_prerequisite_skill(
+                    delete_prerequisite_skill_cmd.skill_id
+                )
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.explanations, list)
+                # Here we use cast because we are narrowing down the type from
+                # SkillChange to a specific change command.
+                update_rubric_cmd = cast(
+                    skill_domain.UpdateRubricsCmd,
+                    change
+                )
                 skill.update_rubric(
-                    change.difficulty, change.explanations)
+                    update_rubric_cmd.difficulty,
+                    update_rubric_cmd.explanations
+                )
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.misconception_id, int)
+                    # Here we use cast because this 'if'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyNameCmd.
+                    update_property_name_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyNameCmd,
+                        change
+                    )
                     skill.update_misconception_name(
-                        change.misconception_id, change.new_value)
+                        update_property_name_cmd.misconception_id,
+                        update_property_name_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.misconception_id, int)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyNotesCmd.
+                    update_property_notes_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyNotesCmd,
+                        change
+                    )
                     skill.update_misconception_notes(
-                        change.misconception_id, change.new_value)
+                        update_property_notes_cmd.misconception_id,
+                        update_property_notes_cmd.new_value
+                    )
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.misconception_id, int)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyFeedbackCmd.
+                    update_property_feedback_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyFeedbackCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     skill.update_misconception_feedback(
-                        change.misconception_id, change.new_value)
+                        update_property_feedback_cmd.misconception_id,
+                        update_property_feedback_cmd.new_value
+                    )
                 elif (change.property_name ==
-                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
-                    # Ruling out the possibility of any other type for mypy type
-                    # checking.
-                    assert isinstance(change.misconception_id, int)
-                    assert isinstance(change.new_value, bool)
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED):  # pylint: disable=line-too-long
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateSkillMisconceptionPropertyMustBeAddressedCmd.
+                    update_property_must_be_addressed_cmd = cast(
+                        skill_domain.UpdateSkillMisconceptionPropertyMustBeAddressedCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     skill.update_misconception_must_be_addressed(
-                        change.misconception_id, change.new_value)
+                        update_property_must_be_addressed_cmd.misconception_id,
+                        update_property_must_be_addressed_cmd.new_value
+                    )
                 else:
                     raise Exception('Invalid change dict.')
             elif (change.cmd in (
@@ -969,12 +1082,16 @@ def update_skill(
         deleted_skill_misconception_ids: List[str] = []
         for change in change_list:
             if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
-                # Ruling out the possibility of any other type for mypy type
-                # checking.
-                assert isinstance(change.misconception_id, int)
+                # Here we use cast because we are narrowing down the type of
+                # 'change' from SkillChange to a specific change command
+                # DeleteSkillMisconceptionCmd.
+                delete_skill_misconception_cmd = cast(
+                    skill_domain.DeleteSkillMisconceptionCmd,
+                    change
+                )
                 deleted_skill_misconception_ids.append(
                     skill.generate_skill_misconception_id(
-                        change.misconception_id
+                        delete_skill_misconception_cmd.misconception_id
                     )
                 )
         taskqueue_services.defer(
@@ -1025,7 +1142,7 @@ def delete_skill_summary(skill_id: str) -> None:
     """
 
     skill_summary_model = (
-        skill_models.SkillSummaryModel.get(skill_id, False))
+        skill_models.SkillSummaryModel.get(skill_id, strict=False))
     if skill_summary_model is not None:
         skill_summary_model.delete()
 

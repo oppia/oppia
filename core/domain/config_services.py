@@ -21,7 +21,7 @@ from core.platform import models
 
 from typing import Any
 
-(config_models,) = models.Registry.import_models([models.NAMES.config])
+(config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 

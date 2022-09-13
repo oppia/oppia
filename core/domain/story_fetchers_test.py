@@ -32,7 +32,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import story_models
 
-(story_models,) = models.Registry.import_models([models.NAMES.story])
+(story_models,) = models.Registry.import_models([models.Names.STORY])
 
 
 class StoryFetchersUnitTests(test_utils.GenericTestBase):
@@ -54,7 +54,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_story(
             self.story_id, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
         )
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.story_id)
         changelist = [
             story_domain.StoryChange({
@@ -176,6 +176,15 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         assert stories[0] is not None
         self.assertEqual(len(stories), 1)
         self.assertEqual(stories[0].to_dict(), expected_story)
+
+    def test_raises_error_if_stories_fetched_with_invalid_id_and_strict(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No story model exists for the story_id: invalid_id'
+        ):
+            story_fetchers.get_stories_by_ids(['invalid_id'], strict=True)
 
     def test_get_stories_by_ids_for_non_existing_story_returns_none(
         self
