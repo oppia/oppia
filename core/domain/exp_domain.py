@@ -993,11 +993,6 @@ class ExplorationCommitLogEntryDict(TypedDict):
 class ExplorationCommitLogEntry:
     """Value object representing a commit to an exploration."""
 
-    # Here, Any is used because argument `commit_cmds` can accept
-    # List of dictionaries that can contain arbitrary no of keys
-    # with different types of values like int, str, List[str], Dict
-    # and other types too. So, to make the argument generalized for
-    # every dictionary we used Any type here.
     def __init__(
         self,
         created_on: datetime.datetime,
