@@ -243,7 +243,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.clipboard.copy(this.loggedOutProgressUniqueUrl);
     const messArrow = document.getElementsByClassName('uid-btn-message-arrow');
     const messBox = document.getElementsByClassName('uid-btn-message-box');
-    if(messArrow.length==0 || messBox.length==0){
+    if(messArrow[0]==undefined || messBox[0]==undefined){
       return ;
     }
     messArrow[0].classList.add('d-block');
