@@ -40,7 +40,8 @@ class DummyTranslatableObjectWithTwoParams(
         self.param2 = param2
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Dict[str, str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
@@ -68,7 +69,8 @@ class DummyTranslatableObjectWithSingleParam(
         self.param3 = param3
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Dict[str, str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
@@ -96,7 +98,8 @@ class DummyTranslatableObjectWithDuplicateContentIdForParams(
         self.param2 = param2
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Dict[str, str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
@@ -148,7 +151,8 @@ class DummyTranslatableObjectWithFourParams(
         self.param4 = param4
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Dict[str, str]
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())

@@ -235,7 +235,7 @@ class TranslatableContentsCollection:
     def add_fields_from_translatable_object(
         self,
         translatable_object: BaseTranslatableObject,
-        **kwargs: Dict
+        **kwargs: Optional[str]
     ) -> None:
         """Adds translatable fields from a translatable object parameter to
         'content_id_to_translatable_content' dict.
@@ -265,7 +265,7 @@ class BaseTranslatableObject:
 
     def get_translatable_contents_collection(
         self,
-        **kwargs: Dict
+        **kwargs: Optional[str]
     ) -> TranslatableContentsCollection:
         """Get all translatable fields in a translatable object.
 
@@ -290,8 +290,8 @@ class BaseTranslatableObject:
 
     def get_all_contents_which_need_translations(
         self,
-        entity_translation: EntityTranslation = None
-    ) -> List[TranslatableContent]:
+        entity_translation: Union[EntityTranslation, None] = None
+    ) -> Dict[str, TranslatableContent]:
         """Returns a list of TranslatableContent instances which need new or
         updated translations.
 
@@ -374,7 +374,7 @@ class BaseTranslatableObject:
         return translations_missing_count + translation_needs_update_count < (
                 min_non_displayable_translation_count)
 
-    def get_content_count(self):
+    def get_content_count(self) ->  int:
         """Returns the total number of distinct content fields available in the
         exploration which are user facing and can be translated into
         different languages.
@@ -387,7 +387,9 @@ class BaseTranslatableObject:
         """
         return len(self.get_all_contents_which_need_translations())
 
-    def validate_translatable_contents(self, next_content_id_index):
+    def validate_translatable_contents(
+        self, next_content_id_index: int
+    ) -> None:
         """Validates the content Ids of the translatable contents."""
         content_id_to_translatable_content = (
             self.get_translatable_contents_collection()
@@ -412,9 +414,9 @@ class EntityTranslationDict(TypedDict):
 
     entity_id: str
     entity_type: str
-    entity_version: str
+    entity_version: int
     language_code: str
-    translations: dict(str, feconf.TranslatedContentDict)
+    translations: Dict[str, feconf.TranslatedContentDict]
 
 
 class EntityTranslation:
@@ -470,6 +472,16 @@ class EntityTranslation:
         cls,
         entity_translation_dict: EntityTranslationDict
     ) -> EntityTranslation:
+        """Creates the EntityTranslation from the given dict.
+
+        Args:
+            entity_translation_dict: EntityTranslationDict. The dict
+                representation of the EntityTranslation object.
+
+        Returns:
+            EntityTranslation. The EntityTranslation object created using the
+            given dict.
+        """
         translations_dict = entity_translation_dict['translations']
         content_id_to_translated_content = {}
         for content_id, translated_content in translations_dict.items():
@@ -528,7 +540,15 @@ class EntityTranslation:
         content_value: feconf.ContentValueType,
         content_format: TranslatableContentFormat,
         needs_update: bool) -> None:
-        """Adds new TranslatedContent in the object."""
+        """Adds new TranslatedContent in the object.
+
+        Args:
+            content_id: str. The Id of the content.
+            content_value: ContentValueType. The translation content.
+            content_format: TranslatableContentFormat. The format of the
+                content.
+            needs_update: bool. Whether the translation needs update.
+        """
         self.translations[content_id] = TranslatedContent(
             content_value, content_format, needs_update)
 
@@ -551,13 +571,23 @@ class EntityTranslation:
         return count
 
     def remove_translations(self, content_ids: List[str]) -> None:
-        """Remove translations for the given list of content Ids."""
+        """Remove translations for the given list of content Ids.
+
+        Args:
+            content_ids: list(str). The list of content Ids for removing
+                translations.
+        """
         for content_id in content_ids:
             if content_id in self.translations:
                 del self.translations[content_id]
 
     def mark_translations_needs_update(self, content_ids: List[str]) -> None:
-        """Marks translation needs update for the given list of content Ids."""
+        """Marks translation needs update for the given list of content Ids.
+
+        Args:
+            content_ids: list(str). The list of content Ids for to mark their
+                translation needs update.
+        """
         for content_id in content_ids:
             if content_id in self.translations:
                 self.translations[content_id].needs_update = True
@@ -565,7 +595,7 @@ class EntityTranslation:
     @classmethod
     def create_empty(
         cls,
-        entity_type: str,
+        entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         language_code: str,
         entity_version: int = 0
@@ -1131,6 +1161,7 @@ class ContentIdGenerator:
     """Class to generate the content-id for a translatable content based on the
     next_content_id_index variable.
     """
+
     def __init__(self, start_index: int = 0) -> None:
         """Constructs an ContentIdGenerator object."""
         self.next_content_id_index = start_index

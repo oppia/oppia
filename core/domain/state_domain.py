@@ -134,7 +134,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def get_translatable_contents_collection(
-        self, **kwargs
+        self, **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the answer group.
 
@@ -384,7 +384,8 @@ class Hint(translation_domain.BaseTranslatableObject):
         self.hint_content = hint_content
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the hint.
 
@@ -497,7 +498,8 @@ class Solution(translation_domain.BaseTranslatableObject):
         self.explanation = explanation
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the solution.
 
@@ -724,7 +726,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.solution = solution
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction instance.
 
@@ -1051,6 +1054,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Args:
             default_dest_state_name: str|None. The default destination state, or
                 None if no default destination is provided.
+            content_id_for_default_outcome: str. The content id for the default
+                outcome.
 
         Returns:
             InteractionInstance. The corresponding InteractionInstance domain
@@ -1257,7 +1262,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def get_translatable_contents_collection(
-        self, **kwargs
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction customization args.
 
@@ -1708,7 +1714,8 @@ class Outcome(translation_domain.BaseTranslatableObject):
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the outcome.
 
@@ -2140,7 +2147,8 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def get_translatable_contents_collection(
-        self, **kwargs
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the rule spec.
 
@@ -2652,7 +2660,8 @@ class State(translation_domain.BaseTranslatableObject):
         self.card_is_checkpoint = card_is_checkpoint
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the state.
 
@@ -3250,7 +3259,9 @@ class State(translation_domain.BaseTranslatableObject):
                 None if no default destination state is defined.
             is_initial_state: bool. Whether this state represents the initial
                 state of an exploration.
-
+            content_id_for_state_content: str. The content id for the content.
+            content_id_for_default_outcome: str. The content id for the default
+                outcome.
         Returns:
             State. The corresponding State domain object.
         """
@@ -3413,6 +3424,7 @@ class State(translation_domain.BaseTranslatableObject):
 
     def get_all_html_content_strings(self) -> List[str]:
         """Get all html content strings in the state.
+
         Returns:
             list(str). The list of all html content strings in the interaction.
         """
@@ -3421,12 +3433,15 @@ class State(translation_domain.BaseTranslatableObject):
                 self.content.html])
         return html_list
 
-    def get_content_html(self, content_id):
+    def get_content_html(self, content_id: str) -> str:
         """Returns the content belongs to a given content id of the object.
+
         Args:
             content_id: str. The id of the content.
+
         Returns:
             str. The html content corresponding to the given content id.
+
         Raises:
             ValueError. The given content_id does not exist.
         """
@@ -3442,7 +3457,7 @@ class State(translation_domain.BaseTranslatableObject):
     @classmethod
     def traverse_v52_state_dict_for_contents(
         cls,
-        state_dict
+        state_dict: StateDict
     ):
         """This method iterates throughout the state dict and yields the value
         for each field. The yielded value is used for generating and updating
@@ -3517,13 +3532,13 @@ class State(translation_domain.BaseTranslatableObject):
             ca_specs_dict = interaction_specs[interaction_id][
                 'customization_arg_specs']
             for spec in ca_specs_dict:
-                if not spec["name"] in customisation_args:
+                if not spec['name'] in customisation_args:
                     continue
 
-                customisation_arg = customisation_args[spec["name"]]
+                customisation_arg = customisation_args[spec['name']]
                 contents = (
                     InteractionCustomizationArg.traverse_by_schema_and_get(
-                        spec['schema'], customisation_arg["value"], [
+                        spec['schema'], customisation_arg['value'], [
                             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
                             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
                         lambda x: x
@@ -3533,38 +3548,48 @@ class State(translation_domain.BaseTranslatableObject):
                     yield (
                         content,
                         translation_domain.ContentType.CUSTOMIZATION_ARG,
-                        spec["name"]
+                        spec['name']
                     )
 
     @classmethod
     def update_old_content_id_to_new_content_id_in_v52_states(
         cls,
-        states_dict
-    ):
+        states_dict: Dict[str, StateDict]
+    ) -> Tuple[StateDict, int]:
         """Updates the old content-ids from the state fields like hints,
         solution, etc with the newly generated content id.
 
         Args:
             states_dict: list(dict(State)). List of dictionaries, where each
-            dict represents a state object.
+                dict represents a state object.
 
         Returns:
             states_dict: list(dict(State)). List of state dicts, with updated
             content-ids.
         """
-        OBJECT_CONTENT_IDS_REPLACERS = {
-            'TranslatableHtmlContentId': (
-                lambda old_id, id_mapping: id_mapping[old_id]),
-        }
+        PossibleContentIdsType = Union[str, List[str], List[List[str]]]
+        OBJECT_CONTENT_IDS_REPLACERS: Dict[
+            str,
+            Callable[
+                [PossibleContentIdsType, Dict[str, str]], PossibleContentIdsType
+            ]
+        ] = {}
+
+        OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'] = (
+            lambda old_id, id_mapping: id_mapping[old_id]
+        )
         OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'] = (
             lambda ids_set, id_mapping: [
-                OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'](old_id, id_mapping)
+                OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'](
+                    old_id, id_mapping)
                 for old_id in ids_set
             ]
         )
-        OBJECT_CONTENT_IDS_REPLACERS['ListOfSetsOfTranslatableHtmlContentIds'] = (
-                lambda items, id_mapping: [
-                OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'](ids_set, id_mapping)
+        OBJECT_CONTENT_IDS_REPLACERS[
+                'ListOfSetsOfTranslatableHtmlContentIds'] = (
+            lambda items, id_mapping: [
+                OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'](
+                    ids_set, id_mapping)
                 for ids_set in items
             ]
         )
@@ -3633,7 +3658,7 @@ class State(translation_domain.BaseTranslatableObject):
 
             for answer_group in answer_groups:
                 for rule_spec in answer_group['rule_specs']:
-                    input = rule_spec['inputs']
+                    rule_input = rule_spec['inputs']
                     rule_type = rule_spec['rule_type']
                     for key, value_class in rules_variables[rule_type]:
                         if value_class not in OBJECT_CONTENT_IDS_REPLACERS:
@@ -3642,25 +3667,25 @@ class State(translation_domain.BaseTranslatableObject):
                         # INVALID_CONTENT_ID doesn't corresponds to any existing
                         # content in the state.
                         # Such Ids cannot be replaced with any new id.
-                        if input[key] == feconf.INVALID_CONTENT_ID:
+                        if rule_input[key] == feconf.INVALID_CONTENT_ID:
                             continue
 
-                        input[key] = OBJECT_CONTENT_IDS_REPLACERS[value_class](
-                            input[key], old_to_new_content_id)
+                        rule_input[key] = OBJECT_CONTENT_IDS_REPLACERS[
+                            value_class](rule_input[key], old_to_new_content_id)
 
         return states_dict, content_id_generator.next_content_id_index
 
     @classmethod
     def generate_old_content_id_to_new_content_id_in_v52_states(
         cls,
-        states_dict
-    ):
+        states_dict: Dict[str, StateDict]
+    ) -> Tuple[Dict[str, Dict[str, str]], int]:
         """Generates the new content-id for each state field based on
         next_content_id_index variable.
 
         Args:
             states_dict: list(dict(State)). List of dictionaries, where each
-            dict represents a state object.
+                dict represents a state object.
 
         Returns:
             (dict(str, dict(str, str)), str). A tuple with the first field as a
@@ -3693,7 +3718,7 @@ class State(translation_domain.BaseTranslatableObject):
             content_id_generator.next_content_id_index
         )
 
-    def has_content_id(self, content_id):
+    def has_content_id(self, content_id: str) -> bool:
         """Returns whether a given content ID is available in the translatable
         content.
         Args:

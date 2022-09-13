@@ -55,6 +55,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'id': 'h51Bu72rDIqO',
         'category': '',
         'auto_tts_enabled': True,
+        'next_content_id_index': 5,
         'states': {
             'Introduction': {
                 'card_is_checkpoint': True,

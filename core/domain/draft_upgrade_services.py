@@ -179,7 +179,14 @@ class DraftUpgradeUtil:
                         elif isinstance(value, str):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
-            elif (change.property_name == 'written_translations'):
+            elif (change.property_name == 'written_translations'): # type: ignore[call-overload]
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyWrittenTranslationsCmd.
+                edit_written_translations_dict_cmd = cast(
+                    exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
+                    change
+                )
+                new_value = edit_written_translations_dict_cmd.new_value
                 for content_id, language_code_to_written_translation in (
                         new_value['translations_mapping'].items()):
                     for language_code in (
@@ -197,10 +204,10 @@ class DraftUpgradeUtil:
                             # MyPy throws an error. Thus to avoid the error,
                             # we used ignore here.
                             new_value['translations_mapping'][
-                                content_id][language_code]['html'] = (  # type: ignore[misc]
+                                content_id][language_code]['html'] = (
                                     conversion_fn(new_value[
                                         'translations_mapping'][content_id][
-                                            language_code]['html'])  # type: ignore[misc]
+                                            language_code]['html'])
                                 )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
@@ -339,8 +346,14 @@ class DraftUpgradeUtil:
         """
         for exp_change in draft_change_list:
             if exp_change.cmd in (
-                exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
-                exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+                (
+                    exp_domain.
+                    DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
+                ),
+                (
+                    exp_domain.
+                    DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE
+                ),
                 exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
             ):
@@ -352,7 +365,7 @@ class DraftUpgradeUtil:
             if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 if (
                     exp_change.property_name ==
-                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX
+                    exp_domain.DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX
                 ):
                     # If we change the next content ID index in the draft
                     # we rather remove it as in the 51 to 52 conversion
@@ -362,7 +375,9 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v50_dict_to_v51_dict(cls, draft_change_list):
+    def _convert_states_v50_dict_to_v51_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
         """Converts from version 50 to 51. Version 51 adds a new
         dest_if_really_stuck field to Outcome class to redirect learners
         to a state for strengthening concepts when they get really stuck. As

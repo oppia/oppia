@@ -590,7 +590,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME),
             is_initial_state=True)
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             self.new_state, 'TextInput', self.content_id_generator)
         self.exploration.init_state_name = 'Introduction'
         self.exploration.states = {
@@ -609,16 +609,16 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             self.end_state, 'EndExploration', self.content_id_generator)
-        self.end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        self.end_state.update_interaction_default_outcome(None)
 
         self.exploration.next_content_id_index = (
             self.content_id_generator.next_content_id_index)
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
-        self.init_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        self.init_state.update_card_is_checkpoint(False)
+        with self.assertRaisesRegex(
             Exception, 'Expected card_is_checkpoint of first state to '
             'be True but found it to be False'):
             self.exploration.validate(strict=True)
@@ -669,7 +669,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.set_interaction_for_state(
                 self.exploration.states['State%s' % i],
                 'Continue', self.content_id_generator)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected checkpoint count to be between 1 and 8 '
             'inclusive but found it to be 9'
             ):
@@ -705,7 +705,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             second_state, 'TextInput', self.content_id_generator)
         third_state = state_domain.State.create_default_state(
             'Third',
@@ -714,7 +714,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             third_state, 'TextInput', self.content_id_generator)
 
         self.exploration.states = {
@@ -903,7 +903,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             a_state, 'TextInput', self.content_id_generator)
         b_state = state_domain.State.create_default_state(
             'B',
@@ -912,7 +912,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             b_state, 'TextInput', self.content_id_generator)
         c_state = state_domain.State.create_default_state(
             'C',
@@ -921,7 +921,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             c_state, 'TextInput', self.content_id_generator)
         d_state = state_domain.State.create_default_state(
             'D',
@@ -930,7 +930,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             d_state, 'TextInput', self.content_id_generator)
 
         self.exploration.states = {
@@ -1143,9 +1143,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME)
         )
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             new_end_state, 'EndExploration', self.content_id_generator)
-        new_end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+        new_end_state.update_interaction_default_outcome(None)
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -1215,7 +1215,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         super().setUp()
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.', 'html', True)
+                'My name is Nikhil.',
+                translation_domain.TranslatableContentFormat.HTML,
+                True
+            )
         }
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
@@ -1258,7 +1261,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME))
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             new_state, 'TextInput', content_id_generator)
         second_state = state_domain.State.create_default_state(
             'ABC',
@@ -1266,7 +1269,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 translation_domain.ContentType.CONTENT),
             content_id_generator.generate(
                 translation_domain.ContentType.DEFAULT_OUTCOME))
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             second_state, 'TextInput', content_id_generator)
 
         # The 'states' property must be a non-empty dict of states.
@@ -1383,7 +1386,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_group.outcome.dest_if_really_stuck = None
 
         # Restore a valid exploration.
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             init_state, 'TextInput', content_id_generator)
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_groups)
@@ -1609,7 +1612,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.next_content_id_index
         )
         self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
+            init_state, 'TextInput', content_id_generator)
         new_answer_groups = [
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
@@ -1658,7 +1661,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.next_content_id_index
         )
         self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
+            init_state, 'TextInput', content_id_generator)
         exploration.validate()
 
         # TODO(#13059): After we fully type the codebase we plan to get
@@ -1672,22 +1675,22 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict(answer_group)
             for answer_group in old_answer_groups
         ]
-        init_state.update_interaction_answer_groups(new_answer_groups)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(
-            init_state, 'EndExploration', content_id_generator)  # type: ignore[no-untyped-call]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            init_state, 'EndExploration', content_id_generator)
+        self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
         self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
-        init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            init_state, 'TextInput', content_id_generator)
+        init_state.update_interaction_default_outcome(None)
+        self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
         self.set_interaction_for_state(
-            init_state, 'EndExploration', content_id_generator # type: ignore[no-untyped-call]
+            init_state, 'EndExploration', content_id_generator
         )
         init_state.interaction.answer_groups = answer_groups
         self._assert_validation_error(
@@ -1701,9 +1704,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
-        init_state.update_interaction_answer_groups(answer_groups)  # type: ignore[no-untyped-call]
-        init_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
+            init_state, 'TextInput', content_id_generator)
+        init_state.update_interaction_answer_groups(answer_groups)
+        init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
@@ -1812,7 +1815,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         translation_domain.ContentType.DEFAULT_OUTCOME),
                     is_initial_state=True))
         }
-        self.set_interaction_for_state(  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(
             exploration.states[exploration.init_state_name], 'TextInput',
             content_id_generator)
         exploration.validate()
@@ -1853,8 +1856,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(
-            init_state, 'EndExploration', content_id_generator)  # type: ignore[no-untyped-call]
-        init_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+            init_state, 'EndExploration', content_id_generator)
+        init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
         # TODO(#13059): After we fully type the codebase we plan to get
@@ -2087,7 +2090,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
+            init_state, 'TextInput', content_id_generator)
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -2113,7 +2116,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(
-            init_state, 'TextInput',content_id_generator)  # type: ignore[no-untyped-call]
+            init_state, 'TextInput',content_id_generator)
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -2519,8 +2522,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['End'])
         end_state = exploration.states['End']
         self.set_interaction_for_state(
-            end_state, 'EndExploration', content_id_generator)  # type: ignore[no-untyped-call]
-        end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
+            end_state, 'EndExploration', content_id_generator)
+        end_state.update_interaction_default_outcome(None)
 
         with self.assertRaisesRegex(
             Exception,
@@ -2657,7 +2660,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rows': {'value': 1}
         }
-        state.update_content(  # type: ignore[no-untyped-call]
+        state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
@@ -5754,13 +5757,13 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
         self.set_interaction_for_state(
-            state1, 'TextInput', content_id_generator)  # type: ignore[no-untyped-call]
+            state1, 'TextInput', content_id_generator)
         self.set_interaction_for_state(
-            state2, 'MultipleChoiceInput', content_id_generator)  # type: ignore[no-untyped-call]
+            state2, 'MultipleChoiceInput', content_id_generator)
         self.set_interaction_for_state(
-            state3, 'ItemSelectionInput', content_id_generator)  # type: ignore[no-untyped-call]
+            state3, 'ItemSelectionInput', content_id_generator)
         self.set_interaction_for_state(
-            state4, 'DragAndDropSortInput', content_id_generator)  # type: ignore[no-untyped-call]
+            state4, 'DragAndDropSortInput', content_id_generator)
 
         customization_args_dict1: Dict[
             str, Dict[str, Union[Dict[str, str], int]]
@@ -6622,7 +6625,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
-            'old_value': [],
+            'old_value': ['old_value'],
             'property_name': 'answer_groups',
             'new_value':
             [
@@ -6746,7 +6749,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'labelled_as_correct': False
             }
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'End',
             'property_name': 'answer_groups',
             'cmd': 'edit_state_property',
@@ -6894,7 +6897,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
-            'old_value': [],
+            'old_value': ['old_value'],
             'property_name': 'answer_groups',
             'new_value':
             [
@@ -7411,7 +7414,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'labelled_as_correct': False
             }
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'End',
             'property_name': 'answer_groups',
             'cmd': 'edit_state_property',
@@ -8138,7 +8141,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'default_outcome',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'new_value': [{
                 'outcome': {
                     'dest': 'End',
@@ -9438,7 +9441,7 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         }), exp_domain.ExplorationChange({
             'property_name': 'hints',
-            'old_value': [],
+            'old_value': ['old_value'],
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'new_value': [
@@ -9475,7 +9478,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -9513,7 +9516,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'training_data': []
             }]
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added answer group.')
 
@@ -9540,10 +9543,10 @@ class ExplorationChangesMergeabilityUnitTests(
             'content_id': 'default_outcome'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some translations.')
 
@@ -9599,7 +9602,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_state_name': 'Intro-Rename'
         })]
 
-        changes_are_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
@@ -9615,7 +9618,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'data_format': 'html'
         })]
 
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
@@ -9682,10 +9685,10 @@ class ExplorationChangesMergeabilityUnitTests(
             }
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Customization Args Placeholder in First State.')
-        changes_are_mergeable_3 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, True)
 
@@ -9847,7 +9850,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'html': '<p>Second State Content.</p>'
             }
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
@@ -9930,7 +9933,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_state_name': 'Intro-Rename'
         })]
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added some translations.')
 
@@ -9955,7 +9958,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'content_html': 'N/A'
         })]
 
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_not_mergeable, False)
 
@@ -9976,7 +9979,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'content',
             'cmd': 'edit_state_property'
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Changing Content in Second State.')
 
@@ -9991,7 +9994,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'add_written_translation',
             'data_format': 'html'
         })]
-        changes_are_not_mergeable_1 = exp_services.are_changes_mergeable(  # type: ignore[no-untyped-call]
+        changes_are_not_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_not_mergeable_1, False)
 
@@ -10637,7 +10640,7 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'new_value': [
@@ -10923,7 +10926,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 'NumericInput',
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
-            'old_value': [],
+            'old_value': ['old_value'],
             'cmd': 'edit_state_property',
             'property_name': 'answer_groups',
             'new_value': [
@@ -11054,7 +11057,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'cmd': 'edit_state_property'
             }), exp_domain.ExplorationChange({
-                'old_value': [],
+                'old_value': ['old_value'],
                 'cmd': 'edit_state_property',
                 'property_name': 'answer_groups',
                 'new_value': [

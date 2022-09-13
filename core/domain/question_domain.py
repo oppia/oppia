@@ -37,7 +37,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -238,6 +238,7 @@ class QuestionDict(TypedDict):
     version: int
     linked_skill_ids: List[str]
     inapplicable_skill_misconception_ids: List[str]
+    next_content_id_index: int
 
 
 class VersionedQuestionStateDict(TypedDict):
@@ -301,7 +302,8 @@ class Question(translation_domain.BaseTranslatableObject):
         self.last_updated = last_updated
 
     def get_translatable_contents_collection(
-        self
+        self,
+        **kwargs: Optional[str]
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the question.
 
@@ -337,7 +339,8 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_question_state(
-            cls, content_id_generator) -> state_domain.State:
+        cls, content_id_generator: translation_domain.ContentIdGenerator
+    ) -> state_domain.State:
         """Return a State domain object with default value for being used as
         question state data.
 
@@ -643,8 +646,8 @@ class Question(translation_domain.BaseTranslatableObject):
                         del question_state_dict['recorded_voiceovers'][
                             'voiceovers_mapping'][content_id]
                     if content_id in question_state_dict[
-                            'written_translations']['translations_mapping']:
-                        del question_state_dict['written_translations'][
+                            'written_translations']['translations_mapping']: # type: ignore[misc]
+                        del question_state_dict['written_translations'][ # type: ignore[misc]
                             'translations_mapping'][content_id]
 
                 question_state_dict['interaction']['id'] = new_interaction_id
@@ -692,7 +695,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         max_existing_content_id_index = -1
         translations_mapping = question_state_dict[
-            'written_translations']['translations_mapping']
+            'written_translations']['translations_mapping'] # type: ignore[misc]
         for content_id in translations_mapping:
             # Find maximum existing content_id index.
             content_id_suffix = content_id.split('_')[-1]
@@ -720,12 +723,12 @@ class Question(translation_domain.BaseTranslatableObject):
                 # the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
-                        translations_mapping[content_id][lang_code]['html'])  # type: ignore[misc]
-                del translations_mapping[content_id][lang_code]['html']  # type: ignore[misc]
+                        translations_mapping[content_id][lang_code]['html'])
+                del translations_mapping[content_id][lang_code]['html']
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id is None:
-            question_state_dict['next_content_id_index'] = (
+            question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
                 max_existing_content_id_index + 1)
             return question_state_dict
 
@@ -854,11 +857,11 @@ class Question(translation_domain.BaseTranslatableObject):
                 ca_specs)
         )
 
-        question_state_dict['next_content_id_index'] = (
+        question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
             content_id_counter.next_content_id_index)
         for new_content_id in content_id_counter.new_content_ids:
             question_state_dict[
-                'written_translations'][
+                'written_translations'][ # type: ignore[misc]
                     'translations_mapping'][new_content_id] = {}
             question_state_dict[
                 'recorded_voiceovers'][
@@ -964,7 +967,7 @@ class Question(translation_domain.BaseTranslatableObject):
                     }
                 }
             })
-            question_state_dict['written_translations']['translations_mapping'][
+            question_state_dict['written_translations']['translations_mapping'][ # type: ignore[misc]
                 'ca_placeholder_0'] = {}
             question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
                 'ca_placeholder_0'] = {}
@@ -1065,7 +1068,7 @@ class Question(translation_domain.BaseTranslatableObject):
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id in ['TextInput', 'SetInput']:
             content_id_counter = ContentIdCounter(
-                question_state_dict['next_content_id_index'])
+                question_state_dict['next_content_id_index']) # type: ignore[misc]
             answer_group_dicts = question_state_dict[
                 'interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
@@ -1089,11 +1092,11 @@ class Question(translation_domain.BaseTranslatableObject):
                             'contentId': content_id,
                             'unicodeStrSet': rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
-            question_state_dict['next_content_id_index'] = (
+            question_state_dict['next_content_id_index'] = ( # type: ignore[misc]
                 content_id_counter.next_content_id_index)
             for new_content_id in content_id_counter.new_content_ids:
                 question_state_dict[
-                    'written_translations'][
+                    'written_translations'][ # type: ignore[misc]
                         'translations_mapping'][new_content_id] = {}
                 question_state_dict[
                     'recorded_voiceovers'][
@@ -1580,14 +1583,17 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v52_dict_to_v53_dict(cls, question_state_dict):
+    def _convert_state_v52_dict_to_v53_dict(
+        cls,
+        question_state_dict: state_domain.StateDict
+    ) -> Tuple[state_domain.StateDict, int]:
         """Converts from v52 to v53. Version 53 removes next_content_id_index
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
         content-id.
         """
         del question_state_dict['next_content_id_index']
-        del question_state_dict['written_translations']
+        del question_state_dict['written_translations'] # type: ignore[misc]
         states_dict, next_content_id_index = (
             state_domain.State
             .update_old_content_id_to_new_content_id_in_v52_states({
@@ -1602,7 +1608,7 @@ class Question(translation_domain.BaseTranslatableObject):
         cls,
         versioned_question_state: VersionedQuestionStateDict,
         current_state_schema_version: int
-    ) -> None:
+    ) -> Optional[int]:
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.

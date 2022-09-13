@@ -177,12 +177,6 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'property_name': (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
             'new_value': interaction_answer_groups
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
-            'new_value': 4
         })]
         with self.assertRaisesRegex(
             Exception,

@@ -53,7 +53,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
     TARGET_ID = 'exp1'
     OLD_SCHEMA_VERSION = 50
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.STATE_1 = state_domain.State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, 'content_0', 'default_outcome_1',
@@ -153,7 +153,7 @@ class MigrateQuestionSuggestionsJobTests(
 
     def test_migrated_question_is_not_migrated(self) -> None:
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             skill_id, self.author_id, description='description')
         content_id_generator = translation_domain.ContentIdGenerator()
         state = self._create_valid_question_data(None, content_id_generator)
@@ -190,7 +190,7 @@ class MigrateQuestionSuggestionsJobTests(
 
     def test_unmigrated_question_suggestion_is_migrated(self) -> None:
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             skill_id, self.author_id, description='description')
         self.save_new_question_suggestion_with_state_data_schema_v27(
             self.author_id, skill_id)

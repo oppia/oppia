@@ -42,6 +42,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
+    from mypy_imports import translation_models
 
 (
     exp_models, opportunity_models,

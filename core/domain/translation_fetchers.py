@@ -20,8 +20,9 @@ from __future__ import annotations
 
 from core.domain import translation_domain
 from core.platform import models
+import feconf
 
-from typing import Optional
+from typing import List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -82,7 +83,9 @@ def get_machine_translation(
     return get_translation_from_model(translation_model)
 
 
-def _get_entity_translation_from_model(entity_translation_model):
+def _get_entity_translation_from_model(
+    entity_translation_model: translation_models.EntityTranslationsModel
+) -> translation_domain.EntityTranslation:
     """Returns the EntityTranslation domain object from its model representation
     (EntityTranslationsModel).
 
@@ -100,13 +103,15 @@ def _get_entity_translation_from_model(entity_translation_model):
         'entity_version': entity_translation_model.entity_version,
         'language_code': entity_translation_model.language_code,
         'translations': entity_translation_model.translations
-
     })
     return entity_translation
 
 
 def get_all_entity_translations_for_entity(
-        entity_type, entity_id, entity_version):
+    entity_type: feconf.TranslatableEntityType,
+    entity_id: str,
+    entity_version: int
+) -> List[translation_domain.EntityTranslation]:
     """Returns a list of entity translation domain objects.
 
     Args:
@@ -133,7 +138,11 @@ def get_all_entity_translations_for_entity(
     return entity_translation_objects
 
 def get_entity_translation(
-        entity_type, entity_id, entity_version, language_code):
+    entity_type: feconf.TranslatableEntityType,
+    entity_id: str,
+    entity_version: int,
+    language_code: str
+) -> translation_domain.EntityTranslation:
     """Returns a unique entity translation domain object.
 
     Args:
@@ -143,7 +152,7 @@ def get_entity_translation(
         language_code: str. The language code for the entity.
 
     Returns:
-        EnitityTranslation. An instance of Entitytranslations.
+        EntityTranslation. An instance of Entitytranslations.
     """
     entity_translation_model = (
         translation_models.EntityTranslationsModel.get_model(

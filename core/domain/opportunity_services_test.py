@@ -1031,7 +1031,7 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
     """TODO
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(OpportunityUpdateOnAcceeptingSuggestionUnitTest, self).setUp()
         supported_language_codes = set(
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)

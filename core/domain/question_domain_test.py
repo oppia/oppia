@@ -1114,12 +1114,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question_state_dict[
             'written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_2'
                 }
             }
@@ -1164,12 +1164,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_2'
                 }
             }
@@ -1213,12 +1213,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_2'
                 }
             }
@@ -1250,12 +1250,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_2'
                 }
             }
@@ -1323,12 +1323,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {  # type: ignore[typeddict-item]
+                'en': {
                     'html': 'html_body_2'
                 }
             }
