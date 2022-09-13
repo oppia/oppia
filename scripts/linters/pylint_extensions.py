@@ -2105,8 +2105,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     msgs = {
         'C0047': (
             'Any type is used. If the Any type is really needed, then please'
-            ' add a proper comment with clear justification why other type'
-            ' narrower cannot be used. The format of the comment should be'
+            ' add a proper comment with clear justification why other specific'
+            ' types cannot be used. The format of the comment should be'
             ' -> Here we use type Any because ...',
             'any-type-used',
             'Annotations with Any type should only be done for exceptional'
@@ -2124,7 +2124,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         'C0049': (
             'object class is used. If the object class is really needed, then'
             ' please add a proper comment with clear justification why other'
-            ' narrower type cannot be used. The format of the comment should'
+            ' specific types cannot be used. The format of the comment should'
             ' be -> Here we use object because ...',
             'object-class-used',
             'Annotations with object should only be done for exceptional'
