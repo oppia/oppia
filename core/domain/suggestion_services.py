@@ -1839,7 +1839,7 @@ def create_translation_contribution_stats_from_model(
         translation_contribution_stats_model.accepted_translation_word_count,
         translation_contribution_stats_model.rejected_translations_count,
         translation_contribution_stats_model.rejected_translation_word_count,
-        translation_contribution_stats_model.contribution_dates
+        set(translation_contribution_stats_model.contribution_dates)
     )
 
 
