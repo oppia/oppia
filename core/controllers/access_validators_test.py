@@ -258,7 +258,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.login(self.BLOG_EDITOR_EMAIL)
 
-        self.get_html_response( # type: ignore[no-untyped-call]
+        self.get_json( # type: ignore[no-untyped-call]
             '%s/can_access_blog_post_page?blog_post_url_fragment=invalid-url' %
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=404)
         self.logout()

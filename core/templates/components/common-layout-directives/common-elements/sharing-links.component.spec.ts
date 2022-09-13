@@ -112,8 +112,7 @@ describe('SharingLinksComponent', () => {
 
     expect(component.serverName).toBe('https://www.oppia.org');
     expect(component.escapedTwitterText).toBe(
-      'Check out this new blog post on Oppia - a free platform for teaching' +
-      ' and learning!');
+      'Check out this new blog post on Oppia!');
   });
 
 
