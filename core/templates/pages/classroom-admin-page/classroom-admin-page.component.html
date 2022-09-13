@@ -25,11 +25,14 @@
       <div *ngFor="let classroom of classroomIdToClassroomName | keyvalue">
         <div class="oppia-classroom-tile"
              (click)="getClassroomData(classroom.key)">
-          <span *ngIf="!(classroomEditorMode && classroom.key == classroomId)">
+          <span *ngIf="!(classroomEditorMode && classroom.key === classroomId)">
             {{classroom.value}}
           </span>
-          <span *ngIf="classroomEditorMode && classroom.key == classroomId">
+          <span *ngIf="classroomEditorMode && classroom.key === classroomId && classroomName.length > 0">
             {{this.classroomName}}
+          </span>
+          <span *ngIf="classroomEditorMode && classroom.key === classroomId && classroomName.length === 0">
+            [New Classroom]
           </span>
           <button mat-button matSuffix mat-icon-button
                   aria-label="Clear"

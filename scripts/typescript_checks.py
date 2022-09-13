@@ -173,7 +173,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/Base.ts',
     'core/templates/pages/admin-page/admin-page.import.ts',
     'core/templates/pages/blog-admin-page/blog-admin-page.import.ts',
-    'core/templates/pages/classroom-admin-page/classroom-admin-page.import.ts',
     'core/templates/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     'core/templates/pages/blog-dashboard-page/blog-dashboard-tile/blog-dashboard-tile.component.ts',
     'core/templates/pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component.spec.ts',

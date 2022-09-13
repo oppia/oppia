@@ -604,10 +604,7 @@ describe('Classroom Admin Page component ', () => {
       expect(component.classroomNameIsValid).toBeTrue();
       expect(component.duplicateClassroomName).toBeFalse();
 
-      component.classroomIdToClassroomName = {
-        physicsId: 'physics',
-        chemistryId: 'chemistry'
-      };
+      component.existingClassroomNames = ['physics', 'chemistry'];
       component.classroomName = 'physics';
 
       component.onClassroomNameChange();

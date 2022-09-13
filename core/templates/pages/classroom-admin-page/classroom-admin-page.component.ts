@@ -52,6 +52,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   courseDetails: string = '';
   topicListIntro: string = '';
   topicIds: string[] = [];
+  existingClassroomNames: string[] = [];
   topicIdToPrerequisiteTopicIds: {[topicId: string]: string[]} = {};
 
   pageIsInitialized: boolean = false;
@@ -93,6 +94,11 @@ export class ClassroomAdminPageComponent implements OnInit {
           cloneDeep(this.selectedClassroomDict));
 
         this.classroomDataIsChanged = false;
+
+        this.existingClassroomNames = (
+          Object.values(this.classroomIdToClassroomName));
+        let index = this.existingClassroomNames.indexOf(this.classroomName);
+        this.existingClassroomNames.splice(index, 1);
       }
     );
   }
@@ -201,7 +207,12 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.classroomViewerMode = true;
         this.updateClassroomPropertiesFromDict(this.selectedClassroomDict);
         this.classroomDataIsChanged = false;
+        this.duplicateClassroomName = false;
+        this.emptyClassroomName = false;
+        this.classroomNameExceedsMaxLen = false;
+        this.emptyClassroomUrlFrgament = false;
         this.duplicateClassroomUrlFragment = false;
+        this.classroomUrlFragmentExceedsmaxLen = false;
         this.classroomUrlFragmentIsValid = true;
       }, () => {
         // Note to developers:
@@ -277,10 +288,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.classroomNameExceedsMaxLen = false;
     }
 
-    let existingClassroomNames: string[] = (
-      Object.values(this.classroomIdToClassroomName));
-
-    if (existingClassroomNames.indexOf(this.classroomName) !== -1) {
+    if (this.existingClassroomNames.indexOf(this.classroomName) !== -1) {
       this.duplicateClassroomName = true;
       this.classroomNameIsValid = false;
     } else {
