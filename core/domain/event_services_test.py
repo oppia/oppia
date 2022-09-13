@@ -41,7 +41,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (stats_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.feedback, models.NAMES.user
+    models.Names.STATISTICS, models.Names.FEEDBACK, models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()

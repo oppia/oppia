@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class MockTopicObject(topic_domain.Topic):
@@ -365,6 +365,15 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topics[0].to_dict(), expected_topic)
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
+
+    def test_raises_error_if_topics_fetched_with_invalid_ids_and_strict(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No topic model exists for the topic_id: invalid_id'
+        ):
+            topic_fetchers.get_topics_by_ids(['invalid_id'], strict=True)
 
     def test_get_all_topic_rights_of_user(self) -> None:
         topic_rights: List[topic_domain.TopicRights] = (

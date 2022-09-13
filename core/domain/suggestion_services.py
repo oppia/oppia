@@ -55,9 +55,15 @@ if MYPY:  # pragma: no cover
     from mypy_imports import transaction_services
     from mypy_imports import user_models
 
+    AllowedSuggestionClasses = Union[
+        suggestion_registry.SuggestionEditStateContent,
+        suggestion_registry.SuggestionTranslateContent,
+        suggestion_registry.SuggestionAddQuestion
+    ]
+
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models([
-        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user
+        models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER
     ])
 )
 
@@ -177,6 +183,12 @@ def create_suggestion(
         # Suggestions of this type do not have an associated language code,
         # since they are not queryable by language.
         language_code = None
+        suggestion: AllowedSuggestionClasses = (
+            suggestion_registry.SuggestionEditStateContent(
+                thread_id, target_id, target_version_at_submission, status,
+                author_id, None, change, score_category, language_code, False
+            )
+        )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
@@ -194,6 +206,10 @@ def create_suggestion(
             raise Exception(
                 'The Exploration content has changed since this translation '
                 'was submitted.')
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            thread_id, target_id, target_version_at_submission, status,
+            author_id, None, change, score_category, language_code, False
+        )
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
@@ -211,21 +227,14 @@ def create_suggestion(
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         # The language code of the question, used for querying purposes.
-        language_code = constants.DEFAULT_LANGUAGE_CODE
+        add_question_language_code = constants.DEFAULT_LANGUAGE_CODE
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            thread_id, target_id, target_version_at_submission, status,
+            author_id, None, change, score_category, add_question_language_code,
+            False
+        )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
-
-    suggestion_domain_class = (
-        suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
-            suggestion_type])
-    # Here, suggestion_domain_class is of Union type which contains
-    # all suggestion classes, but out of these suggestion classes only
-    # `SuggestionEditStateContent` can accept Optional[str] value for
-    # language code and for other classes MyPy throws an `incompatible
-    # argument type` error. Thus to avoid the error, we used ignore here.
-    suggestion = suggestion_domain_class(
-        thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category, language_code, False)  # type: ignore[arg-type]
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
@@ -1830,7 +1839,7 @@ def create_translation_contribution_stats_from_model(
         translation_contribution_stats_model.accepted_translation_word_count,
         translation_contribution_stats_model.rejected_translations_count,
         translation_contribution_stats_model.rejected_translation_word_count,
-        translation_contribution_stats_model.contribution_dates
+        set(translation_contribution_stats_model.contribution_dates)
     )
 
 
@@ -1942,7 +1951,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
 
 
 def _update_suggestion_counts_in_community_contribution_stats(
-    suggestions: List[suggestion_registry.BaseSuggestion], amount: int
+    suggestions: Sequence[suggestion_registry.BaseSuggestion], amount: int
 ) -> None:
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount. The GET and PUT is done in a single
@@ -1968,16 +1977,20 @@ def update_translation_suggestion(
     Args:
         suggestion_id: str. The id of the suggestion to be updated.
         translation_html: str. The new translation_html string.
+
+    Raises:
+        Exception. Expected SuggestionTranslateContent suggestion but found
+            different suggestion.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
-
-    # Clean the translation HTML if not a list of strings.
-    # Here, change is of type BaseChange and all attributes on BaseChange are
-    # created dynamically except cmd, so due this MyPy is unable to recognize
-    # `translation_html` as an attribute of change and throwing `"BaseChange"
-    # has no attribute "translation_html"` error. Thus to avoid the error, we
-    # used ignore here.
-    suggestion.change.translation_html = (  # type: ignore[attr-defined]
+    if not isinstance(
+        suggestion, suggestion_registry.SuggestionTranslateContent
+    ):
+        raise Exception(
+            'Expected SuggestionTranslateContent suggestion but found: %s.'
+            % type(suggestion).__name__
+        )
+    suggestion.change.translation_html = (
         html_cleaner.clean(translation_html)
         if isinstance(translation_html, str)
         else translation_html
@@ -2003,28 +2016,40 @@ def update_question_suggestion(
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
         is found.
+
+    Raises:
+        Exception. Expected SuggestionAddQuestion suggestion but found
+            different suggestion.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
+    if not isinstance(
+        suggestion, suggestion_registry.SuggestionAddQuestion
+    ):
+        raise Exception(
+            'Expected SuggestionAddQuestion suggestion but found: %s.'
+            % type(suggestion).__name__
+        )
     question_dict = suggestion.change.question_dict
-    # Ruling out the possibility of any other type for mypy type checking.
-    assert isinstance(question_dict, dict)
-    new_change_obj = question_domain.QuestionSuggestionChange(
-        {
-            'cmd': suggestion.change.cmd,
-            'question_dict': {
-                'question_state_data': question_state_data,
-                'language_code': question_dict['language_code'],
-                'question_state_data_schema_version': (
-                    question_dict[
-                        'question_state_data_schema_version']),
-                'linked_skill_ids': question_dict['linked_skill_ids'],
-                'inapplicable_skill_misconception_ids': (
-                    question_dict[
-                        'inapplicable_skill_misconception_ids'])
-            },
-            'skill_id': suggestion.change.skill_id,
-            'skill_difficulty': skill_difficulty
-        })
+    new_change_obj = (
+        question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
+            {
+                'cmd': suggestion.change.cmd,
+                'question_dict': {
+                    'question_state_data': question_state_data,
+                    'language_code': question_dict['language_code'],
+                    'question_state_data_schema_version': (
+                        question_dict[
+                            'question_state_data_schema_version']),
+                    'linked_skill_ids': question_dict['linked_skill_ids'],
+                    'inapplicable_skill_misconception_ids': (
+                        question_dict[
+                            'inapplicable_skill_misconception_ids'])
+                },
+                'skill_id': suggestion.change.skill_id,
+                'skill_difficulty': skill_difficulty
+            }
+        )
+    )
     suggestion.pre_update_validate(new_change_obj)
     suggestion.edited_by_reviewer = True
     suggestion.change = new_change_obj
