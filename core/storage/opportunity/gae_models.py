@@ -27,7 +27,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -89,11 +89,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_all_translation_opportunities(
-            cls,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str],
-            language_code: str,
-            topic_name: Optional[str]
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        language_code: str,
+        topic_name: Optional[str]
     ) -> Tuple[
         Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:

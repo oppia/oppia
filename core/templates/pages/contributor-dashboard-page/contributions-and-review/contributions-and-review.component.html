@@ -73,7 +73,7 @@
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
-                  class="oppia-contributions-back-button md-raised">
+                  class="oppia-contributions-back-button mat-raised-button">
             <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
           </button>
           <div class="oppia-contributions-back-button-label">Back to lessons</div>
@@ -208,6 +208,8 @@
   }
 
   .oppia-contributions-back-button {
+    background: none;
+    border: none;
     height: 36px;
     margin-left: 12px;
     min-width: 36px;
