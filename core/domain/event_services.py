@@ -56,8 +56,8 @@ class BaseEventHandler:
     # has type Callable[..., None].
     _handle_event: Callable[..., None]
 
-    # Here we use type Any because in child classes this method can
-    # be redefined with any number of named and keyword arguments
+    # TODO(#16047): Here we use type Any because in child classes this
+    # method can be redefined with any number of named and keyword arguments
     # with different kinds of types.
     @classmethod
     def record(cls, *args: Any, **kwargs: Any) -> None:

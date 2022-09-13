@@ -209,7 +209,7 @@ class DraftUpgradeUtil:
                             new_value['translations_mapping'][
                                 content_id][language_code]['html'] = (  # type: ignore[misc]
                                     # Here we use MyPy ignore because here we
-                                    # are accessing depreciated 'html' key which
+                                    # are accessing deprecated 'html' key which
                                     # causes MyPy to throw an error. Thus, to
                                     # avoid the error, we used ignore here.
                                     conversion_fn(new_value[

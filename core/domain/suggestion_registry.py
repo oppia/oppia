@@ -305,9 +305,9 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
 
-    # Here we use type Any because sub-classes of BaseSuggestion can have
-    # different Change classes. So, to allow every Change class we used Any
-    # type here.
+    # TODO(#16047): Here we use type Any because sub-classes of BaseSuggestion
+    # can have different Change classes. So, to allow every Change class we used
+    # Any type here.
     def pre_update_validate(self, change: Any) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
@@ -420,7 +420,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         # well. So, due to this conflict in types MyPy throws an `Incompatible
         # types in assignment` error. Thus to avoid the error, we used ignore.
         self.language_code = language_code  # type: ignore[assignment]
-        # Here we use MyPy ignore because in BaseSuggestion,
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
         # last_updated is defined with only datetime type but
         # here last_updated is of Optional[datetime] type because
         # while creating 'SuggestionEditStateContent' (through
@@ -642,7 +642,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # Here we use MyPy ignore because in BaseSuggestion,
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
         # last_updated is defined with only datetime type but
         # here last_updated is of Optional[datetime] type because
         # while creating 'SuggestionTranslateContent' (through
@@ -865,7 +865,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # Here we use MyPy ignore because in BaseSuggestion,
+        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
         # last_updated is defined with only datetime type but
         # here last_updated is of Optional[datetime] type because
         # while creating 'SuggestionAddQuestion' (through

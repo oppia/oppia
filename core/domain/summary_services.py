@@ -264,11 +264,13 @@ def get_learner_collection_dict_by_id(
     collection_dict: LearnerCollectionDict = cast(
         LearnerCollectionDict, collection.to_dict()
     )
-    # Here we use MyPy ignore because expression has type List[
-    # CollectionNodeDict] but for implementation purpose we are
-    # assigning List[LearnerCollectionNodeDict]. So, due the
-    # difference in types MyPy throw an error. Thus to avoid the
-    # error, we used ignore here.
+    # Here we use MyPy ignore because the expression has type List[
+    # CollectionNodeDict] but here we need a list of those dictionaries
+    # that can contain both 'exploration_summary' key and CollectionNodeDict's
+    # key. So, we have defined LearnerCollectionNodeDict and assigned
+    # it's list type to the collection_dict['nodes']. So, due to this
+    # difference in types, MyPy throws an error. Thus, to avoid the error,
+    # we used ignore here.
     collection_dict['nodes'] = [
         node.to_dict() for node in collection.nodes]  # type: ignore[misc]
 
