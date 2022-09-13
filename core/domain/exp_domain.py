@@ -3920,40 +3920,48 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, answer_groups: List[state_domain.AnswerGroup], state_name: str):
         """
         """
-        rules_to_remove = []
-        seen_rules = {}
+        rules_to_remove_with_diff_dest_node = []
+        rules_to_remove_with_try_again_dest_node = []
+        seen_rules_with_try_again_dest_node = []
+        seen_rules_with_diff_dest_node = []
         for ans_group_idx, answer_group in enumerate(answer_groups):
             for rule_spec_idx, rule_spec in enumerate(
                 answer_group['rule_specs']):
-                if tuple(rule_spec) in seen_rules:
-                    curr_rule_dest = answer_group['outcome']['dest']
-                    seen_rule_dest = seen_rules[tuple(rule_spec)][0]
-                    if (
-                        curr_rule_dest != state_name and
-                        seen_rule_dest == state_name
-                    ):
-                        ans_group_idx_seen_rule = seen_rules[
-                            tuple(rule_spec)][1]
-                        rule_spec_idx_seen_rule = seen_rules[
-                            tuple(rule_spec)][2]
-                        rules_to_remove.append(
-                            answer_groups[ans_group_idx_seen_rule][
-                                'rule_specs'][rule_spec_idx_seen_rule])
-                        seen_rules[tuple(rule_spec)][1] = ans_group_idx
-                        seen_rules[tuple(rule_spec)][2] = rule_spec_idx
+                if rule_spec in seen_rules_with_try_again_dest_node:
+                    rules_to_remove_with_try_again_dest_node.append(rule_spec)
+        
+                elif rule_spec in seen_rules_with_diff_dest_node:
+                    if answer_group['outcome']['dest'] != state_name:
+                        rules_to_remove_with_diff_dest_node.append(rule_spec)
                     else:
-                        rules_to_remove.append(rule_spec)
+                        rules_to_remove_with_try_again_dest_node.append(rule_spec)
+        
                 else:
-                    seen_rules[tuple(rule_spec)] = [
-                        answer_group['outcome']['dest'], ans_group_idx,
-                        rule_spec_idx]
-
+                    if rule_spec not in seen_rules_with_try_again_dest_node and answer_group['outcome']['dest'] == state_name:
+                        seen_rules_with_try_again_dest_node.append(rule_spec)
+                    elif rule_spec not in seen_rules_with_diff_dest_node and answer_group['outcome']['dest'] != state_name:
+                        seen_rules_with_diff_dest_node.append(rule_spec)
+        
         empty_ans_groups = []
-        for rule_to_remove in rules_to_remove:
+        for rule_to_remove in rules_to_remove_with_try_again_dest_node:
+            for answer_group in reversed(answer_groups):
+                for rule_spec in reversed(answer_group['rule_specs']):
+                    if rule_spec == rule_to_remove and answer_group['outcome']['dest'] == state_name:
+                        answer_group['rule_specs'].remove(rule_to_remove)
+
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
+                    empty_ans_groups.append(answer_group)
+
+
+        for rule_to_remove in rules_to_remove_with_diff_dest_node:
             for answer_group in answer_groups:
                 for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == rule_to_remove:
+                    if rule_spec == rule_to_remove and answer_group['outcome']['dest'] != state_name:
                         answer_group['rule_specs'].remove(rule_to_remove)
+
                 if (
                     len(answer_group['rule_specs']) == 0 and
                     answer_group not in empty_ans_groups
