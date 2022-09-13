@@ -3924,24 +3924,44 @@ class Exploration(translation_domain.BaseTranslatableObject):
         rules_to_remove_with_try_again_dest_node = []
         seen_rules_with_try_again_dest_node = []
         seen_rules_with_diff_dest_node = []
-        for ans_group_idx, answer_group in enumerate(answer_groups):
-            for rule_spec_idx, rule_spec in enumerate(
-                answer_group['rule_specs']):
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
                 if rule_spec in seen_rules_with_try_again_dest_node:
-                    rules_to_remove_with_try_again_dest_node.append(rule_spec)
-        
+                    if (
+                        answer_group['outcome']['dest'] != state_name and
+                        rule_spec not in seen_rules_with_diff_dest_node
+                    ):
+                        seen_rules_with_diff_dest_node.append(rule_spec)
+                        rules_to_remove_with_try_again_dest_node.append(rule_spec)
+
+                    elif (
+                        answer_group['outcome']['dest'] != state_name and
+                        rule_spec in seen_rules_with_diff_dest_node
+                    ):
+                        rules_to_remove_with_diff_dest_node.append(rule_spec)
+
+                    else:
+                        rules_to_remove_with_try_again_dest_node.append(rule_spec)
+
                 elif rule_spec in seen_rules_with_diff_dest_node:
                     if answer_group['outcome']['dest'] != state_name:
                         rules_to_remove_with_diff_dest_node.append(rule_spec)
                     else:
                         rules_to_remove_with_try_again_dest_node.append(rule_spec)
-        
+
                 else:
-                    if rule_spec not in seen_rules_with_try_again_dest_node and answer_group['outcome']['dest'] == state_name:
+                    if (
+                        rule_spec not in seen_rules_with_try_again_dest_node and
+                        answer_group['outcome']['dest'] == state_name
+                    ):
                         seen_rules_with_try_again_dest_node.append(rule_spec)
-                    elif rule_spec not in seen_rules_with_diff_dest_node and answer_group['outcome']['dest'] != state_name:
+
+                    elif (
+                        rule_spec not in seen_rules_with_diff_dest_node and
+                        answer_group['outcome']['dest'] != state_name
+                    ):
                         seen_rules_with_diff_dest_node.append(rule_spec)
-        
+
         empty_ans_groups = []
         for rule_to_remove in rules_to_remove_with_try_again_dest_node:
             for answer_group in reversed(answer_groups):
@@ -3954,7 +3974,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     answer_group not in empty_ans_groups
                 ):
                     empty_ans_groups.append(answer_group)
-
 
         for rule_to_remove in rules_to_remove_with_diff_dest_node:
             for answer_group in answer_groups:
