@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script assists development of for the contributor dashboard. When the
+"""This script assists development of the contributor dashboard. When the
 "contributor dashboard debug" flag is enabled, the start script will call the
 "populate_debug_data" function, which does the following:
     1. Create an admin user with the username "a" and assign curriculum,
