@@ -254,13 +254,15 @@ export class CustomizeInteractionModalComponent
   }
 
   isSaveInteractionButtonEnabled(): boolean {
-    let exploration = this.getTitle(this.stateInteractionIdService.displayed);
+    let explorationTitle = this.getTitle(this.stateInteractionIdService.displayed);
+    if (explorationTitle === 'End Exploration') {
+      return true;
+    }
     return !!(
-      exploration === 'End Exploration' ||
-      (
-        this.hasCustomizationArgs &&
-        this.stateInteractionIdService.displayed &&
-        this.getCustomizationArgsWarningsList().length === 0));
+      this.hasCustomizationArgs &&
+      this.stateInteractionIdService.displayed &&
+      this.getCustomizationArgsWarningsList().length === 0
+    );
   }
 
   getSaveInteractionButtonTooltip(): string {
