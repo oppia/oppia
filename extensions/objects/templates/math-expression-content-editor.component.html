@@ -7,7 +7,7 @@
 
 <div *ngIf="active || alwaysEditable">
   <div>
-    <textarea [(ngModel)]="localValue.label" (ngModelChange)="updateLocalValue($event)" placeholder="frac{x}{y}"></textarea>
+    <textarea [(ngModel)]="localValue.label" (ngModelChange)="updateLocalValue($event)" placeholder="fraction {x}/{y}"></textarea>
   </div>
   Preview:
   <span *ngIf="localValue.label" [oppiaMathJax]="localValue.label">
