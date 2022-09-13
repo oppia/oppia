@@ -178,9 +178,9 @@ describe('Enable correctness feedback and set correctness', function() {
       // Set correctness in response editor.
       responseEditor = await explorationEditorMainTab.getResponseEditor(
         'default');
-      await responseEditor.markAsCorrect();
       await responseEditor.setFeedback(await forms.toRichText('Correct!'));
       await responseEditor.setDestination('End', true, true);
+      await responseEditor.markAsCorrect();
       await explorationEditorMainTab.expectTickMarkIsDisplayed();
 
       await explorationEditorMainTab.moveToState('End');
@@ -222,7 +222,7 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.moveToState('Second');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),

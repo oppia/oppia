@@ -12,8 +12,8 @@ indexes:
 
 - kind: AppFeedbackReportModel
   properties:
-  - name: created_on
   - name: scrubbed_by
+  - name: created_on
 
 - kind: BlogPostRightsModel
   properties:

@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (email_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.user])
+    models.Names.EMAIL, models.Names.USER])
 
 
 class UserQueryServicesTests(test_utils.GenericTestBase):
@@ -42,10 +42,10 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_user_id = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.user_query_model_1 = user_models.UserQueryModel(
             id=self.USER_QUERY_1_ID,

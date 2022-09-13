@@ -311,7 +311,7 @@ export class RouterService {
     return this.refreshTranslationTabEventEmitter;
   }
 
-  get onRefreshVersionHistory(): EventEmitter<void> {
+  get onRefreshVersionHistory(): EventEmitter<void | {forceRefresh: boolean}> {
     return this.refreshVersionHistoryEventEmitter;
   }
 }

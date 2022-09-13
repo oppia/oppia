@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the FractionInput interaction.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { InteractiveFractionInputComponent } from './oppia-interactive-fraction-input.component';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
@@ -25,6 +25,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { FractionAnswer } from 'interactions/answer-defs';
+import { Fraction } from 'domain/objects/fraction.model';
 
 describe('InteractiveFractionInputComponent', () => {
   let component: InteractiveFractionInputComponent;
@@ -247,6 +248,22 @@ describe('InteractiveFractionInputComponent', () => {
     expect(currentInteractionService.onSubmit).toHaveBeenCalled();
     expect(component.isValid).toBe(true);
   });
+
+  it('should throw uncaught errors that are not Error type',
+    waitForAsync(() => {
+      spyOn(Fraction, 'fromRawInputString').and.callFake(
+        () => {
+          throw TypeError;
+        }
+      );
+
+      expect(()=>{
+        component.submitAnswer();
+        // The eslint error is suppressed since we need to test if
+        // just a string was thrown.
+        // eslint-disable-next-line oppia/no-to-throw
+      }).toThrow(TypeError);
+    }));
 
   it('should get no integer placeholder text when interaction loads', () => {
     component.allowNonzeroIntegerPart = false;

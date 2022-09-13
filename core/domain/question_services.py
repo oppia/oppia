@@ -30,7 +30,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, Union, overload
+from typing import Dict, List, Optional, Tuple, Union, cast, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -40,7 +40,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (question_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.question, models.NAMES.skill])
+    [models.Names.QUESTION, models.Names.SKILL])
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -370,7 +370,7 @@ def delete_question(
         question_id, committer_id, force_deletion)
 
     question_summary_model = (
-        question_models.QuestionSummaryModel.get(question_id, False))
+        question_models.QuestionSummaryModel.get(question_id, strict=False))
     if question_summary_model is not None:
         question_summary_model.delete()
 
@@ -631,31 +631,52 @@ def apply_change_list(
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
                 if (change.property_name ==
                         question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
-                    question.update_language_code(change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateQuestionPropertyLanguageCodeCmd.
+                    update_language_code_cmd = cast(
+                        question_domain.UpdateQuestionPropertyLanguageCodeCmd,
+                        change
+                    )
+                    question.update_language_code(
+                        update_language_code_cmd.new_value
+                    )
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, dict)
-                    state_dict: state_domain.StateDict = change.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateQuestionPropertyQuestionStateDataCmd.
+                    update_question_state_data_cmd = cast(
+                        question_domain.UpdateQuestionPropertyQuestionStateDataCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     state_domain_object = state_domain.State.from_dict(
-                        state_dict)
+                        update_question_state_data_cmd.new_value
+                    )
                     question.update_question_state_data(state_domain_object)
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    linked_skill_ids: List[str] = change.new_value
-                    question.update_linked_skill_ids(linked_skill_ids)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateQuestionPropertyLinkedSkillIdsCmd.
+                    update_linked_skill_ids_cmd = cast(
+                        question_domain.UpdateQuestionPropertyLinkedSkillIdsCmd,
+                        change
+                    )
+                    question.update_linked_skill_ids(
+                        update_linked_skill_ids_cmd.new_value
+                    )
                 elif (change.property_name ==
                       question_property_inapplicable_skill_misconception_ids):
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    skill_misconception_ids: List[str] = change.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateQuestionPropertySkillMisconceptionIdsCmd.
+                    update_skill_misconception_ids_cmd = cast(
+                        question_domain.UpdateQuestionPropertySkillMisconceptionIdsCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     question.update_inapplicable_skill_misconception_ids(
-                        skill_misconception_ids)
+                        update_skill_misconception_ids_cmd.new_value
+                    )
 
         return question
 
@@ -763,6 +784,7 @@ def compute_summary_of_question(
 
     Raises:
         Exception. No interaction_id found for the given question.
+        Exception. No data available for when the question was last_updated on.
     """
     question_content = question.question_state_data.content.html
     answer_groups = question.question_state_data.interaction.answer_groups
@@ -779,9 +801,11 @@ def compute_summary_of_question(
         raise Exception(
             'No interaction_id found for the given question.'
         )
-    # Ruling out the possibility of None for mypy type checking.
-    assert question.created_on is not None
-    assert question.last_updated is not None
+
+    if question.created_on is None or question.last_updated is None:
+        raise Exception(
+            'No data available for when the question was last_updated on.'
+        )
     question_summary = question_domain.QuestionSummary(
         question.id, question_content, misconception_ids, interaction_id,
         question.created_on, question.last_updated)

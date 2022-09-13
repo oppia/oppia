@@ -33,7 +33,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (email_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.user])
+    models.Names.EMAIL, models.Names.USER])
 
 
 class InformSubscribersTest(test_utils.EmailTestBase):
@@ -54,10 +54,10 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.USER_EMAIL_2, self.USER_NAME_2)
 
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')

@@ -52,7 +52,7 @@ import webtest
 
 auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
@@ -350,7 +350,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_no_redirection_for_cron_jobs(self):
         # Valid URL, where user now has permissions.
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        admin_user_id = self.get_user_id_from_email('admin@example.com')
         self.get_json('/cron/models/cleanup', expected_status_int=200)
         self.logout()
 

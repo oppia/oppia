@@ -27,11 +27,13 @@ import itertools
 
 from core import feconf
 from core.domain import caching_services
+from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import topic_fetchers
+from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Optional, overload
+from typing import Dict, List, Optional, Sequence, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -40,7 +42,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.Names.STORY, models.Names.USER])
 
 
 def _migrate_story_contents_to_latest_schema(
@@ -280,22 +282,53 @@ def get_story_summary_by_id(
         return None
 
 
+@overload
+def get_stories_by_ids(
+    story_ids: List[str], *, strict: Literal[True]
+) -> List[story_domain.Story]: ...
+
+
+@overload
 def get_stories_by_ids(
     story_ids: List[str]
-) -> List[Optional[story_domain.Story]]:
+) -> List[Optional[story_domain.Story]]: ...
+
+
+@overload
+def get_stories_by_ids(
+    story_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[story_domain.Story]]: ...
+
+
+def get_stories_by_ids(
+    story_ids: List[str], strict: bool = False
+) -> Sequence[Optional[story_domain.Story]]:
     """Returns a list of stories matching the IDs provided.
 
     Args:
         story_ids: list(str). List of IDs to get stories for.
+        strict: bool. Whether to fail noisily if no story model exists
+            with a given ID exists in the datastore.
 
     Returns:
         list(Story|None). The list of stories corresponding to given ids.  If a
         Story does not exist, the corresponding returned list element is None.
+
+    Raises:
+        Exception. No story model exists for the given story_id.
     """
     all_story_models = story_models.StoryModel.get_multi(story_ids)
-    stories = [
-        get_story_from_model(story_model) if story_model is not None else None
-        for story_model in all_story_models]
+    stories: List[Optional[story_domain.Story]] = []
+    for index, story_model in enumerate(all_story_models):
+        if story_model is None:
+            if strict:
+                raise Exception(
+                    'No story model exists for the story_id: %s'
+                    % story_ids[index]
+                )
+            stories.append(story_model)
+        elif story_model is not None:
+            stories.append(get_story_from_model(story_model))
     return stories
 
 
@@ -319,6 +352,76 @@ def get_story_summaries_by_ids(
         if story_summary_model is not None
     ]
     return story_summaries
+
+
+def get_learner_group_syllabus_story_summaries(
+    story_ids: List[str]
+) -> List[story_domain.LearnerGroupSyllabusStorySummaryDict]:
+    """Returns the learner group syllabus story summary dicts
+    corresponding the given story ids.
+
+    Args:
+        story_ids: list(str). The list of story ids for which the story
+            summaries are to be returned.
+
+    Returns:
+        list(LearnerGroupSyllabusStorySummaryDict). The story summaries
+        corresponds to given story ids.
+    """
+    # Validating if story exists before adding it to all stories list is only
+    # done for mypy type checks as all story ids are supposed to be valid as
+    # a part of validation done for learner group syllabus before calling
+    # this function.
+    all_stories = [
+        story for story in get_stories_by_ids(story_ids) if story
+    ]
+
+    topic_ids = list(
+        {story.corresponding_topic_id for story in all_stories}
+    )
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topic_id_to_topic_map = {}
+    for topic in topics:
+        # Ruling out the possibility of None for mypy type checking. Topic is
+        # guaranteed to exist as a part of validation done for story ids since
+        # story is bound to be part of a topic.
+        assert topic is not None
+        topic_id_to_topic_map[topic.id] = topic
+
+    story_summaries_dicts = [
+        story_summary.to_dict() for story_summary in
+        get_story_summaries_by_ids(story_ids)
+    ]
+
+    return [
+        {
+            'id': story.id,
+            'title': story.title,
+            'description': story.description,
+            'language_code': story.language_code,
+            'version': story.version,
+            'node_titles': summary_dict['node_titles'],
+            'thumbnail_filename': story.thumbnail_filename,
+            'thumbnail_bg_color': story.thumbnail_bg_color,
+            'url_fragment': story.url_fragment,
+            'story_model_created_on': summary_dict['story_model_created_on'],
+            'story_model_last_updated':
+                summary_dict['story_model_last_updated'],
+            'story_is_published': True,
+            'completed_node_titles': [],
+            'all_node_dicts': [
+                node.to_dict() for node in
+                story.story_contents.nodes
+            ],
+            'topic_name':
+                topic_id_to_topic_map[story.corresponding_topic_id].name,
+            'topic_url_fragment':
+                topic_id_to_topic_map[
+                    story.corresponding_topic_id].url_fragment
+        }
+        for (story, summary_dict) in
+        zip(all_stories, story_summaries_dicts)
+    ]
 
 
 def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
@@ -374,6 +477,58 @@ def get_completed_nodes_in_story(
     return completed_nodes
 
 
+def get_user_progress_in_story_chapters(
+    user_id: str, story_ids: List[str]
+) -> List[story_domain.StoryChapterProgressSummaryDict]:
+    """Returns the progress of multiple users in multiple chapters.
+
+    Args:
+        user_id: str. The user id of the user.
+        story_ids: list(str). The ids of the stories.
+
+    Returns:
+        list(StoryChapterProgressSummaryDict). The list of the progress
+        summaries of the user corresponding to all stories chapters.
+    """
+    all_valid_story_nodes: List[story_domain.StoryNode] = []
+    for story in get_stories_by_ids(story_ids):
+        if story is not None:
+            all_valid_story_nodes.extend(story.story_contents.nodes)
+    exp_ids = [
+        node.exploration_id for node in all_valid_story_nodes
+        if node.exploration_id
+    ]
+    exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
+    user_id_exp_id_combinations = list(itertools.product([user_id], exp_ids))
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_multi(
+            user_id_exp_id_combinations))
+
+    all_chapters_progress: List[
+        story_domain.StoryChapterProgressSummaryDict] = []
+    for i, user_id_exp_id_pair in enumerate(user_id_exp_id_combinations):
+        exp_id = user_id_exp_id_pair[1]
+        exploration = exp_id_to_exp_map[exp_id]
+        all_checkpoints = user_services.get_checkpoints_in_order(
+            exploration.init_state_name,
+            exploration.states)
+        model = exp_user_data_models[i]
+        visited_checkpoints = 0
+        if model is not None:
+            most_recently_visited_checkpoint = (
+                model.most_recently_reached_checkpoint_state_name)
+            if most_recently_visited_checkpoint is not None:
+                visited_checkpoints = all_checkpoints.index(
+                    most_recently_visited_checkpoint) + 1
+        all_chapters_progress.append({
+            'exploration_id': exp_id,
+            'visited_checkpoints_count': visited_checkpoints,
+            'total_checkpoints_count': len(all_checkpoints)
+        })
+
+    return all_chapters_progress
+
+
 def get_multi_users_progress_in_stories(
     user_ids: List[str], story_ids: List[str]
 ) -> Dict[str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]]:
@@ -395,11 +550,9 @@ def get_multi_users_progress_in_stories(
     topic_ids = list(
         {story.corresponding_topic_id for story in all_valid_stories}
     )
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
     topic_id_to_topic_map = {}
     for topic in topics:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
         topic_id_to_topic_map[topic.id] = topic
 
     story_id_to_story_map = {story.id: story for story in all_valid_stories}

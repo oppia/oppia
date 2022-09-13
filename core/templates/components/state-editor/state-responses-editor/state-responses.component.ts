@@ -23,7 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
 import { DeleteAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Misconception, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
 import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -48,13 +48,6 @@ import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { EditabilityService } from 'services/editability.service';
 
-interface ValueEvent {
-  evt: {
-    stopPropagation: Function;
-  };
-
-  index: number;
-}
 
 @Component({
   selector: 'oppia-state-responses',
@@ -353,17 +346,17 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteAnswerGroup(value: ValueEvent): void {
+  deleteAnswerGroup(evt: Event, index: number): void {
     // Prevent clicking on the delete button from also toggling the
     // display state of the answer group.
-    value.evt.stopPropagation();
+    evt.stopPropagation();
 
     this.alertsService.clearWarnings();
     this.ngbModal.open(DeleteAnswerGroupModalComponent, {
       backdrop: true,
     }).result.then(() => {
       this.responsesService.deleteAnswerGroup(
-        value.index, (newAnswerGroups) => {
+        index, (newAnswerGroups) => {
           this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
           this.refreshWarnings.emit();
         });
@@ -398,7 +391,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveTaggedMisconception(misconceptionId: string, skillId: string): void {
+  saveTaggedMisconception(taggedMisconception: TaggedMisconception): void {
+    const { skillId, misconceptionId } = taggedMisconception;
     this.responsesService.updateActiveAnswerGroup({
       taggedSkillMisconceptionId: skillId + '-' + misconceptionId
     } as AnswerGroup, (newAnswerGroups) => {
@@ -423,6 +417,15 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       missingPrerequisiteSkillId:
         updatedOutcome.missingPrerequisiteSkillId
     }, (newAnswerGroups) => {
+      this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
+      this.refreshWarnings.emit();
+    });
+  }
+
+  saveActiveAnswerGroupDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateActiveAnswerGroup({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck,
+    } as unknown as AnswerGroup, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });
@@ -462,6 +465,14 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       refresherExplorationId: updatedOutcome.refresherExplorationId,
       missingPrerequisiteSkillId:
         updatedOutcome.missingPrerequisiteSkillId
+    } as Outcome, (newDefaultOutcome) => {
+      this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
+    });
+  }
+
+  saveDefaultOutcomeDestIfStuck(updatedOutcome: Outcome): void {
+    this.responsesService.updateDefaultOutcome({
+      destIfReallyStuck: updatedOutcome.destIfReallyStuck
     } as Outcome, (newDefaultOutcome) => {
       this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
     });

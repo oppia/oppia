@@ -47,12 +47,12 @@ if MYPY: # pragma: no cover
     skill_models,
     question_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration,
-    models.NAMES.opportunity,
-    models.NAMES.story,
-    models.NAMES.topic,
-    models.NAMES.skill,
-    models.NAMES.question
+    models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY,
+    models.Names.STORY,
+    models.Names.TOPIC,
+    models.Names.SKILL,
+    models.Names.QUESTION
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -507,7 +507,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story title')
         self.assertEqual(opportunity_model.chapter_title, 'node title')
         self.assertEqual(opportunity_model.content_count, 1)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -592,7 +592,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story 2 title')
         self.assertEqual(opportunity_model.chapter_title, 'node 2 title')
         self.assertEqual(opportunity_model.content_count, 2)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -672,7 +672,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story title')
         self.assertEqual(opportunity_model.chapter_title, 'node title')
         self.assertEqual(opportunity_model.content_count, 1)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -849,7 +849,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story 2 title')
         self.assertEqual(opportunity_model.chapter_title, 'node 2 title')
         self.assertEqual(opportunity_model.content_count, 2)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})

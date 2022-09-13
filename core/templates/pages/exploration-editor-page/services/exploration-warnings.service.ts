@@ -29,7 +29,7 @@ import { ParameterMetadataService } from 'pages/exploration-editor-page/services
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 import { State } from 'domain/state/StateObjectFactory';
-import { GraphLink, GraphNodes } from 'services/compute-graph.service';
+import { ComputeGraphService, GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { AlgebraicExpressionInputValidationService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import { CodeReplValidationService } from 'interactions/CodeRepl/directives/code-repl-validation.service';
 import { ContinueValidationService } from 'interactions/Continue/directives/continue-validation.service';
@@ -51,6 +51,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
 
+var Dequeue = require('dequeue');
 interface _getStatesAndAnswerGroupsWithEmptyClassifiersResult {
   groupIndexes: number[];
   stateName: string;
@@ -62,7 +63,8 @@ interface _verifyParametersResult {
 interface _getReversedLinksResult {
   source: string;
   target: string;
-  linkProperty: string;
+  linkProperty: string | null;
+  connectsDestIfStuck: boolean;
 }
 
 const INTERACTION_SERVICE_MAPPING = {
@@ -102,13 +104,15 @@ export class ExplorationWarningsService {
     private improvementsService: ImprovementsService,
     private solutionValidityService: SolutionValidityService,
     private stateTopAnswersStatsService: StateTopAnswersStatsService,
-    private parameterMetadataService: ParameterMetadataService
+    private parameterMetadataService: ParameterMetadataService,
+    private computeGraphService: ComputeGraphService,
   ) { }
 
   _warningsList = [];
   stateWarnings = {};
   checkpointCountWarning: string = '';
   hasCriticalStateWarning: boolean = false;
+  statesWithInvalidRedirection: string[] = [];
 
   _getStatesWithoutInteractionIds(): string[] {
     let statesWithoutInteractionIds = [];
@@ -183,6 +187,7 @@ export class ExplorationWarningsService {
         source: link.target,
         target: link.source,
         linkProperty: null,
+        connectsDestIfStuck: false
       };
     });
   }
@@ -233,6 +238,40 @@ export class ExplorationWarningsService {
       }
     }
     return indexes;
+  }
+
+  _getStatesWithInvalidRedirection(
+      initStateId: string, links: GraphLink[]
+  ): string[] {
+    let results = [];
+    let states = this.explorationStatesService.getStates();
+    let bfsStateList = this.computeGraphService.computeBfsTraversalOfStates(
+      initStateId, states, initStateId);
+    let visited: Record<string, boolean> = {};
+    bfsStateList.forEach((stateName) => {
+      // Go through all states, taking in the dest and source
+      // calculate distance for each, if invalid push in results.
+      visited[stateName] = true;
+      let state = states.getState(stateName);
+      if (state && state.interaction) {
+        if (state.interaction.defaultOutcome) {
+          let defaultDest = state.interaction.defaultOutcome.dest;
+          if (defaultDest !== stateName && visited[defaultDest] &&
+            !this.redirectionIsValid(defaultDest, stateName, links)) {
+            results.push(stateName);
+          }
+        }
+        let answerGroups = state.interaction.answerGroups;
+        for (let i = 0; i < answerGroups.length; i++) {
+          let dest = answerGroups[i].outcome.dest;
+          if (visited[dest] &&
+            !this.redirectionIsValid(dest, stateName, links)) {
+            results.push(stateName);
+          }
+        }
+      }
+    });
+    return results;
   }
 
   _getStatesAndAnswerGroupsWithEmptyClassifiers():
@@ -322,6 +361,13 @@ export class ExplorationWarningsService {
       _extendStateWarnings(
         stateWithoutInteractionIds,
         AppConstants.STATE_ERROR_MESSAGES.ADD_INTERACTION);
+    });
+
+    let statesWithInvalidRedirection = this._getStatesWithInvalidRedirection(
+      _graphData.initStateId, _graphData.links);
+    statesWithInvalidRedirection.forEach((stateName) => {
+      _extendStateWarnings(
+        stateName, AppConstants.STATE_ERROR_MESSAGES.INVALID_REDIRECTION);
     });
 
     let statesWithAnswersThatMustBeResolved =
@@ -469,7 +515,7 @@ export class ExplorationWarningsService {
     return this.stateWarnings;
   }
 
-  getWarnings(): object[] {
+  getWarnings(): object[] | string[] {
     return this._warningsList;
   }
 
@@ -487,6 +533,53 @@ export class ExplorationWarningsService {
 
   updateWarnings(): void {
     this._updateWarningsList();
+  }
+
+  redirectionIsValid(
+      sourceStateName: string, destStateName: string, links: GraphLink[]
+  ): boolean {
+    let distance = this.getDistanceToDestState(
+      sourceStateName, destStateName, links);
+    // Raise validation error if the creator redirects the learner
+    // back by more than MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards.
+    return distance <= AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION;
+  }
+
+  getDistanceToDestState(
+      sourceStateName: string, destStateName: string, links: GraphLink[]
+  ): number {
+    let distanceToDestState = -1;
+    let stateFound = false;
+    let dequeue = new Dequeue();
+    let visited: Record<string, boolean> = {};
+    visited[sourceStateName] = true;
+    dequeue.push(sourceStateName);
+    while (dequeue.length > 0 && !stateFound) {
+      let dequeueSize = dequeue.length;
+      distanceToDestState++;
+      while (dequeueSize > 0) {
+        // '.shift()' here can return an undefined value, but we're already
+        // checking for queue.length > 0, so this is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let currStateName = dequeue.shift()!;
+        if (currStateName === destStateName) {
+          stateFound = true;
+        }
+        dequeueSize--;
+        for (let e = 0; e < links.length; e++) {
+          let edge = links[e];
+          let dest = edge.target;
+          if (edge.source === currStateName && !visited.hasOwnProperty(dest)) {
+            visited[dest] = true;
+            dequeue.push(dest);
+          }
+        }
+      }
+    }
+    if (distanceToDestState !== -1 && !stateFound) {
+      distanceToDestState = -1;
+    }
+    return distanceToDestState;
   }
 }
 

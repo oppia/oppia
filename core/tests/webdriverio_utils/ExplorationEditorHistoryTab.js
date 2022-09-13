@@ -145,15 +145,12 @@ var ExplorationEditorHistoryTab = function() {
        */
       selectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0.
-        await waitFor.visibilityOf(
-          firstVersionDropdown,
-          'First version dropdown takes too long to appear');
-        await firstVersionDropdown.selectByVisibleText(versionNumber1);
+        await action.matSelect(
+          'Version Number1 Button', firstVersionDropdown, versionNumber1);
 
-        await waitFor.visibilityOf(
-          secondVersionDropdown,
-          'Second version dropdown takes too long to appear');
-        await secondVersionDropdown.selectByVisibleText(versionNumber2);
+        await action.matSelect(
+          'Version Number2 Button', secondVersionDropdown,
+          versionNumber2);
       },
       /*
        * This method compares the states in the history graph using each
@@ -262,16 +259,12 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
-        console.log(1);
         var codeMirrorElement = await codeMirrorElementSelector();
-        console.log(2);
         var lastElement = codeMirrorElement.length - 1;
-        console.log(3);
         await forms.CodeMirrorChecker(
           codeMirrorElement[0],
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
-        console.log(4);
         await forms.CodeMirrorChecker(
           codeMirrorElement[lastElement],
           'last'
