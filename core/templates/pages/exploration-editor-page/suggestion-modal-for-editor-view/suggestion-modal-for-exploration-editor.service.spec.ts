@@ -26,6 +26,7 @@ import { ExplorationStatesService } from '../services/exploration-states.service
 import { LoggerService } from 'services/contextual/logger.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { State } from 'domain/state/StateObjectFactory';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
 describe('Suggestion Modal For Exploration Editor', () => {
   let ngbModal: NgbModal;
@@ -213,7 +214,8 @@ describe('Suggestion Modal For Exploration Editor', () => {
         Hola: stateDict
       },
       version: 10
-    };
+      // TODO(#13015): Remove use of unknown as a type.
+    } as unknown as ExplorationBackendDict;
   });
 
 
