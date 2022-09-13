@@ -1555,7 +1555,7 @@ class TestBase(unittest.TestCase):
             # Here we use MyPy ignore because we are defining a new attribute
             # 'call_num' on a function and MyPy does not allow the addition of
             # new attributes on a function ( or a function class ). So, because
-            # of this, MyPy throws an '"Callable" has no attribute "call_num"'
+            # of this, MyPy throws a '"Callable" has no attribute "call_num"'
             # error. Thus to avoid the error, we used ignore here.
             new_function_with_checks.call_num += 1  # type: ignore[attr-defined]
 
@@ -1564,8 +1564,8 @@ class TestBase(unittest.TestCase):
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' does not contain 'call_num' attribute. So,
-            # because of this, MyPy throws an '"Callable" has no attribute
+            # of type 'callable' do not contain a 'call_num' attribute. So,
+            # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             if expected_args:
                 next_args = next(expected_args_iter, None)
@@ -1575,8 +1575,8 @@ class TestBase(unittest.TestCase):
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' does not contain 'call_num' attribute. So,
-            # because of this, MyPy throws an '"Callable" has no attribute
+            # of type 'callable' do not contain a 'call_num' attribute. So,
+            # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             if expected_kwargs:
                 next_kwargs = next(expected_kwargs_iter, None)
@@ -1591,8 +1591,8 @@ class TestBase(unittest.TestCase):
 
         # Here we use MyPy ignore because we are accessing the 'call_num'
         # attribute on a function which is of type 'callable' and functions
-        # of type 'callable' does not contain 'call_num' attribute. So,
-        # because of this, MyPy throws an '"Callable" has no attribute
+        # of type 'callable' do not contain a 'call_num' attribute. So,
+        # because of this, MyPy throws a '"Callable" has no attribute
         # "call_num"' error. Thus to avoid the error, we used ignore here.
         new_function_with_checks.call_num = 0  # type: ignore[attr-defined]
         setattr(obj, attr, new_function_with_checks)
@@ -1603,8 +1603,8 @@ class TestBase(unittest.TestCase):
             self.longMessage = True
             # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' does not contain 'call_num' attribute. So,
-            # because of this, MyPy throws an '"Callable" has no attribute
+            # of type 'callable' do not contain a 'call_num' attribute. So,
+            # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             self.assertEqual(
                 new_function_with_checks.call_num > 0, called, msg=msg)  # type: ignore[attr-defined]
@@ -1618,8 +1618,8 @@ class TestBase(unittest.TestCase):
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' does not contain 'call_num' attribute. So,
-            # because of this, MyPy throws an '"Callable" has no attribute
+            # of type 'callable' do not contain a 'call_num' attribute. So,
+            # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             if pretty_unused_args:
                 num_expected_calls = (
@@ -1629,18 +1629,18 @@ class TestBase(unittest.TestCase):
                         i, num_expected_calls, attr, call_args)
                     # Here we use MyPy ignore because we are accessing the
                     # 'call_num' attribute on a function which is of type
-                    # 'callable' and functions of type 'callable' does not
-                    # contain 'call_num' attribute. So, because of this,
-                    # MyPy throws an '"Callable" has no attribute "call_num"'
+                    # 'callable' and functions of type 'callable' do not
+                    # contain a 'call_num' attribute. So, because of this,
+                    # MyPy throws a '"Callable" has no attribute "call_num"'
                     # error. Thus to avoid the error, we used ignore here.
                     for i, call_args in enumerate(
                         pretty_unused_args,
                         start=new_function_with_checks.call_num + 1))  # type: ignore[attr-defined]
                 # Here we use MyPy ignore because we are accessing the
                 # 'call_num' attribute on a function which is of type
-                # 'callable' and functions of type 'callable' does not
-                # contain 'call_num' attribute. So, because of this,
-                # MyPy throws an '"Callable" has no attribute "call_num"'
+                # 'callable' and functions of type 'callable' do not
+                # contain a 'call_num' attribute. So, because of this,
+                # MyPy throws a '"Callable" has no attribute "call_num"'
                 # error. Thus to avoid the error, we used ignore here.
                 self.fail(
                     msg='Only %d of the %d expected calls were made.\n'
@@ -1729,8 +1729,8 @@ class TestBase(unittest.TestCase):
         super().assertDictEqual(dict_one, dict_two, msg=msg)  # type: ignore[arg-type]
 
     # Here we use type Any because the method 'assertItemsEqual' can accept any
-    # kind of iterables to compare them against each other, these iterables can
-    # be of type List, Dict, Tuple and etc.
+    # kind of iterables to compare them against each other, and these iterables
+    # can be of type List, Dict, Tuple, etc.
     def assertItemsEqual(  # pylint: disable=invalid-name
         self, *args: Iterable[Any], **kwargs: Iterable[Any]
     ) -> None:
@@ -1981,8 +1981,10 @@ class GenericTestBase(AppEngineTestBase):
     # Here we use MyPy ignore because we are defining an older version
     # dictionary of State which does contain 'content_ids_to_audio_translations'
     # key but we are assigning this dict to the latest version of State
-    # which does not contain the 'content_ids_to_audio_translations' key.
-    # So, because of this MyPy throws an error. Thus, to avoid the error,
+    # which does not contain the 'content_ids_to_audio_translations' key
+    # because we only maintain the types of the latest domain objects. So,
+    # that's why we have to assign the old version dict to the latest dict
+    # type, and because of this MyPy throws an error. Thus, to avoid the error,
     # we used ignore here.
     VERSION_27_STATE_DICT: state_domain.StateDict = {  # type: ignore[typeddict-item]
         'content': {'content_id': 'content', 'html': ''},

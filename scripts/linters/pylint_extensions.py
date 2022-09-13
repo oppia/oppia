@@ -1952,14 +1952,14 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0045': (
-            'Please try to avoid the use of type: ignore where possible.'
+            'Please try to avoid the use of \'type: ignore\' if possible.'
             ' If \'type: ignore\' is really necessary, then add a proper'
-            ' comment with clear justification (see other parts of the'
-            ' codebase for examples).',
+            ' comment with clear justification. The format of the comment'
+            ' should be -> Here we use MyPy ignore because ...',
             'mypy-ignore-used',
-            'MyPy ignores should be used with proper comments following'
-            ' the established patterns in the codebase. Except for'
-            ' no-untyped-call MyPy ignore.'
+            'MyPy ignores (except for \'type: ignore[no-untyped-call]\')'
+            ' should be accompanied by proper comments. The format of'
+            ' comments should be -> Here we use MyPy ignore because ...'
         ),
         'C0046': (
             'Extra comment is present for MyPy type: ignore. Please'
@@ -1983,14 +1983,17 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         self._process_module_tokens(tokens, node)
 
     def _process_module_tokens(self, tokens, node):
-        """Checks if the MyPy type ignores present in a module properly
-        documented by a code comment or not.
+        """Checks if the MyPy type ignores present in a module are properly
+        documented by a code comment or not. Also, checks for unnecessary code
+        comments for which no corresponding type: ignore is found.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        type_ignore_comment_regex = r'Here we use MyPy ignore because'
+        expected_type_ignore_comment_substring = (
+            r'Here we use MyPy ignore because'
+        )
         type_ignore_comment_present = False
         no_of_type_ignore_comments = 0
         previous_comment_line_number = 0
@@ -2000,12 +2003,17 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
             if token_type == tokenize.COMMENT:
                 line = line.lstrip()
 
-                if type_ignore_comment_regex in line:
+                if expected_type_ignore_comment_substring in line:
                     type_ignore_comment_present = True
                     no_of_type_ignore_comments += 1
 
                     if no_of_type_ignore_comments > 1:
                         previous_comment_line_number = comment_line_number
+                        self.add_message(
+                            'redundant-type-comment',
+                            line=previous_comment_line_number,
+                            node=node
+                        )
 
                     comment_line_number = line_num
 
@@ -2025,16 +2033,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                         self.add_message(
                             'mypy-ignore-used', line=line_num, node=node
                         )
-
-                if (
-                    type_ignore_comment_regex in line and
-                    no_of_type_ignore_comments > 1
-                ):
-                    self.add_message(
-                        'redundant-type-comment',
-                        line=previous_comment_line_number,
-                        node=node
-                    )
 
         if type_ignore_comment_present:
             self.add_message(
@@ -2106,23 +2104,28 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0047': (
-            'Any type is used. Please use a more specific type instead.',
+            'Any type is used. If the Any type is really needed, then please'
+            ' add a proper comment with clear justification why other type'
+            ' narrower cannot be used. The format of the comment should be'
+            ' -> Here we use type Any because ...',
             'any-type-used',
             'Annotations with Any type should only be done for exceptional'
             ' cases with proper explanation in the code comment.'
         ),
         'C0048': (
-            'cast function is used. If the cast is really needed, please add a'
-            ' proper comment with clear justification. Generally, casts should'
-            ' only be used immediately after an \'if\' condition in the code'
-            ' forces the object to be of the casted type.',
+            'cast function is used. If the cast is really needed, then please'
+            ' add a proper comment with clear justification why cast function'
+            ' is needed. The format of the comment should be -> Here use cast'
+            ' because ...',
             'cast-func-used',
             'Casting of any value should be done with a proper explanation in'
             ' the code comment.'
         ),
         'C0049': (
-            'object class is used. Please use a more specific type instead.'
-            ' type instead.',
+            'object class is used. If the object class is really needed, then'
+            ' please add a proper comment with clear justification why other'
+            ' narrower type cannot be used. The format of the comment should'
+            ' be -> Here we use object because ...',
             'object-class-used',
             'Annotations with object should only be done for exceptional'
             ' cases with proper explanation in the code comment.'
@@ -2349,13 +2352,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             self.EXCEPTIONAL_TYPE_STATUS_DICT
         )
 
-        object_type_regex = r'Here we use object because'
+        expected_object_class_comment_substring = r'Here we use object because'
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
-                if object_type_regex in line:
+                if expected_object_class_comment_substring in line:
                     object_class_status_dict[
                         'type_comment_no_longer_pending'
                     ] = True
@@ -2375,7 +2378,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             tokens: Token. Object to access all tokens of a module.
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
-        cast_type_regex = r'Here we use cast because'
+        expected_cast_method_comment_substring = r'Here we use cast because'
         cast_comment_present = False
         cast_comment_line_num = 0
         import_status_dict = {
@@ -2388,7 +2391,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
-                if cast_type_regex in line:
+                if expected_cast_method_comment_substring in line:
                     cast_comment_present = True
                     cast_comment_line_num = line_num
 
@@ -2439,13 +2442,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             self.EXCEPTIONAL_TYPE_STATUS_DICT
         )
 
-        any_type_regex = r'Here we use type Any because'
+        expected_any_type_comment_substring = r'Here we use type Any because'
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
-                if any_type_regex in line:
+                if expected_any_type_comment_substring in line:
                     any_type_status_dict[
                         'type_comment_no_longer_pending'
                     ] = True
