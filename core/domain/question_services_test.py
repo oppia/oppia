@@ -41,7 +41,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import question_models
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):

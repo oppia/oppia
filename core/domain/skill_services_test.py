@@ -34,7 +34,6 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 from typing import Dict, List, Union
 from typing_extensions import Final
 
@@ -44,7 +43,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models, question_models) = models.Registry.import_models([
-    models.NAMES.skill, models.NAMES.question
+    models.Names.SKILL, models.Names.QUESTION
 ])
 
 SuggestionChangeDictType = Dict[

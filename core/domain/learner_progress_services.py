@@ -42,6 +42,7 @@ from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
 
+
 from typing import Dict, List, Optional, Tuple
 from typing_extensions import TypedDict
 
@@ -53,7 +54,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (user_models, topic_models, story_models) = models.Registry.import_models([
-    models.NAMES.user, models.NAMES.topic, models.NAMES.story
+    models.Names.USER, models.Names.TOPIC, models.Names.STORY
 ])
 datastore_services = models.Registry.import_datastore_services()
 

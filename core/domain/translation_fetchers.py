@@ -30,7 +30,7 @@ if MYPY: # pragma: no cover
 
 
 (translation_models,) = models.Registry.import_models([
-    models.NAMES.translation])
+    models.Names.TRANSLATION])
 
 
 def get_translation_from_model(

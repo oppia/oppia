@@ -30,7 +30,7 @@ if MYPY: # pragma: no cover
 
 
 (translation_models,) = models.Registry.import_models([
-    models.NAMES.translation])
+    models.Names.TRANSLATION])
 
 
 class MachineTranslationFetchersTests(test_utils.GenericTestBase):

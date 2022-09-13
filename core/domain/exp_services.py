@@ -78,9 +78,9 @@ if MYPY:  # pragma: no cover
 
 (base_models, exp_models, user_models) = (
     models.Registry.import_models([
-        models.NAMES.base_model,
-        models.NAMES.exploration,
-        models.NAMES.user
+        models.Names.BASE_MODEL,
+        models.Names.EXPLORATION,
+        models.Names.USER
     ])
 )
 

@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
 (base_models, app_feedback_report_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.app_feedback_report
+    models.Names.BASE_MODEL, models.Names.APP_FEEDBACK_REPORT
 ])
 
 

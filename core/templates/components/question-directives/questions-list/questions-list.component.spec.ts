@@ -34,6 +34,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { QuestionValidationService } from 'services/question-validation.service';
 import { QuestionsListService } from 'services/questions-list.service';
@@ -72,6 +73,7 @@ describe('Questions List Component', () => {
   let skillEditorRoutingService: SkillEditorRoutingService;
   let skillBackendApiService: SkillBackendApiService;
   let alertsService: AlertsService;
+  let loggerService: LoggerService;
   let questionObjectFactory: QuestionObjectFactory;
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
   let questionUndoRedoService: QuestionUndoRedoService;
@@ -130,6 +132,7 @@ describe('Questions List Component', () => {
     editableQuestionBackendApiService = (
       TestBed.inject(EditableQuestionBackendApiService));
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
+    loggerService = TestBed.inject(LoggerService);
     contextService = TestBed.inject(ContextService);
     questionValidationService = TestBed.inject(QuestionValidationService);
 
@@ -316,6 +319,18 @@ describe('Questions List Component', () => {
     expect(component.createQuestion).toHaveBeenCalled();
   });
 
+  it('should not start creating a question if there are alerts', fakeAsync(
+    () => {
+      alertsService.addWarning('a warning');
+      spyOn(loggerService, 'error').and.stub();
+
+      component.createQuestion();
+
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Could not create new question due to warnings: a warning');
+    }
+  ));
+
   it('should get selected skill id when a question is created', () => {
     // When modal is not shown, then newQuestionSkillIds get the values of
     // skillIds.
@@ -371,9 +386,8 @@ describe('Questions List Component', () => {
 
       expect(component.misconceptionsBySkill).toEqual(undefined);
 
-      component.initiateQuestionCreation();
+      component.createQuestion();
       tick();
-
 
       expect(component.misconceptionsBySkill).toEqual({
         skillId1: [
@@ -388,7 +402,7 @@ describe('Questions List Component', () => {
       });
     }));
 
-  it('should warning message if fetching skills fails', () => {
+  it('should show warning message if fetching skills fails', () => {
     spyOn(alertsService, 'addWarning');
     spyOn(skillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
       Promise.reject('Error occurred.')
@@ -1033,7 +1047,7 @@ describe('Questions List Component', () => {
       expect(component.skillLinkageModificationsArray).toEqual([{
         id: 'skillId1',
         task: 'add',
-        difficulty: 0.3
+        difficulty: 0.6
       }]);
     }));
 
