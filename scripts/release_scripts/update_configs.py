@@ -109,8 +109,8 @@ def apply_changes_based_on_config(
             line_number for (line_number, line) in enumerate(local_lines)
             if line.startswith(match_result.group(1))]
         assert len(matching_local_line_numbers) == 1, (
-            'Could not find correct number of lines in %s matching: %s' %
-            (local_filename, config_line))
+            'Could not find correct number of lines in %s matching: %s, %s' %
+            (local_filename, config_line, matching_local_line_numbers))
         local_line_numbers.append(matching_local_line_numbers[0])
 
     # Then, apply the changes.
@@ -305,43 +305,43 @@ def add_mailchimp_api_key(release_feconf_path):
             f.write(line)
 
 
-def update_analytics_id_in_webpack_config(
-    webpack_config_path,
-    release_constants_path
+def update_analytics_constants_based_on_config(
+    release_analytics_constants_path,
+    analytics_constants_config_path
 ):
-    """Updates the GA4 and UA IDs in the webpack config file.
+    """Updates the GA4 and UA IDs in the analytics constants JSON file.
 
     Args:
-        webpack_config_path: str. The path to webpack config file.
-        release_constants_path: str. The path to release constants file.
+        release_analytics_constants_path: str. The path to constants file.
+        analytics_constants_config_path: str. The path to constants config file.
     """
-    with utils.open_file(release_constants_path, 'r') as release_config_file:
-        release_config_contents = release_config_file.read()
+    with utils.open_file(analytics_constants_config_path, 'r') as config_file:
+        config_file_contents = config_file.read()
     ga_analytics_id = re.search(
-        r'"GA_ANALYTICS_ID": "(.*)"', release_config_contents).group(1)
+        r'"GA_ANALYTICS_ID": "(.*)"', config_file_contents).group(1)
     ua_analytics_id = re.search(
-        r'"UA_ANALYTICS_ID": "(.*)"', release_config_contents).group(1)
+        r'"UA_ANALYTICS_ID": "(.*)"', config_file_contents).group(1)
     site_name_for_analytics = re.search(
-        r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', release_config_contents).group(1)
+        r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', config_file_contents).group(1)
     can_send_analytics_events = re.search(
-        r'"CAN_SEND_ANALYTICS_EVENTS": (.*)',
-        release_config_contents).group(1)
+        r'"CAN_SEND_ANALYTICS_EVENTS": (true|false)',
+        config_file_contents).group(1)
     common.inplace_replace_file(
-        webpack_config_path,
-        'const GA_ANALYTICS_ID = \'\';',
-        'const GA_ANALYTICS_ID = \'%s\';' % ga_analytics_id)
+        release_analytics_constants_path,
+        '"GA_ANALYTICS_ID": ""',
+        '"GA_ANALYTICS_ID": "%s"' % ga_analytics_id)
     common.inplace_replace_file(
-        webpack_config_path,
-        'const UA_ANALYTICS_ID = \'\';',
-        'const UA_ANALYTICS_ID = \'%s\';' % ua_analytics_id)
+        release_analytics_constants_path,
+        '"UA_ANALYTICS_ID": ""',
+        '"UA_ANALYTICS_ID": "%s"' % ua_analytics_id)
     common.inplace_replace_file(
-        webpack_config_path,
-        'const SITE_NAME_FOR_ANALYTICS = \'\';',
-        'const SITE_NAME_FOR_ANALYTICS = \'%s\';' % site_name_for_analytics)
+        release_analytics_constants_path,
+        '"SITE_NAME_FOR_ANALYTICS": ""',
+        '"SITE_NAME_FOR_ANALYTICS": "%s"' % site_name_for_analytics)
     common.inplace_replace_file(
-        webpack_config_path,
-        'const CAN_SEND_ANALYTICS_EVENTS = false;',
-        'const CAN_SEND_ANALYTICS_EVENTS = %s;' % can_send_analytics_events)
+        release_analytics_constants_path,
+        '"CAN_SEND_ANALYTICS_EVENTS": false',
+        '"CAN_SEND_ANALYTICS_EVENTS": %s' % can_send_analytics_events)
 
 
 def main(args=None):
@@ -355,6 +355,8 @@ def main(args=None):
         options.deploy_data_path, 'feconf_updates.config')
     constants_config_path = os.path.join(
         options.deploy_data_path, 'constants_updates.config')
+    analytics_constants_config_path = os.path.join(
+        options.deploy_data_path, 'analytics_constants_updates.config')
 
     release_feconf_path = os.path.join(
         options.release_dir_path, common.FECONF_PATH)
@@ -362,8 +364,8 @@ def main(args=None):
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
     release_app_dev_yaml_path = os.path.join(
         options.release_dir_path, common.APP_DEV_YAML_PATH)
-    release_webpack_config_constants_path = os.path.join(
-        options.release_dir_path, common.WEBPACK_CONFIG_CONSTANTS_FILE_PATH)
+    release_analytics_constants_path = os.path.join(
+        options.release_dir_path, common.ANALYTICS_CONSTANTS_FILE_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
@@ -380,9 +382,9 @@ def main(args=None):
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
     update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
-    update_analytics_id_in_webpack_config(
-        release_webpack_config_constants_path,
-        constants_config_path)
+    update_analytics_constants_based_on_config(
+        release_analytics_constants_path,
+        analytics_constants_config_path)
     verify_config_files(
         release_feconf_path,
         release_app_dev_yaml_path,

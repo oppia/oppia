@@ -160,7 +160,7 @@ WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
 WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
-WEBPACK_CONFIG_CONSTANTS_FILE_PATH = (
+ANALYTICS_CONSTANTS_FILE_PATH = (
     os.path.join('assets', 'analytics-constants.json'))
 
 PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
