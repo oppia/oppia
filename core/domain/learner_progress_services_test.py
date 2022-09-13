@@ -48,7 +48,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class IncompleteExplorationDetailsDict(TypedDict):
@@ -176,9 +176,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'dummy-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.owner_id, topic)
         self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
 
         changelist = [
@@ -221,9 +221,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.owner_id, topic)
         self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
 
         changelist = [
@@ -267,9 +267,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'sample-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.owner_id, topic)
         self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_2)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -296,27 +296,27 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'url_fragment': 'sample-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.owner_id, topic)
         self.save_new_story(self.STORY_ID_3, self.owner_id, self.TOPIC_ID_3)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID_3, self.STORY_ID_3)
 
         # Publish topics and stories.
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
 
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
 
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id)
-        topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
 
     def _get_all_completed_exp_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the explorations completed by the learner
@@ -1307,7 +1307,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
 
         # Unpublish STORY_ID_1.
-        topic_services.unpublish_story(  # type: ignore[no-untyped-call]
+        topic_services.unpublish_story(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
         # Call get_topics_and_stories_progress to get filtered progress.
@@ -1344,7 +1344,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Unpublish TOPIC_ID_1.
-        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_1)
         self.assertEqual(
             topic_rights.topic_is_published, False)
@@ -1415,7 +1415,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Delete TOPIC_ID_1.
-        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_1)  # type: ignore[no-untyped-call]
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_1)
 
         # Call get_topics_and_stories_progress to get filtered progress.
         user_activity = (
@@ -1778,7 +1778,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Unpublish TOPIC_ID_1.
-        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_1)
         self.assertEqual(
             topic_rights.topic_is_published, False)
@@ -1809,7 +1809,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0])
 
         # Unpublish TOPIC_ID_0.
-        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_0)
         self.assertEqual(
             topic_rights.topic_is_published, False)
@@ -1826,7 +1826,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(partially_learnt_topic_summaries), 0)
 
         # Republish TOPIC_ID_0.
-        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
         learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_0)
@@ -1888,7 +1888,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Unpublish TOPIC_ID_0.
-        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)  # type: ignore[no-untyped-call]
+        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)
 
         # Call get_topics_and_stories_progress to get filtered progress.
         user_activity = (
@@ -2269,7 +2269,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             }], 'Add new exploration')
 
         # Delete a topic in the learn section of the learner goals.
-        topic_services.delete_topic(self.owner_id, self.TOPIC_ID_2)  # type: ignore[no-untyped-call]
+        topic_services.delete_topic(self.owner_id, self.TOPIC_ID_2)
 
         # Add a node to a story that has already been completed.
         changelist = [
@@ -2354,7 +2354,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         collection_services.delete_collection(self.owner_id, self.COL_ID_3)
 
         # Delete a topic from incomplete section.
-        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)  # type: ignore[no-untyped-call]
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)
 
         # Get the progress of the user.
         collection_progress = (

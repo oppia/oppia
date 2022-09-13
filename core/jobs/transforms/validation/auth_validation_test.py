@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import auth_models
 
-(auth_models,) = models.Registry.import_models([models.NAMES.auth])
+(auth_models,) = models.Registry.import_models([models.Names.AUTH])
 
 
 class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):

@@ -33,7 +33,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 from typing import Dict, List, Union
 from typing_extensions import Final
 
@@ -43,7 +42,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models, question_models) = models.Registry.import_models([
-    models.NAMES.skill, models.NAMES.question
+    models.Names.SKILL, models.Names.QUESTION
 ])
 
 SuggestionChangeDictType = Dict[
@@ -913,7 +912,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_models.SkillSummaryModel.get(self.SKILL_ID))
         skill_summary_model.delete()
         skill_summary_model_with_none = (
-            skill_models.SkillSummaryModel.get(self.SKILL_ID, False))
+            skill_models.SkillSummaryModel.get(self.SKILL_ID, strict=False))
         self.assertIsNone(skill_summary_model_with_none)
 
         skill_services.delete_skill(
@@ -1470,7 +1469,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(owner_id, topic)
 
         self.assertEqual(
             skill_services.get_topic_names_with_given_skill_in_diagnostic_test(
