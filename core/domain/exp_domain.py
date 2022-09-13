@@ -50,6 +50,7 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from # is
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+from proto_files import exploration_pb2
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -317,7 +318,7 @@ class ExplorationChange(change_domain.BaseChange):
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'edits_allowed'
+        'edits_allowed', 'android_proto_size_in_bytes'
     ]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
@@ -1343,6 +1344,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
+        self._cached_android_proto_size_in_bytes = True
+        self._cached_android_proto_size_in_bytes = 0
 
     def get_translatable_contents_collection(
         self
@@ -2124,6 +2127,41 @@ class Exploration(translation_domain.BaseTranslatableObject):
             bool. True is the current exploration is a demo exploration.
         """
         return self.is_demo_exploration_id(self.id)
+
+    @property
+    def android_proto_size_in_bytes(self):
+        """Returns the most up-to-date size of the exploration proto,
+        recomputing from scratch if necessary.
+
+        Returns:
+            int. The size in bytes of the exploration proto representation.
+        """
+        if self._cached_android_proto_size_is_stale:
+            self._cached_android_proto_size_in_bytes = self.get_proto_size()
+            self._cached_android_proto_size_is_stale = False
+
+        return self._cached_android_proto_size_in_bytes
+
+    def __setattr__(self, attribute, new_val):
+        """Set _cached_android_proto_size_is_stale to True every time the
+        exploration object is updated.
+
+        Args:
+            attribute: str. The name of the Exploration class attribute.
+            new_val: *. The value of the attribute on which the function is
+                called.
+        """
+        # If the value of _cached_android_proto_size_in_bytes or
+        # _cached_android_proto_size_is_stale gets updated, we don't want to
+        # recompute the exploration's proto size. These attributes are both
+        # supporting attributes which aren't included in the proto size
+        # calculation.
+        if attribute not in (
+            '_cached_android_proto_size_in_bytes',
+            '_cached_android_proto_size_is_stale'):
+            self._cached_android_proto_size_is_stale = True
+
+        super().__setattr__(attribute, new_val)
 
     def has_state_name(self, state_name: str) -> bool:
         """Whether the exploration has a state with the given state name.
@@ -3713,6 +3751,32 @@ class Exploration(translation_domain.BaseTranslatableObject):
             html_list += [content_html] + interaction_html_list
 
         return html_list
+
+    def to_android_exploration_proto(self):
+        """Returns a proto representation of the exploration object.
+
+        Returns:
+            ExplorationDto. The proto object.
+        """
+        exp_state_protos = {}
+        for (state_name, state) in self.states.items():
+            exp_state_protos[state_name] = state.to_android_state_proto()
+
+        return exploration_pb2.ExplorationDto(
+            id=self.id,
+            content_version=self.version,
+            init_state_name=self.init_state_name,
+            title=self.title,
+            states=exp_state_protos
+        )
+
+    def get_proto_size(self):
+        """Calculate the byte size of the proto object.
+
+        Returns:
+            int. The byte size of the proto object.
+        """
+        return int(self.to_android_exploration_proto().ByteSize())
 
 
 class ExplorationSummaryMetadataDict(TypedDict):

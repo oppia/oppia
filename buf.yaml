@@ -4,3 +4,4 @@ version: v1beta1
 build:
   roots:
     - third_party/oppia-ml-proto-0.0.0
+    - third_party/oppia-proto-api-8f3cde883c31785438e80656a5b6bb26bd01b6a1
