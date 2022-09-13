@@ -49,6 +49,8 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+# TODO(#15927): This job needs to be kept in sync with AuditSkillMigrationJob
+# and later we will unify these jobs together.
 class MigrateSkillJob(base_jobs.JobBase):
     """Job that migrates skill models."""
 
@@ -274,6 +276,10 @@ class MigrateSkillJob(base_jobs.JobBase):
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        transformed_skill_objects_list = (
+            skill_objects_list
             | 'Remove unmigrated skills' >> beam.Filter(
                 lambda x: len(x['skill_changes']) > 0 and len(x['skill']) > 0)
             | 'Reorganize the skill objects' >> beam.Map(lambda objects: {
@@ -282,17 +288,29 @@ class MigrateSkillJob(base_jobs.JobBase):
                     'skill': objects['skill'][0],
                     'skill_changes': objects['skill_changes']
                 })
+
+        )
+
+        already_migrated_job_run_results = (
+            skill_objects_list
+            | 'Remove migrated skills' >> beam.Filter(
+                lambda x: (
+                        len(x['skill_changes']) == 0 and len(x['skill']) > 0
+                ))
+            | 'Transform previously migrated skills into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL PREVIOUSLY MIGRATED'))
         )
 
         skill_objects_list_job_run_results = (
-            skill_objects_list
+            transformed_skill_objects_list
             | 'Transform skill objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'SKILL MIGRATED'))
         )
 
         cache_deletion_job_run_results = (
-            skill_objects_list
+            transformed_skill_objects_list
             | 'Delete skill from cache' >> beam.Map(
                 lambda skill_object: self._delete_skill_from_cache(
                     skill_object['skill']))
@@ -301,7 +319,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         )
 
         skill_models_to_put = (
-            skill_objects_list
+            transformed_skill_objects_list
             | 'Generate skill models to put' >> beam.FlatMap(
                 lambda skill_objects: self._update_skill(
                     skill_objects['skill_model'],
@@ -311,7 +329,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         )
 
         skill_summary_models_to_put = (
-            skill_objects_list
+            transformed_skill_objects_list
             | 'Generate skill summary models to put' >> beam.Map(
                 lambda skill_objects: self._update_skill_summary(
                     skill_objects['skill'],
@@ -329,7 +347,166 @@ class MigrateSkillJob(base_jobs.JobBase):
             (
                 cache_deletion_job_run_results,
                 migrated_skill_job_run_results,
+                already_migrated_job_run_results,
                 skill_objects_list_job_run_results
+            )
+            | beam.Flatten()
+        )
+
+
+# TODO(#15927): This job needs to be kept in sync with MigrateSkillJob and
+# later we will unify these jobs together.
+class AuditSkillMigrationJob(base_jobs.JobBase):
+    """Job that migrates skill models."""
+
+    @staticmethod
+    def _migrate_skill(
+        skill_id: str, skill_model: skill_models.SkillModel
+    ) -> result.Result[Tuple[str, skill_domain.Skill], Tuple[str, Exception]]:
+        """Migrates skill and transform skill model into skill object.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_model: SkillModel. The skill model to migrate.
+
+        Returns:
+            Result((str, Skill), (str, Exception)). Result containing tuple that
+            consists of skill ID and either skill object or Exception. Skill
+            object is returned when the migration was successful and Exception
+            is returned otherwise.
+        """
+        try:
+            skill = skill_fetchers.get_skill_from_model(skill_model)
+            skill.validate()
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((skill_id, e))
+
+        return result.Ok((skill_id, skill))
+
+    @staticmethod
+    def _generate_skill_changes(
+        skill_id: str, skill_model: skill_models.SkillModel
+    ) -> Iterable[Tuple[str, skill_domain.SkillChange]]:
+        """Generates skill change objects. Skill change object is generated when
+        schema version for some field is lower than the latest schema version.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_model: SkillModel. The skill for which to generate
+                the change objects.
+
+        Yields:
+            (str, SkillChange). Tuple containing skill ID and skill change
+            object.
+        """
+        contents_version = skill_model.skill_contents_schema_version
+        if contents_version < feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION:
+            skill_change = skill_domain.SkillChange({
+                'cmd': (
+                    skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION),
+                'from_version': skill_model.skill_contents_schema_version,
+                'to_version': feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
+            })
+            yield (skill_id, skill_change)
+
+        misconceptions_version = skill_model.misconceptions_schema_version
+        if misconceptions_version < feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION:  # pylint: disable=line-too-long
+            skill_change = skill_domain.SkillChange({
+                'cmd': (
+                    skill_domain
+                    .CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
+                ),
+                'from_version': skill_model.misconceptions_schema_version,
+                'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
+            })
+            yield (skill_id, skill_change)
+
+        rubric_schema_version = skill_model.rubric_schema_version
+        if rubric_schema_version < feconf.CURRENT_RUBRIC_SCHEMA_VERSION:
+            skill_change = skill_domain.SkillChange({
+                'cmd': (
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
+                'from_version': skill_model.rubric_schema_version,
+                'to_version': feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+            })
+            yield (skill_id, skill_change)
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the skill migration.
+
+        Returns:
+            PCollection. A PCollection of results from the skill migration.
+        """
+        unmigrated_skill_models = (
+            self.pipeline
+            | 'Get all non-deleted skill models' >> (
+                ndb_io.GetModels(skill_models.SkillModel.get_all()))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add skill model ID' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda skill_model: skill_model.id)
+        )
+
+        migrated_skill_results = (
+            unmigrated_skill_models
+            | 'Transform and migrate model' >> beam.MapTuple(
+                self._migrate_skill)
+        )
+        migrated_skills = (
+            migrated_skill_results
+            | 'Filter oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+        migrated_skill_job_run_results = (
+            migrated_skill_results
+            | 'Generate results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults('SKILL PROCESSED'))
+        )
+
+        skill_changes = (
+            unmigrated_skill_models
+            | 'Generate skill changes' >> beam.FlatMapTuple(
+                self._generate_skill_changes)
+        )
+
+        skill_objects_list = (
+            {
+                'skill_model': unmigrated_skill_models,
+                'skill': migrated_skills,
+                'skill_changes': skill_changes
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        already_migrated_job_run_results = (
+            skill_objects_list
+            | 'Remove migrated skills' >> beam.Filter(
+                lambda x: (
+                        len(x['skill_changes']) == 0 and len(x['skill']) > 0
+                ))
+            | 'Transform previously migrated skills into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL PREVIOUSLY MIGRATED'))
+        )
+
+        skill_objects_list_job_run_results = (
+            skill_objects_list
+            | 'Remove unmigrated skills' >> beam.Filter(
+                lambda x: len(x['skill_changes']) > 0 and len(x['skill']) > 0)
+            | 'Transform skill objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SKILL MIGRATED'))
+        )
+
+        return (
+            (
+                migrated_skill_job_run_results,
+                skill_objects_list_job_run_results,
+                already_migrated_job_run_results
             )
             | beam.Flatten()
         )
