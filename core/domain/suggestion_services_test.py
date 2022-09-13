@@ -2487,42 +2487,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
-
+        # Contributor's stats are updated manually since contributor's stats are
+        # checked later.
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
         )
         suggestion_services.update_translation_contribution_stats_at_submission(
             latest_suggestion
         )
-
-        # Base verification of contributor stats before the review is made.
-        translation_contribution_stats_model = (
-            suggestion_models.TranslationContributionStatsModel.get(
-                'hi', self.author_id, '0'
-            )
-        )
-        # Assert translation contribution stats before the review.
-        # At this point we can confirm that there should be an associated
-        # translation contribution stat object for the given IDs since we have
-        # called update_translation_contribution_stats_at_submission function
-        # to create/update translation contribution stats.
-        assert translation_contribution_stats_model is not None
-        self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count,
-            2
-        )
-        self.assertEqual(
-            (
-                translation_contribution_stats_model
-                .submitted_translation_word_count
-            ),
-            6
-        )
-        self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_count,
-            0
-        )
-
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -2606,40 +2578,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
-
+        # Contributor's stats are updated manually since contributor's stats are
+        # checked later.
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
         )
         suggestion_services.update_translation_contribution_stats_at_submission(
             latest_suggestion
-        )
-
-        # Base verification of contributor stats before the review is made.
-        translation_contribution_stats_model = (
-            suggestion_models.TranslationContributionStatsModel.get(
-                'hi', self.author_id, '0'
-            )
-        )
-        # Assert translation contribution stats before the review.
-        # At this point we can confirm that there should be an associated
-        # translation contribution stat object for the given IDs since we have
-        # called update_translation_contribution_stats_at_submission function
-        # to create/update translation contribution stats.
-        assert translation_contribution_stats_model is not None
-        self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count,
-            2
-        )
-        self.assertEqual(
-            (
-                translation_contribution_stats_model
-                .submitted_translation_word_count
-            ),
-            6
-        )
-        self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_count,
-            0
         )
 
         suggestion_services.reject_suggestion(
@@ -2762,49 +2707,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
-
+        # Contributor's stats are updated manually since contributor's stats are
+        # checked later.
         suggestion_services.update_translation_contribution_stats_at_submission(
             initial_suggestion
         )
         suggestion_services.update_translation_contribution_stats_at_submission(
             latest_suggestion
         )
-
-        # Base verification of contributor stats before the review is made.
-        translation_contribution_stats_model = (
-            suggestion_models.TranslationContributionStatsModel.get(
-                'hi', self.author_id, '0'
-            )
-        )
-        # Assert translation contribution stats before the review.
-        # At this point we can confirm that there should be an associated
-        # translation contribution stat object for the given IDs since we have
-        # called update_translation_contribution_stats_at_submission function
-        # to create/update translation contribution stats.
-        assert translation_contribution_stats_model is not None
-        self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count,
-            2
-        )
-        self.assertEqual(
-            (
-                translation_contribution_stats_model
-                .submitted_translation_word_count
-            ),
-            6
-        )
-        self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_count,
-            0
-        )
-        self.assertEqual(
-            (
-                translation_contribution_stats_model
-                .accepted_translations_without_reviewer_edits_count
-            ),
-            0
-        )
-
         suggestion_services.update_translation_suggestion(
             initial_suggestion.suggestion_id, 'Edited')
         suggestion_services.accept_suggestion(
@@ -2960,7 +2870,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestion.
+        # 3. Create a question suggestion.
         skill_id_1 = self._create_skill()
         skill_id_2 = self._create_skill()
         topic_id = self._create_topic(skill_id_1, skill_id_2)
@@ -3002,43 +2912,20 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestion.
+        # 3. Create a question suggestion.
         skill_id_1 = self._create_skill()
         skill_id_2 = self._create_skill()
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
-
-        # Since this test case checks for a review, we need to make a base
-        # verification of the contributor's stats before performing the actual
-        # action.
+        # Contributor's stats are updated manually since contributor's stats are
+        # checked later.
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
         suggestion_services.update_question_contribution_stats_at_submission(
             latest_suggestion
         )
-
-        question_contribution_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                self.author_id, topic_id
-            )
-        )
-        # Assert question contribution stats before the review.
-        # At this point we can confirm that there should be an associated
-        # question contribution stat object for the given IDs since we have
-        # called update_question_contribution_stats_at_submission function to
-        # create/update question contribution stats.
-        assert question_contribution_stats_model is not None
-        self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,
-            2
-        )
-        self.assertEqual(
-            question_contribution_stats_model.accepted_questions_count,
-            0
-        )
-
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -3105,43 +2992,20 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestion.
+        # 3. Create a question suggestion.
         skill_id_1 = self._create_skill()
         skill_id_2 = self._create_skill()
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
-
-        # Since this test case checks for a review, we need to make a base
-        # verification of the contributor's stats before performing the actual
-        # action.
+        # Contributor's stats are updated manually since contributor's stats are
+        # checked later.
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
         suggestion_services.update_question_contribution_stats_at_submission(
             latest_suggestion
         )
-
-        question_contribution_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                self.author_id, topic_id
-            )
-        )
-        # Assert question contribution stats before the review.
-        # At this point we can confirm that there should be an associated
-        # question contribution stat object for the given IDs since we have
-        # called update_question_contribution_stats_at_submission function to
-        # create/update question contribution stats.
-        assert question_contribution_stats_model is not None
-        self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,
-            2
-        )
-        self.assertEqual(
-            question_contribution_stats_model.accepted_questions_count,
-            0
-        )
-
         suggestion_services.reject_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
         suggestion_services.reject_suggestion(
@@ -3211,7 +3075,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # Steps required in the setup phase before testing.
         # 1. Save new skills.
         # 2. Save a topic assigning skills for it.
-        # 4. Create a question suggestion.
+        # 3. Create a question suggestion.
         skill_id_1 = self._create_skill()
         skill_id_2 = self._create_skill()
         topic_id = self._create_topic(skill_id_1, skill_id_2)
@@ -3219,44 +3083,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         latest_suggestion = self._create_question_suggestion(skill_id_2)
         question_state_data = self._create_valid_question_data(
             'default_state').to_dict()
-
-        # Since this test case checks for a review, we need to make a base
-        # verification of the contributor's stats before performing the actual
-        # action.
+        # Contributor's stats are updated manually since contributor's stats are
+        # checked later.
         suggestion_services.update_question_contribution_stats_at_submission(
             initial_suggestion
         )
         suggestion_services.update_question_contribution_stats_at_submission(
             latest_suggestion
         )
-
-        question_contribution_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                self.author_id, topic_id
-            )
-        )
-        # Assert question contribution stats before the review.
-        # At this point we can confirm that there should be an associated
-        # question contribution stat object for the given IDs since we have
-        # called update_question_contribution_stats_at_submission function to
-        # create/update question contribution stats.
-        assert question_contribution_stats_model is not None
-        self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,
-            2
-        )
-        self.assertEqual(
-            question_contribution_stats_model.accepted_questions_count,
-            0
-        )
-        self.assertEqual(
-            (
-                question_contribution_stats_model
-                .accepted_questions_without_reviewer_edits_count
-            ),
-            0
-        )
-
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
