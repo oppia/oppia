@@ -3545,25 +3545,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Returns True if the rules passes the range criteria check.
         """
-        # if (
-        #     (earlier_rule['rule_type'] == 'IsExactlyEqualTo' and
-        #     later_rule['rule_type'] == 'IsExactlyEqualTo') or
-        #     (earlier_rule['rule_type'] == 'IsExactlyEqualTo' and
-        #     later_rule['rule_type'] == 'IsEquivalentTo') or
-        #     (earlier_rule['rule_type'] == 'IsExactlyEqualTo' and
-        #     later_rule['rule_type'] == 'IsEquivalentToAndInSimplestForm')
-        # ):
-        #     return False
-        # return True
-
         if earlier_rule['rule_type'] in (
             'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan'
             'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
         ):
             return True
-        return later_rule['rule_type'] not in (
-            'IsExactlyEqualTo', 'IsEquivalentTo',
-            'IsEquivalentToAndInSimplestForm'
+        return later_rule['rule_type'] in (
+            'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
         )
 
     @classmethod
@@ -3927,6 +3915,50 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return answer_groups
 
+    @classmethod
+    def _remove_duplicate_rules_inside_answer_groups(
+        cls, answer_groups: List[state_domain.AnswerGroup], state_name: str):
+        """
+        """
+        rules_to_remove = []
+        seen_rules = {}
+        for ans_group_idx, answer_group in enumerate(answer_groups):
+            for rule_spec_idx, rule_spec in enumerate(
+                answer_group['rule_specs']):
+                if rule_spec in seen_rules:
+                    curr_rule_dest = answer_group['outcome']['dest']
+                    seen_rule_dest = seen_rules[rule_spec][0]
+                    if (
+                        curr_rule_dest != state_name and
+                        seen_rule_dest == state_name
+                    ):
+                        ans_group_idx_seen_rule = seen_rules[rule_spec][1]
+                        rule_spec_idx_seen_rule = seen_rules[rule_spec][2]
+                        rules_to_remove.append(
+                            answer_groups[ans_group_idx_seen_rule][
+                                'rule_specs'][rule_spec_idx_seen_rule])
+                        seen_rules[rule_spec][1] = ans_group_idx
+                        seen_rules[rule_spec][2] = rule_spec_idx
+                    else:
+                        rules_to_remove.append(rule_spec)
+                else:
+                    seen_rules[rule_spec] = [
+                        answer_group['outcome']['dest'], ans_group_idx,
+                        rule_spec_idx]
+
+        empty_ans_groups = []
+        for rule_to_remove in rules_to_remove:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == rule_to_remove:
+                        answer_group['rule_specs'].remove(rule_spec)
+                if len(answer_group['rule_specs']) == 0:
+                    empty_ans_groups.append(answer_group)
+
+        # Remove empty answer groups.
+        for empty_ans_group in empty_ans_groups:
+            answer_groups.remove(empty_ans_group)
+
     # ########################################################.
     # Fix validation errors for exploration state interaction.
     # ########################################################.
@@ -4028,11 +4060,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # End Interaction.
             if state_dict['interaction']['id'] == 'EndExploration':
                 # Should be at most 3 recommended explorations.
-                if len(valid_recc_exp_ids) > 3:
-                    valid_recc_exp_ids = valid_recc_exp_ids[0:3]
+                recc_exp_ids = state_dict['interaction'][
+                    'customization_args']['recommendedExplorationIds']['value']
+                if len(recc_exp_ids) > 3:
+                    recc_exp_ids = recc_exp_ids[0:3]
 
                 state_dict['interaction']['customization_args'][
-                    'recommendedExplorationIds']['value'] = valid_recc_exp_ids
+                    'recommendedExplorationIds']['value'] = recc_exp_ids
 
             # NumericInput Interaction.
             if state_dict['interaction']['id'] == 'NumericInput':
@@ -4061,6 +4095,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
+                cls._remove_duplicate_rules_inside_answer_groups(
+                    answer_groups, state_name)
+
             # FractionInput Interaction.
             if state_dict['interaction']['id'] == 'FractionInput':
                 # All rules should have solutions that do not match
@@ -4072,6 +4109,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     )
                 )
                 state_dict['interaction']['answer_groups'] = answer_groups
+
+                cls._remove_duplicate_rules_inside_answer_groups(
+                    answer_groups, state_name)
 
             # MultipleChoiceInput Interaction.
             if state_dict['interaction']['id'] == 'MultipleChoiceInput':
@@ -4115,6 +4155,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'value'] = choices
 
                 state_dict['interaction']['answer_groups'] = answer_groups
+
+                cls._remove_duplicate_rules_inside_answer_groups(
+                    answer_groups, state_name)
 
             # ItemSelectionInput Interaction.
             if state_dict['interaction']['id'] == 'ItemSelectionInput':
@@ -4190,6 +4233,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
+                cls._remove_duplicate_rules_inside_answer_groups(
+                    answer_groups, state_name)
+
             # DragAndDropInput Interaction.
             if state_dict['interaction']['id'] == 'DragAndDropSortInput':
                 answer_groups = state_dict['interaction']['answer_groups']
@@ -4248,6 +4294,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
+                cls._remove_duplicate_rules_inside_answer_groups(
+                    answer_groups, state_name)
+
             # TextInput Interaction.
             if state_dict['interaction']['id'] == 'TextInput':
                 answer_groups = state_dict['interaction']['answer_groups']
@@ -4271,6 +4320,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 )
 
                 state_dict['interaction']['answer_groups'] = answer_groups
+
+                cls._remove_duplicate_rules_inside_answer_groups(
+                    answer_groups, state_name)
 
             # Update translations and voiceovers.
             cls._remove_unwanted_content_ids_from_translations_and_voiceovers(
