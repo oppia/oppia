@@ -110,7 +110,7 @@ export class VoiceoverRecordingService {
     }
   }
 
-  getMp3Data(): any {
+  getMp3Data(): EventEmitter<void> {
     return this.defer;
   }
 

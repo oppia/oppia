@@ -46,15 +46,6 @@ import { Voiceover } from 'domain/exploration/voiceover.model';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { VoiceoverRecordingService } from '../services/voiceover-recording.service';
 
-// Import ng from 'angular';
-// interface AudioTranslationBarCustomScope extends ng.IScope {
-//   userIsGuest?: boolean;
-//   dropAreaIsAccessible?: boolean;
-//   showDropArea?: boolean;
-//   getVoiceoverRecorder?: () => void;
-//   openAddAudioTranslationModal?: (files: FileList) => void;
-// }
-
 @Component({
   selector: 'oppia-audio-translation-bar',
   templateUrl: './audio-translation-bar.component.html'
@@ -229,7 +220,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     this.cancelTimer();
 
     // Shivam PTAL.
-    this.voiceoverRecorder.getMp3Data().subscribe((audio) => {
+    this.voiceoverRecorder.getMp3Data().subscribe((audio: BlobPart[]) => {
       let fileType = 'audio/mp3';
       this.audioBlob = new Blob(audio, {type: fileType});
       // Free the browser from web worker.
