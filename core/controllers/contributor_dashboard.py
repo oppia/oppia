@@ -861,11 +861,10 @@ def _get_client_side_stats(
         for stats_dict in stats_dicts
     ]
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
-    topic_name_by_topic_id = {}
-    for topic_summary in topic_summaries:
-        if topic_summary is None:
-            continue
-        topic_name_by_topic_id[topic_summary.id] = topic_summary.name
+    topic_name_by_topic_id = {
+        topic_summary.id: topic_summary.name
+        for topic_summary in topic_summaries if topic_summary is not None
+    }
     for stats_dict in stats_dicts:
         stats_dict['topic_name'] = topic_name_by_topic_id.get(
             stats_dict['topic_id'], 'UNKNOWN')
