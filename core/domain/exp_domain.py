@@ -3932,7 +3932,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_spec not in seen_rules_with_diff_dest_node
                     ):
                         seen_rules_with_diff_dest_node.append(rule_spec)
-                        rules_to_remove_with_try_again_dest_node.append(rule_spec)
+                        rules_to_remove_with_try_again_dest_node.append(
+                            rule_spec)
 
                     elif (
                         answer_group['outcome']['dest'] != state_name and
@@ -3941,13 +3942,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rules_to_remove_with_diff_dest_node.append(rule_spec)
 
                     else:
-                        rules_to_remove_with_try_again_dest_node.append(rule_spec)
+                        rules_to_remove_with_try_again_dest_node.append(
+                            rule_spec)
 
                 elif rule_spec in seen_rules_with_diff_dest_node:
                     if answer_group['outcome']['dest'] != state_name:
                         rules_to_remove_with_diff_dest_node.append(rule_spec)
                     else:
-                        rules_to_remove_with_try_again_dest_node.append(rule_spec)
+                        rules_to_remove_with_try_again_dest_node.append(
+                            rule_spec)
 
                 else:
                     if (
@@ -3966,7 +3969,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for rule_to_remove in rules_to_remove_with_try_again_dest_node:
             for answer_group in reversed(answer_groups):
                 for rule_spec in reversed(answer_group['rule_specs']):
-                    if rule_spec == rule_to_remove and answer_group['outcome']['dest'] == state_name:
+                    if (
+                        rule_spec == rule_to_remove and
+                        answer_group['outcome']['dest'] == state_name
+                    ):
                         answer_group['rule_specs'].remove(rule_to_remove)
 
                 if (
@@ -3978,7 +3984,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for rule_to_remove in rules_to_remove_with_diff_dest_node:
             for answer_group in answer_groups:
                 for rule_spec in answer_group['rule_specs']:
-                    if rule_spec == rule_to_remove and answer_group['outcome']['dest'] != state_name:
+                    if (
+                        rule_spec == rule_to_remove and
+                        answer_group['outcome']['dest'] != state_name
+                    ):
                         answer_group['rule_specs'].remove(rule_to_remove)
 
                 if (
@@ -4365,6 +4374,125 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # ################################################.
     # Fix validation errors for exploration state RTE.
     # ################################################.
+
+    @classmethod
+    def _helper_to_fix_rte(html):
+        """
+        """
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+
+        for tag in soup.find_all('oppia-noninteractive-image'):
+            if not tag.has_attr('alt-with-value'):
+                tag['alt-with-value'] = '&quot;&quot;'
+
+            if not tag.has_attr('filepath-with-value'):
+                tag.decompose()
+
+        for tag in soup.find_all('oppia-noninteractive-skillreview'):
+
+            if not tag.has_attr('text-with-value'):
+                tag.decompose()
+
+            else:
+                if tag['text-with-value'] is None:
+                    tag.decompose()
+
+                if (
+                    tag['text-with-value'].strip() in
+                    ('&quot;&quot;', '', '\'\'', '\"\"')
+                ):
+                    tag.decompose()
+
+            if not tag.has_attr('skill_id-with-value'):
+                tag.decompose()
+
+            else:
+                if tag['skill_id-with-value'] is None:
+                    tag.decompose()
+
+                if (
+                    tag['skill_id-with-value'].strip() in
+                    ('&quot;&quot;', '', '\'\'', '\"\"')
+                ):
+                    tag.decompose()
+
+        for tag in soup.find_all('oppia-noninteractive-video'):
+            if not tag.has_attr('start-with-value'):
+                tag['start-with-value'] = '0'
+            else:
+                if (
+                    tag['start-with-value'].strip() in
+                    ('&quot;&quot;', '', '\'\'', '\"\"')
+                ):
+                    tag['start-with-value'] = '0'
+
+            if not tag.has_attr('end-with-value'):
+                tag['end-with-value'] = '0'
+            else:
+                if (
+                    tag['end-with-value'].strip() in
+                    ('&quot;&quot;', '', '\'\'', '\"\"')
+                ):
+                    tag['end-with-value'] = '0'
+
+            if not tag.has_attr('autoplay-with-value'):
+                tag['autoplay-with-value'] = 'false'
+            else:
+                if (
+                    tag['autoplay-with-value'].strip() not in
+                    (
+                        'true', 'false', '\'true\'', '\'false\'',
+                        '\"true\"', '\"false\"'
+                    )
+                ):
+                    tag['autoplay-with-value'] = 'false'
+
+            if not tag.has_attr('video_id-with-value'):
+                tag.decompose()
+            else:
+                if tag['video_id-with-value'] is None:
+                    tag.decompose()
+                elif (
+                    tag['video_id-with-value'].strip() in
+                    ('&quot;&quot;', '', '\'\'', '\"\"')
+                ):
+                    tag.decompose()
+
+        for tag in soup.find_all('oppia-noninteractive-link'):
+            if (
+                not tag.has_attr('text-with-value') or
+                not tag.has_attr('url-with-value')
+            ):
+                tag.decompose()
+
+            else:
+                empty_values = ['&quot;&quot;', '', '\'\'', '\"\"']
+                if (
+                    tag['text-with-value'].strip() in empty_values or
+                    tag['url-with-value'] in empty_values
+                ):
+                    tag.decompose()
+
+        for tag in soup.find_all('oppia-noninteractive-math'):
+            if not tag.has_attr('math_content-with-value'):
+                tag.decompose()
+            else:
+                math_content_json = html_validation_service.unescape_html(
+                    tag['math_content-with-value'])
+                math_content_list = json.loads(math_content_json)
+
+                if 'raw_latex' not in math_content_list:
+                    tag.decompose()
+                elif math_content_list['raw_latex'] is None:
+                    tag.decompose()
+                elif (
+                    math_content_list['raw_latex'].strip()
+                    in ('&quot;&quot;', '', '\'\'', '\"\"')
+                ):
+                    tag.decompose()
+
+        return str(soup).replace('<br/>', '<br>')
+
     @classmethod
     def _update_general_state_rte(
         cls, states_dict: Dict[str, state_domain.StateDict]
@@ -4407,27 +4535,26 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             for tag in soup:
                 if tag.name == 'oppia-noninteractive-image':
-                    if 'alt-with-value' not in tag:
+                    if not tag.has_attr('alt-with-value'):
                         tag['alt-with-value'] = '&quot;&quot;'
 
-                    if 'filepath-with-value' not in tag:
+                    if not tag.has_attr('filepath-with-value'):
                         tag.decompose()
 
                 elif tag.name == 'oppia-noninteractive-math':
-                    if 'math_content-with-value' not in tag:
+                    if not tag.has_attr('math_content-with-value'):
                         tag.decompose()
                     else:
-                        if 'raw_latex' not in tag['math_content-with-value']:
+                        math_content_tag = tag['math_content-with-value']
+                        if not math_content_tag.has_attr('raw_latex'):
                             tag.decompose()
-                        elif tag['math_content-with-value'][
-                            'raw_latex'] is None:
+                        elif math_content_tag['raw_latex'] is None:
                             tag.decompose()
-                        elif tag['math_content-with-value'][
-                            'raw_latex'].strip() == '':
+                        elif math_content_tag['raw_latex'].strip() == '':
                             tag.decompose()
 
                 elif tag.name == 'oppia-noninteractive-skillreview':
-                    if 'text-with-value' not in tag:
+                    if not tag.has_attr('text-with-value'):
                         tag.decompose()
                     elif tag['text-with-value'] is None:
                         tag.decompose()
@@ -4435,21 +4562,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         tag.decompose()
 
                 elif tag.name == 'oppia-noninteractive-video':
-                    if 'start-with-value' not in tag:
+                    if not tag.has_attr('start-with-value'):
                         tag['start-with-value'] = '0'
 
-                    if 'end-with-value' not in tag:
+                    if not tag.has_attr('end-with-value'):
                         tag['end-with-value'] = '0'
 
-                    if 'autoplay-with-value' not in tag:
+                    if not tag.has_attr('autoplay-with-value'):
                         tag['autoplay-with-value'] = 'false'
 
-                    if 'autoplay-with-value' in tag:
+                    if not tag.has_attr('autoplay-with-value'):
                         if tag['autoplay-with-value'].strip() not in (
                             'true', 'false'):
                             tag['autoplay-with-value'] = 'false'
 
-                    if 'video_id-with-value' not in tag:
+                    if not tag.has_attr('video_id-with-value'):
                         tag.decompose()
 
                     else:
@@ -4460,17 +4587,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 elif tag.name == 'oppia-noninteractive-link':
                     if (
-                        'text-with-value' not in tag or
-                        'url-with-value' not in tag
+                        not tag.has_attr('text-with-value') or
+                        not tag.has_attr('url-with-value')
                     ):
                         tag.decompose()
 
                     elif tag['text-with-value'].strip() == '':
                         tag.decompose()
 
-            html_ele_list = soup.prettify().split('\n')
-            html_ele_list = [ele.strip() for ele in html_ele_list]
-            state['content']['html'] = ','.join(html_ele_list).replace(',', '')
+            state['content']['html'] = str(soup)
 
         return states_dict
 
