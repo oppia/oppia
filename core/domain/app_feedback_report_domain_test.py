@@ -1008,9 +1008,6 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             self.entry_point,
             'Exploration id should be a string')
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
     def test_validation_story_id_fails_on_none_value(self) -> None:
         self.entry_point.topic_id = 'valid_topic1'
         self.entry_point.story_id = None

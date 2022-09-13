@@ -2446,7 +2446,8 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         )
         message1 = testutils.Message(
             msg_id='redundant-type-comment',
-            line=7
+            line=7,
+            node=node_function_with_extra_comment
         )
         message2 = testutils.Message(
             msg_id='redundant-type-comment',
@@ -2487,7 +2488,8 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         )
         message = testutils.Message(
             msg_id='redundant-type-comment',
-            line=7
+            line=7,
+            node=node_function_with_extra_comment2
         )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
