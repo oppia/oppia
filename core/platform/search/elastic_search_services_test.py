@@ -144,47 +144,16 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         result, new_offset = (
             elastic_search_services.search(
                 '', correct_index_name, [], [], offset=0,
-                size=50, ids_only=True))
+                size=50
+            )
+        )
         self.assertEqual(result, [1, 12])
-        self.assertIsNone(new_offset)
-
-    def test_search_returns_full_response(self) -> None:
-        correct_index_name = 'index1'
-        elastic_search_services.add_documents_to_index([{
-            'id': 1,
-            'source': {
-                'param1': 1,
-                'param2': 2
-            }
-        }, {
-            'id': 12,
-            'source': {
-                'param1': 3,
-                'param2': 4
-            }
-        }], correct_index_name)
-
-        result, new_offset = elastic_search_services.search(
-            '', correct_index_name, [], [], offset=0, size=50, ids_only=False)
-        self.assertEqual(result, [{
-            'id': 1,
-            'source': {
-                'param1': 1,
-                'param2': 2
-            }
-        }, {
-            'id': 12,
-            'source': {
-                'param1': 3,
-                'param2': 4
-            }
-        }])
         self.assertIsNone(new_offset)
 
     def test_search_returns_none_when_response_is_empty(self) -> None:
         result, new_offset = elastic_search_services.search(
-            '', 'index', [], [], offset=0,
-            size=50, ids_only=False)
+            '', 'index', [], [], offset=0, size=50
+        )
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
 
@@ -313,21 +282,15 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             'title': 'hello me'
         }], 'index')
         results, new_offset = elastic_search_services.search(
-            'hello', 'index', [], [], offset=None, size=1, ids_only=False
+            'hello', 'index', [], [], offset=None, size=1
         )
         self.assertEqual(len(results), 1)
-        # Letting mypy know that results[0] is a dict.
-        assert isinstance(results[0], dict)
-        self.assertEqual(results[0]['id'], 'doc_id1')
         self.assertEqual(new_offset, 1)
 
         results, new_offset = elastic_search_services.search(
-            'hello', 'index', [], [], offset=1, size=1, ids_only=False
+            'hello', 'index', [], [], offset=1, size=1
         )
         self.assertEqual(len(results), 1)
-        # Letting mypy know that results[0] is a dict.
-        assert isinstance(results[0], dict)
-        self.assertEqual(results[0]['id'], 'doc_id2')
         self.assertIsNone(new_offset)
 
     def test_search_returns_without_error_when_index_does_not_exist(
@@ -356,50 +319,18 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         result, new_offset = (
             elastic_search_services.blog_post_summaries_search(
-                '', [], offset=0, size=50, ids_only=True
+                '', [], offset=0, size=50
             )
         )
         self.assertEqual(result, [1, 12])
-        self.assertIsNone(new_offset)
-
-    def test_blog_post_summaries_search_returns_full_response(self) -> None:
-        correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
-        elastic_search_services.add_documents_to_index([{
-            'id': 1,
-            'source': {
-                'param1': 1,
-                'param2': 2
-            }
-        }, {
-            'id': 12,
-            'source': {
-                'param1': 3,
-                'param2': 4
-            }
-        }], correct_index_name)
-
-        result, new_offset = elastic_search_services.blog_post_summaries_search(
-            '', [], offset=0, size=50, ids_only=False)
-        self.assertEqual(result, [{
-            'id': 1,
-            'source': {
-                'param1': 1,
-                'param2': 2
-            }
-        }, {
-            'id': 12,
-            'source': {
-                'param1': 3,
-                'param2': 4
-            }
-        }])
         self.assertIsNone(new_offset)
 
     def test_blog_post_summaries_search_returns_none_when_response_is_empty(
         self
     ) -> None:
         result, new_offset = elastic_search_services.blog_post_summaries_search(
-            '', [], offset=0, size=50, ids_only=False)
+            '', [], offset=0, size=50
+        )
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
 
@@ -520,38 +451,6 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 )
             )
         self.assertEqual(result, [])
-        self.assertIsNone(new_offset)
-
-    def test_blog_post_search_returns_the_right_num_of_docs_even_if_more_exist(
-        self
-    ) -> None:
-        elastic_search_services.add_documents_to_index([{
-            'id': 'doc_id1',
-            'title': 'blog post world'
-        }, {
-            'id': 'doc_id2',
-            'title': 'hello blog'
-        }], search_services.SEARCH_INDEX_BLOG_POSTS)
-        results, new_offset = (
-            elastic_search_services.blog_post_summaries_search(
-                'blog', [], offset=None, size=1, ids_only=False
-            )
-        )
-        self.assertEqual(len(results), 1)
-        # Letting mypy know that results[0] is a dict.
-        assert isinstance(results[0], dict)
-        self.assertEqual(results[0]['id'], 'doc_id1')
-        self.assertEqual(new_offset, 1)
-
-        results, new_offset = (
-            elastic_search_services.blog_post_summaries_search(
-                'blog', [], offset=1, size=1, ids_only=False
-            )
-        )
-        self.assertEqual(len(results), 1)
-        # Letting mypy know that results[0] is a dict.
-        assert isinstance(results[0], dict)
-        self.assertEqual(results[0]['id'], 'doc_id2')
         self.assertIsNone(new_offset)
 
     def test_blog_post_search_returns_without_error_when_index_does_not_exist(

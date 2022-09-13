@@ -254,8 +254,7 @@ def search_explorations(
     result_ids, result_offset = platform_search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS,
         categories, language_codes,
-        offset=offset, size=size,
-        ids_only=True
+        offset=offset, size=size
     )
     return result_ids, result_offset
 
@@ -313,8 +312,7 @@ def search_collections(
     result_ids, result_offset = platform_search_services.search(
         query, SEARCH_INDEX_COLLECTIONS,
         categories, language_codes,
-        offset=offset, size=size,
-        ids_only=True
+        offset=offset, size=size
     )
     return result_ids, result_offset
 
@@ -428,8 +426,7 @@ def search_blog_post_summaries(
             query,
             tags,
             offset=offset,
-            size=size,
-            ids_only=True
+            size=size
         )
     )
     return result_ids, result_offset
