@@ -22,13 +22,9 @@ import datetime
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import improvements_domain
-from core.domain import user_services
-from core.platform import models
 from core.tests import test_utils
-
-(improvements_models,) = (
-    models.Registry.import_models([models.NAMES.improvements]))
 
 
 class TaskEntryTests(test_utils.GenericTestBase):
@@ -36,43 +32,45 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
     MOCK_DATE = datetime.datetime(2020, 6, 15, 9, 0, 0, 123456)
 
-    def setUp(self):
-        super(TaskEntryTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'eid'
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
-        self.maxDiff = None
+        self.maxDiff = 0
 
-    def test_task_id_has_expected_value(self):
+    def test_task_id_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
         self.assertEqual(
             task_entry.task_id,
             'exploration.eid.1.high_bounce_rate.state.Introduction')
 
-    def test_composite_entity_id_has_expected_value(self):
+    def test_composite_entity_id_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
         self.assertEqual(task_entry.composite_entity_id, 'exploration.eid.1')
 
-    def test_to_dict_has_expected_value(self):
+    def test_to_dict_has_expected_value(self) -> None:
+        # Data url for images/avatar/user_blue_72px.png.
+        # Generated using utils.convert_png_to_data_url.
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
         self.assertEqual(task_entry.to_dict(), {
             'entity_type': 'exploration',
@@ -83,31 +81,18 @@ class TaskEntryTests(test_utils.GenericTestBase):
             'target_id': 'Introduction',
             'issue_description': 'issue description',
             'status': 'resolved',
-            'resolver_username': self.OWNER_USERNAME,
-            'resolver_profile_picture_data_url': (
-                user_services.DEFAULT_IDENTICON_DATA_URL),
+            'resolver_username': None,
+            'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 
-    def test_to_dict_with_non_existing_resolver_id_raises_exception(self):
-        invalid_resolver_id = 'non_existing_user_id'
+    def test_can_create_open_task_with_corresponding_values(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_RESOLVED, invalid_resolver_id,
-            self.MOCK_DATE)
-        with self.assertRaisesRegexp(Exception, 'User not found'):
-            task_entry.to_dict()
-
-    def test_can_create_open_task_with_corresponding_values(self):
-        task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_OPEN, None, None)
+            constants.TASK_STATUS_OPEN, None, None)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)
@@ -120,13 +105,13 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_can_create_obsolete_task_with_corresponding_values(self):
+    def test_can_create_obsolete_task_with_corresponding_values(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_OBSOLETE, None, None)
+            constants.TASK_STATUS_OBSOLETE, None, None)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)
@@ -139,13 +124,13 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_can_create_resolved_task_with_corresponding_value(self):
+    def test_can_create_resolved_task_with_corresponding_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_RESOLVED, self.owner_id,
+            constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
@@ -159,13 +144,15 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertEqual(task_entry.resolver_id, self.owner_id)
         self.assertEqual(task_entry.resolved_on, self.MOCK_DATE)
 
-    def test_constructor_ignores_resolution_args_when_task_is_open(self):
+    def test_constructor_ignores_resolution_args_when_task_is_open(
+        self
+    ) -> None:
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_OPEN, self.owner_id, self.MOCK_DATE)
+            constants.TASK_STATUS_OPEN, self.owner_id, self.MOCK_DATE)
 
         self.assertEqual(task_entry.entity_type, 'exploration')
         self.assertEqual(task_entry.entity_id, self.exp_id)
@@ -178,13 +165,15 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.assertIsNone(task_entry.resolver_id)
         self.assertIsNone(task_entry.resolved_on)
 
-    def test_constructor_ignores_resolution_args_when_task_is_obsolete(self):
+    def test_constructor_ignores_resolution_args_when_task_is_obsolete(
+        self
+    ) -> None:
         task_entry = improvements_domain.TaskEntry(
-            improvements_models.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
-            improvements_models.TASK_TYPE_HIGH_BOUNCE_RATE,
-            improvements_models.TASK_TARGET_TYPE_STATE,
+            constants.TASK_ENTITY_TYPE_EXPLORATION, self.exp_id, 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
-            improvements_models.TASK_STATUS_OBSOLETE, self.owner_id,
+            constants.TASK_STATUS_OBSOLETE, self.owner_id,
             self.MOCK_DATE)
 
         self.assertEqual(task_entry.entity_type, 'exploration')

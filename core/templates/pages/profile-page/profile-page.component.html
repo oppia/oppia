@@ -7,22 +7,22 @@
           <h1>{{ profileIsOfCurrentUsers }}</h1>
           <a *ngIf="profileIsOfCurrentUser"
              href="/preferences"
-             [routerLink]="preferencesUrl"
+             [smartRouterLink]="preferencesUrl"
              class="oppia-profile-preferences">
             <div class="oppia-profile-picture-mask">
               <div class="oppia-profile-picture-edit-prompt">
                Edit avatar
-                <i class="material-icons md-18" title="Edit Profile Picture">&#xE254;</i>
+                <i class="fas fa-pen" title="Edit Profile Picture"></i>
               </div>
             </div>
           </a>
           <img *ngIf="profileIsOfCurrentUser"
                [src]="profilePictureDataUrl"
-               class="oppia-profile-picture-fullsize protractor-test-profile-current-user-photo"
+               class="oppia-profile-picture-fullsize e2e-test-profile-current-user-photo"
                alt="">
           <img *ngIf="!profileIsOfCurrentUser"
                [src]="profilePictureDataUrl"
-               class="oppia-profile-picture-fullsize protractor-test-profile-other-user-photo"
+               class="oppia-profile-picture-fullsize e2e-test-profile-other-user-photo"
                alt="">
         </div>
       </div>
@@ -55,7 +55,7 @@
         <div placement="right"
              [ngbPopover]="stat.helpText"
              triggers="mouseenter:mouseleave">
-          <span class="oppia-stats-value-text protractor-test-profile-{{ stat.title | lowercase }}-stat">
+          <span class="oppia-stats-value-text e2e-test-profile-{{ stat.title | lowercase }}-stat">
             <strong>{{ stat.value || 0 }}</strong>
           </span>
           <span>{{ stat.title }}</span>
@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <p class="oppia-profile-user-bio protractor-test-profile-bio">
+    <p class="oppia-profile-user-bio e2e-test-profile-bio">
       <span *ngIf="userBio" class="oppia-user-bio-text">{{ userBio }}</span>
       <span *ngIf="!userBio">
         <em>This user has not supplied a bio yet.</em>
@@ -72,15 +72,15 @@
 
     <p class="oppia-profile-subject-interest-container">
       Interests:
-      <span *ngIf="subjectInterests.length > 0"><br>
+      <span class="oppia-profile-subject-interest-blocks" *ngIf="subjectInterests.length > 0">
         <span *ngFor="let interest of subjectInterests; index as index">
-          <span class="oppia-profile-subject-interest protractor-test-profile-interest">
+          <span class="oppia-profile-subject-interest e2e-test-profile-interest">
             {{ interest }}
           </span>
         </span>
       </span>
       <span *ngIf="subjectInterests.length === 0"
-            class="oppia-profile-no-interests-text protractor-test-profile-no-interest">
+            class="oppia-profile-no-interests-text e2e-test-profile-no-interest">
         <em>none specified</em>
       </span>
     </p>
@@ -99,15 +99,15 @@
     <hr class="oppia-profile-stat-container-line-small-screen">
 
     <div *ngIf="!isUserVisitingOwnProfile" class="oppia-align-center">
-      <button class="btn oppia-subscription-button oppia-transition-200 protractor-test-subscription-button"
+      <button class="btn oppia-subscription-button oppia-transition-200 e2e-test-subscription-button"
               (click)="changeSubscriptionStatus()"
               placement="right"
               [ngbPopover]="subscriptionButtonPopoverText"
               triggers="mouseenter:mouseleave">
-        <span class="protractor-test-subscribe-label" *ngIf="!isAlreadySubscribed">
+        <span class="e2e-test-subscribe-label" *ngIf="!isAlreadySubscribed">
            {{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}
         </span>
-        <span class="protractor-test-unsubscribe-label" *ngIf="isAlreadySubscribed">
+        <span class="e2e-test-unsubscribe-label" *ngIf="isAlreadySubscribed">
            {{ 'I18N_UNSUBSCRIBE_BUTTON_TEXT' | translate }}
         </span>
       </button>
@@ -138,35 +138,18 @@
       </mat-card-content>
 
       <span class="oppia-profile-portfolio-pages" *ngIf="numUserPortfolioExplorations > 6">
-        <button class="material-icons md-18 oppia-navigation-button"
+        <button class="fas fa-arrow-left oppia-navigation-button"
                 [disabled]="startingExplorationNumber === 1"
                 (click)="goToPreviousPage()"
                 [ngClass]="{'oppia-navigation-mouse-pointer': startingExplorationNumber !== 1}">
-          &#xE5C4;
         </button>
         Showing {{ startingExplorationNumber }} - {{ endingExplorationNumber }} of {{ numUserPortfolioExplorations }}
-        <button class="material-icons md-18 oppia-navigation-button"
+        <button class="fas fa-arrow-right oppia-navigation-button"
                 [disabled]="endingExplorationNumber >= numUserPortfolioExplorations"
                 (click)="goToNextPage()"
                 [ngClass]="{'oppia-navigation-mouse-pointer': endingExplorationNumber < numUserPortfolioExplorations}">
-          &#xE5C8;
         </button>
       </span>
     </div>
   </mat-card>
 </div>
-
-<style>
-  .oppia-profile-container .oppia-profile-portfolio-pages .oppia-navigation-mouse-pointer:hover {
-    background-color: #808080;
-    border-radius: 50%;
-    color: #FFF;
-    cursor: pointer;
-  }
-  .oppia-profile-container .oppia-stats-value-text {
-    font-size: 16px;
-  }
-  .oppia-profile-container .oppia-user-bio-text {
-    white-space: pre-wrap;
-  }
-</style>

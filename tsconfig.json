@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "skipLibCheck": true,
     "downlevelIteration": true,
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "dom", "webworker"],
     "module": "es2020",
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js_for_test",
@@ -22,6 +23,7 @@
       "google-analytics.initializer": ["core/templates/google-analytics.initializer"],
       "hybrid-router-module-provider": ["core/templates/hybrid-router-module-provider"],
       "app-events/*": ["core/templates/app-events/*"],
+      "base-components/*": ["core/templates/base-components/*"],
       "components/*": ["core/templates/components/*"],
       "directives/*": ["core/templates/directives/*"],
       "domain/*": ["core/templates/domain/*"],
@@ -36,7 +38,8 @@
       "objects/*": ["extensions/objects/*"],
       "filters/*": ["core/templates/filters/*"],
       "static/*": ["third_party/static/*"],
-      "tests/*": ["core/templates/tests/*"]
+      "tests/*": ["core/templates/tests/*"],
+      "utility/*": ["core/templates/utility/*"]
     }
   },
   "files": [

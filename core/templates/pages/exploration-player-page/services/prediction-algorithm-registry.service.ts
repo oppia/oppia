@@ -19,16 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { TextInputPredictionService } from
-  'interactions/TextInput/text-input-prediction.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-
-interface PredictionService {
-  predict: (classifierData: ArrayBuffer, answer: InteractionAnswer) => number;
-}
+import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 
 type AlgorithmIdPredictionServiceMap = (
-  Map<string, Map<number, PredictionService>>);
+  Map<string, Map<number, TextInputPredictionService>>);
 
 @Injectable({providedIn: 'root'})
 export class PredictionAlgorithmRegistryService {
@@ -45,7 +39,7 @@ export class PredictionAlgorithmRegistryService {
 
   getPredictionService(
       algorithmId: string, dataSchemaVersion: number):
-     PredictionService | null {
+    TextInputPredictionService | null {
     const predictionServicesByAlgorithmId = (
       this.algorithmIdPredictionServiceMapping.get(algorithmId));
     if (predictionServicesByAlgorithmId) {
@@ -60,7 +54,7 @@ export class PredictionAlgorithmRegistryService {
 
   testOnlySetPredictionService(
       algorithmId: string, dataSchemaVersion: number,
-      service: PredictionService): void {
+      service: TextInputPredictionService): void {
     if (!this.algorithmIdPredictionServiceMapping.get(algorithmId)) {
       this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
     }

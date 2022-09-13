@@ -18,6 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
@@ -35,6 +36,7 @@ describe('topicEditorNavbar', () => {
   let topic = null;
   let UndoRedoService = null;
   let AlertsService = null;
+  let ngbModal: NgbModal = null;
   let TopicEditorRoutingService = null;
   let TopicRightsBackendApiService = null;
   let topicInitializedEventEmitter = new EventEmitter();
@@ -42,7 +44,16 @@ describe('topicEditorNavbar', () => {
   let undoRedoChangeAppliedEventEmitter = new EventEmitter();
 
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     let mockWindow = {
       location: '',
@@ -53,6 +64,7 @@ describe('topicEditorNavbar', () => {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
+    ngbModal = $injector.get('NgbModal');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     UrlService = $injector.get('UrlService');
@@ -62,6 +74,7 @@ describe('topicEditorNavbar', () => {
     TopicRightsBackendApiService =
       $injector.get('TopicRightsBackendApiService');
     $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._skillIds = ['skill_1'];
@@ -71,6 +84,7 @@ describe('topicEditorNavbar', () => {
     topic = TopicObjectFactory.createInterstitialTopic();
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
+    topic._skillSummariesForDiagnosticTest = [skillSummary];
 
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -326,9 +340,11 @@ describe('topicEditorNavbar', () => {
   ' clicks the \'publish\' button and then cancels', fakeAsync(() => {
     spyOn(TopicRightsBackendApiService, 'sendMailAsync').and.returnValue(
       Promise.resolve());
-    spyOn($uibModal, 'open').and.returnValue({
-      result: Promise.reject()
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.reject()
+      } as NgbModalRef
+    );
     spyOn(AlertsService, 'addSuccessMessage');
     $scope.topicRights = TopicRights.createFromBackendDict({
       published: false,
@@ -435,26 +451,24 @@ describe('topicEditorNavbar', () => {
   });
 
   it('should save topic when user saves topic changes', fakeAsync(() => {
+    const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve('commitMessage')
+      } as NgbModalRef);
+    });
     TopicEditorStateService.setTopic(topic);
     $scope.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    const modalspy = spyOn($uibModal, 'open').and.callFake(
-      (obj) => {
-        obj.resolve.topicIsPublished();
-        return {
-          result: Promise.resolve('commitMessage')
-        };
-      });
     spyOn(AlertsService, 'addSuccessMessage');
     spyOn(TopicEditorStateService, 'saveTopic').and.callFake(
       (msg, callback) => {
         callback();
         expect(msg).toBe('commitMessage');
       });
-
     $scope.saveChanges();
     tick();
 
@@ -464,21 +478,19 @@ describe('topicEditorNavbar', () => {
   }));
 
   it('should close save topic modal when user clicks cancel', fakeAsync(() => {
+    const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.reject()
+      } as NgbModalRef);
+    });
     TopicEditorStateService.setTopic(topic);
     $scope.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true
     });
-    const modalspy = spyOn($uibModal, 'open').and.callFake(
-      (obj) => {
-        obj.resolve.topicIsPublished();
-        return {
-          result: Promise.reject()
-        };
-      });
     spyOn(AlertsService, 'addSuccessMessage');
-
     $scope.saveChanges();
     tick();
 

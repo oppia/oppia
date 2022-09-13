@@ -22,8 +22,10 @@ from core.constants import constants
 from core.domain import classroom_domain
 from core.domain import config_domain
 
+from typing import Optional
 
-def get_classroom_url_fragment_for_topic_id(topic_id):
+
+def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     """Returns the classroom url fragment for the provided topic id.
 
     Args:
@@ -34,11 +36,18 @@ def get_classroom_url_fragment_for_topic_id(topic_id):
     """
     for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
         if topic_id in classroom_dict['topic_ids']:
-            return classroom_dict['url_fragment']
-    return constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS
+            # As config_property in config domain is set to Any, we need type
+            # casting to return a string value.
+            return str(classroom_dict['url_fragment'])
+        # As it is described in 'core/constants/parse_json_from_ts', we are
+        # casting the type to change it from Any to string to return
+        # string type value.
+    return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
 
-def get_classroom_by_url_fragment(classroom_url_fragment):
+def get_classroom_by_url_fragment(
+    classroom_url_fragment: str
+) -> Optional[classroom_domain.Classroom]:
     """Returns the classroom domain object for the provided classroom url
     fragment.
 

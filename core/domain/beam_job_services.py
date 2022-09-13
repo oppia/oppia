@@ -32,7 +32,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import beam_job_models
     from mypy_imports import datastore_services
 
-(beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
+(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -51,6 +51,9 @@ def run_beam_job(
 
     Returns:
         BeamJobRun. Metadata about the run's execution.
+
+    Raises:
+        ValueError. Both name and class of the job are not specified.
     """
     if job_class is None and job_name is None:
         raise ValueError('Must specify the job class or name to run')
@@ -73,6 +76,9 @@ def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
 
     Returns:
         BeamJobRun. Metadata about the updated run's execution.
+
+    Raises:
+        ValueError. Job does not exist.
     """
     beam_job_run_model = (
         beam_job_models.BeamJobRunModel.get(job_id, strict=False))
@@ -80,12 +86,11 @@ def cancel_beam_job(job_id: str) -> beam_job_domain.BeamJobRun:
     if beam_job_run_model is None:
         raise ValueError('No such job with id="%s"' % job_id)
 
-    elif beam_job_run_model.dataflow_job_id is None:
+    if beam_job_run_model.dataflow_job_id is None:
         raise ValueError('Job with id="%s" cannot be cancelled' % job_id)
 
-    else:
-        jobs_manager.cancel_job(beam_job_run_model)
-        return get_beam_job_run_from_model(beam_job_run_model)
+    jobs_manager.cancel_job(beam_job_run_model)
+    return get_beam_job_run_from_model(beam_job_run_model)
 
 
 def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
@@ -95,6 +100,22 @@ def get_beam_jobs() -> List[beam_job_domain.BeamJob]:
         list(BeamJob). The list of registered Apache Beam jobs.
     """
     return [beam_job_domain.BeamJob(j) for j in jobs_registry.get_all_jobs()]
+
+
+def is_state_terminal(job_state: str) -> bool:
+    """Returns whether the job state is a terminal state, meaning
+    that the job is longer executing.
+
+    Returns:
+        bool. Whether the state is a terminal state.
+    """
+    return job_state in (
+        beam_job_models.BeamJobState.CANCELLED.value,
+        beam_job_models.BeamJobState.DRAINED.value,
+        beam_job_models.BeamJobState.UPDATED.value,
+        beam_job_models.BeamJobState.DONE.value,
+        beam_job_models.BeamJobState.FAILED.value,
+    )
 
 
 def get_beam_job_runs(
@@ -117,7 +138,7 @@ def get_beam_job_runs(
         updated_beam_job_run_models = []
 
         for i, beam_job_run_model in enumerate(beam_job_run_models):
-            if beam_job_runs[i].in_terminal_state:
+            if is_state_terminal(beam_job_runs[i].job_state):
                 continue
             jobs_manager.refresh_state_of_beam_job_run_model(beam_job_run_model)
             beam_job_run_model.update_timestamps(update_last_updated_time=False)

@@ -29,13 +29,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 export class RatioExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: number[];
   @Output() valueChanged = new EventEmitter();
   localValue!: { label: string };
-  warningText: string = '';
+  warningTextI18nKey: string = '';
   eventBusGroup: EventBusGroup;
 
   constructor(private eventBusService: EventBusService) {
@@ -56,7 +56,7 @@ export class RatioExpressionEditorComponent implements OnInit {
     try {
       this.value = Ratio.fromRawInputString(value).components;
       this.valueChanged.emit(this.value);
-      this.warningText = '';
+      this.warningTextI18nKey = '';
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         modalId: this.modalId,
         value: false
@@ -64,7 +64,7 @@ export class RatioExpressionEditorComponent implements OnInit {
       return true;
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
-        this.warningText = parsingError.message;
+        this.warningTextI18nKey = parsingError.message;
       }
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         modalId: this.modalId,

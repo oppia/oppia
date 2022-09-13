@@ -22,13 +22,12 @@ import copy
 import datetime
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -269,15 +268,30 @@ class CollectionModel(base_models.VersionedModel):
             **CollectionModel.convert_to_valid_dict(snapshot_dict))
         return self
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+    # We expect Mapping because we want to allow models that inherit
+    # from BaseModel as the values, if we used Dict this wouldn't be allowed.
+    def _prepare_additional_models(self) -> Mapping[str, base_models.BaseModel]:
+        """Prepares additional models needed for the commit process.
+
+        Returns:
+            dict(str, BaseModel). Additional models needed for
+            the commit process. Contains the CollectionRightsModel.
+        """
+        return {
+            'rights_model': CollectionRightsModel.get_by_id(self.id)
+        }
+
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -287,37 +301,61 @@ class CollectionModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit message or None if unpublished
+                collection is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
         """
-        super(CollectionModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
-        collection_rights = CollectionRightsModel.get_by_id(self.id)
-
+        # The cast is needed because the additional_models is list of BaseModels
+        # and we want to hint the mypy that this is CollectionRightsModel.
+        collection_rights_model = cast(
+            CollectionRightsModel, additional_models['rights_model']
+        )
         collection_commit_log = CollectionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
-            commit_cmds, collection_rights.status,
-            collection_rights.community_owned
+            self.id,
+            self.version,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            collection_rights_model.status,
+            collection_rights_model.community_owned
         )
         collection_commit_log.collection_id = self.id
-        collection_commit_log.update_timestamps()
-        collection_commit_log.put()
+        return {
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
+            'commit_log_model': collection_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
+        }
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def delete_multi( # type: ignore[override]
-            cls,
-            entity_ids: List[str],
-            committer_id: str,
-            commit_message: str,
-            force_deletion: bool = False
+        cls,
+        entity_ids: List[str],
+        committer_id: str,
+        commit_message: str,
+        force_deletion: bool = False
     ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 
@@ -340,14 +378,14 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights_models = CollectionRightsModel.get_multi(
                 entity_ids, include_deleted=True)
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
-            for model, rights_model in python_utils.ZIP(
-                    versioned_models, collection_rights_models):
+            for model, rights_model in zip(
+                versioned_models, collection_rights_models):
                 # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
                 assert rights_model is not None
                 collection_commit_log = CollectionCommitLogEntryModel.create(
                     model.id, model.version, committer_id,
-                    cls._COMMIT_TYPE_DELETE,
+                    feconf.COMMIT_TYPE_DELETE,
                     commit_message, [{'cmd': cls.CMD_DELETE_COMMIT}],
                     rights_model.status, rights_model.community_owned
                 )
@@ -505,13 +543,11 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def save(
-            self,
-            committer_id: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_message: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -526,7 +562,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and additional arguments for that command.
         """
-        super(CollectionRightsModel, self).commit(
+        super().commit(
             committer_id, commit_message, commit_cmds)
 
     # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
@@ -572,10 +608,12 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): This '_reconstitute' method accepts content NDB JSON
+    # properties and those NDB JSON properties have loose typing. So, once
+    # we explicitly typed those NDB JSON properties we can remove Any type
+    # from the argument of '_reconstitute' method.
     def _reconstitute(
-            self, snapshot_dict: Dict[str, Any]
+        self, snapshot_dict: Dict[str, Any]
     ) -> CollectionRightsModel:
         """Populates the model instance with the snapshot.
 
@@ -596,15 +634,17 @@ class CollectionRightsModel(base_models.VersionedModel):
             **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this overrides the superclass method.
@@ -614,38 +654,29 @@ class CollectionRightsModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit message or None if unpublished
+                collection is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
         """
-        super(CollectionRightsModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
 
-        # Create and delete events will already be recorded in the
-        # CollectionModel.
-        if commit_type not in ['create', 'delete']:
-            CollectionCommitLogEntryModel(
-                id=('rights-%s-%s' % (self.id, self.version)),
-                user_id=committer_id,
-                collection_id=self.id,
-                commit_type=commit_type,
-                commit_message=commit_message,
-                commit_cmds=commit_cmds,
-                version=None,
-                post_commit_status=self.status,
-                post_commit_community_owned=self.community_owned,
-                post_commit_is_private=(
-                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put()
-
-        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
-            self.get_snapshot_id(self.id, self.version))
-        # Ruling out the possibility of None for mypy type checking.
-        assert snapshot_metadata_model is not None
-
+        snapshot_metadata_model = models_to_put['snapshot_metadata_model']
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
             set(self.editor_ids) |
@@ -661,12 +692,40 @@ class CollectionRightsModel(base_models.VersionedModel):
                 if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
-                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+                user_id_name_value = commit_cmd[user_id_attribute_name]
+                # # Ruling out the possibility of any other type for mypy type
+                # checking.
+                assert isinstance(user_id_name_value, str)
+                commit_cmds_user_ids.add(user_id_name_value)
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.update_timestamps()
-        snapshot_metadata_model.put()
+        # Create and delete events will already be recorded in the
+        # CollectionModel.
+        if commit_type not in ['create', 'delete']:
+            collection_commit_log = CollectionCommitLogEntryModel(
+                id=('rights-%s-%s' % (self.id, self.version)),
+                user_id=committer_id,
+                collection_id=self.id,
+                commit_type=commit_type,
+                commit_message=commit_message,
+                commit_cmds=commit_cmds,
+                version=None,
+                post_commit_status=self.status,
+                post_commit_community_owned=self.community_owned,
+                post_commit_is_private=(
+                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
+            )
+            return {
+                'snapshot_metadata_model': (
+                    models_to_put['snapshot_metadata_model']),
+                'snapshot_content_model': (
+                    models_to_put['snapshot_content_model']),
+                'commit_log_model': collection_commit_log,
+                'versioned_model': models_to_put['versioned_model'],
+            }
+
+        return models_to_put
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, List[str]]:

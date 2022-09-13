@@ -12,234 +12,322 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
- * @fileoverview Directives for the outcome editor.
+ * @fileoverview Component for the outcome editor.
  */
 
-require(
-  'components/state-directives/outcome-editor/' +
-  'outcome-destination-editor.component.ts');
-require(
-  'components/state-directives/outcome-editor/' +
-  'outcome-feedback-editor.component.ts');
-require('directives/angular-html-bind.directive.ts');
-
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/external-save.service.ts');
-
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import cloneDeep from 'lodash/cloneDeep';
+import { AppConstants } from 'app.constants';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Subscription } from 'rxjs';
+import { ExternalSaveService } from 'services/external-save.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
-angular.module('oppia').component('outcomeEditor', {
-  bindings: {
-    isEditable: '&isEditable',
-    displayFeedback: '=',
-    getOnSaveDestFn: '&onSaveDest',
-    getOnSaveFeedbackFn: '&onSaveFeedback',
-    getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
-    outcome: '=outcome',
-    areWarningsSuppressed: '&warningsAreSuppressed',
-    addState: '=',
-    showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-  },
-  template: require('./outcome-editor.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    'ExternalSaveService', 'StateEditorService',
-    'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
-    'INTERACTION_SPECS',
-    function(
-        ExternalSaveService, StateEditorService,
-        StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
-        INTERACTION_SPECS) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.isInQuestionMode = function() {
-        return StateEditorService.isInQuestionMode();
-      };
 
-      ctrl.isCorrectnessFeedbackEnabled = function() {
-        return StateEditorService.getCorrectnessFeedbackEnabled();
-      };
+interface AddOutcomeModalResponse {
+  outcome: Outcome;
+}
 
-      // This returns false if the current interaction ID is null.
-      ctrl.isCurrentInteractionLinear = function() {
-        var interactionId = ctrl.getCurrentInteractionId();
-        return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-      };
+@Component({
+  selector: 'oppia-outcome-editor',
+  templateUrl: './outcome-editor.component.html'
+})
+export class OutcomeEditorComponent implements OnInit {
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+  EventEmitter<string[]> = new EventEmitter();
 
-      var onExternalSave = function() {
-        // The reason for this guard is because, when the editor page for an
-        // exploration is first opened, the 'initializeAnswerGroups' event
-        // (which fires an 'externalSave' event) only fires after the
-        // ctrl.savedOutcome is set above. Until then, ctrl.savedOutcome
-        // is undefined.
-        if (ctrl.savedOutcome === undefined) {
-          ctrl.savedOutcome = angular.copy(ctrl.outcome);
-        }
+  @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveDestIfStuck: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
+  @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() areWarningsSuppressed!: boolean;
+  @Input() displayFeedback!: boolean;
+  @Input() isEditable!: boolean;
+  @Input() outcome!: Outcome;
+  @Input() addState!: (value: string) => void;
+  savedOutcome!: Outcome;
+  directiveSubscriptions = new Subscription();
+  ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
+  canAddPrerequisiteSkill: boolean = false;
+  correctnessLabelEditorIsOpen: boolean = false;
+  destinationEditorIsOpen: boolean = false;
+  destinationIfStuckEditorIsOpen: boolean = false;
+  feedbackEditorIsOpen: boolean = false;
+  destIfStuckFeatEnabled: boolean = (
+    AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED);
 
-        if (ctrl.feedbackEditorIsOpen) {
-          if (ctrl.editOutcomeForm.editFeedbackForm.$valid &&
-              !ctrl.invalidStateAfterFeedbackSave()) {
-            ctrl.saveThisFeedback(false);
-          } else {
-            ctrl.cancelThisFeedbackEdit();
-          }
-        }
+  onMobile: boolean = false;
+  resizeSubscription!: Subscription;
+  // The value of this variable should match the breapoint used in
+  // outcome-editor.component.html.
+  mobileBreakpoint: number = 500;
 
-        if (ctrl.destinationEditorIsOpen) {
-          if (ctrl.editOutcomeForm.editDestForm.$valid &&
-              !ctrl.invalidStateAfterDestinationSave()) {
-            ctrl.saveThisDestination();
-          } else {
-            ctrl.cancelThisDestinationEdit();
-          }
-        }
-      };
+  constructor(
+    private externalSaveService: ExternalSaveService,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private ngbModal: NgbModal,
+    private changeDetectorRef: ChangeDetectorRef,
+    private windowDimensionsService: WindowDimensionsService
+  ) {}
 
-      ctrl.isFeedbackLengthExceeded = function() {
-        return (ctrl.outcome.feedback._html.length > 1000);
-      };
+  isInQuestionMode(): boolean {
+    return this.stateEditorService.isInQuestionMode();
+  }
 
-      ctrl.isSelfLoop = function(outcome) {
-        return (
-          outcome &&
-          outcome.dest === StateEditorService.getActiveStateName());
-      };
+  isFeedbackLengthExceeded(): boolean {
+    // TODO(#13764): Edit this check after appropriate limits are found.
+    return (this.outcome.feedback._html.length > 10000);
+  }
 
-      ctrl.getCurrentInteractionId = function() {
-        return StateInteractionIdService.savedMemento;
-      };
+  isCorrectnessFeedbackEnabled(): boolean {
+    return this.stateEditorService.getCorrectnessFeedbackEnabled();
+  }
 
-      ctrl.isSelfLoopWithNoFeedback = function(outcome) {
-        if (outcome && typeof outcome === 'object' &&
-          outcome.constructor.name === 'Outcome') {
-          return ctrl.isSelfLoop(outcome) &&
-            !outcome.hasNonemptyFeedback();
-        }
-        return false;
-      };
+  isCurrentInteractionLinear(): boolean {
+    let interactionId = this.getCurrentInteractionId();
+    return Boolean(interactionId) && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear;
+  }
 
-      ctrl.invalidStateAfterFeedbackSave = function() {
-        var tmpOutcome = angular.copy(ctrl.savedOutcome);
-        tmpOutcome.feedback = angular.copy(ctrl.outcome.feedback);
-        return ctrl.isSelfLoopWithNoFeedback(tmpOutcome);
-      };
-
-      ctrl.invalidStateAfterDestinationSave = function() {
-        var tmpOutcome = angular.copy(ctrl.savedOutcome);
-        tmpOutcome.dest = angular.copy(ctrl.outcome.dest);
-        return ctrl.isSelfLoopWithNoFeedback(tmpOutcome);
-      };
-
-      ctrl.openFeedbackEditor = function() {
-        if (ctrl.isEditable()) {
-          ctrl.feedbackEditorIsOpen = true;
-        }
-      };
-
-      ctrl.openDestinationEditor = function() {
-        if (ctrl.isEditable()) {
-          ctrl.destinationEditorIsOpen = true;
-        }
-      };
-
-      ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
-        ctrl.feedbackEditorIsOpen = false;
-        var contentHasChanged = (
-          ctrl.savedOutcome.feedback.html !==
-          ctrl.outcome.feedback.html);
-        ctrl.savedOutcome.feedback = angular.copy(
-          ctrl.outcome.feedback);
-
-        if (StateEditorService.isInQuestionMode()) {
-          ctrl.savedOutcome.dest = null;
-        } else if (
-          ctrl.savedOutcome.dest === ctrl.outcome.dest &&
-            !StateEditorService.getStateNames().includes(
-              ctrl.outcome.dest)) {
-          // If the stateName has changed and previously saved
-          // destination points to the older name, update it to
-          // the active state name.
-          ctrl.savedOutcome.dest = StateEditorService.getActiveStateName();
-        }
-        if (fromClickSaveFeedbackButton && contentHasChanged) {
-          var contentId = ctrl.savedOutcome.feedback.contentId;
-          ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
-        }
-        ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
-      };
-
-      ctrl.saveThisDestination = function() {
-        StateEditorService.onSaveOutcomeDestDetails.emit();
-        ctrl.destinationEditorIsOpen = false;
-        ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
-        if (!ctrl.isSelfLoop(ctrl.outcome)) {
-          ctrl.outcome.refresherExplorationId = null;
-        }
-        ctrl.savedOutcome.refresherExplorationId = (
-          ctrl.outcome.refresherExplorationId);
-        ctrl.savedOutcome.missingPrerequisiteSkillId =
-          ctrl.outcome.missingPrerequisiteSkillId;
-
-        ctrl.getOnSaveDestFn()(ctrl.savedOutcome);
-      };
-
-      ctrl.onChangeCorrectnessLabel = function() {
-        ctrl.savedOutcome.labelledAsCorrect = (
-          ctrl.outcome.labelledAsCorrect);
-
-        ctrl.getOnSaveCorrectnessLabelFn()(ctrl.savedOutcome);
-      };
-
-      ctrl.cancelThisFeedbackEdit = function() {
-        ctrl.outcome.feedback = angular.copy(
-          ctrl.savedOutcome.feedback);
-        ctrl.feedbackEditorIsOpen = false;
-      };
-
-      ctrl.cancelThisDestinationEdit = function() {
-        ctrl.outcome.dest = angular.copy(ctrl.savedOutcome.dest);
-        ctrl.outcome.refresherExplorationId = (
-          ctrl.savedOutcome.refresherExplorationId);
-        ctrl.outcome.missingPrerequisiteSkillId =
-          ctrl.savedOutcome.missingPrerequisiteSkillId;
-        ctrl.destinationEditorIsOpen = false;
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          ExternalSaveService.onExternalSave.subscribe(
-            () => onExternalSave()
-          )
-        );
-        ctrl.directiveSubscriptions.add(
-          StateInteractionIdService.onInteractionIdChanged.subscribe(
-            () => onExternalSave())
-        );
-        ctrl.editOutcomeForm = {};
-        ctrl.canAddPrerequisiteSkill = (
-          ENABLE_PREREQUISITE_SKILLS &&
-          StateEditorService.isExplorationWhitelisted());
-        ctrl.feedbackEditorIsOpen = false;
-        ctrl.destinationEditorIsOpen = false;
-        ctrl.correctnessLabelEditorIsOpen = false;
-        // TODO(sll): Investigate whether this line can be removed, due to
-        // ctrl.savedOutcome now being set in onExternalSave().
-        ctrl.savedOutcome = angular.copy(ctrl.outcome);
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  onExternalSave(): void {
+    // The reason for this guard is because, when the editor page for an
+    // exploration is first opened, the 'initializeAnswerGroups' event
+    // (which fires an 'externalSave' event) only fires after the
+    // this.savedOutcome is set above. Until then, this.savedOutcome
+    // is undefined.
+    if (this.savedOutcome === undefined) {
+      this.savedOutcome = cloneDeep(this.outcome);
     }
-  ]
-});
+
+    if (this.feedbackEditorIsOpen) {
+      if (!this.invalidStateAfterFeedbackSave()) {
+        this.saveThisFeedback(false);
+      } else {
+        this.cancelThisFeedbackEdit();
+      }
+    }
+
+    if (this.destinationEditorIsOpen) {
+      if (!this.invalidStateAfterDestinationSave()) {
+        this.saveThisDestination();
+      } else {
+        this.cancelThisDestinationEdit();
+      }
+    }
+
+    if (this.destinationIfStuckEditorIsOpen) {
+      this.saveThisIfStuckDestination();
+    }
+  }
+
+  isSelfLoop(outcome: Outcome): boolean {
+    return Boolean (
+      outcome &&
+      outcome.dest === this.stateEditorService.getActiveStateName());
+  }
+
+  isSelfLoopDestStuck(outcome: Outcome): boolean {
+    return Boolean (
+      outcome &&
+      outcome.destIfReallyStuck === (
+        this.stateEditorService.getActiveStateName()));
+  }
+
+  getCurrentInteractionId(): string {
+    return this.stateInteractionIdService.savedMemento;
+  }
+
+  isSelfLoopWithNoFeedback(outcome: Outcome): boolean {
+    return Boolean (
+      this.isSelfLoop(outcome) &&
+      !outcome.hasNonemptyFeedback());
+  }
+
+  invalidStateAfterFeedbackSave(): boolean {
+    let tmpOutcome = cloneDeep(this.savedOutcome);
+    tmpOutcome.feedback = cloneDeep(this.outcome.feedback);
+    return this.isSelfLoopWithNoFeedback(tmpOutcome);
+  }
+
+  invalidStateAfterDestinationSave(): boolean {
+    let tmpOutcome = cloneDeep(this.savedOutcome);
+    tmpOutcome.dest = cloneDeep(this.outcome.dest);
+    return this.isSelfLoopWithNoFeedback(tmpOutcome);
+  }
+
+  openFeedbackEditorModal(): void {
+    if (this.isEditable) {
+      let modalRef = this.ngbModal.open(AddOutcomeModalComponent, {
+        backdrop: 'static',
+      });
+
+      let currentOutcome = cloneDeep(this.outcome);
+      modalRef.componentInstance.outcome = currentOutcome;
+
+      modalRef.result.then((result: AddOutcomeModalResponse): void => {
+        this.outcome = result.outcome;
+        this.saveThisFeedback(true);
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    }
+  }
+
+  openFeedbackEditor(): void {
+    if (this.isEditable) {
+      this.feedbackEditorIsOpen = true;
+    }
+  }
+
+  openDestinationEditor(): void {
+    if (this.isEditable) {
+      this.destinationEditorIsOpen = true;
+    }
+  }
+
+  openDestinationIfStuckEditor(): void {
+    if (this.isEditable) {
+      this.destinationIfStuckEditorIsOpen = true;
+    }
+  }
+
+  saveThisFeedback(fromClickSaveFeedbackButton: boolean): void {
+    this.feedbackEditorIsOpen = false;
+    let contentHasChanged = (
+      this.savedOutcome.feedback.html !==
+      this.outcome.feedback.html);
+    this.savedOutcome.feedback = cloneDeep(
+      this.outcome.feedback);
+
+    if (
+      !this.stateEditorService.isInQuestionMode() &&
+      this.savedOutcome.dest === this.outcome.dest &&
+        !this.stateEditorService.getStateNames().includes(
+          this.outcome.dest)) {
+      // If the stateName has changed and previously saved
+      // destination points to the older name, update it to
+      // the active state name.
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      if (activeStateName === null) {
+        throw new Error(
+          'The active state name is null in the outcome editor.');
+      }
+      this.savedOutcome.dest = activeStateName;
+    }
+    if (fromClickSaveFeedbackButton && contentHasChanged) {
+      let contentId = this.savedOutcome.feedback.contentId;
+      if (contentId === null) {
+        throw new Error(
+          'The content ID is null in the outcome editor.');
+      }
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
+    }
+    this.saveFeedback.emit(this.savedOutcome);
+  }
+
+  saveThisDestination(): void {
+    this.stateEditorService.onSaveOutcomeDestDetails.emit();
+    this.destinationEditorIsOpen = false;
+    this.savedOutcome.dest = cloneDeep(this.outcome.dest);
+    if (!this.isSelfLoop(this.outcome)) {
+      this.outcome.refresherExplorationId = null;
+    } else {
+      if (this.outcome.labelledAsCorrect) {
+        this.outcome.labelledAsCorrect = false;
+        this.onChangeCorrectnessLabel();
+      }
+    }
+    this.savedOutcome.refresherExplorationId = (
+      this.outcome.refresherExplorationId);
+    this.savedOutcome.missingPrerequisiteSkillId =
+      this.outcome.missingPrerequisiteSkillId;
+
+    this.saveDest.emit(this.savedOutcome);
+  }
+
+  saveThisIfStuckDestination(): void {
+    this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
+    this.destinationIfStuckEditorIsOpen = false;
+    this.savedOutcome.destIfReallyStuck = (
+      cloneDeep(this.outcome.destIfReallyStuck));
+    this.saveDestIfStuck.emit(this.savedOutcome);
+  }
+
+  onChangeCorrectnessLabel(): void {
+    this.savedOutcome.labelledAsCorrect = (
+      this.outcome.labelledAsCorrect);
+
+    this.saveCorrectnessLabel.emit(this.savedOutcome);
+  }
+
+  cancelThisFeedbackEdit(): void {
+    this.outcome.feedback = cloneDeep(
+      this.savedOutcome.feedback);
+    this.feedbackEditorIsOpen = false;
+  }
+
+  cancelThisDestinationEdit(): void {
+    this.outcome.dest = cloneDeep(this.savedOutcome.dest);
+    this.outcome.refresherExplorationId = (
+      this.savedOutcome.refresherExplorationId);
+    this.outcome.missingPrerequisiteSkillId =
+      this.savedOutcome.missingPrerequisiteSkillId;
+    this.destinationEditorIsOpen = false;
+  }
+
+  cancelThisIfStuckDestinationEdit(): void {
+    this.outcome.destIfReallyStuck = (
+      cloneDeep(this.savedOutcome.destIfReallyStuck));
+    this.destinationIfStuckEditorIsOpen = false;
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.externalSaveService.onExternalSave.subscribe(
+        () => this.onExternalSave()
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.stateInteractionIdService.onInteractionIdChanged.subscribe(
+        () => this.onExternalSave())
+    );
+    this.canAddPrerequisiteSkill = (
+      this.ENABLE_PREREQUISITE_SKILLS &&
+      this.stateEditorService.isExplorationWhitelisted());
+    this.feedbackEditorIsOpen = false;
+    this.destinationEditorIsOpen = false;
+    this.correctnessLabelEditorIsOpen = false;
+    this.savedOutcome = cloneDeep(this.outcome);
+
+    this.onMobile = (
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.onMobile = (
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaOutcomeEditor',
+downgradeComponent({
+  component: OutcomeEditorComponent
+}) as angular.IDirectiveFactory);

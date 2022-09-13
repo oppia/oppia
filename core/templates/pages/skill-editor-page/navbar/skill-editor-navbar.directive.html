@@ -2,7 +2,7 @@
     ng-if="!isLoadingSkill()">
   <li class="oppia-publish-button-container" ng-if="getActiveTabName() !== 'questions'">
     <div uib-dropdown>
-      <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
+      <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button e2e-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"
               ng-click="saveChanges()"
               ng-disabled="!isSkillSaveable()">
@@ -13,7 +13,7 @@
               &#xE161;
             </i>
             <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
-            <span class="d-none d-md-block float-left oppia-changes-count-text protractor-test-changes-count-text"
+            <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
                   ng-if="getChangeListCount() > 0">
               (<[getChangeListCount()]>)
             </span>
@@ -129,12 +129,12 @@
     }
     skill-editor-navbar .discard-changes-btn {
       background-color: #008098;
-      color: #FFF;
+      color: #fff;
       font-weight: bold;
       width: 100%;
     }
     skill-editor-navbar .publish-skill-btn {
-      background-color: #FFF;
+      background-color: #fff;
       border: 2px solid #008098;
       color: #008098;
       font-weight: bold;
@@ -151,14 +151,14 @@
       width: 45%;
     }
      .skill-nav-skill-nav-dropdown-options {
-      background-color: #FFF;
+      background-color: #fff;
       border: 1px solid #000;
       bottom: 100%;
       position: absolute;
       width: 100%;
     }
      .skill-nav-dropdown-content {
-      background-color: #FFF;
+      background-color: #fff;
       border: 1.5px solid #6d6969;
       border-radius: 5px;
       display: flex;
@@ -168,7 +168,7 @@
 
      .right-container {
       background-color: #419889;
-      color: #FFF;
+      color: #fff;
     }
 
      .skill-nav-dropdown-option {

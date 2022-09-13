@@ -56,7 +56,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 from core.domain import auth_domain
 from core.platform import models
@@ -72,7 +71,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import auth_models
 
 auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+    models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -89,7 +88,7 @@ def establish_firebase_connection() -> None:
         firebase_admin.App. The App being by the Firebase SDK.
 
     Raises:
-        Exception. The Firebase app has a genuine problem.
+        ValueError. The Firebase app has a genuine problem.
     """
     try:
         firebase_admin.get_app()
@@ -409,14 +408,13 @@ def associate_multi_auth_ids_with_user_ids(
         Exception. One or more auth associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
-    auth_ids, user_ids = python_utils.ZIP(*auth_id_user_id_pairs)
+    auth_ids, user_ids = zip(*auth_id_user_id_pairs)
 
     user_id_collisions = get_multi_user_ids_from_auth_ids(auth_ids)
     if any(user_id is not None for user_id in user_id_collisions):
         user_id_collisions_text = ', '.join(
             '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
-            for auth_id, user_id in python_utils.ZIP(
-                auth_ids, user_id_collisions)
+            for auth_id, user_id in zip(auth_ids, user_id_collisions)
             if user_id is not None)
         raise Exception('already associated: %s' % user_id_collisions_text)
 
@@ -424,8 +422,7 @@ def associate_multi_auth_ids_with_user_ids(
     if any(auth_id is not None for auth_id in auth_id_collisions):
         auth_id_collisions_text = ', '.join(
             '{user_id=%r: auth_id=%r}' % (user_id, auth_id)
-            for user_id, auth_id in python_utils.ZIP(
-                user_ids, auth_id_collisions)
+            for user_id, auth_id in zip(user_ids, auth_id_collisions)
             if auth_id is not None)
         raise Exception('already associated: %s' % auth_id_collisions_text)
 
@@ -433,7 +430,7 @@ def associate_multi_auth_ids_with_user_ids(
     # doesn't exist because get_auth_id_from_user_id returned None.
     assoc_by_auth_id_models = [
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
-        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
+        for auth_id, user_id in zip(auth_ids, user_ids)
     ]
     auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(
         assoc_by_auth_id_models)
@@ -447,7 +444,7 @@ def associate_multi_auth_ids_with_user_ids(
     # create a new model rather than update an existing one.
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id)
-        for auth_id, user_id, assoc_by_user_id_model in python_utils.ZIP(
+        for auth_id, user_id, assoc_by_user_id_model in zip(
             auth_ids, user_ids,
             auth_models.UserAuthDetailsModel.get_multi(user_ids))
         if (assoc_by_user_id_model is None or
@@ -464,6 +461,9 @@ def grant_super_admin_privileges(user_id: str) -> None:
 
     Args:
         user_id: str. The Oppia user ID to promote to super admin.
+
+    Raises:
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
@@ -480,6 +480,9 @@ def revoke_super_admin_privileges(user_id: str) -> None:
 
     Args:
         user_id: str. The Oppia user ID to revoke privileges from.
+
+    Raises:
+        ValueError. No Firebase account associated with given user ID.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
@@ -556,12 +559,19 @@ def _get_auth_claims_from_session_cookie(
         return None
     try:
         claims = firebase_auth.verify_session_cookie(cookie, check_revoked=True)
-    except firebase_auth.ExpiredSessionCookieError:
-        raise auth_domain.StaleAuthSessionError('session has expired')
-    except firebase_auth.RevokedSessionCookieError:
-        raise auth_domain.StaleAuthSessionError('session has been revoked')
-    except (firebase_exceptions.FirebaseError, ValueError) as error:
-        raise auth_domain.InvalidAuthSessionError('session invalid: %s' % error)
+    except firebase_auth.ExpiredSessionCookieError as e:
+        raise auth_domain.StaleAuthSessionError(
+            'session has expired') from e
+    except firebase_auth.RevokedSessionCookieError as e:
+        raise auth_domain.StaleAuthSessionError(
+            'session has been revoked') from e
+    except firebase_auth.UserDisabledError as e:
+        raise auth_domain.UserDisabledError(
+            'user is being deleted') from e
+    except (
+        firebase_exceptions.FirebaseError, ValueError) as error:
+        raise auth_domain.InvalidAuthSessionError(
+            'session invalid: %s' % error) from error
     else:
         return _create_auth_claims(claims)
 

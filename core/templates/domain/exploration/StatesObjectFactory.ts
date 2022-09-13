@@ -72,19 +72,23 @@ export class States {
   getStateObjects(): StateObjectsDict {
     return this._states;
   }
+
   addState(newStateName: string): void {
     this._states[newStateName] = this._stateObject.createDefaultState(
       newStateName);
   }
+
   setState(stateName: string, stateData: State): void {
     // We use the copy method defined in the StateObjectFactory to make
     // sure that this._states[stateName] remains a State object as opposed to
     // Object.assign(..) which returns an object with the content of stateData.
     this._states[stateName].copy(stateData);
   }
+
   hasState(stateName: string): boolean {
     return this._states.hasOwnProperty(stateName);
   }
+
   deleteState(deleteStateName: string): void {
     delete this._states[deleteStateName];
     for (let otherStateName in this._states) {
@@ -94,14 +98,21 @@ export class States {
         if (groups[i].outcome.dest === deleteStateName) {
           groups[i].outcome.dest = otherStateName;
         }
+        if (groups[i].outcome.destIfReallyStuck === deleteStateName) {
+          groups[i].outcome.destIfReallyStuck = otherStateName;
+        }
       }
       if (interaction.defaultOutcome) {
         if (interaction.defaultOutcome.dest === deleteStateName) {
           interaction.defaultOutcome.dest = otherStateName;
         }
+        if (interaction.defaultOutcome.destIfReallyStuck === deleteStateName) {
+          interaction.defaultOutcome.destIfReallyStuck = otherStateName;
+        }
       }
     }
   }
+
   renameState(oldStateName: string, newStateName: string): void {
     this._states[newStateName] = this._states[oldStateName];
     this._states[newStateName].setName(newStateName);
@@ -114,17 +125,25 @@ export class States {
         if (groups[i].outcome.dest === oldStateName) {
           groups[i].outcome.dest = newStateName;
         }
+        if (groups[i].outcome.destIfReallyStuck === oldStateName) {
+          groups[i].outcome.destIfReallyStuck = newStateName;
+        }
       }
       if (interaction.defaultOutcome) {
         if (interaction.defaultOutcome.dest === oldStateName) {
           interaction.defaultOutcome.dest = newStateName;
         }
+        if (interaction.defaultOutcome.destIfReallyStuck === oldStateName) {
+          interaction.defaultOutcome.destIfReallyStuck = newStateName;
+        }
       }
     }
   }
+
   getStateNames(): string[] {
     return Object.keys(this._states);
   }
+
   getFinalStateNames(): string[] {
     let finalStateNames = [];
     for (let stateName in this._states) {

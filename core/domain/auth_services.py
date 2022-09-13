@@ -22,12 +22,22 @@ from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-auth_models, = models.Registry.import_models([models.NAMES.auth])
+from typing import List, Optional
+import webapp2
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import auth_models
+    from mypy_imports import platform_auth_services
+
+auth_models, = models.Registry.import_models([models.Names.AUTH])
 
 platform_auth_services = models.Registry.import_auth_services()
 
 
-def create_profile_user_auth_details(user_id, parent_user_id):
+def create_profile_user_auth_details(
+    user_id: str, parent_user_id: str
+) -> auth_domain.UserAuthDetails:
     """Returns a domain object for a new profile user.
 
     Args:
@@ -46,7 +56,9 @@ def create_profile_user_auth_details(user_id, parent_user_id):
     return auth_domain.UserAuthDetails(user_id, None, None, parent_user_id)
 
 
-def get_all_profiles_by_parent_user_id(parent_user_id):
+def get_all_profiles_by_parent_user_id(
+    parent_user_id: str
+) -> List[auth_models.UserAuthDetailsModel]:
     """Fetch the auth details of all profile users with the given parent user.
 
     Args:
@@ -56,12 +68,17 @@ def get_all_profiles_by_parent_user_id(parent_user_id):
         list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
         with the given parent user.
     """
-    return auth_models.UserAuthDetailsModel.query(
-        auth_models.UserAuthDetailsModel.parent_user_id == parent_user_id
-    ).fetch()
+    return list(
+        auth_models.UserAuthDetailsModel.query(
+            auth_models.UserAuthDetailsModel.parent_user_id == parent_user_id
+        ).fetch()
+    )
 
 
-def establish_auth_session(request, response):
+def establish_auth_session(
+    request: webapp2.Request,
+    response: webapp2.Response
+) -> None:
     """Sets login cookies to maintain a user's sign-in session.
 
     Args:
@@ -73,7 +90,7 @@ def establish_auth_session(request, response):
     platform_auth_services.establish_auth_session(request, response)
 
 
-def destroy_auth_session(response):
+def destroy_auth_session(response: webapp2.Response) -> None:
     """Clears login cookies from the given response headers.
 
     Args:
@@ -82,7 +99,9 @@ def destroy_auth_session(response):
     platform_auth_services.destroy_auth_session(response)
 
 
-def get_user_auth_details_from_model(user_auth_details_model):
+def get_user_auth_details_from_model(
+    user_auth_details_model: auth_models.UserAuthDetailsModel
+) -> auth_domain.UserAuthDetails:
     """Returns a UserAuthDetails domain object from the given model.
 
     Args:
@@ -99,7 +118,9 @@ def get_user_auth_details_from_model(user_auth_details_model):
         deleted=user_auth_details_model.deleted)
 
 
-def get_auth_claims_from_request(request):
+def get_auth_claims_from_request(
+    request: webapp2.Request
+) -> Optional[auth_domain.AuthClaims]:
     """Authenticates the request and returns claims about its authorizer.
 
     Args:
@@ -116,7 +137,7 @@ def get_auth_claims_from_request(request):
     return platform_auth_services.get_auth_claims_from_request(request)
 
 
-def mark_user_for_deletion(user_id):
+def mark_user_for_deletion(user_id: str) -> None:
     """Marks the user, and all of their auth associations, as deleted.
 
     Args:
@@ -126,7 +147,7 @@ def mark_user_for_deletion(user_id):
     platform_auth_services.mark_user_for_deletion(user_id)
 
 
-def delete_external_auth_associations(user_id):
+def delete_external_auth_associations(user_id: str) -> None:
     """Deletes all associations that refer to the user outside of Oppia.
 
     Args:
@@ -136,7 +157,7 @@ def delete_external_auth_associations(user_id):
     platform_auth_services.delete_external_auth_associations(user_id)
 
 
-def verify_external_auth_associations_are_deleted(user_id):
+def verify_external_auth_associations_are_deleted(user_id: str) -> bool:
     """Returns true if and only if we have successfully verified that all
     external associations have been deleted.
 
@@ -152,7 +173,7 @@ def verify_external_auth_associations_are_deleted(user_id):
         user_id)
 
 
-def get_auth_id_from_user_id(user_id):
+def get_auth_id_from_user_id(user_id: str) -> Optional[str]:
     """Returns the auth ID associated with the given user ID.
 
     Args:
@@ -165,7 +186,9 @@ def get_auth_id_from_user_id(user_id):
     return platform_auth_services.get_auth_id_from_user_id(user_id)
 
 
-def get_multi_auth_ids_from_user_ids(user_ids):
+def get_multi_auth_ids_from_user_ids(
+    user_ids: List[str]
+) -> List[Optional[str]]:
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
@@ -178,20 +201,28 @@ def get_multi_auth_ids_from_user_ids(user_ids):
     return platform_auth_services.get_multi_auth_ids_from_user_ids(user_ids)
 
 
-def get_user_id_from_auth_id(auth_id):
+def get_user_id_from_auth_id(
+    auth_id: str,
+    include_deleted: bool = False
+) -> Optional[str]:
     """Returns the user ID associated with the given auth ID.
 
     Args:
         auth_id: str. The auth ID.
+        include_deleted: bool. Whether to return the ID of models marked for
+            deletion.
 
     Returns:
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    return platform_auth_services.get_user_id_from_auth_id(auth_id)
+    return platform_auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=include_deleted)
 
 
-def get_multi_user_ids_from_auth_ids(auth_ids):
+def get_multi_user_ids_from_auth_ids(
+    auth_ids: List[str]
+) -> List[Optional[str]]:
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
@@ -204,7 +235,9 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     return platform_auth_services.get_multi_user_ids_from_auth_ids(auth_ids)
 
 
-def associate_auth_id_with_user_id(auth_id_user_id_pair):
+def associate_auth_id_with_user_id(
+    auth_id_user_id_pair: auth_domain.AuthIdUserIdPair
+) -> None:
     """Commits the association between auth ID and user ID.
 
     Args:
@@ -217,7 +250,9 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
     platform_auth_services.associate_auth_id_with_user_id(auth_id_user_id_pair)
 
 
-def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
+def associate_multi_auth_ids_with_user_ids(
+    auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]
+) -> None:
     """Commits the associations between auth IDs and user IDs.
 
     Args:
@@ -231,7 +266,7 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
         auth_id_user_id_pairs)
 
 
-def grant_super_admin_privileges(user_id):
+def grant_super_admin_privileges(user_id: str) -> None:
     """Grants the user super admin privileges.
 
     Args:
@@ -240,7 +275,7 @@ def grant_super_admin_privileges(user_id):
     firebase_auth_services.grant_super_admin_privileges(user_id)
 
 
-def revoke_super_admin_privileges(user_id):
+def revoke_super_admin_privileges(user_id: str) -> None:
     """Revokes the user's super admin privileges.
 
     Args:

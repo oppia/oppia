@@ -16,7 +16,7 @@
  * @fileoverview Component for a collection summary tile.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -24,14 +24,17 @@ import { CollectionSummaryTileConstants } from 'components/summary-tile/collecti
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { UrlService } from 'services/contextual/url.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'oppia-collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
 })
-export class CollectionSummaryTileComponent implements OnInit {
+export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() getCollectionId!: string;
   @Input() getCollectionTitle!: string;
@@ -46,29 +49,69 @@ export class CollectionSummaryTileComponent implements OnInit {
   @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
+  @Input() mobileCutoffPx!: number;
 
   userIsLoggedIn: boolean = false;
   collectionIsCurrentlyHoveredOver: boolean = false;
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
+  mobileCardToBeShown: boolean = false;
+  resizeSubscription!: Subscription;
+  // A null value for 'relativeLastUpdatedDateTime' indicates that
+  // getLastUpdatedMsecs received after component interactions
+  // is empty or does not exist.
+  relativeLastUpdatedDateTime: string | null = null;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
     private userService: UserService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionsService: WindowDimensionsService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
+    if (!this.mobileCutoffPx) {
+      this.mobileCutoffPx = 0;
+    }
+    this.checkIfMobileCardToBeShown();
     this.defaultEmptyTitle = CollectionSummaryTileConstants.DEFAULT_EMPTY_TITLE;
     this.activityTypeCollection = constants.ACTIVITY_TYPE_COLLECTION;
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.checkIfMobileCardToBeShown();
+      });
+    this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeSubscription) {
+      this.resizeSubscription.unsubscribe();
+    }
+  }
+
+  checkIfMobileCardToBeShown(): void {
+    let mobileViewActive =
+      this.windowDimensionsService.getWidth() < this.mobileCutoffPx;
+    let currentPageUrl = this.urlService.getPathname();
+    this.mobileCardToBeShown = (
+      mobileViewActive && (currentPageUrl === '/community-library'));
   }
 
   getLastUpdatedDatetime(): string {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
       this.getLastUpdatedMsec);
+  }
+
+  getRelativeLastUpdatedDateTime(): string | null {
+    if (this.getLastUpdatedMsec) {
+      return this.dateTimeFormatService.getRelativeTimeFromNow(
+        this.getLastUpdatedMsec);
+    }
+    return null;
   }
 
   getCollectionLink(): string | null {

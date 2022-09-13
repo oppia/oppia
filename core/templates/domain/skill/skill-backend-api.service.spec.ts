@@ -40,7 +40,7 @@ describe('Skill backend API service', () => {
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict = {
-      id: '2',
+      id: 2,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
@@ -240,6 +240,60 @@ describe('Skill backend API service', () => {
 
       let req = httpTestingController.expectOne(
         '/skill_description_handler/Adding%20Fractions'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    }));
+
+  it(
+    'should make a request to check if skill assigned for diagnostic test.',
+    fakeAsync(() => {
+      const backendResponse = {
+        topic_names: [],
+      };
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      const skillId = 'skill1';
+
+      skillBackendApiService
+        .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
+          skillId).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/diagnostic_test_skill_assignment_handler/skill1'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(backendResponse);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it(
+    'should use the rejection handler if skill assigned for diagnostic test' +
+    ' request failed.', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const skillId = 'skill1';
+
+      skillBackendApiService
+        .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
+          skillId).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/diagnostic_test_skill_assignment_handler/skill1'
       );
       expect(req.request.method).toEqual('GET');
       req.flush({

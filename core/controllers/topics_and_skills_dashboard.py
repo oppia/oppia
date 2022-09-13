@@ -18,12 +18,15 @@ are created.
 
 from __future__ import annotations
 
-import logging
+import base64
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -51,6 +54,10 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
     """Provides data for the user's topics and skills dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
@@ -93,43 +100,18 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
 
-        untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
-        categorized_skills_dict = {}
-        topics = topic_fetchers.get_all_topics()
-        for topic in topics:
-            subtopics = topic.subtopics
-            categorized_skills_dict[topic.name] = {}
-            uncategorized_skills = (
-                skill_services.get_descriptions_of_skills(
-                    topic.uncategorized_skill_ids)[0])
-            skills_list = []
-            for skill_id in topic.uncategorized_skill_ids:
-                skill_dict = {
-                    'skill_id': skill_id,
-                    'skill_description': uncategorized_skills[skill_id]
-                }
-                skills_list.append(skill_dict)
-            categorized_skills_dict[topic.name]['uncategorized'] = (
-                skills_list)
-            for subtopic in subtopics:
-                skills = (skill_services.get_descriptions_of_skills(
-                    subtopic.skill_ids))[0]
-                skills_list = []
-                for skill_id in subtopic.skill_ids:
-                    skill_dict = {
-                        'skill_id': skill_id,
-                        'skill_description': skills[skill_id]
-                    }
-                    skills_list.append(skill_dict)
-                categorized_skills_dict[topic.name][
-                    subtopic.title] = skills_list
+
+        untriaged_skill_summaries = (
+            skill_services.get_untriaged_skill_summaries(
+                skill_summaries, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
+
+        categorized_skills = (
+            skill_services.get_categorized_skill_ids_and_descriptions())
 
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
-            if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in merged_skill_ids):
-                untriaged_skill_summary_dicts.append(skill_summary_dict)
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -147,7 +129,10 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
-            'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'untriaged_skill_summary_dicts': [
+                skill_summary.to_dict()
+                for skill_summary in untriaged_skill_summaries
+            ],
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'total_skill_count': len(skill_summary_dicts),
@@ -156,7 +141,46 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'can_create_topic': can_create_topic,
             'can_delete_skill': can_delete_skill,
             'can_create_skill': can_create_skill,
-            'categorized_skills_dict': categorized_skills_dict
+            'categorized_skills_dict': categorized_skills.to_dict()
+        })
+        self.render_json(self.values)
+
+
+class CategorizedAndUntriagedSkillsDataHandler(base.BaseHandler):
+    """Provides information about categorized skills and untriaged skill
+    summaries for the exploration editor page's skill editor component."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_ids_assigned_to_some_topic = (
+            topic_fetchers.get_all_skill_ids_assigned_to_some_topic())
+        merged_skill_ids = skill_services.get_merged_skill_ids()
+
+        untriaged_skill_summaries = (
+            skill_services.get_untriaged_skill_summaries(
+                skill_summaries, skill_ids_assigned_to_some_topic,
+                merged_skill_ids))
+        untriaged_short_skill_summaries = [
+            skill_domain.ShortSkillSummary.from_skill_summary(skill_summary)
+            for skill_summary in untriaged_skill_summaries]
+
+        categorized_skills = (
+            skill_services.get_categorized_skill_ids_and_descriptions())
+
+        self.values.update({
+            'untriaged_skill_summary_dicts': [
+                short_skill_summary.to_dict()
+                for short_skill_summary in untriaged_short_skill_summaries
+            ],
+            'categorized_skills_dict': categorized_skills.to_dict()
         })
         self.render_json(self.values)
 
@@ -165,6 +189,20 @@ class TopicAssignmentsHandler(base.BaseHandler):
     """Provides information about which topics contain the given skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id):
@@ -184,42 +222,62 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
     """Provides data for the user's skills dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'classroom_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'next_cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'keywords': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                }
+            },
+            'num_skills_to_fetch': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'sort': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS
+            },
+            'status': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': constants.SKILL_STATUS_OPTIONS
+            }
+        }
+    }
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self):
         """Handles POST requests."""
 
-        classroom_name = self.payload.get('classroom_name')
-        urlsafe_start_cursor = self.payload.get('next_cursor', None)
-        keywords = self.payload.get('keywords')
-        num_skills_to_fetch = self.payload.get('num_skills_to_fetch')
-        sort_by = self.payload.get('sort')
-        status = self.payload.get('status')
-
-        if (classroom_name is not None and not isinstance(classroom_name, str)):
-            raise self.InvalidInputException(
-                'Classroom name should be a string.')
-
-        if (urlsafe_start_cursor is not None and
-                not isinstance(urlsafe_start_cursor, str)):
-            raise self.InvalidInputException('Next Cursor should be a string.')
-
-        if (num_skills_to_fetch is None or
-                not isinstance(num_skills_to_fetch, int)):
-            raise self.InvalidInputException(
-                'Number of skills to fetch should be a number.')
-
-        if (keywords is not None and (not isinstance(keywords, list) or (
-                not all(isinstance(keyword, str) for keyword in keywords)))):
-            raise self.InvalidInputException(
-                'Keywords should be a list of strings.')
-
-        if (sort_by is not None and not isinstance(sort_by, str)):
-            raise self.InvalidInputException(
-                'The value of sort_by should be a string.')
-
-        if (status is not None and not isinstance(status, str)):
-            raise self.InvalidInputException('Status should be a string.')
+        classroom_name = self.normalized_payload.get('classroom_name')
+        urlsafe_start_cursor = self.normalized_payload.get('next_cursor')
+        keywords = self.normalized_payload.get('keywords')
+        num_skills_to_fetch = self.normalized_payload.get('num_skills_to_fetch')
+        sort_by = self.normalized_payload.get('sort')
+        status = self.normalized_payload.get('status')
 
         skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
@@ -247,15 +305,16 @@ class NewTopicHandler(base.BaseHandler):
         thumbnail_filename = self.payload.get('filename')
         thumbnail_bg_color = self.payload.get('thumbnailBgColor')
         raw_image = self.request.get('image')
+        page_title_frag = self.payload.get('page_title_fragment')
 
         try:
             topic_domain.Topic.require_valid_name(name)
-        except:
+        except Exception as e:
             raise self.InvalidInputException(
-                'Invalid topic name, received %s.' % name)
+                'Invalid topic name, received %s.' % name) from e
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, url_fragment, description)
+            new_topic_id, name, url_fragment, description, page_title_frag)
         topic_services.save_new_topic(self.user_id, topic)
 
         try:
@@ -294,29 +353,67 @@ class NewTopicHandler(base.BaseHandler):
 class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'description': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': android_validation_constants
+                            .MAX_CHARS_IN_SKILL_DESCRIPTION
+                    }]
+                }
+            },
+            'linked_topic_ids': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring',
+                        'validators': [{
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX
+                        }]
+                    }
+                }
+            },
+            'explanation_dict': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': state_domain.SubtitledHtml
+                }
+            },
+            'rubrics': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': skill_domain.Rubric
+                    }
+                }
+            },
+            'files': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.
+                            validate_suggestion_images
+                    )
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_create_skill
     def post(self):
-        description = self.payload.get('description')
-        linked_topic_ids = self.payload.get('linked_topic_ids')
-        explanation_dict = self.payload.get('explanation_dict')
-        rubrics = self.payload.get('rubrics')
+        description = self.normalized_payload.get('description')
+        linked_topic_ids = self.normalized_payload.get('linked_topic_ids')
+        explanation_dict = self.normalized_payload.get('explanation_dict')
+        rubrics = self.normalized_payload.get('rubrics')
+        files = self.normalized_payload.get('files')
 
-        if not isinstance(rubrics, list):
-            raise self.InvalidInputException('Rubrics should be a list.')
-
-        if not isinstance(explanation_dict, dict):
-            raise self.InvalidInputException(
-                'Explanation should be a dict.')
-
-        try:
-            subtitled_html = (
-                state_domain.SubtitledHtml.from_dict(explanation_dict))
-            subtitled_html.validate()
-        except:
-            raise self.InvalidInputException(
-                'Explanation should be a valid SubtitledHtml dict.')
-
-        rubrics = [skill_domain.Rubric.from_dict(rubric) for rubric in rubrics]
         new_skill_id = skill_services.get_new_skill_id()
         if linked_topic_ids is not None:
             topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
@@ -326,8 +423,6 @@ class NewSkillHandler(base.BaseHandler):
                 topic_services.add_uncategorized_skill(
                     self.user_id, topic.id, new_skill_id)
 
-        skill_domain.Skill.require_valid_description(description)
-
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(
                 'Skill description should not be a duplicate.')
@@ -335,36 +430,22 @@ class NewSkillHandler(base.BaseHandler):
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
 
-        skill.update_explanation(
-            state_domain.SubtitledHtml.from_dict(explanation_dict))
+        skill.update_explanation(explanation_dict)
 
         image_filenames = skill_services.get_image_filenames_from_skill(skill)
 
         skill_services.save_new_skill(self.user_id, skill)
 
-        image_validation_error_message_suffix = (
-            'Please go to oppia.org/skill_editor/%s to edit '
-            'the image.' % skill.id)
         for filename in image_filenames:
-            image = self.request.get(filename)
-            if not image:
-                logging.exception(
-                    'Image not provided for file with name %s when the skill '
-                    'with id %s was created.' % (filename, skill.id))
-                raise self.InvalidInputException(
-                    'No image data provided for file with name %s. %s'
-                    % (filename, image_validation_error_message_suffix))
-            try:
-                file_format = (
-                    image_validation_services.validate_image_and_filename(
-                        image, filename))
-            except utils.ValidationError as e:
-                e = '%s %s' % (e, image_validation_error_message_suffix)
-                raise self.InvalidInputException(e)
+            base64_image = files.get(filename)
+            bytes_image = base64.decodebytes(base64_image.encode('utf-8'))
+            file_format = (
+                image_validation_services.validate_image_and_filename(
+                    bytes_image, filename))
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_SKILL, skill.id, image,
+                filename, feconf.ENTITY_TYPE_SKILL, skill.id, bytes_image,
                 'image', image_is_compressible)
 
         self.render_json({
@@ -411,3 +492,47 @@ class MergeSkillHandler(base.BaseHandler):
         self.render_json({
             'merged_into_skill': new_skill_id
         })
+
+
+def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
+    """Normalizes a string of comma-separated topic IDs into a list of
+    topic IDs.
+
+    Args:
+        comma_separated_topic_ids: str. Comma separated topic IDs.
+
+    Returns:
+        list(str). A list of topic IDs.
+    """
+    if not comma_separated_topic_ids:
+        return list([])
+    return list(comma_separated_topic_ids.split(','))
+
+
+class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
+    """Handler class to get topic ID to diagnostic test skill IDs dict."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'comma_separated_topic_ids': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': normalize_comma_separated_topic_ids
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self):
+        topic_ids = self.normalized_request.get(
+            'comma_separated_topic_ids')
+        self.values.update({
+            'topic_id_to_diagnostic_test_skill_ids': (
+                topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                    topic_ids))
+        })
+        self.render_json(self.values)

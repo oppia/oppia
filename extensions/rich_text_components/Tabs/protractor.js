@@ -40,13 +40,13 @@ var customizeComponent = async function(modal, tabArray) {
 
 var expectComponentDetailsToMatch = async function(elem, tabArray) {
   var titleElems = elem.all(
-    by.css('.protractor-test-non-interactive-tabs-headers'));
+    by.css('.e2e-test-non-interactive-tabs-headers'));
   expect(await titleElems.count()).toEqual(tabArray.length);
 
   for (var i = 0; i < tabArray.length; i++) {
     // Click on each tab in turn to check its contents.
     await waitFor.visibilityOf(
-      elem.element(by.css('.protractor-test-non-interactive-tabs-headers')),
+      elem.element(by.css('.e2e-test-non-interactive-tabs-headers')),
       'Non-interactive-tabs-headers is taking too long to appear'
     );
     expect(await (await titleElems.get(i)).getText()).toMatch(
@@ -54,11 +54,11 @@ var expectComponentDetailsToMatch = async function(elem, tabArray) {
     await (await titleElems.get(i)).click();
 
     const tabContentEl = elem.element(
-      by.css('.protractor-test-tab-content-' + i));
+      by.css('.e2e-test-tab-content-' + i));
 
     await waitFor.visibilityOf(
       tabContentEl,
-      '.protractor-test-tab-content-' + i + 'is taking too long to appear'
+      '.e2e-test-tab-content-' + i + 'is taking too long to appear'
     );
     await forms.expectRichText(tabContentEl).toMatch(
       tabArray[i].content);

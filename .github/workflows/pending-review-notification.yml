@@ -1,8 +1,8 @@
 name: Send pending review notifications to reviewer on github-discussion
 on:
   schedule:
-    # Every Tuesday and Thursday at 00:00 UTC.
-    - cron: '0 0 * * 2,5'
+    # Every Tuesday and Thursday at 16:00 UTC.
+    - cron: '0 16 * * 2,4'
   # GitHub doesn't provide assurance that the scheduled jobs will run on time
   # (see https://github.community/t/no-assurance-on-scheduled-jobs/133753).
   # So, we add the workflow_dispatch event here to allow triggering this
@@ -15,7 +15,7 @@ jobs:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-22.04]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2

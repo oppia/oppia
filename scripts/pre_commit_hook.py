@@ -29,16 +29,23 @@ but it will have no effect.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
 import sys
 
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
+from core import utils  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
+RELEASE_CONSTANTS_FILEPATH = os.path.join(
+    '.', 'assets', 'release_constants.json')
 KEYS_UPDATED_IN_FECONF = [
     b'INCOMING_EMAILS_DOMAIN_NAME', b'ADMIN_EMAIL_ADDRESS',
     b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS', b'CAN_SEND_EMAILS',
@@ -178,6 +185,27 @@ def check_changes_in_config():
                 CONSTANTS_FILEPATH))
 
 
+def check_changes_in_gcloud_path():
+    """Checks that the gcloud path in common.py matches with the path in
+    release_constants.json.
+
+    Raises:
+        Exception. The gcloud path in common.py does not match with the path
+            in release_constants.json.
+    """
+    with utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
+        release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
+
+    if not (
+            os.path.exists(release_constants_gcloud_path) and
+            os.path.samefile(release_constants_gcloud_path, common.GCLOUD_PATH)
+    ):
+        raise Exception(
+            'The gcloud path in common.py: %s should match the path in '
+            'release_constants.json: %s. Please fix.' % (
+                common.GCLOUD_PATH, release_constants_gcloud_path))
+
+
 def main(args=None):
     """Main method for pre-commit hook that checks files added/modified
     in a commit.
@@ -193,6 +221,8 @@ def main(args=None):
 
     print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
+    print('Running pre-commit check for gcloud path changes...')
+    check_changes_in_gcloud_path()
     print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):

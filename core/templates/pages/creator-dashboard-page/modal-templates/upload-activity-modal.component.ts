@@ -33,6 +33,7 @@ export class UploadActivityModalComponent {
      private alertsService: AlertsService,
      private activeModal: NgbActiveModal
   ) {}
+
   save(): void {
     let returnObj: ExplorationObj = {
       yamlFile: null
@@ -51,7 +52,7 @@ export class UploadActivityModalComponent {
       return;
     }
     returnObj.yamlFile = file;
-    this.activeModal.dismiss(returnObj);
+    this.activeModal.close(returnObj);
   }
 
   cancel(): void {

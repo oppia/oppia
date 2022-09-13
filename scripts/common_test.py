@@ -26,31 +26,50 @@ import os
 import re
 import shutil
 import socketserver
+import ssl
 import stat
 import subprocess
 import sys
 import tempfile
 import time
+from urllib import request as urlrequest
 
 from core import constants
-from core import python_utils
+from core import utils
 from core.tests import test_utils
+from scripts import install_python_dev_dependencies
+
+import github
+from typing import Generator, List, NoReturn
+from typing_extensions import Literal
 
 from . import common
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
 
-import github # isort:skip  pylint: disable=wrong-import-position
+# The pool_size argument is required by Requester.__init__(), but it is missing
+# from the typing definition in Requester.pyi.  We therefore disable type
+# checking here. A PR was opened to PyGithub to fix this, but it was closed due
+# to inactivity (the project does not seem very active). Here is the PR:
+# https://github.com/PyGithub/PyGithub/pull/2151.
+_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore
+    login_or_token=None,
+    password=None,
+    jwt=None,
+    base_url='https://github.com',
+    timeout=0,
+    user_agent='user',
+    per_page=0,
+    verify=False,
+    retry=None,
+    pool_size=None,
+)
 
 
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
 
     @contextlib.contextmanager
-    def open_tcp_server_port(self):
+    def open_tcp_server_port(self) -> Generator[int, None, None]:
         """Context manager for starting and stoping an HTTP TCP server.
 
         Yields:
@@ -65,65 +84,99 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             server.server_close()
 
-    def test_is_x64_architecture_in_x86(self):
+    def test_protoc_version_matches_protobuf(self) -> None:
+        """Check that common.PROTOC_VERSION matches the version of protobuf in
+        requirements.in.
+        """
+        with open(
+            install_python_dev_dependencies.REQUIREMENTS_DEV_FILE_PATH,
+            'r',
+            encoding='utf-8',
+        ) as f:
+            for line in f:
+                if line.startswith('protobuf'):
+                    line = line.strip()
+                    protobuf_version = line.split('==')[1]
+                    break
+        self.assertEqual(common.PROTOC_VERSION, protobuf_version)
+
+    def test_is_x64_architecture_in_x86(self) -> None:
         maxsize_swap = self.swap(sys, 'maxsize', 1)
         with maxsize_swap:
             self.assertFalse(common.is_x64_architecture())
 
-    def test_is_x64_architecture_in_x64(self):
+    def test_is_x64_architecture_in_x64(self) -> None:
         maxsize_swap = self.swap(sys, 'maxsize', 2**32 + 1)
         with maxsize_swap:
             self.assertTrue(common.is_x64_architecture())
 
-    def test_run_cmd(self):
+    def test_is_mac_os(self) -> None:
+        with self.swap(common, 'OS_NAME', 'Darwin'):
+            self.assertTrue(common.is_mac_os())
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertFalse(common.is_mac_os())
+
+    def test_is_linux_os(self) -> None:
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertTrue(common.is_linux_os())
+        with self.swap(common, 'OS_NAME', 'Windows'):
+            self.assertFalse(common.is_linux_os())
+
+    def test_run_cmd(self) -> None:
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
             'Test for common.py')
 
-    def test_ensure_directory_exists_with_existing_dir(self):
+    def test_ensure_directory_exists_with_existing_dir(self) -> None:
         check_function_calls = {
             'makedirs_gets_called': False
         }
-        def mock_makedirs(unused_dirpath):
+        def mock_makedirs(unused_dirpath: str) -> None:
             check_function_calls['makedirs_gets_called'] = True
         with self.swap(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('assets')
         self.assertEqual(check_function_calls, {'makedirs_gets_called': False})
 
-    def test_ensure_directory_exists_with_non_existing_dir(self):
+    def test_ensure_directory_exists_with_non_existing_dir(self) -> None:
         check_function_calls = {
             'makedirs_gets_called': False
         }
-        def mock_makedirs(unused_dirpath):
+        def mock_makedirs(unused_dirpath: str) -> None:
             check_function_calls['makedirs_gets_called'] = True
         with self.swap(os, 'makedirs', mock_makedirs):
             common.ensure_directory_exists('test-dir')
         self.assertEqual(check_function_calls, {'makedirs_gets_called': True})
 
     def test_require_cwd_to_be_oppia_with_correct_cwd_and_unallowed_deploy_dir(
-            self):
+        self
+    ) -> None:
         common.require_cwd_to_be_oppia()
 
     def test_require_cwd_to_be_oppia_with_correct_cwd_and_allowed_deploy_dir(
-            self):
+        self
+    ) -> None:
         common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
     def test_require_cwd_to_be_oppia_with_wrong_cwd_and_unallowed_deploy_dir(
-            self):
-        def mock_getcwd():
+        self
+    ) -> None:
+        def mock_getcwd() -> str:
             return 'invalid'
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        with getcwd_swap, self.assertRaisesRegexp(
+        with getcwd_swap, self.assertRaisesRegex(
             Exception, 'Please run this script from the oppia/ directory.'):
             common.require_cwd_to_be_oppia()
 
     def test_require_cwd_to_be_oppia_with_wrong_cwd_and_allowed_deploy_dir(
-            self):
-        def mock_getcwd():
+        self
+    ) -> None:
+        def mock_getcwd() -> str:
             return 'invalid'
-        def mock_basename(unused_dirpath):
+
+        def mock_basename(unused_dirpath: str) -> str:
             return 'deploy-dir'
-        def mock_isdir(unused_dirpath):
+
+        def mock_isdir(unused_dirpath: str) -> Literal[True]:
             return True
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         basename_swap = self.swap(os.path, 'basename', mock_basename)
@@ -132,7 +185,8 @@ class CommonTests(test_utils.GenericTestBase):
             common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
     def test_open_new_tab_in_browser_if_possible_with_user_manually_opening_url(
-            self):
+        self
+    ) -> None:
         try:
             check_function_calls = {
                 'input_gets_called': 0,
@@ -142,11 +196,14 @@ class CommonTests(test_utils.GenericTestBase):
                 'input_gets_called': 1,
                 'check_call_gets_called': False
             }
-            def mock_call(unused_cmd_tokens):
+
+            def mock_call(unused_cmd_tokens: List[str]) -> int:
                 return 0
-            def mock_check_call(unused_cmd_tokens):
+
+            def mock_check_call(unused_cmd_tokens: List[str]) -> None:
                 check_function_calls['check_call_gets_called'] = True
-            def mock_input():
+
+            def mock_input() -> str:
                 check_function_calls['input_gets_called'] += 1
                 return 'n'
             call_swap = self.swap(subprocess, 'call', mock_call)
@@ -161,22 +218,28 @@ class CommonTests(test_utils.GenericTestBase):
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
-            self):
+        self
+    ) -> None:
         try:
             check_function_calls = {
                 'input_gets_called': 0,
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 1,
+                'input_gets_called': 2,
                 'check_call_gets_called': True
             }
-            def mock_call(unused_cmd_tokens):
+
+            def mock_call(unused_cmd_tokens: List[str]) -> int:
                 return 0
-            def mock_check_call(unused_cmd_tokens):
+
+            def mock_check_call(unused_cmd_tokens: List[str]) -> None:
                 check_function_calls['check_call_gets_called'] = True
-            def mock_input():
+
+            def mock_input() -> str:
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
@@ -190,22 +253,28 @@ class CommonTests(test_utils.GenericTestBase):
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
-            self):
+        self
+    ) -> None:
         try:
             check_function_calls = {
                 'input_gets_called': 0,
                 'check_call_gets_called': False
             }
             expected_check_function_calls = {
-                'input_gets_called': 2,
+                'input_gets_called': 3,
                 'check_call_gets_called': False
             }
-            def mock_call(unused_cmd_tokens):
+
+            def mock_call(unused_cmd_tokens: List[str]) -> int:
                 return 1
-            def mock_check_call(unused_cmd_tokens):
+
+            def mock_check_call(unused_cmd_tokens: List[str]) -> None:
                 check_function_calls['check_call_gets_called'] = True
-            def mock_input():
+
+            def mock_input() -> str:
                 check_function_calls['input_gets_called'] += 1
+                if check_function_calls['input_gets_called'] == 2:
+                    return '1'
                 return 'y'
             call_swap = self.swap(subprocess, 'call', mock_call)
             check_call_swap = self.swap(
@@ -218,152 +287,181 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
-    def test_get_remote_alias_with_correct_alias(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_get_remote_alias_with_correct_alias(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'remote1 url1\nremote2 url2'
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
-            self.assertEqual(common.get_remote_alias('url1'), 'remote1')
+            self.assertEqual(common.get_remote_alias(['url1']), 'remote1')
 
-    def test_get_remote_alias_with_incorrect_alias(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_get_remote_alias_with_incorrect_alias(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
-            'ERROR: There is no existing remote alias for the url3 repo.'
+            'ERROR: There is no existing remote alias for the url3, url4 repo.'
         ):
-            common.get_remote_alias('url3')
+            common.get_remote_alias(['url3', 'url4'])
 
-    def test_verify_local_repo_is_clean_with_clean_repo(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_local_repo_is_clean_with_clean_repo(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'nothing to commit, working directory clean'
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
             common.verify_local_repo_is_clean()
 
-    def test_verify_local_repo_is_clean_with_unclean_repo(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_local_repo_is_clean_with_unclean_repo(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception, 'ERROR: This script should be run from a clean branch.'
         ):
             common.verify_local_repo_is_clean()
 
-    def test_get_current_branch_name(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_get_current_branch_name(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
-    def test_get_current_release_version_number_with_non_hotfix_branch(self):
+    def test_update_branch_with_upstream(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
+            return b'On branch test'
+
+        def mock_run_cmd(cmd: str) -> str:
+            return cmd
+
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            with self.swap(common, 'run_cmd', mock_run_cmd):
+                common.update_branch_with_upstream()
+
+    def test_get_current_release_version_number_with_non_hotfix_branch(
+        self
+    ) -> None:
         self.assertEqual(
             common.get_current_release_version_number('release-1.2.3'), '1.2.3')
 
-    def test_get_current_release_version_number_with_hotfix_branch(self):
+    def test_get_current_release_version_number_with_hotfix_branch(
+        self
+    ) -> None:
         self.assertEqual(
             common.get_current_release_version_number('release-1.2.3-hotfix-1'),
             '1.2.3')
 
-    def test_get_current_release_version_number_with_maintenance_branch(self):
+    def test_get_current_release_version_number_with_maintenance_branch(
+        self
+    ) -> None:
         self.assertEqual(
             common.get_current_release_version_number(
                 'release-maintenance-1.2.3'), '1.2.3')
 
-    def test_get_current_release_version_number_with_invalid_branch(self):
-        with self.assertRaisesRegexp(
+    def test_get_current_release_version_number_with_invalid_branch(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
             Exception, 'Invalid branch name: invalid-branch.'):
             common.get_current_release_version_number('invalid-branch')
 
-    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(
+        self
+    ) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
 
-    def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_release_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_release_branch(
+        self
+    ) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_hotfix_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_hotfix_branch(
+        self
+    ) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_maintenance_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_maintenance_branch(
+        self
+    ) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch release-maintenance-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
-    def test_is_current_branch_a_release_branch_with_non_release_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_release_branch_with_non_release_branch(
+        self
+    ) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
 
-    def test_is_current_branch_a_test_branch_with_test_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_test_branch_with_test_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch test-common'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), True)
 
-    def test_is_current_branch_a_test_branch_with_non_test_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_is_current_branch_a_test_branch_with_non_test_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch invalid-test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), False)
 
-    def test_verify_current_branch_name_with_correct_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_current_branch_name_with_correct_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             common.verify_current_branch_name('test')
 
-    def test_verify_current_branch_name_with_incorrect_branch(self):
-        def mock_check_output(unused_cmd_tokens):
+    def test_verify_current_branch_name_with_incorrect_branch(self) -> None:
+        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
             return b'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'ERROR: This script can only be run from the "test" branch.'
         ):
             common.verify_current_branch_name('test')
 
-    def test_is_port_in_use(self):
+    def test_is_port_in_use(self) -> None:
         with self.open_tcp_server_port() as port:
             self.assertTrue(common.is_port_in_use(port))
         self.assertFalse(common.is_port_in_use(port))
 
-    def test_wait_for_port_to_not_be_in_use_port_never_closes(self):
-        def mock_sleep(unused_seconds):
+    def test_wait_for_port_to_not_be_in_use_port_never_closes(self) -> None:
+        def mock_sleep(unused_seconds: int) -> None:
             return
-        def mock_is_port_in_use(unused_port_number):
+        def mock_is_port_in_use(unused_port_number: int) -> Literal[True]:
             return True
 
         sleep_swap = self.swap_with_checks(
@@ -375,10 +473,10 @@ class CommonTests(test_utils.GenericTestBase):
             success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertFalse(success)
 
-    def test_wait_for_port_to_not_be_in_use_port_closes(self):
-        def mock_sleep(unused_seconds):
+    def test_wait_for_port_to_not_be_in_use_port_closes(self) -> None:
+        def mock_sleep(unused_seconds: int) -> NoReturn:
             raise AssertionError('mock_sleep should not be called.')
-        def mock_is_port_in_use(unused_port_number):
+        def mock_is_port_in_use(unused_port_number: int) -> Literal[False]:
             return False
 
         sleep_swap = self.swap(
@@ -390,13 +488,49 @@ class CommonTests(test_utils.GenericTestBase):
             success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertTrue(success)
 
-    def test_permissions_of_file(self):
+    def test_wait_for_port_to_be_in_use_port_never_opens(self) -> None:
+        def mock_sleep(unused_seconds: int) -> None:
+            return
+        def mock_is_port_in_use(unused_port_number: int) -> Literal[False]:
+            return False
+        def mock_exit(unused_code: str) -> None:
+            pass
+
+        sleep_swap = self.swap_with_checks(
+            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60 * 5)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+
+        with sleep_swap, is_port_in_use_swap, exit_swap:
+            common.wait_for_port_to_be_in_use(9999)
+
+    def test_wait_for_port_to_be_in_use_port_opens(self) -> None:
+        def mock_sleep(unused_seconds: int) -> NoReturn:
+            raise AssertionError('mock_sleep should not be called.')
+        def mock_is_port_in_use(unused_port_number: int) -> Literal[True]:
+            return True
+        def mock_exit(unused_code: str) -> NoReturn:
+            raise AssertionError('mock_exit should not be called.')
+
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        exit_swap = self.swap(sys, 'exit', mock_exit)
+
+        with sleep_swap, is_port_in_use_swap, exit_swap:
+            common.wait_for_port_to_be_in_use(9999)
+
+    def test_permissions_of_file(self) -> None:
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
         temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
-        temp_file.name = 'temp_file'
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
+        setattr(temp_file, 'name', 'temp_file')
         temp_file_path = os.path.join(temp_dirpath, 'temp_file')
-        with python_utils.open_file(temp_file_path, 'w') as f:
+        with utils.open_file(temp_file_path, 'w') as f:
             f.write('content')
 
         common.recursive_chown(root_temp_dir, os.getuid(), -1)
@@ -426,9 +560,11 @@ class CommonTests(test_utils.GenericTestBase):
         temp_file.close()
         shutil.rmtree(root_temp_dir)
 
-    def test_print_each_string_after_two_new_lines(self):
+    def test_print_each_string_after_two_new_lines(self) -> None:
         @contextlib.contextmanager
-        def _redirect_stdout(new_target):
+        def _redirect_stdout(
+            new_target: io.TextIOWrapper
+        ) -> Generator[io.TextIOWrapper, None, None]:
             """Redirect stdout to the new target.
 
             Args:
@@ -453,15 +589,18 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertEqual(
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
 
-    def test_install_npm_library(self):
+    def test_install_npm_library(self) -> None:
 
-        def _mock_subprocess_check_call(unused_command):
+        def _mock_subprocess_check_call(unused_command: str) -> None:
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.
             """
             temp_file = tempfile.NamedTemporaryFile()
-            temp_file.name = 'temp_file'
-            with python_utils.open_file('temp_file', 'w') as f:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used to set
+            # the attribute.
+            setattr(temp_file, 'name', 'temp_file')
+            with utils.open_file('temp_file', 'w') as f:
                 f.write('content')
 
             self.assertTrue(os.path.exists('temp_file'))
@@ -477,23 +616,23 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-    def test_ask_user_to_confirm(self):
-        def mock_input():
+    def test_ask_user_to_confirm(self) -> None:
+        def mock_input() -> str:
             return 'Y'
         with self.swap(builtins, 'input', mock_input):
             common.ask_user_to_confirm('Testing')
 
-    def test_get_personal_access_token_with_valid_token(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+    def test_get_personal_access_token_with_valid_token(self) -> None:
+        def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
             return 'token'
         with self.swap(getpass, 'getpass', mock_getpass):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
-    def test_get_personal_access_token_with_token_as_none(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+    def test_get_personal_access_token_with_token_as_none(self) -> None:
+        def mock_getpass(prompt: str) -> None:  # pylint: disable=unused-argument
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegexp(
+        with getpass_swap, self.assertRaisesRegex(
             Exception,
             'No personal access token provided, please set up a personal '
             'access token at https://github.com/settings/tokens and re-run '
@@ -501,35 +640,43 @@ class CommonTests(test_utils.GenericTestBase):
             common.get_personal_access_token()
 
     def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
-            self):
+        self
+    ) -> None:
         mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
+            requester=_MOCK_REQUESTER, headers={}, attributes={},
+            completed=True)
         label_for_released_prs = (
             constants.release_constants.LABEL_FOR_RELEASED_PRS)
         label_for_current_release_prs = (
             constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
         pull1 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
                     {'name': label_for_released_prs},
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         pull2 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
                     {'name': label_for_released_prs},
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         label = github.Label.Label(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'name': label_for_current_release_prs},
-            completed='')
-        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
+            completed=True)
+
+        def mock_get_issues(
+            unused_self: str, state: str, labels: List[github.Label.Label]  # pylint: disable=unused-argument
+        ) -> List[github.PullRequest.PullRequest]:
             return [pull1, pull2]
-        def mock_get_label(unused_self, unused_name):
+
+        def mock_get_label(
+            unused_self: str, unused_name: str
+        ) -> List[github.Label.Label]:
             return [label]
 
         get_issues_swap = self.swap(
@@ -540,36 +687,45 @@ class CommonTests(test_utils.GenericTestBase):
             common.check_prs_for_current_release_are_released(mock_repo)
 
     def test_check_prs_for_current_release_are_released_with_unreleased_prs(
-            self):
+        self
+    ) -> None:
         mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
-        def mock_open_tab(unused_url):
+            requester=_MOCK_REQUESTER, headers={}, attributes={},
+            completed=True)
+
+        def mock_open_tab(unused_url: str) -> None:
             pass
         label_for_released_prs = (
             constants.release_constants.LABEL_FOR_RELEASED_PRS)
         label_for_current_release_prs = (
             constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
         pull1 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         pull2 = github.PullRequest.PullRequest(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
                     {'name': label_for_released_prs},
                     {'name': label_for_current_release_prs}]},
-            completed='')
+            completed=True)
         label = github.Label.Label(
-            requester='', headers='',
+            requester=_MOCK_REQUESTER, headers={},
             attributes={
                 'name': label_for_current_release_prs},
-            completed='')
-        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
+            completed=True)
+
+        def mock_get_issues(
+            unused_self: str, state: str, labels: List[str]  # pylint: disable=unused-argument
+        ) -> List[github.PullRequest.PullRequest]:
             return [pull1, pull2]
-        def mock_get_label(unused_self, unused_name):
+
+        def mock_get_label(
+            unused_self: str, unused_name: str
+        ) -> List[github.Label.Label]:
             return [label]
 
         get_issues_swap = self.swap(
@@ -579,7 +735,7 @@ class CommonTests(test_utils.GenericTestBase):
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         with get_issues_swap, get_label_swap, open_tab_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 Exception, (
                     'There are PRs for current release which do not '
                     'have a \'%s\' label. Please ensure that '
@@ -588,7 +744,7 @@ class CommonTests(test_utils.GenericTestBase):
                         constants.release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
-    def test_inplace_replace_file(self):
+    def test_inplace_replace_file(self) -> None:
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
@@ -602,7 +758,7 @@ class CommonTests(test_utils.GenericTestBase):
             '}\n'
         ]
 
-        def mock_remove(unused_file):
+        def mock_remove(unused_file: str) -> None:
             return
 
         remove_swap = self.swap_with_checks(
@@ -615,23 +771,23 @@ class CommonTests(test_utils.GenericTestBase):
                 '"DEV_MODE": true,',
                 expected_number_of_replacements=1
             )
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
         os.remove(origin_file)
         shutil.move(backup_file, origin_file)
 
     def test_inplace_replace_file_with_expected_number_of_replacements_raises(
-            self
-    ):
+        self
+    ) -> None:
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, 'Wrong number of replacements. Expected 1. Performed 0.'
         ):
             common.inplace_replace_file(
@@ -641,39 +797,39 @@ class CommonTests(test_utils.GenericTestBase):
                 expected_number_of_replacements=1
             )
         self.assertFalse(os.path.isfile(backup_file))
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
-    def test_inplace_replace_file_with_exception_raised(self):
+    def test_inplace_replace_file_with_exception_raised(self) -> None:
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
         backup_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json.bak')
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             origin_content = f.readlines()
 
-        def mock_compile(unused_arg):
+        def mock_compile(unused_arg: str) -> NoReturn:
             raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             re.escape('Exception raised from compile()')
         ), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))
-        with python_utils.open_file(origin_file, 'r') as f:
+        with utils.open_file(origin_file, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
 
-    def test_inplace_replace_file_context(self):
+    def test_inplace_replace_file_context(self) -> None:
         file_path = (
             os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
         backup_file_path = '%s.bak' % file_path
 
-        with python_utils.open_file(file_path, 'r') as f:
+        with utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -685,7 +841,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         replace_file_context = common.inplace_replace_file_context(
             file_path, '"DEV_MODE": .*', '"DEV_MODE": true,')
-        with replace_file_context, python_utils.open_file(file_path, 'r') as f:
+        with replace_file_context, utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -696,7 +852,7 @@ class CommonTests(test_utils.GenericTestBase):
             ])
             self.assertTrue(os.path.isfile(backup_file_path))
 
-        with python_utils.open_file(file_path, 'r') as f:
+        with utils.open_file(file_path, 'r') as f:
             self.assertEqual(f.readlines(), [
                 '{\n',
                 '    "RANDMON1" : "randomValue1",\n',
@@ -713,8 +869,8 @@ class CommonTests(test_utils.GenericTestBase):
             os.remove(backup_file_path)
             raise
 
-    def test_convert_to_posixpath_on_windows(self):
-        def mock_is_windows():
+    def test_convert_to_posixpath_on_windows(self) -> None:
+        def mock_is_windows() -> Literal[True]:
             return True
 
         is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
@@ -723,8 +879,8 @@ class CommonTests(test_utils.GenericTestBase):
             actual_file_path = common.convert_to_posixpath(original_filepath)
         self.assertEqual(actual_file_path, 'c:/path/to/a/file.js')
 
-    def test_convert_to_posixpath_on_platform_other_than_windows(self):
-        def mock_is_windows():
+    def test_convert_to_posixpath_on_platform_other_than_windows(self) -> None:
+        def mock_is_windows() -> Literal[False]:
             return False
 
         is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
@@ -733,38 +889,60 @@ class CommonTests(test_utils.GenericTestBase):
             actual_file_path = common.convert_to_posixpath(original_filepath)
         self.assertEqual(actual_file_path, original_filepath)
 
-    def test_create_readme(self):
+    def test_create_readme(self) -> None:
         try:
             os.makedirs('readme_test_dir')
             common.create_readme('readme_test_dir', 'Testing readme.')
-            with python_utils.open_file('readme_test_dir/README.md', 'r') as f:
+            with utils.open_file('readme_test_dir/README.md', 'r') as f:
                 self.assertEqual(f.read(), 'Testing readme.')
         finally:
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
 
-    def test_fix_third_party_imports_correctly_sets_up_imports(self):
+    def test_fix_third_party_imports_correctly_sets_up_imports(self) -> None:
         common.fix_third_party_imports()
         # Asserts that imports from problematic modules do not error.
         from google.cloud import tasks_v2  # pylint: disable=unused-import
 
-    def test_swap_env_when_var_had_a_value(self):
+    def test_cd(self) -> None:
+        def mock_chdir(unused_path: str) -> None:
+            pass
+        def mock_getcwd() -> str:
+            return '/old/path'
+
+        chdir_swap = self.swap_with_checks(
+            os, 'chdir', mock_chdir, expected_args=[
+                ('/new/path',),
+                ('/old/path',),
+            ])
+        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+
+        with chdir_swap, getcwd_swap:
+            with common.CD('/new/path'):
+                pass
+
+    def test_swap_env_when_var_had_a_value(self) -> None:
         os.environ['ABC'] = 'Hard as Rocket Science'
         with common.swap_env('ABC', 'Easy as 123') as old_value:
             self.assertEqual(old_value, 'Hard as Rocket Science')
             self.assertEqual(os.environ['ABC'], 'Easy as 123')
         self.assertEqual(os.environ['ABC'], 'Hard as Rocket Science')
 
-    def test_swap_env_when_var_did_not_exist(self):
+    def test_swap_env_when_var_did_not_exist(self) -> None:
         self.assertNotIn('DEF', os.environ)
         with common.swap_env('DEF', 'Easy as 123') as old_value:
             self.assertIsNone(old_value)
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
 
-    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(self):
+    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(
+        self
+    ) -> None:
         raised_once = False
-        def write_raise_oserror(unused_fileno, bytes_to_write):
+
+        def write_raise_oserror(
+            unused_fileno: int, bytes_to_write: bytes
+        ) -> int:
             self.assertEqual(bytes_to_write, 'test'.encode('utf-8'))
 
             nonlocal raised_once
@@ -790,7 +968,150 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertTrue(raised_once)
 
-    def test_write_stdout_safe_with_oserror(self):
+    def test_write_stdout_safe_with_oserror(self) -> None:
         write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
-        with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
+        with write_swap, self.assertRaisesRegex(OSError, 'OS error'):
             common.write_stdout_safe('test')
+
+    def test_write_stdout_safe_with_unsupportedoperation(self) -> None:
+        mock_stdout = io.StringIO()
+
+        write_swap = self.swap_to_always_raise(
+            os, 'write',
+            io.UnsupportedOperation('unsupported operation'))
+        stdout_write_swap = self.swap(sys, 'stdout', mock_stdout)
+
+        with write_swap, stdout_write_swap:
+            common.write_stdout_safe('test')
+        self.assertEqual(mock_stdout.getvalue(), 'test')
+
+    def _assert_ssl_context_matches_default(
+        self, context: ssl.SSLContext
+    ) -> None:
+        """Assert that an SSL context matches the default one.
+
+        If we create two default SSL contexts, they will evaluate as unequal
+        even though they are the same for our purposes. Therefore, this function
+        checks that the provided context has the same important security
+        properties as the default.
+
+        Args:
+            context: SSLContext. The context to compare.
+
+        Raises:
+            AssertionError. Raised if the contexts differ in any of their
+                important attributes or behaviors.
+        """
+        default_context = ssl.create_default_context()
+        for attribute in (
+            'verify_flags', 'verify_mode', 'protocol',
+            'hostname_checks_common_name', 'options', 'minimum_version',
+            'maximum_version', 'check_hostname'
+        ):
+            self.assertEqual(
+                getattr(context, attribute),
+                getattr(default_context, attribute)
+            )
+        for method in ('get_ca_certs', 'get_ciphers'):
+            self.assertEqual(
+                getattr(context, method)(),
+                getattr(default_context, method)()
+            )
+
+    def test_url_retrieve_with_successful_https_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'buffer')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_with_successful_https_works_on_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 2)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                if len(attempts) == 1:
+                    raise ssl.SSLError()
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_runs_out_of_attempts(self) -> None:
+        attempts = []
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> io.BufferedIOBase:
+            attempts.append(url)
+            self.assertLessEqual(len(attempts), 2)
+            self.assertEqual(url, 'https://example.com')
+            self._assert_ssl_context_matches_default(context)
+            raise ssl.SSLError('test_error')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
+                common.url_retrieve('https://example.com', 'test_path')
+
+    def test_url_retrieve_https_check_fails(self) -> None:
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
+            raise AssertionError('urlopen() should not be called')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(
+                Exception, 'The URL http://example.com should use HTTPS.'
+            ):
+                common.url_retrieve('http://example.com', 'test_path')
+
+    def test_url_retrieve_with_successful_http_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BufferedIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve(
+                    'https://example.com', output_path, enforce_https=False)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')

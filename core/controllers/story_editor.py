@@ -81,10 +81,6 @@ class EditableStoryDataHandler(base.BaseHandler):
         topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         skill_ids = topic.get_all_skill_ids()
-        for node in story.story_contents.nodes:
-            for skill_id in node.prerequisite_skill_ids:
-                if skill_id not in skill_ids:
-                    skill_ids.append(skill_id)
 
         skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
@@ -225,6 +221,12 @@ class StoryUrlFragmentHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self, story_url_fragment):

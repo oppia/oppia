@@ -20,32 +20,45 @@ from __future__ import annotations
 
 import collections
 
-from core import python_utils
 from core.jobs import base_jobs
 from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms.validation import base_validation
 from core.jobs.transforms.validation import base_validation_registry
 from core.jobs.types import base_validation_errors
+from core.jobs.types import model_property
 from core.platform import models
 
 import apache_beam as beam
 
+from typing import Dict, FrozenSet, Iterable, Iterator, List, Set, Tuple, Type
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+
 datastore_services = models.Registry.import_datastore_services()
 
-AUDIT_DO_FN_TYPES_BY_KIND = (
-    base_validation_registry.get_audit_do_fn_types_by_kind())
-KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
+AUDIT_DO_FN_TYPES_BY_KIND: Dict[str, FrozenSet[Type[beam.DoFn]]] = (
+    base_validation_registry.get_audit_do_fn_types_by_kind()
+)
+KIND_BY_INDEX: Tuple[str, ...] = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 
 # Type is: dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
 # (ModelProperty, tuple(kind of models)), grouped by the kind of model the
 # properties belong to.
-ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR = (
+ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR: Dict[
+    str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
+] = (
     base_validation_registry.
-    get_id_referencing_properties_by_kind_of_possessor())
+    get_id_referencing_properties_by_kind_of_possessor()
+)
 
 # Type is: set(str). All model kinds referenced by one or more properties.
-ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES = (
+ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES: Set[str] = (
     base_validation_registry.get_all_model_kinds_referenced_by_properties())
 
 
@@ -53,7 +66,7 @@ class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
     """Helper class for wrapping a (model kind, model ID) pair."""
 
     @classmethod
-    def from_model(cls, model):
+    def from_model(cls, model: base_models.BaseModel) -> ModelKey:
         """Creates a model key from the given model.
 
         Args:
@@ -70,7 +83,7 @@ class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
 class AuditAllStorageModelsJob(base_jobs.JobBase):
     """Runs a comprehensive audit on every model in the datastore."""
 
-    def run(self):
+    def run(self) -> beam.PCollection[base_validation_errors.BaseAuditError]:
         """Returns a PCollection of audit errors aggregated from all models.
 
         Returns:
@@ -118,7 +131,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 beam.ParDo(base_validation.ValidateDeletedModel()))
         ]
 
-        model_groups = python_utils.ZIP(KIND_BY_INDEX, models_of_kind_by_index)
+        model_groups = zip(KIND_BY_INDEX, models_of_kind_by_index)
         for kind, models_of_kind in model_groups:
             audit_error_pcolls.extend(models_of_kind | ApplyAuditDoFns(kind))
 
@@ -148,7 +161,13 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         return audit_error_pcolls | 'Combine audit results' >> beam.Flatten()
 
     def _get_model_relationship_errors(
-            self, unused_join_key, counts_and_errors):
+        self,
+        unused_join_key: ModelKey,
+        counts_and_errors: Tuple[
+            List[int],
+            List[base_validation_errors.ModelRelationshipError]
+        ]
+    ) -> List[base_validation_errors.ModelRelationshipError]:
         """Returns errors associated with the given model key if it's missing.
 
         Args:
@@ -168,21 +187,27 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         return errors if sum(counts) == 0 else []
 
 
-class ApplyAuditDoFns(beam.PTransform):
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
+# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
+# we added an ignore here.
+class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
     """Runs every Audit DoFn targeting the models of a specific kind."""
 
-    def __init__(self, kind):
+    def __init__(self, kind: str) -> None:
         """Initializes a new ApplyAuditDoFns instance.
 
         Args:
             kind: str. The kind of models this PTransform will receive.
         """
-        super(ApplyAuditDoFns, self).__init__(
+        super().__init__(
             label='Apply every Audit DoFn targeting %s' % kind)
         self._kind = kind
         self._do_fn_types = tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind])
 
-    def expand(self, inputs):
+    def expand(
+        self, inputs: beam.PCollection[base_models.BaseModel]
+    ) -> beam.PCollection[base_validation_errors.BaseAuditError]:
         """Returns audit errors from every Audit DoFn targeting the models.
 
         This is the method that PTransform requires us to override when
@@ -203,20 +228,26 @@ class ApplyAuditDoFns(beam.PTransform):
         )
 
 
-class GetExistingModelKeyCounts(beam.PTransform):
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
+# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
+# we added an ignore here.
+class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
     """Returns PCollection of (key, count) pairs for each input model."""
 
-    def __init__(self, kind):
+    def __init__(self, kind: str) -> None:
         """Initializes the PTransform.
 
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetExistingModelKeyCounts, self).__init__(
+        super().__init__(
             label='Generate (key, count)s for all existing %ss' % kind)
         self._kind = kind
 
-    def expand(self, input_or_inputs):
+    def expand(
+        self, input_or_inputs: beam.PCollection[base_models.BaseModel]
+    ) -> beam.PCollection[Tuple[ModelKey, int]]:
         """Returns a PCollection of (key, count) pairs for each input model.
 
         Args:
@@ -233,21 +264,31 @@ class GetExistingModelKeyCounts(beam.PTransform):
         )
 
 
-class GetMissingModelKeyErrors(beam.PTransform):
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
+# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
+# we added an ignore here.
+class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
     """Returns PCollection of (key, error) pairs for each referenced model."""
 
-    def __init__(self, kind):
+    def __init__(self, kind: str) -> None:
         """Initializes the PTransform.
 
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetMissingModelKeyErrors, self).__init__(
+        super().__init__(
             label='Generate (key, error)s from the ID properties in %s' % kind)
         self._id_referencing_properties = (
             ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR[kind])
 
-    def expand(self, input_or_inputs):
+    def expand(
+        self, input_or_inputs: beam.PCollection[base_models.BaseModel]
+    ) -> Iterable[
+        beam.PCollection[
+            Tuple[ModelKey, base_validation_errors.ModelRelationshipError]
+        ]
+    ]:
         """Returns PCollections of (key, error) pairs referenced by the models.
 
         Args:
@@ -270,7 +311,13 @@ class GetMissingModelKeyErrors(beam.PTransform):
         )
 
     def _generate_missing_key_errors(
-            self, model, property_of_model, referenced_kinds):
+        self,
+        model: base_models.BaseModel,
+        property_of_model: model_property.ModelProperty,
+        referenced_kinds: Tuple[str, ...]
+    ) -> Iterator[
+        Tuple[ModelKey, base_validation_errors.ModelRelationshipError]
+    ]:
         """Yields all model keys referenced by the given model's properties.
 
         Args:

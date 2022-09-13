@@ -3,26 +3,27 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.33.0rc1
+apache-beam[gcp]==2.38.0
 beautifulsoup4==4.10.0
 bleach==4.1.0
+deepdiff==5.8.1
 defusedxml==0.7.1
-elasticsearch==7.14.1
-firebase-admin==5.0.1
+elasticsearch==7.17.0
+firebase-admin==5.2.0
 future==0.18.2
 googledatastore==7.0.2
-google-cloud-storage==1.42.1
+google-cloud-storage==2.1.0
 google-auth==1.35.0
-google-cloud-dataflow-client==0.1.3
-google-cloud-logging==2.7.0
-google-cloud-ndb==1.10.3
-google-cloud-tasks==2.5.1
-google-cloud-translate==3.4.0
+google-cloud-dataflow-client==0.3.1
+google-cloud-logging==3.0.0
+google-cloud-ndb==1.11.1
+google-cloud-tasks==2.7.2
+google-cloud-translate==3.6.1
 gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
-pillow==8.3.2
+pillow==9.0.1
 pylatexenc==2.10
 pytest==6.2.5
 redis==3.5.3
@@ -33,9 +34,9 @@ result==0.6.0
 rsa==4.7.2
 simplejson==3.17.5
 six==1.16.0
-soupsieve==2.2.1
-typing_extensions==3.10.0.2
-urllib3==1.26.6
+soupsieve==2.3.1
+typing-extensions==3.10.0.2
+urllib3==1.26.7
 webapp2==3.0.0b1
 webencodings==0.5.1
 # TODO(#13506): Remove these after we refactor the Python library
@@ -44,5 +45,5 @@ webencodings==0.5.1
 # since the oppia_tools folder is used for tooling and is not deployed to the
 # server. These libraries need to be in the oppia_tools folder because we need
 # them earlier than we are able to install the libraries from this file.
-PyYAML==5.4.1
+PyYAML==6.0
 certifi==2021.5.30

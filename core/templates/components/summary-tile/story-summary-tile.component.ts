@@ -26,6 +26,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import { StoryNode } from 'domain/story/story-node.model';
+
+import './story-summary-tile.component.css';
+
 
 @Component({
   selector: 'oppia-story-summary-tile',
@@ -33,22 +38,25 @@ import { StorySummary } from 'domain/story/story-summary.model';
 })
 export class StorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and component interactions, therefore we need to do non-null assertion,
-  // for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() classroomUrlFragment!: string;
   @Input() storySummary!: StorySummary;
   @Input() topicUrlFragment!: string;
+  @Input() allChaptersAreShown!: boolean;
   initialCount!: number;
   chaptersDisplayed!: number;
   nodeCount!: number;
   completedStoriesCount!: number;
   storyProgress!: number;
+  storyStatus!: string;
   storyTitle!: string;
+  storyTitleTranslationKey!: string;
   strokeDashArrayValues!: string | number;
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
   nodeTitles!: string[];
+  nodeTitlesTranslationKeys: string[] = [];
   storyLink!: string;
   thumbnailUrl: string | null = null;
   showButton: boolean = false;
@@ -57,11 +65,16 @@ export class StorySummaryTileComponent implements OnInit {
   EXPLORE_PAGE_PREFIX = '/explore/';
 
   constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
+
+  checkTabletView(): boolean {
+    return this.windowDimensionsService.getWidth() < 768;
+  }
 
   getStoryLink(): string {
     // This component is being used in the topic editor as well and
@@ -75,10 +88,17 @@ export class StorySummaryTileComponent implements OnInit {
         story_url_fragment: this.storySummary.getUrlFragment(),
         topic_url_fragment: this.topicUrlFragment
       });
-    if (storyLink === null) {
-      return '#';
-    }
     return storyLink;
+  }
+
+  getStoryStatus(): void {
+    if (this.storyProgress === 0) {
+      this.storyStatus = 'Not Started';
+    } else if (this.storyProgress < 100 && this.storyProgress > 0) {
+      this.storyStatus = 'In Progress';
+    } else if (this.storyProgress === 100) {
+      this.storyStatus = 'Completed';
+    }
   }
 
   isChapterCompleted(title: string): boolean {
@@ -171,12 +191,19 @@ export class StorySummaryTileComponent implements OnInit {
     this.storyProgress = Math.floor(
       (this.completedStoriesCount / this.nodeCount) * 100);
 
-    this.chaptersDisplayed = 3;
-    if (this.windowDimensionsService.getWidth() <= 800) {
+    this.chaptersDisplayed = this.allChaptersAreShown ? this.nodeCount : 3;
+    if (this.windowDimensionsService.getWidth() <= 768 &&
+      this.windowDimensionsService.getWidth() > 500 &&
+      !this.allChaptersAreShown) {
       this.chaptersDisplayed = 2;
     }
+    if (this.windowDimensionsService.getWidth() <= 500 &&
+      !this.allChaptersAreShown) {
+      this.chaptersDisplayed = 1;
+    }
     this.showButton = false;
-    if (this.chaptersDisplayed !== this.nodeCount) {
+    if (!this.allChaptersAreShown &&
+      this.chaptersDisplayed !== this.nodeCount) {
       this.showButton = true;
     }
 
@@ -191,11 +218,38 @@ export class StorySummaryTileComponent implements OnInit {
     this.getStrokeDashArrayValues();
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
+    this.storyTitleTranslationKey = this.i18nLanguageCodeService
+      .getStoryTranslationKey(
+        this.storySummary.getId(), TranslationKeyType.TITLE);
     this.strokeDashArrayValues = this.getStrokeDashArrayValues();
     this.completedStrokeDashArrayValues =
       this.getCompletedStrokeDashArrayValues();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
     this.nodeTitles = this.storySummary.getNodeTitles();
+    for (let idx in this.storySummary.getAllNodes()) {
+      let storyNode: StoryNode = this.storySummary.getAllNodes()[idx];
+      let storyNodeTranslationKey = this.i18nLanguageCodeService.
+        getExplorationTranslationKey(
+          storyNode.getExplorationId() as string, TranslationKeyType.TITLE);
+      this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey);
+    }
+    this.getStoryStatus();
+  }
+
+  isHackyStoryTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.storyTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyNodeTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.nodeTitlesTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

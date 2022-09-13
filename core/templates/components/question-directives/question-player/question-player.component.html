@@ -1,42 +1,42 @@
 <div class="oppia-question-player-container">
   <!-- Question Player -->
-  <div class="oppia-question-player" ng-if="!resultsLoaded">
+  <div class="oppia-question-player" *ngIf="!resultsLoaded">
 
     <div class="oppia-practice-session">
       Practice Session
     </div>
 
     <div class="oppia-question-player-card">
-      <div ng-show="$ctrl.totalQuestions > 0">
-        <h3 class="oppia-question-player-header">Question <[$ctrl.currentQuestion]>/<[$ctrl.totalQuestions]></h3>
+      <div [hidden]="!(totalQuestions > 0)">
+        <h3 class="oppia-question-player-header">Question {{currentQuestion}}/{{totalQuestions}}</h3>
         <div class="oppia-question-player-progress">
-          <div class="current-progress" ng-style="{width: $ctrl.currentProgress + '%'}"></div>
+          <div class="current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
         </div>
       </div>
-      <div ng-show="$ctrl.totalQuestions === 0">
+      <div [hidden]="!(totalQuestions === 0)">
         <h4 class="practice-questions-coming-soon-header">Coming Soon!</h4>
         <div class="practice-questions-coming-soon-text">There are no questions created yet for the selected subtopic(s). Please check back later!</div>
       </div>
     </div>
     <div class="oppia-question-player-body">
-      <conversation-skin question-player-config="$ctrl.questionPlayerConfig"></conversation-skin>
+      <oppia-conversation-skin [questionPlayerConfig]="questionPlayerConfig"></oppia-conversation-skin>
       <attribution-guide></attribution-guide>
     </div>
   </div>
   <!-- End of Question Player -->
 
   <!-- Results Page -->
-  <div class="oppia-question-player-results d-flex flex-column" ng-if="resultsLoaded">
+  <div class="oppia-question-player-results d-flex flex-column" *ngIf="resultsLoaded">
     <div class="oppia-result-header">
-      <h3 class="oppia-question-result-header protractor-test-practice-complete-message" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
-      <h3 class="oppia-question-result-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
+      <h3 class="oppia-question-result-header e2e-test-practice-complete-message" *ngIf="testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
+      <h3 class="oppia-question-result-header" *ngIf="!testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
     </div>
 
     <div class="oppia-result-body">
       <div class="score-ring-outer">
         <div class="score-ring-inner">
-          <oppia-score-ring [score]="$ctrl.totalScore"
-                            [test-is-passed]="$ctrl.testIsPassed">
+          <oppia-score-ring [score]="totalScore"
+                            [testIsPassed]="testIsPassed">
           </oppia-score-ring>
         </div>
       </div>
@@ -45,49 +45,53 @@
         <h3 class="oppia-result-detail-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
 
         <div class="skill-score-body">
-          <div class="score" ng-repeat="(skillId, scorePerSkill) in $ctrl.scorePerSkillMapping">
-            <div class="list-item" ng-click="$ctrl.openSkillMasteryModal(skillId)"><[scorePerSkill.description]></div>
-            <div class="score-outer d-flex justify-content-between align-items-center">
-              <div class="oppia-skill-score-container">
-                <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScoreBar(scorePerSkill)}"></div>
-              </div>
-              <div class="score-text-outer">
-                <span class="score-recieved"><[scorePerSkill.score.toFixed(2)]></span>
-                <span class="score-total">/ <[scorePerSkill.total]></span>
+          <div class="score" *ngFor="let item of scorePerSkillMapping | keyvalue">
+            <div *ngIf="item.value && item.value.total > 0">
+              <div class="list-item" (click)="openSkillMasteryModal(item.key)">{{item.value.description}}</div>
+              <div class="score-outer d-flex justify-content-between align-items-center">
+                <div class="oppia-skill-score-container">
+                  <div class="score-bar" [ngStyle]="{width: getScorePercentage(item.value) + '%', background: getColorForScoreBar(item.value)}"></div>
+                </div>
+                <div class="score-text-outer">
+                  <span class="score-recieved">{{item.value.score.toFixed(2)}}</span>
+                  <span class="score-total">/ {{item.value.total}}</span>
+                </div>
               </div>
             </div>
           </div>
           <div class="final-result">
             <span class="score-final-description">Answers Correct:</span>
-            <span class="score-final score-recieved"><[$ctrl.finalCorrect.toFixed(2)]></span>
-            <span class="score-final">/ <[$ctrl.allQuestions]></span>
+            <span class="score-final score-recieved">{{finalCorrect.toFixed(2)}}</span>
+            <span class="score-final">/ {{allQuestions}}</span>
           </div>
+          <div class="score-calculation-text">This score is based on the number of hints you used and incorrect answers you entered during this session.</div>
         </div>
 
         <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text mt-4"
-                ng-if="!$ctrl.testIsPassed"
-                ng-click="$ctrl.reviewConceptCardAndRetryTest()">
+                *ngIf="!testIsPassed"
+                (click)="reviewConceptCardAndRetryTest()">
           Review and Retry
         </button>
       </div>
     </div>
 
     <div class="results-footer">
-      <div class="question-player-results-footer" ng-if="$ctrl.showActionButtonsFooter()">
-        <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
-              ng-click="$ctrl.performAction(actionButton)" ng-if="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !$ctrl.userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && $ctrl.getWorstSkillIds().length === 0)">
-          <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
-            <span ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></span>
-            <span class="action-button-text" translate="<[actionButton.i18nId]>"></span>
+      <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
+        <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
+              (click)="performAction(actionButton)">
+          <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
+               *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)">
+            <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
+            <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
           </div>
         </span>
       </div>
-      <div class="question-player-results-footer" ng-if="$ctrl.showActionButtonsFooter()">
-        <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
-              ng-click="$ctrl.performAction(actionButton)" ng-if="actionButton.type === 'RETRY_SESSION'">
-          <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
-            <span ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)"></span>
-            <span class="action-button-text" translate="<[actionButton.i18nId]>"></span>
+      <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
+        <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
+              (click)="performAction(actionButton)">
+          <div *ngIf="actionButton.type === 'RETRY_SESSION'" class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}">
+            <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
+            <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
           </div>
         </span>
       </div>
@@ -179,11 +183,11 @@
   }
 
   .oppia-result-header, .oppia-result-body {
-    background-color: #FFF;
+    background-color: #fff;
   }
 
   .oppia-question-result-header {
-    color: #015C53;
+    color: #015c53;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 30px;
     font-style: normal;
@@ -220,7 +224,7 @@
   }
 
   .oppia-question-player-container .action-button-inner {
-    color: #FFF;
+    color: #fff;
     text-align: center;
     vertical-align: center;
   }
@@ -247,7 +251,7 @@
   .oppia-question-player-container .review-lowest-scored-skill-inner {
     background-color: rgb(32, 93, 134);
     border-radius: 5px;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
     font-weight: 500;
     margin: 10px 0;
@@ -260,14 +264,14 @@
   }
 
   .oppia-question-player-container .learn-more {
-    color: #0D48A1;
+    color: #0d48a1;
     margin-top: -15px;
   }
 
   .oppia-question-player-container .my-dashboard-inner {
     background-color: rgb(0, 100, 92);
     border-radius: 5px;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
     font-weight: 500;
     margin: 10px 0;
@@ -277,7 +281,7 @@
   .oppia-question-player-container .new-session-inner {
     background-color: rgb(197, 95, 69);
     border-radius: 5px;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
     font-weight: 500;
     margin: 10px 0;
@@ -285,7 +289,7 @@
   }
 
   .oppia-question-player-container .oppia-question-player-card {
-    background: #FFF;
+    background: #fff;
     border-radius: 4px;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     height: 100px;
@@ -305,7 +309,7 @@
   }
 
   .oppia-question-player-container .oppia-question-player-header {
-    color: #015C53;
+    color: #015c53;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     font-style: normal;
@@ -317,15 +321,15 @@
   }
 
   .oppia-question-player-container .oppia-question-player-progress {
-    background: #FFF;
-    border: 2px solid #0D48A1;
+    background: #fff;
+    border: 2px solid #0d48a1;
     box-sizing: border-box;
     height: 20px;
     margin: 10px 25px 0;
   }
 
   .oppia-question-player-progress .current-progress {
-    background: #0D48A1;
+    background: #0d48a1;
     height: 16px;
   }
 
@@ -334,7 +338,7 @@
   }
 
   .oppia-question-player-container .skill-score-table {
-    background: #FFF;
+    background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.25);
     box-sizing: border-box;
     height: 10px;
@@ -369,11 +373,17 @@
   }
 
   .oppia-skill-score-container {
-    background-color: #FFF;
+    background-color: #fff;
     border: 1px solid rgba(0, 0, 0, 0.25);
     border-radius: 20px;
     height: 17px;
     width: 80%;
+  }
+
+  .score-calculation-text {
+    font-size: 0.9em;
+    margin: 30px 0 -20px 0;
+    text-align: right;
   }
 
   .list-item {
@@ -451,6 +461,10 @@
 
   .score-final {
     font-size: 16px;
+  }
+
+  .score-calculation-text {
+    text-align: center;
   }
 }
 

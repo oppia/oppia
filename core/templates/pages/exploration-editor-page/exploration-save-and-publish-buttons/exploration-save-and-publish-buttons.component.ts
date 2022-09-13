@@ -55,6 +55,10 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         return ExplorationRightsService.isPrivate();
       };
 
+      $scope.isLockedByAdmin = function() {
+        return EditabilityService.isLockedByAdmin();
+      };
+
       $scope.isExplorationLockedForEditing = function() {
         return ChangeListService.isExplorationLockedForEditing();
       };
@@ -158,13 +162,13 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
-        ExplorationSaveService.saveChanges(
+        ExplorationSaveService.saveChangesAsync(
           showLoadingDots, hideLoadingAndUpdatePermission)
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
             $scope.$applyAsync();
-          });
+          }, () => {});
         $scope.$applyAsync();
       };
       ctrl.$onInit = function() {

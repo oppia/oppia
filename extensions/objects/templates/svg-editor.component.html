@@ -92,7 +92,7 @@
                 [disabled]="!isPencilEnabled()">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
+        <button class="icon-tool toolbar-button thin-button e2e-test-create-line"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createLine()"
                 placement="right"
@@ -100,7 +100,7 @@
                 [disabled]="!areAllToolsEnabled()">
           <i class="fas fa-slash oppia-slash-icon"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
+        <button class="icon-tool toolbar-button thin-button e2e-test-create-rectangle"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createRect()"
                 placement="left"
@@ -108,7 +108,7 @@
                 [disabled]="!areAllToolsEnabled()">
           <i class="far fa-square"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-circle"
+        <button class="icon-tool toolbar-button thin-button e2e-test-create-circle"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createCircle()"
                 placement="right"
@@ -116,7 +116,7 @@
                 [disabled]="!areAllToolsEnabled()">
           <i class="far fa-circle"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-text"
+        <button class="icon-tool toolbar-button thin-button e2e-test-create-text"
                 [ngClass]="{'disabled' : !areAllToolsEnabled()}"
                 (click)="createText()"
                 placement="left"
@@ -138,7 +138,7 @@
                 ngbTooltip="Open Polygon"
                 [disabled]="!isOpenPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-bezier"
+        <button class="icon-tool toolbar-button thin-button e2e-test-create-bezier"
                 [ngClass]="{'disabled' : !(areAllToolsEnabled() || isDrawModeBezier())}"
                 (click)="createQuadraticBezier()"
                 placement="right"
@@ -146,7 +146,7 @@
                 [disabled]="!(areAllToolsEnabled() || isDrawModeBezier())">
           <i class="fas fa-bezier-curve bezier-curve"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-piechart"
+        <button class="icon-tool toolbar-button thin-button e2e-test-create-piechart"
                 [ngClass]="{'disabled' : !isPieChartEnabled()}"
                 (click)="createPieChart()"
                 placement="left"
@@ -154,7 +154,7 @@
                 [disabled]="!isPieChartEnabled()">
           <i class="fas fa-chart-pie pie-chart"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
+        <button class="icon-tool toolbar-button thin-button e2e-test-create-svgupload"
                 [ngClass]="{'disabled' : !isSvgUploadEnabled()}"
                 (click)="uploadSvgFile()"
                 placement="right"
@@ -274,24 +274,28 @@
       </div>
       <div class="input-tag" *ngIf="objectIsSelected">
         Layer number:{{ layerNum }}
-        <i class="material-icons layer-info" placement="bottom"
+        <i class="fas fa-question-circle layer-info" placement="bottom"
            ngbTooltip="This denotes the layer in which the currently selected shape is present. Layer 1 is the bottom layer.">
-          &#xE887;
         </i>
       </div>
     </div>
   </div>
   <div *ngIf="isDiagramSaved()">
-    <div class="diagram-editor-saved-image-container protractor-test-saved-diagram-container">
-      <i class="material-icons diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
-         title="Continue editing the diagram">
-        &#xE254;
+    <div class="diagram-editor-saved-image-container e2e-test-saved-diagram-container">
+      <i class="fas fa-pen diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
+         title="Continue editing the diagram">s
       </i>
       <img [src]="data.savedSvgUrl" [ngStyle]="svgContainerStyle">
     </div>
   </div>
-  <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box">
-    <button class="btn btn-success float-right protractor-test-save-diagram"
+  <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box mt-4 d-flex justify-content-end">
+    <button type="button"
+            class="btn btn-secondary mr-3"
+            (click)="discardSvgFile()"
+            [disabled]="isUserDrawing()">
+      Discard
+    </button>
+    <button class="btn btn-success e2e-test-save-diagram"
             (click)="saveSvgFile()"
             [disabled]="isUserDrawing() || loadingIndicatorIsShown">
       <span *ngIf="!loadingIndicatorIsShown">Use This Image</span>
@@ -438,7 +442,7 @@
   }
 
   .svg-editor .svg-editor .horizontal-toolbar .layer-info {
-    font-size: 19px;
+    font-size: 16px;
   }
 
   .svg-editor .svg-editor .vertical-toolbar {

@@ -40,7 +40,7 @@ interface FetchSkillBackendResponse {
   };
 }
 
-interface FetchSkillResponse {
+export interface FetchSkillResponse {
   skill: Skill;
   assignedSkillTopicData: {
     [topicName: string]: string;
@@ -60,6 +60,10 @@ interface UpdateSkillBackendResponse {
 
 interface DoesSkillWithDescriptionExistBackendResponse {
   'skill_description_exists': boolean;
+}
+
+interface SkillAssignmentForDiagnosticTestBackendResponse {
+  'topic_names': string[];
 }
 
 @Injectable({
@@ -161,7 +165,7 @@ export class SkillBackendApiService {
 
   private _doesSkillWithDescriptionExist(
       description: string,
-      successCallback: (value?: boolean) => void,
+      successCallback: (value: boolean | PromiseLike<boolean>) => void,
       errorCallback: (reason?: string) => void): void {
     let skillDescriptionUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE, {
@@ -181,6 +185,25 @@ export class SkillBackendApiService {
       Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesSkillWithDescriptionExist(description, resolve, reject);
+    });
+  }
+
+  async getTopicNamesWithGivenSkillAssignedForDiagnosticTest(skillId: string):
+      Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      let skillAssignmentForDiagnosticTestUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          SkillDomainConstants
+            .SKILL_ASSIGNMENT_FOR_DIAGNOSTIC_TEST_URL_TEMPLATE, {
+            skill_id: skillId
+          }));
+
+      this.http.get<SkillAssignmentForDiagnosticTestBackendResponse>(
+        skillAssignmentForDiagnosticTestUrl).toPromise().then((response) => {
+        resolve(response.topic_names);
+      }, (errorResponse) => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 }

@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (user_models, email_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.email])
+    [models.Names.USER, models.Names.EMAIL])
 
 
 class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
@@ -39,7 +39,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     }
 
     def setUp(self):
-        super(EmailDashboardDataHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.SUBMITTER_EMAIL)
@@ -80,9 +80,9 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     def test_that_page_is_accessible_to_authorised_users_only(self):
         # Make sure that only authorised users can access query pages.
         self.login(self.USER_A_EMAIL)
-        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
             self.get_html_response('/emaildashboard')
-        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+        with self.assertRaisesRegex(Exception, '401 Unauthorized'):
             self.get_html_response(
                 '/querystatuscheck?query_id=%s' % 'valid_query_id')
         self.logout()
@@ -149,7 +149,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     }
 
     def setUp(self):
-        super(EmailDashboardResultTests, self).setUp()
+        super().setUp()
         # User A has one created exploration.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, 'systemUser')
@@ -283,9 +283,6 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 sent_email_model.subject, 'subject')
             self.assertEqual(
                 sent_email_model.html_body, 'body')
-            self.assertEqual(
-                sorted(sent_email_model.recipient_ids),
-                sorted([self.user_a_id, self.user_b_id]))
             self.assertEqual(
                 sent_email_model.sender_id, self.submitter_id)
             self.assertEqual(

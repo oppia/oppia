@@ -18,578 +18,777 @@
  * keeps no mementos.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { EventEmitter, Injectable } from '@angular/core';
+
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
+
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { ConfirmDeleteStateModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import { ContextService } from 'services/context.service';
+import { ChangeListService, StatePropertyNames, StatePropertyValues } from 'pages/exploration-editor-page/services/change-list.service';
+import { StateObjectsBackendDict, States, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { AlertsService } from 'services/alerts.service';
+import { ValidatorsService } from 'services/validators.service';
+import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { State } from 'domain/state/StateObjectFactory';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { DataFormatToDefaultValuesKey } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
+import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
+import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-require(
-  'pages/exploration-editor-page/editor-tab/templates/' +
-  'modal-templates/confirm-delete-state-modal.controller.ts');
-require('domain/exploration/StatesObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('pages/exploration-editor-page/services/angular-name.service.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-init-state-name.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'solution-validity.service.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/validators.service.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationStatesService {
+  stateAddedCallbacks: ((addedStateName: string) => void)[] = [];
+  stateDeletedCallbacks: ((deletedStateName: string) => void)[] = [];
+  stateRenamedCallbacks: (
+    (oldStateName: string, newStateName: string) => void
+  )[] = [];
 
-import { EventEmitter } from '@angular/core';
+  stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
+  private _states: States | null = null;
+  private _refreshGraphEventEmitter: EventEmitter<unknown> = new EventEmitter();
 
-angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
-  'AlertsService', 'AngularNameService', 'AnswerClassificationService',
-  'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
-  'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
-  'StatesObjectFactory', 'ValidatorsService',
-  function(
-      $filter, $injector, $location, $q, $rootScope, $uibModal,
-      AlertsService, AngularNameService, AnswerClassificationService,
-      ChangeListService, ContextService, ExplorationInitStateNameService,
-      SolutionValidityService, StateEditorRefreshService, StateEditorService,
-      StatesObjectFactory, ValidatorsService) {
-    var _states = null;
+  constructor(
+    private angularNameService: AngularNameService,
+    private alertsService: AlertsService,
+    private answerClassificationService: AnswerClassificationService,
+    private changeListService: ChangeListService,
+    private contextService: ContextService,
+    private explorationInitStateNameService: ExplorationInitStateNameService,
+    private interactionRulesRegistryService: InteractionRulesRegistryService,
+    private windowRef: WindowRef,
+    private ngbModal: NgbModal,
+    private normalizeWhitespacePipe: NormalizeWhitespacePipe,
+    private solutionValidityService: SolutionValidityService,
+    private stateEditorService: StateEditorService,
+    private stateEditorRefreshService: StateEditorRefreshService,
+    private statesObjectFactory: StatesObjectFactory,
+    private validatorsService: ValidatorsService,
+  ) {}
 
-    var stateAddedCallbacks = [];
-    var stateDeletedCallbacks = [];
-    var stateRenamedCallbacks = [];
-    var stateInteractionSavedCallbacks = [];
-    /** @private */
-    var refreshGraphEventEmitter = new EventEmitter();
-
-    // Properties that have a different backend representation from the
-    // frontend and must be converted.
-    var BACKEND_CONVERSIONS = {
-      answer_groups: function(answerGroups) {
-        return answerGroups.map(function(answerGroup) {
-          return answerGroup.toBackendDict();
-        });
-      },
-      content: function(content) {
-        return content.toBackendDict();
-      },
-      recorded_voiceovers: function(recordedVoiceovers) {
-        return recordedVoiceovers.toBackendDict();
-      },
-      default_outcome: function(defaultOutcome) {
-        if (defaultOutcome) {
-          return defaultOutcome.toBackendDict();
-        } else {
-          return null;
-        }
-      },
-      hints: function(hints) {
-        return hints.map(function(hint) {
-          return hint.toBackendDict();
-        });
-      },
-      param_changes: function(paramChanges) {
-        return paramChanges.map(function(paramChange) {
-          return paramChange.toBackendDict();
-        });
-      },
-      param_specs: function(paramSpecs) {
-        return paramSpecs.toBackendDict();
-      },
-      solution: function(solution) {
-        if (solution) {
-          return solution.toBackendDict();
-        } else {
-          return null;
-        }
-      },
-      written_translations: function(writtenTranslations) {
-        return writtenTranslations.toBackendDict();
-      },
-      widget_customization_args: function(customizationArgs) {
-        return Interaction.convertCustomizationArgsToBackendDict(
-          customizationArgs);
-      }
-    };
-
-    // Maps backend names to the corresponding frontend dict accessor lists.
-    var PROPERTY_REF_DATA = {
-      answer_groups: ['interaction', 'answerGroups'],
-      confirmed_unclassified_answers: [
-        'interaction', 'confirmedUnclassifiedAnswers'],
-      content: ['content'],
-      recorded_voiceovers: ['recordedVoiceovers'],
-      linked_skill_id: ['linkedSkillId'],
-      default_outcome: ['interaction', 'defaultOutcome'],
-      param_changes: ['paramChanges'],
-      param_specs: ['paramSpecs'],
-      hints: ['interaction', 'hints'],
-      next_content_id_index: ['nextContentIdIndex'],
-      solicit_answer_details: ['solicitAnswerDetails'],
-      card_is_checkpoint: ['cardIsCheckpoint'],
-      solution: ['interaction', 'solution'],
-      widget_id: ['interaction', 'id'],
-      widget_customization_args: ['interaction', 'customizationArgs'],
-      written_translations: ['writtenTranslations']
-    };
-
-    var CONTENT_ID_EXTRACTORS = {
-      answer_groups: function(answerGroups) {
-        var contentIds = new Set();
-        answerGroups.forEach(function(answerGroup) {
-          contentIds.add(answerGroup.outcome.feedback.contentId);
-          answerGroup.rules.forEach(rule => {
-            Object.keys(rule.inputs).forEach(inputName => {
-              if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
-                contentIds.add(rule.inputs[inputName].contentId);
-              }
-            });
-          });
-        });
-        return contentIds;
-      },
-      default_outcome: function(defaultOutcome) {
-        var contentIds = new Set();
-        if (defaultOutcome) {
-          contentIds.add(defaultOutcome.feedback.contentId);
-        }
-        return contentIds;
-      },
-      hints: function(hints) {
-        var contentIds = new Set();
-        hints.forEach(function(hint) {
-          contentIds.add(hint.hintContent.contentId);
-        });
-        return contentIds;
-      },
-      solution: function(solution) {
-        var contentIds = new Set();
-        if (solution) {
-          contentIds.add(solution.explanation.contentId);
-        }
-        return contentIds;
-      },
-      widget_customization_args: function(customizationArgs) {
-        return new Set(
-          Interaction.getCustomizationArgContentIds(customizationArgs));
-      }
-    };
-
-    var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
-      var diffList = Array.from(setA).filter(function(element) {
-        return !setB.has(element);
+  // Properties that have a different backend representation from the
+  // frontend and must be converted.
+  private _BACKEND_CONVERSIONS = {
+    answer_groups: (answerGroups: AnswerGroup[]) => {
+      return answerGroups.map((answerGroup) => {
+        return answerGroup.toBackendDict();
       });
-      return diffList;
-    };
-
-    var _setState = function(stateName, stateData, refreshGraph) {
-      _states.setState(stateName, angular.copy(stateData));
-      if (refreshGraph) {
-        refreshGraphEventEmitter.emit();
+    },
+    content: (content: SubtitledHtml): SubtitledHtmlBackendDict => {
+      return content.toBackendDict();
+    },
+    recorded_voiceovers: (recordedVoiceovers: RecordedVoiceovers) => {
+      return recordedVoiceovers.toBackendDict();
+    },
+    default_outcome: (defaultOutcome: Outcome | null) => {
+      if (defaultOutcome) {
+        return defaultOutcome.toBackendDict();
+      } else {
+        return null;
       }
-    };
-
-    var getStatePropertyMemento = function(stateName, backendName) {
-      var accessorList = PROPERTY_REF_DATA[backendName];
-      var propertyRef = _states.getState(stateName);
-      try {
-        accessorList.forEach(function(key) {
-          propertyRef = propertyRef[key];
-        });
-      } catch (e) {
-        var additionalInfo = (
-          '\nUndefined states error debug logs:' +
-          '\nRequested state name: ' + stateName +
-          '\nExploration ID: ' + ContextService.getExplorationId() +
-          '\nChange list: ' + JSON.stringify(
-            ChangeListService.getChangeList()) +
-          '\nAll states names: ' + _states.getStateNames());
-        $rootScope.$applyAsync();
-        e.message += additionalInfo;
-        throw e;
+    },
+    hints: (hints: Hint[]) => {
+      return hints.map((hint) => {
+        return hint.toBackendDict();
+      });
+    },
+    param_changes: (paramChanges: ParamChange[]) => {
+      return paramChanges.map((paramChange) => {
+        return paramChange.toBackendDict();
+      });
+    },
+    param_specs: (paramSpecs: ParamSpecs) => {
+      return paramSpecs.toBackendDict();
+    },
+    solution: (solution: Solution) => {
+      if (solution) {
+        return solution.toBackendDict();
+      } else {
+        return null;
       }
+    },
+    written_translations: (writtenTranslations: WrittenTranslations) => {
+      return writtenTranslations.toBackendDict();
+    },
+    widget_customization_args: (
+        customizationArgs: InteractionCustomizationArgs
+    ) => {
+      return Interaction.convertCustomizationArgsToBackendDict(
+        customizationArgs);
+    }
+  };
 
-      return angular.copy(propertyRef);
-    };
+  // Maps backend names to the corresponding frontend dict accessor lists.
+  PROPERTY_REF_DATA = {
+    answer_groups: ['interaction', 'answerGroups'],
+    confirmed_unclassified_answers: [
+      'interaction', 'confirmedUnclassifiedAnswers'],
+    content: ['content'],
+    recorded_voiceovers: ['recordedVoiceovers'],
+    linked_skill_id: ['linkedSkillId'],
+    default_outcome: ['interaction', 'defaultOutcome'],
+    param_changes: ['paramChanges'],
+    param_specs: ['paramSpecs'],
+    hints: ['interaction', 'hints'],
+    next_content_id_index: ['nextContentIdIndex'],
+    solicit_answer_details: ['solicitAnswerDetails'],
+    card_is_checkpoint: ['cardIsCheckpoint'],
+    solution: ['interaction', 'solution'],
+    widget_id: ['interaction', 'id'],
+    widget_customization_args: ['interaction', 'customizationArgs'],
+    written_translations: ['writtenTranslations']
+  };
 
-    var saveStateProperty = function(stateName, backendName, newValue) {
-      var oldValue = getStatePropertyMemento(stateName, backendName);
-      var newBackendValue = angular.copy(newValue);
-      var oldBackendValue = angular.copy(oldValue);
-
-      if (BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
-        newBackendValue = convertToBackendRepresentation(newValue, backendName);
-        oldBackendValue = convertToBackendRepresentation(oldValue, backendName);
-      }
-
-      if (!angular.equals(oldValue, newValue)) {
-        ChangeListService.editStateProperty(
-          stateName, backendName, newBackendValue, oldBackendValue);
-        $rootScope.$applyAsync();
-
-        var newStateData = _states.getState(stateName);
-        var accessorList = PROPERTY_REF_DATA[backendName];
-
-        if (CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
-          var oldContentIds = CONTENT_ID_EXTRACTORS[backendName](oldValue);
-          var newContentIds = CONTENT_ID_EXTRACTORS[backendName](newValue);
-          var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
-            oldContentIds, newContentIds);
-          var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
-            newContentIds, oldContentIds);
-          contentIdsToDelete.forEach(function(contentId) {
-            newStateData.recordedVoiceovers.deleteContentId(contentId);
-            newStateData.writtenTranslations.deleteContentId(contentId);
-          });
-          contentIdsToAdd.forEach(function(contentId) {
-            newStateData.recordedVoiceovers.addContentId(contentId);
-            newStateData.writtenTranslations.addContentId(contentId);
-          });
-        }
-        var propertyRef = newStateData;
-        for (var i = 0; i < accessorList.length - 1; i++) {
-          propertyRef = propertyRef[accessorList[i]];
-        }
-
-        propertyRef[accessorList[accessorList.length - 1]] = angular.copy(
-          newValue);
-
-        // We do not refresh the state editor immediately after the interaction
-        // id alone is saved, because the customization args dict will be
-        // temporarily invalid. A change in interaction id will always entail
-        // a change in the customization args dict anyway, so the graph will
-        // get refreshed after both properties have been updated.
-        var refreshGraph = (backendName !== 'widget_id');
-        _setState(stateName, newStateData, refreshGraph);
-      }
-    };
-
-    var convertToBackendRepresentation = function(frontendValue, backendName) {
-      var conversionFunction = BACKEND_CONVERSIONS[backendName];
-      return conversionFunction(frontendValue);
-    };
-
-    // TODO(sll): Add unit tests for all get/save methods.
-    return {
-      init: function(statesBackendDict) {
-        _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
-        // Initialize the solutionValidityService.
-        SolutionValidityService.init(_states.getStateNames());
-        _states.getStateNames().forEach(function(stateName) {
-          var solution = _states.getState(stateName).interaction.solution;
-          if (solution) {
-            var result = (
-              AnswerClassificationService.getMatchingClassificationResult(
-                stateName,
-                _states.getState(stateName).interaction,
-                solution.correctAnswer,
-                $injector.get(
-                  AngularNameService.getNameOfInteractionRulesService(
-                    _states.getState(stateName).interaction.id))));
-            var solutionIsValid = stateName !== result.outcome.dest;
-            SolutionValidityService.updateValidity(
-              stateName, solutionIsValid);
-          }
-        });
-      },
-      getStates: function() {
-        return angular.copy(_states);
-      },
-      getStateNames: function() {
-        return _states.getStateNames();
-      },
-      hasState: function(stateName) {
-        return _states.hasState(stateName);
-      },
-      getState: function(stateName) {
-        return angular.copy(_states.getState(stateName));
-      },
-      setState: function(stateName, stateData) {
-        _setState(stateName, stateData, true);
-      },
-      getCheckpointCount: function() {
-        var count: number = 0;
-        if (_states) {
-          _states.getStateNames().forEach(function(stateName) {
-            if (_states.getState(stateName).cardIsCheckpoint) {
-              count++;
+  private _CONTENT_ID_EXTRACTORS = {
+    answer_groups: (answerGroups) => {
+      let contentIds = new Set();
+      answerGroups.forEach((answerGroup) => {
+        contentIds.add(answerGroup.outcome.feedback.contentId);
+        answerGroup.rules.forEach((rule) => {
+          Object.keys(rule.inputs).forEach(inputName => {
+            const ruleInput = rule.inputs[inputName];
+            // All rules input types which are translatable are subclasses of
+            // BaseTranslatableObject having dict structure with contentId
+            // as a key.
+            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+              contentIds.add(ruleInput.contentId);
             }
           });
-        }
-        return count;
-      },
-      isNewStateNameValid: function(newStateName, showWarnings) {
-        if (_states.hasState(newStateName)) {
-          if (showWarnings) {
-            AlertsService.addWarning('A state with this name already exists.');
-          }
-          return false;
-        }
-        return (
-          ValidatorsService.isValidStateName(newStateName, showWarnings));
-      },
-      getStateContentMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'content');
-      },
-      saveStateContent: function(stateName, newContent) {
-        saveStateProperty(stateName, 'content', newContent);
-      },
-      getStateParamChangesMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'param_changes');
-      },
-      saveStateParamChanges: function(stateName, newParamChanges) {
-        saveStateProperty(stateName, 'param_changes', newParamChanges);
-      },
-      getInteractionIdMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'widget_id');
-      },
-      saveInteractionId: function(stateName, newInteractionId) {
-        saveStateProperty(stateName, 'widget_id', newInteractionId);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(_states.getState(stateName));
         });
-      },
-      saveLinkedSkillId: function(stateName, newLinkedSkillId) {
-        saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
-      },
-      saveNextContentIdIndex: function(stateName, newNextContentIdIndex) {
-        saveStateProperty(
-          stateName, 'next_content_id_index', newNextContentIdIndex);
-      },
-      getInteractionCustomizationArgsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'widget_customization_args');
-      },
-      saveInteractionCustomizationArgs: function(
-          stateName, newCustomizationArgs) {
-        saveStateProperty(
-          stateName, 'widget_customization_args', newCustomizationArgs);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(_states.getState(stateName));
-        });
-      },
-      getInteractionAnswerGroupsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'answer_groups');
-      },
-      saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
-        saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(_states.getState(stateName));
-        });
-      },
-      getConfirmedUnclassifiedAnswersMemento: function(stateName) {
-        return getStatePropertyMemento(
-          stateName, 'confirmed_unclassified_answers');
-      },
-      saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
-        saveStateProperty(
-          stateName, 'confirmed_unclassified_answers', newAnswers);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(_states.getState(stateName));
-        });
-      },
-      getInteractionDefaultOutcomeMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'default_outcome');
-      },
-      saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
-        saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
-      },
-      getHintsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'hints');
-      },
-      saveHints: function(stateName, newHints) {
-        saveStateProperty(stateName, 'hints', newHints);
-      },
-      getSolutionMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'solution');
-      },
-      saveSolution: function(stateName, newSolution) {
-        saveStateProperty(stateName, 'solution', newSolution);
-      },
-      getRecordedVoiceoversMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'recorded_voiceovers');
-      },
-      saveRecordedVoiceovers: function(stateName, newRecordedVoiceovers) {
-        saveStateProperty(
-          stateName, 'recorded_voiceovers', newRecordedVoiceovers);
-      },
-      getSolicitAnswerDetailsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'solicit_answer_details');
-      },
-      saveSolicitAnswerDetails: function(stateName, newSolicitAnswerDetails) {
-        saveStateProperty(
-          stateName, 'solicit_answer_details', newSolicitAnswerDetails);
-      },
-      getCardIsCheckpointMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'card_is_checkpoint');
-      },
-      saveCardIsCheckpoint: function(stateName, newCardIsCheckpoint) {
-        saveStateProperty(
-          stateName, 'card_is_checkpoint', newCardIsCheckpoint);
-      },
-      getWrittenTranslationsMemento: function(stateName) {
-        return _states.getState(stateName).writtenTranslations;
-      },
-      saveWrittenTranslation: function(
-          contentId, dataFormat, languageCode, stateName, translationHtml) {
-        ChangeListService.addWrittenTranslation(
-          contentId, dataFormat, languageCode, stateName, translationHtml);
-        let stateData = _states.getState(stateName);
-        if (stateData.writtenTranslations.hasWrittenTranslation(
-          contentId, languageCode)) {
-          stateData.writtenTranslations.updateWrittenTranslation(
-            contentId, languageCode, translationHtml);
-        } else {
-          stateData.writtenTranslations.addWrittenTranslation(
-            contentId, languageCode, dataFormat, translationHtml);
-        }
-        _states.setState(stateName, angular.copy(stateData));
-      },
-      markWrittenTranslationAsNeedingUpdate: function(
-          contentId, languageCode, stateName) {
-        ChangeListService.markTranslationAsNeedingUpdate(
-          contentId, languageCode, stateName);
-        let stateData = _states.getState(stateName);
-        stateData.writtenTranslations.translationsMapping[contentId][
-          languageCode].markAsNeedingUpdate();
-        _states.setState(stateName, angular.copy(stateData));
-      },
-      markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
-        ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
-        let stateData = _states.getState(stateName);
-        const translationMapping = (
-          stateData.writtenTranslations.translationsMapping[contentId]);
-        for (const languageCode in translationMapping) {
-          stateData.writtenTranslations.translationsMapping[contentId][
-            languageCode].markAsNeedingUpdate();
-        }
-        _states.setState(stateName, angular.copy(stateData));
-      },
-      isInitialized: function() {
-        return _states !== null;
-      },
-      addState: function(newStateName, successCallback) {
-        newStateName = $filter('normalizeWhitespace')(newStateName);
-        if (!ValidatorsService.isValidStateName(newStateName, true)) {
-          return;
-        }
-        if (_states.hasState(newStateName)) {
-          AlertsService.addWarning('A state with this name already exists.');
-          return;
-        }
-        AlertsService.clearWarnings();
-
-        _states.addState(newStateName);
-
-        ChangeListService.addState(newStateName);
-        $rootScope.$applyAsync();
-        stateAddedCallbacks.forEach(function(callback) {
-          callback(newStateName);
-        });
-        refreshGraphEventEmitter.emit();
-        if (successCallback) {
-          successCallback(newStateName);
-        }
-      },
-      deleteState: function(deleteStateName) {
-        AlertsService.clearWarnings();
-
-        var initStateName = ExplorationInitStateNameService.displayed;
-        if (deleteStateName === initStateName) {
-          return $q.reject('The initial state can not be deleted.');
-        }
-        if (!_states.hasState(deleteStateName)) {
-          var message = 'No state with name ' + deleteStateName + ' exists.';
-          AlertsService.addWarning(message);
-          return $q.reject(message);
-        }
-
-        return $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/confirm-delete-state-modal.template.html'),
-          backdrop: true,
-          resolve: {
-            deleteStateName: () => deleteStateName
-          },
-          controller: 'ConfirmDeleteStateModalController'
-        }).result.then(function() {
-          _states.deleteState(deleteStateName);
-
-          ChangeListService.deleteState(deleteStateName);
-          $rootScope.$applyAsync();
-
-          if (StateEditorService.getActiveStateName() === deleteStateName) {
-            StateEditorService.setActiveStateName(
-              ExplorationInitStateNameService.savedMemento);
-          }
-
-          stateDeletedCallbacks.forEach(function(callback) {
-            callback(deleteStateName);
-          });
-          $location.path('/gui/' + StateEditorService.getActiveStateName());
-          refreshGraphEventEmitter.emit();
-          // This ensures that if the deletion changes rules in the current
-          // state, they get updated in the view.
-          StateEditorRefreshService.onRefreshStateEditor.emit();
-        }, function() {
-          AlertsService.clearWarnings();
-        });
-      },
-      renameState: function(oldStateName, newStateName) {
-        newStateName = $filter('normalizeWhitespace')(newStateName);
-        if (!ValidatorsService.isValidStateName(newStateName, true)) {
-          return;
-        }
-        if (_states.hasState(newStateName)) {
-          AlertsService.addWarning('A state with this name already exists.');
-          return;
-        }
-        AlertsService.clearWarnings();
-
-        _states.renameState(oldStateName, newStateName);
-
-        StateEditorService.setActiveStateName(newStateName);
-        StateEditorService.setStateNames(_states.getStateNames());
-        // The 'rename state' command must come before the 'change
-        // init_state_name' command in the change list, otherwise the backend
-        // will raise an error because the new initial state name does not
-        // exist.
-        ChangeListService.renameState(newStateName, oldStateName);
-        $rootScope.$applyAsync();
-        SolutionValidityService.onRenameState(newStateName, oldStateName);
-        // Amend initStateName appropriately, if necessary. Note that this
-        // must come after the state renaming, otherwise saving will lead to
-        // a complaint that the new name is not a valid state name.
-        if (ExplorationInitStateNameService.displayed === oldStateName) {
-          ExplorationInitStateNameService.displayed = newStateName;
-          ExplorationInitStateNameService.saveDisplayedValue(newStateName);
-        }
-        stateRenamedCallbacks.forEach(function(callback) {
-          callback(oldStateName, newStateName);
-        });
-        refreshGraphEventEmitter.emit();
-      },
-      registerOnStateAddedCallback: function(callback) {
-        stateAddedCallbacks.push(callback);
-      },
-      registerOnStateDeletedCallback: function(callback) {
-        stateDeletedCallbacks.push(callback);
-      },
-      registerOnStateRenamedCallback: function(callback) {
-        stateRenamedCallbacks.push(callback);
-      },
-      registerOnStateInteractionSavedCallback: function(callback) {
-        stateInteractionSavedCallbacks.push(callback);
-      },
-      get onRefreshGraph() {
-        return refreshGraphEventEmitter;
+      });
+      return contentIds;
+    },
+    default_outcome: (defaultOutcome) => {
+      let contentIds = new Set();
+      if (defaultOutcome) {
+        contentIds.add(defaultOutcome.feedback.contentId);
       }
-    };
+      return contentIds;
+    },
+    hints: (hints) => {
+      let contentIds = new Set();
+      hints.forEach((hint) => {
+        contentIds.add(hint.hintContent.contentId);
+      });
+      return contentIds;
+    },
+    solution: (solution) => {
+      let contentIds = new Set();
+      if (solution) {
+        contentIds.add(solution.explanation.contentId);
+      }
+      return contentIds;
+    },
+    widget_customization_args: (customizationArgs) => {
+      return new Set(
+        Interaction.getCustomizationArgContentIds(customizationArgs));
+    }
+  };
+
+  private _getElementsInFirstSetButNotInSecond(setA, setB): string[] {
+    let diffList = Array.from(setA).filter((element) => {
+      return !setB.has(element);
+    });
+    return diffList as string[];
   }
-]);
+
+  private _setState(stateName: string, stateData, refreshGraph: boolean): void {
+    this._states.setState(stateName, cloneDeep(stateData));
+    if (refreshGraph) {
+      this._refreshGraphEventEmitter.emit();
+    }
+  }
+
+  getStatePropertyMemento(
+     stateName: string, backendName: 'content'
+  ): SubtitledHtml;
+  getStatePropertyMemento(
+      stateName: string, backendName: 'param_changes'
+  ): ParamChange[];
+  getStatePropertyMemento(stateName: string, backendName: 'widget_id'): string;
+  getStatePropertyMemento(
+      stateName: string, backendName: 'widget_customization_args'
+  ): InteractionCustomizationArgs;
+  getStatePropertyMemento(
+      stateName: string, backendName: 'answer_groups'
+  ): AnswerGroup[];
+  getStatePropertyMemento(
+      stateName: string, backendName: 'confirmed_unclassified_answers'
+  ): AnswerGroup[];
+  getStatePropertyMemento(
+      stateName: string, backendName: 'default_outcome'
+  ): Outcome;
+  getStatePropertyMemento(stateName: string, backendName: 'hints'): Hint[];
+  getStatePropertyMemento(
+      stateName: string, backendName: 'solution'
+  ): SubtitledHtml;
+  getStatePropertyMemento(
+      stateName: string, backendName: 'recorded_voiceovers'
+  ): RecordedVoiceovers;
+  getStatePropertyMemento(
+      stateName: string, backendName: 'solicit_answer_details'
+  ): boolean;
+  getStatePropertyMemento(
+      stateName: string, backendName: 'card_is_checkpoint'
+  ): boolean;
+  getStatePropertyMemento(
+      stateName: string, backendName: StatePropertyNames
+  ): StatePropertyValues;
+  getStatePropertyMemento(
+      stateName: string, backendName: StatePropertyNames
+  ): StatePropertyValues {
+    let accessorList = this.PROPERTY_REF_DATA[backendName];
+    let propertyRef = this._states.getState(stateName);
+    try {
+      accessorList.forEach((key: string) => {
+        propertyRef = propertyRef[key];
+      });
+    } catch (e) {
+      let additionalInfo = (
+        '\nUndefined states error debug logs:' +
+        '\nRequested state name: ' + stateName +
+        '\nExploration ID: ' + this.contextService.getExplorationId() +
+        '\nChange list: ' + JSON.stringify(
+          this.changeListService.getChangeList()) +
+        '\nAll states names: ' + this._states.getStateNames());
+      e.message += additionalInfo;
+      throw e;
+    }
+
+    return cloneDeep(propertyRef);
+  }
+
+  saveStateProperty(
+      stateName: string, backendName: 'content', newValue: SubtitledHtml
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'param_changes', newValue: ParamChange[]
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'widget_id', newValue: string
+  ): void;
+  saveStateProperty(
+      stateName: string,
+      backendName: 'widget_customization_args',
+      newValue: InteractionCustomizationArgs
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'answer_groups', newValue: AnswerGroup[]
+  ): void;
+  saveStateProperty(
+      stateName: string,
+      backendName: 'confirmed_unclassified_answers',
+      newValue: AnswerGroup[]
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'default_outcome', newValue: Outcome
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'hints', newValue: Hint[]
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'solution', newValue: SubtitledHtml
+  ): void;
+  saveStateProperty(
+      stateName: string,
+      backendName: 'recorded_voiceovers',
+      newValue: RecordedVoiceovers
+  ): void;
+  saveStateProperty(
+      stateName: string,
+      backendName: 'solicit_answer_details',
+      newValue: boolean
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'card_is_checkpoint', newValue: boolean
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'linked_skill_id', newValue: string
+  ): void;
+  saveStateProperty(
+      stateName: string, backendName: 'next_content_id_index', newValue: number
+  ): void;
+  saveStateProperty(
+      stateName: string,
+      backendName: StatePropertyNames,
+      newValue: StatePropertyValues
+  ): void {
+    let oldValue = (
+      this.getStatePropertyMemento(stateName, backendName));
+    let newBackendValue = cloneDeep(newValue);
+    let oldBackendValue = cloneDeep(oldValue);
+
+    if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
+      newBackendValue = (
+        this.convertToBackendRepresentation(newValue, backendName));
+      oldBackendValue = (
+        this.convertToBackendRepresentation(oldValue, backendName));
+    }
+
+    if (!isEqual(oldValue, newValue)) {
+      this.changeListService.editStateProperty(
+        stateName, backendName, newBackendValue, oldBackendValue);
+
+      let newStateData = this._states.getState(stateName);
+      let accessorList = this.PROPERTY_REF_DATA[backendName];
+
+      if (this._CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
+        let oldContentIds = this._CONTENT_ID_EXTRACTORS[backendName](oldValue);
+        let newContentIds = this._CONTENT_ID_EXTRACTORS[backendName](newValue);
+        let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
+          oldContentIds, newContentIds);
+        let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
+          newContentIds, oldContentIds);
+        contentIdsToDelete.forEach((contentId) => {
+          newStateData.recordedVoiceovers.deleteContentId(contentId);
+          newStateData.writtenTranslations.deleteContentId(contentId);
+        });
+        contentIdsToAdd.forEach((contentId) => {
+          newStateData.recordedVoiceovers.addContentId(contentId);
+          newStateData.writtenTranslations.addContentId(contentId);
+        });
+      }
+      let propertyRef = newStateData;
+      for (let i = 0; i < accessorList.length - 1; i++) {
+        propertyRef = propertyRef[accessorList[i]];
+      }
+
+      propertyRef[accessorList[accessorList.length - 1]] = cloneDeep(
+        newValue);
+
+      // We do not refresh the state editor immediately after the interaction
+      // id alone is saved, because the customization args dict will be
+      // temporarily invalid. A change in interaction id will always entail
+      // a change in the customization args dict anyway, so the graph will
+      // get refreshed after both properties have been updated.
+      let refreshGraph = (backendName !== 'widget_id');
+      this._setState(stateName, newStateData, refreshGraph);
+    }
+  }
+
+  convertToBackendRepresentation(
+      frontendValue: StatePropertyValues, backendName: string
+  ): string {
+    let conversionFunction = this._BACKEND_CONVERSIONS[backendName];
+    return conversionFunction(frontendValue);
+  }
+
+  init(statesBackendDict: StateObjectsBackendDict): void {
+    this._states = (
+      this.statesObjectFactory.createFromBackendDict(statesBackendDict));
+    // Initialize the solutionValidityService.
+    this.solutionValidityService.init(this._states.getStateNames());
+    this._states.getStateNames().forEach((stateName: string) => {
+      let solution = this._states.getState(stateName).interaction.solution;
+      if (solution) {
+        let interactionId = this._states.getState(stateName).interaction.id;
+        let result = (
+          this.answerClassificationService.getMatchingClassificationResult(
+            stateName,
+            this._states.getState(stateName).interaction,
+            solution.correctAnswer,
+            this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+              interactionId
+            )
+          )
+        );
+        let solutionIsValid = stateName !== result.outcome.dest;
+        this.solutionValidityService.updateValidity(
+          stateName, solutionIsValid);
+      }
+    });
+  }
+
+  getStates(): States {
+    return cloneDeep(this._states);
+  }
+
+  getStateNames(): string[] {
+    return this._states.getStateNames();
+  }
+
+  hasState(stateName: string): boolean {
+    return this._states.hasState(stateName);
+  }
+
+  getState(stateName: string): State {
+    return cloneDeep(this._states.getState(stateName));
+  }
+
+  setState(stateName: string, stateData: State): void {
+    this._setState(stateName, stateData, true);
+  }
+
+  getCheckpointCount(): number {
+    let count: number = 0;
+    if (this._states) {
+      this._states.getStateNames().forEach((stateName) => {
+        if (this._states.getState(stateName).cardIsCheckpoint) {
+          count++;
+        }
+      });
+    }
+    return count;
+  }
+
+  isNewStateNameValid(newStateName: string, showWarnings: boolean): boolean {
+    if (this._states.hasState(newStateName)) {
+      if (showWarnings) {
+        this.alertsService.addWarning('A state with this name already exists.');
+      }
+      return false;
+    }
+    return (
+      this.validatorsService.isValidStateName(newStateName, showWarnings));
+  }
+
+  getStateContentMemento(stateName: string): SubtitledHtml {
+    return this.getStatePropertyMemento(stateName, 'content');
+  }
+
+  saveStateContent(stateName: string, newContent: SubtitledHtml): void {
+    this.saveStateProperty(stateName, 'content', newContent);
+  }
+
+  getStateParamChangesMemento(stateName: string): ParamChange[] {
+    return this.getStatePropertyMemento(stateName, 'param_changes');
+  }
+
+  saveStateParamChanges(
+      stateName: string, newParamChanges: ParamChange[]
+  ): void {
+    this.saveStateProperty(stateName, 'param_changes', newParamChanges);
+  }
+
+  getInteractionIdMemento(stateName: string): string {
+    return this.getStatePropertyMemento(stateName, 'widget_id');
+  }
+
+  saveInteractionId(stateName: string, newInteractionId: string): void {
+    this.saveStateProperty(stateName, 'widget_id', newInteractionId);
+    this.stateInteractionSavedCallbacks.forEach((callback) => {
+      callback(this._states.getState(stateName));
+    });
+  }
+
+  saveLinkedSkillId(stateName: string, newLinkedSkillId: string): void {
+    this.saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
+  }
+
+  saveNextContentIdIndex(
+      stateName: string, newNextContentIdIndex: number
+  ): void {
+    this.saveStateProperty(
+      stateName, 'next_content_id_index', newNextContentIdIndex);
+  }
+
+  getInteractionCustomizationArgsMemento(
+      stateName: string
+  ): InteractionCustomizationArgs {
+    return this.getStatePropertyMemento(stateName, 'widget_customization_args');
+  }
+
+  saveInteractionCustomizationArgs(
+      stateName: string, newCustomizationArgs: InteractionCustomizationArgs
+  ): void {
+    this.saveStateProperty(
+      stateName, 'widget_customization_args', newCustomizationArgs);
+    this.stateInteractionSavedCallbacks.forEach((callback) => {
+      callback(this._states.getState(stateName));
+    });
+  }
+
+  getInteractionAnswerGroupsMemento(stateName: string): AnswerGroup[] {
+    return this.getStatePropertyMemento(stateName, 'answer_groups');
+  }
+
+  saveInteractionAnswerGroups(
+      stateName: string, newAnswerGroups: AnswerGroup[]
+  ): void {
+    this.saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
+    this.stateInteractionSavedCallbacks.forEach((callback) => {
+      callback(this._states.getState(stateName));
+    });
+  }
+
+  getConfirmedUnclassifiedAnswersMemento(stateName: string): AnswerGroup[] {
+    return this.getStatePropertyMemento(
+      stateName, 'confirmed_unclassified_answers');
+  }
+
+  saveConfirmedUnclassifiedAnswers(
+      stateName: string, newAnswers: AnswerGroup[]
+  ): void {
+    this.saveStateProperty(
+      stateName, 'confirmed_unclassified_answers', newAnswers);
+    this.stateInteractionSavedCallbacks.forEach((callback) => {
+      callback(this._states.getState(stateName));
+    });
+  }
+
+  getInteractionDefaultOutcomeMemento(stateName: string): Outcome {
+    return this.getStatePropertyMemento(stateName, 'default_outcome');
+  }
+
+  saveInteractionDefaultOutcome(
+      stateName: string, newDefaultOutcome: Outcome
+  ): void {
+    this.saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
+  }
+
+  getHintsMemento(stateName: string): Hint[] {
+    return this.getStatePropertyMemento(stateName, 'hints');
+  }
+
+  saveHints(stateName: string, newHints: Hint[]): void {
+    this.saveStateProperty(stateName, 'hints', newHints);
+  }
+
+  getSolutionMemento(stateName: string): SubtitledHtml {
+    return this.getStatePropertyMemento(stateName, 'solution');
+  }
+
+  saveSolution(stateName: string, newSolution: SubtitledHtml): void {
+    this.saveStateProperty(stateName, 'solution', newSolution);
+  }
+
+  getRecordedVoiceoversMemento(stateName: string): RecordedVoiceovers {
+    return this.getStatePropertyMemento(stateName, 'recorded_voiceovers');
+  }
+
+  saveRecordedVoiceovers(
+      stateName: string, newRecordedVoiceovers: RecordedVoiceovers): void {
+    this.saveStateProperty(
+      stateName, 'recorded_voiceovers', newRecordedVoiceovers);
+  }
+
+  getSolicitAnswerDetailsMemento(stateName: string): boolean {
+    return this.getStatePropertyMemento(stateName, 'solicit_answer_details');
+  }
+
+  saveSolicitAnswerDetails(
+      stateName: string, newSolicitAnswerDetails: boolean): void {
+    this.saveStateProperty(
+      stateName, 'solicit_answer_details', newSolicitAnswerDetails);
+  }
+
+  getCardIsCheckpointMemento(stateName: string): boolean {
+    return this.getStatePropertyMemento(stateName, 'card_is_checkpoint');
+  }
+
+  saveCardIsCheckpoint(stateName: string, newCardIsCheckpoint: boolean): void {
+    this.saveStateProperty(
+      stateName, 'card_is_checkpoint', newCardIsCheckpoint);
+  }
+
+  getWrittenTranslationsMemento(stateName: string): WrittenTranslations {
+    return this._states.getState(stateName).writtenTranslations;
+  }
+
+  saveWrittenTranslation(
+      contentId: string,
+      dataFormat: DataFormatToDefaultValuesKey,
+      languageCode: string,
+      stateName: string,
+      translationHtml: string
+  ): void {
+    this.changeListService.addWrittenTranslation(
+      contentId, dataFormat, languageCode, stateName, translationHtml);
+    let stateData = this._states.getState(stateName);
+    if (
+      stateData.writtenTranslations.hasWrittenTranslation(
+        contentId, languageCode)
+    ) {
+      stateData.writtenTranslations.updateWrittenTranslation(
+        contentId, languageCode, translationHtml);
+    } else {
+      stateData.writtenTranslations.addWrittenTranslation(
+        contentId, languageCode, dataFormat, translationHtml);
+    }
+    this._states.setState(stateName, cloneDeep(stateData));
+  }
+
+  markWrittenTranslationAsNeedingUpdate(
+      contentId: string, languageCode: string, stateName: string
+  ): void {
+    this.changeListService.markTranslationAsNeedingUpdate(
+      contentId, languageCode, stateName);
+    let stateData = this._states.getState(stateName);
+    stateData.writtenTranslations.translationsMapping[contentId][
+      languageCode].markAsNeedingUpdate();
+    this._states.setState(stateName, cloneDeep(stateData));
+  }
+
+  markWrittenTranslationsAsNeedingUpdate(
+      contentId: string, stateName: string
+  ): void {
+    this.changeListService.markTranslationsAsNeedingUpdate(
+      contentId, stateName);
+    let stateData = this._states.getState(stateName);
+    const translationMapping = (
+      stateData.writtenTranslations.translationsMapping[contentId]);
+    for (const languageCode in translationMapping) {
+      stateData.writtenTranslations.translationsMapping[contentId][
+        languageCode].markAsNeedingUpdate();
+    }
+    this._states.setState(stateName, cloneDeep(stateData));
+  }
+
+  isInitialized(): boolean {
+    return this._states !== null;
+  }
+
+  addState(
+      newStateName: string, successCallback: (arg0: string) => void
+  ): void {
+    newStateName = this.normalizeWhitespacePipe.transform(newStateName);
+    if (!this.validatorsService.isValidStateName(newStateName, true)) {
+      return;
+    }
+    if (this._states.hasState(newStateName)) {
+      this.alertsService.addWarning('A state with this name already exists.');
+      return;
+    }
+    this.alertsService.clearWarnings();
+
+    this._states.addState(newStateName);
+
+    this.changeListService.addState(newStateName);
+    this.stateAddedCallbacks.forEach((callback) => {
+      callback(newStateName);
+    });
+    this._refreshGraphEventEmitter.emit();
+    if (successCallback) {
+      successCallback(newStateName);
+    }
+  }
+
+  deleteState(deleteStateName: string): Promise<never> {
+    this.alertsService.clearWarnings();
+
+    let initStateName = this.explorationInitStateNameService.displayed;
+    if (deleteStateName === initStateName) {
+      return Promise.reject('The initial state can not be deleted.');
+    }
+    if (!this._states.hasState(deleteStateName)) {
+      let message = 'No state with name ' + deleteStateName + ' exists.';
+      this.alertsService.addWarning(message);
+      return Promise.reject(message);
+    }
+
+    const modalRef = this.ngbModal.open(ConfirmDeleteStateModalComponent, {
+      backdrop: true,
+    });
+    modalRef.componentInstance.deleteStateName = deleteStateName;
+    modalRef.result.then(() => {
+      this._states.deleteState(deleteStateName);
+
+      this.changeListService.deleteState(deleteStateName);
+
+      if (this.stateEditorService.getActiveStateName() === deleteStateName) {
+        this.stateEditorService.setActiveStateName(
+          this.explorationInitStateNameService.savedMemento);
+      }
+
+      this.stateDeletedCallbacks.forEach((callback) => {
+        callback(deleteStateName);
+      });
+      this.windowRef.nativeWindow.location.hash = (
+        '/gui/' + this.stateEditorService.getActiveStateName());
+      this._refreshGraphEventEmitter.emit();
+      // This ensures that if the deletion changes rules in the current
+      // state, they get updated in the view.
+      this.stateEditorRefreshService.onRefreshStateEditor.emit();
+    }, () => {
+      this.alertsService.clearWarnings();
+    });
+  }
+
+  renameState(oldStateName: string, newStateName: string): void {
+    newStateName = this.normalizeWhitespacePipe.transform(newStateName);
+    if (!this.validatorsService.isValidStateName(newStateName, true)) {
+      return;
+    }
+    if (this._states.hasState(newStateName)) {
+      this.alertsService.addWarning('A state with this name already exists.');
+      return;
+    }
+    this.alertsService.clearWarnings();
+
+    this._states.renameState(oldStateName, newStateName);
+
+    this.stateEditorService.setActiveStateName(newStateName);
+    this.stateEditorService.setStateNames(this._states.getStateNames());
+    // The 'rename state' command must come before the 'change
+    // init_state_name' command in the change list, otherwise the backend
+    // will raise an error because the new initial state name does not
+    // exist.
+    this.changeListService.renameState(newStateName, oldStateName);
+    this.solutionValidityService.onRenameState(newStateName, oldStateName);
+    // Amend initStateName appropriately, if necessary. Note that this
+    // must come after the state renaming, otherwise saving will lead to
+    // a complaint that the new name is not a valid state name.
+    if (this.explorationInitStateNameService.displayed === oldStateName) {
+      this.explorationInitStateNameService.displayed = newStateName;
+      this.explorationInitStateNameService.saveDisplayedValue();
+    }
+    this.stateRenamedCallbacks.forEach((callback) => {
+      callback(oldStateName, newStateName);
+    });
+    this._refreshGraphEventEmitter.emit();
+  }
+
+  registerOnStateAddedCallback(
+      callback: (addedStateName: string) => void): void {
+    this.stateAddedCallbacks.push(callback);
+  }
+
+  registerOnStateDeletedCallback(
+      callback: (deletedStateName: string) => void): void {
+    this.stateDeletedCallbacks.push(callback);
+  }
+
+  registerOnStateRenamedCallback(
+      callback: (oldStateName: string, newStateName: string) => void): void {
+    this.stateRenamedCallbacks.push(callback);
+  }
+
+  registerOnStatesChangedCallback(callback: () => void): void {
+    this.stateAddedCallbacks.push(callback);
+    this.stateRenamedCallbacks.push(callback);
+    this.stateAddedCallbacks.push(callback);
+  }
+
+  registerOnStateInteractionSavedCallback(
+      callback: (state: State) => void): void {
+    this.stateInteractionSavedCallbacks.push(callback);
+  }
+
+  get onRefreshGraph(): EventEmitter<unknown> {
+    return this._refreshGraphEventEmitter;
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationStatesService',
+  downgradeInjectable(ExplorationStatesService));

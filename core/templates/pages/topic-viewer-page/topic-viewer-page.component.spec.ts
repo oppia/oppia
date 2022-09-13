@@ -18,8 +18,9 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
 
 import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
@@ -30,6 +31,7 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockWindowRef {
   _window = {
@@ -41,7 +43,7 @@ class MockWindowRef {
       }
     },
     history: {
-      pushState(data, title: string, url?: string | null) {}
+      pushState(title: string, url: string | null) {}
     }
   };
 
@@ -50,14 +52,23 @@ class MockWindowRef {
   }
 }
 
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
+
 describe('Topic viewer page', () => {
-  let httpTestingController = null;
-  let alertsService = null;
-  let pageTitleService = null;
-  let urlService = null;
-  let windowDimensionsService = null;
-  let topicViewerPageComponent = null;
+  let httpTestingController: HttpTestingController;
+  let alertsService: AlertsService;
+  let pageTitleService: PageTitleService;
+  let urlService: UrlService;
+  let windowDimensionsService: WindowDimensionsService;
+  let topicViewerPageComponent: TopicViewerPageComponent;
   let windowRef: MockWindowRef;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let translateService: TranslateService;
 
   let topicName = 'Topic Name';
   let topicUrlFragment = 'topic-frag';
@@ -99,6 +110,10 @@ describe('Topic viewer page', () => {
         {
           provide: WindowRef,
           useValue: windowRef
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -107,9 +122,14 @@ describe('Topic viewer page', () => {
     alertsService = TestBed.inject(AlertsService);
     pageTitleService = TestBed.inject(PageTitleService);
     urlService = TestBed.inject(UrlService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    translateService = TestBed.inject(TranslateService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   afterEach(() => {
@@ -121,8 +141,7 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
-    spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
+    spyOn(topicViewerPageComponent, 'subscribeToOnLangChange');
     spyOn(windowRef.nativeWindow.history, 'pushState');
 
     topicViewerPageComponent.ngOnInit();
@@ -137,10 +156,7 @@ describe('Topic viewer page', () => {
 
     expect(topicViewerPageComponent.topicId).toBe('1');
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      `Learn ${topicName} | Topic page title | Oppia`);
-    expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
-      'Topic Meta Tag');
+    expect(topicViewerPageComponent.subscribeToOnLangChange);
     expect(topicViewerPageComponent.topicDescription).toBe(
       'Topic Description');
     expect(topicViewerPageComponent.canonicalStorySummaries.length).toBe(1);
@@ -151,6 +167,40 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.topicIsLoading).toBe(false);
     expect(topicViewerPageComponent.practiceTabIsDisplayed).toBe(true);
   }));
+
+  it('should obtain translated title and set it whenever the ' +
+    'selected language changes', () => {
+    topicViewerPageComponent.subscribeToOnLangChange();
+    spyOn(topicViewerPageComponent, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(topicViewerPageComponent.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    topicViewerPageComponent.topicName = topicName;
+    topicViewerPageComponent.pageTitleFragment =
+      topicDict.page_title_fragment_for_web;
+    topicViewerPageComponent.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_PAGE_TITLE', {
+        topicName: 'Topic Name',
+        pageTitleFragment: 'Topic page title'
+      });
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_TOPIC_VIEWER_PAGE_TITLE');
+  });
+
+  it('should unsubscribe upon component destruction', () => {
+    topicViewerPageComponent.subscribeToOnLangChange();
+    expect(topicViewerPageComponent.directiveSubscriptions.closed).toBe(false);
+    topicViewerPageComponent.ngOnDestroy();
+
+    expect(topicViewerPageComponent.directiveSubscriptions.closed).toBe(true);
+  });
 
   it('should set story tab correctly', fakeAsync(() => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -229,6 +279,15 @@ describe('Topic viewer page', () => {
 
     widthSpy.and.returnValue(700);
     expect(topicViewerPageComponent.checkMobileView()).toBe(false);
+  });
+
+  it('should check if the view is tablet or not', () => {
+    var widthSpy = spyOn(windowDimensionsService, 'getWidth');
+    widthSpy.and.returnValue(700);
+    expect(topicViewerPageComponent.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+    expect(topicViewerPageComponent.checkTabletView()).toBe(false);
   });
 
   it('should set url accordingly when user changes active tab to' +

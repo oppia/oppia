@@ -20,55 +20,72 @@ from __future__ import annotations
 
 from core import feconf
 from core.jobs.types import base_validation_errors
+from core.platform import models
+
+from typing import List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
+(base_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.USER])
 
 
 class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):
     """Error class for incorrect key in PendingDeletionRequestModel."""
 
-    def __init__(self, model, incorrect_keys):
+    def __init__(
+        self,
+        model: user_models.PendingDeletionRequestModel,
+        incorrect_keys: List[str]
+    ) -> None:
         message = 'contains keys %s are not allowed' % (incorrect_keys)
-        super(ModelIncorrectKeyError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class ModelExpiringError(base_validation_errors.BaseAuditError):
     """Error class for models that are expiring."""
 
-    def __init__(self, model):
+    def __init__(self, model: user_models.UserQueryModel) -> None:
         message = 'mark model as deleted when older than %s days' % (
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
-        super(ModelExpiringError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class DraftChangeListLastUpdatedNoneError(
-        base_validation_errors.BaseAuditError):
+    base_validation_errors.BaseAuditError
+):
     """Error class for models with draft change list but draft change list
     last_updated is None.
     """
 
-    def __init__(self, model):
+    def __init__(self, model: user_models.ExplorationUserDataModel) -> None:
         message = (
             'draft change list %s exists but draft change list '
             'last updated is None' % model.draft_change_list)
-        super(DraftChangeListLastUpdatedNoneError, self).__init__(
+        super().__init__(
             message, model)
 
 
 class DraftChangeListLastUpdatedInvalidError(
-        base_validation_errors.BaseAuditError):
+    base_validation_errors.BaseAuditError
+):
     """Error class for models with invalid draft change list last_updated."""
 
-    def __init__(self, model):
+    def __init__(self, model: user_models.ExplorationUserDataModel) -> None:
         message = (
             'draft change list last updated %s is greater than the time '
             'when job was run' % model.draft_change_list_last_updated)
-        super(DraftChangeListLastUpdatedInvalidError, self).__init__(
+        super().__init__(
             message, model)
 
 
 class ArchivedModelNotMarkedDeletedError(
-        base_validation_errors.BaseAuditError):
+    base_validation_errors.BaseAuditError
+):
     """Error class for models which are archived but not deleted."""
 
-    def __init__(self, model):
+    def __init__(self, model: user_models.UserQueryModel) -> None:
         message = 'model is archived but not marked as deleted'
-        super(ArchivedModelNotMarkedDeletedError, self).__init__(message, model)
+        super().__init__(message, model)

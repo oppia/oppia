@@ -16,39 +16,64 @@
  * @fileoverview Unit tests for reviewTestPage.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ReviewTestBackendApiService } from
-  'domain/review_test/review-test-backend-api.service';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { TranslateModule, TranslateLoader, TranslateFakeLoader, TranslateService } from '@ngx-translate/core';
+import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
 import { PageTitleService } from 'services/page-title.service';
-import { ReviewTestEngineService } from
-  'pages/review-test-page/review-test-engine.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ReviewTestPageComponent } from './review-test-page.component';
+import { UrlService } from 'services/contextual/url.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { ReviewTest } from 'domain/review_test/review-test.model';
 
-describe('Review test page component', function() {
-  var ctrl = null;
-  var $q = null;
-  var $scope = null;
-  var pageTitleService = null;
-  var reviewTestBackendApiService = null;
-  var reviewTestEngineService = null;
-  var urlService = null;
+describe('Review test page component', () => {
+  let component: ReviewTestPageComponent;
+  let fixture: ComponentFixture<ReviewTestPageComponent>;
+  let pageTitleService: PageTitleService;
+  let reviewTestBackendApiService: ReviewTestBackendApiService;
+  let urlService: UrlService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let translateService: TranslateService;
 
-  importAllAngularServices();
-
-  beforeEach(function() {
-    pageTitleService = TestBed.get(PageTitleService);
-    reviewTestBackendApiService = TestBed.get(ReviewTestBackendApiService);
-    reviewTestEngineService = TestBed.get(ReviewTestEngineService);
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ReviewTestBackendApiService', reviewTestBackendApiService);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader
+          }
+        })
+      ],
+      declarations: [
+        ReviewTestPageComponent,
+      ],
+      providers: [
+        TranslateService,
+        PracticeSessionsBackendApiService,
+        CsrfTokenService,
+        PageTitleService,
+        UrlService,
+        I18nLanguageCodeService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
-    urlService = $injector.get('UrlService');
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ReviewTestPageComponent);
+    component = fixture.componentInstance;
+
+    pageTitleService = TestBed.inject(PageTitleService);
+    reviewTestBackendApiService = TestBed.inject(ReviewTestBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    translateService = TestBed.inject(TranslateService);
+    urlService = TestBed.inject(UrlService);
 
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic_1');
@@ -57,39 +82,25 @@ describe('Review test page component', function() {
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'classroom_1');
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('reviewTestPage', {
-      PageTitleService: pageTitleService,
-      ReviewTestEngineService: reviewTestEngineService
-    });
-
-    // This approach was choosen because spyOn() doesn't work on properties
-    // that doesn't have a get access type.
-    // Without this approach the test will fail because it'll throw
-    // 'Property reviewTestBackendApiService does not have access type get'
-    // or 'Property reviewTestBackendApiService does not have access type set'
-    // error.
-    Object.defineProperty(ctrl, 'reviewTestBackendApiService', {
-      get: () => undefined,
-      set: () => {}
-    });
-
-    spyOnProperty(ctrl, 'reviewTestBackendApiService').and.returnValue(
-      reviewTestBackendApiService);
     spyOn(
       reviewTestBackendApiService, 'fetchReviewTestDataAsync').and.returnValue(
-      $q.resolve({
-        storyName: '',
-        skillDescriptions: ['skill_1', 'skill_2']
-      }));
-
-    ctrl.$onInit();
-    $scope.$apply();
-  }));
+      Promise.resolve(
+        new ReviewTest(
+          '', {skill_1: 'skill_1'})
+      ));
+    spyOn(translateService, 'use').and.stub();
+    spyOn(translateService, 'instant').and.returnValue('translatedTitle');
+  });
 
   it('should initialize correctly controller properties after its' +
-  ' initialization and get skill details from backend', function() {
-    expect(ctrl.questionPlayerConfig).toEqual({
+  ' initialization and get skill details from backend', fakeAsync(() => {
+    spyOn(component, 'subscribeToOnLanguageCodeChange');
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.subscribeToOnLanguageCodeChange).toHaveBeenCalled();
+    expect(component.questionPlayerConfig).toEqual({
       resultActionButtons: [{
         type: 'REVIEW_LOWEST_SCORED_SKILL',
         i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
@@ -102,14 +113,52 @@ describe('Review test page component', function() {
         i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
         url: '/learn/classroom_1/topic_1/story/story_1'
       }],
-      skillList: ['0', '1'],
-      skillDescriptions: ['skill_1', 'skill_2'],
-      questionCount: 6,
+      skillList: ['skill_1'],
+      skillDescriptions: ['skill_1'],
+      questionCount: 3,
       questionPlayerMode: {
         modeType: 'PASS_FAIL',
         passCutoff: 0.75
       },
       questionsSortedByDifficulty: true
     });
+  }));
+
+  it('should subscribe to onLanguageCodeChange', () => {
+    spyOn(component.directiveSubscriptions, 'add');
+    spyOn(i18nLanguageCodeService.onI18nLanguageCodeChange, 'subscribe');
+
+    component.subscribeToOnLanguageCodeChange();
+
+    expect(component.directiveSubscriptions.add).toHaveBeenCalled();
+    expect(i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe)
+      .toHaveBeenCalled();
+  });
+
+  it('should update title whenever the language changes', () => {
+    component.subscribeToOnLanguageCodeChange();
+    spyOn(component, 'setPageTitle');
+
+    i18nLanguageCodeService.onI18nLanguageCodeChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should obtain translated title and set it', () => {
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.storyName = 'dummy_story_name';
+
+    component.setPageTitle();
+
+    expect(pageTitleService.setDocumentTitle)
+      .toHaveBeenCalledWith('translatedTitle');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });

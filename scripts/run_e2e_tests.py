@@ -22,12 +22,16 @@ import os
 import subprocess
 import sys
 
-from core.constants import constants
-from scripts import build
-from scripts import common
-from scripts import flake_checker
-from scripts import install_third_party_libs
-from scripts import servers
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core.constants import constants  # isort:skip
+from scripts import build  # isort:skip
+from scripts import flake_checker  # isort:skip
+from scripts import install_third_party_libs  # isort:skip
+from scripts import servers  # isort:skip
 
 MAX_RETRY_COUNT = 3
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -95,58 +99,52 @@ _PARSER.add_argument(
     action='store_true')
 
 
-# Never rerun failing tests, even when they match a known flake.
-RERUN_POLICY_NEVER = 'never'
-# Only rerun failing tests when they match a known flake.
-RERUN_POLICY_KNOWN_FLAKES = 'known flakes'
-# Always rerun failing tests, even when they don't match a known flake.
-RERUN_POLICY_ALWAYS = 'always'
+SUITES_MIGRATED_TO_WEBDRIVERIO = [
+    'accessibility',
+    'additionalEditorFeatures',
+    'additionalEditorFeaturesModals',
+    'additionalPlayerFeatures',
+    'adminPage',
+    'blogDashboard',
+    'checkpointFeatures',
+    'classroomPage',
+    'classroomPageFileUploadFeatures',
+    'collections',
+    'contributorDashboard',
+    'coreEditorAndPlayerFeatures',
+    'creatorDashboard',
+    'learner',
+    'learnerDashboard',
+    'navigation',
+    'preferences',
+    'profileFeatures',
+    'profileMenu',
+    'skillEditor',
+    'subscriptions',
+    'topicsAndSkillsDashboard',
+    'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures',
+    'topicAndStoryViewer',
+    'users',
+    'wipeout',
+]
 
-RERUN_POLICIES = {
-    'accessibility': RERUN_POLICY_NEVER,
-    'additionaleditorfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
-    'additionalplayerfeatures': RERUN_POLICY_NEVER,
-    'adminpage': RERUN_POLICY_NEVER,
-    'blogdashboard': RERUN_POLICY_NEVER,
-    'classroompage': RERUN_POLICY_NEVER,
-    'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
-    'collections': RERUN_POLICY_NEVER,
-    'contributordashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'embedding': RERUN_POLICY_KNOWN_FLAKES,
-    'explorationfeedbacktab': RERUN_POLICY_NEVER,
-    'explorationhistorytab': RERUN_POLICY_KNOWN_FLAKES,
-    'explorationimprovementstab': RERUN_POLICY_ALWAYS,
-    'explorationstatisticstab': RERUN_POLICY_KNOWN_FLAKES,
-    'explorationtranslationtab': RERUN_POLICY_KNOWN_FLAKES,
-    'extensions': RERUN_POLICY_NEVER,
-    'featuregating': RERUN_POLICY_ALWAYS,
-    'fileuploadextensions': RERUN_POLICY_NEVER,
-    'fileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'learner': RERUN_POLICY_NEVER,
-    'learnerdashboard': RERUN_POLICY_NEVER,
-    'library': RERUN_POLICY_NEVER,
-    'navigation': RERUN_POLICY_KNOWN_FLAKES,
-    'playvoiceovers': RERUN_POLICY_NEVER,
-    'preferences': RERUN_POLICY_NEVER,
-    'profilefeatures': RERUN_POLICY_NEVER,
-    'profilemenu': RERUN_POLICY_NEVER,
-    'publication': RERUN_POLICY_NEVER,
-    'releasecoordinatorpagefeatures': RERUN_POLICY_NEVER,
-    'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
-    'subscriptions': RERUN_POLICY_NEVER,
-    'topicandstoryeditor': RERUN_POLICY_NEVER,
-    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_NEVER,
-    'topicandstoryviewer': RERUN_POLICY_NEVER,
-    'topicsandskillsdashboard': RERUN_POLICY_NEVER,
-    'users': RERUN_POLICY_NEVER,
-    'wipeout': RERUN_POLICY_NEVER,
-    # The suite name is `full` when no --suite argument is passed. This
-    # indicates that all the tests should be run.
-    'full': RERUN_POLICY_NEVER,
-}
+SUITES_STILL_IN_PROTRACTOR = [
+    'embedding',
+    'explorationImprovementsTab',
+    'explorationFeedbackTab',
+    'explorationHistoryTab',
+    'explorationStatisticsTab',
+    'explorationTranslationTab',
+    'extensions',
+    'featureGating',
+    'fileUploadFeatures',
+    'fileUploadExtensions',
+    'learner',
+    'library',
+    'playVoiceovers',
+    'publication',
+]
 
 
 def is_oppia_server_already_running():
@@ -262,21 +260,62 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        stack.enter_context(servers.managed_webdriver_server(
-            chrome_version=args.chrome_driver_version))
+        if args.suite == 'full':
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
 
-        proc = stack.enter_context(servers.managed_protractor_server(
-            suite_name=args.suite,
-            dev_mode=dev_mode,
-            debug_mode=args.debug_mode,
-            sharding_instances=args.sharding_instances,
-            stdout=subprocess.PIPE))
+            print('Protractor suites are starting to run')
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
 
-        print(
-            'Servers have come up.\n'
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots of the '
-            'failed tests in ../protractor-screenshots/')
+            print('WebdriverIO suites are starting to run')
+            proc = stack.enter_context(servers.managed_webdriverio_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+        elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
+            proc = stack.enter_context(servers.managed_webdriverio_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+            print(
+                'Servers have come up.\n'
+                'Note: You can view screenshots of failed tests '
+                'in ../webdriverio-screenshots/')
+
+        elif args.suite in SUITES_STILL_IN_PROTRACTOR:
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
+
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+            print(
+                'Servers have come up.\n'
+                'Note: You can view screenshots of the failed tests '
+                'in ../protractor-screenshots/')
+
+        else:
+            print(
+                'The suite requested to run does not exist'
+                'Please provide a valid suite name')
+            sys.exit(1)
 
         output_lines = []
         while True:
@@ -287,7 +326,7 @@ def run_tests(args):
                     # Although our unit tests always provide unicode strings,
                     # the actual server needs this failsafe since it can output
                     # non-unicode strings.
-                    line = line.encode('utf-8')  # pragma: nocover
+                    line = line.encode('utf-8')  # pragma: no cover
                 output_lines.append(line.rstrip())
                 # Replaces non-ASCII characters with '?'.
                 common.write_stdout_safe(line.decode('ascii', errors='replace'))
@@ -302,7 +341,6 @@ def run_tests(args):
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
-    policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
         for attempt_num in range(1, MAX_RETRY_COUNT + 1):
@@ -319,20 +357,14 @@ def main(args=None):
                 flake_checker.report_pass(parsed_args.suite)
                 break
 
-            # Check whether we should rerun based on this suite's policy.
-            test_is_flaky = flake_checker.is_test_output_flaky(
+            # Check whether we should rerun based on the instructions from the
+            # flake checker server.
+            rerun = flake_checker.check_test_flakiness(
                 output, parsed_args.suite)
-            if policy == RERUN_POLICY_NEVER:
-                print(
-                    'Not rerunning because the policy is to never '
-                    'rerun the {} suite'.format(parsed_args.suite))
-                break
-            if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
-                print((
-                    'Not rerunning because the policy is to only '
-                    'rerun the %s suite on known flakes, and this '
-                    'failure did not match any known flakes')
-                    % parsed_args.suite)
+            if rerun:
+                print('Rerunning.')
+            else:
+                print('Not rerunning.')
                 break
 
     sys.exit(return_code)

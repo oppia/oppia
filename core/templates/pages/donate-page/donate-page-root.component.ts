@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 
@@ -31,6 +32,7 @@ export class DonatePageRootComponent {
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.META);
   }
 }

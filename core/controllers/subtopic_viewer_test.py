@@ -29,7 +29,7 @@ from core.tests import test_utils
 class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(BaseSubtopicViewerControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -48,7 +48,8 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': self.subtopic_id_1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         subtopic_page_services.save_subtopic_page(
@@ -56,7 +57,8 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': self.subtopic_id_2,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
             })]
         )
         subtopic_page_private_topic = (
@@ -67,15 +69,16 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': self.subtopic_id_1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment-one'
             })]
         )
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title')
+            1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = ['skill_id_1']
         subtopic.url_fragment = 'sub-url-frag-one'
         subtopic2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2')
+            2, 'Subtopic Title 2', 'url-frag-two')
         subtopic2.skill_ids = ['skill_id_2']
         subtopic2.url_fragment = 'sub-url-frag-two'
 
@@ -194,7 +197,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'topic_id': 'topic_id',
             'page_contents': expected_page_contents_dict,
             'subtopic_title': 'Subtopic Title',
-            'next_subtopic_dict': expected_next_subtopic_dict
+            'next_subtopic_dict': expected_next_subtopic_dict,
+            'prev_subtopic_dict': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -210,7 +214,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             },
             'written_translations': self.written_translations_dict
         }
-        expected_next_subtopic_dict = {
+        expected_prev_subtopic_dict = {
             'thumbnail_bg_color': None,
             'skill_ids': ['skill_id_1'],
             'id': 1,
@@ -224,7 +228,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'topic_id': 'topic_id',
             'page_contents': expected_page_contents_dict,
             'subtopic_title': 'Subtopic Title 2',
-            'next_subtopic_dict': expected_next_subtopic_dict
+            'next_subtopic_dict': None,
+            'prev_subtopic_dict': expected_prev_subtopic_dict
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 

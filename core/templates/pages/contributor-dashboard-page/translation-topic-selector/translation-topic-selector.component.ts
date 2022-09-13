@@ -17,7 +17,8 @@
  */
 
 import {
-  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild
+  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild,
+  ElementRef
 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -30,11 +31,14 @@ import { ContributionOpportunitiesBackendApiService } from
   templateUrl: './translation-topic-selector.component.html'
 })
 export class TranslationTopicSelectorComponent implements OnInit {
-  @Input() activeTopicName: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activeTopicName!: string;
   @Output() setActiveTopicName: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef;
+  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
 
-  options: string[];
+  options!: string[];
   dropdownShown = false;
 
   constructor(
@@ -44,7 +48,7 @@ export class TranslationTopicSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.contributionOpportunitiesBackendApiService
-      .fetchAllTopicNamesAsync()
+      .fetchTranslatableTopicNamesAsync()
       .then((topicNames) => {
         this.options = topicNames;
       });

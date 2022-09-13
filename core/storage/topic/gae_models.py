@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Dict, List, Mapping, Optional, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -30,7 +30,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 (base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user])
+    models.Names.BASE_MODEL, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -165,22 +166,43 @@ class TopicModel(base_models.VersionedModel):
     # the page title fragment field represents the middle value 'Add, Subtract,
     # Multiply and Divide'.
     page_title_fragment_for_web = datastore_services.StringProperty(
-        indexed=True, default='')
+        required=True, indexed=True)
+    # A diagnostic test contains a set of questions covering multiple topics and
+    # based on the user's performance in the test, a topic is recommended to
+    # them. Now, this field is used for listing the skill IDs from which the
+    # questions should be fetched for the diagnostic test.
+    skill_ids_for_diagnostic_test = datastore_services.StringProperty(
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+    # We expect Mapping because we want to allow models that inherit
+    # from BaseModel as the values, if we used Dict this wouldn't be allowed.
+    def _prepare_additional_models(self) -> Mapping[str, base_models.BaseModel]:
+        """Prepares additional models needed for the commit process.
+
+        Returns:
+            dict(str, BaseModel). Additional models needed for
+            the commit process. Contains the TopicRightsModel.
+        """
+        return {
+            'rights_model': TopicRightsModel.get_by_id(self.id)
+        }
+
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -190,17 +212,31 @@ class TopicModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, for
+                unpublished topics, it may be equal to None.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
-        """
-        super(TopicModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
 
-        topic_rights = TopicRightsModel.get_by_id(self.id)
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
+        """
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
+
+        topic_rights = cast(
+            TopicRightsModel, additional_models['rights_model']
+        )
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
@@ -211,8 +247,12 @@ class TopicModel(base_models.VersionedModel):
             commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
-        topic_commit_log_entry.update_timestamps()
-        topic_commit_log_entry.put()
+        return {
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
+            'commit_log_model': topic_commit_log_entry,
+            'versioned_model': models_to_put['versioned_model'],
+        }
 
     @classmethod
     def get_by_name(cls, topic_name: str) -> Optional[TopicModel]:
@@ -279,6 +319,8 @@ class TopicModel(base_models.VersionedModel):
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_ids_for_diagnostic_test':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -471,15 +513,17 @@ class TopicRightsModel(base_models.VersionedModel):
         """
         return cls.query(cls.manager_ids == user_id).fetch()
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
-    def _trusted_commit(
-            self,
-            committer_id: str,
-            commit_type: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
-    ) -> None:
+    def compute_models_to_commit(
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
         Note that this extends the superclass method.
@@ -489,23 +533,34 @@ class TopicRightsModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, for
+                unpublished topic, it may be equal to None.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
                     cmd: str. Unique command.
                 and then additional arguments for that command.
-        """
-        super(TopicRightsModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
 
-        topic_rights = TopicRightsModel.get_by_id(self.id)
-        if topic_rights.topic_is_published:
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
+        """
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
+
+        if self.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
             status = constants.ACTIVITY_STATUS_PRIVATE
 
-        TopicCommitLogEntryModel(
+        topic_commit_log = TopicCommitLogEntryModel(
             id=('rights-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
             topic_id=self.id,
@@ -515,14 +570,10 @@ class TopicRightsModel(base_models.VersionedModel):
             version=None,
             post_commit_status=status,
             post_commit_community_owned=False,
-            post_commit_is_private=not topic_rights.topic_is_published
-        ).put()
+            post_commit_is_private=not self.topic_is_published
+        )
 
-        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
-            self.get_snapshot_id(self.id, self.version))
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert snapshot_metadata_model is not None
+        snapshot_metadata_model = models_to_put['snapshot_metadata_model']
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             self.manager_ids)))
 
@@ -534,12 +585,20 @@ class TopicRightsModel(base_models.VersionedModel):
                 if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
-                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+                user_id_attribute = commit_cmd[user_id_attribute_name]
+                # Ruling out the possibility of Any other type for mypy type
+                # checking.
+                assert isinstance(user_id_attribute, str)
+                commit_cmds_user_ids.add(user_id_attribute)
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
-        snapshot_metadata_model.update_timestamps()
-        snapshot_metadata_model.put()
+        return {
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
+            'commit_log_model': topic_commit_log,
+            'versioned_model': models_to_put['versioned_model'],
+        }
 
     @staticmethod
     def get_model_association_to_user(

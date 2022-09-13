@@ -16,7 +16,7 @@
  * @fileoverview Component for showing learner dashboard icons.
  */
 
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -33,9 +33,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
 })
-export class LearnerDashboardIconsComponent implements OnInit {
+export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activityType!: string;
   @Input() activityId!: string;
@@ -49,6 +49,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
   get activityActive(): boolean {
     return this.activityIsCurrentlyHoveredOver;
   }
+
   set activityActive(hoverState: boolean) {
     this.activityIsCurrentlyHoveredOver = hoverState;
   }
@@ -58,7 +59,7 @@ export class LearnerDashboardIconsComponent implements OnInit {
       LearnerDashboardIdsBackendApiService,
     private learnerDashboardActivityBackendApiService:
       LearnerDashboardActivityBackendApiService,
-    private ngbModal: NgbModal,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +69,12 @@ export class LearnerDashboardIconsComponent implements OnInit {
           this.learnerDashboardActivityIds = learnerDashboardActivityIds;
         }
       );
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.activityActive !== undefined) {
+      this.setHoverState(changes.activityActive.currentValue);
+    }
   }
 
   enablePlaylistTooltip(): void {

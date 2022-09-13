@@ -168,6 +168,10 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         Args:
             tag: str. End tag of a HTML line.
+
+        Raises:
+            TagMismatchException. Identation mismatch between starting tag and
+                given tag.
         """
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
@@ -176,9 +180,9 @@ class CustomHTMLParser(html.parser.HTMLParser):
         try:
             last_starttag, last_starttag_line_num, last_starttag_col_num = (
                 self.tag_stack.pop())
-        except IndexError:
+        except IndexError as e:
             raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filepath))
+                line_number, self.filepath)) from e
 
         if last_starttag != tag:
             raise TagMismatchException('Error in line %s of file %s\n' % (
@@ -285,6 +289,10 @@ class HTMLLintChecksManager:
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
+
+        Raises:
+            TagMismatchException. Proper identation absent in specified
+                html file.
         """
         html_files_to_lint = self.html_filepaths
         failed = False
@@ -333,7 +341,7 @@ class ThirdPartyHTMLLintChecksManager:
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
         """
-        super(ThirdPartyHTMLLintChecksManager, self).__init__()
+        super().__init__()
         self.files_to_lint = files_to_lint
 
     @property

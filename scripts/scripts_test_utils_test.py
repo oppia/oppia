@@ -28,7 +28,7 @@ import psutil
 
 class PopenStubTests(test_utils.TestBase):
 
-    def test_default_attributes(self):
+    def test_default_attributes(self) -> None:
         popen = scripts_test_utils.PopenStub()
 
         self.assertEqual(popen.pid, 1)
@@ -47,7 +47,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertEqual(popen.name(), 'process')
         self.assertEqual(popen.children(), [])
 
-    def test_explicit_attributes(self):
+    def test_explicit_attributes(self) -> None:
         child = scripts_test_utils.PopenStub()
         popen = scripts_test_utils.PopenStub(
             pid=123, name='foo', stdout=b'abc', stderr=b'def',
@@ -70,14 +70,14 @@ class PopenStubTests(test_utils.TestBase):
         self.assertEqual(popen.children(), [child])
         self.assertEqual(popen.name(), 'foo')
 
-    def test_reassign_returncode(self):
+    def test_reassign_returncode(self) -> None:
         popen = scripts_test_utils.PopenStub(return_code=1)
         self.assertEqual(popen.returncode, 1)
 
         popen.returncode = 2
         self.assertEqual(popen.returncode, 2)
 
-    def test_children(self):
+    def test_children(self) -> None:
         grandchild = scripts_test_utils.PopenStub()
         child = scripts_test_utils.PopenStub(child_procs=[grandchild])
         popen = scripts_test_utils.PopenStub(child_procs=[child])
@@ -85,7 +85,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertEqual(popen.children(), [child])
         self.assertEqual(popen.children(recursive=True), [child, grandchild])
 
-    def test_terminate(self):
+    def test_terminate(self) -> None:
         popen = scripts_test_utils.PopenStub()
 
         self.assertEqual(popen.terminate_count, 0)
@@ -98,21 +98,21 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 1)
 
-    def test_reject_terminate(self):
+    def test_reject_terminate(self) -> None:
         popen = scripts_test_utils.PopenStub(reject_terminate=True)
 
         self.assertEqual(popen.terminate_count, 0)
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        with self.assertRaisesRegexp(OSError, 'rejected'):
+        with self.assertRaisesRegex(OSError, 'rejected'):
             popen.terminate()
 
         self.assertEqual(popen.terminate_count, 1)
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_kill(self):
+    def test_kill(self) -> None:
         popen = scripts_test_utils.PopenStub()
 
         self.assertEqual(popen.kill_count, 0)
@@ -125,21 +125,21 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 1)
 
-    def test_reject_kill(self):
+    def test_reject_kill(self) -> None:
         popen = scripts_test_utils.PopenStub(reject_kill=True)
 
         self.assertEqual(popen.kill_count, 0)
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        with self.assertRaisesRegexp(OSError, 'rejected'):
+        with self.assertRaisesRegex(OSError, 'rejected'):
             popen.kill()
 
         self.assertEqual(popen.kill_count, 1)
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_send_signal(self):
+    def test_send_signal(self) -> None:
         popen = scripts_test_utils.PopenStub()
 
         self.assertEqual(popen.signals_received, [])
@@ -152,21 +152,21 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 1)
 
-    def test_reject_signal(self):
+    def test_reject_signal(self) -> None:
         popen = scripts_test_utils.PopenStub(reject_signal=True)
 
         self.assertEqual(popen.signals_received, [])
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        with self.assertRaisesRegexp(OSError, 'rejected'):
+        with self.assertRaisesRegex(OSError, 'rejected'):
             popen.send_signal(signal.SIGINT)
 
         self.assertEqual(popen.signals_received, [signal.SIGINT])
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_poll(self):
+    def test_poll(self) -> None:
         popen = scripts_test_utils.PopenStub()
         self.assertEqual(popen.poll_count, 0)
 
@@ -178,7 +178,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertEqual(popen.poll(), 1)
         self.assertEqual(popen.poll_count, 2)
 
-    def test_wait(self):
+    def test_wait(self) -> None:
         popen = scripts_test_utils.PopenStub()
 
         self.assertTrue(popen.is_running())
@@ -194,7 +194,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_wait_with_timeout(self):
+    def test_wait_with_timeout(self) -> None:
         popen = scripts_test_utils.PopenStub()
 
         self.assertTrue(popen.is_running())
@@ -210,7 +210,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_communicate(self):
+    def test_communicate(self) -> None:
         popen = scripts_test_utils.PopenStub(stdout=b'abc', stderr=b'def')
 
         self.assertTrue(popen.is_running())
@@ -226,7 +226,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_communicate_with_input(self):
+    def test_communicate_with_input(self) -> None:
         popen = scripts_test_utils.PopenStub(stdout=b'abc', stderr=b'def')
 
         self.assertEqual(popen.stdin.getvalue(), b'')
@@ -245,7 +245,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_terminate_on_unresponsive_popen_does_nothing(self):
+    def test_terminate_on_unresponsive_popen_does_nothing(self) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
@@ -259,7 +259,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_kill_on_unresponsive_popen_ends_process(self):
+    def test_kill_on_unresponsive_popen_ends_process(self) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
@@ -273,7 +273,7 @@ class PopenStubTests(test_utils.TestBase):
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 1)
 
-    def test_send_signal_on_unresponsive_popen_does_nothing(self):
+    def test_send_signal_on_unresponsive_popen_does_nothing(self) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
@@ -287,23 +287,27 @@ class PopenStubTests(test_utils.TestBase):
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-    def test_wait_on_unresponsive_popen_raises_runtime_error(self):
+    def test_wait_on_unresponsive_popen_raises_runtime_error(self) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
-        with self.assertRaisesRegexp(RuntimeError, 'entered an infinite loop'):
+        with self.assertRaisesRegex(RuntimeError, 'entered an infinite loop'):
             popen.wait()
 
-    def test_wait_with_timeout_on_unresponive_popen_raises_timeout_error(self):
+    def test_wait_with_timeout_on_unresponive_popen_raises_timeout_error(
+        self
+    ) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
-        with self.assertRaisesRegexp(psutil.TimeoutExpired, '10'):
+        with self.assertRaisesRegex(psutil.TimeoutExpired, '10'):
             popen.wait(timeout=10)
 
-    def test_communicate_on_unresponsive_popen_raises_runtime_error(self):
+    def test_communicate_on_unresponsive_popen_raises_runtime_error(
+        self
+    ) -> None:
         popen = scripts_test_utils.PopenStub(unresponsive=True)
         self.assertTrue(popen.unresponsive)
 
-        with self.assertRaisesRegexp(RuntimeError, 'entered an infinite loop'):
+        with self.assertRaisesRegex(RuntimeError, 'entered an infinite loop'):
             popen.communicate()

@@ -30,7 +30,7 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
     def test_requires_override_for_calculation(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             re.escape(
                 'Subclasses of BaseCalculation should implement the '

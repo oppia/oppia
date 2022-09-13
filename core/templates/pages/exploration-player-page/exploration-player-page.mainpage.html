@@ -13,6 +13,17 @@
           max-width: 130px;
         }
       }
+      /*
+      Note that this affects both the learner mode and the 'editor preview'
+      mode.
+      */
+      html, body {
+        background: #e8e7e3 no-repeat center center fixed;
+        background-size: cover;
+        color: rgba(0,0,0,0.87);
+        font-family: 'Roboto', Arial, sans-serif;
+        font-size: 1.0em;
+      }
     </style>
   </head>
   <body>
@@ -28,7 +39,7 @@
           </nav-options>
 
           <content>
-            <exploration-player-page></exploration-player-page>
+            <oppia-exploration-player-page></oppia-exploration-player-page>
           </content>
 
           <page-footer>

@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-player-page/learner-experience/' +
-    'conversation-skin.directive.ts');
+    'conversation-skin.component.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require(
@@ -29,6 +29,7 @@ require(
 require('pages/review-test-page/review-test-page.constants.ajs.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
+require('domain/question/QuestionObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/question-player-engine.service.ts');
 require('services/contextual/url.service.ts');
@@ -45,13 +46,13 @@ angular.module('oppia').component('skillPreviewTab', {
   controller: [
     '$rootScope', '$scope', 'ContextService', 'CurrentInteractionService',
     'ExplorationPlayerStateService',
-    'QuestionBackendApiService', 'QuestionPlayerEngineService',
-    'SkillEditorStateService', 'UrlService',
+    'QuestionBackendApiService', 'QuestionObjectFactory',
+    'QuestionPlayerEngineService', 'SkillEditorStateService', 'UrlService',
     function(
         $rootScope, $scope, ContextService, CurrentInteractionService,
         ExplorationPlayerStateService,
-        QuestionBackendApiService, QuestionPlayerEngineService,
-        SkillEditorStateService, UrlService) {
+        QuestionBackendApiService, QuestionObjectFactory,
+        QuestionPlayerEngineService, SkillEditorStateService, UrlService) {
       var ctrl = this;
       var QUESTION_COUNT = 20;
       const INTERACTION_TYPES = {
@@ -140,7 +141,13 @@ angular.module('oppia').component('skillPreviewTab', {
         QuestionPlayerEngineService.clearQuestions();
         ctrl.displayCardIsInitialized = false;
         QuestionPlayerEngineService.init(
-          [ctrl.displayedQuestions[index]], ctrl.initializeQuestionCard);
+          [
+            QuestionObjectFactory.createFromBackendDict(
+              ctrl.displayedQuestions[index]
+            )
+          ],
+          ctrl.initializeQuestionCard
+        );
       };
 
       $scope.$on('$destroy', function() {

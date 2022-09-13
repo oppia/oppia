@@ -39,24 +39,20 @@ export class PlayerPositionService {
   private _newCardAvailableEventEmitter = new EventEmitter<void>();
   private _helpCardAvailableEventEmitter =
     new EventEmitter<HelpCardEventResponse>();
+
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
-  private _displayedCardIndexChangedEventEmitter = new EventEmitter<number>();
+  private _loadedMostRecentCheckpointEmitter = new EventEmitter<void>();
 
   // The following property is initialized using the class methods.
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   displayedCardIndex!: number;
   onChangeCallback!: Function;
   learnerJustSubmittedAnAnswer = false;
 
   init(callback: Function): void {
-    this.updateDisplayedCardIndexAndEmitEvent(-1);
+    this.displayedCardIndex = -1;
     this.onChangeCallback = callback;
-  }
-
-  updateDisplayedCardIndexAndEmitEvent(index: number): void {
-    this.displayedCardIndex = index;
-    this._displayedCardIndexChangedEventEmitter.emit(index);
   }
 
   /**
@@ -75,7 +71,7 @@ export class PlayerPositionService {
    */
   setDisplayedCardIndex(index: number): void {
     let oldIndex = this.displayedCardIndex;
-    this.updateDisplayedCardIndexAndEmitEvent(index);
+    this.displayedCardIndex = index;
 
     if (oldIndex !== this.displayedCardIndex) {
       if (!this.onChangeCallback) {
@@ -129,6 +125,10 @@ export class PlayerPositionService {
     return this._newCardOpenedEventEmitter;
   }
 
+  get onLoadedMostRecentCheckpoint(): EventEmitter<void> {
+    return this._loadedMostRecentCheckpointEmitter;
+  }
+
   changeCurrentQuestion(index: number): void {
     this._currentQuestionChangedEventEmitter.emit(index);
   }
@@ -139,10 +139,6 @@ export class PlayerPositionService {
 
   get onCurrentQuestionChange(): EventEmitter<number> {
     return this._currentQuestionChangedEventEmitter;
-  }
-
-  get displayedCardIndexChangedEventEmitter(): EventEmitter<number> {
-    return this._displayedCardIndexChangedEventEmitter;
   }
 }
 

@@ -4,7 +4,7 @@
   </h3>
   <i class="fa fa-times modal-close-button" ng-click="cancel()"></i>
 </div>
-<form ng-submit="save(nodeTitle)">
+<form ng-submit="saveAsync(nodeTitle)">
   <div class="modal-body create-new-chapter">
     <div class="chapter-input">
       <div class="chapter-input-header">
@@ -15,7 +15,7 @@
           </i>
         </div>
       </div>
-      <input class="form-control protractor-test-new-chapter-title-field oppia-new-chapter-title-field"
+      <input class="form-control e2e-test-new-chapter-title-field oppia-new-chapter-title-field"
              placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
              ng-model="title" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_EXPLORATION_TITLE]>" autofocus>
       <span class="oppia-input-box-subtitle">
@@ -32,16 +32,25 @@
       <div class="chapter-input-header">
         <span>Exploration ID*</span>
       </div>
-      <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control protractor-test-chapter-exploration-input">
-      <span class="new-chapter-error-msg protractor-test-invalid-exp-id" ng-if="invalidExpId || explorationId && !validateExplorationId()">
-        <span><[invalidExpErrorString]></span>
+      <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control e2e-test-chapter-exploration-input">
+      <div ng-if="invalidExpId || explorationId && !validateExplorationId()">
+        <div ng-repeat="invalidExpErrorString in invalidExpErrorStrings" class="new-chapter-error-msg e2e-test-invalid-exp-id">
+          <span><[invalidExpErrorString]></span>
+        </div>
+      </div>
+      <span class="new-chapter-error-msg" ng-if="correctnessFeedbackDisabled">
+        <span><[correctnessFeedbackDisabledString]></span>
+      </span>
+      <span class="new-chapter-error-msg" ng-if="!categoryIsDefault">
+        <span>The category of this exploration is invalid. Curated lessons need to have their category to be one of the default categories.</span>
       </span>
     </div>
-    <div class="chapter-input chapter-input-thumbnail protractor-test-chapter-input-thumbnail">
+    <div class="chapter-input chapter-input-thumbnail e2e-test-chapter-input-thumbnail">
       <div class="chapter-input-header">
         <span>Thumbnail Image*</span>
       </div>
       <oppia-thumbnail-uploader [filename]="editableThumbnailFilename"
+                                [use-local-storage]="false"
                                 (update-filename)="updateThumbnailFilename($event)"
                                 [bg-color]="editableThumbnailBgColor"
                                 (update-bg-color)="updateThumbnailBgColor($event)"
@@ -53,8 +62,8 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary protractor-test-cancel-chapter-creation-button" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-chapter-creation-button" type="submit" ng-disabled="!isValid()">
+    <button class="btn btn-secondary e2e-test-cancel-chapter-creation-button" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success e2e-test-confirm-chapter-creation-button" type="submit" ng-disabled="!isValid()">
       <span>Create Chapter</span>
     </button>
   </div>
@@ -72,7 +81,7 @@
     padding-top: 10px;
   }
   .create-new-chapter .new-chapter-error-msg {
-    color: #F00;
+    color: #f00;
     font-size: small;
   }
   .create-new-chapter .modal-close-button {
@@ -96,11 +105,11 @@
     }
     .create-new-chapter .modal-header {
       align-items: center;
-      background-color: #00609C;
+      background-color: #00609c;
       display: flex;
     }
     .create-new-chapter .modal-header h3 {
-      color: #FFF;
+      color: #fff;
     }
     .create-new-chapter .chapter-input {
       margin: 30px 10px;
@@ -109,7 +118,7 @@
       margin: 25px 0;
     }
     .create-new-chapter .modal-close-button {
-      color: #FFF;
+      color: #fff;
       display: block;
       font-size: 20px;
     }

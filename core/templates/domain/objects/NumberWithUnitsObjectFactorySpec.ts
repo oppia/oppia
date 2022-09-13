@@ -27,12 +27,13 @@ describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {
     let nwuof: NumberWithUnitsObjectFactory;
     let uof: UnitsObjectFactory;
-    let errors: typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
+    let errors: (
+      typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS);
 
     beforeEach(() => {
       nwuof = new NumberWithUnitsObjectFactory(new UnitsObjectFactory());
       uof = new UnitsObjectFactory();
-      errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
+      errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
     });
 
     it('should convert units to list format', () => {

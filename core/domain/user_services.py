@@ -21,42 +21,68 @@ from __future__ import annotations
 import datetime
 import hashlib
 import imghdr
+import itertools
 import logging
 import re
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
+from core.domain import exp_fetchers
 from core.domain import role_services
+from core.domain import state_domain
 from core.domain import user_domain
 from core.platform import models
 
 import requests
 
-auth_models, user_models, audit_models, suggestion_models = (
-    models.Registry.import_models(
-        [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
-         models.NAMES.suggestion]))
+from typing import Dict, List, Optional, Sequence, overload
+from typing_extensions import Final, Literal, TypedDict
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import audit_models
+    from mypy_imports import auth_models
+    from mypy_imports import bulk_email_services
+    from mypy_imports import suggestion_models
+    from mypy_imports import transaction_services
+    from mypy_imports import user_models
+
+(auth_models, user_models, audit_models, suggestion_models) = (
+    models.Registry.import_models([
+        models.Names.AUTH,
+        models.Names.USER,
+        models.Names.AUDIT,
+        models.Names.SUGGESTION
+    ])
+)
 
 bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
-GRAVATAR_SIZE_PX = 150
+GRAVATAR_SIZE_PX: Final = 150
 # Data url for images/avatar/user_blue_72px.png.
 # Generated using utils.convert_png_to_data_url.
-DEFAULT_IDENTICON_DATA_URL = (
+DEFAULT_IDENTICON_DATA_URL: Final = (
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAAAAXNSR0IArs4c6QAADhtJREFUeAHtXHlwVdUZ/859jyxmIQESyCaglC0iAgkJIntrIpvKphSwY2ttxbFOp9R/cGGqdhykLaMVO2OtoyRSCEKNEpYKyBIVQ1iNkBhNMCtb8shiQpJ3b7/fTW7m5uUlecu9L4nTM5Pce8895zvf93vnnPud833fEdQLKXb5jsC6%2BuZERZbHKaSMYRbGKERxgpQQUkSIIigEbAmFavlfrUKiVhCVcFa%2BIJEvJOlCcNCAnNKMFQ0o58vEfPgmhS5Mn0ot8n2KIs8lIZJJUfy8almIJqbxhRDSIbJKe2s%2BXvWlV/RcrGwqYGGp20bI1LyaeVmjKMrodp4EycGBAy6MjgsrSxozqG7O5GgxcVREeEigNDAwwBpmsUiRKGu3y1caGltstQ3yjbOFV6sPnypXTuRXBReU2GLqGprHkUKSRlMIUcD3WyUakGbbt7JYyzf6agpgYfe9O8kui/U8nB7UhJIkUTljwrBTTz449mZKUlyCEBTnjTCKQiX7T5ScfGP3Rf9j5ysny7IyTKXHPwYP690WSXnZtvcXp71pw1ldQwELm59%2BlyzbX%2BbeNL%2Btscb4EYOyNz2ZWD99wtAFnGdxxoQBefbs85f3rHsjJyivuGo60wsATe51WZJkWW/LWnXGgDZUEoYAFr58x0B7beOLPHGv5XnFIpGoS0mKOfze%2Bpmj/f2smNR9lm42teQ/8vLRgv0nyuZwVwtm1Ows5BZLSMBz1RkrbnjLiNeAhaWmPWgn%2BxYeejwkRMu9idH7tm%2BYE8/z0EhvmfOmPs9/RQ9tOJx3IKc8lUixkqBKC1nW2vat3u0NXY8Bi1%2B%2Bw6%2BktnETD7%2BnwEB4iP/pL/5xf03U4IBZ3jBkdN2K641Hkn/7YWh17c1JoM3D9PW4kIB1eRkrmjxpyyPAeK4aLttbPuAhOIU5aHpm1cTMZ1ffuRT8eMKED%2BooL6Wd%2B2Bj%2BtnFUGeYyVzJYl3Kc9sld9t2W8Dw%2BWkTWuz2fdxQ9ACr9P3Jfy7%2BZuSw0HnuNtwb5Ysqaw4mPJb5k%2BYW%2BVZuv9xqsaRWZ60%2B7w4vbgEWnrJ1hp3kTO5ZYUPCAnK%2B3bYiitWDWHca7O2yrI6U3r5yR8U1W2MiC2%2BzkLS4ev%2BaY67y1a749VQBYLUIZT/AGhUTduS7f68Y39/AgozgGbxDBsgCmSBbT/Jr710CDMMQPYvHf2DC2Mj9p95efA8TCNKI9MNrEGSALJAJskFGV%2BTocUhigrfbWz5jYtH4VdrAMksBdYVnI8vYJ/8q83hhmW0WEy23WKx39/Qh6LaHQXXA1xBgYc5isBL4/scCFoC3QCbIBhkhK2TGi65St4CpeharDvgaYoJnIv15GHaFQRBkg4w8p02BzF0VRH6XgEGDV5VS1rOgOvTHCb47wfXvIBtkhE4JmSG7/r3%2B3ilg6toQyx1OUEr7i56lF8zde8gIWVEPSz1g4IyGU8CwkMbaEMudNg3eWd0fXR5khcyQXcXAiYSdAMMWDY/ltVhIY23IdXr8kjqh21%2BzRKvMogUYAAtHQToBhv0sbNFg16GvLaQdmTfjGTJDdmCgYuHQSIfe07pTSqewn3V9z6qrvb1F48Crzx6xNTR4QXoE9tN4c2%2ByfufWqudC3VbmAYzNPwZrkf6dL%2B4LSm5Q9vkrVH79B6qs%2BoH8B1goatAtNCIqmOZOiabw4G5VJMNYREdhDD7ae6J0USsmtEwj3t7DYLCwK83f8WbbzauZP7/kq53SxiY7vfmfC5R24Fv6prTrDVEWgqbfEUlPLY2nlKkxGv%2BmXbFzG7H4/eE8g/tZyO92zbDSPoe1WncUgT14X4G189NimvjobnrhX6e6BQuo8DCho2crafnzB2n%2BMwe4PL5H5iVgACx4wEltli%2B1sXbA%2BGkNcmCwUN%2BY%2BI%2B3WOjZt3Lpl68cpQoefu6m4%2Bcqae7TWfTfk%2BXuVnWrvA4LFRtUVockjKxKc8sJmMJsWWsiON/U9eJvNmXTtk%2B%2BdYt5Z4WZX0p/bjYtmBbn7LURefaw%2BVuvwoQnBliTYCxu7WFskQb1WROjcvliKlibM/IMAQv8siD0643H6etiGx7NSBbYUlXCbRipgKnme859Ysl4jwwDrnKaV2SjDe%2B0tu9qnZ7KsQWch/YxVpt6KunZexieUVPDSIJjCC86k3lwyikJ0di%2BMS09/3au2iuMbuDr4mpKN2CIO%2BMLVnpgA4yAlVRX1ziV4fODrwOv2k2bDM4UVvEkXeaMJ0PyXn3/nCF0HIkAE2ADjICVpChiLArBMcSxsJHPmdmXjCTXiVZRRS19VVTdKd%2BIDA0bYCW1%2BWcRvGiMIN4Vjb1flHb1yrD8rM9LDKOlJ6RhA6ww6au%2BD3A50hcy%2Bt5sRRP8FpSYo8zqsBnDPax13oJ/ltEgafSqam5SU7NdezTtWsHrTzOShg2wYtWP3SQ5wZnNjMZA80Z9s1mkO9CtMakdDRtgJcGnFK3C869D6wY%2BRISp7loGUnROKtKkdtqxYawkzQGXdwNUN0nnrHiXGxxoJf40e0fEhdpRg29xoZT7RTRsgJV%2B8e0%2BJTdqJIwd4kZpz4pOGWN%2BG5Lq2s38wQHXMzZdq2XiAlllgP2%2BaH6yOX4xGjbAinejlVq0CG9l10T3rNT99wwnf96KMyvNuHMoDR0UaAr5dmwYK1YrhAoYXLtNaa2N6DAW5vFF6qLClGZeeHSyKXRBVMMGWLFaoUZYEPzgTWuxjfC6lROI/RgMb2bZ7JGUaOIcqWEDrDDp50MCBA0YLokDQRgx0p%2BdTezH4PDG88dxI8LotaeneU7AhZo6bPK5hwkVMERYuFDX6yLT2JDx99/fTVY2anibYiOCaPuGuayydDB%2BeUu2U30NG2AlCaFcRAmEo3QqaVLGynm30a6X5sHz2uMWksZH0pHXF9CIYeb/zho2CAqTgoMDvoTXCmJ3EI7isQRuVpw9KYqytyykhxk8qASuJoD84mNTKGvjveSLFQQwUeOaGCNE0Flqvs5o8b/9gZ8xwyMmj404NComZJyrzHtbLjTIjxZNv1X9C/S30pXqRrLVdd4lh7EjOX4oPfHAOHrzD9Np9l1RZMHnygeJ45kOZXxaPJ6byr6WueotdfAjhI73rGdu2ZXnn5oY7QM2OjZxx8hw%2BvPjCepf2bUfqJz/Llc1qHpb1OBAiosMpoFB5i%2BtOnLV%2BoTgL9ypYYZ8bZ0tOd6QmuUNbCiFMoN9GPM0TCbeXYoZcgvhr48kOyLlVF6AESf1UwV7G88jBbC/ISqsjzDb62wAC9UmydhoAaz6b/tWcIgQul7ntI8woMNCxQZstQOGSFYeqQriDeGI0Ud47jU2gIEae8kmtlZsWllpB6zNO2UXZwcg3rDXOO0jDbdhEIDoXs1zB6y1A4YHhP3iiuBMOJXh3tfJzuZ/qBbfX65nR5UGqmto8TUL2OoqAgZoWMNEY6KTMhOa%2Bt4ehCDfmxjz8c4X5y3UChp5hVk/j63Vpwuu0zdlNVTIrkuFfC1hkOobO%2B//Qw8LD/an26JDaFRsKI2KCWU76kCaOi6CoHYYnZY9d/DjAzllC/lDmFWz75EFevqdFmGIkbbL9hREsiI40yg/11wGhxex9PlXV%2BjEhatUU99ZQdUzpr%2BH08n1mkb1L%2BfiVf0rGs5Lo2nxkXT3HUPZ0S7WawAhsxrFy6HPwKJDY/zQqYehAPey1%2BDgDxfsSxkPwZPYaTmU7S7BPWDXkWLafayYLlWaaidW2cASK5nBWzJzOD3AG5YebCgqw5dvP4PoXab1Oveu3znK5xQIOPW31DZchL/6M6vv2sn%2B68scK3b1jDlo%2B6Hv6G878ij/e1M3cbtiQc3HML4vKZbWrbyTpowe3G1Z7SVH7e7cmHZmGXePSmtI4FhnQfVOAQMBNfhdse/CwvzsO/cf6ykapKlZpq0HCmlzxlc%2B6U2akK5c2XJNf3x4At3D29hdJUTrTnz0wxlwOrEIy5Kugum7BAyEtaGJwKVrH63mrSDn0besEdNTmz9XJ%2B6uGOoL%2BbAr/OXJJIoM77jryx%2Bh0iGL0mSENnc1FDX%2BO6gVWqZ2RfQ9I5oLQgj75fxO/q%2BvpJ9TnXTxlevr6cPjlyj5iUx2bb%2BsZ7UesqlgsayQWf/S8b7bHobC3QWYrv3rZ%2BwuXuhIs88/Y4v8vfWz4BvrdoBpj4BBejWE2W4/yupTGMJ%2BD21O/emf3j1t2bTNrYD8PgWkv7/FflvUwE8uFFelMAg2i8Uy05UTBlwCTAWtLUieJ8XA2MiQIxXX6xNYI%2B6XC3Wep%2Br5xz/Jsszij1qDVREprp4s4DJgGmjaMQzcUA5bgaNkRTbH3GxSf5SEVMoxRBUMlrnHMIB//ArounxbjgZZuWWtSzlokmyGkwWv4Bm8QwZ1GLpxZgUYcquHaRLgQ6A/SobJ4IiGpeyc7RE9ja55V/aKEOID5s/3R8loQjkeVsTzwmmeF2oYuFlamT5xFeII/4qh3LMmgR/oWT4/rEgPhONxWEKifUJW4mWikfpyvr5nBbNIkUQeD8BU7lm9fxyWHgDHA9fYQlzHg/0w/6qjuZzqdKwvb/J9PveiAl4Hz%2BE5q%2B8duKYXHjHSjkf6sXkqWyEZK4QFLIQ51iihWrr2CJKCeE6fzm2pax8Grm8e6acHDffth0YSLdF9CCoZvFye55okRU7gIetV1AkPuRJZSCfZUdefezJMYf3v0MhOwHVzLKlQxAWSRJlQlDr%2BzrPcUjjbGwbyBB2mCKH62/K7KwywjWM8b5CQq%2BH9x%2B%2BCSVZiFKH8eI4ldQQOz4jJ/P/Bt86QcSFPPVqZA50Qu4NwFK7i3tHK7HEEJ5reOFr5fwkK97jkk8ywAAAAAElFTkSuQmCC')  # pylint: disable=line-too-long
 
-LABEL_FOR_USER_BEING_DELETED = '[User being deleted]'
-USERNAME_FOR_USER_BEING_DELETED = 'UserBeingDeleted'
+LABEL_FOR_USER_BEING_DELETED: Final = '[User being deleted]'
+USERNAME_FOR_USER_BEING_DELETED: Final = 'UserBeingDeleted'
 
 
-def is_username_taken(username):
+class DashboardStatsDict(TypedDict):
+    """Dictionary representing the dashborad stats dictionary."""
+
+    num_ratings: int
+    average_ratings: Optional[float]
+    total_plays: int
+
+
+def is_username_taken(username: str) -> bool:
     """Returns whether the given username has already been taken.
 
     Args:
@@ -69,7 +95,7 @@ def is_username_taken(username):
         user_domain.UserSettings.normalize_username(username))
 
 
-def get_email_from_user_id(user_id):
+def get_email_from_user_id(user_id: str) -> str:
     """Gets the email from a given user_id.
 
     Args:
@@ -85,7 +111,7 @@ def get_email_from_user_id(user_id):
     return user_settings.email
 
 
-def get_user_id_from_username(username):
+def get_user_id_from_username(username: str) -> Optional[str]:
     """Gets the user_id for a given username.
 
     Args:
@@ -103,7 +129,47 @@ def get_user_id_from_username(username):
         return user_model.id
 
 
-def get_user_settings_from_username(username):
+def get_multi_user_ids_from_usernames(
+    usernames: List[str]
+) -> List[Optional[str]]:
+    """Gets the user_ids for a given list of usernames.
+
+    Args:
+        usernames: list(str). Identifiable usernames to display in the UI.
+
+    Returns:
+        list(str|None). Return the list of user ids corresponding to given
+        usernames.
+        """
+    if len(usernames) == 0:
+        return []
+
+    normalized_usernames = [
+        user_domain.UserSettings.normalize_username(username)
+        for username in usernames
+    ]
+
+    found_models: Sequence[user_models.UserSettingsModel] = (
+        user_models.UserSettingsModel.query(
+            user_models.UserSettingsModel.normalized_username.IN(
+                normalized_usernames
+            )
+        ).fetch()
+    )
+
+    username_to_user_id_map = {
+        model.normalized_username: model.id for model in found_models
+    }
+
+    return [
+        username_to_user_id_map.get(username)
+        for username in normalized_usernames
+    ]
+
+
+def get_user_settings_from_username(
+    username: str
+) -> Optional[user_domain.UserSettings]:
     """Gets the user settings for a given username.
 
     Args:
@@ -121,7 +187,9 @@ def get_user_settings_from_username(username):
         return get_user_settings(user_model.id)
 
 
-def get_user_settings_from_email(email):
+def get_user_settings_from_email(
+    email: str
+) -> Optional[user_domain.UserSettings]:
     """Gets the user settings for a given email.
 
     Args:
@@ -138,7 +206,38 @@ def get_user_settings_from_email(email):
         return get_user_settings(user_model.id)
 
 
-def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
+@overload
+def get_users_settings(
+    user_ids: Sequence[Optional[str]],
+    *,
+    strict: Literal[True],
+    include_marked_deleted: bool = False
+) -> Sequence[user_domain.UserSettings]: ...
+
+
+@overload
+def get_users_settings(
+    user_ids: Sequence[Optional[str]],
+    *,
+    strict: Literal[False],
+    include_marked_deleted: bool = False
+) -> Sequence[Optional[user_domain.UserSettings]]: ...
+
+
+@overload
+def get_users_settings(
+    user_ids: Sequence[Optional[str]],
+    *,
+    strict: bool = ...,
+    include_marked_deleted: bool = False
+) -> Sequence[Optional[user_domain.UserSettings]]: ...
+
+
+def get_users_settings(
+    user_ids: Sequence[Optional[str]],
+    strict: bool = False,
+    include_marked_deleted: bool = False
+) -> Sequence[Optional[user_domain.UserSettings]]:
     """Gets domain objects representing the settings for the given user_ids.
 
     Args:
@@ -161,11 +260,10 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         user_ids, include_deleted=include_marked_deleted)
 
     if strict:
-        for user_id, user_settings_model in python_utils.ZIP(
-                user_ids, user_settings_models):
+        for user_id, user_settings_model in zip(user_ids, user_settings_models):
             if user_settings_model is None:
                 raise Exception('User with ID \'%s\' not found.' % user_id)
-    result = []
+    result: List[Optional[user_domain.UserSettings]] = []
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
             result.append(user_domain.UserSettings(
@@ -179,6 +277,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                 ],
                 banned=False,
                 username='admin',
+                has_viewed_lesson_info_modal_once=False,
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
@@ -191,7 +290,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     return result
 
 
-def generate_initial_profile_picture(user_id):
+def generate_initial_profile_picture(user_id: str) -> None:
     """Generates a profile picture for a new user and
     updates the user's settings in the datastore.
 
@@ -203,7 +302,7 @@ def generate_initial_profile_picture(user_id):
     update_profile_picture_data_url(user_id, user_gravatar)
 
 
-def get_gravatar_url(email):
+def get_gravatar_url(email: str) -> str:
     """Returns the gravatar url for the specified email.
 
     Args:
@@ -218,7 +317,7 @@ def get_gravatar_url(email):
         (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
-def fetch_gravatar(email):
+def fetch_gravatar(email: str) -> str:
     """Returns the gravatar corresponding to the user's email, or an
     identicon generated from the email if the gravatar doesn't exist.
 
@@ -249,13 +348,33 @@ def fetch_gravatar(email):
     return DEFAULT_IDENTICON_DATA_URL
 
 
-def get_user_settings(user_id, strict=False):
+@overload
+def get_user_settings(
+    user_id: str
+) -> user_domain.UserSettings: ...
+
+
+@overload
+def get_user_settings(
+    user_id: str, *, strict: Literal[True]
+) -> user_domain.UserSettings: ...
+
+
+@overload
+def get_user_settings(
+    user_id: str, *, strict: Literal[False]
+) -> Optional[user_domain.UserSettings]: ...
+
+
+def get_user_settings(
+    user_id: str, strict: bool = True
+) -> Optional[user_domain.UserSettings]:
     """Return the user settings for a single user.
 
     Args:
         user_id: str. The unique ID of the user.
         strict: bool. Whether to fail noisily if no user with the given
-            id exists in the datastore. Defaults to False.
+            id exists in the datastore. Defaults to True.
 
     Returns:
         UserSettings or None. If the given user_id does not exist and strict
@@ -273,7 +392,27 @@ def get_user_settings(user_id, strict=False):
     return user_settings
 
 
-def get_user_settings_by_auth_id(auth_id, strict=False):
+@overload
+def get_user_settings_by_auth_id(
+    auth_id: str, *, strict: Literal[True]
+) -> user_domain.UserSettings: ...
+
+
+@overload
+def get_user_settings_by_auth_id(
+    auth_id: str
+) -> Optional[user_domain.UserSettings]: ...
+
+
+@overload
+def get_user_settings_by_auth_id(
+    auth_id: str, *, strict: Literal[False]
+) -> Optional[user_domain.UserSettings]: ...
+
+
+def get_user_settings_by_auth_id(
+    auth_id: str, strict: bool = False
+) -> Optional[user_domain.UserSettings]:
     """Return the user settings for a single user.
 
     Args:
@@ -289,7 +428,9 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     Raises:
         Exception. The value of strict is True and given auth_id does not exist.
     """
-    user_id = auth_services.get_user_id_from_auth_id(auth_id)
+    user_id = auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=True
+    )
     user_settings_model = (
         None if user_id is None else
         user_models.UserSettingsModel.get_by_id(user_id))
@@ -302,7 +443,7 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
         return None
 
 
-def get_user_roles_from_id(user_id):
+def get_user_roles_from_id(user_id: str) -> List[str]:
     """Returns roles of the user with given user_id.
 
     Args:
@@ -317,7 +458,11 @@ def get_user_roles_from_id(user_id):
     return user_settings.roles
 
 
-def _create_user_contribution_rights_from_model(user_contribution_rights_model):
+def _create_user_contribution_rights_from_model(
+    user_contribution_rights_model: Optional[
+        user_models.UserContributionRightsModel
+    ]
+) -> user_domain.UserContributionRights:
     """Creates a UserContributionRights object from the given model. If the
     model is None, an empty UserContributionRights object is returned.
 
@@ -347,7 +492,9 @@ def _create_user_contribution_rights_from_model(user_contribution_rights_model):
         return user_domain.UserContributionRights('', [], [], False, False)
 
 
-def get_user_contribution_rights(user_id):
+def get_user_contribution_rights(
+    user_id: str
+) -> user_domain.UserContributionRights:
     """Returns the UserContributionRights domain object for the given user_id.
 
     Args:
@@ -360,7 +507,9 @@ def get_user_contribution_rights(user_id):
     return get_users_contribution_rights([user_id])[0]
 
 
-def get_users_contribution_rights(user_ids):
+def get_users_contribution_rights(
+    user_ids: List[str]
+) -> List[user_domain.UserContributionRights]:
     """Returns the UserContributionRights domain object for each user_id in
     user_ids.
 
@@ -389,7 +538,7 @@ def get_users_contribution_rights(user_ids):
     return users_contribution_rights
 
 
-def get_reviewer_user_ids_to_notify():
+def get_reviewer_user_ids_to_notify() -> List[str]:
     """Gets a list of the reviewer user_ids who want to be notified of
     Contributor Dashboard reviewer updates.
 
@@ -413,7 +562,9 @@ def get_reviewer_user_ids_to_notify():
     return reviewer_ids_to_notify
 
 
-def get_all_reviewers_contribution_rights():
+def get_all_reviewers_contribution_rights() -> List[
+    user_domain.UserContributionRights
+]:
     """Returns a list of UserContributionRights objects corresponding to each
     UserContributionRightsModel.
 
@@ -431,7 +582,9 @@ def get_all_reviewers_contribution_rights():
     ]
 
 
-def _save_user_contribution_rights(user_contribution_rights):
+def _save_user_contribution_rights(
+    user_contribution_rights: user_domain.UserContributionRights
+) -> None:
     """Saves the UserContributionRights object into the datastore.
 
     Args:
@@ -455,7 +608,9 @@ def _save_user_contribution_rights(user_contribution_rights):
             user_contribution_rights.can_submit_questions)).put()
 
 
-def _update_user_contribution_rights(user_contribution_rights):
+def _update_user_contribution_rights(
+    user_contribution_rights: user_domain.UserContributionRights
+) -> None:
     """Updates the users rights model if the updated object has review rights in
     at least one item else delete the existing model.
 
@@ -471,7 +626,8 @@ def _update_user_contribution_rights(user_contribution_rights):
 
 @transaction_services.run_in_transaction_wrapper
 def _update_reviewer_counts_in_community_contribution_stats_transactional(
-        future_user_contribution_rights):
+    future_user_contribution_rights: user_domain.UserContributionRights
+) -> None:
     """Updates the reviewer counts in the community contribution stats based
     on the given user contribution rights with the most up-to-date values.
     This method is intended to be called right before the new updates to the
@@ -530,7 +686,8 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
 
 
 def _update_reviewer_counts_in_community_contribution_stats(
-        user_contribution_rights):
+    user_contribution_rights: user_domain.UserContributionRights
+) -> None:
     """Updates the reviewer counts in the community contribution stats based
     on the updates to the given user contribution rights. The GET and PUT is
     done in a transaction to avoid loss of updates that come in rapid
@@ -544,7 +701,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
         user_contribution_rights)
 
 
-def get_usernames_by_role(role):
+def get_usernames_by_role(role: str) -> List[str]:
     """Get usernames of all the users with given role ID.
 
     Args:
@@ -557,7 +714,7 @@ def get_usernames_by_role(role):
     return [user.username for user in user_settings]
 
 
-def get_user_ids_by_role(role):
+def get_user_ids_by_role(role: str) -> List[str]:
     """Get user ids of all the users with given role ID.
 
     Args:
@@ -570,7 +727,7 @@ def get_user_ids_by_role(role):
     return [user.id for user in user_settings]
 
 
-def get_user_actions_info(user_id):
+def get_user_actions_info(user_id: str) -> user_domain.UserActionsInfo:
     """Gets user actions info for a user.
 
     Args:
@@ -584,7 +741,7 @@ def get_user_actions_info(user_id):
     return user_domain.UserActionsInfo(user_id, roles, actions)
 
 
-def get_system_user():
+def get_system_user() -> user_domain.UserActionsInfo:
     """Returns user object with system committer user id.
 
     Returns:
@@ -593,7 +750,7 @@ def get_system_user():
     return get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
 
 
-def _save_user_settings(user_settings):
+def _save_user_settings(user_settings: user_domain.UserSettings) -> None:
     """Commits a user settings object to the datastore.
 
     Args:
@@ -616,7 +773,9 @@ def _save_user_settings(user_settings):
     user_model.put()
 
 
-def _get_user_settings_from_model(user_settings_model):
+def _get_user_settings_from_model(
+    user_settings_model: user_models.UserSettingsModel
+) -> user_domain.UserSettings:
     """Transform user settings storage model to domain object.
 
     Args:
@@ -656,14 +815,18 @@ def _get_user_settings_from_model(user_settings_model):
             user_settings_model.preferred_site_language_code),
         preferred_audio_language_code=(
             user_settings_model.preferred_audio_language_code),
+        preferred_translation_language_code=(
+            user_settings_model.preferred_translation_language_code),
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
-        created_on=user_settings_model.created_on
+        created_on=user_settings_model.created_on,
+        has_viewed_lesson_info_modal_once=(
+            user_settings_model.has_viewed_lesson_info_modal_once)
     )
 
 
-def is_user_registered(user_id):
+def is_user_registered(user_id: str) -> bool:
     """Checks if a user is registered with the given user_id.
 
     Args:
@@ -672,13 +835,11 @@ def is_user_registered(user_id):
     Returns:
         bool. Whether a user with the given user_id is registered.
     """
-    if user_id is None:
-        return False
     user_settings = user_models.UserSettingsModel.get(user_id, strict=False)
     return bool(user_settings)
 
 
-def has_ever_registered(user_id):
+def has_ever_registered(user_id: str) -> bool:
     """Checks if a user has ever been registered with given user_id.
 
     Args:
@@ -691,7 +852,7 @@ def has_ever_registered(user_id):
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
 
-def has_fully_registered_account(user_id):
+def has_fully_registered_account(user_id: str) -> bool:
     """Checks if a user has fully registered.
 
     Args:
@@ -700,16 +861,22 @@ def has_fully_registered_account(user_id):
     Returns:
         bool. Whether a user with the given user_id has fully registered.
     """
-    if user_id is None:
+    user_settings = get_user_settings(user_id, strict=False)
+
+    if user_settings is None:
         return False
 
-    user_settings = get_user_settings(user_id, strict=True)
-    return user_settings.username and user_settings.last_agreed_to_terms and (
-        user_settings.last_agreed_to_terms >=
-        feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
+    return bool(
+        user_settings.username and user_settings.last_agreed_to_terms and (
+            user_settings.last_agreed_to_terms >=
+            feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC
+        )
+    )
 
 
-def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
+def get_all_profiles_auth_details_by_parent_user_id(
+    parent_user_id: str
+) -> List[auth_domain.UserAuthDetails]:
     """Gets domain objects representing the auth details for all profiles
     associated with the user having the given parent_user_id.
 
@@ -736,7 +903,7 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
     ]
 
 
-def create_new_user(auth_id, email):
+def create_new_user(auth_id: str, email: str) -> user_domain.UserSettings:
     """Creates a new user and commits it to the datastore.
 
     Args:
@@ -755,14 +922,16 @@ def create_new_user(auth_id, email):
             user_settings.user_id, auth_id))
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = user_domain.UserSettings(
-        user_id, email, [feconf.ROLE_ID_FULL_USER], False,
+        user_id, email, [feconf.ROLE_ID_FULL_USER], False, False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
 
 
 @transaction_services.run_in_transaction_wrapper
-def _create_new_user_transactional(auth_id, user_settings):
+def _create_new_user_transactional(
+    auth_id: str, user_settings: user_domain.UserSettings
+) -> None:
     """Save user models for new users as a transaction.
 
     Args:
@@ -776,7 +945,11 @@ def _create_new_user_transactional(auth_id, user_settings):
         auth_domain.AuthIdUserIdPair(auth_id, user_settings.user_id))
 
 
-def create_new_profiles(auth_id, email, modifiable_user_data_list):
+def create_new_profiles(
+    auth_id: str,
+    email: str,
+    modifiable_user_data_list: List[user_domain.ModifiableUserData]
+) -> List[user_domain.UserSettings]:
     """Creates new profiles for the users specified in the
     modifiable_user_data_list and commits them to the datastore.
 
@@ -810,7 +983,7 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id()
         user_settings = user_domain.UserSettings(
-            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False,
+            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False, False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
@@ -829,7 +1002,10 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
 
 
 @transaction_services.run_in_transaction_wrapper
-def _create_new_profile_transactional(user_settings, user_auth_details):
+def _create_new_profile_transactional(
+    user_settings: user_domain.UserSettings,
+    user_auth_details: auth_domain.UserAuthDetails
+) -> None:
     """Save user models for new users as a transaction.
 
     Args:
@@ -842,7 +1018,9 @@ def _create_new_profile_transactional(user_settings, user_auth_details):
     _save_user_auth_details(user_auth_details)
 
 
-def update_multiple_users_data(modifiable_user_data_list):
+def update_multiple_users_data(
+    modifiable_user_data_list: List[user_domain.ModifiableUserData]
+) -> None:
     """Updates user settings and user auth model details for the users
     specified in the modifiable_user_data_list.
 
@@ -857,22 +1035,26 @@ def update_multiple_users_data(modifiable_user_data_list):
             not found.
     """
     user_ids = [user.user_id for user in modifiable_user_data_list]
-    user_settings_list = get_users_settings(user_ids)
+    user_settings_list_with_none = get_users_settings(user_ids, strict=False)
+    user_settings_list = []
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
-    for modifiable_user_data, user_settings in python_utils.ZIP(
-            modifiable_user_data_list, user_settings_list):
+    for modifiable_user_data, user_settings in zip(
+            modifiable_user_data_list, user_settings_list_with_none):
         user_id = modifiable_user_data.user_id
         if user_id is None:
             raise Exception('Missing user ID.')
         if not user_settings:
             raise Exception('User not found.')
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
+        user_settings_list.append(user_settings)
 
     _save_existing_users_settings(user_settings_list)
     _save_existing_users_auth_details(user_auth_details_list)
 
 
-def _save_existing_users_settings(user_settings_list):
+def _save_existing_users_settings(
+    user_settings_list: List[user_domain.UserSettings]
+) -> None:
     """Commits a list of existing users' UserSettings objects to the datastore.
 
     Args:
@@ -880,18 +1062,24 @@ def _save_existing_users_settings(user_settings_list):
             objects to be saved.
     """
     user_ids = [user.user_id for user in user_settings_list]
-    user_settings_models = user_models.UserSettingsModel.get_multi(
+    user_settings_models_with_none = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_model, user_settings in python_utils.ZIP(
-            user_settings_models, user_settings_list):
+    user_settings_models = []
+    for user_model, user_settings in zip(
+            user_settings_models_with_none, user_settings_list):
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_model is not None
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
+        user_settings_models.append(user_model)
 
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
 
 
-def _save_existing_users_auth_details(user_auth_details_list):
+def _save_existing_users_auth_details(
+    user_auth_details_list: List[auth_domain.UserAuthDetails]
+) -> None:
     """Commits a list of existing users' UserAuthDetails objects to the
     datastore.
 
@@ -900,17 +1088,26 @@ def _save_existing_users_auth_details(user_auth_details_list):
             UserAuthDetails objects to be saved.
     """
     user_ids = [user.user_id for user in user_auth_details_list]
-    user_auth_models = auth_models.UserAuthDetailsModel.get_multi(
+    user_auth_models_with_none = auth_models.UserAuthDetailsModel.get_multi(
         user_ids, include_deleted=True)
-    for user_auth_details_model, user_auth_details in python_utils.ZIP(
-            user_auth_models, user_auth_details_list):
+    user_auth_models = []
+    for user_auth_details_model, user_auth_details in zip(
+            user_auth_models_with_none, user_auth_details_list):
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_auth_details_model is not None
         user_auth_details.validate()
         user_auth_details_model.populate(**user_auth_details.to_dict())
-    auth_models.UserAuthDetailsModel.update_timestamps_multi(user_auth_models)
+        user_auth_models.append(user_auth_details_model)
+
+    auth_models.UserAuthDetailsModel.update_timestamps_multi(
+        user_auth_models
+    )
     auth_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
 
-def _save_user_auth_details(user_auth_details):
+def _save_user_auth_details(
+    user_auth_details: auth_domain.UserAuthDetails
+) -> None:
     """Commits a user auth details object to the datastore.
 
     Args:
@@ -935,7 +1132,9 @@ def _save_user_auth_details(user_auth_details):
         model.put()
 
 
-def get_multiple_user_auth_details(user_ids):
+def get_multiple_user_auth_details(
+    user_ids: List[Optional[str]]
+) -> List[auth_domain.UserAuthDetails]:
     """Gets domain objects representing the auth details
     for the given user_ids.
 
@@ -944,9 +1143,8 @@ def get_multiple_user_auth_details(user_ids):
             the user auth details.
 
     Returns:
-        list(UserAuthDetails|None). The UserAuthDetails domain objects
-        corresponding to the given user ids. If the given user_id does not
-        exist, the corresponding entry in the returned list is None.
+        list(UserAuthDetails). The UserAuthDetails domain objects
+        corresponding to the given user ids.
     """
     user_settings_models = auth_models.UserAuthDetailsModel.get_multi(user_ids)
     return [
@@ -955,7 +1153,27 @@ def get_multiple_user_auth_details(user_ids):
     ]
 
 
-def get_auth_details_by_user_id(user_id, strict=False):
+@overload
+def get_auth_details_by_user_id(
+    user_id: str, *, strict: Literal[True]
+) -> auth_domain.UserAuthDetails: ...
+
+
+@overload
+def get_auth_details_by_user_id(
+    user_id: str
+) -> Optional[auth_domain.UserAuthDetails]: ...
+
+
+@overload
+def get_auth_details_by_user_id(
+    user_id: str, *, strict: Literal[False]
+) -> Optional[auth_domain.UserAuthDetails]: ...
+
+
+def get_auth_details_by_user_id(
+    user_id: str, strict: bool = False
+) -> Optional[auth_domain.UserAuthDetails]:
     """Return the user auth details for a single user.
 
     Args:
@@ -983,7 +1201,7 @@ def get_auth_details_by_user_id(user_id, strict=False):
         return None
 
 
-def get_pseudonymous_username(pseudonymous_id):
+def get_pseudonymous_username(pseudonymous_id: str) -> str:
     """Get the username from pseudonymous ID.
 
     Args:
@@ -998,7 +1216,7 @@ def get_pseudonymous_username(pseudonymous_id):
         pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
 
 
-def get_username(user_id):
+def get_username(user_id: str) -> str:
     """Gets username corresponding to the given user_id.
 
     Args:
@@ -1010,7 +1228,27 @@ def get_username(user_id):
     return get_usernames([user_id], strict=True)[0]
 
 
-def get_usernames(user_ids, strict=False):
+@overload
+def get_usernames(
+    user_ids: List[str], *, strict: Literal[True]
+) -> Sequence[str]: ...
+
+
+@overload
+def get_usernames(
+    user_ids: List[str]
+) -> Sequence[Optional[str]]: ...
+
+
+@overload
+def get_usernames(
+    user_ids: List[str], *, strict: Literal[False]
+) -> Sequence[Optional[str]]: ...
+
+
+def get_usernames(
+    user_ids: List[str], strict: bool = False
+) -> Sequence[Optional[str]]:
     """Gets usernames corresponding to the given user_ids.
 
     Args:
@@ -1024,7 +1262,7 @@ def get_usernames(user_ids, strict=False):
         returned list is None. Can also return username of pseudonymized user
         or a temporary username of user that is being deleted.
     """
-    usernames = [None] * len(user_ids)
+    usernames: List[Optional[str]] = [None] * len(user_ids)
     non_system_user_indices = []
     non_system_user_ids = []
     for index, user_id in enumerate(user_ids):
@@ -1048,7 +1286,7 @@ def get_usernames(user_ids, strict=False):
     return usernames
 
 
-def set_username(user_id, new_username):
+def set_username(user_id: str, new_username: str) -> None:
     """Updates the username of the user with the given user_id.
 
     Args:
@@ -1069,7 +1307,7 @@ def set_username(user_id, new_username):
     _save_user_settings(user_settings)
 
 
-def record_agreement_to_terms(user_id):
+def record_agreement_to_terms(user_id: str) -> None:
     """Records that the user with given user_id has agreed to the license terms.
 
     Args:
@@ -1080,7 +1318,9 @@ def record_agreement_to_terms(user_id):
     _save_user_settings(user_settings)
 
 
-def update_profile_picture_data_url(user_id, profile_picture_data_url):
+def update_profile_picture_data_url(
+    user_id: str, profile_picture_data_url: str
+) -> None:
     """Updates profile_picture_data_url of user with given user_id.
 
     Args:
@@ -1092,7 +1332,7 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
     _save_user_settings(user_settings)
 
 
-def update_user_bio(user_id, user_bio):
+def update_user_bio(user_id: str, user_bio: str) -> None:
     """Updates user_bio of user with given user_id.
 
     Args:
@@ -1104,7 +1344,9 @@ def update_user_bio(user_id, user_bio):
     _save_user_settings(user_settings)
 
 
-def update_user_default_dashboard(user_id, default_dashboard):
+def update_user_default_dashboard(
+    user_id: str, default_dashboard: str
+) -> None:
     """Updates the default dashboard of user with given user id.
 
     Args:
@@ -1117,7 +1359,8 @@ def update_user_default_dashboard(user_id, default_dashboard):
 
 
 def update_user_creator_dashboard_display(
-        user_id, creator_dashboard_display_pref):
+    user_id: str, creator_dashboard_display_pref: str
+) -> None:
     """Updates the creator dashboard preference of user with given user id.
 
     Args:
@@ -1131,7 +1374,9 @@ def update_user_creator_dashboard_display(
     _save_user_settings(user_settings)
 
 
-def update_subject_interests(user_id, subject_interests):
+def update_subject_interests(
+    user_id: str, subject_interests: List[str]
+) -> None:
     """Updates subject_interests of user with given user_id.
 
     Args:
@@ -1140,18 +1385,18 @@ def update_subject_interests(user_id, subject_interests):
     """
     if not isinstance(subject_interests, list):
         raise utils.ValidationError('Expected subject_interests to be a list.')
-    else:
-        for interest in subject_interests:
-            if not isinstance(interest, str):
-                raise utils.ValidationError(
-                    'Expected each subject interest to be a string.')
-            elif not interest:
-                raise utils.ValidationError(
-                    'Expected each subject interest to be non-empty.')
-            elif not re.match(constants.TAG_REGEX, interest):
-                raise utils.ValidationError(
-                    'Expected each subject interest to consist only of '
-                    'lowercase alphabetic characters and spaces.')
+
+    for interest in subject_interests:
+        if not isinstance(interest, str):
+            raise utils.ValidationError(
+                'Expected each subject interest to be a string.')
+        if not interest:
+            raise utils.ValidationError(
+                'Expected each subject interest to be non-empty.')
+        if not re.match(constants.TAG_REGEX, interest):
+            raise utils.ValidationError(
+                'Expected each subject interest to consist only of '
+                'lowercase alphabetic characters and spaces.')
 
     if len(set(subject_interests)) != len(subject_interests):
         raise utils.ValidationError(
@@ -1162,7 +1407,9 @@ def update_subject_interests(user_id, subject_interests):
     _save_user_settings(user_settings)
 
 
-def _update_first_contribution_msec(user_id, first_contribution_msec):
+def _update_first_contribution_msec(
+    user_id: str, first_contribution_msec: float
+) -> None:
     """Updates first_contribution_msec of user with given user_id.
 
     Args:
@@ -1175,7 +1422,9 @@ def _update_first_contribution_msec(user_id, first_contribution_msec):
     _save_user_settings(user_settings)
 
 
-def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
+def update_first_contribution_msec_if_not_set(
+    user_id: str, first_contribution_msec: float
+) -> None:
     """Updates first_contribution_msec of user with given user_id
     if it is set to None.
 
@@ -1190,7 +1439,9 @@ def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
             user_id, first_contribution_msec)
 
 
-def update_preferred_language_codes(user_id, preferred_language_codes):
+def update_preferred_language_codes(
+    user_id: str, preferred_language_codes: List[str]
+) -> None:
     """Updates preferred_language_codes of user with given user_id.
 
     Args:
@@ -1203,7 +1454,9 @@ def update_preferred_language_codes(user_id, preferred_language_codes):
     _save_user_settings(user_settings)
 
 
-def update_preferred_site_language_code(user_id, preferred_site_language_code):
+def update_preferred_site_language_code(
+    user_id: str, preferred_site_language_code: str
+) -> None:
     """Updates preferred_site_language_code of user with given user_id.
 
     Args:
@@ -1218,7 +1471,8 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
 
 
 def update_preferred_audio_language_code(
-        user_id, preferred_audio_language_code):
+    user_id: str, preferred_audio_language_code: str
+) -> None:
     """Updates preferred_audio_language_code of user with given user_id.
 
     Args:
@@ -1232,7 +1486,24 @@ def update_preferred_audio_language_code(
     _save_user_settings(user_settings)
 
 
-def add_user_role(user_id, role):
+def update_preferred_translation_language_code(
+    user_id: str, preferred_translation_language_code: str
+) -> None:
+    """Updates preferred_translation_language_code of user with
+    given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        preferred_translation_language_code: str. New text translation
+            language preference to set.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.preferred_translation_language_code = (
+        preferred_translation_language_code)
+    _save_user_settings(user_settings)
+
+
+def add_user_role(user_id: str, role: str) -> None:
     """Updates the roles of the user with given user_id.
 
     Args:
@@ -1256,7 +1527,7 @@ def add_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def remove_user_role(user_id, role):
+def remove_user_role(user_id: str, role: str) -> None:
     """Updates the roles of the user with given user_id.
 
     Args:
@@ -1281,7 +1552,7 @@ def remove_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def mark_user_for_deletion(user_id):
+def mark_user_for_deletion(user_id: str) -> None:
     """Set the 'deleted' property of the user with given user_id to True.
 
     Args:
@@ -1297,7 +1568,7 @@ def mark_user_for_deletion(user_id):
     auth_services.mark_user_for_deletion(user_id)
 
 
-def save_deleted_username(normalized_username):
+def save_deleted_username(normalized_username: str) -> None:
     """Save the username of deleted user.
 
     Args:
@@ -1313,7 +1584,9 @@ def save_deleted_username(normalized_username):
     deleted_user_model.put()
 
 
-def get_human_readable_user_ids(user_ids, strict=True):
+def get_human_readable_user_ids(
+    user_ids: List[str], strict: bool = True
+) -> List[str]:
     """Converts the given ids to usernames, or truncated email addresses.
     Requires all users to be known.
 
@@ -1352,7 +1625,7 @@ def get_human_readable_user_ids(user_ids, strict=True):
     return usernames
 
 
-def record_user_started_state_editor_tutorial(user_id):
+def record_user_started_state_editor_tutorial(user_id: str) -> None:
     """Updates last_started_state_editor_tutorial to the current datetime
     for the user with given user_id.
 
@@ -1365,7 +1638,7 @@ def record_user_started_state_editor_tutorial(user_id):
     _save_user_settings(user_settings)
 
 
-def record_user_started_state_translation_tutorial(user_id):
+def record_user_started_state_translation_tutorial(user_id: str) -> None:
     """Updates last_started_state_translation_tutorial to the current datetime
     for the user with given user_id.
 
@@ -1378,7 +1651,7 @@ def record_user_started_state_translation_tutorial(user_id):
     _save_user_settings(user_settings)
 
 
-def record_user_logged_in(user_id):
+def record_user_logged_in(user_id: str) -> None:
     """Updates last_logged_in to the current datetime for the user with
     given user_id.
 
@@ -1391,36 +1664,40 @@ def record_user_logged_in(user_id):
     _save_user_settings(user_settings)
 
 
-def record_user_edited_an_exploration(user_id):
+def record_user_edited_an_exploration(user_id: str) -> None:
     """Updates last_edited_an_exploration to the current datetime for
     the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
     """
-    user_settings = get_user_settings(user_id)
-    if user_settings:
+    user_settings = get_user_settings(user_id, strict=False)
+    if user_settings is not None:
         user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
         _save_user_settings(user_settings)
 
 
-def record_user_created_an_exploration(user_id):
+def record_user_created_an_exploration(user_id: str) -> None:
     """Updates last_created_an_exploration to the current datetime for
     the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
     """
-    user_settings = get_user_settings(user_id)
-    if user_settings:
+    user_settings = get_user_settings(user_id, strict=False)
+    if user_settings is not None:
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
         _save_user_settings(user_settings)
 
 
 def update_email_preferences(
-        user_id, can_receive_email_updates, can_receive_editor_role_email,
-        can_receive_feedback_email, can_receive_subscription_email,
-        bulk_email_db_already_updated=False):
+    user_id: str,
+    can_receive_email_updates: bool,
+    can_receive_editor_role_email: bool,
+    can_receive_feedback_email: bool,
+    can_receive_subscription_email: bool,
+    bulk_email_db_already_updated: bool = False
+) -> bool:
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -1475,7 +1752,7 @@ def update_email_preferences(
     return False
 
 
-def get_email_preferences(user_id):
+def get_email_preferences(user_id: str) -> user_domain.UserGlobalPrefs:
     """Gives email preferences of user with given user_id.
 
     Args:
@@ -1497,7 +1774,9 @@ def get_email_preferences(user_id):
             email_preferences_model.subscription_notifications)
 
 
-def get_users_email_preferences(user_ids):
+def get_users_email_preferences(
+    user_ids: List[str]
+) -> List[user_domain.UserGlobalPrefs]:
     """Get email preferences for the list of users.
 
     Args:
@@ -1527,8 +1806,11 @@ def get_users_email_preferences(user_ids):
 
 
 def set_email_preferences_for_exploration(
-        user_id, exploration_id, mute_feedback_notifications=None,
-        mute_suggestion_notifications=None):
+    user_id: str,
+    exploration_id: str,
+    mute_feedback_notifications: Optional[bool] = None,
+    mute_suggestion_notifications: Optional[bool] = None
+) -> None:
     """Sets mute preferences for exploration with given exploration_id of user
     with given user_id.
 
@@ -1558,7 +1840,9 @@ def set_email_preferences_for_exploration(
     exploration_user_model.put()
 
 
-def get_email_preferences_for_exploration(user_id, exploration_id):
+def get_email_preferences_for_exploration(
+    user_id: str, exploration_id: str
+) -> user_domain.UserExplorationPrefs:
     """Gives mute preferences for exploration with given exploration_id of user
     with given user_id.
 
@@ -1581,7 +1865,9 @@ def get_email_preferences_for_exploration(user_id, exploration_id):
             exploration_user_model.mute_suggestion_notifications)
 
 
-def get_users_email_preferences_for_exploration(user_ids, exploration_id):
+def get_users_email_preferences_for_exploration(
+    user_ids: List[str], exploration_id: str
+) -> List[user_domain.UserExplorationPrefs]:
     """Gives mute preferences for exploration with given exploration_id of user
     with given user_id.
 
@@ -1594,9 +1880,11 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
         list(UserExplorationPrefs). Representing whether the users has chosen to
         receive email updates for particular exploration.
     """
+    user_id_exp_id_combinations = list(
+        itertools.product(user_ids, [exploration_id]))
     exploration_user_models = (
         user_models.ExplorationUserDataModel.get_multi(
-            user_ids, exploration_id))
+            user_id_exp_id_combinations))
     result = []
 
     for exploration_user_model in exploration_user_models:
@@ -1611,7 +1899,27 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     return result
 
 
-def get_user_contributions(user_id, strict=False):
+@overload
+def get_user_contributions(
+    user_id: str, *, strict: Literal[True]
+) -> user_domain.UserContributions: ...
+
+
+@overload
+def get_user_contributions(
+    user_id: str
+) -> Optional[user_domain.UserContributions]: ...
+
+
+@overload
+def get_user_contributions(
+    user_id: str, *, strict: Literal[False]
+) -> Optional[user_domain.UserContributions]: ...
+
+
+def get_user_contributions(
+    user_id: str, strict: bool = False
+) -> Optional[user_domain.UserContributions]:
     """Gets domain object representing the contributions for the given user_id.
 
     Args:
@@ -1625,17 +1933,21 @@ def get_user_contributions(user_id, strict=False):
         object.
     """
     model = user_models.UserContributionsModel.get(user_id, strict=strict)
-    if model is not None:
-        result = user_domain.UserContributions(
-            model.id, model.created_exploration_ids,
-            model.edited_exploration_ids)
-    else:
-        result = None
+    if model is None:
+        return None
+
+    result = user_domain.UserContributions(
+        model.id, model.created_exploration_ids,
+        model.edited_exploration_ids)
+
     return result
 
 
 def create_user_contributions(
-        user_id, created_exploration_ids, edited_exploration_ids):
+    user_id: str,
+    created_exploration_ids: List[str],
+    edited_exploration_ids: List[str]
+) -> Optional[user_domain.UserContributions]:
     """Creates a new UserContributionsModel and returns the domain object.
     Note: This does not create a contributions model if the user is
     OppiaMigrationBot.
@@ -1662,15 +1974,18 @@ def create_user_contributions(
     if user_contributions:
         raise Exception(
             'User contributions model for user %s already exists.' % user_id)
-    else:
-        user_contributions = user_domain.UserContributions(
-            user_id, created_exploration_ids, edited_exploration_ids)
-        _save_user_contributions(user_contributions)
+
+    user_contributions = user_domain.UserContributions(
+        user_id, created_exploration_ids, edited_exploration_ids)
+    _save_user_contributions(user_contributions)
     return user_contributions
 
 
 def update_user_contributions(
-        user_id, created_exploration_ids, edited_exploration_ids):
+    user_id: str,
+    created_exploration_ids: List[str],
+    edited_exploration_ids: List[str]
+) -> None:
     """Updates an existing UserContributionsModel with new calculated
     contributions.
 
@@ -1696,7 +2011,7 @@ def update_user_contributions(
     _save_user_contributions(user_contributions)
 
 
-def add_created_exploration_id(user_id, exploration_id):
+def add_created_exploration_id(user_id: str, exploration_id: str) -> None:
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of created explorations.
 
@@ -1714,7 +2029,7 @@ def add_created_exploration_id(user_id, exploration_id):
         _save_user_contributions(user_contributions)
 
 
-def add_edited_exploration_id(user_id, exploration_id):
+def add_edited_exploration_id(user_id: str, exploration_id: str) -> None:
     """Adds an exploration_id to a user_id's UserContributionsModel collection
     of edited explorations.
 
@@ -1733,7 +2048,9 @@ def add_edited_exploration_id(user_id, exploration_id):
         _save_user_contributions(user_contributions)
 
 
-def _save_user_contributions(user_contributions):
+def _save_user_contributions(
+    user_contributions: user_domain.UserContributions
+) -> None:
     """Commits a user contributions object to the datastore.
 
     Args:
@@ -1748,7 +2065,9 @@ def _save_user_contributions(user_contributions):
     ).put()
 
 
-def migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
+def migrate_dashboard_stats_to_latest_schema(
+    versioned_dashboard_stats: user_models.UserStatsModel
+) -> None:
     """Holds responsibility of updating the structure of dashboard stats.
 
     Args:
@@ -1766,7 +2085,7 @@ def migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION)
 
 
-def get_current_date_as_string():
+def get_current_date_as_string() -> str:
     """Gets the current date.
 
     Returns:
@@ -1776,7 +2095,7 @@ def get_current_date_as_string():
         feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
 
 
-def parse_date_from_string(datetime_str):
+def parse_date_from_string(datetime_str: str) -> Dict[str, int]:
     """Parses the given string, and returns the year, month and day of the
     date that it represents.
 
@@ -1795,7 +2114,7 @@ def parse_date_from_string(datetime_str):
     }
 
 
-def get_user_impact_score(user_id):
+def get_user_impact_score(user_id: str) -> float:
     """Gets the user impact score for the given user_id.
 
     Args:
@@ -1808,12 +2127,18 @@ def get_user_impact_score(user_id):
     model = user_models.UserStatsModel.get(user_id, strict=False)
 
     if model:
-        return model.impact_score
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        impact_score: float = model.impact_score
+        return impact_score
     else:
         return 0
 
 
-def get_weekly_dashboard_stats(user_id):
+def get_weekly_dashboard_stats(
+    user_id: str
+) -> List[Dict[str, DashboardStatsDict]]:
     """Gets weekly dashboard stats for a given user_id.
 
     Args:
@@ -1849,12 +2174,20 @@ def get_weekly_dashboard_stats(user_id):
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
     if model and model.weekly_creator_stats_list:
-        return model.weekly_creator_stats_list
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        weekly_creator_stats_list: List[
+            Dict[str, DashboardStatsDict]
+        ] = model.weekly_creator_stats_list
+        return weekly_creator_stats_list
     else:
-        return None
+        return []
 
 
-def get_last_week_dashboard_stats(user_id):
+def get_last_week_dashboard_stats(
+    user_id: str
+) -> Optional[Dict[str, DashboardStatsDict]]:
     """Gets last week's dashboard stats for a given user_id.
 
     Args:
@@ -1878,7 +2211,7 @@ def get_last_week_dashboard_stats(user_id):
         return None
 
 
-def update_dashboard_stats_log(user_id):
+def update_dashboard_stats_log(user_id: str) -> None:
     """Save statistics for creator dashboard of a user by appending to a list
     keyed by a datetime string.
 
@@ -1902,7 +2235,7 @@ def update_dashboard_stats_log(user_id):
     model.put()
 
 
-def is_moderator(user_id):
+def is_moderator(user_id: str) -> bool:
     """Checks if a user with given user_id is a moderator.
 
     Args:
@@ -1914,7 +2247,7 @@ def is_moderator(user_id):
     return feconf.ROLE_ID_MODERATOR in get_user_roles_from_id(user_id)
 
 
-def is_curriculum_admin(user_id):
+def is_curriculum_admin(user_id: str) -> bool:
     """Checks if a user with given user_id is an admin.
 
     Args:
@@ -1926,7 +2259,7 @@ def is_curriculum_admin(user_id):
     return feconf.ROLE_ID_CURRICULUM_ADMIN in get_user_roles_from_id(user_id)
 
 
-def is_topic_manager(user_id):
+def is_topic_manager(user_id: str) -> bool:
     """Checks if a user with given user_id is a topic manager.
 
     Args:
@@ -1938,7 +2271,9 @@ def is_topic_manager(user_id):
     return feconf.ROLE_ID_TOPIC_MANAGER in get_user_roles_from_id(user_id)
 
 
-def can_review_translation_suggestions(user_id, language_code=None):
+def can_review_translation_suggestions(
+    user_id: str, language_code: Optional[str] = None
+) -> bool:
     """Returns whether the user can review translation suggestions in any
     language or in the given language.
 
@@ -1963,7 +2298,9 @@ def can_review_translation_suggestions(user_id, language_code=None):
         return bool(reviewable_language_codes)
 
 
-def can_review_voiceover_applications(user_id, language_code=None):
+def can_review_voiceover_applications(
+    user_id: str, language_code: Optional[str] = None
+) -> bool:
     """Returns whether the user can review voiceover applications in any
     language or in the given language.
 
@@ -1988,7 +2325,7 @@ def can_review_voiceover_applications(user_id, language_code=None):
         return bool(reviewable_language_codes)
 
 
-def can_review_question_suggestions(user_id):
+def can_review_question_suggestions(user_id: str) -> bool:
     """Checks whether the user can review question suggestions.
 
     Args:
@@ -2001,7 +2338,7 @@ def can_review_question_suggestions(user_id):
     return user_contribution_rights.can_review_questions
 
 
-def can_submit_question_suggestions(user_id):
+def can_submit_question_suggestions(user_id: str) -> bool:
     """Checks whether the user can submit question suggestions.
 
     Args:
@@ -2014,7 +2351,9 @@ def can_submit_question_suggestions(user_id):
     return user_contribution_rights.can_submit_questions
 
 
-def allow_user_to_review_translation_in_language(user_id, language_code):
+def allow_user_to_review_translation_in_language(
+    user_id: str, language_code: str
+) -> None:
     """Allows the user with the given user id to review translation in the given
     language_code.
 
@@ -2034,7 +2373,8 @@ def allow_user_to_review_translation_in_language(user_id, language_code):
 
 
 def remove_translation_review_rights_in_language(
-        user_id, language_code_to_remove):
+    user_id: str, language_code_to_remove: str
+) -> None:
     """Removes the user's review rights to translation suggestions in the given
     language_code.
 
@@ -2052,7 +2392,9 @@ def remove_translation_review_rights_in_language(
     _update_user_contribution_rights(user_contribution_rights)
 
 
-def allow_user_to_review_voiceover_in_language(user_id, language_code):
+def allow_user_to_review_voiceover_in_language(
+    user_id: str, language_code: str
+) -> None:
     """Allows the user with the given user id to review voiceover applications
     in the given language_code.
 
@@ -2071,7 +2413,9 @@ def allow_user_to_review_voiceover_in_language(user_id, language_code):
     _save_user_contribution_rights(user_contribution_rights)
 
 
-def remove_voiceover_review_rights_in_language(user_id, language_code):
+def remove_voiceover_review_rights_in_language(
+    user_id: str, language_code: str
+) -> None:
     """Removes the user's review rights to voiceover applications in the given
     language_code.
 
@@ -2087,7 +2431,7 @@ def remove_voiceover_review_rights_in_language(user_id, language_code):
     _update_user_contribution_rights(user_contribution_rights)
 
 
-def allow_user_to_review_question(user_id):
+def allow_user_to_review_question(user_id: str) -> None:
     """Allows the user with the given user id to review question suggestions.
 
     Args:
@@ -2099,7 +2443,7 @@ def allow_user_to_review_question(user_id):
     _save_user_contribution_rights(user_contribution_rights)
 
 
-def remove_question_review_rights(user_id):
+def remove_question_review_rights(user_id: str) -> None:
     """Removes the user's review rights to question suggestions.
 
     Args:
@@ -2111,7 +2455,7 @@ def remove_question_review_rights(user_id):
     _update_user_contribution_rights(user_contribution_rights)
 
 
-def allow_user_to_submit_question(user_id):
+def allow_user_to_submit_question(user_id: str) -> None:
     """Allows the user with the given user id to submit question suggestions.
 
     Args:
@@ -2123,7 +2467,7 @@ def allow_user_to_submit_question(user_id):
     _save_user_contribution_rights(user_contribution_rights)
 
 
-def remove_question_submit_rights(user_id):
+def remove_question_submit_rights(user_id: str) -> None:
     """Removes the user's submit rights to question suggestions.
 
     Args:
@@ -2135,7 +2479,7 @@ def remove_question_submit_rights(user_id):
     _update_user_contribution_rights(user_contribution_rights)
 
 
-def remove_contribution_reviewer(user_id):
+def remove_contribution_reviewer(user_id: str) -> None:
     """Deletes the UserContributionRightsModel corresponding to the given
     user_id.
 
@@ -2156,7 +2500,9 @@ def remove_contribution_reviewer(user_id):
         user_contribution_rights_model.delete()
 
 
-def get_contributor_usernames(category, language_code=None):
+def get_contributor_usernames(
+    category: str, language_code: Optional[str] = None
+) -> Sequence[str]:
     """Returns a list of usernames of users who has contribution rights of given
     category.
 
@@ -2167,14 +2513,35 @@ def get_contributor_usernames(category, language_code=None):
             review category.
 
     Returns:
-        list(str). A list of usernames.
+        Sequence(str). A list of usernames.
+
+    Raises:
+        Exception. The language code is not of None for question review
+            contribution.
+        Exception. Invalid category.
+        Exception. The language_code cannot be None if review category is
+            'translation' or 'voiceover'.
     """
     user_ids = []
+    if (
+        category in (
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER
+        ) and language_code is None
+    ):
+        raise Exception(
+            'The language_code cannot be None if review category is'
+            ' \'translation\' or \'voiceover\'.'
+        )
     if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
+        # Ruling out the possibility of None for mypy type checking.
+        assert language_code is not None
         user_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids(language_code))
     elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
+        # Ruling out the possibility of None for mypy type checking.
+        assert language_code is not None
         user_ids = (
             user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
@@ -2192,10 +2559,15 @@ def get_contributor_usernames(category, language_code=None):
     else:
         raise Exception('Invalid category: %s' % category)
 
-    return get_usernames(user_ids)
+    usernames = get_usernames(user_ids, strict=True)
+    return usernames
 
 
-def log_username_change(committer_id, old_username, new_username):
+def log_username_change(
+    committer_id: str,
+    old_username: str,
+    new_username: str
+) -> None:
     """Stores the query to role structure in UsernameChangeAuditModel.
 
     Args:
@@ -2211,7 +2583,7 @@ def log_username_change(committer_id, old_username, new_username):
         new_username=new_username).put()
 
 
-def create_login_url(return_url):
+def create_login_url(return_url: str) -> str:
     """Creates a login url.
 
     Args:
@@ -2223,7 +2595,7 @@ def create_login_url(return_url):
     return '/login?%s' % urllib.parse.urlencode({'return_url': return_url})
 
 
-def mark_user_banned(user_id):
+def mark_user_banned(user_id: str) -> None:
     """Marks a user banned.
 
     Args:
@@ -2234,7 +2606,7 @@ def mark_user_banned(user_id):
     _save_user_settings(user_settings)
 
 
-def unmark_user_banned(user_id):
+def unmark_user_banned(user_id: str) -> None:
     """Unmarks a banned user.
 
     Args:
@@ -2252,7 +2624,7 @@ def unmark_user_banned(user_id):
     _save_user_settings(user_settings)
 
 
-def get_dashboard_stats(user_id):
+def get_dashboard_stats(user_id: str) -> DashboardStatsDict:
     """Returns the dashboard stats associated with the given user_id.
 
     Args:
@@ -2282,3 +2654,286 @@ def get_dashboard_stats(user_id):
         'num_ratings': num_ratings,
         'average_ratings': average_ratings
     }
+
+
+def get_checkpoints_in_order(
+    init_state_name: str, states: Dict[str, state_domain.State]
+) -> List[str]:
+    """Returns the checkpoints of an exploration in sequential order by a
+    BFS traversal.
+
+    Args:
+        init_state_name: str. The name of the first state of the exploration.
+        states: dict(state). All states of the exploration.
+
+    Returns:
+        list(str). List of all checkpoints of the exploration in sequential
+        order.
+
+    Raises:
+        Exception. States with a null destination can never be a checkpoint.
+    """
+    queue = [init_state_name]
+    checkpoint_state_names = []
+    visited_state_names = []
+    while len(queue) > 0:
+        current_state_name = queue.pop()
+        if current_state_name not in visited_state_names:
+            visited_state_names.append(current_state_name)
+            current_state = states[current_state_name]
+            if (
+                current_state.card_is_checkpoint and
+                current_state_name not in checkpoint_state_names
+            ):
+                checkpoint_state_names.append(current_state_name)
+            for answer_group in current_state.interaction.answer_groups:
+                if answer_group.outcome.dest is None:
+                    raise Exception(
+                        'States with a null destination can never be a'
+                        ' checkpoint.'
+                    )
+                queue.append(answer_group.outcome.dest)
+
+            # Add the default outcome destination in the queue.
+            if current_state.interaction.default_outcome is not None:
+                if current_state.interaction.default_outcome.dest is None:
+                    raise Exception(
+                        'States with a null destination can never be a'
+                        ' checkpoint.'
+                    )
+                queue.append(current_state.interaction.default_outcome.dest)
+
+    return checkpoint_state_names
+
+
+def get_most_distant_reached_checkpoint_in_current_exploration(
+    checkpoints_in_current_exploration: List[str],
+    checkpoints_in_older_exploration: List[str],
+    most_distant_reached_checkpoint_state_name_in_older_exploration: str
+) -> Optional[str]:
+    """Returns the most distant reached checkpoint in current exploration after
+    comparing current exploration with older exploration.
+
+    Args:
+        checkpoints_in_current_exploration: list(str). The checkpoints of
+            current exploration in sequential order.
+        checkpoints_in_older_exploration: list(str). The checkpoints
+            of older exploration in sequential order.
+        most_distant_reached_checkpoint_state_name_in_older_exploration: str.
+            The state name of the most distant reached checkpoint in the older
+            exploration.
+
+    Returns:
+        str or None. The most distant checkpoint in current exploration or
+        None if most distant reached checkpoint of older exploration is not
+        present in current exploration.
+    """
+    # Index of the most_distant_reached_checkpoint in the older exploration.
+    mdrc_index = (
+        checkpoints_in_older_exploration.index(
+            most_distant_reached_checkpoint_state_name_in_older_exploration))
+
+    # Loop through checkpoints of furthest_reached_exploration backwards until
+    # a checkpoint is found that exists in current_exploration too.
+    while mdrc_index >= 0:
+        checkpoint_in_old_exp = checkpoints_in_older_exploration[mdrc_index]
+        if checkpoint_in_old_exp in checkpoints_in_current_exploration:
+            return checkpoint_in_old_exp
+        mdrc_index -= 1
+
+    return None
+
+
+def update_learner_checkpoint_progress(
+    user_id: str,
+    exploration_id: str,
+    state_name: str,
+    exp_version: int
+) -> None:
+    """Sets the furthest reached and most recently reached checkpoint in
+    an exploration by the user.
+
+    Args:
+        user_id: str. The Id of the user.
+        exploration_id: str. The Id of the exploration.
+        state_name: str. The state name of the most recently reached checkpoint.
+        exp_version: int. The exploration version of the most recently reached
+            checkpoint.
+    """
+
+    exp_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    if exp_user_model is None:
+        exp_user_model = user_models.ExplorationUserDataModel.create(
+            user_id, exploration_id)
+
+    current_exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=True, version=exp_version
+    )
+
+    # If the exploration is being visited the first time.
+    if exp_user_model.furthest_reached_checkpoint_state_name is None:
+        exp_user_model.furthest_reached_checkpoint_exp_version = exp_version
+        exp_user_model.furthest_reached_checkpoint_state_name = state_name
+    elif exp_user_model.furthest_reached_checkpoint_exp_version < exp_version:
+        furthest_reached_checkpoint_exp = (
+            exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                strict=True,
+                version=exp_user_model.furthest_reached_checkpoint_exp_version
+            )
+        )
+        checkpoints_in_current_exp = get_checkpoints_in_order(
+            current_exploration.init_state_name, current_exploration.states)
+        checkpoints_in_older_exp = get_checkpoints_in_order(
+            furthest_reached_checkpoint_exp.init_state_name,
+            furthest_reached_checkpoint_exp.states)
+
+        # Get the furthest reached checkpoint in current exploration.
+        furthest_reached_checkpoint_in_current_exp = (
+            get_most_distant_reached_checkpoint_in_current_exploration(
+                checkpoints_in_current_exp,
+                checkpoints_in_older_exp,
+                exp_user_model.furthest_reached_checkpoint_state_name
+            )
+        )
+
+        # If the furthest reached checkpoint doesn't exist in current
+        # exploration.
+        if furthest_reached_checkpoint_in_current_exp is None:
+            exp_user_model.furthest_reached_checkpoint_exp_version = (
+                exp_version)
+            exp_user_model.furthest_reached_checkpoint_state_name = state_name
+        else:
+            # Index of the furthest reached checkpoint.
+            frc_index = checkpoints_in_current_exp.index(
+                furthest_reached_checkpoint_in_current_exp)
+            # If furthest reached checkpoint is behind most recently
+            # reached checkpoint.
+            if frc_index <= checkpoints_in_current_exp.index(state_name):
+                exp_user_model.furthest_reached_checkpoint_exp_version = (
+                    exp_version)
+                exp_user_model.furthest_reached_checkpoint_state_name = (
+                    state_name)
+
+    exp_user_model.most_recently_reached_checkpoint_exp_version = exp_version
+    exp_user_model.most_recently_reached_checkpoint_state_name = state_name
+    exp_user_model.update_timestamps()
+    exp_user_model.put()
+
+
+def set_user_has_viewed_lesson_info_modal_once(user_id: str) -> None:
+    """Updates the user's settings once he has viewed the lesson info modal.
+
+    Args:
+        user_id: str. The Id of the user.
+    """
+    user_settings = get_user_settings(user_id)
+    user_settings.mark_lesson_info_modal_viewed()
+    _save_user_settings(user_settings)
+
+
+def clear_learner_checkpoint_progress(
+    user_id: str, exploration_id: str
+) -> None:
+    """Clears learner's checkpoint progress through the exploration by
+    clearing the most recently reached checkpoint fields of the exploration.
+
+    Args:
+        user_id: str. The Id of the user.
+        exploration_id: str. The Id of the exploration.
+    """
+    exp_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    if exp_user_model is not None:
+        exp_user_model.most_recently_reached_checkpoint_exp_version = None
+        exp_user_model.most_recently_reached_checkpoint_state_name = None
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
+
+
+def sync_logged_in_learner_checkpoint_progress_with_current_exp_version(
+    user_id: str, exploration_id: str
+) -> Optional[user_domain.ExplorationUserData]:
+    """Synchronizes the most recently reached checkpoint and the furthest
+    reached checkpoint with the latest exploration.
+
+    Args:
+        user_id: str. The Id of the user.
+        exploration_id: str. The Id of the exploration.
+
+    Returns:
+        ExplorationUserData. The domain object corresponding to the given user
+        and exploration.
+    """
+    exp_user_model = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+
+    if exp_user_model is None:
+        return None
+
+    latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    most_recently_interacted_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            strict=True,
+            version=exp_user_model.most_recently_reached_checkpoint_exp_version
+        ))
+    furthest_reached_exploration = (
+        exp_fetchers.get_exploration_by_id(
+            exploration_id,
+            strict=True,
+            version=exp_user_model.furthest_reached_checkpoint_exp_version
+        ))
+
+    most_recently_reached_checkpoint_in_current_exploration = (
+        get_most_distant_reached_checkpoint_in_current_exploration(
+            get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states),
+            get_checkpoints_in_order(
+                most_recently_interacted_exploration.init_state_name,
+                most_recently_interacted_exploration.states),
+            exp_user_model.most_recently_reached_checkpoint_state_name
+        )
+    )
+
+    furthest_reached_checkpoint_in_current_exploration = (
+        get_most_distant_reached_checkpoint_in_current_exploration(
+            get_checkpoints_in_order(
+                latest_exploration.init_state_name,
+                latest_exploration.states),
+            get_checkpoints_in_order(
+                furthest_reached_exploration.init_state_name,
+                furthest_reached_exploration.states),
+            exp_user_model.furthest_reached_checkpoint_state_name
+        )
+    )
+
+    # If the most recently reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        most_recently_reached_checkpoint_in_current_exploration !=
+        exp_user_model.most_recently_reached_checkpoint_state_name
+    ):
+        exp_user_model.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_in_current_exploration)
+        exp_user_model.most_recently_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
+
+    # If the furthest reached checkpoint doesn't exist in current
+    # exploration.
+    if (
+        furthest_reached_checkpoint_in_current_exploration !=
+        exp_user_model.furthest_reached_checkpoint_state_name
+    ):
+        exp_user_model.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_in_current_exploration)
+        exp_user_model.furthest_reached_checkpoint_exp_version = (
+            latest_exploration.version)
+        exp_user_model.update_timestamps()
+        exp_user_model.put()
+
+    return exp_fetchers.get_exploration_user_data(user_id, exploration_id)

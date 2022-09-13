@@ -30,6 +30,7 @@ export class BaseUndoRedo {
   constructor() {
     this.init();
   }
+
   private _appliedChanges: Change[] = [];
   private _undoneChanges: Change[] = [];
   _undoRedoChangeEventEmitter: EventEmitter<void> = new EventEmitter();
@@ -72,8 +73,8 @@ export class BaseUndoRedo {
    * fires mutation event.
    */
   undoChange(domainObject: DomainObject): boolean {
-    if (this._appliedChanges.length !== 0) {
-      var change = this._appliedChanges.pop();
+    var change = this._appliedChanges.pop();
+    if (change !== undefined) {
       this._undoneChanges.push(change);
       this._reverseChange(change, domainObject);
       return true;
@@ -87,8 +88,8 @@ export class BaseUndoRedo {
    * returned list will not be reflected in this class instance.
    */
   redoChange(domainObject: DomainObject): boolean {
-    if (this._undoneChanges.length !== 0) {
-      var change = this._undoneChanges.pop();
+    var change = this._undoneChanges.pop();
+    if (change !== undefined) {
       this._appliedChanges.push(change);
       this._applyChange(change, domainObject);
       return true;
@@ -136,7 +137,7 @@ export class BaseUndoRedo {
   }
 
   /**
-   * Returns whether this objcet has any applied changes.
+   * Returns whether this object has any applied changes.
    */
   hasChanges(): boolean {
     return this._appliedChanges.length !== 0;

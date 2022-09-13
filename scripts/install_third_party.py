@@ -24,14 +24,13 @@ import os
 import subprocess
 import sys
 import tarfile
-import urllib.request as urlrequest
+import urllib
 import zipfile
 
-from core import python_utils
 from core import utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -100,9 +99,9 @@ def download_files(source_url_root, target_dir, source_filenames):
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
             print('Downloading file %s to %s ...' % (filename, target_dir))
-            urlrequest.urlretrieve(
+            common.url_retrieve(
                 '%s/%s' % (source_url_root, filename),
-                filename=os.path.join(target_dir, filename))
+                os.path.join(target_dir, filename))
 
             print('Download of %s succeeded.' % filename)
 
@@ -131,7 +130,7 @@ def download_and_unzip_files(
             zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        common.url_retrieve(source_url, TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -142,7 +141,7 @@ def download_and_unzip_files(
                 os.remove(TMP_UNZIP_PATH)
 
             # Some downloads (like jqueryui-themes) may require a user-agent.
-            req = python_utils.url_request(source_url, None, {})
+            req = urllib.request.Request(source_url, None, {})
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
@@ -182,7 +181,7 @@ def download_and_untar_files(
             tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urlrequest.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        common.url_retrieve(source_url, TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
@@ -198,7 +197,7 @@ def download_and_untar_files(
 
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with python_utils.open_file(filepath, mode) as f:
+    with utils.open_file(filepath, mode) as f:
         return f.read()
 
 
@@ -278,6 +277,9 @@ def validate_dependencies(filepath):
 
     Args:
         filepath: str. The path to the json file.
+
+    Raises:
+        Exception. The 'downloadFormat' not specified.
     """
     dependencies_data = return_json(filepath)
     dependencies = dependencies_data['dependencies']
@@ -350,7 +352,10 @@ def install_elasticsearch_dev_server():
             ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+            # Set the minimum heap size to 100 MB and maximum to 500 MB.
+            env={'ES_JAVA_OPTS': '-Xms100m -Xmx500m'}
+        )
         print('ElasticSearch is already installed.')
         return
     except OSError:
@@ -453,7 +458,7 @@ def main(args=None):
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
-    install_backend_python_libs.main()
+    install_python_prod_dependencies.main()
     download_all_dependencies(DEPENDENCIES_FILE_PATH)
     install_redis_cli()
     install_elasticsearch_dev_server()

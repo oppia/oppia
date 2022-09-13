@@ -18,27 +18,50 @@
 
 from __future__ import annotations
 
-from core import python_utils
+import enum
+
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
 Registry = registry.Registry
-FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
-PARAM_NAMES = python_utils.create_enum( # pylint: disable=invalid-name
-    'dummy_feature', 'dummy_parameter')
+
+# TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
+# to PascalCase and its values to UPPER_CASE. Because we want to be consistent
+# throughout the codebase according to the coding style guide.
+# https://github.com/oppia/oppia/wiki/Coding-style-guide
+class ParamNames(enum.Enum):
+    """Enum for parameter names."""
+
+    DUMMY_FEATURE = 'dummy_feature'
+    DUMMY_PARAMETER = 'dummy_parameter'
+
+    END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
+    CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
+
 
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
-    PARAM_NAMES.dummy_feature,
+    ParamNames.DUMMY_FEATURE,
     'This is a dummy feature flag.',
-    FEATURE_STAGES.dev,
+    platform_parameter_domain.FeatureStages.DEV,
 )
 
 Registry.create_platform_parameter(
-    PARAM_NAMES.dummy_parameter,
+    ParamNames.DUMMY_PARAMETER,
     'This is a dummy platform parameter.',
-    DATA_TYPES.string
+    platform_parameter_domain.DataTypes.STRING
+)
+
+Registry.create_feature_flag(
+    ParamNames.END_CHAPTER_CELEBRATION,
+    'This flag is for the end chapter celebration feature.',
+    platform_parameter_domain.FeatureStages.PROD,
+)
+
+Registry.create_feature_flag(
+    ParamNames.CHECKPOINT_CELEBRATION,
+    'This flag is for the checkpoint celebration feature.',
+    platform_parameter_domain.FeatureStages.PROD,
 )

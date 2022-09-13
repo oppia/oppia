@@ -22,31 +22,39 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import base_models
+    from mypy_imports import user_models
 
-(auth_models, base_models) = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.base_model]))
+(auth_models, base_models, user_models) = (
+    models.Registry.import_models([
+        models.Names.AUTH,
+        models.Names.BASE_MODEL,
+        models.Names.USER
+    ])
+)
 
 
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     """Tests for UserAuthDetailsModel."""
 
-    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
-    NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_GAE_ID = 'auth_id_x'
-    USER_ID = 'user_id'
-    USER_GAE_ID = 'auth_id'
-    FIREBASE_USER_ID = 'firebase_user_id'
-    FIREBASE_AUTH_ID = 'firebase_auth_id'
-    PROFILE_ID = 'profile_id'
-    PROFILE_2_ID = 'profile_2_id'
+    NONEXISTENT_AUTH_METHOD_NAME: Final = 'auth_method_x'
+    NONEXISTENT_USER_ID: Final = 'id_x'
+    NONREGISTERED_GAE_ID: Final = 'auth_id_x'
+    USER_ID: Final = 'user_id'
+    USER_GAE_ID: Final = 'auth_id'
+    FIREBASE_USER_ID: Final = 'firebase_user_id'
+    FIREBASE_AUTH_ID: Final = 'firebase_auth_id'
+    PROFILE_ID: Final = 'profile_id'
+    PROFILE_2_ID: Final = 'profile_2_id'
 
     def setUp(self) -> None:
         """Set up user models in storage for use in testing."""
-        super(UserAuthDetailsModelTests, self).setUp()
+        super().setUp()
 
         auth_models.UserAuthDetailsModel(
             id=self.USER_ID,
@@ -72,8 +80,76 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             auth_models.UserAuthDetailsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
+    def test_get_field_names_for_takeout(self) -> None:
+        expected_dict = {
+            'parent_user_id': 'parent_username'
+        }
+        self.assertEqual(
+            auth_models.UserAuthDetailsModel
+                .get_field_names_for_takeout(),
+            expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            auth_models.UserAuthDetailsModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'firebase_auth_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'parent_user_id': base_models.EXPORT_POLICY.EXPORTED,
+        }
+        self.assertEqual(
+            auth_models.UserAuthDetailsModel
+                .get_export_policy(),
+            expected_export_policy_dict)
+
+    def test_export_data_trivial(self) -> None:
+        """Trivial test of export_data functionality."""
+
+        exported_dict = (
+            auth_models.UserAuthDetailsModel.export_data(
+                self.NONEXISTENT_USER_ID))
+
+        self.assertEqual(exported_dict, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        user_auth_model = (
+            auth_models.UserAuthDetailsModel
+                .get_by_id(self.PROFILE_2_ID))
+        self.assertIsNotNone(user_auth_model)
+
+        # The parent_user_id should exist to fetch the
+        # parent_model further on in the test.
+        self.assertIsNotNone(user_auth_model.parent_user_id)
+        self.assertEqual(user_auth_model.parent_user_id, self.USER_ID)
+
+        # Create the model instance to be fetched using
+        # user_auth_model.parent_user_id. The fetched
+        # parent_model will provide the username to be
+        # returned by .export_data().
+        user_models.UserSettingsModel(
+            id=self.USER_ID,
+            email='user@example.com',
+            roles=[feconf.ROLE_ID_CURRICULUM_ADMIN],
+            banned=False,
+            username='user'
+        ).put()
+
+        exported_dict = (
+            auth_models.UserAuthDetailsModel.export_data(
+                self.PROFILE_2_ID))
+        expected_dict = {'parent_username': 'user'}
+
+        self.assertEqual(expected_dict, exported_dict)
+
     def test_apply_deletion_policy_for_registered_user_deletes_them(
-            self
+        self
     ) -> None:
         # Deleting a full user.
         auth_models.UserAuthDetailsModel.apply_deletion_policy(self.USER_ID)
@@ -86,7 +162,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             self.PROFILE_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
-            self
+        self
     ) -> None:
         self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id(
             self.NONEXISTENT_USER_ID))
@@ -138,7 +214,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         )
 
     def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(
-            self
+        self
     ) -> None:
         self.assertNotEqual(
             auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
@@ -156,17 +232,17 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
 class UserIdentifiersModelTests(test_utils.GenericTestBase):
     """Tests for UserIdentifiersModel."""
 
-    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
-    NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_GAE_ID = 'auth_id_x'
-    USER_ID = 'user_id'
-    USER_GAE_ID = 'auth_id'
-    PROFILE_ID = 'profile_id'
-    PROFILE_2_ID = 'profile_2_id'
+    NONEXISTENT_AUTH_METHOD_NAME: Final = 'auth_method_x'
+    NONEXISTENT_USER_ID: Final = 'id_x'
+    NONREGISTERED_GAE_ID: Final = 'auth_id_x'
+    USER_ID: Final = 'user_id'
+    USER_GAE_ID: Final = 'auth_id'
+    PROFILE_ID: Final = 'profile_id'
+    PROFILE_2_ID: Final = 'profile_2_id'
 
     def setUp(self) -> None:
         """Set up user models in storage for use in testing."""
-        super(UserIdentifiersModelTests, self).setUp()
+        super().setUp()
 
         auth_models.UserIdentifiersModel(
             id=self.USER_GAE_ID,
@@ -178,8 +254,25 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
             auth_models.UserIdentifiersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            auth_models.UserIdentifiersModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            auth_models.UserIdentifiersModel.get_export_policy(),
+            expected_export_policy_dict)
+
     def test_apply_deletion_policy_for_registered_user_deletes_them(
-            self
+        self
     ) -> None:
         # Deleting a full user.
         auth_models.UserIdentifiersModel.apply_deletion_policy(self.USER_ID)
@@ -187,7 +280,7 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
             self.USER_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
-            self
+        self
     ) -> None:
         self.assertIsNone(auth_models.UserIdentifiersModel.get_by_id(
             self.NONEXISTENT_USER_ID))
@@ -234,17 +327,17 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
 class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
     """Tests for auth_models.UserIdByFirebaseAuthIdModel."""
 
-    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
-    NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_AUTH_ID = 'auth_id_x'
-    USER_ID = 'user_id'
-    USER_AUTH_ID = 'auth_id'
-    PROFILE_ID = 'profile_id'
-    PROFILE_2_ID = 'profile_2_id'
+    NONEXISTENT_AUTH_METHOD_NAME: Final = 'auth_method_x'
+    NONEXISTENT_USER_ID: Final = 'id_x'
+    NONREGISTERED_AUTH_ID: Final = 'auth_id_x'
+    USER_ID: Final = 'user_id'
+    USER_AUTH_ID: Final = 'auth_id'
+    PROFILE_ID: Final = 'profile_id'
+    PROFILE_2_ID: Final = 'profile_2_id'
 
     def setUp(self) -> None:
         """Set up user models in storage for use in testing."""
-        super(UserIdByFirebaseAuthIdModelTests, self).setUp()
+        super().setUp()
 
         auth_models.UserIdByFirebaseAuthIdModel(
             id=self.USER_AUTH_ID, user_id=self.USER_ID).put()
@@ -255,7 +348,7 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(
-            self
+        self
     ) -> None:
         # Deleting a full user.
         auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
@@ -265,7 +358,7 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
                 self.USER_ID, strict=False))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
-            self
+        self
     ) -> None:
         self.assertIsNone(
             auth_models.UserIdByFirebaseAuthIdModel.get(
@@ -309,7 +402,7 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
 class FirebaseSeedModelTests(test_utils.GenericTestBase):
     """Tests for auth_models.FirebaseSeedModel."""
 
-    USER_ID = 'user_id'
+    USER_ID: Final = 'user_id'
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(

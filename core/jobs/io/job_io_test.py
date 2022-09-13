@@ -53,7 +53,7 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
             job_run_result.JobRunResult(stdout='ghi', stderr='789'),
         ]
 
-        with self.swap(job_run_result, 'MAX_OUTPUT_BYTES', 11):
+        with self.swap(job_run_result, 'MAX_OUTPUT_CHARACTERS', 8):
             self.assert_pcoll_empty(
                 self.pipeline
                 | beam.Create(messages)
@@ -61,5 +61,5 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
             )
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)
-        self.assertItemsEqual(result.stdout.split('\n'), ['abc', 'def', 'ghi']) # type: ignore[no-untyped-call]
-        self.assertItemsEqual(result.stderr.split('\n'), ['123', '456', '789']) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(result.stdout.split('\n'), ['abc', 'def', 'ghi'])
+        self.assertItemsEqual(result.stderr.split('\n'), ['123', '456', '789'])

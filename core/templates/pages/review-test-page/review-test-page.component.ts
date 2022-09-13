@@ -16,107 +16,131 @@
  * @fileoverview Component for the review tests page.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PageTitleService } from 'services/page-title.service';
+import { QuestionPlayerConstants } from 'components/question-directives/question-player/question-player.constants';
+import { ReviewTestPageConstants } from './review-test-page.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { ReviewTestEngineService } from './review-test-engine.service';
+import { QuestionPlayerConfig } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
-require(
-  'components/question-directives/question-player/' +
-  'question-player.component.ts');
-require('interactions/interactionsQuestionsRequires.ts');
-require('objects/objectComponentsRequiresForPlayers.ts');
-require('pages/interaction-specs.constants.ajs.ts');
-require('pages/review-test-page/review-test-page.constants.ajs.ts');
-require('pages/review-test-page/review-test-engine.service.ts');
-require('services/alerts.service.ts');
-require('services/page-title.service.ts');
-require('services/contextual/url.service.ts');
-require('domain/review_test/review-test-backend-api.service.ts');
+@Component({
+  selector: 'review-test-page',
+  templateUrl: './review-test-page.component.html'
+})
+export class ReviewTestPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
+  questionPlayerConfig: QuestionPlayerConfig;
+  storyName: string;
 
-angular.module('oppia').component('reviewTestPage', {
-  template: require('./review-test-page.component.html'),
-  controller: [
-    'PageTitleService', 'ReviewTestEngineService', 'UrlInterpolationService',
-    'UrlService', 'QUESTION_PLAYER_MODE', 'REVIEW_TESTS_URL',
-    'STORY_VIEWER_PAGE',
-    function(
-        PageTitleService, ReviewTestEngineService, UrlInterpolationService,
-        UrlService, QUESTION_PLAYER_MODE, REVIEW_TESTS_URL,
-        STORY_VIEWER_PAGE
-    ) {
-      var ctrl = this;
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private pageTitleService: PageTitleService,
+    private reviewTestBackendApiService: ReviewTestBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
+    private reviewTestEngineService: ReviewTestEngineService,
+    private translateService: TranslateService
+  ) {}
 
-      ctrl.reviewTestBackendApiService = (
-        OppiaAngularRootComponent.reviewTestBackendApiService);
-
-      var _fetchSkillDetails = function() {
-        var topicUrlFragment = (
-          UrlService.getTopicUrlFragmentFromLearnerUrl());
-        var storyUrlFragment = (
-          UrlService.getStoryUrlFragmentFromLearnerUrl());
-        var classroomUrlFragment = (
-          UrlService.getClassroomUrlFragmentFromLearnerUrl());
-        var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
-          REVIEW_TESTS_URL, {
-            topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: classroomUrlFragment,
-            story_url_fragment: storyUrlFragment
-          });
-        var storyViewerUrl = UrlInterpolationService.interpolateUrl(
-          STORY_VIEWER_PAGE, {
-            topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: classroomUrlFragment,
-            story_url_fragment: storyUrlFragment
-          });
-        ctrl.reviewTestBackendApiService.fetchReviewTestDataAsync(
-          storyUrlFragment).then(
-          function(result) {
-            var skillIdList = [];
-            var skillDescriptions = [];
-            PageTitleService.setDocumentTitle(
-              'Review Test: ' + result.storyName + ' - Oppia');
-            for (var skillId in result.skillDescriptions) {
-              skillIdList.push(skillId);
-              skillDescriptions.push(
-                result.skillDescriptions[skillId]);
+  _fetchSkillDetails(): void {
+    const topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    const storyUrlFragment = (
+      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    const classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    const reviewTestsUrl = this.urlInterpolationService.interpolateUrl(
+      ReviewTestPageConstants.REVIEW_TESTS_URL, {
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
+        story_url_fragment: storyUrlFragment
+      });
+    const storyViewerUrl = this.urlInterpolationService.interpolateUrl(
+      ReviewTestPageConstants.STORY_VIEWER_PAGE, {
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
+        story_url_fragment: storyUrlFragment
+      });
+    this.reviewTestBackendApiService.fetchReviewTestDataAsync(
+      storyUrlFragment).then(
+      (result) => {
+        const skillIdList = [];
+        const skillDescriptions = [];
+        this.storyName = result.storyName;
+        this.setPageTitle();
+        this.subscribeToOnLanguageCodeChange();
+        for (let skillId in result.skillDescriptions) {
+          skillIdList.push(skillId);
+          skillDescriptions.push(
+            result.skillDescriptions[skillId]);
+        }
+        this.questionPlayerConfig = {
+          resultActionButtons: [
+            {
+              type: 'REVIEW_LOWEST_SCORED_SKILL',
+              i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
+            },
+            {
+              type: 'RETRY_SESSION',
+              i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
+              url: reviewTestsUrl
+            },
+            {
+              type: 'DASHBOARD',
+              i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
+              url: storyViewerUrl
             }
-            var questionPlayerConfig = {
-              resultActionButtons: [
-                {
-                  type: 'REVIEW_LOWEST_SCORED_SKILL',
-                  i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
-                },
-                {
-                  type: 'RETRY_SESSION',
-                  i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
-                  url: reviewTestsUrl
-                },
-                {
-                  type: 'DASHBOARD',
-                  i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
-                  url: storyViewerUrl
-                }
-              ],
-              skillList: skillIdList,
-              skillDescriptions: skillDescriptions,
-              questionCount: ReviewTestEngineService
-                .getReviewTestQuestionCount(skillIdList.length),
-              questionPlayerMode: {
-                modeType: QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
-                passCutoff: 0.75
-              },
-              questionsSortedByDifficulty: true
-            };
-            ctrl.questionPlayerConfig = questionPlayerConfig;
-          });
-      };
+          ],
+          skillList: skillIdList,
+          skillDescriptions: skillDescriptions,
+          questionCount: (
+            this.reviewTestEngineService
+              .getReviewTestQuestionCount(skillIdList.length)),
+          questionPlayerMode: {
+            modeType: (
+              QuestionPlayerConstants.QUESTION_PLAYER_MODE.PASS_FAIL_MODE),
+            passCutoff: 0.75
+          },
+          questionsSortedByDifficulty: true
+        };
+      });
+  }
 
-      ctrl.$onInit = function() {
-        ctrl.questionPlayerConfig = null;
-        _fetchSkillDetails();
-      };
-    }
-  ]
-});
+  setPageTitle(): void {
+    this.translateService.use(
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+    const translatedTitle = this.translateService.instant(
+      'I18N_REVIEW_TEST_PAGE_TITLE', {
+        storyName: this.storyName
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  subscribeToOnLanguageCodeChange(): void {
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  ngOnInit(): void {
+    this._fetchSkillDetails();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('reviewTestPage',
+  downgradeComponent({
+    component: ReviewTestPageComponent
+  }) as angular.IDirectiveFactory);

@@ -24,13 +24,31 @@ from typing import Dict
 
 class OppiaRootPage(base.BaseHandler):
     """Renders oppia root page (unified entry point) for all routes registered
-       with angular router.
+    with angular router.
     """
 
     # Using type ignore[misc] here because untyped decorator makes function
     # "get" also untyped.
+    # The '**kwargs' argument is needed because some routes pass keyword
+    # arguments and even when we don't use them we need to allow them so that
+    # there is no error in the callsite.
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self, **kwargs: Dict[str, str]) -> None: # pylint: disable=unused-argument
+    def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
-        self.render_template( # type: ignore[no-untyped-call]
-            'oppia-root.mainpage.html')
+        self.render_template('oppia-root.mainpage.html') # type: ignore[no-untyped-call]
+
+
+class OppiaLightweightRootPage(base.BaseHandler):
+    """Renders lightweight oppia root page (unified entry point) for all routes
+    registered with angular router.
+    """
+
+    # Using type ignore[misc] here because untyped decorator makes function
+    # "get" also untyped.
+    # The '**kwargs' argument is needed because some routes pass keyword
+    # arguments and even when we don't use them we need to allow them so that
+    # there is no error in the callsite.
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self, **kwargs: Dict[str, str]) -> None:
+        """Handles GET requests."""
+        self.render_template('lightweight-oppia-root.mainpage.html') # type: ignore[no-untyped-call]

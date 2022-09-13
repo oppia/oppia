@@ -24,7 +24,7 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
-var splashPage = element(by.css('.protractor-test-splash-page'));
+var splashPage = element(by.css('.e2e-test-splash-page'));
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -62,30 +62,22 @@ var login = async function(email, useManualNavigation = true) {
     await browser.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
-  var loginPage = element(by.css('.protractor-test-login-page'));
+  var loginPage = element(by.css('.e2e-test-login-page'));
   await waitFor.presenceOf(loginPage, 'Login page did not load');
 
-  var emailInput = element(by.css('.protractor-test-sign-in-email-input'));
+  var emailInput = element(by.css('.e2e-test-sign-in-email-input'));
   await action.sendKeys('Email input', emailInput, email);
 
-  var signInButton = element(by.css('.protractor-test-sign-in-button'));
-
-  var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
-
-  var returnUrl = currentUrl.split('return_url=')[
-    currentUrl.split('return_url=').length - 1];
+  var signInButton = element(by.css('.e2e-test-sign-in-button'));
 
   await waitFor.clientSideRedirection(async() => {
     // Click the "sign in" button to trigger redirection.
     await action.click('Sign in button', signInButton);
   }, (url) => {
-    if (returnUrl === '/') {
-      // Users will be redirected to preferred dashboard if they are fully
-      // registered. Otherwise, they will be redirected to signup page.
-      return /(learner-dashboard|creator-dashboard|signup)/.test(url);
-    } else {
-      return (new RegExp(returnUrl + '|signup')).test(url);
-    }
+    // Users will be redirected to preferred dashboard if they are fully
+    // registered. Otherwise, they will be redirected to signup page.
+    // eslint-disable-next-line max-len
+    return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(url);
   }, async() => {
     // Cannot predict the new page, so waiting for loading message to disappear.
     await waitFor.pageToFullyLoad();
@@ -110,23 +102,23 @@ var logout = async function() {
 var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
   let cookieBannerAcceptButton = element(
-    by.css('.protractor-test-oppia-cookie-banner-accept-button'));
+    by.css('.e2e-test-oppia-cookie-banner-accept-button'));
   let cookie = await browser.manage().getCookie('OPPIA_COOKIES_ACKNOWLEDGED');
   if (!cookie) {
     await action.click('Cookie Banner Accept button', cookieBannerAcceptButton);
   }
 
-  var signupPage = element(by.css('.protractor-test-signup-page'));
+  var signupPage = element(by.css('.e2e-test-signup-page'));
   await waitFor.presenceOf(signupPage, 'Signup page did not load');
 
-  var usernameInput = element(by.css('.protractor-test-username-input'));
+  var usernameInput = element(by.css('.e2e-test-username-input'));
   await action.sendKeys('Username input', usernameInput, username);
 
   var agreeToTermsCheckbox = (
-    element(by.css('.protractor-test-agree-to-terms-checkbox')));
+    element(by.css('.e2e-test-agree-to-terms-checkbox')));
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
-  var registerUser = element(by.css('.protractor-test-register-user'));
+  var registerUser = element(by.css('.e2e-test-register-user'));
 
   var currentUrl = decodeURIComponent(await browser.getCurrentUrl());
 

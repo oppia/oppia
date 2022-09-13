@@ -22,15 +22,18 @@ import inspect
 
 from extensions.answer_summarizers import models
 
+from typing import Callable, Dict, overload
+from typing_extensions import Literal
+
 
 class Registry:
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.
-    _calculations_dict = {}
+    _calculations_dict: Dict[str, Callable[..., models.BaseCalculation]] = {}
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Refreshes the registry to add new visualization instances."""
         cls._calculations_dict.clear()
 
@@ -45,8 +48,46 @@ class Registry:
             if 'BaseCalculation' in ancestor_names:
                 cls._calculations_dict[clazz.__name__] = clazz
 
+    @overload
     @classmethod
-    def get_calculation_by_id(cls, calculation_id):
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['AnswerFrequencies']
+    ) -> models.AnswerFrequencies: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['Top5AnswerFrequencies']
+    ) -> models.Top5AnswerFrequencies: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['Top10AnswerFrequencies']
+    ) -> models.Top10AnswerFrequencies: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['FrequencyCommonlySubmittedElements']
+    ) -> models.FrequencyCommonlySubmittedElements: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['TopAnswersByCategorization']
+    ) -> models.TopAnswersByCategorization: ...
+
+    @overload
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: Literal['TopNUnresolvedAnswersByFrequency']
+    ) -> models.TopNUnresolvedAnswersByFrequency: ...
+
+    @classmethod
+    def get_calculation_by_id(
+        cls, calculation_id: str
+    ) -> models.BaseCalculation:
         """Gets a calculation instance by its id (which is also its class name).
 
         Refreshes once if the class is not found; subsequently, throws an

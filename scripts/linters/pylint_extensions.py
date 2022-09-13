@@ -20,19 +20,14 @@ presubmit checks. Next message id would be C0041.
 
 from __future__ import annotations
 
+import fnmatch
 import linecache
-import os
 import re
-import sys
 import tokenize
 
 from core import handler_schema_constants
 
 from .. import docstrings_checker
-
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-sys.path.insert(0, _PYLINT_PATH)
 
 # List of punctuation symbols that can be used at the end of
 # comments and docstrings.
@@ -289,9 +284,10 @@ class HangingIndentChecker(checkers.BaseChecker):
                     split_line = line.split()
                     if '#' in split_line:
                         comment_index = split_line.index('#')
-                        if split_line[comment_index - 1].endswith('):'):
+                        if (split_line[comment_index - 1].endswith(':') or
+                                split_line[comment_index - 1].endswith('):')):
                             excluded = False
-                    elif line.endswith('):'):
+                    elif line.endswith(':') or line.endswith('):'):
                         excluded = False
                 if excluded:
                     continue
@@ -337,13 +333,13 @@ class HangingIndentChecker(checkers.BaseChecker):
                         comment_index = split_content.index('#')
                         if comment_index == 0:
                             continue
-                        else:
-                            last_content_before_comment = (
-                                split_content[comment_index - 1])
-                            if last_content_before_comment.endswith(
-                                    ('(', '[', '{')
-                            ):
-                                continue
+
+                        last_content_before_comment = (
+                            split_content[comment_index - 1])
+                        if last_content_before_comment.endswith(
+                                ('(', '[', '{')
+                        ):
+                            continue
                     self.add_message(
                         'no-break-after-hanging-indent', line=line_num)
 
@@ -1370,6 +1366,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     # If import from any of these is made, it may not be a module.
     EXCLUDED_IMPORT_MODULES = [
         '__future__',
+        'types',
         'typing',
         'mypy_imports',
         'typing_extensions'
@@ -1484,10 +1481,16 @@ class RestrictedImportChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0009': (
-            'Importing %s layer in %s layer is prohibited.',
+            'Importing any file from module %s in module "%s" is prohibited.',
             'invalid-import',
-            'Storage layer and domain layer must not import'
-            'domain layer and controller layer respectively.'),
+            'Some modules cannot be imported in other modules.'
+        ),
+        'C0010': (
+            'Importing file named "%s" from module "%s" '
+            'in module "%s" is prohibited.',
+            'invalid-import-from',
+            'Some modules cannot be imported in other modules.'
+        ),
     }
 
     options = (
@@ -1511,21 +1514,32 @@ class RestrictedImportChecker(checkers.BaseChecker):
     )
 
     def __init__(self, linter=None):
-        super(RestrictedImportChecker, self).__init__(linter=linter)
+        super().__init__(linter=linter)
         self._module_to_forbidden_imports = []
 
     def open(self):
         """Parse the forbidden imports."""
-        splitted_module_to_forbidden_imports = [
+        module_to_forbidden_imports = [
             forbidden_import.strip().split(':')
             for forbidden_import in self.config.forbidden_imports
         ]
-        self._module_to_forbidden_imports = list(
-            (
-                forbidden_imports[0].strip(),
-                [import_.strip() for import_ in forbidden_imports[1].split('|')]
-            ) for forbidden_imports in splitted_module_to_forbidden_imports
-        )
+        self._module_to_forbidden_imports = []
+        for module_regex, forbidden_imports in module_to_forbidden_imports:
+            processed_forbidden_imports = []
+            for forbidden_import in forbidden_imports.split('|'):
+                stripped_forbidden_import = forbidden_import.strip()
+                if stripped_forbidden_import.startswith('from'):
+                    from_part, import_part = (
+                        stripped_forbidden_import[4:].split(' import '))
+                    processed_forbidden_imports.append(
+                        (from_part.strip(), import_part.strip()))
+                else:
+                    processed_forbidden_imports.append(
+                        (stripped_forbidden_import[7:].strip(), None))
+            self._module_to_forbidden_imports.append((
+                module_regex.strip(),
+                processed_forbidden_imports
+            ))
 
     def _iterate_forbidden_imports(self, node):
         """Yields pairs of module name and forbidden imports.
@@ -1535,31 +1549,46 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 in the AST.
 
         Yields:
-            tuple(str, str). Yields pair of module name and forbidden import.
+            tuple(str, tuple(str, None)). Yields pair of module name and
+            forbidden import.
         """
         modnode = node.root()
         for module_name, forbidden_imports in self._module_to_forbidden_imports:
             for forbidden_import in forbidden_imports:
-                if module_name in modnode.name and not '_test' in modnode.name:
+                if (
+                        fnmatch.fnmatch(modnode.name, module_name) and
+                        not '_test' in modnode.name
+                ):
                     yield module_name, forbidden_import
 
-    def _add_invalid_import_message(self, node, module_name, forbidden_import):
+    def _add_invalid_import_message(
+        self, node, module_name, forbidden_import_names
+    ):
         """Adds pylint message about the invalid import.
 
         Args:
             node: astroid.node_classes.Import. Node for a import statement
                 in the AST.
             module_name: str. The module that was checked.
-            forbidden_import: str. The import that was invalid.
+            forbidden_import_names: tuple(str, str|None). The import that
+                was invalid.
         """
-        self.add_message(
-            'invalid-import',
-            node=node,
-            args=(
-                forbidden_import.split('.')[-1],
-                module_name.split('.')[-1]
-            ),
-        )
+        if forbidden_import_names[1] is None:
+            self.add_message(
+                'invalid-import',
+                node=node,
+                args=(forbidden_import_names[0], module_name)
+            )
+        else:
+            self.add_message(
+                'invalid-import-from',
+                node=node,
+                args=(
+                    forbidden_import_names[1],
+                    forbidden_import_names[0],
+                    module_name
+                )
+            )
 
     def visit_import(self, node):
         """Visits every import statement in the file.
@@ -1569,11 +1598,18 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 in the AST.
         """
         names = [name for name, _ in node.names]
-        for module_name, forbidden_import in self._iterate_forbidden_imports(
-                node):
-            if any(forbidden_import in name for name in names):
+        forbidden_imports = self._iterate_forbidden_imports(node)
+        for module_name, forbidden_import_names in forbidden_imports:
+            if forbidden_import_names[1] is not None:
+                import_to_check = '%s.%s' % (
+                    forbidden_import_names[0],
+                    forbidden_import_names[1]
+                )
+            else:
+                import_to_check = forbidden_import_names[0]
+            if any(fnmatch.fnmatch(name, import_to_check) for name in names):
                 self._add_invalid_import_message(
-                    node, module_name, forbidden_import)
+                    node, module_name, forbidden_import_names)
 
     def visit_importfrom(self, node):
         """Visits all import-from statements in a python file and checks that
@@ -1583,11 +1619,18 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-        for module_name, forbidden_import in self._iterate_forbidden_imports(
-                node):
-            if forbidden_import in node.modname:
-                self._add_invalid_import_message(
-                    node, module_name, forbidden_import)
+        forbidden_imports = self._iterate_forbidden_imports(node)
+        for module_name, forbidden_import_names in forbidden_imports:
+            if fnmatch.fnmatch(node.modname, forbidden_import_names[0]):
+                if forbidden_import_names[1] is None:
+                    self._add_invalid_import_message(
+                        node, module_name, forbidden_import_names)
+                elif any(
+                        fnmatch.fnmatch(name[0], forbidden_import_names[1])
+                        for name in node.names
+                ):
+                    self._add_invalid_import_message(
+                        node, module_name, forbidden_import_names)
 
 
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
@@ -1621,32 +1664,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('only-one-character', line=file_length)
         if file_length >= 2 and not re.search(r'[^\n]\n', file_content[-1]):
             self.add_message('newline-at-eof', line=file_length)
-
-
-class DivisionOperatorChecker(checkers.BaseChecker):
-    """Checks if division operator is used."""
-
-    __implements__ = interfaces.IAstroidChecker
-    name = 'division-operator-used'
-    priority = -1
-    msgs = {
-        'C0015': (
-            'Please use python_utils.divide() instead of the "/" operator',
-            'division-operator-used',
-            'Do not use division operator.'
-        )
-    }
-
-    def visit_binop(self, node):
-        """Visit assign statements to ensure that the division operator('/')
-        is not used and python_utils.divide() is used instead.
-
-        Args:
-            node: astroid.node.BinOp. Node to access module content.
-        """
-        if node.op == '/':
-            self.add_message(
-                'division-operator-used', node=node)
 
 
 class SingleLineCommentChecker(checkers.BaseChecker):
@@ -2072,7 +2089,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
         ),)
 
     def __init__(self, linter=None):
-        super(DisallowedFunctionsChecker, self).__init__(linter=linter)
+        super().__init__(linter=linter)
         self.funcs_to_replace_str = {}
         self.funcs_to_remove_str = set()
         self.funcs_to_replace_regex = []
@@ -2299,7 +2316,6 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
-    linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))

@@ -16,58 +16,87 @@
  * @fileoverview Unit tests for PreviewSummaryTileModalController.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
+import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
+import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
+import { PreviewSummaryTileModalComponent } from './preview-summary-tile-modal.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+class MockActiveModal {
+  close(): void {
+    return;
+  }
+
+  dismiss(): void {
+    return;
+  }
+}
 
 describe('Preview Summary Tile Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var ExplorationCategoryService = null;
-  var ExplorationObjectiveService = null;
-  var ExplorationTitleService = null;
+  let component: PreviewSummaryTileModalComponent;
+  let fixture: ComponentFixture<PreviewSummaryTileModalComponent>;
+  let explorationCategoryService: ExplorationCategoryService;
+  let explorationObjectiveService: ExplorationObjectiveService;
+  let explorationTitleService: ExplorationTitleService;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-    ExplorationCategoryService = $injector.get('ExplorationCategoryService');
-    ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
-    ExplorationTitleService = $injector.get('ExplorationTitleService');
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    $scope = $rootScope.$new();
-    $controller('PreviewSummaryTileModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        PreviewSummaryTileModalComponent
+      ],
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        ExplorationCategoryService,
+        ExplorationObjectiveService,
+        ExplorationTitleService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PreviewSummaryTileModalComponent);
+    component = fixture.componentInstance;
+
+    explorationCategoryService = TestBed.inject(ExplorationCategoryService);
+    explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
+    explorationTitleService = TestBed.inject(ExplorationTitleService);
+    fixture.detectChanges();
+  });
 
   it('should get exploration title', function() {
-    ExplorationTitleService.init('Exploration Title');
-    expect($scope.getExplorationTitle()).toBe('Exploration Title');
+    explorationTitleService.init('Exploration Title');
+    expect(component.getExplorationTitle()).toBe('Exploration Title');
   });
+
   it('should get exploration objective', function() {
-    ExplorationObjectiveService.init('Exploration Objective');
-    expect($scope.getExplorationObjective()).toBe('Exploration Objective');
+    explorationObjectiveService.init('Exploration Objective');
+    expect(component.getExplorationObjective()).toBe('Exploration Objective');
   });
+
   it('should get exploration category', function() {
-    ExplorationCategoryService.init('Exploration Category');
-    expect($scope.getExplorationCategory()).toBe('Exploration Category');
+    explorationCategoryService.init('Exploration Category');
+    expect(component.getExplorationCategory()).toBe('Exploration Category');
   });
 
   it('should get thumbnail icon url', function() {
-    ExplorationCategoryService.init('Astrology');
-    expect($scope.getThumbnailIconUrl()).toBe('/subjects/Lightbulb.svg');
+    explorationCategoryService.init('Astrology');
+    expect(component.getThumbnailIconUrl()).toBe('/subjects/Lightbulb.svg');
   });
 
   it('should get thumbnail bg color if category is listed', function() {
-    ExplorationCategoryService.init('Algebra');
-    expect($scope.getThumbnailBgColor()).toBe('#cd672b');
+    explorationCategoryService.init('Algebra');
+    expect(component.getThumbnailBgColor()).toBe('#cd672b');
   });
 
   it('should get thumbnail bg color if category is not listed', function() {
-    ExplorationCategoryService.init('Astrology');
-    expect($scope.getThumbnailBgColor()).toBe('#a33f40');
+    explorationCategoryService.init('Astrology');
+    expect(component.getThumbnailBgColor()).toBe('#a33f40');
   });
 });

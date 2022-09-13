@@ -56,9 +56,12 @@ export class ContextService {
   // Depending on this value, new images can be either saved in the localStorage
   // or uploaded directly to the datastore.
 
+  learnerGroupId!: string;
+
   init(editorName: string): void {
     this.editorContext = editorName;
   }
+
   // Following method helps to know the whether the context of editor is
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
@@ -66,6 +69,7 @@ export class ContextService {
   getEditorContext(): string | null {
     return this.editorContext;
   }
+
   // Returns a string representing the current tab of the editor (either
   // 'editor' or 'preview'), or null if the current tab is neither of these,
   // or the current page is not the editor.
@@ -79,6 +83,7 @@ export class ContextService {
       return null;
     }
   }
+
   // Returns a string representing the context of the current page.
   // This is PAGE_CONTEXT.EXPLORATION_EDITOR or
   // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
@@ -130,12 +135,17 @@ export class ContextService {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD;
+        } else if (pathnameArray[i] === 'edit-learner-group') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR);
+          return ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR;
         }
       }
 
       return ServicesConstants.PAGE_CONTEXT.OTHER;
     }
   }
+
   // This is required in cases like when we need to access question player
   // from the skill editor preview tab.
   setQuestionPlayerIsOpen(): void {
@@ -260,6 +270,28 @@ export class ContextService {
     throw new Error(
       'ContextService should not be used outside the ' +
       'context of an exploration or a question.'
+    );
+  }
+
+  // Returns a string representing the learnerGroupId (obtained from the
+  // URL).
+  getLearnerGroupId(): string {
+    if (this.learnerGroupId) {
+      return this.learnerGroupId;
+    }
+    // The pathname should be one of /edit-learner-group/{group_id} or
+    // /learner-group/{group_id}.
+    let pathnameArray = this.urlService.getPathname().split('/');
+    for (let i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'edit-learner-group' ||
+          pathnameArray[i] === 'learner-groups') {
+        this.learnerGroupId = pathnameArray[i + 1];
+        return pathnameArray[i + 1];
+      }
+    }
+    throw new Error(
+      'ContextService should not be used outside the ' +
+      'context of a learner group.'
     );
   }
 

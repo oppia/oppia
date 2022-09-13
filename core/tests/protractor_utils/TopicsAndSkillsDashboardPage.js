@@ -23,95 +23,99 @@ var workflow = require('./workflow.js');
 var general = require('../protractor_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
-  var topicNames = element.all(by.css('.protractor-test-topic-name'));
+  var topicNames = element.all(by.css('.e2e-test-topic-name'));
   var skillDescriptions = element.all(
-    by.css('.protractor-test-skill-description'));
+    by.css('.e2e-test-skill-description'));
   var createTopicButton = element(
-    by.css('.protractor-test-create-topic-button'));
+    by.css('.e2e-test-create-topic-button'));
   var createSkillButton = element(
-    by.css('.protractor-test-create-skill-button'));
+    by.css('.e2e-test-create-skill-button'));
   var createSkillButtonSecondary = element(
-    by.css('.protractor-test-create-skill-button-circle'));
+    by.css('.e2e-test-create-skill-button-circle'));
   var deleteSkillButton = element(
-    by.css('.protractor-test-delete-skill-button'));
-  var topicsTable = element(by.css('.protractor-test-topics-table'));
-  var skillsTable = element(by.css('.protractor-test-skills-table'));
+    by.css('.e2e-test-delete-skill-button'));
+  var topicsTable = element(by.css('.e2e-test-topics-table'));
+  var skillsTable = element(by.css('.e2e-test-skills-table'));
   var topicsListItems = element.all(
-    by.css('.protractor-test-topics-list-item'));
-  var topicNamesClass = '.protractor-test-topic-name-in-topic-select-modal';
+    by.css('.e2e-test-topics-list-item'));
+  var topicNamesClass = '.e2e-test-topic-name-in-topic-select-modal';
   var skillsListItems = element.all(
-    by.css('.protractor-test-skills-list-item'));
-  var skillListItemsClass = '.protractor-test-skills-list-item';
+    by.css('.e2e-test-skills-list-item'));
+  var skillListItemsClass = '.e2e-test-skills-list-item';
   var topicNameField = element(by.css(
-    '.protractor-test-new-topic-name-field'));
+    '.e2e-test-new-topic-name-field'));
   var topicUrlFragmentField = element(by.css(
-    '.protractor-test-new-topic-url-fragment-field'));
+    '.e2e-test-new-topic-url-fragment-field'));
   var topicDescriptionField = element(by.css(
-    '.protractor-test-new-topic-description-field'));
+    '.e2e-test-new-topic-description-field'));
+  var topicPageTitleFragmentField = element(by.css(
+    '.e2e-test-new-page-title-fragm-field'));
   var topicFilterKeywordField = element(by.css(
-    '.protractor-test-select-keyword-dropdown'));
+    '.e2e-test-select-keyword-dropdown'));
   var topicFilterClassroomField = element(by.css(
-    '.protractor-test-select-classroom-dropdown'));
+    '.e2e-test-select-classroom-dropdown'));
   var topicEditOptions = element.all(
-    by.css('.protractor-test-topic-edit-box'));
+    by.css('.e2e-test-topic-edit-box'));
   var skillEditOptions = element.all(
-    by.css('.protractor-test-skill-edit-box'));
+    by.css('.e2e-test-skill-edit-box'));
   var topicResetFilters = element(by.css(
-    '.protractor-test-topic-filter-reset'));
+    '.e2e-test-topic-filter-reset'));
   var deleteTopicButton = element(
-    by.css('.protractor-test-delete-topic-button'));
+    by.css('.e2e-test-delete-topic-button'));
   var editTopicButton = element(
-    by.css('.protractor-test-edit-topic-button'));
+    by.css('.e2e-test-edit-topic-button'));
   var unassignSkillButton = element(
-    by.css('.protractor-test-unassign-skill-button'));
+    by.css('.e2e-test-unassign-skill-button'));
   var skillNameField = element(
-    by.css('.protractor-test-new-skill-description-field')
+    by.css('.e2e-test-new-skill-description-field')
   );
   var confirmTopicCreationButton = element(
-    by.css('.protractor-test-confirm-topic-creation-button')
+    by.css('.e2e-test-confirm-topic-creation-button')
   );
   var confirmTopicDeletionButton = element(
-    by.css('.protractor-test-confirm-topic-deletion-button')
+    by.css('.e2e-test-confirm-topic-deletion-button')
   );
   var confirmSkillCreationButton = element(
-    by.css('.protractor-test-confirm-skill-creation-button')
+    by.css('.e2e-test-confirm-skill-creation-button')
   );
   var confirmSkillDeletionButton = element(
-    by.css('.protractor-test-confirm-skill-deletion-button')
+    by.css('.e2e-test-confirm-skill-deletion-button')
   );
   var skillsTabButton = element(
-    by.css('.protractor-test-skills-tab')
+    by.css('.e2e-test-skills-tab')
   );
   var assignSkillToTopicButtons = element.all(
-    by.css('.protractor-test-assign-skill-to-topic-button'));
+    by.css('.e2e-test-assign-skill-to-topic-button'));
   var confirmMoveButton = element(
-    by.css('.protractor-test-confirm-move-button'));
+    by.css('.e2e-test-confirm-move-button'));
   var mergeSkillsButton = element(
-    by.css('.protractor-test-merge-skills-button'));
+    by.css('.e2e-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
-    by.css('.protractor-test-confirm-skill-selection-button'));
+    by.css('.e2e-test-confirm-skill-selection-button'));
   var openConceptCardExplanationButton = element(
-    by.css('.protractor-test-open-concept-card'));
+    by.css('.e2e-test-open-concept-card'));
   var topicThumbnailButton = element(
-    by.css('.protractor-test-photo-button'));
+    by.css('.e2e-test-photo-button'));
   var thumbnailContainer = element(
-    by.css('.protractor-test-thumbnail-container'));
+    by.css('.e2e-test-thumbnail-container'));
   var skillStatusFilterDropdown = element(
-    by.css('.protractor-test-select-skill-status-dropdown'));
+    by.css('.e2e-test-select-skill-status-dropdown'));
   var confirmUnassignSkillButton =
-    element(by.css('.protractor-test-confirm-unassign-skill-button'));
+    element(by.css('.e2e-test-confirm-unassign-skill-button'));
   var noSkillsPresentMessage = element(
-    by.css('.protractor-test-no-skills-present-message'));
+    by.css('.e2e-test-no-skills-present-message'));
   var assignedTopicNamesInput = element.all(
-    by.css('.protractor-test-unassign-topic'));
-  var assignedTopicNameInputClass = by.css('.protractor-test-unassign-topic');
+    by.css('.e2e-test-unassign-topic'));
+  var assignedTopicNameInputClass = by.css('.e2e-test-unassign-topic');
   var topicNameFieldElement = element(
-    by.css('.protractor-test-topic-name-field'));
-  var keywordFieldInput = by.css('.protractor-test-multi-selection-input');
-  var editor = element(by.css('.protractor-test-concept-card-text'));
-  var retLocator = by.css('.protractor-test-rte');
+    by.css('.e2e-test-topic-name-field'));
+  var keywordFieldInput = by.css('.e2e-test-multi-selection-input');
+  var editor = element(by.css('.e2e-test-concept-card-text'));
+  var retLocator = by.css('.e2e-test-rte');
   var skillDescriptionField = element(
-    by.css('.protractor-test-skill-description-field'));
+    by.css('.e2e-test-skill-description-field'));
+  var openSkillEditorButtons = element.all(
+    by.css('.e2e-test-open-skill-editor'));
 
   this.get = async function() {
     await waitFor.clientSideRedirection(async() => {
@@ -176,6 +180,20 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.navigateToSkillWithDescription = async function(description) {
+    await this.navigateToSkillsTab();
+    await this.waitForSkillsToLoad();
+    for (var i = 0; i < await openSkillEditorButtons.count(); i++) {
+      var button = openSkillEditorButtons.get(i);
+      var buttonText = await action.getText('Skill editor button', button);
+      if (buttonText.includes(description)) {
+        await action.click('Skill editor', button);
+        await waitFor.pageToFullyLoad();
+        return;
+      }
+    }
+  };
+
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
@@ -209,6 +227,9 @@ var TopicsAndSkillsDashboardPage = function() {
       'Topic URL fragment field', topicUrlFragmentField, topicUrlFragment);
     await action.sendKeys(
       'Topic description field', topicDescriptionField, description);
+    await action.sendKeys(
+      'Topic page title fragment field',
+      topicPageTitleFragmentField, description);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer,
       ('../data/test_svg.svg'), false);
@@ -364,7 +385,7 @@ var TopicsAndSkillsDashboardPage = function() {
       'Topic names in unassign skill from topics modal taking' +
       ' too long to appear.');
     var topicListItem = element(by.cssContainingText(
-      '.protractor-test-unassign-topic-label', topicName));
+      '.e2e-test-unassign-topic-label', topicName));
     var assignedTopicInput = topicListItem.element(
       assignedTopicNameInputClass);
     await action.click('Assigned Topic Input', assignedTopicInput);

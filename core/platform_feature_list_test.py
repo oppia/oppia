@@ -22,7 +22,7 @@ import os
 import re
 
 from core import platform_feature_list
-from core import python_utils
+from core import utils
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
@@ -40,7 +40,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
     """Tests for feature flags listed in platform_feature_list.py."""
 
     def setUp(self):
-        super(PlatformFeatureListTest, self).setUp()
+        super().setUp()
 
         self.all_features_list = (
             platform_feature_list.DEV_FEATURES_LIST +
@@ -50,7 +50,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def _parse_feature_names_in_frontend(self):
         """Reads and parses feature flag definition in frontend."""
-        with python_utils.open_file(FRONTEND_FEATURE_NAMES_PATH, 'r') as f:
+        with utils.open_file(FRONTEND_FEATURE_NAMES_PATH, 'r') as f:
             content = f.read()
 
         body = ENUM_BODY_REGEXP.search(content).group(1)
@@ -122,7 +122,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             feature_flag = (
                 registry.Registry.get_platform_parameter(feature.value))
             if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FEATURE_STAGES.dev.value):
+                    platform_parameter_domain.FeatureStages.DEV.value):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -136,7 +136,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             feature_flag = (
                 registry.Registry.get_platform_parameter(feature.name))
             if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FEATURE_STAGES.test.value):
+                    platform_parameter_domain.FeatureStages.TEST.value):
                 invalid_feature_names.append(feature.name)
         self.assertTrue(
             len(invalid_feature_names) == 0,
@@ -150,7 +150,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             feature_flag = (
                 registry.Registry.get_platform_parameter(feature.value))
             if (feature_flag.feature_stage !=
-                    platform_parameter_domain.FEATURE_STAGES.prod.value):
+                    platform_parameter_domain.FeatureStages.PROD.value):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,

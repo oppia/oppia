@@ -42,9 +42,6 @@ def _require_valid_version(version_from_payload, skill_version):
     Raises:
         Exception. Invalid input.
     """
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
 
     if version_from_payload != skill_version:
         raise base.BaseHandler.InvalidInputException(
@@ -146,13 +143,52 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
+                }
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'change_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': skill_domain.SkillChange
+                    }
+                }
+            }
+        },
+        'DELETE': {}
+    }
+
     @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        try:
-            skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.PageNotFoundException('Invalid skill id.')
 
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
@@ -197,28 +233,22 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def put(self, skill_id):
         """Updates properties of the given skill."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, skill.version)
 
-        commit_message = self.payload.get('commit_message')
-
+        commit_message = self.normalized_payload.get('commit_message')
         if (commit_message is not None and
                 len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
                 % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
-        change_dicts = self.payload.get('change_dicts')
-        change_list = [
-            skill_domain.SkillChange(change_dict)
-            for change_dict in change_dicts
-        ]
+        change_list = self.normalized_payload.get('change_dicts')
         try:
             skill_services.update_skill(
                 self.user_id, skill_id, change_list, commit_message)
@@ -236,7 +266,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_skill
     def delete(self, skill_id):
         """Handles Delete requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
 
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
 
@@ -264,8 +293,9 @@ class SkillDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except utils.ValidationError:
-            raise self.PageNotFoundException('Invalid skill id.')
+        except utils.ValidationError as e:
+            raise self.PageNotFoundException(
+                'Invalid skill id.') from e
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
@@ -281,6 +311,11 @@ class SkillDataHandler(base.BaseHandler):
 
 class FetchSkillsHandler(base.BaseHandler):
     """A handler for accessing all skills data."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -314,5 +349,37 @@ class SkillDescriptionHandler(base.BaseHandler):
             'skill_description_exists': (
                 skill_services.does_skill_with_description_exist(
                     skill_description))
+        })
+        self.render_json(self.values)
+
+
+class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
+    """A handler that returns a list of topic names for which the given skill
+    is assigned to that topic's diagnostic test.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_edit_skill
+    def get(self, skill_id: str) -> None:
+        """Returns a list of topic names for which the given skill is assigned
+        to that topic's diagnostic test.
+        """
+        self.values.update({
+            'topic_names': (
+                skill_services
+                .get_topic_names_with_given_skill_in_diagnostic_test(skill_id))
         })
         self.render_json(self.values)

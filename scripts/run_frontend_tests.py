@@ -21,10 +21,16 @@ import os
 import subprocess
 import sys
 
-from . import build
-from . import check_frontend_test_coverage
-from . import common
-from . import install_third_party_libs
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from typing import Optional, Sequence  # isort:skip
+
+from . import build  # isort:skip
+from . import check_frontend_test_coverage  # isort:skip
+from . import install_third_party_libs  # isort:skip
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
@@ -62,12 +68,17 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--check_coverage',
-    help='option; if specified, checks frontend test coverage',
+    help='optional; if specified, checks frontend test coverage',
+    action='store_true'
+)
+_PARSER.add_argument(
+    '--download_combined_frontend_spec_file',
+    help='optional; if specifided, downloads the combined frontend file',
     action='store_true'
 )
 
 
-def run_dtslint_type_tests():
+def run_dtslint_type_tests() -> None:
     """Runs the dtslint type tests in typings/tests."""
     print('Running dtslint type tests.')
 
@@ -79,6 +90,9 @@ def run_dtslint_type_tests():
            TYPESCRIPT_DIR_RELATIVE_PATH]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert task.stdout is not None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
         line = task.stdout.readline()
@@ -93,7 +107,7 @@ def run_dtslint_type_tests():
         sys.exit('The dtslint (type tests) failed.')
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -128,6 +142,14 @@ def main(args=None):
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert task.stdout is not None
+    # Prevents the wget command from running multiple times.
+    combined_spec_file_started_downloading = False
+    # This variable will be used to define the wget command to download
+    # the combined-test.spec.js file.
+    download_task = None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
         line = task.stdout.readline()
@@ -140,10 +162,32 @@ def main(args=None):
             # the line to print it.
             print(line.decode('utf-8'), end='')
             output_lines.append(line)
+        # Download the combined-tests.js file from the web-server.
+        if ('Executed' in line.decode('utf-8') and
+            not combined_spec_file_started_downloading and
+            parsed_args.download_combined_frontend_spec_file):
+            download_task = subprocess.Popen(
+                ['wget',
+                'http://localhost:9876/base/core/templates/' +
+                'combined-tests.spec.js',
+                '-P',
+                os.path.join('../karma_coverage_reports')])
+            # Wait for the wget command to download the combined-tests.spec.js
+            # file to complete.
+            download_task.wait()
+            combined_spec_file_started_downloading = True
     # Standard output is in bytes, we need to decode the line to print it.
     concatenated_output = ''.join(
         line.decode('utf-8') for line in output_lines)
-
+    if download_task:
+        # The result of the download is printed at the end for
+        # easy access to it.
+        if download_task.returncode:
+            print('Failed to download the combined-tests.spec.js file.')
+        else:
+            print(
+                'Downloaded the combined-tests.spec.js file and stored'
+                'in ../karma_coverage_reports')
     print('Done!')
 
     if 'Trying to get the Angular injector' in concatenated_output:
@@ -164,5 +208,5 @@ def main(args=None):
         sys.exit(task.returncode)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

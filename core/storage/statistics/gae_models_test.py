@@ -33,8 +33,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import stats_models
 
-(base_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.statistics])
+(base_models, stats_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.STATISTICS
+])
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
@@ -69,6 +70,28 @@ class StateCounterModelTests(test_utils.GenericTestBase):
         self.assertEqual(model_instance.resolved_answer_count, 0)
         self.assertEqual(model_instance.active_answer_count, 0)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.StateCounterModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_entry_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subsequent_entries_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'resolved_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'active_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.StateCounterModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the AnswerSubmittedEventLogEntryModel class."""
@@ -87,14 +110,38 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.AnswerSubmittedEventLogEntryModel.get(
             event_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
         self.assertEqual(event_model.is_feedback_useful, True)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.AnswerSubmittedEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_feedback_useful': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.AnswerSubmittedEventLogEntryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class ExplorationActualStartEventLogEntryModelUnitTests(
@@ -115,12 +162,34 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         event_model = stats_models.ExplorationActualStartEventLogEntryModel.get(
             event_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.ExplorationActualStartEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.ExplorationActualStartEventLogEntryModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -139,13 +208,36 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.SolutionHitEventLogEntryModel.get(
             event_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.SolutionHitEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.SolutionHitEventLogEntryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -166,14 +258,40 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.StartExplorationEventLogEntryModel.get(
             event_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.StartExplorationEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.StartExplorationEventLogEntryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class MaybeLeaveExplorationEventLogEntryModelUnitTests(
@@ -185,6 +303,49 @@ class MaybeLeaveExplorationEventLogEntryModelUnitTests(
             stats_models.MaybeLeaveExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_create_event_models(self) -> None:
+        event_id = stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
+            'exp_id1', 1, 'state_name1', 'session_id1', 1.0, {},
+            feconf.PLAY_TYPE_NORMAL)
+        event_model = stats_models.MaybeLeaveExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id1')
+        self.assertEqual(event_model.exploration_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.params, {})
+        self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.MaybeLeaveExplorationEventLogEntryModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class CompleteExplorationEventLogEntryModelUnitTests(
@@ -206,8 +367,6 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         event_model = stats_models.CompleteExplorationEventLogEntryModel.get(
             event_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
@@ -215,6 +374,35 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         self.assertEqual(event_model.client_time_spent_in_secs, 0.0)
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class RateExplorationEventLogEntryModelUnitTests(
@@ -226,6 +414,41 @@ class RateExplorationEventLogEntryModelUnitTests(
             stats_models.RateExplorationEventLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_create_event_models(self) -> None:
+        event_id = stats_models.RateExplorationEventLogEntryModel.create(
+            'exp_id', 'user_id', 2, 1
+        )
+        event_model = stats_models.RateExplorationEventLogEntryModel.get(
+            event_id)
+
+        self.assertEqual(event_model.exploration_id, 'exp_id')
+        self.assertEqual(event_model.rating, 2)
+        self.assertEqual(event_model.old_rating, 1)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.RateExplorationEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'old_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.RateExplorationEventLogEntryModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -245,13 +468,37 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.StateHitEventLogEntryModel.get(
             event_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exploration_id, 'exp_id1')
         self.assertEqual(event_model.exploration_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.StateHitEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.StateHitEventLogEntryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -270,13 +517,36 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         event_model = stats_models.StateCompleteEventLogEntryModel.get(
             event_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.exp_version, 1)
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.StateCompleteEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.StateCompleteEventLogEntryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
@@ -298,8 +568,6 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
             stats_models.LeaveForRefresherExplorationEventLogEntryModel.get(
                 event_id))
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert event_model is not None
         self.assertEqual(event_model.exp_id, 'exp_id1')
         self.assertEqual(event_model.refresher_exp_id, 'exp_id2')
         self.assertEqual(event_model.exp_version, 1)
@@ -309,6 +577,33 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
         self.assertEqual(
             event_model.event_schema_version,
             feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'refresher_exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.LeaveForRefresherExplorationEventLogEntryModel
+                .get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
@@ -349,9 +644,9 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             'exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
 
         exp_version_reference_dicts = [
-            exp_domain.ExpVersionReference('exp_id1', 1), # type: ignore[no-untyped-call]
-            exp_domain.ExpVersionReference('exp_id1', 2), # type: ignore[no-untyped-call]
-            exp_domain.ExpVersionReference('exp_id2', 1)] # type: ignore[no-untyped-call]
+            exp_domain.ExpVersionReference('exp_id1', 1),
+            exp_domain.ExpVersionReference('exp_id1', 2),
+            exp_domain.ExpVersionReference('exp_id2', 1)]
 
         stat_models = stats_models.ExplorationStatsModel.get_multi_stats_models(
             exp_version_reference_dicts)
@@ -367,6 +662,51 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stat_models[1].exp_version, 2)
         self.assertEqual(stat_models[2].exp_id, 'exp_id2')
         self.assertEqual(stat_models[2].exp_version, 1)
+
+    def test_get_multi_versions(self) -> None:
+        stats_models.ExplorationStatsModel.create(
+            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
+        stats_models.ExplorationStatsModel.create(
+            'exp_id1', 2, 0, 0, 0, 0, 0, 0, {})
+
+        stat_models = stats_models.ExplorationStatsModel.get_multi_versions(
+            'exp_id1', [1, 2]
+        )
+
+        assert stat_models[0] is not None
+        assert stat_models[1] is not None
+        self.assertEqual(len(stat_models), 2)
+        self.assertEqual(stat_models[0].exp_id, 'exp_id1')
+        self.assertEqual(stat_models[0].exp_version, 1)
+        self.assertEqual(stat_models[1].exp_id, 'exp_id1')
+        self.assertEqual(stat_models[1].exp_version, 2)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.ExplorationStatsModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_actual_starts_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_actual_starts_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_stats_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.ExplorationStatsModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
@@ -384,12 +724,44 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
 
         model = stats_models.ExplorationIssuesModel.get(model_id)
 
+        self.assertEqual(model.id, model_id)
+        self.assertEqual(model.exp_id, 'exp_id1')
+        self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.unresolved_issues, [])
+
+    def test_get_exploration_issues_model(self) -> None:
+        model_id = (
+            stats_models.ExplorationIssuesModel.create(
+                'exp_id1', 1, []))
+
+        model = stats_models.ExplorationIssuesModel.get_model('exp_id1', 1)
         # Ruling out the possibility of None for mypy type checking.
         assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
         self.assertEqual(model.unresolved_issues, [])
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.ExplorationIssuesModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'unresolved_issues': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            stats_models.ExplorationIssuesModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class PlaythroughModelUnitTests(test_utils.GenericTestBase):
@@ -407,8 +779,6 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
         model = stats_models.PlaythroughModel.get(model_id)
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
@@ -422,13 +792,36 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
             stats_models.PlaythroughModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, stats_models.PlaythroughModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'The id generator for PlaythroughModel is producing too '
             'many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
             stats_models.PlaythroughModel.create(
                 'exp_id1', 1, 'EarlyQuit', {}, [])
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.PlaythroughModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_customization_args': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'actions': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.PlaythroughModel.get_export_policy(),
+            expected_export_policy_dict
+        )
 
 
 class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
@@ -565,6 +958,33 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             model_instance.state_reference, '123:%s' % (state_name))
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.LearnerAnswerDetailsModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_reference': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'learner_answer_info_list':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'learner_answer_info_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'accumulated_answer_info_json_size_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.LearnerAnswerDetailsModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationAnnotationsModel class."""
@@ -580,8 +1000,6 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
 
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert model1 is not None
         self.assertEqual(model1.exploration_id, 'exp_id1')
         self.assertEqual(model1.version, '1')
         self.assertEqual(model1.num_starts, 5)
@@ -605,6 +1023,29 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(versions, [])
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.ExplorationAnnotationsModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_hit_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.ExplorationAnnotationsModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class StateAnswersModelUnitTests(test_utils.GenericTestBase):
     """Tests the StateAnswersModel class."""
@@ -616,7 +1057,19 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
     def test_shard_count_is_updated_when_data_overflows(self) -> None:
 
-        submitted_answer_list = [{'answer': 'value'}]
+        submitted_answer_list: List[stats_domain.SubmittedAnswerDict] = [{
+            'answer': 'value',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': 'rule spec str',
+            'answer_str': 'answer str'
+        }]
 
         stats_models.StateAnswersModel.insert_submitted_answers(
             'exp_id', 1, 'state_name', 'interaction_id',
@@ -673,6 +1126,153 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
         assert model1 is not None
         self.assertEqual(model1.shard_count, 2)
 
+    def test_get_all_state_answer_models_of_a_single_shard(self) -> None:
+        self.assertIsNone(stats_models.StateAnswersModel.get_all_models(
+            'exp_id', 1, 'state_name'
+        ))
+
+        # The 'shard_count' will be zero since the number of answer lists
+        # is less than _MAX_ANSWER_LIST_BYTE_SIZE.
+        submitted_answer_list1: List[stats_domain.SubmittedAnswerDict] = [{
+            'answer': 'value1',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': 'rule spec str',
+            'answer_str': 'answer str'
+        }]
+        stats_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id1',
+            submitted_answer_list1)
+
+        submitted_answer_list2: List[stats_domain.SubmittedAnswerDict] = [{
+            'answer': 'value2',
+            'interaction_id': 'TextInput',
+            'answer_group_index': 0,
+            'rule_spec_index': 1,
+            'classification_categorization': (
+                exp_domain.EXPLICIT_CLASSIFICATION),
+            'params': {},
+            'session_id': 'sess',
+            'time_spent_in_sec': 10.5,
+            'rule_spec_str': 'rule spec str',
+            'answer_str': 'answer str'
+        }]
+        stats_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id2',
+            submitted_answer_list2)
+
+        stat_answer_models = stats_models.StateAnswersModel.get_all_models(
+            'exp_id', 1, 'state_name'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert stat_answer_models is not None
+
+        # Ensure we got the correct model.
+        self.assertEqual(stat_answer_models[0].exploration_id, 'exp_id')
+        self.assertEqual(stat_answer_models[0].exploration_version, 1)
+        self.assertEqual(stat_answer_models[0].state_name, 'state_name')
+        self.assertEqual(
+            stat_answer_models[0].submitted_answer_list,
+            submitted_answer_list1 + submitted_answer_list2
+        )
+
+    def test_get_all_state_answer_models_of_all_shards(self) -> None:
+        # Use a smaller max answer list size so fewer answers are needed to
+        # exceed a shard. This will increase the 'shard_count'.
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
+            submitted_answer_list1: List[stats_domain.SubmittedAnswerDict] = [{
+                'answer': 'value1',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 10.5,
+                'rule_spec_str': 'rule spec str',
+                'answer_str': 'answer str'
+            }]
+            stats_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id1',
+                submitted_answer_list1)
+
+            submitted_answer_list2: List[stats_domain.SubmittedAnswerDict] = [{
+                'answer': 'value2',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 10.5,
+                'rule_spec_str': 'rule spec str',
+                'answer_str': 'answer str'
+            }]
+            stats_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id2',
+                submitted_answer_list2)
+
+            stat_answer_models = stats_models.StateAnswersModel.get_all_models(
+                'exp_id', 1, 'state_name'
+            )
+
+            # Ruling out the possibility of None for mypy type checking.
+            assert stat_answer_models is not None
+
+            # Ensure we got the correct model.
+            self.assertEqual(stat_answer_models[1].exploration_id, 'exp_id')
+            self.assertEqual(stat_answer_models[1].exploration_version, 1)
+            self.assertEqual(stat_answer_models[1].state_name, 'state_name')
+            self.assertEqual(
+                stat_answer_models[1].submitted_answer_list,
+                submitted_answer_list1
+            )
+
+            self.assertEqual(stat_answer_models[2].exploration_id, 'exp_id')
+            self.assertEqual(stat_answer_models[2].exploration_version, 1)
+            self.assertEqual(stat_answer_models[2].state_name, 'state_name')
+            self.assertEqual(
+                stat_answer_models[2].submitted_answer_list,
+                submitted_answer_list2
+            )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.StateAnswersModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'shard_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'shard_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'accumulated_answer_json_size_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'submitted_answer_list': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.StateAnswersModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutputModel class."""
@@ -681,3 +1281,28 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.StateAnswersCalcOutputModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            stats_models.StateAnswersCalcOutputModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_output_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_output': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            stats_models.StateAnswersCalcOutputModel.get_export_policy(),
+            expected_export_policy_dict
+        )

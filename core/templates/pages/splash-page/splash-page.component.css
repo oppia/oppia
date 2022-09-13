@@ -1,0 +1,594 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.splash-page .image-mobile {
+  display: none;
+}
+
+.splash-page {
+  text-align: left;
+}
+
+.splash-page .image-with-border {
+  border-radius: 11em;
+}
+
+.splash-page .oppia-splash-section-one {
+  background-color: #e7f6ff;
+  display: flex;
+  height: 75vh;
+  max-height: 75vw;
+  overflow: hidden;
+}
+
+.splash-page .oppia-splash-section-two {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 30px;
+  text-align: center;
+}
+
+.splash-page .oppia-splash-h1,
+.splash-page .oppia-splash-h2 {
+  color: #005c5e;
+  display: flex;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+}
+
+.splash-page .oppia-splash-h1 {
+  margin-left: 10vw;
+  margin-right: 10vw;
+  width: 90%;
+}
+
+.splash-page .oppia-splash-h2-container {
+  margin-left: 10vw;
+  margin-right: 10vw;
+  max-width: 900px;
+  width: 90%;
+}
+
+.splash-page .oppia-splash-h2 {
+  line-height: 1.6em;
+  padding-bottom: 72px;
+}
+
+.splash-page .oppia-splash-section-three {
+  background-color: #f4f4f4;
+  color: #2c4841;
+  display: flex;
+  gap: 8vw;
+  justify-content: center;
+  padding: 50px 5vw;
+  width: 100vw;
+}
+
+.splash-page .oppia-splash-button {
+  background-color: #015c53;
+  border-radius: 0;
+  color: #fff;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  margin-top: -20px;
+  min-width: 250px;
+  padding: 10px;
+  text-transform: uppercase;
+}
+
+.splash-page .oppia-splash-button:hover,
+.splash-page .oppia-splash-button:focus,
+.splash-page .oppia-splash-button:active {
+  background-color: rgba(5, 190, 178, 1);
+  color: #fff;
+}
+
+@media only screen and (max-width: 500px) {
+  .splash-page button.btn.oppia-splash-button {
+    font-size: 3.6vw;
+  }
+}
+
+.splash-page .oppia-splash-button-container {
+  float: left;
+  margin-left: 10vw;
+  margin-right: 10vw;
+  max-width: 500px;
+  position: relative;
+  transform: translate(0, 10px);
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .splash-page .oppia-splash-button-browse {
+    left: -webkit-calc(50% - 200px);
+    left: -moz-calc(50% - 200px);
+    left: -o-calc(50% - 200px);
+    left: calc(50% - 200px);
+  }
+}
+
+@media (min-width: 575px) {
+  .splash-page .oppia-splash-button {
+    left: -webkit-calc(130px - -15%);
+    left: -moz-calc(130px - -15%);
+    left: -o-calc(130px - -15%);
+    left: calc(130px - -15%);
+  }
+}
+
+@media (max-width: 365px) {
+  .splash-page .oppia-splash-button {
+    min-width: 95%;
+  }
+}
+
+.splash-page .oppia-splash-section-four {
+  background-color: #fff;
+  display: flex;
+  padding-bottom: 50px;
+  padding-top: 40px;
+  width: 100vw;
+}
+
+.splash-page .oppia-splash-testimonial-arrow {
+  color: #6d6d6d;
+  font-size: 3.0em;
+  margin-right: 20px;
+  margin-top: 50px;
+}
+.splash-page .splash-arrows-container {
+  position: absolute;
+}
+
+.splash-page .oppia-splash-section-one-left {
+  margin-bottom: auto;
+  margin-top: auto;
+  position: relative;
+  width: 45vw;
+}
+
+.splash-page .splash-icon-text-container {
+  min-width: fit-content;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 5px;
+}
+
+.splash-page .oppia-splash-section-one-right {
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-top: auto;
+}
+
+.splash-page .material-icons {
+  color: #6d6d6d;
+  cursor: pointer;
+  font-size: 2.5em;
+  margin-top: 50px;
+}
+
+.splash-page .splash-vol-image img {
+  max-width: 400px;
+  width: 100%;
+}
+
+.splash-page .splash-books-image {
+  height: auto;
+  max-width: 500px;
+  width: 100%;
+}
+
+.splash-page .splash-student-image img {
+  height: auto;
+  max-width: 350px;
+  width: 100%;
+}
+
+.splash-page .oppia-splash-section-five,
+.splash-page .oppia-splash-section-seven {
+  background-color: #fff;
+  background-size: cover;
+  display: flex;
+  margin-bottom: -1px;
+  margin-top: -1px;
+  padding-bottom: 15vh;
+  padding-top: 20vh;
+  width: 100vw;
+}
+
+.splash-page .oppia-splash-section-five {
+  background-image: url(/assets/images/splash/dsk_testimonial_background.png);
+}
+
+.splash-page .oppia-splash-section-seven {
+  background-image: url(/assets/images/splash/dsk_community_background.png);
+  padding-top: 30vh;
+}
+
+.splash-page .oppia-splash-section-six .oppia-splash-button-container,
+.splash-page .oppia-splash-section-seven .oppia-splash-button-container {
+  margin-left: 0;
+  margin-top: 50px;
+}
+
+.splash-page .oppia-splash-section-six {
+  background-color: #fff;
+  display: flex;
+  padding-top: 50px;
+  width: 100vw;
+}
+
+.splash-page .oppia-splash-section-seven-right {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -5vh;
+  width: 50vw;
+}
+
+.splash-page .oppia-splash-section-five-left {
+  margin-bottom: auto;
+  margin-left: 10vw;
+  margin-top: auto;
+  width: 50vw;
+}
+
+.splash-page .oppia-splash-section-seven-left {
+  margin-bottom: auto;
+  margin-left: 10vw;
+  margin-top: auto;
+  width: 50vw;
+}
+
+.splash-page .oppia-splash-section-six-left {
+  margin-left: 2vw;
+  margin-right: 5vw;
+}
+
+.splash-page .oppia-splash-section-five-right {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.splash-page .oppia-splash-section-six-right {
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-top: auto;
+  width: 40vw;
+}
+
+.splash-page .oppia-splash-section-four .oppia-splash-button-container {
+  margin-left: 0;
+  margin-top: 50px;
+}
+
+.splash-page .splash-student-desk-image img {
+  height: auto;
+  max-width: 500px;
+  width: 100%;
+}
+
+.splash-page .oppia-splash-section-three-right h3 {
+  align-self: flex-start;
+  color: #6d6d6d;
+  margin-bottom: 25px;
+  margin-left: 10px;
+}
+
+.splash-page .oppia-splash-section-four-left h2,
+.splash-page .oppia-splash-section-five-left .testimonial-student-details,
+.splash-page .oppia-splash-section-six-right h2,
+.splash-page .oppia-splash-section-seven-left h2 {
+  color: #6d6d6d;
+  font-size: 1.17em;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+.splash-page .oppia-splash-section-four-left h3,
+.splash-page .oppia-splash-section-five-left .testimonial-quote-details,
+.splash-page .oppia-splash-section-six-right h3,
+.splash-page .oppia-splash-section-seven-left h3 {
+  color: #094142;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 2.1em;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.splash-page .oppia-splash-section-five-left .testimonial-quote-details {
+  line-height: 1.75em;
+}
+
+.splash-page .oppia-splash-section-four-left p,
+.splash-page .oppia-splash-section-six-right p,
+.splash-page .oppia-splash-section-seven-left p {
+  font-family: "Roboto", Arial, sans-serif;
+  line-height: 1.5;
+  padding-right: 10vw;
+}
+
+.splash-page .oppia-splash-section-four-right {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.splash-page .oppia-splash-section-four-left {
+  margin-bottom: auto;
+  margin-left: 10vw;
+  margin-top: auto;
+  width: 40vw;
+}
+
+.splash-page .splash-benefits-section {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 25px;
+}
+
+.splash-page .splash-matthew-image {
+  height: auto;
+  max-width: 600px;
+  width: 100%;
+}
+
+.splash-page .splash-benefits {
+  color: #094142;
+  font-size: 1.4em;
+  margin: 0;
+}
+
+.splash-page .splash-benefits-list {
+  display: flex;
+}
+
+.splash-page .splash-benefit-bullets-column {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 220px;
+  justify-content: space-between;
+  margin-right: 25px;
+  width: 40px;
+}
+
+.splash-page .splash-benefit-bullets-column img {
+  height: auto;
+}
+
+.splash-page .splash-benefit-text-items-column {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  height: 220px;
+  justify-content: space-between;
+}
+
+.splash-page .oppia-splash-icon-1-container,
+.splash-page .oppia-splash-icon-2-container,
+.splash-page .oppia-splash-icon-3-container {
+  display: flex;
+}
+
+@media (max-width: 950px) {
+  .splash-page .oppia-splash-icon-1-container,
+  .splash-page .oppia-splash-icon-2-container,
+  .splash-page .oppia-splash-icon-3-container {
+    display: flow-root;
+  }
+}
+
+.splash-page .oppia-splash-icon-3-container img {
+  max-height: 2.05em;
+}
+
+.splash-page .splash-icon-text {
+  color: #6d6d6d;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.splash-page .oppia-splash-main-image img {
+  height: auto;
+  max-width: 800px;
+  width: 100%;
+}
+
+.splash-page .oppia-splash-browse-button-position {
+  bottom: 210px;
+  z-index: 10;
+}
+.splash-page .oppia-splash-create-button-position {
+  bottom: 150px;
+  z-index: 10;
+}
+.splash-page .oppia-splash-h2-text {
+  color: #4c4c4c;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.3em;
+  font-weight: 500;
+  max-width: 700px;
+  padding-bottom: 30px;
+  padding-top: 0;
+}
+
+@media (max-width: 768px) {
+  .splash-page .oppia-splash-section-one ,
+  .splash-page .oppia-splash-section-three,
+  .splash-page .oppia-splash-section-four,
+  .splash-page .oppia-splash-section-five,
+  .splash-page .oppia-splash-section-six,
+  .splash-page .oppia-splash-section-seven {
+    display: block;
+    height: auto;
+    max-height: fit-content;
+  }
+
+  .splash-page .image-mobile {
+    display: inherit;
+  }
+
+  .splash-page .oppia-splash-section-five {
+    background-image: url(/assets/images/splash/m_testimonial_background.png);
+  }
+
+  .splash-page .image-desktop {
+    display: none;
+  }
+
+  .splash-page .oppia-splash-button-browse {
+    left: 50%;
+  }
+
+  .splash-page .oppia-splash-button-container {
+    margin-left: 0;
+    max-width: none;
+    transform: translate(0, 0);
+    width: 100%;
+    z-index: 10;
+  }
+
+  .splash-page .oppia-splash-button {
+    min-width: auto;
+  }
+
+  .splash-page .oppia-splash-section-seven-image {
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 50px;
+    width: 50vw;
+  }
+
+  .splash-page .oppia-splash-section-seven {
+    background-image: url(/assets/images/splash/m_community_background.png);
+    padding-top: 20vh;
+  }
+
+  .splash-page .splash-vol-image img {
+    height: auto;
+    max-width: fit-content;
+  }
+
+  .splash-page .oppia-splash-section-four-image-mobile {
+    margin-left: 10vw;
+  }
+
+  .splash-page .oppia-splash-section-three {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 50px;
+    padding-top: 15px;
+  }
+
+  .splash-page .oppia-splash-section-three-left {
+    display: block;
+    width: 100%;
+  }
+
+  .splash-page .oppia-splash-section-three-right {
+    align-self: center;
+  }
+
+  .splash-page .oppia-splash-section-five-image {
+    margin-left: auto;
+    margin-right: auto;
+    width: 10em;
+  }
+
+  .splash-page .oppia-splash-section-three-left,
+  .splash-page .oppia-splash-section-six-right,
+  .splash-page .oppia-splash-section-seven-left {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .splash-page .oppia-splash-section-six-right,
+  .splash-page .oppia-splash-section-seven-left {
+    width: 90vw;
+  }
+
+  .splash-page .oppia-splash-section-one-left {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 7.5vh;
+    text-align: center;
+    width: 75vw;
+  }
+
+  .splash-page .oppia-splash-section-six-right p,
+  .splash-page .oppia-splash-section-seven-left p {
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .splash-page .oppia-splash-section-five-left {
+    margin-right: 10vw;
+    text-align: center;
+    width: auto;
+  }
+
+  .splash-page .oppia-splash-section-four-left h3,
+  .splash-page .oppia-splash-section-five-left .testimonial-quote-details,
+  .splash-page .oppia-splash-section-six-right h3,
+  .splash-page .oppia-splash-section-seven-left h3 {
+    font-size: 1.5em;
+  }
+
+  .splash-page .splash-student-image img {
+    height: auto;
+    max-width: 150px;
+  }
+
+  .splash-page .oppia-splash-section-four-left {
+    width: auto;
+  }
+
+  .splash-page .splash-arrows-container {
+    position: relative;
+  }
+
+  .splash-page .oppia-splash-section-four-left .oppia-splash-button,
+  .splash-page .oppia-splash-section-six-right .oppia-splash-button,
+  .splash-page .oppia-splash-section-seven-left .oppia-splash-button {
+    width: 90%;
+  }
+
+  .splash-page .oppia-splash-section-six-left {
+    margin-left: auto;
+    margin-right: auto;
+    width: 70vw;
+  }
+
+  .splash-page .splash-icon-text {
+    display: block;
+    font-size: 0.8em;
+  }
+
+  .splash-page .oppia-splash-h1,
+  .splash-page .oppia-splash-h2 {
+    display: block;
+    margin-left: 0;
+  }
+
+  .splash-page .oppia-splash-h1 {
+    font-size: 1.7em;
+    line-height: 1.5;
+  }
+
+  .splash-page .oppia-splash-h2-container {
+    margin-left: 0;
+  }
+
+  .splash-page .oppia-splash-h2-text {
+    font-size: 1.05em;
+    font-weight: 600;
+  }
+  @media screen and (max-width: 768px) {
+    .splash-page .oppia-splash-icon-3-container {
+      display: block;
+    }
+  }
+}

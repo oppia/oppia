@@ -66,6 +66,19 @@ interface SubtopicSkills {
   uncategorized: ShortSkillSummary[];
 }
 
+interface FetchTopicIdToDiagnosticTestSkillIdsBackendResponse {
+  'topic_id_to_diagnostic_test_skill_ids': {
+    [topicId: string]: string[];
+  };
+}
+
+export interface TopicIdToDiagnosticTestSkillIdsResponse {
+  topicIdToDiagnosticTestSkillIds: {
+    [topicId: string]: string[];
+  };
+}
+
+
 export interface TopicsAndSkillsDashboardDataBackendDict {
   'all_classroom_names': string[];
   'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
@@ -79,6 +92,11 @@ export interface TopicsAndSkillsDashboardDataBackendDict {
   'categorized_skills_dict': CategorizedSkillsBackendDict;
 }
 
+export interface CategorizedAndUntriagedSkillsDataBackendDict {
+  'untriaged_skill_summary_dicts': ShortSkillSummaryBackendDict[];
+  'categorized_skills_dict': CategorizedSkillsBackendDict;
+}
+
 export interface TopicsAndSkillDashboardData {
   allClassroomNames: string[];
   canDeleteTopic: boolean;
@@ -89,6 +107,11 @@ export interface TopicsAndSkillDashboardData {
   mergeableSkillSummaries: SkillSummary[];
   totalSkillCount: number;
   topicSummaries: CreatorTopicSummary[];
+  categorizedSkillsDict: CategorizedSkills;
+}
+
+export interface CategorizedAndUntriagedSkillsData {
+  untriagedSkillSummaries: ShortSkillSummary[];
   categorizedSkillsDict: CategorizedSkills;
 }
 
@@ -164,6 +187,38 @@ export class TopicsAndSkillsDashboardBackendApiService {
     });
   }
 
+  async fetchCategorizedAndUntriagedSkillsDataAsync():
+      Promise<CategorizedAndUntriagedSkillsData> {
+    return this.http.get<CategorizedAndUntriagedSkillsDataBackendDict>(
+      '/topics_and_skills_dashboard/categorized_and_untriaged_skills_data'
+    ).toPromise().then(response => {
+      let categorizedSkills: CategorizedSkills = {};
+      for (let topic in response.categorized_skills_dict) {
+        let subtopicSkillsDict = response.categorized_skills_dict[topic];
+        let subtopicSkills: SubtopicSkills = {
+          uncategorized: []
+        };
+        for (let subtopic in subtopicSkillsDict) {
+          subtopicSkills[subtopic] = (
+            subtopicSkillsDict[subtopic].map(
+              backendDict => ShortSkillSummary
+                .createFromBackendDict(backendDict)));
+        }
+        categorizedSkills[topic] = subtopicSkills;
+      }
+
+      return {
+        untriagedSkillSummaries: (
+          response.untriaged_skill_summary_dicts.map(
+            backendDict => ShortSkillSummary
+              .createFromBackendDict(backendDict))),
+        categorizedSkillsDict: categorizedSkills
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
   async fetchTopicAssignmentsForSkillAsync(
       skillId: string
   ): Promise<AssignedSkill[]> {
@@ -178,6 +233,39 @@ export class TopicsAndSkillsDashboardBackendApiService {
           .createFromBackendDict(backendDict));
     }, errorResponse => {
       throw new Error(errorResponse.error.error);
+    });
+  }
+
+  private _fetchTopicIdToDiagnosticTestSkillIdsAsync(
+      topicIds: string[],
+      successCallback: (
+        value: TopicIdToDiagnosticTestSkillIdsResponse) => void,
+      errorCallback: (reason: string) => void
+  ): void {
+    const topicIdToSkillIdsUrl = this.urlInterpolationService.interpolateUrl(
+      'topic_id_to_diagnostic_test_skill_ids_handler' +
+        '/?comma_separated_topic_ids=<comma_separated_topic_ids>', {
+        comma_separated_topic_ids: topicIds.join(',')
+      });
+    this.http.get<FetchTopicIdToDiagnosticTestSkillIdsBackendResponse>(
+      topicIdToSkillIdsUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback({
+          topicIdToDiagnosticTestSkillIds: (
+            response.topic_id_to_diagnostic_test_skill_ids)
+        });
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
+  }
+
+  async fetchTopicIdToDiagnosticTestSkillIdsAsync(
+      topicIds: string[]
+  ): Promise<TopicIdToDiagnosticTestSkillIdsResponse> {
+    return new Promise((resolve, reject) => {
+      this._fetchTopicIdToDiagnosticTestSkillIdsAsync(
+        topicIds, resolve, reject);
     });
   }
 

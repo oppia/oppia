@@ -28,15 +28,15 @@
     <div class="dashboard-content">
       <div class="dashboard-content-primary">
         <div>
-          <ul class="dashboard-tabs protractor-test-topics-tab">
+          <ul class="dashboard-tabs e2e-test-topics-tab">
             <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
-              <a class="dashboard-tabs-text protractor-test-topics-tab"
+              <a class="dashboard-tabs-text e2e-test-topics-tab"
                  (click)="setActiveTab(TAB_NAME_TOPICS)">
                 Topics
               </a>
             </li>
             <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_SKILLS}">
-              <a class="dashboard-tabs-text protractor-test-skills-tab"
+              <a class="dashboard-tabs-text e2e-test-skills-tab"
                  (click)="setActiveTab(TAB_NAME_SKILLS)">
                 Skills
               </a>
@@ -110,7 +110,7 @@
                                [userCanDeleteSkill]="userCanDeleteSkill"
                                [skillsCategorizedByTopics]="skillsCategorizedByTopics">
             </oppia-skills-list>
-            <p class="intro-card-message protractor-test-no-skills-present-message" *ngIf="!displayedSkillSummaries.length">
+            <p class="intro-card-message e2e-test-no-skills-present-message" *ngIf="!displayedSkillSummaries.length">
               No skills to display.
             </p>
           </div>
@@ -145,12 +145,12 @@
           <div class="create-topic-skill">
             <div *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"
                  (click)="createTopic()"
-                 class="protractor-test-create-topic-button create-topic-button oppia-autofocus"
+                 class="e2e-test-create-topic-button create-topic-button oppia-autofocus"
                  oppiaFocusOn="createTopicBtn">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Topic</span>
             </div>
-            <div *ngIf="activeTab === TAB_NAME_SKILLS && userCanCreateSkill"  (click)="createSkill()" class="protractor-test-create-skill-button-circle create-skill-button
+            <div *ngIf="activeTab === TAB_NAME_SKILLS && userCanCreateSkill"  (click)="createSkill()" class="e2e-test-create-skill-button-circle create-skill-button
             oppia-autofocus" oppiaFocusOn="createSkillBtn">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Skill</span>
@@ -161,7 +161,7 @@
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
-              <span class="topic-skill-filter-reset protractor-test-topic-filter-reset" (click)="resetFilters()">Reset</span>
+              <span class="topic-skill-filter-reset e2e-test-topic-filter-reset" (click)="resetFilters()">Reset</span>
               <i class="fa fa-times dashboard-cross-icon" (click)="toggleFilterBox()"></i>
             </div>
             <div class="topic-skill-filter-header-mobile">
@@ -189,7 +189,7 @@
                   </oppia-filtered-choices-field>
                 </div>
                 <div *ngIf="activeTab === TAB_NAME_SKILLS">
-                  <oppia-filtered-choices-field class="protractor-test-select-skill-status-dropdown"
+                  <oppia-filtered-choices-field class="e2e-test-select-skill-status-dropdown"
                                                 [choices]="skillStatusOptions"
                                                 placeholder="Status Options"
                                                 searchLabel="Search"
@@ -205,7 +205,7 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div *ngIf="activeTab === TAB_NAME_TOPICS">
-                  <oppia-filtered-choices-field class="protractor-test-select-classroom-dropdown"
+                  <oppia-filtered-choices-field class="e2e-test-select-classroom-dropdown"
                                                 [choices]="classrooms"
                                                 placeholder="Classrooms"
                                                 searchLabel="Search"
@@ -244,7 +244,7 @@
               </div>
               <div class="topic-skill-filter-value">
                 <div>
-                  <oppia-multi-selection-field class="protractor-test-select-keyword-dropdown"
+                  <oppia-multi-selection-field class="e2e-test-select-keyword-dropdown"
                                                label="Keywords"
                                                [(selections)]="filterObject.keywords"
                                                placeholder="Multiple allowed"
@@ -264,12 +264,12 @@
       <p class="intro-card-message">
         No topics or skills have been created yet.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text  oppia-create-topic-btn protractor-test-create-topic-button"
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text  oppia-create-topic-btn e2e-test-create-topic-button"
               (click)="createTopic()"
               *ngIf="userCanCreateTopic">
         Create Topic
       </button>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-skill-button"
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text e2e-test-create-skill-button"
               (click)="createSkill()"
               *ngIf="userCanCreateSkill">
         Create Skill
@@ -362,12 +362,12 @@
     display: none;
   }
   .oppia-topics-and-skills-dashboard .create-topic-skill i {
-    color: #00645C;
+    color: #00645c;
     font-size: 30px;
     width: 100%;
   }
   .oppia-topics-and-skills-dashboard .create-topic-skill span {
-    color: #00645C;
+    color: #00645c;
     display: inline-block;
     font-size: 16px;
     line-height: 17px;
@@ -397,7 +397,7 @@
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter-reset {
     bottom: 0;
-    color: #00645C;
+    color: #00645c;
     cursor: pointer;
     position: absolute;
     right: 0;
@@ -440,10 +440,10 @@
     padding: 0 4px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active {
-    background-color: #00645C;
+    background-color: #00645c;
     border-radius: 50%;
     box-shadow: 0 3px 3px #707070;
-    color: #FFF;
+    color: #fff;
     cursor: pointer;
     display: inline-block;
     font-size: 16px;
@@ -454,7 +454,7 @@
     width: 23px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active span {
-    color: #FFF;
+    color: #fff;
     font-size: 16px;
     outline: none;
   }
@@ -524,7 +524,7 @@
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text {
     border-bottom: 2px solid #aaaac1;
-    color: #00645D;
+    color: #00645d;
     font-size: 16px;
     padding: 10px;
     text-decoration: none;
@@ -534,12 +534,12 @@
   .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
   .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
     background-color: #d8f4f2;
-    border-bottom: 4px solid #00645D;
+    border-bottom: 4px solid #00645d;
     border-radius: 0;
-    color: #00645D;
+    color: #00645d;
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
-    color: #00645D;
+    color: #00645d;
     font-size: 16px;
     padding: 10px;
     text-decoration: none;
@@ -556,7 +556,7 @@
     width: auto;
   }
   .oppia-topics-and-skills-dashboard .oppia-create-button-text {
-    color: #FFF;
+    color: #fff;
     text-decoration: none;
   }
   @media screen and (max-width: 1200px) {
@@ -594,15 +594,15 @@
       box-shadow: 0 0 5px #333;
     }
     .oppia-topics-and-skills-dashboard .dashboard-tabs li {
-      background-color: #00645C;
+      background-color: #00645c;
       width: 50%;
     }
     .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
     .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
-      background-color: #00645C;
-      border-bottom: 2px solid #FFF;
+      background-color: #00645c;
+      border-bottom: 2px solid #fff;
       border-radius: 0;
-      color: #FFF;
+      color: #fff;
     }
     .oppia-topics-and-skills-dashboard .create-buttons,
     .oppia-topics-and-skills-dashboard .topic-skill-count,
@@ -611,7 +611,7 @@
       display: none;
     }
     .oppia-topics-and-skills-dashboard .topic-skill-filter {
-      background-color: #FFF;
+      background-color: #fff;
       border: 0;
       border-radius: 0;
       height: 100vh;
@@ -675,7 +675,7 @@
       text-align: center;
     }
     .oppia-topics-and-skills-dashboard .topic-skill-filter-action-box span {
-      color: #00645C;
+      color: #00645c;
       font-size: 15px;
     }
     .oppia-topics-and-skills-dashboard .topic-skill-filter-action-reset {

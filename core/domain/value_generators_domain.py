@@ -26,7 +26,7 @@ import os
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, Type
 
 
 class BaseValueGenerator:
@@ -53,7 +53,7 @@ class BaseValueGenerator:
         return self.__class__.__name__
 
     @classmethod
-    def get_html_template(cls) -> bytes:
+    def get_html_template(cls) -> str:
         """Returns the HTML template for the class.
 
         Returns:
@@ -69,8 +69,8 @@ class BaseValueGenerator:
     # are set to 'Any'.
     def generate_value(
         self,
-        *args: Tuple[Any],
-        **kwargs: Dict[str, Any]
+        *args: Any,
+        **kwargs: Any
     ) -> Any:
         """Generates a new value, using the given customization args.
 

@@ -1,19 +1,19 @@
 <style>
   .oppia-graph-input-viz-container {
-    border: 1px solid black;
     background-color: white;
+    border: 1px solid black;
     cursor: default;
   }
   .oppia-graph-button-label {
-    font-family: 'Font Awesome 5 Free';
+    font-family: 'Font Awesome 5 Free', Arial, sans-serif;
     font-weight: 900;
   }
   .unselectable-text {
+    cursor: default;
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
     -webkit-user-select: none;
     -o-user-select: none;
-    cursor: default;
   }
   .unclickable-text {
     pointer-events: none;
@@ -27,7 +27,7 @@
   }
 </style>
 <div class="graph-viz">
-  <div class="oppia-graph-input-viz-container protractor-test-graph-input-viz-container">
+  <div class="oppia-graph-input-viz-container e2e-test-graph-input-viz-container">
     <svg class="oppia-graph-viz-svg"
          width="100%"
          height="250"
@@ -39,7 +39,8 @@
         <text>{{canEditOptions}}</text>
         <ng-container *ngIf="canEditOptions">
           <g *ngFor="let button of graphOptions; let idx = index">
-            <rect attr.class="{{(button.text).toLowerCase()}}"
+            <rect *ngIf="graph"
+                  attr.class="{{button.text.toLowerCase()}}"
                   width="70"
                   height="30"
                   x="10"
@@ -61,7 +62,7 @@
       </svg>
 
       <g *ngFor="let button of buttons; let idx = index">
-        <rect attr.class="protractor-test-{{(button.description | translate).replace(' ','-')}}-button"
+        <rect attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
               width="140"
               height="30"
               x="10"
@@ -90,14 +91,14 @@
       </g>
 
       <line *ngIf="state.addEdgeVertex !== null && !isMobile"
-            [attr.x1]="graph.vertices[state.addEdgeVertex].x"
-            [attr.y1]="graph.vertices[state.addEdgeVertex].y"
+            [attr.x1]="graph?.vertices[state.addEdgeVertex].x"
+            [attr.y1]="graph?.vertices[state.addEdgeVertex].y"
             [attr.x2]="state.mouseX"
             [attr.y2]="state.mouseY"
             [ngStyle]="{'stroke': 'black', 'stroke-width': EDGE_WIDTH}">
       </line>
-      <g *ngFor="let edge of graph.edges; let idx = index">
-        <line class="protractor-test-graph-edge"
+      <g *ngFor="let edge of graph?.edges; let idx = index">
+        <line class="e2e-test-graph-edge"
               (click)="onClickEdge(idx)"
               (mouseenter)="state.hoveredEdge = idx"
               (mouseleave)="state.hoveredEdge = (idx === state.hoveredEdge) ? null : state.hoveredEdge"
@@ -107,13 +108,13 @@
               attr.y2="{{graph.vertices[edge.dst].y}}"
               attr.style="{{'stroke:' + getEdgeColor(idx) + '; stroke-width:' + EDGE_WIDTH}}">
         </line>
-        <polygon *ngIf="graph.isDirected"
+        <polygon *ngIf="graph?.isDirected"
                  (mouseenter)="state.hoveredEdge = idx"
                  (mouseleave)="state.hoveredEdge = (idx === state.hoveredEdge) ? null : state.hoveredEdge"
                  [attr.points]="getDirectedEdgeArrowPoints(idx)"
                  attr.style="{{'fill:' + getEdgeColor(idx)}}">
         </polygon>
-        <text *ngIf="graph.isWeighted"
+        <text *ngIf="graph?.isWeighted"
               [attr.x]="getEdgeCentre(idx).x"
               attr.y="{{getEdgeCentre(idx).y - 12}}"
               attr.style="{{'fill: ' + getEdgeColor(idx)}}"
@@ -124,9 +125,9 @@
           {{edge.weight}}
         </text>
       </g>
-      <g *ngFor="let vertex of graph.vertices; let idx = index"
+      <g *ngFor="let vertex of graph?.vertices; let idx = index"
          attr.transform="{{'translate(' + vertex.x + ',' + vertex.y + ')'}}">
-        <text *ngIf="graph.isLabeled"
+        <text *ngIf="graph?.isLabeled"
               x="0"
               y="-10"
               (click)="onClickVertex(idx)"
@@ -137,7 +138,7 @@
               class="unselectable-text">
           {{vertex.label}}
         </text>
-        <circle attr.class="protractor-test-graph-vertex-{{idx}}"
+        <circle attr.class="e2e-test-graph-vertex-{{idx}}"
                 (mouseenter)="state.hoveredVertex = idx"
                 (mouseleave)="onMouseleaveVertex(idx)"
                 (click)="onClickVertex(idx)"
@@ -156,14 +157,14 @@
   <br>
 
   <div class="oppia-update-button-container">
-    <div *ngIf="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
+    <div *ngIf="state.selectedVertex !== null && graph?.isLabeled && canEditVertexLabel">
       <input type="text" [(ngModel)]="selectedVertexLabel" [oppiaFocusOn]="vertexLabelEditBegun">
       <button mat-raised-button
               (click)="state.selectedVertex = null"
               [innerHTML]="'I18N_INTERACTIONS_GRAPH_UPDATE_LABEL' | translate">
       </button>
     </div>
-    <div *ngIf="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
+    <div *ngIf="state.selectedEdge !== null && graph?.isWeighted && canEditEdgeWeight">
       <input type="number"
              [(ngModel)]="selectedEdgeWeight"
              [oppiaFocusOn]="edgeWeightEditBegun"

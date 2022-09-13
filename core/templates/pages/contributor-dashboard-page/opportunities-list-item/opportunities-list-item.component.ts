@@ -21,6 +21,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 export interface ExplorationOpportunity {
   id: string;
@@ -39,27 +41,51 @@ export interface ExplorationOpportunity {
   styleUrls: []
 })
 export class OpportunitiesListItemComponent {
-  @Input() opportunity: ExplorationOpportunity;
+  constructor(
+    private windowDimensionsService: WindowDimensionsService
+  ) {}
+
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() opportunity!: ExplorationOpportunity;
+  @Input() opportunityHeadingTruncationLength!: number;
+  @Input() opportunityType!: string;
+  @Input() labelRequired: boolean = false;
+  @Input() progressBarRequired: boolean = false;
+  @Input() showOpportunityButton: boolean = true;
+
+  labelText!: string;
+  labelStyle!: { 'background-color': string };
+  progressPercentage!: string;
+  progressBarStyle!: { width: string };
+  translatedProgressStyle!: { width: string };
+  inReviewProgressStyle!: { width: string };
+  untranslatedProgressStyle!: { width: string };
+  targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
+  cardsAvailable: number = 0;
+  onMobile!: boolean;
+  resizeSubscription!: Subscription;
+  mobileBreakpoint: number = (
+    constants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT);
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
-  @Input() labelRequired: boolean;
-  @Input() progressBarRequired: boolean;
-  @Input() opportunityHeadingTruncationLength: number;
-  @Input() opportunityType: string;
 
   opportunityDataIsLoading: boolean = true;
-  labelText: string;
-  labelStyle: { 'background-color': string };
-  progressPercentage: string;
-  progressBarStyle: { width: string };
-  translatedProgressStyle: { width: string };
-  inReviewProgressStyle: { width: string };
-  untranslatedProgressStyle: { width: string };
   correspondingOpportunityDeleted: boolean = false;
   translationProgressBar: boolean = false;
   opportunityButtonDisabled: boolean = false;
 
   ngOnInit(): void {
+    this.onMobile = (
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.onMobile = (
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+      });
+
     if (this.opportunity && this.labelRequired) {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {
@@ -72,8 +98,8 @@ export class OpportunitiesListItemComponent {
     }
     if (this.opportunity) {
       if (this.opportunity.progressPercentage) {
-        this.progressPercentage = (
-          this.opportunity.progressPercentage + '%');
+        this.progressPercentage =
+          `${Math.floor(this.opportunity.progressPercentage)}%`;
         if (this.opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
           this.translationProgressBar = true;
           const translatedPercentage = (
@@ -84,6 +110,14 @@ export class OpportunitiesListItemComponent {
           ) * 100;
           const untranslatedPercentage = (
             100 - (translatedPercentage + inReviewTranslationsPercentage));
+
+          this.cardsAvailable = (
+            this.opportunity.totalCount -
+              (
+                this.opportunity.translationsCount +
+                this.opportunity.inReviewCount
+              )
+          );
 
           this.translatedProgressStyle = { width: translatedPercentage + '%' };
           this.untranslatedProgressStyle = {
@@ -107,6 +141,12 @@ export class OpportunitiesListItemComponent {
       }
     } else {
       this.opportunityDataIsLoading = true;
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeSubscription) {
+      this.resizeSubscription.unsubscribe();
     }
   }
 }

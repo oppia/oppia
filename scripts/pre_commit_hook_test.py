@@ -22,8 +22,12 @@ import builtins
 import os
 import shutil
 import subprocess
+import tempfile
 
+from core import utils
 from core.tests import test_utils
+
+from scripts import common
 
 from . import pre_commit_hook
 
@@ -32,7 +36,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     """Test the methods for pre commit hook script."""
 
     def setUp(self):
-        super(PreCommitHookTests, self).setUp()
+        super().setUp()
         self.print_arr = []
         def mock_print(msg):
             self.print_arr.append(msg)
@@ -74,7 +78,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
-            with self.assertRaisesRegexp(ValueError, 'Error'):
+            with self.assertRaisesRegex(ValueError, 'Error'):
                 pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertFalse(
@@ -222,7 +226,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
-        with subprocess_swap, self.assertRaisesRegexp(ValueError, 'Error'):
+        with subprocess_swap, self.assertRaisesRegex(ValueError, 'Error'):
             pre_commit_hook.does_diff_include_package_lock_file()
 
     def test_does_current_folder_contain_have_package_lock_file(self):
@@ -259,7 +263,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'Changes to %s made for deployment cannot be committed.' % (
                 pre_commit_hook.FECONF_FILEPATH)):
@@ -276,7 +280,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 b'+  "ANALYTICS_ID": "change",\n')
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        with check_output_swap, self.assertRaisesRegex(
             Exception,
             'Changes to %s made for deployment cannot be committed.' % (
                 pre_commit_hook.CONSTANTS_FILEPATH)):
@@ -300,7 +304,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap, self.print_swap, self.assertRaisesRegexp(
+            with check_config_swap, self.print_swap, self.assertRaisesRegex(
                 SystemExit, '1'):
                 pre_commit_hook.main(args=[])
         self.assertTrue(
@@ -340,3 +344,39 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 pre_commit_hook.main(args=[])
         self.assertTrue(
             check_function_calls['check_changes_in_config_is_called'])
+
+    def test_check_changes_in_gcloud_path_without_mismatch(self):
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file_name = 'mock_release_constants.json'
+        temp_file.name = temp_file_name
+        with utils.open_file(temp_file_name, 'w') as tmp:
+            tmp.write('{"GCLOUD_PATH": "%s"}' % common.GCLOUD_PATH)
+        with self.swap(
+            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name):
+            pre_commit_hook.check_changes_in_gcloud_path()
+        temp_file.close()
+        if os.path.isfile(temp_file_name):
+            # On Windows system, occasionally this temp file is not deleted.
+            os.remove(temp_file_name)
+
+    def test_check_changes_in_gcloud_path_with_mismatch(self):
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file_name = 'mock_release_constants.json'
+        temp_file.name = temp_file_name
+        incorrect_gcloud_path = (
+            '../oppia_tools/google-cloud-sdk-314.0.0/google-cloud-sdk/'
+            'bin/gcloud')
+        with utils.open_file(temp_file_name, 'w') as tmp:
+            tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
+        constants_file_swap = self.swap(
+            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)
+        with constants_file_swap, self.assertRaisesRegex(
+            Exception, (
+                'The gcloud path in common.py: %s should match the path in '
+                'release_constants.json: %s. Please fix.' % (
+                    common.GCLOUD_PATH, incorrect_gcloud_path))):
+            pre_commit_hook.check_changes_in_gcloud_path()
+        temp_file.close()
+        if os.path.isfile(temp_file_name):
+            # On Windows system, occasionally this temp file is not deleted.
+            os.remove(temp_file_name)

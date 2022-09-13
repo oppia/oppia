@@ -1,36 +1,46 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container ng-scope">
-  <h2 class="oppia-preferences-page-heading protractor-test-preferences-title">
+  <h2 class="oppia-preferences-page-heading e2e-test-preferences-title">
       {{ 'I18N_PREFERENCES_HEADING' | translate }}
   </h2>
-  <em><div class="oppia-preferences-page-heading-subtext">{{ 'I18N_PREFERENCES_HEADING_SUBTEXT' | translate }}</div></em>
+  <em>
+    <div class="oppia-preferences-page-heading-subtext">
+      {{ 'I18N_PREFERENCES_HEADING_SUBTEXT' | translate }}
+    </div>
+  </em>
   <mat-card class="oppia-page-card">
     <div class="container">
       <div class="form-group row">
-        <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_USERNAME' | translate }}</label>
+        <label class="col-lg-4 col-md-4 col-sm-4">
+          {{ 'I18N_PREFERENCES_USERNAME' | translate }}
+        </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <a *ngIf="username"
              href="/profile/{{ username }}"
-             [routerLink]="'/profile/' + username">
+             [smartRouterLink]="'/profile/' + username">
              {{ username }}
           </a>
-          <em *ngIf="!username">{{ 'I18N_PREFERENCES_USERNAME_NOT_SELECTED' | translate }}</em>
+          <em *ngIf="!username">
+            {{ 'I18N_PREFERENCES_USERNAME_NOT_SELECTED' | translate }}
+          </em>
         </div>
       </div>
 
       <div class="form-group row">
-        <label class="col-lg-4 col-md-4 col-sm-4"> {{ 'I18N_PREFERENCES_PICTURE' | translate }}</label>
+        <label class="col-lg-4 col-md-4 col-sm-4">
+          {{ 'I18N_PREFERENCES_PICTURE' | translate }}
+        </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <div class="oppia-editable-section oppia-profile-picture-container"
                title="{{ 'I18N_PREFERENCES_CHANGE_PICTURE' | translate }}">
-            <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
+            <div class="oppia-click-to-start-editing e2e-test-photo-clickable"
                  (click)="showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
             </div>
-            <i class="material-icons oppia-editor-edit-icon oppia-editor-edit-icon-pos">&#xE254;</i>
+            <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"></i>
             <img *ngIf="profilePictureDataUrl"
                  [src]="profilePictureDataUrl"
-                 class="img-thumbnail protractor-test-custom-photo"
+                 class="img-thumbnail e2e-test-custom-photo"
                  alt="Profile photo picture">
             <picture *ngIf="!profilePictureDataUrl">
               <source type="image/webp" [srcset]="getStaticImageUrl('/general/no_profile_picture.webp')">
@@ -44,10 +54,12 @@
       </div>
 
       <div class="form-group row">
-        <label for="label-target-user-bio" class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_BIO' | translate }}</label>
+        <label for="label-target-user-bio" class="col-lg-4 col-md-4 col-sm-4">
+          {{ 'I18N_PREFERENCES_BIO' | translate }}
+        </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <textarea id="label-target-user-bio"
-                    class="oppia-bio-border protractor-test-user-bio oppia-autofocus"
+                    class="oppia-bio-border e2e-test-user-bio oppia-autofocus"
                     [(ngModel)]="userBio"
                     [attr.value]="userBio"
                     (blur)="saveUserBio(userBio)"
@@ -55,19 +67,25 @@
                     rows="5"
                     maxlength="2000">
           </textarea>
-          <span class="form-text oppia-form-text">{{ 'I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate }}</span>
+          <span class="form-text oppia-form-text">
+            {{ 'I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate }}
+          </span>
         </div>
       </div>
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}</label>
+      <label class="col-lg-4 col-md-4 col-sm-4">
+        {{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}
+      </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <div class="checkbox oppia-checkbox">
           <label>
-            <input type="radio" [(ngModel)]="defaultDashboard" value="{{ DASHBOARD_TYPE_CREATOR }}" (change)="saveDefaultDashboard(defaultDashboard)" class="protractor-test-creator-dashboard-radio"
+            <input type="radio" [(ngModel)]="defaultDashboard" value="{{ DASHBOARD_TYPE_CREATOR }}" (change)="saveDefaultDashboard(defaultDashboard)" class="e2e-test-creator-dashboard-radio"
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}">
-            <span> {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}</span>
+            <span>
+              {{ 'I18N_TOPNAV_CREATOR_DASHBOARD' | translate }}
+            </span>
           </label>
         </div>
         <div class="checkbox oppia-checkbox">
@@ -76,17 +94,23 @@
                    [(ngModel)]="defaultDashboard"
                    value="{{ DASHBOARD_TYPE_LEARNER }}"
                    (change)="saveDefaultDashboard(defaultDashboard)"
-                   class="protractor-test-learner-dashboard-radio"
+                   class="e2e-test-learner-dashboard-radio"
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
-            <span> {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}</span>
+            <span>
+              {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}
+            </span>
           </label>
         </div>
-        <span class="form-text oppia-form-text">{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD_EXPLAIN' | translate }}</span>
+        <span class="form-text oppia-form-text">
+          {{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD_EXPLAIN' | translate }}
+        </span>
       </div>
     </div>
 
     <div class="form-group row">
-      <label for="label-target-interests-dropdown" class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}</label>
+      <label for="label-target-interests-dropdown" class="col-lg-4 col-md-4 col-sm-4">
+        {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
+      </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <div *ngIf="hasPageLoaded">
           <oppia-subject-interests [subjectInterests]="subjectInterests"
@@ -100,29 +124,37 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_SUBSCRIBED_CREATORS' | translate }}</label>
+      <label class="col-lg-4 col-md-4 col-sm-4">
+        {{ 'I18N_PREFERENCES_SUBSCRIBED_CREATORS' | translate }}
+      </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <span *ngIf="subscriptionList?.length === 0" class="form-text oppia-form-text">{{ 'I18N_PREFERENCES_NO_SUBSCRIPTIONS' | translate }}</span>
+        <span *ngIf="subscriptionList?.length === 0" class="form-text oppia-form-text">
+          {{ 'I18N_PREFERENCES_NO_SUBSCRIPTIONS' | translate }}
+        </span>
         <mat-grid-list *ngIf="subscriptionList?.length > 0" cols="2" rowHeight="100px">
           <mat-grid-tile *ngFor="let subscription of subscriptionList">
             <mat-card class="oppia-subscription-card oppia-subscription-list-container">
               <a class="oppia-subscription-profile-link"
                  href="/profile/{{ subscription.creator_username }}"
-                 [routerLink]="'/profile/' + subscription.creator_username"
+                 [smartRouterLink]="'/profile/' + subscription.creator_username"
                  rel="noopener"
                  target="_blank">
                 <img [src]="subscription.creator_picture_data_url" class="oppia-subscription-card-profile-picture rounded-circle">
                 <span class="oppia-subscription-card-summary">
                   <div class="oppia-subscription-card-summary-text-container">
-                    <strong class="protractor-test-subscription-name"
+                    <strong class="e2e-test-subscription-name"
                             [ngbPopover]="subscription.creator_username"
                             [triggers]="showUsernamePopover(subscription.creator_username)">
                       {{ subscription.creator_username| truncate:10 }}
                     </strong>
                   </div>
                   <div class="oppia-impact-text">
-                    <span>Impact</span>
-                    <span> {{ subscription.creator_impact || 0 }}</span>
+                    <span>
+                      {{ 'I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING' | translate }}
+                    </span>
+                    <span>
+                      {{ subscription.creator_impact || 0 }}
+                    </span>
                   </div>
                 </span>
               </a>
@@ -133,7 +165,9 @@
     </div>
 
     <div class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}</label>
+      <label class="col-lg-4 col-md-4 col-sm-4">
+        {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
+      </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
          <!--
           If the *ngIf is omitted, the select2-dropdown directive won't be
@@ -162,7 +196,7 @@
         -->
         <div *ngIf="hasPageLoaded">
           <oppia-preferred-language-selector [choices]="SITE_LANGUAGE_CHOICES"
-                                             entity="site"
+                                             entity="{{ 'I18N_PREFERENCES_SITE_LANGUAGE_LABEL' | translate }}"
                                              [preferredLanguageCode]="preferredSiteLanguageCode"
                                              (preferredLanguageCodeChange)="savePreferredSiteLanguageCodes($event)">
           </oppia-preferred-language-selector>
@@ -184,7 +218,7 @@
         -->
         <div *ngIf="hasPageLoaded">
           <oppia-preferred-language-selector [choices]="AUDIO_LANGUAGE_CHOICES"
-                                             entity="audio"
+                                             entity="{{ 'I18N_PREFERENCES_AUDIO_LANGUAGE_LABEL' | translate }}"
                                              [preferredLanguageCode]="preferredAudioLanguageCode"
                                              (preferredLanguageCodeChange)="savePreferredAudioLanguageCode($event)">
           </oppia-preferred-language-selector>
@@ -196,10 +230,14 @@
     </div>
     <hr>
     <div role="form" class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_EMAIL' | translate }}</label>
+      <label class="col-lg-4 col-md-4 col-sm-4">
+        {{ 'I18N_PREFERENCES_EMAIL' | translate }}
+      </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         {{ email }}
-        <span class="help-block oppia-form-text">{{ 'I18N_PREFERENCES_EMAIL_EXPLAIN' | translate }}</span>
+        <span class="help-block oppia-form-text">
+          {{ 'I18N_PREFERENCES_EMAIL_EXPLAIN' | translate }}
+        </span>
         <div>
           <i>
             <span class="help-block oppia-form-text">
@@ -216,13 +254,17 @@
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-email-updates-checkbox"
+                   class="e2e-test-email-updates-checkbox"
                    [(ngModel)]="canReceiveEmailUpdates"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
-            <span> {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_NEWS' | translate }}</span>
+            <span>
+              {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_NEWS' | translate }}
+            </span>
           </label>
           <div class="alert alert-warning" *ngIf="showEmailSignupLink">
-            <span class="help-block oppia-form-text">{{ 'I18N_PREFERENCES_EMAIL_SIGNUP_TEXT' | translate }}</span>
+            <span class="help-block oppia-form-text">
+              {{ 'I18N_PREFERENCES_EMAIL_SIGNUP_TEXT' | translate }}
+            </span>
             <a class="help-block oppia-form-text"
                [href]="emailSignupLink"
                target="_blank"
@@ -234,28 +276,34 @@
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-editor-role-email-checkbox"
+                   class="e2e-test-editor-role-email-checkbox"
                    [(ngModel)]="canReceiveEditorRoleEmail"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
-            <span> {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS' | translate }}</span>
+            <span>
+              {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS' | translate }}
+            </span>
           </label>
         </div>
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-subscription-email-checkbox"
+                   class="e2e-test-subscription-email-checkbox"
                    [(ngModel)]="canReceiveSubscriptionEmail"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
-            <span> {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS' | translate }}</span>
+            <span>
+              {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS' | translate }}
+            </span>
           </label>
         </div>
         <div class="checkbox">
           <label>
             <input type="checkbox"
-                   class="protractor-test-feedback-message-email-checkbox"
+                   class="e2e-test-feedback-message-email-checkbox"
                    [(ngModel)]="canReceiveFeedbackMessageEmail"
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
-            <span> {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS' | translate }}</span>
+            <span>
+              {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS' | translate }}
+            </span>
           </label>
         </div>
       </div>
@@ -264,10 +312,12 @@
     <hr>
 
     <div role="form" class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}</label>
+      <label class="col-lg-4 col-md-4 col-sm-4">
+        {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
+      </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
-          <button type="button" class="btn btn-danger protractor-test-delete-account-button">
+        <a href="/delete-account" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
+          <button type="button" class="btn btn-danger e2e-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>
         </a>
@@ -280,87 +330,28 @@
     <hr>
 
     <div role="form" class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">Export Account</label>
+      <label class="col-lg-4 col-md-4 col-sm-4 text-capitalize">
+        {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
+      </label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
         <a href="/export-account-handler">
           <button type="button"
-                  class="btn btn-primary protractor-test-export-account-button"
+                  class="btn btn-primary e2e-test-export-account-button"
                   title="Export account"
                   (click)="handleExportDataClick()">
-            Export account
+                  {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
           </button>
         </a>
-        <span class="form-text oppia-form-text">This will download your Oppia account data as a JSON formatted text file.</span>
+        <span class="form-text oppia-form-text">
+          {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate }}
+        </span>
       </div>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="exportingData">
-        <span class="form-text oppia-form-text">Please do not leave this page. Your data is currently being loaded and will be downloaded as a
-            JSON formatted text file upon completion. If something goes wrong, please contact <a href="mailto:support@oppia.org">support@oppia.org</a>.
+        <span class="form-text oppia-form-text">
+          {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT' | translate }} <a href="mailto:support@oppia.org">support@oppia.org</a>.
         </span>
       </div>
     </div>
 
   </mat-card>
 </div>
-<style>
-  .oppia-dashboard-container .checkbox label {
-    font-weight: normal;
-  }
-  .oppia-preferences-page-heading {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 3em;
-    margin-bottom: 10px;
-    margin-top: 0;
-    padding-top: 45px;
-    position: relative;
-    text-align: center;
-  }
-
-  .oppia-preferences-page-heading-subtext {
-    color: #01645c;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    font-size: 1.2em;
-    position: relative;
-    text-align: center;
-  }
-
-  .oppia-bio-border {
-    border-color: rgb(156,156,156);
-    border-radius: 4px;
-    border-width: 0.01em;
-  }
-
-  .oppia-profile-picture-container {
-    height: 150px;
-    width: 150px;
-  }
-
-  .oppia-editor-edit-icon-pos {
-    right: 8px;
-    top: 8px;
-  }
-
-  .oppia-checkbox {
-    padding-top: 0;
-  }
-
-  .oppia-subscription-card.mat-card {
-    padding: 0;
-  }
-
-  .oppia-subscription-list-container {
-    margin: 0 8px 0 0;
-  }
-
-  .oppia-subscription-card-summary-text-container {
-    font-size: 17.5px;
-    margin-bottom: 5px;
-  }
-
-  .oppia-impact-text {
-    font-size: 14.5px;
-  }
-  .oppia-form-text {
-    font-size: smaller;
-  }
-</style>

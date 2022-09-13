@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT])
 
 REPORT_JSON = {
     'platform_type': 'android',
@@ -86,7 +86,7 @@ ANDROID_APP_VERSION_CODE_STRING = str('2') # pylint: disable=disallowed-function
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(IncomingAndroidFeedbackReportHandlerTests, self).setUp()
+        super().setUp()
         self.payload = {
             'report': REPORT_JSON
         }

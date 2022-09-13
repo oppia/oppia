@@ -45,7 +45,8 @@ import {
 } from './base-content.component';
 
 // Miscellaneous.
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 @NgModule({
   imports: [
@@ -53,9 +54,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
     SharedPipesModule,
   ],
 
@@ -67,6 +68,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     PromoBarComponent,
     SideNavigationBarComponent,
@@ -80,6 +82,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BaseContentComponent,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     PromoBarComponent,
     SideNavigationBarComponent,
@@ -103,6 +106,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     SideNavigationBarComponent,
     SocialButtonsComponent,

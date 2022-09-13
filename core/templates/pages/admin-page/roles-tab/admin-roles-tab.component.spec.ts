@@ -22,7 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
-import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, AdminPageData, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminRolesTabComponent} from './admin-roles-tab.component';
@@ -120,12 +120,6 @@ describe('Admin roles tab component ', function() {
     spyOn(adminDataService, 'getDataAsync').and.returnValue(
       Promise.resolve(adminPageData));
 
-    // Prechecks.
-    expect(component.UPDATABLE_ROLES).toEqual(null);
-    expect(component.roleToActions).toEqual(null);
-    expect(component.VIEWABLE_ROLES).toEqual(null);
-    expect(component.topicSummaries).toEqual(null);
-
     component.ngOnInit();
     tick();
     fixture.detectChanges();
@@ -144,21 +138,25 @@ describe('Admin roles tab component ', function() {
     component.clearEditor();
 
     expect(component.userRoles).toEqual([]);
-    expect(component.roleCurrentlyBeingUpdatedInBackend).toEqual(null);
+    expect(component.roleCurrentlyBeingUpdatedInBackend).toBeNull();
     expect(component.userIsBanned).toEqual(false);
   });
 
   describe('on startEditing', function() {
+    let successPromise: Promise<UserRolesBackendResponse>;
+
     beforeEach(function() {
-      spyOn(adminBackendApiService, 'viewUsersRoleAsync')
-        .and.returnValue(Promise.resolve({
-          roles: ['TOPIC_MANAGER'],
-          managed_topic_ids: ['topic_id_1'],
-          banned: false
-        }));
+      successPromise = Promise.resolve({
+        roles: ['TOPIC_MANAGER'],
+        managed_topic_ids: ['topic_id_1'],
+        banned: false
+      });
     });
 
     it('should enable roleIsCurrentlyBeingEdited', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync').and.returnValue(
+        successPromise
+      );
       expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
       component.startEditing();
@@ -168,6 +166,10 @@ describe('Admin roles tab component ', function() {
     }));
 
     it('should fetch user roles and intialize properties', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync').and.returnValue(
+        successPromise
+      );
+
       // Prechecks.
       expect(component.rolesFetched).toBeFalse();
       expect(component.userRoles).toEqual([]);
@@ -181,6 +183,22 @@ describe('Admin roles tab component ', function() {
       expect(component.userRoles).toEqual(['TOPIC_MANAGER']);
       expect(component.managedTopicIds).toEqual(['topic_id_1']);
       expect(component.userIsBanned).toBeFalse();
+    }));
+
+    it('should set status when viewUsersRoleAsync fails', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync').and.returnValue(
+        Promise.reject('Error')
+      );
+      spyOn(component.setStatusMessage, 'emit');
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
+
+      component.startEditing();
+      tick();
+
+      // As the promise is rejected with error, we do not expect it to be marked
+      // as being edited and the status message is shown with the error.
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith('Error');
     }));
   });
 
@@ -307,25 +325,25 @@ describe('Admin roles tab component ', function() {
   });
 
   describe('on calling openTopicManagerRoleEditor', function() {
-    let modalSpy = null;
     let ngbModal: NgbModal;
 
     class MockNgbModalRef {
-      componentInstance: {};
+      componentInstance!: {};
     }
 
     beforeEach(function() {
       ngbModal = TestBed.inject(NgbModal);
       component.topicSummaries = [sampleTopicSummary];
-      modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+    });
+
+    it('should open the TopicManagerRoleEditorModal', fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(['topic_id_1'])
         }) as NgbModalRef;
       });
-    });
 
-    it('should open the TopicManagerRoleEditorModal', fakeAsync(() => {
       component.userRoles = ['MODERATOR'];
       component.managedTopicIds = [];
 
@@ -340,6 +358,13 @@ describe('Admin roles tab component ', function() {
 
     it('should not readd topic manager role if user is already a manager',
       fakeAsync(() => {
+        let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+          return ({
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve(['topic_id_1'])
+          }) as NgbModalRef;
+        });
+
         component.userRoles = ['MODERATOR', 'TOPIC_MANAGER'];
         component.managedTopicIds = [];
 

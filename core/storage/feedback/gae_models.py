@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import python_utils
 from core import utils
 # TODO(#13594): After the domain layer is refactored to be independent of
 # the storage layer, the disable=invalid-import will
@@ -33,24 +32,25 @@ from core import utils
 from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
+from typing_extensions import Final, Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
 # Allowed feedback thread statuses.
-STATUS_CHOICES_OPEN = 'open'
-STATUS_CHOICES_FIXED = 'fixed'
-STATUS_CHOICES_IGNORED = 'ignored'
-STATUS_CHOICES_COMPLIMENT = 'compliment'
-STATUS_CHOICES_NOT_ACTIONABLE = 'not_actionable'
-STATUS_CHOICES = [
+STATUS_CHOICES_OPEN: Final = 'open'
+STATUS_CHOICES_FIXED: Final = 'fixed'
+STATUS_CHOICES_IGNORED: Final = 'ignored'
+STATUS_CHOICES_COMPLIMENT: Final = 'compliment'
+STATUS_CHOICES_NOT_ACTIONABLE: Final = 'not_actionable'
+STATUS_CHOICES: Final = [
     STATUS_CHOICES_OPEN,
     STATUS_CHOICES_FIXED,
     STATUS_CHOICES_IGNORED,
@@ -59,8 +59,8 @@ STATUS_CHOICES = [
 ]
 
 # Constants used for generating new ids.
-_MAX_RETRIES = 10
-_RAND_RANGE = 127 * 127
+_MAX_RETRIES: Final = 10
+_RAND_RANGE: Final = 127 * 127
 
 
 class GeneralFeedbackThreadModel(base_models.BaseModel):
@@ -71,7 +71,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     """
 
     # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     # The type of entity the thread is linked to.
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
@@ -283,7 +283,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     """
 
     # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = datastore_services.StringProperty(required=True, indexed=True)
@@ -353,8 +353,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, bool, None]]]:
         """Exports the data from GeneralFeedbackMessageModel
         into dict format for Takeout.
@@ -440,7 +440,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def create_multi(
         cls,
         message_identifiers: List[
-            feedback_domain.FullyQualifiedMessageIdentifier]
+            feedback_domain.FullyQualifiedMessageIdentifier
+        ]
     ) -> List[GeneralFeedbackMessageModel]:
         """Creates a new GeneralFeedbackMessageModel entry for each
         (thread_id, message_id) pair.
@@ -470,7 +471,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         # Generate the new ids.
         instance_ids = [
             cls._generate_id(thread_id, message_id) for thread_id, message_id
-            in python_utils.ZIP(thread_ids, message_ids)
+            in zip(thread_ids, message_ids)
         ]
 
         # Check if the new ids are valid.
@@ -489,6 +490,30 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get().
+    @overload # type: ignore[override]
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int
+    ) -> GeneralFeedbackMessageModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int, *, strict: Literal[True]
+    ) -> GeneralFeedbackMessageModel: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int, *, strict: Literal[False]
+    ) -> Optional[GeneralFeedbackMessageModel]: ...
+
+    @overload
+    @classmethod
+    def get(
+        cls, thread_id: str, message_id: int, *, strict: bool = ...
+    ) -> Optional[GeneralFeedbackMessageModel]: ...
+
     @classmethod
     def get( # type: ignore[override]
         cls, thread_id: str, message_id: int, strict: bool = True
@@ -553,8 +578,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
         thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
         message = cls.get(thread_id, thread.message_count - 1)
-        # Ruling out the possibility of None for mypy type checking.
-        assert message is not None
         return message
 
     @classmethod
@@ -572,7 +595,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_message_counts(
-            cls, thread_ids: List[str]
+        cls, thread_ids: List[str]
     ) -> List[int]:
         """Returns a list containing the number of messages in the threads.
         Includes the deleted entries.
@@ -864,10 +887,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: id field but it isn't
-        deleted because it is needed for auditing purposes.
-        """
-        return base_models.DELETION_POLICY.KEEP
+        """Model contains data corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
@@ -883,6 +904,15 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'retries': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instance of UnsentFeedbackEmailModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:

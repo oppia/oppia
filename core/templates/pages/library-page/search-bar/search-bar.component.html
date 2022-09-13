@@ -1,18 +1,18 @@
 <div class="oppia-same-row-container">
-  <form class="navbar-form float-left oppia-search-bar-form" role="search">
+  <form class="navbar-form search-bar-float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': classroomPageIsActive}">
+      <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
         <div class="input-group-addon oppia-search-bar-icon">
-          <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
+          <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
           <span *ngIf="isSearchInProgress()">
-            <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+            <i class="fas fa-sync material-icons md-18 oppia-animate-spin"></i>
           </span>
         </div>
         <input type="text"
-               class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
+               class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                [placeholder]="searchBarPlaceholder"
                [(ngModel)]="searchQuery"
-               (ngModelChange)="classroomPageIsActive ? null : onSearchQueryChangeExec()"
+               (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
                [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
                aria-label="Search bar"
                (keydown.enter)="$event.target.blur()"
@@ -23,34 +23,37 @@
 </div>
 
 <div class="oppia-same-row-container">
-  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector dropdown" autoClose="outside">
+  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-navbar-button-container oppia-search-bar-category-selector e2e-test-search-bar-category-selector dropdown" autoClose="outside">
     <button ngbDropdownToggle
             (click)="openSubmenu($event, 'category')"
             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
-            class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{ selectionDetails.categories.description | translate }}">
-      {{categoryButtonText|truncate:14}}
+      <i *ngIf="isMobileViewActive()" class="fas fa-shapes material-icons md-18 category-selector-icon"></i>
+      <span class="btn-text">
+        {{ categoryButtonText | truncate:14 }}
+      </span>
     </button>
     <ul ngbDropdownMenu
-        class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+        class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
       <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
         <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)"
              *ngIf="last"
              (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -61,340 +64,87 @@
       <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
         <li ngbDropdownItem *ngIf="!selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
     </ul>
   </div>
 </div>
-<div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
-  <button ngbDropdownToggle
-          (click)="openSubmenu($event, 'language')"
-          (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-          type="button"
-          class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
-          title="{{selectionDetails.languageCodes.description | translate}}">
-    {{ languageButtonText | truncate:14 }}
-  </button>
-  <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
-      role="menu">
-    <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; trackBy: index">
-      <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
-        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
-          <span class="protractor-test-selected">{{ item.text | translate }}</span>
-          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-          <span class="protractor-test-selected">{{ item.text | translate }}</span>
-          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
-           class="dropdown-item">
-          <span class="protractor-test-selected">{{ item.text | translate }}</span>
-          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-      </li>
-    </ng-container>
-    <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.numSelections > 1">
-      <a (click)="deselectAll('languageCodes')" class="dropdown-item"><i>Deselect All</i></a>
-    </li>
-    <hr *ngIf="selectionDetails.languageCodes.numSelections > 0" class="oppia-search-bar-hr">
-    <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList trackBy: index">
-      <li ngbDropdownItem *ngIf="!selectionDetails.languageCodes.selections[item.id]">
-        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
-          <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-          <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-        <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
-           class="dropdown-item">
-          <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-          <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
-        </a>
-      </li>
-    </ng-container>
-  </ul>
-</div>
+
 <div class="oppia-same-row-container">
-  <div class="float-left oppia-navbar-button-container">
-    <div *ngIf="classroomPageIsActive"
-         class="oppia-search-button protractor-test-search-button"
-         (click)="onSearchQueryChangeExec()"
-         title="Click here to search">
-         Go!
+  <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="search-bar-float-left oppia-navbar-button-container oppia-search-bar-language-selector e2e-test-search-bar-language-selector dropdown" autoClose="outside">
+    <button ngbDropdownToggle
+            (click)="openSubmenu($event, 'language')"
+            (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+            type="button"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
+            title="{{selectionDetails.languageCodes.description | translate}}">
+      <i *ngIf="isMobileViewActive()" class="fas fa-globe material-icons md-18 language-selector-icon"></i>
+      <span class="btn-text">
+        {{ languageButtonText | truncate:14 }}
+      </span>
+    </button>
+    <ul ngbDropdownMenu class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+        role="menu">
+      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; trackBy: index">
+        <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
+          <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
+          </a>
+          <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
+          </a>
+          <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
+          </a>
+        </li>
+      </ng-container>
+      <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.numSelections > 1">
+        <a (click)="deselectAll('languageCodes')" class="dropdown-item"><i>Deselect All</i></a>
+      </li>
+      <hr *ngIf="selectionDetails.languageCodes.numSelections > 0" class="oppia-search-bar-hr">
+      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList trackBy: index">
+        <li ngbDropdownItem *ngIf="!selectionDetails.languageCodes.selections[item.id]">
+          <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
+          </a>
+          <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
+          </a>
+          <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
+             class="dropdown-item">
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
+          </a>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+  <div class="oppia-same-row-container">
+    <div class="search-bar-float-left oppia-navbar-button-container">
+      <div *ngIf="searchButtonIsActive"
+           class="oppia-search-button e2e-test-search-button"
+           (click)="onSearchQueryChangeExec()"
+           title="Click here to search">
+        <i class="fas fa-search material-icons md-18 search-button-icon"></i>
+      </div>
     </div>
   </div>
 </div>
-<style>
-  .dropup .dropdown-menu,
-  .navbar-fixed-bottom .dropdown .dropdown-menu {
-    bottom: auto;
-  }
-  .oppia-search-bar-input,
-  .oppia-search-button {
-    background: #fff;
-    border-color: #257D76;
-    border-radius: 0;
-    border-style: solid;
-    border-width: 1px 1px 1px 0;
-    color: #257D76;
-    font-size: 15px;
-    height: 35px;
-  }
-
-  .oppia-search-button {
-    background: #257D76;
-    border-bottom-right-radius: 4px;
-    border-top-right-radius: 4px;
-    color: #fff;
-    padding: 6px 15px 0 15px;
-  }
-
-  .oppia-search-button:hover {
-    cursor: pointer;
-  }
-
-  .oppia-search-bar-form {
-    margin-top: 10px;
-    padding-right: 0;
-  }
-  .oppia-search-bar-input.btn {
-    color: #257D76;
-  }
-  .oppia-search-bar-icon {
-    background: #fff;
-    border-color: #257D76;
-    border-style: solid;
-    border-width: 1px 0 1px 1px;
-    color: #257D76;
-  }
-  .oppia-search-bar-input.btn:hover,
-  .oppia-search-bar-input.btn:focus {
-    color: #257D76;
-  }
-
-  .oppia-search-bar-input.btn:focus {
-    outline: 1px dotted #fff;
-    outline: auto 5px -webkit-focus-ring-color;
-  }
-
-  .oppia-search-bar-input::-webkit-input-placeholder {
-    color: #257D76;
-  }
-  .oppia-search-bar-input::-moz-placeholder {
-    color: #257D76;
-  }
-  .oppia-search-bar-input:-moz-placeholder {
-    color: #257D76;
-  }
-  .oppia-search-bar-input:-ms-input-placeholder {
-    color: #257D76;
-  }
-  .oppia-input-group {
-    max-width: 375px;
-    width: 17em;
-  }
-  .oppia-search-bar-dropdown-toggle {
-    border-radius: 0;
-    max-width: 150px;
-  }
-  .oppia-search-bar-dropdown-menu-section {
-    max-height: 400px;
-    overflow: auto;
-  }
-  .oppia-search-bar-hr {
-    margin: 2px;
-  }
-  .oppia-search-bar-dropdown-toggle-button {
-    border-radius: 0;
-    max-width: 150px;
-  }
-
-  .oppia-input-group.classroom-page-input-group {
-    width: 20em;
-  }
-
-  @media (max-width: 1125px) {
-    .oppia-search-bar-input {
-      color: #257D76;
-    }
-    .oppia-search-bar-input::-webkit-input-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-input::-moz-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-input:-moz-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-input:-ms-input-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-icon {
-      color: #257D76;
-    }
-    .oppia-search-bar-input.btn {
-      color: #257D76;
-    }
-    .oppia-search-bar-input.btn:hover,
-    .oppia-search-bar-input.btn:focus {
-      color: #257D76;
-    }
-    .oppia-search-bar-input:focus {
-      color: #257D76;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .oppia-search-bar-input {
-      color: #257D76;
-      padding-top: 17px;
-    }
-    .oppia-search-button,
-    .oppia-search-bar-input {
-      border-radius: 0;
-      height: 45px;
-    }
-    .oppia-search-button {
-      border-bottom-right-radius: 4px;
-      border-top-right-radius: 4px;
-      padding-top: 12px;
-    }
-    .oppia-search-bar-input::-webkit-input-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-input::-moz-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-input:-moz-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-input:-ms-input-placeholder {
-      color: #257D76;
-    }
-    .oppia-search-bar-icon {
-      color: #257D76;
-    }
-    .oppia-search-bar-input.btn {
-      border-left: 1px solid #257D76;
-      color: #257D76;
-      margin-left: 10px;
-      margin-top: -64px;
-      text-align: left;
-      width: 137px;
-    }
-    .oppia-search-bar-input.btn:hover,
-    .oppia-search-bar-input.btn:focus {
-      color: #257D76;
-    }
-    .protractor-test-search-bar-dropdown-menu {
-      margin-top: -25px;
-    }
-    .oppia-same-row-container {
-      display: inline-block;
-    }
-    .oppia-search-bar-category-selector {
-      margin-top: 95px;
-      right: 9px;
-      transform: translate(-321px, 1px);
-      width: 0;
-      z-index: 101;
-    }
-
-    .oppia-search-bar-language-selector {
-      margin-top: 95px;
-      transform: translate(-194px, 1px);
-      width: 0;
-      z-index: 101;
-    }
-
-    .oppia-dropdown-label {
-      color: #257D76;
-      display: block;
-      font-size: 10px;
-      font-weight: 300;
-      left: 23px;
-      opacity: 0.95;
-      position: absolute;
-      top: -35px;
-    }
-
-    .oppia-search-bar-text-input {
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-      height: 45px;
-      padding-top: 8px;
-    }
-
-    .oppia-search-bar-category-input {
-      border-bottom-left-radius: 4px;
-    }
-
-    .oppia-search-bar-language-input {
-      border-bottom-right-radius: 4px;
-    }
-
-    .oppia-translate-icon-down {
-      transform: translate(0,6px);
-    }
-  }
-
-  .oppia-search-bar-input:focus {
-    border-color: #66afe9;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
-    outline: 0;
-  }
-
-  @media (max-width: 629px) {
-    .oppia-search-bar-category-selector {
-      position: relative;
-    }
-  }
-
-  /* This rule targets only Firefox browsers. */
-  @-moz-document url-prefix() {
-    .oppia-search-bar-category-selection-symbol {
-      margin-top: -18px;
-      padding-top: 16px;
-    }
-  }
-
-  @media (max-width: 500px) {
-    .oppia-input-group.classroom-page-input-group {
-      width: 17em;
-    }
-    .oppia-search-bar-category-selector {
-      margin-top: 95px;
-      position: relative;
-      transform: translate(-273px);
-      width: 0;
-    }
-    .oppia-search-bar-language-selector {
-      transform: translate(-147px);
-    }
-    .oppia-search-bar-input.btn {
-      width: 137px;
-    }
-  }
-
-  @media (max-width: 378px) {
-    .oppia-search-bar-form {
-      padding-left: 0;
-    }
-  }
-</style>

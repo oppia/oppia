@@ -26,10 +26,18 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+from typing import List, Optional, Type
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import suggestion_models
+
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
-def _get_voiceover_application_class(target_type):
+def _get_voiceover_application_class(
+    target_type: str
+) -> Type[suggestion_registry.ExplorationVoiceoverApplication]:
     """Returns the voiceover application class for a given target type.
 
     Args:
@@ -50,7 +58,9 @@ def _get_voiceover_application_class(target_type):
             'Invalid target type for voiceover application: %s' % target_type)
 
 
-def _get_voiceover_application_model(voiceover_application):
+def _get_voiceover_application_model(
+    voiceover_application: suggestion_registry.ExplorationVoiceoverApplication
+) -> suggestion_models.GeneralVoiceoverApplicationModel:
     """Returns the GeneralVoiceoverApplicationModel object for the give
     voiceover application object.
 
@@ -75,7 +85,11 @@ def _get_voiceover_application_model(voiceover_application):
         rejection_message=voiceover_application.rejection_message)
 
 
-def _get_voiceover_application_from_model(voiceover_application_model):
+def _get_voiceover_application_from_model(
+    voiceover_application_model: (
+        suggestion_models.GeneralVoiceoverApplicationModel
+    )
+) -> suggestion_registry.ExplorationVoiceoverApplication:
     """Returns the BaseVoiceoverApplication object for the give
     voiceover application model object.
 
@@ -101,7 +115,11 @@ def _get_voiceover_application_from_model(voiceover_application_model):
         voiceover_application_model.rejection_message)
 
 
-def _save_voiceover_applications(voiceover_applications):
+def _save_voiceover_applications(
+    voiceover_applications: List[
+        suggestion_registry.ExplorationVoiceoverApplication
+    ]
+) -> None:
     """Saves a list of given voiceover application object in datastore.
 
     Args:
@@ -121,7 +139,9 @@ def _save_voiceover_applications(voiceover_applications):
         voiceover_application_models)
 
 
-def get_voiceover_application_by_id(voiceover_application_id):
+def get_voiceover_application_by_id(
+    voiceover_application_id: str
+) -> suggestion_registry.ExplorationVoiceoverApplication:
     """Returns voiceover application model corresponding to give id.
 
     Args:
@@ -137,7 +157,9 @@ def get_voiceover_application_by_id(voiceover_application_id):
     return _get_voiceover_application_from_model(voiceover_application_model)
 
 
-def get_reviewable_voiceover_applications(user_id):
+def get_reviewable_voiceover_applications(
+    user_id: str
+) -> List[suggestion_registry.ExplorationVoiceoverApplication]:
     """Returns a list of voiceover applications which the given user can review.
 
     Args:
@@ -156,7 +178,9 @@ def get_reviewable_voiceover_applications(user_id):
             voiceover_application_models)]
 
 
-def get_user_submitted_voiceover_applications(user_id, status=None):
+def get_user_submitted_voiceover_applications(
+    user_id: str, status: Optional[str] = None
+) -> List[suggestion_registry.ExplorationVoiceoverApplication]:
     """Returns a list of voiceover application submitted by the given user which
     are currently in the given status.
 
@@ -177,13 +201,19 @@ def get_user_submitted_voiceover_applications(user_id, status=None):
             voiceover_application_models)]
 
 
-def accept_voiceover_application(voiceover_application_id, reviewer_id):
+def accept_voiceover_application(
+    voiceover_application_id: str, reviewer_id: str
+) -> None:
     """Accept the voiceover application of given voiceover application id.
 
     Args:
         voiceover_application_id: str. The id of the voiceover application which
             need to be accepted.
         reviewer_id: str. The user ID of the reviewer.
+
+    Raises:
+        Exception. Reviewer ID is same as the author ID.
+        Exception. No exploration summary exists for the given target_id.
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)
@@ -208,9 +238,17 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids([
                 voiceover_application.target_id]))
+        exploration_opportunity_summary = opportunities[
+            voiceover_application.target_id
+        ]
+        if exploration_opportunity_summary is None:
+            raise Exception(
+                'No exploration summary exists for the given '
+                'voiceover_application\'s target_id.'
+            )
         email_manager.send_accepted_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[voiceover_application.target_id].chapter_title,
+            exploration_opportunity_summary.chapter_title,
             voiceover_application.language_code)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
@@ -234,7 +272,10 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
 
 
 def reject_voiceover_application(
-        voiceover_application_id, reviewer_id, rejection_message):
+    voiceover_application_id: str,
+    reviewer_id: str,
+    rejection_message: str
+) -> None:
     """Rejects the voiceover application of given voiceover application id.
 
     Args:
@@ -243,6 +284,10 @@ def reject_voiceover_application(
         reviewer_id: str. The user ID of the reviewer.
         rejection_message: str. The plain text message submitted by the
             reviewer while rejecting the application.
+
+    Raises:
+        Exception. Reviewer ID is same as the author ID.
+        Exception. No exploration summary exists for the given target_id.
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)
@@ -260,16 +305,30 @@ def reject_voiceover_application(
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids([
                 voiceover_application.target_id]))
+        exploration_opportunity_summary = opportunities[
+            voiceover_application.target_id
+        ]
+        if exploration_opportunity_summary is None:
+            raise Exception(
+                'No exploration summary exists for the given '
+                'voiceover_application\'s target_id.'
+            )
         email_manager.send_rejected_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[voiceover_application.target_id].chapter_title,
+            exploration_opportunity_summary.chapter_title,
             voiceover_application.language_code, rejection_message)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
 
 
 def create_new_voiceover_application(
-        target_type, target_id, language_code, content, filename, author_id):
+    target_type: str,
+    target_id: str,
+    language_code: str,
+    content: str,
+    filename: str,
+    author_id: str
+) -> None:
     """Creates a new voiceover application withe the given data.
 
     Args:
@@ -293,7 +352,10 @@ def create_new_voiceover_application(
 
 
 def get_text_to_create_voiceover_application(
-        target_type, target_id, language_code):
+    target_type: str,
+    target_id: str,
+    language_code: str
+) -> str:
     """Returns a text to voiceover for a voiceover application.
 
     Args:
@@ -303,6 +365,9 @@ def get_text_to_create_voiceover_application(
 
     Returns:
         str. The text which can be voiceover for a voiceover application.
+
+    Raises:
+        Exception. Invalid target type.
     """
     if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)

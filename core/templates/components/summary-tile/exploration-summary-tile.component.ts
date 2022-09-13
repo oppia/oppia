@@ -30,6 +30,9 @@ import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Subscription } from 'rxjs';
 import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+
+import './exploration-summary-tile.component.css';
 
 @Component({
   selector: 'oppia-exploration-summary-tile',
@@ -37,7 +40,7 @@ import { HumanReadableContributorsSummary } from 'domain/summary/creator-explora
 })
 export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() collectionId!: string;
   @Input() explorationId!: string;
@@ -76,12 +79,17 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   userIsLoggedIn: boolean = false;
   isRefresherExploration: boolean = false;
   contributors!: object;
-  // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
-  // received after component interactions is empty or does not exist.
+  // A null value for 'lastUpdatedDateTime' and 'relativeLastUpdatedDateTime'
+  // indicates that lastUpdatedMsecs received after component interactions
+  // is empty or does not exist.
   lastUpdatedDateTime: string | null = null;
+  relativeLastUpdatedDateTime: string | null = null;
   // 'avgRating' will be null if the exploration has no ratings.
   avgRating!: number | null;
   thumbnailIcon!: string;
+  mobileCardToBeShown: boolean = false;
+  expTitleTranslationKey!: string;
+  expObjectiveTranslationKey!: string;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -91,6 +99,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     private dateTimeFormatService: DateTimeFormatService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -122,21 +131,40 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     }
     this.isWindowLarge = (
       this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+    this.checkIfMobileCardToBeShown();
 
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent().
       subscribe(evt => {
         this.isWindowLarge = (
           this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+        this.checkIfMobileCardToBeShown();
       });
     this.lastUpdatedDateTime = this.getLastUpdatedDatetime();
+    this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
     this.avgRating = this.getAverageRating();
     this.thumbnailIcon = this.getCompleteThumbnailIconUrl();
+    this.expTitleTranslationKey = (
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId, TranslationKeyType.TITLE)
+    );
+    this.expObjectiveTranslationKey = (
+      this.i18nLanguageCodeService.getExplorationTranslationKey(
+        this.explorationId, TranslationKeyType.DESCRIPTION)
+    );
   }
 
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
+  }
+
+  checkIfMobileCardToBeShown(): void {
+    let currentPageUrl = this.urlService.getPathname();
+    this.mobileCardToBeShown = (
+      !this.isWindowLarge && ((
+        currentPageUrl === '/community-library') ||
+        currentPageUrl.includes('/explore')));
   }
 
   setHoverState(hoverState: boolean): void {
@@ -161,6 +189,14 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   getLastUpdatedDatetime(): string | null {
     if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+        this.lastUpdatedMsec);
+    }
+    return null;
+  }
+
+  getRelativeLastUpdatedDateTime(): string | null {
+    if (this.lastUpdatedMsec) {
+      return this.dateTimeFormatService.getRelativeTimeFromNow(
         this.lastUpdatedMsec);
     }
     return null;
@@ -216,6 +252,22 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.thumbnailIconUrl);
+  }
+
+  isHackyExpTitleTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expTitleTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isHackyExpObjectiveTranslationDisplayed(): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.expObjectiveTranslationKey
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 }
 

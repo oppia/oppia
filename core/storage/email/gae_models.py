@@ -24,14 +24,14 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -79,7 +79,10 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
-            feconf.BULK_EMAIL_INTENT_TEST
+            feconf.BULK_EMAIL_INTENT_TEST,
+            (
+                feconf
+                .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)
@@ -94,10 +97,9 @@ class SentEmailModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data corresponding to a user: recipient_id,
-        recipient_email, sender_id, and sender_email, but this isn't deleted
-        because this model is needed for auditing purposes.
+        recipient_email, sender_id, and sender_email.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
@@ -124,6 +126,19 @@ class SentEmailModel(base_models.BaseModel):
             'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'email_hash': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of SentEmailModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        keys = cls.query(datastore_services.any_of(
+            cls.recipient_id == user_id,
+            cls.sender_id == user_id,
+        )).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -172,15 +187,15 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            recipient_id: str,
-            recipient_email: str,
-            sender_id: str,
-            sender_email: str,
-            intent: str,
-            subject: str,
-            html_body: str,
-            sent_datetime: datetime.datetime
+        cls,
+        recipient_id: str,
+        recipient_email: str,
+        sender_id: str,
+        sender_email: str,
+        intent: str,
+        subject: str,
+        html_body: str,
+        sent_datetime: datetime.datetime
     ) -> None:
         """Creates a new SentEmailModel entry.
 
@@ -207,7 +222,7 @@ class SentEmailModel(base_models.BaseModel):
 
     def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
-        super(SentEmailModel, self)._pre_put_hook()
+        super()._pre_put_hook()
         self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
 
@@ -255,10 +270,10 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def _generate_hash(
-            cls,
-            recipient_id: str,
-            email_subject: str,
-            email_body: str
+        cls,
+        recipient_id: str,
+        email_subject: str,
+        email_body: str
     ) -> str:
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
@@ -279,10 +294,10 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def check_duplicate_message(
-            cls,
-            recipient_id: str,
-            email_subject: str,
-            email_body: str
+        cls,
+        recipient_id: str,
+        email_subject: str,
+        email_body: str
     ) -> bool:
         """Check for a given recipient_id, email_subject and cleaned
         email_body, whether a similar message has been sent in the last
@@ -325,10 +340,11 @@ class BulkEmailModel(base_models.BaseModel):
     This model is read-only; entries cannot be modified once created. The
     id/key of instances of this model is randomly generated string of
     length 12.
+
+    The recipient IDs are not stored in this model. But, we store all
+    bulk emails that are sent to a particular user in UserBulkEmailsModel.
     """
 
-    # The user IDs of the email recipients.
-    recipient_ids = datastore_services.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
     sender_id = datastore_services.StringProperty(required=True, indexed=True)
@@ -352,13 +368,15 @@ class BulkEmailModel(base_models.BaseModel):
     sent_datetime = (
         datastore_services.DateTimeProperty(required=True, indexed=True))
 
+    # DEPRECATED in v3.2.1. Do not use.
+    recipient_ids = datastore_services.JsonProperty(default=[], compressed=True)
+
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data corresponding to a user: recipient_ids,
-        sender_id, and sender_email, but this isn't deleted because this model
-        is needed for auditing purposes.
+        """Model contains data corresponding to a user: sender_id, and
+        sender_email.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
@@ -375,9 +393,9 @@ class BulkEmailModel(base_models.BaseModel):
         (since emails were sent to them).
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -385,11 +403,20 @@ class BulkEmailModel(base_models.BaseModel):
         })
 
     @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of BulkEmailModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        keys = cls.query(datastore_services.any_of(
+            cls.sender_id == user_id,
+        )).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether BulkEmailModel exists for user. Since recipient_ids
-        can't be indexed it also can't be checked by this method, we can allow
-        this because the deletion policy for this model is keep , thus even the
-        deleted user's id will remain here.
+        """Check whether BulkEmailModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -398,25 +425,24 @@ class BulkEmailModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None)
+            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None
+        )
 
     @classmethod
     def create(
-            cls,
-            instance_id: str,
-            recipient_ids: List[str],
-            sender_id: str,
-            sender_email: str,
-            intent: str,
-            subject: str,
-            html_body: str,
-            sent_datetime: datetime.datetime
+        cls,
+        instance_id: str,
+        sender_id: str,
+        sender_email: str,
+        intent: str,
+        subject: str,
+        html_body: str,
+        sent_datetime: datetime.datetime
     ) -> None:
         """Creates a new BulkEmailModel entry.
 
         Args:
             instance_id: str. The ID of the instance.
-            recipient_ids: list(str). The user IDs of the email recipients.
             sender_id: str. The user ID of the email sender.
             sender_email: str. The email address used to send the notification.
             intent: str. The intent string, i.e. the purpose of the email.
@@ -426,7 +452,7 @@ class BulkEmailModel(base_models.BaseModel):
                 was sent, in UTC.
         """
         email_model_instance = cls(
-            id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
+            id=instance_id, sender_id=sender_id,
             sender_email=sender_email, intent=intent, subject=subject,
             html_body=html_body, sent_datetime=sent_datetime)
         email_model_instance.update_timestamps()

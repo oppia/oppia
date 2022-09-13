@@ -6,9 +6,9 @@
     </div>
     <br>
     <p [ngClass]="{'has-error': !tmpSkillDescription.length > 0}">
-      <input type="text" aria-label="Skill Description" class="form-control protractor-test-skill-description-field" *ngIf="canEditSkillDescription()"
+      <input type="text" aria-label="Skill Description" class="form-control e2e-test-skill-description-field" *ngIf="canEditSkillDescription()"
              [(ngModel)]="tmpSkillDescription" (change)="resetErrorMsg()" (blur)="saveSkillDescription(tmpSkillDescription)"
-             maxlength="MAX_CHARS_IN_SKILL_DESCRIPTION" ng-trim="false">
+             [attr.maxlength]="MAX_CHARS_IN_SKILL_DESCRIPTION" ng-trim="false">
       <span class="oppia-input-box-subtitle">
         <i>
           Skill description should be at most {{ MAX_CHARS_IN_SKILL_DESCRIPTION }} characters.

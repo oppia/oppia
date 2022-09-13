@@ -1,44 +1,91 @@
-<oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                               [activityType]="activityTypeCollection"
-                               [activityId]="getCollectionId"
-                               [activityTitle]="getCollectionTitle"
-                               [isContainerNarrow]="isContainerNarrow"
-                               [activityActive]="collectionIsCurrentlyHoveredOver"
-                               [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
-</oppia-learner-dashboard-icons>
-<mat-card class="oppia-activity-summary-tile protractor-test-collection-card"
-         [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
-  <a [href]="getCollectionLink()" class="thumbnail">
-    <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
-      <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
-      <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
-      <h3 class="activity-title protractor-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
-    </div>
-
-    <div [ngStyle]="isPlaylistTile && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
-      <div class="objective">
-        {{ getObjective | truncateAndCapitalize: 95 }}
-        <span *ngIf="!getObjective">No objective specified.</span>
+<div *ngIf="!mobileCardToBeShown">
+  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+                                [activityType]="activityTypeCollection"
+                                [activityId]="getCollectionId"
+                                [activityTitle]="getCollectionTitle"
+                                [isContainerNarrow]="isContainerNarrow"
+                                [activityActive]="collectionIsCurrentlyHoveredOver"
+                                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+  </oppia-learner-dashboard-icons>
+  <mat-card class="oppia-activity-summary-tile e2e-test-collection-card"
+          [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
+    <a [href]="getCollectionLink()" class="thumbnail">
+      <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
+        <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
+        <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+        <h3 class="activity-title e2e-test-collection-summary-tile-title">
+          {{ getCollectionTitle || defaultEmptyTitle }}
+        </h3>
       </div>
-      <ul class="metrics layout-align-space-between-center layout-row">
-        <li>
-          <span>
-            COLLECTION ({{ getNodeCount }})
-          </span>
-        </li>
-        <li>
-          <span>
-            <span class="oppia-icon-accessibility-label">Last Updated</span>
-            {{ getLastUpdatedDatetime() }}
-          </span>
-        </li>
-      </ul>
-    </div>
-    <div *ngIf="!isPlaylistTile" class="title-section-mask"
-         (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
-    </div>
-  </a>
-</mat-card>
+
+      <div [ngStyle]="isPlaylistTile && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
+        <div class="objective">
+          {{ getObjective | truncateAndCapitalize: 95 }}
+          <span *ngIf="!getObjective">No objective specified.</span>
+        </div>
+        <ul class="metrics layout-align-space-between-center layout-row">
+          <li>
+            <span>
+              {{ 'I18N_COMMUNITY_LIBRARY_PAGE_COLLECTION' | translate }} ({{ getNodeCount }})
+            </span>
+          </li>
+          <li>
+            <span>
+              <span class="oppia-icon-accessibility-label">Last Updated</span>
+              {{ getLastUpdatedDatetime() }}
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div *ngIf="!isPlaylistTile" class="title-section-mask"
+           (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
+      </div>
+    </a>
+  </mat-card>
+</div>
+
+<div *ngIf="mobileCardToBeShown">
+  <mat-card class="mobile-activity-summary-card">
+    <a [href]="getCollectionLink()" class="thumbnail">
+
+      <div class="mobile-collection-card-cascading-images-container">
+        <div class="mobile-collection-card-image-container rear-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
+          <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+        </div>
+        <div class="mobile-collection-card-image-container middle-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
+          <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+        </div>
+        <div class="mobile-collection-card-image-container front-image" [ngStyle]="{'background-color': getThumbnailBgColor}">
+          <img class="mobile-collection-card-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+        </div>
+      </div>
+
+      <div class="mobile-activity-card-details">
+        <h3 class="mobile-collection-title e2e-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
+        <div class="mobile-activity-card-summary-section">
+          <ul class="mobile-activity-card-summary-elements">
+            <li>
+              <span>
+                {{ getNodeCount }} explorations
+              </span>
+            </li>
+            <li>
+              <span>
+                <i class="material-icons md-12 bullet-separator">&#xef4a;</i>
+              </span>
+            </li>
+            <li>
+              <span>
+                <span class="oppia-icon-accessibility-label">Last Updated</span>
+                {{ relativeLastUpdatedDateTime }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </a>
+  </mat-card>
+</div>
 
 <style>
   .oppia-activity-summary-tile {
@@ -57,5 +104,40 @@
   .oppia-activity-summary-tile .collection-corner-image {
     position: absolute;
     width: 36px;
+  }
+
+  .mobile-activity-summary-card {
+    box-shadow: slategrey 2px 4px 4px 0;
+    padding: 0 0 0 0;
+  }
+
+  .mobile-collection-card-cascading-images-container {
+    align-self: center;
+    height: 63px;
+    position: relative;
+    width: 63px;
+  }
+
+  .mobile-collection-card-image-container {
+    box-shadow: slategrey -1px 3px 4px 0;
+    position: absolute;
+    width: 55px;
+  }
+
+  .rear-image {
+    opacity: 40%;
+    right: 0;
+    top: 0;
+  }
+
+  .middle-image {
+    left: 4px;
+    opacity: 70%;
+    top: 4px;
+  }
+
+  .front-image {
+    bottom: 0;
+    left: 0;
   }
 </style>

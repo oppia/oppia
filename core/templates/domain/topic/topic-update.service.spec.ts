@@ -68,6 +68,7 @@ describe('Topic update service', function() {
       }],
       next_subtopic_id: 2,
       language_code: 'en',
+      skill_ids_for_diagnostic_test: []
     },
     skillIdToDescriptionDict: {
       skill_1: 'Description 1',
@@ -208,6 +209,24 @@ describe('Topic update service', function() {
         _sampleTopic, _thirdSkillSummary);
     }).toThrowError('Given skillId is not an uncategorized skill.');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should create a proper backend change dict for updating the skill Ids ' +
+     'for diagnostic test', function() {
+    _sampleTopic.setSkillSummariesForDiagnosticTest([_secondSkillSummary]);
+    topicUpdateService.updateDiagnosticTestSkills(
+      _sampleTopic, [_firstSkillSummary]);
+    expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
+      [_firstSkillSummary]);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'skill_ids_for_diagnostic_test',
+      new_value: ['skill_1'],
+      old_value: ['skill_2']
+    }]);
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
+      [_secondSkillSummary]);
   });
 
   it('should set/unset changes to a topic\'s name', () => {
@@ -573,7 +592,7 @@ describe('Topic update service', function() {
 
   it('should add/remove a subtopic', () => {
     expect(_sampleTopic.getSubtopics().length).toEqual(1);
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title2');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title2', 'frag-two');
     expect(_sampleTopic.getSubtopics().length).toEqual(2);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
     expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual('Title2');
@@ -706,11 +725,12 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for adding a subtopic',
     () => {
-      topicUpdateService.addSubtopic(_sampleTopic, 'Title2');
+      topicUpdateService.addSubtopic(_sampleTopic, 'Title2', 'frag-two');
       expect(undoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'add_subtopic',
         subtopic_id: 2,
-        title: 'Title2'
+        title: 'Title2',
+        url_fragment: 'frag-two'
       }]);
     }
   );
@@ -729,8 +749,8 @@ describe('Topic update service', function() {
   });
 
   it('should properly remove/add a newly created subtopic', () => {
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title2');
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title3');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title2', 'frag-two');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title3', 'frag-three');
     expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
     expect(_sampleTopic.getSubtopics()[2].getId()).toEqual(3);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(4);
@@ -797,7 +817,7 @@ describe('Topic update service', function() {
      * Undo back to old subtopic
      *  Move to _sampleTopic, move to _sampleTopic2, then undo
      */
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
 
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic, null, 1, _firstSkillSummary);
@@ -822,7 +842,7 @@ describe('Topic update service', function() {
 
   it('should correctly create changelists when moving a skill to a newly ' +
     'created subtopic that has since been deleted', () => {
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic, null, 2, _firstSkillSummary
     );
@@ -832,7 +852,7 @@ describe('Topic update service', function() {
     topicUpdateService.deleteSubtopic(_sampleTopic, 2);
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
 
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic, 1, 2, _secondSkillSummary
     );
@@ -853,7 +873,7 @@ describe('Topic update service', function() {
     }]);
     undoRedoService.clearChanges();
 
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic, null, 2, _firstSkillSummary
     );
@@ -870,8 +890,8 @@ describe('Topic update service', function() {
 
   it('should create properly decrement subtopic ids of later subtopics when ' +
     'a newly created subtopic is deleted', () => {
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 3');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 3', 'frag-three');
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic, 1, 3, _secondSkillSummary
     );
@@ -879,7 +899,8 @@ describe('Topic update service', function() {
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_subtopic',
       title: 'Title 3',
-      subtopic_id: 2
+      subtopic_id: 2,
+      url_fragment: 'frag-three'
     }, {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,
@@ -890,9 +911,9 @@ describe('Topic update service', function() {
 
   it('should properly decrement subtopic ids of moved subtopics ' +
     'when a newly created subtopic is deleted', () => {
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 3');
-    topicUpdateService.addSubtopic(_sampleTopic, 'Title 4');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 3', 'frag-three');
+    topicUpdateService.addSubtopic(_sampleTopic, 'Title 4', 'frag-four');
 
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic, 1, 3, _secondSkillSummary
@@ -904,11 +925,13 @@ describe('Topic update service', function() {
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_subtopic',
       title: 'Title 3',
-      subtopic_id: 2
+      subtopic_id: 2,
+      url_fragment: 'frag-three'
     }, {
       cmd: 'add_subtopic',
       title: 'Title 4',
-      subtopic_id: 3
+      subtopic_id: 3,
+      url_fragment: 'frag-four'
     }, {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,

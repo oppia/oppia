@@ -72,7 +72,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
         )
 
     def test_copy_with_non_existing_source_blob_fails(self) -> None:
-        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
                 Exception, 'Source asset does not exist'
         ):
             dev_mode_storage_services.copy(
@@ -90,7 +90,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
             blob.download_as_bytes() for blob in
             dev_mode_storage_services.listdir('bucket', '/')
         ]
-        self.assertItemsEqual(blob_data, [b'data1', b'data2', b'data3'])  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(blob_data, [b'data1', b'data2', b'data3'])
 
     def test_listdir_with_specific_folder_returns_some_blobs(self) -> None:
         dev_mode_storage_services.commit(
@@ -104,4 +104,4 @@ class DevModeStorageServicesTests(test_utils.TestBase):
             blob.download_as_bytes() for blob in
             dev_mode_storage_services.listdir('bucket', '/file')
         ]
-        self.assertItemsEqual(blob_data, [b'data1', b'data2'])  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(blob_data, [b'data1', b'data2'])

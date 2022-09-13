@@ -1,14 +1,13 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
   <li class="oppia-dropdown-menu-container">
     <div ngbDropdown>
-      <button class="btn btn-light dropdown oppia-save-changes-button float-left protractor-test-save-story-button"
+      <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
               [ngClass]="{'btn-success': isStorySaveable()}"
               (click)="saveChanges()"
               [disabled]="!isStorySaveable()">
         <span *ngIf="!isSaveInProgress()">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+          <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
              alt="Save Story">
-            &#xE161;
           </i>
           <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">
             Save Draft
@@ -27,7 +26,7 @@
         </span>
       </button>
       <button type="button"
-              class="btn btn-light dropdown-toggle oppia-dropdown-toggle protractor-test-show-discard-option"
+              class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
               [disabled]="!getChangeListLength()"
               aria-label="Dropdown toggle"
               ngbDropdownToggle>
@@ -38,7 +37,7 @@
         <li title="Discard all pending changes">
           <a (click)="discardChanges()"
              [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
-             class="dropdown-item protractor-test-discard-story-changes">
+             class="dropdown-item e2e-test-discard-story-changes">
              Discard Draft
           </a>
         </li>
@@ -48,7 +47,7 @@
   <li class="oppia-editor-publish-button-container">
     <button type="button"
             *ngIf="!isStoryPublished()"
-            class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
+            class="btn btn-secondary oppia-editor-publish-button e2e-test-publish-story-button"
             (click)="publishStory()"
             [ngClass]="{'btn-success': !isStorySaveable() && getWarningsCount() === 0 && validationIssues.length === 0 && explorationValidationIssues.length === 0 && prepublishValidationIssues.length === 0}"
             [disabled]="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0 || prepublishValidationIssues.length > 0">
@@ -63,7 +62,7 @@
     <button type="button"
             (click)="unpublishStory()"
             *ngIf="isStoryPublished()"
-            class="btn btn-secondary protractor-test-unpublish-story-button"
+            class="btn btn-secondary e2e-test-unpublish-story-button"
             [disabled]="isStorySaveable()">
       Unpublish Story
     </button>
@@ -198,6 +197,10 @@
     margin-right: 20px;
     margin-top: 8px;
   }
+  .story-editor-save-draft-icon {
+    padding-left: 4px;
+  }
+
   @media screen and (max-width: 768px) {
     .navbar-desktop li {
       display: none;
@@ -218,14 +221,14 @@
     }
     .save-changes-btn {
       background-color: #008098;
-      color: #FFF;
+      color: #fff;
       font-weight: bold;
       width: 80%;
     }
     .discard-changes-btn {
       background-color: #008098;
       bottom: 47px;
-      color: #FFF;
+      color: #fff;
       font-weight: bold;
       left: 12px;
       position: absolute;
@@ -239,7 +242,7 @@
     }
     .arrow-up-container {
       align-items: center;
-      background-color: #FFF;
+      background-color: #fff;
       border: 1px solid #808080;
       border-radius: 4px;
       display: flex;
@@ -261,14 +264,14 @@
       width: 45%;
     }
     .story-nav-story-nav-dropdown-options {
-      background-color: #FFF;
+      background-color: #fff;
       border: 1px solid #000;
       bottom: 100%;
       position: absolute;
       width: 100%;
     }
     .story-nav-dropdown-content {
-      background-color: #FFF;
+      background-color: #fff;
       border: 1.5px solid #6d6969;
       border-radius: 5px;
       display: flex;
@@ -278,7 +281,7 @@
 
     .right-container {
       background-color: #419889;
-      color: #FFF;
+      color: #fff;
     }
 
     .story-nav-dropdown-option {

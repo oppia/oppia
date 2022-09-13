@@ -4,14 +4,15 @@
      on-finish="$ctrl.onFinishTutorial()"
      on-skip="$ctrl.onSkipTutorial()">
   <div class="exp-editor-main-editor">
-    <div class="oppia-editor-cards-container protractor-test-editor-cards-container">
+    <div class="oppia-editor-cards-container e2e-test-editor-cards-container">
       <div class="oppia-editor-header">
-        <state-name-editor></state-name-editor>
+        <oppia-state-name-editor></oppia-state-name-editor>
       </div>
       <div>
-        <md-checkbox class="checkpoint-selection-checkbox protractor-test-checkpoint-selection-checkbox"
+        <md-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
                      ng-change="$ctrl.onChangeCardIsCheckpoint()"
-                     ng-model="$ctrl.stateCardIsCheckpointService.displayed">
+                     ng-model="$ctrl.stateCardIsCheckpointService.displayed"
+                     ng-disabled="!$ctrl.isEditable()">
           Set as a checkpoint for learners
         </md-checkbox>
       </div>
@@ -19,32 +20,32 @@
         <state-param-changes-editor></state-param-changes-editor>
       </div>
 
-      <state-editor on-save-state-content="$ctrl.saveStateContent"
-                    on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
-                    on-save-next-content-id-index="$ctrl.saveNextContentIdIndex"
-                    on-save-interaction-id="$ctrl.saveInteractionId"
-                    on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
-                    on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
-                    on-save-linked-skill-id="$ctrl.saveLinkedSkillId"
-                    on-save-solution="$ctrl.saveSolution"
-                    on-save-hints="$ctrl.saveHints"
-                    on-save-solicit-answer-details="$ctrl.saveSolicitAnswerDetails"
-                    recompute-graph="$ctrl.recomputeGraph"
-                    show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
-                    state-content-placeholder="$ctrl.getStateContentPlaceholder()"
-                    state-content-save-button-placeholder="$ctrl.getStateContentSaveButtonPlaceholder()"
-                    navigate-to-state="$ctrl.navigateToState"
-                    add-state="$ctrl.addState"
-                    refresh-warnings="$ctrl.refreshWarnings"
-                    interaction-is-shown="$ctrl.interactionIsShown"
-                    exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
-      </state-editor>
+      <oppia-state-editor (on-save-state-content)="$ctrl.saveStateContent($event)"
+                          (on-save-interaction-customization-args)="$ctrl.saveInteractionCustomizationArgs($event)"
+                          (on-save-next-content-id-index)="$ctrl.saveNextContentIdIndex($event)"
+                          (on-save-interaction-id)="$ctrl.saveInteractionId($event)"
+                          (on-save-interaction-default-outcome)="$ctrl.saveInteractionDefaultOutcome($event)"
+                          (on-save-interaction-answer-groups)="$ctrl.saveInteractionAnswerGroups($event)"
+                          (on-save-linked-skill-id)="$ctrl.saveLinkedSkillId($event)"
+                          (on-save-solution)="$ctrl.saveSolution($event)"
+                          (on-save-hints)="$ctrl.saveHints($event)"
+                          (on-save-solicit-answer-details)="$ctrl.saveSolicitAnswerDetails($event)"
+                          (recompute-graph)="$ctrl.recomputeGraph()"
+                          (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                          [state-content-placeholder]="$ctrl.getStateContentPlaceholder()"
+                          [state-content-save-button-placeholder]="$ctrl.getStateContentSaveButtonPlaceholder()"
+                          (navigate-to-state)="$ctrl.navigateToState($event)"
+                          (refresh-warnings)="$ctrl.refreshWarnings()"
+                          [add-state]="$ctrl.addState"
+                          [interaction-is-shown]="$ctrl.interactionIsShown"
+                          [exploration-is-linked-to-story]="$ctrl.explorationIsLinkedToStory">
+      </oppia-state-editor>
     </div>
   </div>
   <div class="exp-editor-overview">
     <div class="exp-editor-overview-content">
-      <exploration-graph></exploration-graph>
-      <unresolved-answers-overview></unresolved-answers-overview>
+      <oppia-exploration-graph></oppia-exploration-graph>
+      <oppia-unresolved-answers-overview></oppia-unresolved-answers-overview>
     </div>
   </div>
   <attribution-guide></attribution-guide>

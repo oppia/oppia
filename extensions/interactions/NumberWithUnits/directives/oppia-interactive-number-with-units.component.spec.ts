@@ -16,143 +16,148 @@
  * @fileoverview Unit tests for the NumberWithUnits interaction.
  */
 
-require(
-  'interactions/NumberWithUnits/directives/' +
-  'oppia-interactive-number-with-units.component.ts');
+import { async, ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { InteractiveNumberWithUnitsComponent } from './oppia-interactive-number-with-units.component';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule } from '@ngx-translate/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+describe('Number with units interaction component', () => {
+  let component: InteractiveNumberWithUnitsComponent;
+  let fixture: ComponentFixture<InteractiveNumberWithUnitsComponent>;
+  let currentInteractionService: CurrentInteractionService;
+  let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
+  let ngbModal: NgbModal;
 
-describe('oppiaInteractiveNumberWithUnits', function() {
-  let ctrl = null, $scope = null, $rootScope = null;
-  let $q = null;
-  let $uibModal = null;
-  let numberWithUnitsObjectFactory = null;
-  let currentInteractionService = null;
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+    updateViewWithNewAnswer: () => {},
+    onSubmit: (
+        answer: NumberWithUnitsAnswer, rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
-      isAnswerValid();
-    }
-  };
-  let mockNumberWithUnitsRulesService = {};
-  let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
-      return attrs;
+      validateExpressionFn();
     }
   };
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CurrentInteractionService', mockCurrentInteractionService);
-    $provide.value(
-      'NumberWithUnitsRulesService',
-      mockNumberWithUnitsRulesService);
-    $provide.value(
-      'InteractionAttributesExtractorService',
-      mockInteractionAttributesExtractorService);
-    $provide.value('$attrs', {
-      labelForFocusTarget: 'label'
-    });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [InteractiveNumberWithUnitsComponent],
+      imports: [
+        TranslateModule.forRoot({
+          useDefaultLang: true,
+          isolate: false,
+          extend: false,
+          defaultLanguage: 'en'
+        })
+      ],
+      providers: [
+        {
+          provide: CurrentInteractionService,
+          useValue: mockCurrentInteractionService
+        },
+        NumberWithUnitsObjectFactory,
+        NgbModal,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $q = $injector.get('$q');
-    $uibModal = $injector.get('$uibModal');
-    numberWithUnitsObjectFactory =
-      $injector.get('NumberWithUnitsObjectFactory');
-    currentInteractionService = $injector.get('CurrentInteractionService');
-    ctrl = $componentController('oppiaInteractiveNumberWithUnits');
-    ctrl.NumberWithUnitsForm = {
-      answer: {
-        $invalid: false,
-        $setValidity: function(errorType, valid) {
-          this.$invalid = !valid;
-        }
-      }
-    };
-  }));
+
+  beforeEach(() => {
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
+    numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
+    ngbModal = TestBed.inject(NgbModal);
+    fixture = TestBed.createComponent(InteractiveNumberWithUnitsComponent);
+    component = fixture.componentInstance;
+  });
 
   it('should initialise component when user adds or plays interaction', () => {
     spyOn(numberWithUnitsObjectFactory, 'createCurrencyUnits');
     spyOn(currentInteractionService, 'registerCurrentInteraction');
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.answer).toBe('');
-    expect(ctrl.labelForFocusTarget).toBe('label');
-    expect(ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA).toEqual({
-      type: 'unicode',
-      ui_config: {}
-    });
+    expect(component.answer).toBe('');
     expect(numberWithUnitsObjectFactory.createCurrencyUnits).toHaveBeenCalled();
     expect(currentInteractionService.registerCurrentInteraction)
       .toHaveBeenCalled();
   });
 
-  it('should not display warning when the answer format is correct', () => {
-    ctrl.$onInit();
+  it('should not display warning when the answer format is correct',
+    fakeAsync(() => {
+      component.errorMessageI18nKey = 'Unit "xyz" not found';
+      component.isValid = false;
 
-    expect(ctrl.getWarningText()).toBe('');
+      // PreChecks.
+      expect(component.errorMessageI18nKey).toBe('Unit "xyz" not found');
+      expect(component.isValid).toBeFalse();
 
-    ctrl.answer = '24 km';
-    $scope.$apply();
+      // Test: Correct answer.
+      component.answer = '24 km';
 
-    expect(ctrl.getWarningText()).toBe('');
-  });
+      component.answerValueChanged();
+      tick(150);
 
-  it('should display warning when the answer format is incorrect', () => {
-    ctrl.$onInit();
+      // PostChecks: The format of the answer '24 km' is correct,
+      // Therefore we verify that the value of errorMessage is ''.
+      expect(component.errorMessageI18nKey).toBe('');
+      expect(component.isValid).toBeTrue();
+    }));
 
-    expect(ctrl.getWarningText()).toBe('');
+  it('should display warning when the answer format is incorrect',
+    fakeAsync(() => {
+      // PreChecks.
+      expect(component.errorMessageI18nKey).toBe('');
+      expect(component.isValid).toBeTrue();
 
-    ctrl.answer = '24 k';
-    $scope.$apply();
+      // Test: Incorrect answer.
+      component.answer = '24 k';
 
-    expect(ctrl.getWarningText()).toBe('Unit "k" not found.');
-  });
+      component.answerValueChanged();
+      tick(150);
+
+      // PostChecks: Error message as the Unit is incorrect.
+      expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
+      expect(component.isValid).toBeFalse();
+    }));
 
   it('should close help modal when user clicks the \'close\' button', () =>{
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject('close')
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.reject('close')
+      } as NgbModalRef
+    );
 
-    ctrl.showHelp();
-    $scope.$apply();
+    component.showHelp();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should display help modal when user clicks the \'help\' button', () =>{
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve('confirm')
-    });
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        result: Promise.resolve('confirm')
+      } as NgbModalRef
+    );
 
-    ctrl.showHelp();
-    $scope.$apply();
+    component.showHelp();
 
-    expect($uibModal.open).toHaveBeenCalled();
-  });
-
-  it('should return true if the answer is valid', () => {
-    ctrl.NumberWithUnitsForm = undefined;
-
-    expect(ctrl.isAnswerValid()).toBeTrue();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should return false if the answer is invalid', () => {
-    ctrl.answer = '';
-    ctrl.NumberWithUnitsForm.answer.$setValidity(
-      'NUMBER_WITH_UNITS_FORMAT_ERROR', false);
+    component.answer = '';
+    component.isValid = false;
 
-    expect(ctrl.isAnswerValid()).toBeFalse();
+    expect(component.isAnswerValid()).toBeFalse();
   });
 
   it('should save solution when user saves solution', () => {
-    ctrl.savedSolution = {
+    component.savedSolution = {
       type: 'real',
       real: 24,
       fraction: {
@@ -168,19 +173,47 @@ describe('oppiaInteractiveNumberWithUnits', function() {
         }
       ]
     };
+    component.answer = '';
 
-    ctrl.answer = '';
+    component.ngOnInit();
 
-    ctrl.$onInit();
-
-    expect(ctrl.answer).toBe('24 km');
+    expect(component.answer).toBe('24 km');
   });
 
   it('should show error when user submits answer in incorrect format', () => {
-    expect(ctrl.getWarningText()).toBe('');
+    component.answer = '24 k';
 
-    ctrl.submitAnswer('24 k');
+    expect(component.errorMessageI18nKey).toBe('');
 
-    expect(ctrl.getWarningText()).toBe('Unit "k" not found.');
+    component.submitAnswer();
+
+    expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
+  });
+
+  it('should throw uncaught errors that are not Error type',
+    waitForAsync(() => {
+      spyOn(numberWithUnitsObjectFactory, 'fromRawInputString').and.callFake(
+        () => {
+          throw TypeError;
+        }
+      );
+
+      expect(()=>{
+        component.submitAnswer();
+        // The eslint error is suppressed since we need to test if
+        // just a string was thrown.
+        // eslint-disable-next-line oppia/no-to-throw
+      }).toThrow(TypeError);
+    }));
+
+  it('should unsubscribe when component is destroyed', function() {
+    spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();
+
+    expect(component.componentSubscriptions.closed).toBeFalse();
+
+    component.ngOnDestroy();
+
+    expect(component.componentSubscriptions.unsubscribe).toHaveBeenCalled();
+    expect(component.componentSubscriptions.closed).toBeTrue();
   });
 });

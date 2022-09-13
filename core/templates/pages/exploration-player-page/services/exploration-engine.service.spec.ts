@@ -121,6 +121,7 @@ describe('Exploration engine service ', () => {
                     html: '<p>Good Job</p>'
                   },
                   param_changes: [],
+                  dest_if_really_stuck: null,
                   dest: 'Mid'
                 },
                 training_data: [],
@@ -149,6 +150,7 @@ describe('Exploration engine service ', () => {
                 html: '<p>Try again.</p>'
               },
               param_changes: [],
+              dest_if_really_stuck: null,
               dest: 'Start'
             }
           },
@@ -244,6 +246,7 @@ describe('Exploration engine service ', () => {
                     html: ' <p>Good Job</p>'
                   },
                   param_changes: [],
+                  dest_if_really_stuck: null,
                   dest: 'End'
                 },
                 training_data: [],
@@ -272,6 +275,7 @@ describe('Exploration engine service ', () => {
                 html: '<p>try again.</p>'
               },
               param_changes: [],
+              dest_if_really_stuck: null,
               dest: 'Mid'
             }
           },
@@ -317,6 +321,7 @@ describe('Exploration engine service ', () => {
 
     explorationBackendResponse = {
       can_edit: true,
+      draft_change_list_id: 0,
       exploration: {
         init_state_name: 'state_name',
         param_changes: [],
@@ -327,6 +332,22 @@ describe('Exploration engine service ', () => {
         objective: '',
         correctness_feedback_enabled: false
       },
+      exploration_metadata: {
+        title: '',
+        category: '',
+        objective: '',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'state_name',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: false,
+        edits_allowed: true
+      },
       exploration_id: 'test_id',
       is_logged_in: true,
       session_id: 'test_session',
@@ -335,7 +356,12 @@ describe('Exploration engine service ', () => {
       preferred_language_codes: [],
       auto_tts_enabled: false,
       correctness_feedback_enabled: true,
-      record_playthrough_probability: 1
+      record_playthrough_probability: 1,
+      has_viewed_lesson_info_modal_once: false,
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
+      most_recently_reached_checkpoint_state_name: 'State A',
+      most_recently_reached_checkpoint_exp_version: 1
     };
 
     explorationFeatures = {
@@ -452,6 +478,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'Answer is correct!'
@@ -492,6 +519,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'Answer is correct!'
@@ -532,6 +560,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: null
@@ -553,7 +582,7 @@ describe('Exploration engine service ', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.returnValue();
+        alertsService, 'addWarning').and.callThrough();
 
       explorationEngineService.init(
         explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -573,6 +602,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'feedback'
@@ -594,7 +624,7 @@ describe('Exploration engine service ', () => {
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.returnValue();
+        alertsService, 'addWarning').and.callThrough();
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
       spyOn(explorationEngineService, 'makeParams')
         .and.returnValue(null);
@@ -617,6 +647,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'feedback'
@@ -640,7 +671,7 @@ describe('Exploration engine service ', () => {
       spyOn(explorationEngineService, 'makeQuestion')
         .and.returnValue(null);
       let alertsServiceSpy = spyOn(
-        alertsService, 'addWarning').and.returnValue();
+        alertsService, 'addWarning').and.callThrough();
 
       explorationEngineService.init(
         explorationDict, 1, null, true, ['en'], initSuccessCb);
@@ -716,13 +747,13 @@ describe('Exploration engine service ', () => {
   });
 
   it('should return author recommended exploration id\'s ' +
-    'when calling \'getAuthorRecommendedExpIds\'', () => {
+    'when calling \'getAuthorRecommendedExpIdsByStateName\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
 
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds();
+      explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
     }).toThrowError(
       'Cannot read properties of undefined ' +
       '(reading \'getAuthorRecommendedExpIds\')');
@@ -730,17 +761,15 @@ describe('Exploration engine service ', () => {
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
 
-    explorationEngineService.currentStateName = 'Start';
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds();
+      explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
     }).toThrowError(
       'Tried to get recommendations for a non-terminal state: Start');
 
     // Please note that in order to get author recommended exploration id's
     // current should be the last state.
-    explorationEngineService.currentStateName = 'End';
-
-    const recommendedId = explorationEngineService.getAuthorRecommendedExpIds();
+    const recommendedId = explorationEngineService
+      .getAuthorRecommendedExpIdsByStateName('End');
     expect(recommendedId).toContain('recommnendedExplorationId');
   });
 
@@ -752,6 +781,7 @@ describe('Exploration engine service ', () => {
     let answerClassificationResult = new AnswerClassificationResult(
       outcomeObjectFactory.createFromBackendDict({
         dest: 'Mid',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'feedback_1',
           html: 'Answer is correct!'
@@ -894,6 +924,69 @@ describe('Exploration engine service ', () => {
     expect(() => {
       explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
     }).toThrowError('Cannot populate exploration in learner mode.');
+  });
+
+  it('should return state when calling \'getStateFromStateName\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getStateFromStateName('Start');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getState\')'
+    );
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let state = explorationEngineService.getStateFromStateName('Start');
+
+    expect(state.name).toBe('Start');
+
+    // Check for second state.
+    state = explorationEngineService.getStateFromStateName('Mid');
+
+    expect(state.name).toBe('Mid');
+  });
+
+  it('should return state card when calling \'getStateCardByName\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getStateCardByName('Start');
+    }).toThrowError(
+      'Cannot read properties of undefined (reading \'getInteraction\')'
+    );
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let stateCard = explorationEngineService.getStateCardByName('Start');
+
+    expect(stateCard.getStateName()).toBe('Start');
+
+    // Check for second state.
+    stateCard = explorationEngineService.getStateCardByName('Mid');
+
+    expect(stateCard.getStateName()).toBe('Mid');
+  });
+
+  it('should return shortest path to state when calling ' +
+    '\'getShortestPathToState\'', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    // Check for first state.
+    let shortestPathToState = explorationEngineService.getShortestPathToState(
+      explorationDict.states, 'Mid');
+
+    expect(shortestPathToState).toEqual(['Start', 'Mid']);
   });
 
   describe('on validating parameters ', () => {

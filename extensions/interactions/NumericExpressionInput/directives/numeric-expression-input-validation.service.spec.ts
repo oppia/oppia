@@ -60,6 +60,7 @@ describe('NumericExpressionInputValidationService', () => {
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -148,7 +149,7 @@ describe('NumericExpressionInputValidationService', () => {
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
-        x: '-1 + 3^2'
+        x: '3^2 - 1'
       }
     }, 'NumericExpressionInput');
 

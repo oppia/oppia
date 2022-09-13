@@ -17,21 +17,15 @@
 from __future__ import annotations
 
 import builtins
+import io
+
 from core import utils
 from core.tests import test_utils
 from scripts import check_if_pr_is_low_risk
 from scripts import common
 
-# We import StringIO directly instead of using python_utils.string_io
-# because we need to inherit from StringIO, so we need the StringIO
-# class. python_utils.string_io returns a StringIO object.
-try:
-    from StringIO import StringIO  # pylint: disable=import-only-modules
-except ImportError:
-    from io import StringIO  # pylint: disable=import-only-modules
 
-
-class MockResponse(StringIO):
+class MockResponse(io.StringIO):
     """Mock for the objects returned by urllib2.url_open."""
 
     def __init__(self, data='', code=200):
@@ -42,7 +36,7 @@ class MockResponse(StringIO):
             data: str. Response data.
             code: int. HTTP response code.
         """
-        StringIO.__init__(self, data)
+        super().__init__(data)
         self.code = code
 
     def getcode(self):
@@ -75,7 +69,7 @@ class ParsePrUrlTests(test_utils.GenericTestBase):
 class LoadDiffTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LoadDiffTests, self).setUp()
+        super().setUp()
         self.url = (
             'https://patch-diff.githubusercontent.com'
             '/raw/oppia/oppia/pull/1'
@@ -268,7 +262,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
 class LookupPrTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LookupPrTests, self).setUp()
+        super().setUp()
         self.url = (
             'https://api.github.com/repos/oppia/oppia/pulls/1')
         self.headers = {
@@ -963,7 +957,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
 
         with parse_url_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
                 'Failed to parse PR URL %s' % url,
             ):
@@ -990,7 +984,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
 
         with parse_url_swap, lookup_pr_swap:
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 RuntimeError,
                 'Failed to load PR',
             ):
@@ -1041,7 +1035,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap, load_diff_swap:
             with run_cmd_swap:
-                with self.assertRaisesRegexp(
+                with self.assertRaisesRegex(
                     RuntimeError,
                     'Failed to load PR diff',
                 ):

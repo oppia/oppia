@@ -20,54 +20,6 @@ var suites = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
-
-    additionalEditorFeatures: [
-      'protractor_desktop/additionalEditorFeatures.js'
-    ],
-
-    additionalEditorFeaturesModals: [
-      'protractor_desktop/additionalEditorFeaturesModals.js'
-    ],
-
-
-    additionalPlayerFeatures: [
-      'protractor_desktop/additionalPlayerFeatures.js'
-    ],
-
-    adminPage: [
-      'protractor_desktop/adminTabFeatures.js'
-    ],
-
-    blogDashboard: [
-      'protractor_desktop/blogDashboard.js'
-    ],
-
-    classroomPage: [
-      'protractor_desktop/classroomPage.js'
-    ],
-
-    classroomPageFileUploadFeatures: [
-      'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
-
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
-
-    coreEditorAndPlayerFeatures: [
-      'protractor_desktop/coreEditorAndPlayerFeatures.js'
-    ],
-
-    creatorDashboard: [
-      'protractor_desktop/creatorDashboard.js'
-    ],
 
     embedding: [
       'protractor_desktop/embedding.js'
@@ -109,73 +61,17 @@ var suites = {
       'protractor_desktop/fileUploadExtensions.js'
     ],
 
-    learnerDashboard: [
-      'protractor_desktop/learnerDashboard.js'
-    ],
-
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
-
     library: [
       'protractor/libraryFlow.js'
-    ],
-
-    navigation: [
-      'protractor_desktop/navigation.js'
     ],
 
     playVoiceovers: [
       'protractor_desktop/playVoiceovers.js'
     ],
 
-    preferences: [
-      'protractor_desktop/preferences.js'
-    ],
-
-    profileFeatures: [
-      'protractor_desktop/profileFeatures.js'
-    ],
-
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
-
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
     ],
-
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
-    ],
-
-    topicAndStoryEditor: [
-      'protractor_desktop/topicAndStoryEditor.js'
-    ],
-
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
-    ],
-
-    topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
-    ],
-
-    skillEditor: [
-      'protractor_desktop/skillEditor.js'
-    ],
-
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
-    users: [
-      'protractor_desktop/userJourneys.js',
-    ],
-
-    wipeout: [
-      'protractor_desktop/wipeout.js',
-    ]
   };
 
 // A reference configuration file.
@@ -368,33 +264,27 @@ exports.config = {
           }
         },
       });
-    }
-    else {
+    } else {
       console.log(
         'Videos will not be recorded for this suite either because videos' +
         ' have been disabled for it (using environment variables) or' +
         ' because it\'s on CircleCI');
     }
 
-    // Screenshots will only run on CircleCI, since we don't have videos here.
-    // We don't need these on Github Actions since we have videos.
-
-    if (process.env.CIRCLECI) {
-      // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
-      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots.
-        dest: '../protractor-screenshots',
-        // Function to build filenames of screenshots.
-        pathBuilder: function(currentSpec) {
-          let filename = currentSpec.fullName;
-          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
-        },
-        captureOnlyFailedSpecs: true,
-        reportFailedUrl: true,
-        preserveDirectory: true
-      }));
-    }
+    // This takes screenshots of failed tests. For more information see
+    // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+    jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
+      // Directory for screenshots.
+      dest: '../protractor-screenshots',
+      // Function to build filenames of screenshots.
+      pathBuilder: function(currentSpec) {
+        let filename = currentSpec.fullName;
+        return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
+      },
+      captureOnlyFailedSpecs: true,
+      reportFailedUrl: true,
+      preserveDirectory: true
+    }));
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({

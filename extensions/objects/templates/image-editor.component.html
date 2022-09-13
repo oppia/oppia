@@ -1,6 +1,5 @@
 <div class="filepath-editor">
-  <div [attr.style]="getMainContainerDynamicStyles()"
-       class="filepath-editor-main-container">
+  <div class="filepath-editor-main-container">
     <div *ngIf="isImageUploaded()"
          class="filepath-editor-img-toolbar"
          [attr.style]="getToolbarDynamicStyles()">
@@ -21,10 +20,9 @@
         <span>{{ calculateTargetImageDimensions().width }}</span>
         &times;
         <span> {{ calculateTargetImageDimensions().height }} </span>
-        <i class="material-icons"
+        <i class="fas fa-question-circle"
            *ngIf="getImageSizeHelp() !== null"
            title="{{getImageSizeHelp()}}">
-          &#xE887;
         </i>
       </div>
     </div>
@@ -74,12 +72,24 @@
       </div>
     </div>
     <div *ngIf="isImageUploaded()" class="filepath-editor-save-box">
-      <button type="button"
+      <button *ngIf="!imageIsUploading; else Loading"
+              type="button"
               class="btn btn-success filepath-editor-use"
               (click)="saveUploadedFile()"
               [disabled]="isUserCropping()">
         Use This Image
       </button>
+      <ng-template #Loading>
+        <button class="btn btn-success filepath-editor-use"
+                type="button"
+                disabled>
+          <span class="spinner-border spinner-border-md"
+                role="status"
+                aria-hidden="true">
+          </span>
+          Uploading..
+        </button>
+      </ng-template>
       <button type="button"
               class="btn btn-secondary filepath-editor-discard"
               (click)="discardUploadedFile()"
@@ -87,12 +97,10 @@
         Discard
       </button>
     </div>
-    <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.tags.length">
-      Unsupported SVG tags found: {{ invalidTagsAndAttributes.tags }}
-    </div>
-    <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.attrs.length">
-      Unsupported SVG attributes found: {{ invalidTagsAndAttributes.attrs }}
-    </div>
+    <div *ngIf="invalidTagsAndAttributes.tags.length || invalidTagsAndAttributes.attrs.length"
+         class="oppia-form-error oppia-unsupported-svg-tag-attribute-error"
+         [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }"
+    ></div>
     <div class="oppia-form-error oppia-processed-image-too-large-error" *ngIf="processedImageIsTooLarge">
       The processed image is too large to upload. Please try cropping or resizing the current image.
     </div>
@@ -118,6 +126,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    width: 100%;
   }
 
   .filepath-editor .filepath-editor-main-container .oppia-form-error {
@@ -176,12 +185,12 @@
 
   .filepath-editor .filepath-editor-button {
     background: grey;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #F2F2F2), color-stop(1, #D0D0D0));
-    background-image: -o-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
-    background-image: -moz-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
-    background-image: -webkit-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
-    background-image: -ms-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
-    background-image: linear-gradient(to bottom, #F2F2F2 0%, #D0D0D0 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f2f2f2), color-stop(1, #d0d0d0));
+    background-image: -o-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: -moz-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: -webkit-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: -ms-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: linear-gradient(to bottom, #f2f2f2 0%, #d0d0d0 100%);
     cursor: default;
     font-size: 12px;
     font-weight: normal;
@@ -197,22 +206,22 @@
   }
 
   .filepath-editor .filepath-editor-button:hover {
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #D0D0D0), color-stop(1, #D0D0D0));
-    background-image: -o-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
-    background-image: -moz-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
-    background-image: -webkit-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
-    background-image: -ms-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
-    background-image: linear-gradient(to bottom, #D0D0D0 0%, #D0D0D0 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #d0d0d0), color-stop(1, #d0d0d0));
+    background-image: -o-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: -moz-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: -webkit-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: -ms-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: linear-gradient(to bottom, #d0d0d0 0%, #d0d0d0 100%);
     cursor: pointer;
   }
 
   .filepath-editor .filepath-editor-button:active {
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #B0B0B0), color-stop(1, #B0B0B0));
-    background-image: -o-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
-    background-image: -moz-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
-    background-image: -webkit-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
-    background-image: -ms-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
-    background-image: linear-gradient(to bottom, #B0B0B0 0%, #B0B0B0 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #b0b0b0), color-stop(1, #b0b0b0));
+    background-image: -o-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: -moz-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: -webkit-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: -ms-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: linear-gradient(to bottom, #b0b0b0 0%, #b0b0b0 100%);
   }
 
   .filepath-editor .filepath-editor-decrease-size {
@@ -283,5 +292,26 @@
   .filepath-editor .oppia-unsupported-svg-tag-attribute-error,
   .filepath-editor .oppia-processed-image-too-large-error {
     margin-top: 15px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    padding: 10px;
+  }
+  @media(max-width:540px) {
+    .filepath-editor .filepath-editor-image-container {
+      text-align: left;
+    }
+
+    .filepath-editor .filepath-editor-img-toolbar-resize {
+      float: none;
+      text-align: left;
+    }
+
+    .filepath-editor .filepath-editor-save-box {
+      text-align: left;
+    }
   }
 </style>

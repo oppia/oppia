@@ -105,7 +105,7 @@ export class SpeechSynthesisChunkerService {
     // excluding the text being spoken.
     for (var property in utterance) {
       const _property = property as keyof SpeechSynthesisUtterance;
-      if (_property !== 'text') {
+      if (_property !== 'text' && _property !== 'addEventListener') {
         Object.defineProperty(
           newUtterance, _property, {
             value: utterance[_property]
@@ -113,18 +113,15 @@ export class SpeechSynthesisChunkerService {
         );
       }
     }
-    Object.defineProperty(
-      newUtterance, 'onend', {
-        value: () => {
-          if (this.cancelRequested) {
-            this.cancelRequested = false;
-            return;
-          }
-          offset += chunk.length;
-          this._speechUtteranceChunker(utterance, offset, callback);
-        }
+    newUtterance.addEventListener('end', () => {
+      if (this.cancelRequested) {
+        this.cancelRequested = false;
+        return;
       }
-    );
+      offset += chunk.length;
+      this._speechUtteranceChunker(utterance, offset, callback);
+    });
+
 
     // IMPORTANT!! Do not remove: Logging the object out fixes some onend
     // firing issues. Placing the speak invocation inside a callback
@@ -189,7 +186,7 @@ export class SpeechSynthesisChunkerService {
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
       .replaceWith(function() {
-        var element = this as HTMLElement;
+        var element = this as unknown as HTMLElement;
         const _newTextAttr = element.attributes[
           'text-with-value' as keyof NamedNodeMap] as Attr;
         // 'Node.textContent' only returns 'null' if the Node is a
@@ -208,7 +205,7 @@ export class SpeechSynthesisChunkerService {
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
-        var element = this as HTMLElement;
+        var element = this as unknown as HTMLElement;
         const _mathContentAttr = element.attributes[
           'math_content-with-value' as keyof NamedNodeMap] as Attr;
         var mathContent = (

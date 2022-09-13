@@ -1,0 +1,10 @@
+name: John Smith
+contact:
+    home:   1012355532
+    office:  5002586256
+address:
+  street: |
+            123 Tornado Alley
+            Suite 16            
+    city:   East Centerville
+    state:  KS

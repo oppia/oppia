@@ -1,0 +1,19 @@
+<div class="modal-header">
+  <h3>Preview Summary Card</h3>
+</div>
+
+<div class="modal-body text-center">
+  This is how your activity will appear to learners in search results
+  or the library.
+  <oppia-exploration-summary-tile class="e2e-test-exploration-summary-tile"
+                                  [explorationTitle]="getExplorationTitle()"
+                                  [objective]="getExplorationObjective()"
+                                  [category]="getExplorationCategory()"
+                                  [thumbnailIconUrl]="getThumbnailIconUrl()"
+                                  [thumbnailBgColor]="getThumbnailBgColor()">
+  </oppia-exploration-summary-tile>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-close-preview-summary-modal" (click)="cancel()">Return to editor</button>
+</div>

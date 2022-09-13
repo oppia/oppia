@@ -23,20 +23,12 @@ import os
 import re
 import shutil
 import subprocess
-import sys
+
+import esprima
 
 from .. import common
 from .. import concurrent_task_utils
 
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-
-ESPRIMA_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
-
-sys.path.insert(1, ESPRIMA_PATH)
-
-import esprima  # isort:skip pylint: disable=wrong-import-order, wrong-import-position
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
@@ -138,7 +130,14 @@ def compile_all_ts_files():
     """
     cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
         './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
-    subprocess.call(cmd, stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+    _, encoded_stderr = proc.communicate()
+    stderr = encoded_stderr.decode('utf-8')
+
+    if stderr:
+        raise Exception(stderr)
 
 
 class JsTsLintChecksManager:
@@ -183,6 +182,9 @@ class JsTsLintChecksManager:
         Returns:
             dict. A dict which has key as filepath and value as contents of js
             and ts files after validating and parsing the files.
+
+        Raises:
+            Exception. The filepath ends with '.js'.
         """
 
         # Select JS files which need to be checked.
@@ -295,35 +297,35 @@ class JsTsLintChecksManager:
                                 parsed_node, components_to_check))
                         if not expression:
                             continue
-                        else:
-                            # The following block populates a set to
-                            # store constants for the Angular-AngularJS
-                            # constants file consistency check.
-                            angularjs_constants_name = (
-                                expression.arguments[0].value)
+
+                        # The following block populates a set to
+                        # store constants for the Angular-AngularJS
+                        # constants file consistency check.
+                        angularjs_constants_name = (
+                            expression.arguments[0].value)
+                        angularjs_constants_value = (
+                            expression.arguments[1])
+                        # Check if const is declared outside the
+                        # class.
+                        if angularjs_constants_value.property:
                             angularjs_constants_value = (
-                                expression.arguments[1])
-                            # Check if const is declared outside the
-                            # class.
-                            if angularjs_constants_value.property:
-                                angularjs_constants_value = (
-                                    angularjs_constants_value.property.name)
-                            if angularjs_constants_value != (
-                                    angularjs_constants_name):
-                                failed = True
-                                error_messages.append(
-                                    '%s --> Please ensure that the '
-                                    'constant %s is initialized '
-                                    'from the value from the '
-                                    'corresponding Angular constants'
-                                    ' file (the *.constants.ts '
-                                    'file). Please create one in the'
-                                    ' Angular constants file if it '
-                                    'does not exist there.' % (
-                                        filepath,
-                                        angularjs_constants_name))
-                            angularjs_constants_list.append(
-                                angularjs_constants_name)
+                                angularjs_constants_value.property.name)
+                        if angularjs_constants_value != (
+                                angularjs_constants_name):
+                            failed = True
+                            error_messages.append(
+                                '%s --> Please ensure that the '
+                                'constant %s is initialized '
+                                'from the value from the '
+                                'corresponding Angular constants'
+                                ' file (the *.constants.ts '
+                                'file). Please create one in the'
+                                ' Angular constants file if it '
+                                'does not exist there.' % (
+                                    filepath,
+                                    angularjs_constants_name))
+                        angularjs_constants_list.append(
+                            angularjs_constants_name)
 
             # Check if the constant has multiple declarations which is
             # prohibited.
@@ -335,22 +337,22 @@ class JsTsLintChecksManager:
                     parsed_node, components_to_check)
                 if not expression:
                     continue
+
+                constant_name = expression.arguments[0].raw
+                if constant_name in constants_to_source_filepaths_dict:
+                    failed = True
+                    error_message = (
+                        '%s --> The constant %s is already declared '
+                        'in %s. Please import the file where the '
+                        'constant is declared or rename the constant'
+                        '.' % (
+                            filepath, constant_name,
+                            constants_to_source_filepaths_dict[
+                                constant_name]))
+                    error_messages.append(error_message)
                 else:
-                    constant_name = expression.arguments[0].raw
-                    if constant_name in constants_to_source_filepaths_dict:
-                        failed = True
-                        error_message = (
-                            '%s --> The constant %s is already declared '
-                            'in %s. Please import the file where the '
-                            'constant is declared or rename the constant'
-                            '.' % (
-                                filepath, constant_name,
-                                constants_to_source_filepaths_dict[
-                                    constant_name]))
-                        error_messages.append(error_message)
-                    else:
-                        constants_to_source_filepaths_dict[
-                            constant_name] = filepath
+                    constants_to_source_filepaths_dict[
+                        constant_name] = filepath
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
@@ -449,7 +451,7 @@ class ThirdPartyJsTsLintChecksManager:
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
         """
-        super(ThirdPartyJsTsLintChecksManager, self).__init__()
+        super().__init__()
         self.files_to_lint = files_to_lint
 
     @property
@@ -504,13 +506,16 @@ class ThirdPartyJsTsLintChecksManager:
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
+
+        Raises:
+            Exception. The start.py file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
             raise Exception(
-                'ERROR    Please run start.sh first to install node-eslint '
+                'ERROR    Please run start.py first to install node-eslint '
                 'and its dependencies.')
 
         files_to_lint = self.all_filepaths

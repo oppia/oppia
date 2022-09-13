@@ -1,130 +1,49 @@
 <background-banner></background-banner>
 <div class="oppia-subtopic-viewer-container">
   <div class="oppia-subtopic-viewer-container-card">
+    <div class="oppia-topic-title">
+      <span *ngIf="!isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitle }}
+      </span>
+      <span *ngIf="isHackyTopicTitleTranslationDisplayed()">
+        {{ parentTopicTitleTranslationKey | translate }}
+      </span>
+    </div>
     <div class="oppia-subtopic-title">
-      {{ subtopicTitle }}
+      <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitle }}
+      </span>
+      <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
+        {{ subtopicTitleTranslationKey | translate }}
+      </span>
     </div>
     <div class="oppia-page-contents-viewer">
       <div>
-        <angular-html-bind-wrapper *ngIf="pageContents" [htmlData]="pageContents.getHtml()">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display *ngIf="pageContents" [rteString]="pageContents.getHtml()">
+        </oppia-rte-output-display>
       </div>
     </div>
   </div>
 
-  <div *ngIf="nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
+  <div *ngIf="subtopicSummaryIsShown"
+       class="oppia-subtopic-viewer-next-subtopic-summary pb-4"
+       [ngClass]="{'justify-content-start': prevSubtopic, 'justify-content-end': nextSubtopic}">
     <div class="next-subtopic-section">
-      <p class="oppia-subtopic-next-subtopic-label" [innerHTML]="'I18N_SUBTOPIC_VIEWER_NEXT_SKILL' | translate">Next Skill:</p>
+      <p *ngIf="nextSubtopic"
+         class="oppia-subtopic-next-subtopic-label"
+         [innerHTML]="'I18N_SUBTOPIC_VIEWER_NEXT_SKILL' | translate">
+         Next Skill:
+      </p>
+      <p *ngIf="prevSubtopic"
+         class="oppia-subtopic-next-subtopic-label"
+         [innerHTML]="'I18N_SUBTOPIC_VIEWER_PREVIOUS_SKILL' | translate">
+         Previous Skill:
+      </p>
       <oppia-subtopic-summary-tile [topicUrlFragment]="topicUrlFragment"
                                    [classroomUrlFragment]="classroomUrlFragment"
-                                   [subtopic]="nextSubtopic"
+                                   [subtopic]="nextSubtopic || prevSubtopic"
                                    [topicId]="parentTopicId">
       </oppia-subtopic-summary-tile>
     </div>
   </div>
 </div>
-<style>
-  .oppia-subtopic-viewer-container .next-subtopic-section {
-    margin-top: 30px;
-  }
-
-  .oppia-subtopic-summary-tile-container {
-    margin-right: 50px;
-    margin-top: 80px;
-  }
-
-  .oppia-subtopic-viewer-container {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 40px;
-    position: relative;
-  }
-  .oppia-subtopic-title {
-    color: #00645C;
-    font-family: Capriola, Roboto, Arial, sans-serif;
-    font-size: 3em;
-    margin-bottom: 25px;
-    margin-left: 50px;
-    margin-top: 0;
-    padding-top: 66.5px;
-    text-align: left;
-  }
-  .oppia-subtopic-viewer-container-card {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px #0000001A;
-    color: #000;
-    font-family: Roboto, Arial, sans-serif;
-    height: 100%;
-    margin: 0 auto;
-    max-width: 880px;
-    min-height: 500px;
-    padding-bottom: 100px;
-    padding-top: 30px;
-    position: relative;
-    text-decoration: none;
-  }
-  .oppia-subtopic-next-subtopic-label {
-    color: rgb(51, 51, 51);
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 1.4em;
-    font-weight: 600;
-  }
-  .oppia-page-contents-viewer {
-    background-color: rgb(236, 245, 252);
-    border-radius: 4px;
-    color: rgb(51, 51, 51);
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 1.4em;
-    margin-left: 50px;
-    margin-right: 50px;
-    margin-top: 4vh;
-    padding: 40px 50px;
-    width: calc(100% - 100px);
-  }
-  .oppia-subtopic-viewer-next-subtopic-summary {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 100px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20px;
-    max-width: 880px;
-  }
-  .oppia-subtopic-summary-tile {
-    background-color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    height: 240px;
-    margin-right: 5%;
-    padding: 0;
-    position: relative;
-    text-align: left;
-    -webkit-transition: all 300ms;
-    transition: all 300ms;
-    vertical-align: top;
-    white-space: normal;
-    width: 200px;
-  }
-
-  @media(max-width: 600px) {
-    .oppia-subtopic-viewer-container {
-      padding-top: 80px;
-    }
-
-    .oppia-subtopic-title {
-      font-size: 2em;
-      margin-left: 25px;
-      padding-right: 25px;
-      padding-top: 20px;
-    }
-
-    .oppia-page-contents-viewer {
-      font-size: 1.2em;
-      margin-left: 25px;
-      margin-right: 25px;
-      padding: 30px 20px;
-      width: calc(100% - 50px);
-    }
-  }
-</style>

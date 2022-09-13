@@ -67,6 +67,7 @@ describe('States Object Factory', () => {
         },
         default_outcome: {
           dest: '(untitled state)',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -113,6 +114,7 @@ describe('States Object Factory', () => {
         },
         default_outcome: {
           dest: 'new state',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -161,6 +163,7 @@ describe('States Object Factory', () => {
         },
         default_outcome: {
           dest: 'new state',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -225,6 +228,7 @@ describe('States Object Factory', () => {
         },
         default_outcome: {
           dest: 'new state',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -282,6 +286,7 @@ describe('States Object Factory', () => {
           answer_groups: [{
             outcome: {
               dest: 'second state',
+              dest_if_really_stuck: 'second state',
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -297,6 +302,7 @@ describe('States Object Factory', () => {
           }],
           default_outcome: {
             dest: 'second state',
+            dest_if_really_stuck: 'second state',
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -338,6 +344,7 @@ describe('States Object Factory', () => {
           answer_groups: [{
             outcome: {
               dest: 'first state',
+              dest_if_really_stuck: 'first state',
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -353,6 +360,7 @@ describe('States Object Factory', () => {
           }],
           default_outcome: {
             dest: 'first state',
+            dest_if_really_stuck: 'first state',
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -447,6 +455,7 @@ describe('States Object Factory', () => {
           answer_groups: [{
             outcome: {
               dest: 'second state',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: '<p>Good.</p>'
@@ -472,6 +481,7 @@ describe('States Object Factory', () => {
           },
           default_outcome: {
             dest: 'new state',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: '<p>Feedback</p>'
@@ -611,6 +621,7 @@ describe('States Object Factory', () => {
           answer_groups: [{
             outcome: {
               dest: 'third state',
+              dest_if_really_stuck: 'third state',
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -626,6 +637,7 @@ describe('States Object Factory', () => {
           }],
           default_outcome: {
             dest: 'third state',
+            dest_if_really_stuck: 'third state',
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -794,6 +806,7 @@ describe('States Object Factory', () => {
             answer_groups: [{
               outcome: {
                 dest: 'END',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: '<p>Correct!</p>'
@@ -826,6 +839,7 @@ describe('States Object Factory', () => {
             },
             default_outcome: {
               dest: 'new state',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: ''

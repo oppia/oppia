@@ -50,6 +50,7 @@ describe('Learner Local Nav Component ', () => {
 
   const explorationBackendResponse = {
     can_edit: true,
+    draft_change_list_id: 0,
     exploration: {
       init_state_name: 'state_name',
       param_changes: [],
@@ -60,6 +61,22 @@ describe('Learner Local Nav Component ', () => {
       objective: '',
       correctness_feedback_enabled: false
     },
+    exploration_metadata: {
+      title: '',
+      category: '',
+      objective: '',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: '',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      edits_allowed: true
+    },
     exploration_id: 'test_id',
     is_logged_in: true,
     session_id: 'test_session',
@@ -68,7 +85,12 @@ describe('Learner Local Nav Component ', () => {
     preferred_language_codes: [],
     auto_tts_enabled: false,
     correctness_feedback_enabled: true,
-    record_playthrough_probability: 1
+    record_playthrough_probability: 1,
+    has_viewed_lesson_info_modal_once: false,
+    furthest_reached_checkpoint_exp_version: 1,
+    furthest_reached_checkpoint_state_name: 'State B',
+    most_recently_reached_checkpoint_state_name: 'State A',
+    most_recently_reached_checkpoint_exp_version: 1
   };
 
   const userInfoForCollectionCreator = UserInfo.createDefault();

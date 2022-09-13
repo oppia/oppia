@@ -19,24 +19,32 @@
 
 export interface MisconceptionBackendDict {
   'feedback': string;
-  'id': string;
+  'id': number;
   'must_be_addressed': boolean;
   'name': string;
   'notes': string;
+}
+export interface MisconceptionSkillMap {
+  [skillName: string]: Misconception[];
+}
+
+export interface TaggedMisconception {
+  skillId: string;
+  misconceptionId: number;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class Misconception {
-  _id: string;
+  _id: number;
   _name: string;
   _notes: string;
   _feedback: string;
   _mustBeAddressed: boolean;
 
   constructor(
-      id: string, name: string, notes: string, feedback: string,
+      id: number, name: string, notes: string, feedback: string,
       mustBeAddressed: boolean) {
     this._id = id;
     this._name = name;
@@ -55,7 +63,7 @@ export class Misconception {
     };
   }
 
-  getId(): string {
+  getId(): number {
     return this._id;
   }
 
@@ -105,8 +113,9 @@ export class MisconceptionObjectFactory {
       misconceptionBackendDict.feedback,
       misconceptionBackendDict.must_be_addressed);
   }
+
   create(
-      id: string, name: string, notes: string,
+      id: number, name: string, notes: string,
       feedback: string, mustBeAddressed: boolean): Misconception {
     return new Misconception(id, name, notes, feedback, mustBeAddressed);
   }

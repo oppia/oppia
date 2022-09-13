@@ -27,18 +27,15 @@ import argparse
 import getpass
 import os
 import re
-import sys
 
-from core import python_utils
-from core import utils
-from .. import common
+import github
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from .. import common  # isort:skip  # pylint: disable=wrong-import-position
+from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
-import github  # isort:skip pylint: disable=wrong-import-position
 
 CONSTANTS_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
@@ -73,7 +70,8 @@ _PARSER.add_argument(
 
 
 def apply_changes_based_on_config(
-        local_filepath, config_filepath, expected_config_line_regex):
+    local_filepath, config_filepath, expected_config_line_regex
+):
     """Updates the local file based on the deployment configuration specified
     in the config file.
 
@@ -85,11 +83,14 @@ def apply_changes_based_on_config(
         expected_config_line_regex: str. The regex to use to verify each line
             of the config file. It should have a single group, which
             corresponds to the prefix to extract.
+
+    Raises:
+        Exception. Line(s) in config file are not matching with the regex.
     """
-    with python_utils.open_file(config_filepath, 'r') as config_file:
+    with utils.open_file(config_filepath, 'r') as config_file:
         config_lines = config_file.read().splitlines()
 
-    with python_utils.open_file(local_filepath, 'r') as local_file:
+    with utils.open_file(local_filepath, 'r') as local_file:
         local_lines = local_file.read().splitlines()
 
     local_filename = os.path.basename(local_filepath)
@@ -116,12 +117,13 @@ def apply_changes_based_on_config(
     for index, config_line in enumerate(config_lines):
         local_lines[local_line_numbers[index]] = config_line
 
-    with python_utils.open_file(local_filepath, 'w') as writable_local_file:
+    with utils.open_file(local_filepath, 'w') as writable_local_file:
         writable_local_file.write('\n'.join(local_lines) + '\n')
 
 
 def check_updates_to_terms_of_service(
-        release_feconf_path, personal_access_token):
+    release_feconf_path, personal_access_token
+):
     """Checks if updates are made to terms of service and updates
     REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
 
@@ -155,9 +157,9 @@ def check_updates_to_terms_of_service(
             commit_time.year, commit_time.month, commit_time.day,
             commit_time.hour, commit_time.minute, commit_time.second)
         feconf_lines = []
-        with python_utils.open_file(release_feconf_path, 'r') as f:
+        with utils.open_file(release_feconf_path, 'r') as f:
             feconf_lines = f.readlines()
-        with python_utils.open_file(release_feconf_path, 'w') as f:
+        with utils.open_file(release_feconf_path, 'w') as f:
             for line in feconf_lines:
                 if line.startswith('REGISTRATION_PAGE_LAST_UPDATED_UTC'):
                     line = (
@@ -167,17 +169,54 @@ def check_updates_to_terms_of_service(
                 f.write(line)
 
 
-def verify_feconf(release_feconf_path, verify_email_api_keys):
+def update_app_yaml(release_app_dev_yaml_path, feconf_config_path):
+    """Updates app.yaml file with more strict CORS HTTP header.
+
+    Args:
+        release_app_dev_yaml_path: str. Absolute path of the app_dev.yaml file.
+        feconf_config_path: str. Absolute path of the feconf config file.
+    """
+    with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
+        feconf_config_contents = feconf_config_file.read()
+
+    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
+        app_yaml_contents = app_yaml_file.read()
+
+    project_origin = re.search(
+        r'OPPIA_SITE_URL = \'(.*)\'', feconf_config_contents).group(1)
+    access_control_allow_origin_header = (
+        'Access-Control-Allow-Origin: %s' % project_origin)
+
+    edited_app_yaml_contents, _ = re.subn(
+        r'Access-Control-Allow-Origin: \"\*\"',
+        access_control_allow_origin_header,
+        app_yaml_contents
+    )
+
+    with utils.open_file(release_app_dev_yaml_path, 'w') as app_yaml_file:
+        app_yaml_file.write(edited_app_yaml_contents)
+
+
+def verify_config_files(
+    release_feconf_path, release_app_dev_yaml_path, verify_email_api_keys
+):
     """Verifies that feconf is updated correctly to include
     mailgun api key, mailchimp api key and redishost.
 
     Args:
         release_feconf_path: str. The path to feconf file in release
             directory.
+        release_app_dev_yaml_path: str. The path to app_dev.yaml file in release
+            directory.
         verify_email_api_keys: bool. Whether to verify both mailgun and
             mailchimp api keys.
+
+    Raises:
+        Exception. The mailgun API key not added before deployment.
+        Exception. The mailchimp API key not added before deployment.
+        Exception. REDISHOST not updated before deployment.
     """
-    feconf_contents = python_utils.open_file(
+    feconf_contents = utils.open_file(
         release_feconf_path, 'r').read()
     if verify_email_api_keys and (
             'MAILGUN_API_KEY' not in feconf_contents or
@@ -193,6 +232,15 @@ def verify_feconf(release_feconf_path, verify_email_api_keys):
     if ('REDISHOST' not in feconf_contents or
             'REDISHOST = \'localhost\'' in feconf_contents):
         raise Exception('REDISHOST must be updated before deployment.')
+
+    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
+        app_yaml_contents = app_yaml_file.read()
+
+    if 'Access-Control-Allow-Origin: \"*\"' in app_yaml_contents:
+        raise Exception(
+            '\'Access-Control-Allow-Origin: "*"\' must be updated to '
+            'a specific origin before deployment.'
+        )
 
 
 def add_mailgun_api_key(release_feconf_path):
@@ -213,13 +261,12 @@ def add_mailgun_api_key(release_feconf_path):
                 'key: %s, please retry.' % mailgun_api_key))
         mailgun_api_key = mailgun_api_key.strip()
 
-    feconf_lines = []
-    with python_utils.open_file(release_feconf_path, 'r') as f:
+    with utils.open_file(release_feconf_path, 'r') as f:
         feconf_lines = f.readlines()
 
     assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
 
-    with python_utils.open_file(release_feconf_path, 'w') as f:
+    with utils.open_file(release_feconf_path, 'w') as f:
         for line in feconf_lines:
             if line == 'MAILGUN_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailgun_api_key)
@@ -245,13 +292,13 @@ def add_mailchimp_api_key(release_feconf_path):
         mailchimp_api_key = mailchimp_api_key.strip()
 
     feconf_lines = []
-    with python_utils.open_file(release_feconf_path, 'r') as f:
+    with utils.open_file(release_feconf_path, 'r') as f:
         feconf_lines = f.readlines()
 
     error_text = 'Missing mailchimp API key'
     assert 'MAILCHIMP_API_KEY = None\n' in feconf_lines, error_text
 
-    with python_utils.open_file(release_feconf_path, 'w') as f:
+    with utils.open_file(release_feconf_path, 'w') as f:
         for line in feconf_lines:
             if line == 'MAILCHIMP_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailchimp_api_key)
@@ -274,12 +321,14 @@ def main(args=None):
         options.release_dir_path, common.FECONF_PATH)
     release_constants_path = os.path.join(
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
+    release_app_dev_yaml_path = os.path.join(
+        options.release_dir_path, common.APP_DEV_YAML_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
             utils.url_open(TERMS_PAGE_FOLDER_URL)
-        except Exception:
-            raise Exception('Terms mainpage does not exist on Github.')
+        except Exception as e:
+            raise Exception('Terms mainpage does not exist on Github.') from e
         add_mailgun_api_key(release_feconf_path)
         add_mailchimp_api_key(release_feconf_path)
         check_updates_to_terms_of_service(
@@ -289,8 +338,12 @@ def main(args=None):
         release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
-    verify_feconf(
-        release_feconf_path, options.prompt_for_mailgun_and_terms_update)
+    update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
+    verify_config_files(
+        release_feconf_path,
+        release_app_dev_yaml_path,
+        options.prompt_for_mailgun_and_terms_update
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

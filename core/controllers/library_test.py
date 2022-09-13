@@ -54,7 +54,7 @@ class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
 class LibraryPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LibraryPageTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -231,7 +231,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exp_services.index_explorations_given_ids([exp_id])
         response_dict = self.get_json(
             feconf.LIBRARY_SEARCH_DATA_URL, params={
-                'category': '("A category")',
+                'category': '("Algebra")',
                 'language_code': '("en")'
             })
         activity_list = (
@@ -296,7 +296,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LibraryIndexHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -418,7 +418,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 class LibraryGroupPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LibraryGroupPageTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -571,6 +571,19 @@ class CategoryConfigTests(test_utils.GenericTestBase):
             '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON))
 
 
+class LibraryRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old 'gallery' page URL to the
+    library index page."""
+
+    def test_old_gallery_page_url(self):
+        """Test to validate that the old gallery page url redirects
+        to the library index page.
+        """
+        response = self.get_html_response('/gallery', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/community-library', response.headers['location'])
+
+
 class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
     PRIVATE_EXP_ID_EDITOR = 'eid0'
@@ -578,7 +591,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
     PRIVATE_EXP_ID_VIEWER = 'eid2'
 
     def setUp(self):
-        super(ExplorationSummariesHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

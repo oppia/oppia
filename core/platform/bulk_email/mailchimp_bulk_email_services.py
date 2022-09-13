@@ -114,7 +114,7 @@ def _create_user_in_mailchimp_db(user_email: str) -> bool:
         # common error titles.
         if error_message['title'] == 'Forgotten Email Not Subscribed':
             return False
-        raise Exception(error_message['detail'])
+        raise Exception(error_message['detail']) from error
     return True
 
 
@@ -155,7 +155,7 @@ def permanently_delete_user_from_list(user_email: str) -> None:
         error_message = ast.literal_eval(str(error))
         # Ignore if the error corresponds to "User does not exist".
         if error_message['status'] != 404:
-            raise Exception(error_message['detail'])
+            raise Exception(error_message['detail']) from error
 
 
 def add_or_update_user_status(
@@ -234,5 +234,5 @@ def add_or_update_user_status(
                 if not user_creation_successful:
                     return False
         else:
-            raise Exception(error_message['detail'])
+            raise Exception(error_message['detail']) from error
     return True

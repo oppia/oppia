@@ -23,6 +23,8 @@ import { MatCardModule } from '@angular/material/card';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -32,8 +34,9 @@ import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.co
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ToastrModule } from 'ngx-toastr';
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 declare var angular: ng.IAngularStatic;
 
@@ -42,9 +45,10 @@ declare var angular: ng.IAngularStatic;
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     MatCardModule,
     ReactiveFormsModule,
     SharedComponentsModule,
@@ -75,6 +79,11 @@ declare var angular: ng.IAngularStatic;
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ],
 })

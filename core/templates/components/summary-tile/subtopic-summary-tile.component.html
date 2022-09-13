@@ -1,7 +1,7 @@
-<div class="subtopic-card protractor-test-subtopic-tile"
+<div class="subtopic-card e2e-test-subtopic-tile"
      (click)="openSubtopicPage()"
      [ngClass]="{'disabled-link': !classroomUrlFragment}">
-  <div class="subtopic-thumbnail protractor-test-subtopic-thumbnail"
+  <div class="subtopic-thumbnail e2e-test-subtopic-thumbnail"
        [ngStyle]="{background: thumbnailBgColor}">
     <img [src]="thumbnailUrl"
          class="img-thumbnail"
@@ -9,13 +9,19 @@
          [ngStyle]="{background: thumbnailBgColor}">
   </div>
   <div class="subtopic-title">
-    {{ subtopicTitle }}
+    <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
+      {{ subtopicTitle }}
+    </span>
+    <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
+      {{ subtopicTitleTranslationKey | translate  }}
+    </span>
   </div>
 </div>
 <style>
   .subtopic-card {
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    max-width: 170px;
     width: 170px;
   }
 
@@ -40,7 +46,7 @@
   }
 
   .subtopic-title {
-    background-color: #BE563C;
+    background-color: #be563c;
     border-radius: 0 0 0.4em 0.4em;
     color: #fff;
     font-family: Roboto, Arial, sans-serif;
@@ -58,10 +64,6 @@
   }
 
   @media(max-width: 1024px) {
-    subtopics-list .subtopic-card {
-      width: 150px;
-    }
-
     .subtopic-title {
       font-size: 0.8em;
       height: 85px;
@@ -70,10 +72,6 @@
   }
 
   @media(max-width: 680px) {
-    subtopics-list .subtopic-card {
-      width: 130px;
-    }
-
     .subtopic-title {
       font-size: 0.8em;
       height: 85px;
@@ -81,8 +79,9 @@
   }
 
   @media(max-width: 500px) {
-    subtopics-list .subtopic-card {
-      width: 130px;
+    .oppia-page-card {
+      padding: 15px 24px 64px 24px;
+      width: 90vw;
     }
 
     .subtopic-title {
@@ -91,37 +90,6 @@
 
     .subtopic-thumbnail {
       height: 100px;
-    }
-  }
-
-  @media(max-width: 350px) {
-    subtopics-list .subtopic-card {
-      width: 120px;
-    }
-  }
-
-  .oppia-topic-viewer-container .background-banner-position {
-    position: inherit;
-  }
-
-  .oppia-page-card {
-    border-radius: 0.25em;
-    margin-top: 5vh;
-    padding-bottom: 7.5vh;
-    width: 704px;
-  }
-
-  @media(max-width: 1024px) {
-    .oppia-page-card {
-      margin-top: 5vh;
-      width: 80vw;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .oppia-page-card {
-      padding: 15px 24px 64px 24px;
-      width: 90vw;
     }
   }
 </style>

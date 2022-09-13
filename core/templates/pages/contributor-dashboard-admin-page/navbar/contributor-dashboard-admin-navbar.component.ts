@@ -29,14 +29,19 @@ import { AppConstants } from 'app.constants';
   templateUrl: './contributor-dashboard-admin-navbar.component.html',
 })
 export class ContributorDashboardAdminNavbarComponent implements OnInit {
-  profilePictureDataUrl: string;
-  username: string;
-  profileUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  profilePictureDataUrl!: string;
+  profileUrl!: string;
+  logoWebpImageSrc!: string;
+  logoPngImageSrc!: string;
+  // User name is null if the user is not logged in.
+  username: string | null = null;
   logoutUrl: string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
+
   profileDropdownIsActive: boolean = false;
-  logoWebpImageSrc: string;
-  logoPngImageSrc: string;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
@@ -62,11 +67,15 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
-    this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl('/profile/<username>', {
-        username: this.username
-      })
-    );
+    if (this.username === null) {
+      throw new Error('User name is null.');
+    } else {
+      this.profileUrl = (
+        this.urlInterpolationService.interpolateUrl('/profile/<username>', {
+          username: this.username
+        })
+      );
+    }
   }
 
   ngOnInit(): void {

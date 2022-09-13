@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,49 +13,64 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the skill rubric editor.
+ * @fileoverview Component for the skill rubrics editor.
  */
 
-require('domain/skill/skill-update.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-
-require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
-require('services/contextual/window-dimensions.service.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
+import { Rubric } from 'domain/skill/rubric.model';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
-angular.module('oppia').component('skillRubricsEditor', {
-  template: require('./skill-rubrics-editor.component.html'),
-  controller: [
-    '$scope', 'SkillEditorStateService',
-    'SkillUpdateService', 'WindowDimensionsService',
-    function(
-        $scope, SkillEditorStateService,
-        SkillUpdateService, WindowDimensionsService) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      $scope.onSaveRubric = function(difficulty, explanations) {
-        SkillUpdateService.updateRubricForDifficulty(
-          $scope.skill, difficulty, explanations);
-      };
-      $scope.toggleRubricsList = function() {
-        if (WindowDimensionsService.isWindowNarrow()) {
-          $scope.rubricsListIsShown = !$scope.rubricsListIsShown;
-        }
-      };
-      ctrl.$onInit = function() {
-        $scope.skill = SkillEditorStateService.getSkill();
-        $scope.rubricsListIsShown = (
-          !WindowDimensionsService.isWindowNarrow());
-        ctrl.directiveSubscriptions.add(
-          SkillEditorStateService.onSkillChange.subscribe(
-            () => $scope.rubrics = $scope.skill.getRubrics())
-        );
-      };
+@Component({
+  selector: 'oppia-skill-rubrics-editor',
+  templateUrl: './skill-rubrics-editor.component.html'
+})
+export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  skill!: Skill;
+  rubrics!: Rubric[];
+  rubricsListIsShown: boolean = false;
+  directiveSubscriptions = new Subscription();
 
-      $scope.$on('$destroy', function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      });
-    }]
-});
+  constructor(
+    private skillEditorStateService: SkillEditorStateService,
+    private skillUpdateService: SkillUpdateService,
+    private windowDimensionsService: WindowDimensionsService
+  ) {}
+
+  onSaveRubric(difficulty: string, explanations: string[]): void {
+    this.skillUpdateService.updateRubricForDifficulty(
+      this.skill, difficulty, explanations);
+  }
+
+  toggleRubricsList(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.rubricsListIsShown = !this.rubricsListIsShown;
+    }
+  }
+
+  ngOnInit(): void {
+    this.skill = this.skillEditorStateService.getSkill();
+    this.rubricsListIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.directiveSubscriptions.add(
+      this.skillEditorStateService.onSkillChange.subscribe(
+        () => this.rubrics = this.skill.getRubrics())
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaSkillRubricsEditor',
+  downgradeComponent({
+    component: SkillRubricsEditorComponent
+  }) as angular.IDirectiveFactory);

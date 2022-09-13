@@ -22,18 +22,50 @@ import re
 
 from core import feconf
 from core import utils
-from core.domain import object_registry
 from core.domain import value_generators_domain
+
+from typing import Any, Dict, List, Union, cast
+from typing_extensions import TypedDict
+
+
+class CustomizationArgsDict(TypedDict):
+    """Dictionary representing the customization_args argument."""
+
+    parse_with_jinja: bool
+
+
+class CustomizationArgsDictWithValue(CustomizationArgsDict):
+    """Dictionary representing the customization_args argument
+    containing value key.
+    """
+
+    value: str
+
+
+class CustomizationArgsDictWithValueList(CustomizationArgsDict):
+    """Dictionary representing the customization_args argument
+    containing list_of_values key.
+    """
+
+    list_of_values: List[str]
+
+
+AllowedCustomizationArgsDict = Union[
+    CustomizationArgsDictWithValue,
+    CustomizationArgsDictWithValueList
+]
+
+
+class ParamSpecDict(TypedDict):
+    """Dictionary representing the ParamSpec object."""
+
+    obj_type: str
 
 
 class ParamSpec:
     """Value object for an exploration parameter specification."""
 
-    SUPPORTED_OBJ_TYPES = {
-        'UnicodeString',
-    }
-
-    def __init__(self, obj_type):
+    def __init__(self, obj_type: str) -> None:
         """Initializes a ParamSpec object with the specified object type.
 
         Args:
@@ -42,7 +74,7 @@ class ParamSpec:
         """
         self.obj_type = obj_type
 
-    def to_dict(self):
+    def to_dict(self) -> ParamSpecDict:
         """Returns a dict representation of this ParamSpec.
 
         Returns:
@@ -54,7 +86,7 @@ class ParamSpec:
         }
 
     @classmethod
-    def from_dict(cls, param_spec_dict):
+    def from_dict(cls, param_spec_dict: ParamSpecDict) -> ParamSpec:
         """Creates a ParamSpec object from its dict representation.
 
         Args:
@@ -68,24 +100,34 @@ class ParamSpec:
         """
         return cls(param_spec_dict['obj_type'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validate the existence of the object class."""
 
-        # Ensure that this object class exists.
-        object_registry.Registry.get_object_class_by_type(self.obj_type)
-
         # Ensure the obj_type is among the supported ParamSpec types.
-        if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
+        if self.obj_type not in feconf.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
                 '%s is not among the supported object types for parameters:'
                 ' {%s}.' %
-                (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
+                (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
+
+
+class ParamChangeDict(TypedDict):
+    """Dictionary representing the ParamChange object."""
+
+    name: str
+    generator_id: str
+    customization_args: AllowedCustomizationArgsDict
 
 
 class ParamChange:
     """Value object for a parameter change."""
 
-    def __init__(self, name, generator_id, customization_args):
+    def __init__(
+        self,
+        name: str,
+        generator_id: str,
+        customization_args: AllowedCustomizationArgsDict
+    ) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
         Args:
@@ -107,7 +149,7 @@ class ParamChange:
         self._customization_args = customization_args
 
     @property
-    def name(self):
+    def name(self) -> str:
         """The name of the changing parameter.
 
         Returns:
@@ -116,7 +158,7 @@ class ParamChange:
         return self._name
 
     @property
-    def generator(self):
+    def generator(self) -> value_generators_domain.BaseValueGenerator:
         """The value generator used to define the new value of the
         changing parameter.
 
@@ -128,7 +170,7 @@ class ParamChange:
             self._generator_id)()
 
     @property
-    def customization_args(self):
+    def customization_args(self) -> AllowedCustomizationArgsDict:
         """A dict containing several arguments that determine the changing value
         of the parameter.
 
@@ -142,7 +184,7 @@ class ParamChange:
          """
         return self._customization_args
 
-    def to_dict(self):
+    def to_dict(self) -> ParamChangeDict:
         """Returns a dict representing this ParamChange domain object.
 
         Returns:
@@ -155,7 +197,7 @@ class ParamChange:
         }
 
     @classmethod
-    def from_dict(cls, param_change_dict):
+    def from_dict(cls, param_change_dict: ParamChangeDict) -> ParamChange:
         """Create a ParamChange object with the specified arguments.
 
         Args:
@@ -181,18 +223,19 @@ class ParamChange:
             param_change_dict['customization_args']
         )
 
-    def _get_value(self, context_params):
+    # This method returns the single value of a parameter which can be of type
+    # str, int and other types too. That's why Any is used as return type.
+    def get_value(self, context_params: Dict[str, Any]) -> Any:
         """Generates a single value for a parameter change."""
+        # The generate_value() can accept different types of customization
+        # keyword args But here we are providing CustomizationArgsDict as
+        # keywords args which causes MyPy to throw error. Thus to match
+        # the argument type we used cast here.
+        custom_args = cast(Dict[str, Any], self.customization_args)
         return self.generator.generate_value(
-            context_params, **self.customization_args)
+            context_params, **custom_args)
 
-    def get_normalized_value(self, obj_type, context_params):
-        """Generates a single normalized value for a parameter change."""
-        raw_value = self._get_value(context_params)
-        return object_registry.Registry.get_object_class_by_type(
-            obj_type).normalize(raw_value)
-
-    def validate(self):
+    def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
         if not isinstance(self.name, str):
             raise utils.ValidationError(
@@ -210,9 +253,9 @@ class ParamChange:
 
         try:
             hasattr(self, 'generator')
-        except KeyError:
+        except KeyError as e:
             raise utils.ValidationError(
-                'Invalid generator ID %s' % self._generator_id)
+                'Invalid generator ID %s' % self._generator_id) from e
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(

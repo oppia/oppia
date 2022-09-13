@@ -29,7 +29,6 @@ import urllib
 
 from core import feconf
 from core import handler_schema_constants
-from core import python_utils
 from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
@@ -70,7 +69,7 @@ def load_template(filename):
         str. The HTML file content.
     """
     filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
-    with python_utils.open_file(filepath, 'r') as f:
+    with utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
 
@@ -119,18 +118,6 @@ class UserFacingExceptions:
 
         pass
 
-    class TemporaryMaintenanceException(Exception):
-        """Error class for when the server is currently down for temporary
-        maintenance (error code 503).
-        """
-
-        def __init__(self):
-            super(
-                UserFacingExceptions.TemporaryMaintenanceException, self
-            ).__init__(
-                'Oppia is currently being upgraded, and the site should be up '
-                'and running again in a few hours. Thanks for your patience!')
-
 
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
@@ -168,10 +155,19 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # This try-catch block is intended to log cases where getting the
+        # request payload errors with ValueError: Invalid boundary in multipart
+        # form: b''. This is done to gather sufficient data to help debug the
+        # error if it arises in the future.
+        try:
+            payload_json_string = self.request.get('payload')
+        except ValueError as e:
+            logging.error('%s: request %s', e, self.request)
+            raise e
         # TODO(#13155): Remove the if-else part once all the handlers have had
         # schema validation implemented.
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
+        if payload_json_string:
+            self.payload = json.loads(payload_json_string)
         else:
             self.payload = None
         self.iframed = False
@@ -195,6 +191,11 @@ class BaseHandler(webapp2.RequestHandler):
         except auth_domain.StaleAuthSessionError:
             auth_services.destroy_auth_session(self.response)
             self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        except auth_domain.UserDisabledError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
         except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
@@ -275,8 +276,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if not self._is_requested_path_currently_accessible_to_user():
-            self.handle_exception(
-                self.TemporaryMaintenanceException(), self.app.debug)
+            self.render_template('maintenance-page.mainpage.html')
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -321,19 +321,20 @@ class BaseHandler(webapp2.RequestHandler):
         schema_validation_succeeded = True
         try:
             self.validate_and_normalize_args()
-        except self.InvalidInputException as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
-        # TODO(#13155): Remove this clause once all the handlers have had
-        # schema validation implemented.
-        except NotImplementedError as e:
-            self.handle_exception(e, self.app.debug)
-            schema_validation_succeeded = False
 
+        # TODO(#13155): Remove NotImplementedError once all the handlers
+        # have had schema validation implemented.
+        except (
+            NotImplementedError,
+            self.InternalErrorException,
+            self.InvalidInputException
+        ) as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
         if not schema_validation_succeeded:
             return
 
-        super(BaseHandler, self).dispatch()
+        super().dispatch()
 
     def validate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.
@@ -344,11 +345,24 @@ class BaseHandler(webapp2.RequestHandler):
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
-        url_path_args = self.request.route_kwargs
-        handler_class_names_with_no_schema = (
-            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
 
-        if handler_class_name in handler_class_names_with_no_schema:
+        # For HEAD requests, we use the schema of GET handler,
+        # because HEAD returns just the handlers of the GET request.
+        if request_method == 'HEAD':
+            request_method = 'GET'
+
+        url_path_args = self.request.route_kwargs
+
+        if (
+            handler_class_name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
+            # TODO(#13155): Remove this clause once all the handlers have had
+            # schema validation implemented.
+            if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
+                raise self.InternalErrorException(
+                    'Remove handler class name from '
+                    'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
             return
 
         handler_args = {}
@@ -358,7 +372,7 @@ class BaseHandler(webapp2.RequestHandler):
             if arg == 'csrf_token':
                 # 'csrf_token' has been already validated in the
                 # dispatch method.
-                continue
+                pass
             elif arg == 'source':
                 source_url = self.request.get('source')
                 regex_pattern = (
@@ -391,7 +405,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         self.request.route_kwargs, errors = (
-            payload_validator.validate(
+            payload_validator.validate_arguments_against_schema(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
 
@@ -413,14 +427,14 @@ class BaseHandler(webapp2.RequestHandler):
         try:
             schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
                 request_method]
-        except Exception:
+        except Exception as e:
             raise NotImplementedError(
                 'Missing schema for %s method in %s handler class.' % (
-                    request_method, handler_class_name))
+                    request_method, handler_class_name)) from e
 
         allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
-            payload_validator.validate(
+            payload_validator.validate_arguments_against_schema(
                 handler_args, schema_for_request_method, extra_args_are_allowed,
                 allow_string_to_bool_conversion)
         )
@@ -446,6 +460,11 @@ class BaseHandler(webapp2.RequestHandler):
                 self.normalized_request[arg] = normalized_arg_values.get(arg)
             else:
                 self.normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        self.request.get = RaiseErrorOnGet(
+            'Use self.normalized_request instead of self.request.').get
+        self.payload = RaiseErrorOnGet(
+            'Use self.normalized_payload instead of self.payload.')
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
@@ -506,6 +525,12 @@ class BaseHandler(webapp2.RequestHandler):
         """
         raise self.PageNotFoundException
 
+    def head(self, *args, **kwargs):
+        """Method to handle HEAD requests. The webapp library automatically
+        makes sure that HEAD only returns the headers of GET request.
+        """
+        return self.get(*args, **kwargs)
+
     def render_json(self, values: Dict[Any, Any]) -> None:
         """Prepares JSON response to be sent to the client.
 
@@ -553,6 +578,9 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
+
+        Raises:
+            Exception. Invalid X-Frame-Options.
         """
 
         # The 'no-store' must be used to properly invalidate the cache when we
@@ -592,8 +620,6 @@ class BaseHandler(webapp2.RequestHandler):
             if self.iframed:
                 self.render_template(
                     'error-iframed.mainpage.html', iframe_restriction=None)
-            elif values['status_code'] == 503:
-                self.render_template('maintenance-page.mainpage.html')
             elif values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
@@ -619,7 +645,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert error_code in [400, 401, 404, 500, 503]
+        assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
 
@@ -652,9 +678,20 @@ class BaseHandler(webapp2.RequestHandler):
             # For GET requests, there is no payload, so we check against
             # GET_HANDLER_ERROR_RETURN_TYPE.
             # Otherwise, we check whether self.payload exists.
-            if (self.payload is not None or
+
+            # This check is to avoid throwing of 401 when payload doesn't
+            # exists and self.payload is replaced by RaiseErrorOnGet object.
+            # TODO(#13155): Change this to self.normalized_payload
+            #  once schema is implemented for all handlers.
+            payload_exists = (
+                self.payload is not None and
+                not isinstance(self.payload, RaiseErrorOnGet)
+            )
+            if (
+                    payload_exists or
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
-                    feconf.HANDLER_TYPE_JSON):
+                    feconf.HANDLER_TYPE_JSON
+            ):
                 self.error(401)
                 self._render_exception(
                     401, {
@@ -692,11 +729,6 @@ class BaseHandler(webapp2.RequestHandler):
             self._render_exception(500, {'error': str(exception)})
             return
 
-        if isinstance(exception, self.TemporaryMaintenanceException):
-            self.error(503)
-            self._render_exception(503, {'error': str(exception)})
-            return
-
         self.error(500)
         self._render_exception(500, {'error': str(exception)})
 
@@ -705,14 +737,23 @@ class BaseHandler(webapp2.RequestHandler):
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
     PageNotFoundException = UserFacingExceptions.PageNotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
-    TemporaryMaintenanceException = (
-        UserFacingExceptions.TemporaryMaintenanceException)
 
 
 class Error404Handler(BaseHandler):
     """Handles 404 errors."""
 
     pass
+
+
+class RaiseErrorOnGet:
+    """Class that will throw a ValueError when the get function is invoked."""
+
+    def __init__(self, message: str):
+        self.error_message = message
+
+    def get(self, *args: Any, **kwargs: Any) -> None:
+        """Raises an error when invoked."""
+        raise ValueError(self.error_message)
 
 
 class CsrfTokenManager:

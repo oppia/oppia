@@ -27,9 +27,58 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { ExplorationChange, ExplorationChangeEditExplorationProperty } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
+import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
+import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
+import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
+import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
+import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
+import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+
+export type StatePropertyValues = (
+  AnswerGroup[] |
+  boolean |
+  Hint[] |
+  InteractionCustomizationArgs |
+  Outcome |
+  ParamChange[] |
+  RecordedVoiceovers |
+  string |
+  SubtitledHtml
+);
+export type StatePropertyDictValues = (
+  AnswerGroupBackendDict[] |
+  boolean |
+  HintBackendDict[] |
+  InteractionCustomizationArgsBackendDict |
+  OutcomeBackendDict |
+  ParamChangeBackendDict[] |
+  RecordedVoiceOverBackendDict |
+  string |
+  SubtitledHtmlBackendDict
+);
+export type StatePropertyNames = (
+  'answer_groups' |
+  'card_is_checkpoint' |
+  'confirmed_unclassified_answers' |
+  'content' |
+  'default_outcome' |
+  'hints' |
+  'linked_skill_id' |
+  'next_content_id_index' |
+  'param_changes' |
+  'param_specs' |
+  'recorded_voiceovers' |
+  'solicit_answer_details' |
+  'solution' |
+  'state_name' |
+  'widget_customization_args' |
+  'widget_id' |
+  'written_translations'
+);
 
 @Injectable({
   providedIn: 'root'
@@ -37,10 +86,10 @@ import { InternetConnectivityService } from 'services/internet-connectivity.serv
 export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
-  undoneChangeStack: ExplorationChange[] = [];
+
   // Stack for storing undone changes. The last element is the most recently
   // undone change.
-  ndoneChangeStack = [];
+  undoneChangeStack: ExplorationChange[] = [];
   loadingMessage: string = '';
   // Temporary list of the changes made to the exploration when offline.
   temporaryListOfChanges: ExplorationChange[] = [];
@@ -61,7 +110,7 @@ export class ChangeListService {
     correctness_feedback_enabled: true
   };
 
-  ALLOWED_STATE_BACKEND_NAMES = {
+  ALLOWED_STATE_BACKEND_NAMES: Record<StatePropertyNames, boolean> = {
     answer_groups: true,
     confirmed_unclassified_answers: true,
     content: true,
@@ -171,7 +220,6 @@ export class ChangeListService {
    *
    * @param {string} stateName - The name of the newly-added state
    */
-
   addState(stateName: string): void {
     this.addChange({
       cmd: 'add_state',
@@ -186,7 +234,6 @@ export class ChangeListService {
    *
    * @param {string} stateName - The name of the deleted state.
    */
-
   deleteState(stateName: string): void {
     this.addChange({
       cmd: 'delete_state',
@@ -210,9 +257,11 @@ export class ChangeListService {
    * @param {string} newValue - The new value of the property
    * @param {string} oldValue - The previous value of the property
    */
-
   editExplorationProperty(
-      backendName: string, newValue: string, oldValue: string): void {
+      backendName: string,
+      newValue: unknown,
+      oldValue: unknown
+  ): void {
     if (!this.ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning(
         'Invalid exploration property: ' + backendName);
@@ -223,7 +272,7 @@ export class ChangeListService {
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
       property_name: backendName
-    });
+    } as ExplorationChangeEditExplorationProperty);
   }
 
   /**
@@ -236,10 +285,10 @@ export class ChangeListService {
    * @param {string} newValue - The new value of the property
    * @param {string} oldValue - The previous value of the property
    */
-
   editStateProperty(
-      stateName: string, backendName: string,
-      newValue: string, oldValue: string): void {
+      stateName: string, backendName: StatePropertyNames,
+      newValue: StatePropertyDictValues, oldValue: StatePropertyDictValues
+  ): void {
     if (!this.ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning('Invalid state property: ' + backendName);
       return;
@@ -267,7 +316,6 @@ export class ChangeListService {
    *
    * @param {object} changeList - Autosaved changeList data
    */
-
   loadAutosavedChangeList(changeList: ExplorationChange[]): void {
     this.explorationChangeList = changeList;
   }

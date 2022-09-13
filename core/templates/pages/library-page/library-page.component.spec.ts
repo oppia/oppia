@@ -17,10 +17,15 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -34,7 +39,7 @@ import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
 import { MockTranslateModule } from 'tests/unit-test-utils';
 import { LibraryPageComponent } from './library-page.component';
-import { LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
+import { ActivityDict, LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -48,7 +53,7 @@ class MockWindowRef {
 class MockWindowDimensionsService {
   getResizeEvent() {
     return {
-      subscribe: (callb) => {
+      subscribe: (callb: () => void) => {
         callb();
         return {
           unsubscribe() {}
@@ -59,6 +64,13 @@ class MockWindowDimensionsService {
 
   getWidth(): number {
     return 700;
+  }
+}
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
   }
 }
 
@@ -77,16 +89,23 @@ describe('Library Page Component', () => {
   let keyboardShortcutService: KeyboardShortcutService;
   let loggerService: LoggerService;
   let searchService: SearchService;
+  let translateService: TranslateService;
 
-  let explorationList = [{
+  let explorationList: CreatorExplorationSummaryBackendDict[] = [{
     category: '',
     community_owned: true,
     activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
     last_updated_msec: 1,
-    ratings: null,
+    ratings: {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0
+    },
     id: 'id1',
     created_on_msec: 12,
-    human_readable_contributors_summary: null,
+    human_readable_contributors_summary: {},
     language_code: '',
     num_views: 2,
     objective: '',
@@ -99,7 +118,7 @@ describe('Library Page Component', () => {
     num_open_threads: 3
   }];
 
-  let collectionList = [{
+  let collectionList: CollectionSummaryBackendDict[] = [{
     category: '',
     community_owned: true,
     last_updated_msec: 2,
@@ -114,7 +133,7 @@ describe('Library Page Component', () => {
     node_count: 2
   }];
 
-  let libraryIndexData = {
+  let libraryIndexData: LibraryIndexData = {
     activity_summary_dicts_by_category: [{
       activity_summary_dicts: [{
         activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
@@ -195,7 +214,11 @@ describe('Library Page Component', () => {
           useClass: MockWindowDimensionsService
         },
         ClassroomBackendApiService,
-        PageTitleService
+        PageTitleService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -208,6 +231,7 @@ describe('Library Page Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     pageTitleService = TestBed.inject(PageTitleService);
+    translateService = TestBed.inject(TranslateService);
     libraryPageBackendApiService = TestBed.inject(LibraryPageBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -231,7 +255,7 @@ describe('Library Page Component', () => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.returnValue(Promise.resolve(true));
-    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(translateService.onLangChange, 'subscribe');
     spyOn(libraryPageBackendApiService, 'fetchLibraryGroupDataAsync')
       .and.returnValue(Promise.resolve({
         activity_list: [],
@@ -250,7 +274,7 @@ describe('Library Page Component', () => {
     expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
       .toHaveBeenCalled();
     expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBeTrue();
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(libraryPageBackendApiService.fetchLibraryGroupDataAsync)
       .toHaveBeenCalled();
     expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit)
@@ -265,11 +289,11 @@ describe('Library Page Component', () => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.returnValue(Promise.resolve(true));
-    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(translateService.onLangChange, 'subscribe');
     windowRef.nativeWindow.location.pathname = '/community-library';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+      .and.returnValue(Promise.resolve(libraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       new UserInfo(
         ['role'], true, true, true, true, true, 'en', 'user',
@@ -294,7 +318,7 @@ describe('Library Page Component', () => {
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
     expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
       .toHaveBeenCalled();
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(libraryPageBackendApiService.fetchLibraryIndexDataAsync)
       .toHaveBeenCalled();
     expect(userService.getUserInfoAsync).toHaveBeenCalled();
@@ -309,11 +333,11 @@ describe('Library Page Component', () => {
       spyOn(
         classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
         .and.returnValue(Promise.resolve(true));
-      spyOn(pageTitleService, 'setDocumentTitle');
+      spyOn(translateService.onLangChange, 'subscribe');
       windowRef.nativeWindow.location.pathname = '/community-library';
       fixture.detectChanges();
       spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-        .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+        .and.returnValue(Promise.resolve(libraryIndexData));
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({ isLoggedIn: () => false } as UserInfo));
       spyOn(loaderService, 'hideLoadingScreen');
@@ -338,12 +362,13 @@ describe('Library Page Component', () => {
       expect(
         classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
         .toHaveBeenCalled();
-      expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+      expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
       expect(userService.getUserInfoAsync).toHaveBeenCalled();
       expect(loggerService.error).toHaveBeenCalledWith(
-        'The actual width of tile is different than the ' +
-        'expected width. Actual size: ' + actualWidth +
-        ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX
+        'The actual width of tile is different than either of the ' +
+        'expected widths. Actual size: ' + actualWidth +
+        ', Expected sizes: ' + AppConstants.LIBRARY_TILE_WIDTH_PX +
+        '/' + AppConstants.LIBRARY_MOBILE_TILE_WIDTH_PX
       );
     }));
 
@@ -353,11 +378,11 @@ describe('Library Page Component', () => {
     spyOn(
       classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.returnValue(Promise.resolve(true));
-    spyOn(pageTitleService, 'setDocumentTitle');
+    spyOn(translateService.onLangChange, 'subscribe');
     windowRef.nativeWindow.location.pathname = '/not-valid';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+      .and.returnValue(Promise.resolve(libraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({ isLoggedIn: () => false } as UserInfo));
     spyOn(loaderService, 'hideLoadingScreen');
@@ -376,10 +401,105 @@ describe('Library Page Component', () => {
     expect(
       classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
       .toHaveBeenCalled();
-    expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(userService.getUserInfoAsync).toHaveBeenCalled();
     expect(loggerService.error).toHaveBeenCalled();
   }));
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', fakeAsync(() => {
+    componentInstance.ngOnInit();
+    tick();
+    spyOn(componentInstance, 'setPageTitle');
+    translateService.onLangChange.emit();
+    tick();
+    tick(4000);
+
+    expect(componentInstance.setPageTitle).toHaveBeenCalled();
+  }));
+
+  it('should set appropriate new page title when not in browse mode', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    componentInstance.pageMode = 'not_search';
+    componentInstance.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_LIBRARY_PAGE_TITLE');
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_LIBRARY_PAGE_TITLE');
+  });
+
+  it('should set appropriate new page title when in browse mode', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    componentInstance.pageMode = 'search';
+    componentInstance.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE');
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_LIBRARY_PAGE_BROWSE_MODE_TITLE');
+  });
+
+  it('should not initiate carousels if in mobile view', () => {
+    componentInstance.libraryWindowIsNarrow = true;
+    componentInstance.initCarousels();
+    expect(componentInstance.leftmostCardIndices.length).toEqual(0);
+  });
+
+  it('should toggle the correct button\'s text when clicked', () => {
+    componentInstance.mobileLibraryGroupsProperties = [
+      {
+        inCollapsedState: true,
+        buttonText: 'See More'
+      },
+      {
+        inCollapsedState: false,
+        buttonText: 'Collapse Section'
+      }
+    ];
+    componentInstance.toggleButtonText(0);
+
+    // Correct button text should be toggled.
+    expect(componentInstance.mobileLibraryGroupsProperties[0].buttonText)
+      .toBe('Collapse Section');
+    // Other button's text should remain unchanged.
+    expect(componentInstance.mobileLibraryGroupsProperties[1].buttonText)
+      .toBe('Collapse Section');
+
+    componentInstance.toggleButtonText(1);
+
+    expect(componentInstance.mobileLibraryGroupsProperties[1].buttonText)
+      .toBe('See More');
+    expect(componentInstance.mobileLibraryGroupsProperties[0].buttonText)
+      .toBe('Collapse Section');
+  });
+
+  it('should toggle the corresponding container\'s max-height' +
+    'and toggle the corresponding button\'s text', () => {
+    let buttonTextToggleSpy = spyOn(componentInstance, 'toggleButtonText');
+    componentInstance.mobileLibraryGroupsProperties = [
+      {
+        inCollapsedState: true,
+        buttonText: 'See More'
+      },
+      {
+        inCollapsedState: false,
+        buttonText: 'Collapse Section'
+      }
+    ];
+
+    componentInstance.toggleCardContainerHeightInMobileView(0);
+
+    // Correct container's height should be toggled.
+    expect(componentInstance.mobileLibraryGroupsProperties[0].inCollapsedState)
+      .toBe(false);
+    // Other container's height should remain unchanged.
+    expect(componentInstance.mobileLibraryGroupsProperties[1].inCollapsedState)
+      .toBe(false);
+    expect(buttonTextToggleSpy).toHaveBeenCalledWith(0);
+  });
 
   it('should show full results page when full results url is available',
     () => {
@@ -467,7 +587,7 @@ describe('Library Page Component', () => {
 
   it('should scroll carousel', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts = [];
+    let activityDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 5; i++) {
       activityDicts.push({
@@ -525,6 +645,7 @@ describe('Library Page Component', () => {
   it('should not scroll if all tiles are already showing', () => {
     componentInstance.libraryGroups = [];
     let activityDicts = [];
+    let summaryDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 3; i++) {
       activityDicts.push({
@@ -545,7 +666,7 @@ describe('Library Page Component', () => {
 
     for (let i = 0; i < 2; i++) {
       componentInstance.libraryGroups.push({
-        activity_summary_dicts: activityDicts,
+        activity_summary_dicts: summaryDicts,
         categories: [],
         header_i18n_id: '',
         has_full_results_page: true,
@@ -571,4 +692,18 @@ describe('Library Page Component', () => {
     componentInstance.scroll(1, false);
     expect(componentInstance.leftmostCardIndices).toEqual([]);
   });
+
+  it('should unsubscribe on component destruction',
+    () => {
+      componentInstance.translateSubscription = new Subscription();
+      componentInstance.resizeSubscription = new Subscription();
+      spyOn(componentInstance.translateSubscription, 'unsubscribe');
+      spyOn(componentInstance.resizeSubscription, 'unsubscribe');
+      componentInstance.ngOnDestroy();
+
+      expect(componentInstance.translateSubscription.unsubscribe)
+        .toHaveBeenCalled();
+      expect(componentInstance.resizeSubscription.unsubscribe)
+        .toHaveBeenCalled();
+    });
 });

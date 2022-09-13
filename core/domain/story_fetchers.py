@@ -23,18 +23,32 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import copy
+import itertools
 
 from core import feconf
 from core.domain import caching_services
+from core.domain import exp_fetchers
 from core.domain import story_domain
+from core.domain import topic_fetchers
+from core.domain import user_services
 from core.platform import models
 
+from typing import Dict, List, Optional, Sequence, overload
+from typing_extensions import Literal
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import story_models
+    from mypy_imports import user_models
+
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.Names.STORY, models.Names.USER])
 
 
 def _migrate_story_contents_to_latest_schema(
-        versioned_story_contents, story_id):
+    versioned_story_contents: story_domain.VersionedStoryContentsDict,
+    story_id: str
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the story structure based on the schema version of the input
     story dictionary. If the current story_contents schema changes, a new
@@ -66,7 +80,9 @@ def _migrate_story_contents_to_latest_schema(
         story_contents_schema_version += 1
 
 
-def get_story_from_model(story_model):
+def get_story_from_model(
+    story_model: story_models.StoryModel
+) -> story_domain.Story:
     """Returns a story domain object given a story model loaded
     from the datastore.
 
@@ -80,7 +96,7 @@ def get_story_from_model(story_model):
     """
 
     # Ensure the original story model does not get altered.
-    versioned_story_contents = {
+    versioned_story_contents: story_domain.VersionedStoryContentsDict = {
         'schema_version': story_model.story_contents_schema_version,
         'story_contents': copy.deepcopy(story_model.story_contents)
     }
@@ -104,7 +120,9 @@ def get_story_from_model(story_model):
         story_model.last_updated)
 
 
-def get_story_summary_from_model(story_summary_model):
+def get_story_summary_from_model(
+    story_summary_model: story_models.StorySummaryModel
+) -> story_domain.StorySummary:
     """Returns a domain object for an Oppia story summary given a
     story summary model.
 
@@ -130,7 +148,43 @@ def get_story_summary_from_model(story_summary_model):
     )
 
 
-def get_story_by_id(story_id, strict=True, version=None):
+@overload
+def get_story_by_id(
+    story_id: str,
+) -> story_domain.Story: ...
+
+
+@overload
+def get_story_by_id(
+    story_id: str,
+    *,
+    version: Optional[int] = None
+) -> story_domain.Story: ...
+
+
+@overload
+def get_story_by_id(
+    story_id: str,
+    *,
+    strict: Literal[True],
+    version: Optional[int] = None
+) -> story_domain.Story: ...
+
+
+@overload
+def get_story_by_id(
+    story_id: str,
+    *,
+    strict: Literal[False],
+    version: Optional[int] = None
+) -> Optional[story_domain.Story]: ...
+
+
+def get_story_by_id(
+    story_id: str,
+    strict: bool = True,
+    version: Optional[int] = None
+) -> Optional[story_domain.Story]:
     """Returns a domain object representing a story.
 
     Args:
@@ -166,7 +220,9 @@ def get_story_by_id(story_id, strict=True, version=None):
             return None
 
 
-def get_story_by_url_fragment(url_fragment):
+def get_story_by_url_fragment(
+    url_fragment: str
+) -> Optional[story_domain.Story]:
     """Returns a domain object representing a story.
 
     Args:
@@ -184,7 +240,27 @@ def get_story_by_url_fragment(url_fragment):
     return story
 
 
-def get_story_summary_by_id(story_id, strict=True):
+@overload
+def get_story_summary_by_id(
+    story_id: str
+) -> story_domain.StorySummary: ...
+
+
+@overload
+def get_story_summary_by_id(
+    story_id: str, *, strict: Literal[True]
+) -> story_domain.StorySummary: ...
+
+
+@overload
+def get_story_summary_by_id(
+    story_id: str, *, strict: Literal[False]
+) -> Optional[story_domain.StorySummary]: ...
+
+
+def get_story_summary_by_id(
+    story_id: str, strict: bool = True
+) -> Optional[story_domain.StorySummary]:
     """Returns a domain object representing a story summary.
 
     Args:
@@ -206,24 +282,59 @@ def get_story_summary_by_id(story_id, strict=True):
         return None
 
 
-def get_stories_by_ids(story_ids):
+@overload
+def get_stories_by_ids(
+    story_ids: List[str], *, strict: Literal[True]
+) -> List[story_domain.Story]: ...
+
+
+@overload
+def get_stories_by_ids(
+    story_ids: List[str]
+) -> List[Optional[story_domain.Story]]: ...
+
+
+@overload
+def get_stories_by_ids(
+    story_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[story_domain.Story]]: ...
+
+
+def get_stories_by_ids(
+    story_ids: List[str], strict: bool = False
+) -> Sequence[Optional[story_domain.Story]]:
     """Returns a list of stories matching the IDs provided.
 
     Args:
         story_ids: list(str). List of IDs to get stories for.
+        strict: bool. Whether to fail noisily if no story model exists
+            with a given ID exists in the datastore.
 
     Returns:
         list(Story|None). The list of stories corresponding to given ids.  If a
         Story does not exist, the corresponding returned list element is None.
+
+    Raises:
+        Exception. No story model exists for the given story_id.
     """
     all_story_models = story_models.StoryModel.get_multi(story_ids)
-    stories = [
-        get_story_from_model(story_model) if story_model is not None else None
-        for story_model in all_story_models]
+    stories: List[Optional[story_domain.Story]] = []
+    for index, story_model in enumerate(all_story_models):
+        if story_model is None:
+            if strict:
+                raise Exception(
+                    'No story model exists for the story_id: %s'
+                    % story_ids[index]
+                )
+            stories.append(story_model)
+        elif story_model is not None:
+            stories.append(get_story_from_model(story_model))
     return stories
 
 
-def get_story_summaries_by_ids(story_ids):
+def get_story_summaries_by_ids(
+    story_ids: List[str]
+) -> List[story_domain.StorySummary]:
     """Returns the StorySummary objects corresponding the given story ids.
 
     Args:
@@ -243,7 +354,77 @@ def get_story_summaries_by_ids(story_ids):
     return story_summaries
 
 
-def get_latest_completed_node_ids(user_id, story_id):
+def get_learner_group_syllabus_story_summaries(
+    story_ids: List[str]
+) -> List[story_domain.LearnerGroupSyllabusStorySummaryDict]:
+    """Returns the learner group syllabus story summary dicts
+    corresponding the given story ids.
+
+    Args:
+        story_ids: list(str). The list of story ids for which the story
+            summaries are to be returned.
+
+    Returns:
+        list(LearnerGroupSyllabusStorySummaryDict). The story summaries
+        corresponds to given story ids.
+    """
+    # Validating if story exists before adding it to all stories list is only
+    # done for mypy type checks as all story ids are supposed to be valid as
+    # a part of validation done for learner group syllabus before calling
+    # this function.
+    all_stories = [
+        story for story in get_stories_by_ids(story_ids) if story
+    ]
+
+    topic_ids = list(
+        {story.corresponding_topic_id for story in all_stories}
+    )
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topic_id_to_topic_map = {}
+    for topic in topics:
+        # Ruling out the possibility of None for mypy type checking. Topic is
+        # guaranteed to exist as a part of validation done for story ids since
+        # story is bound to be part of a topic.
+        assert topic is not None
+        topic_id_to_topic_map[topic.id] = topic
+
+    story_summaries_dicts = [
+        story_summary.to_dict() for story_summary in
+        get_story_summaries_by_ids(story_ids)
+    ]
+
+    return [
+        {
+            'id': story.id,
+            'title': story.title,
+            'description': story.description,
+            'language_code': story.language_code,
+            'version': story.version,
+            'node_titles': summary_dict['node_titles'],
+            'thumbnail_filename': story.thumbnail_filename,
+            'thumbnail_bg_color': story.thumbnail_bg_color,
+            'url_fragment': story.url_fragment,
+            'story_model_created_on': summary_dict['story_model_created_on'],
+            'story_model_last_updated':
+                summary_dict['story_model_last_updated'],
+            'story_is_published': True,
+            'completed_node_titles': [],
+            'all_node_dicts': [
+                node.to_dict() for node in
+                story.story_contents.nodes
+            ],
+            'topic_name':
+                topic_id_to_topic_map[story.corresponding_topic_id].name,
+            'topic_url_fragment':
+                topic_id_to_topic_map[
+                    story.corresponding_topic_id].url_fragment
+        }
+        for (story, summary_dict) in
+        zip(all_stories, story_summaries_dicts)
+    ]
+
+
+def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     """Returns the ids of the completed nodes that come latest in the story.
 
     Args:
@@ -262,7 +443,7 @@ def get_latest_completed_node_ids(user_id, story_id):
         return []
 
     num_of_nodes = min(len(progress_model.completed_node_ids), 3)
-    story = get_story_by_id(story_id)
+    story = get_story_by_id(story_id, strict=True)
     ordered_node_ids = (
         [node.id for node in story.story_contents.get_ordered_nodes()])
     ordered_completed_node_ids = (
@@ -272,7 +453,9 @@ def get_latest_completed_node_ids(user_id, story_id):
     return ordered_completed_node_ids[-num_of_nodes:]
 
 
-def get_completed_nodes_in_story(user_id, story_id):
+def get_completed_nodes_in_story(
+    user_id: str, story_id: str
+) -> List[story_domain.StoryNode]:
     """Returns nodes that are completed in a story
 
     Args:
@@ -283,7 +466,7 @@ def get_completed_nodes_in_story(user_id, story_id):
         list(StoryNode). The list of the story nodes that the user has
         completed.
     """
-    story = get_story_by_id(story_id)
+    story = get_story_by_id(story_id, strict=True)
     completed_nodes = []
 
     completed_node_ids = get_completed_node_ids(user_id, story_id)
@@ -294,7 +477,142 @@ def get_completed_nodes_in_story(user_id, story_id):
     return completed_nodes
 
 
-def get_pending_and_all_nodes_in_story(user_id, story_id):
+def get_user_progress_in_story_chapters(
+    user_id: str, story_ids: List[str]
+) -> List[story_domain.StoryChapterProgressSummaryDict]:
+    """Returns the progress of multiple users in multiple chapters.
+
+    Args:
+        user_id: str. The user id of the user.
+        story_ids: list(str). The ids of the stories.
+
+    Returns:
+        list(StoryChapterProgressSummaryDict). The list of the progress
+        summaries of the user corresponding to all stories chapters.
+    """
+    all_valid_story_nodes: List[story_domain.StoryNode] = []
+    for story in get_stories_by_ids(story_ids):
+        if story is not None:
+            all_valid_story_nodes.extend(story.story_contents.nodes)
+    exp_ids = [
+        node.exploration_id for node in all_valid_story_nodes
+        if node.exploration_id
+    ]
+    exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
+    user_id_exp_id_combinations = list(itertools.product([user_id], exp_ids))
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_multi(
+            user_id_exp_id_combinations))
+
+    all_chapters_progress: List[
+        story_domain.StoryChapterProgressSummaryDict] = []
+    for i, user_id_exp_id_pair in enumerate(user_id_exp_id_combinations):
+        exp_id = user_id_exp_id_pair[1]
+        exploration = exp_id_to_exp_map[exp_id]
+        all_checkpoints = user_services.get_checkpoints_in_order(
+            exploration.init_state_name,
+            exploration.states)
+        model = exp_user_data_models[i]
+        visited_checkpoints = 0
+        if model is not None:
+            most_recently_visited_checkpoint = (
+                model.most_recently_reached_checkpoint_state_name)
+            if most_recently_visited_checkpoint is not None:
+                visited_checkpoints = all_checkpoints.index(
+                    most_recently_visited_checkpoint) + 1
+        all_chapters_progress.append({
+            'exploration_id': exp_id,
+            'visited_checkpoints_count': visited_checkpoints,
+            'total_checkpoints_count': len(all_checkpoints)
+        })
+
+    return all_chapters_progress
+
+
+def get_multi_users_progress_in_stories(
+    user_ids: List[str], story_ids: List[str]
+) -> Dict[str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]]:
+    """Returns the progress of given users in all given stories.
+
+    Args:
+        user_ids: list(str). The user ids of the users.
+        story_ids: list(str). The list of story ids.
+
+    Returns:
+        Dict(str, list(StoryProgressDict)). Dictionary of user id and their
+        corresponding list of story progress dicts.
+    """
+    all_valid_stories = [
+        story for story in get_stories_by_ids(story_ids) if story
+    ]
+
+    # Filter unique topic ids from all valid stories.
+    topic_ids = list(
+        {story.corresponding_topic_id for story in all_valid_stories}
+    )
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+    topic_id_to_topic_map = {}
+    for topic in topics:
+        topic_id_to_topic_map[topic.id] = topic
+
+    story_id_to_story_map = {story.id: story for story in all_valid_stories}
+    valid_story_ids = [story.id for story in all_valid_stories]
+    all_story_summaries = get_story_summaries_by_ids(valid_story_ids)
+    story_id_to_summary_map = {
+        summary.id: summary for summary in all_story_summaries
+    }
+
+    # All poosible combinations of user_id and story_id for which progress
+    # models are returned.
+    all_posssible_combinations = itertools.product(user_ids, valid_story_ids)
+    progress_models = user_models.StoryProgressModel.get_multi(
+        user_ids, valid_story_ids
+    )
+    all_users_stories_progress: Dict[
+        str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]
+    ] = {user_id: [] for user_id in user_ids}
+    for i, (user_id, story_id) in enumerate(all_posssible_combinations):
+        progress_model = progress_models[i]
+        completed_node_ids = []
+        if progress_model is not None:
+            completed_node_ids = progress_model.completed_node_ids
+        story = story_id_to_story_map[story_id]
+        completed_node_titles = [
+            node.title for node in story.story_contents.nodes
+            if node.id in completed_node_ids
+        ]
+        topic = topic_id_to_topic_map[story.corresponding_topic_id]
+        summary_dict = story_id_to_summary_map[story_id].to_dict()
+        all_users_stories_progress[user_id].append({
+            'id': summary_dict['id'],
+            'title': summary_dict['title'],
+            'description': summary_dict['description'],
+            'language_code': summary_dict['language_code'],
+            'version': summary_dict['version'],
+            'node_titles': summary_dict['node_titles'],
+            'thumbnail_filename': summary_dict['thumbnail_filename'],
+            'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
+            'url_fragment': summary_dict['url_fragment'],
+            'story_model_created_on':
+                summary_dict['story_model_created_on'],
+            'story_model_last_updated':
+                summary_dict['story_model_last_updated'],
+            'story_is_published': True,
+            'completed_node_titles': completed_node_titles,
+            'all_node_dicts': [
+                node.to_dict() for node in
+                story.story_contents.nodes
+            ],
+            'topic_name': topic.name,
+            'topic_url_fragment': topic.url_fragment
+        })
+
+    return all_users_stories_progress
+
+
+def get_pending_and_all_nodes_in_story(
+    user_id: str, story_id: str
+) -> Dict[str, List[story_domain.StoryNode]]:
     """Returns the nodes that are pending in a story
 
     Args:
@@ -302,9 +620,10 @@ def get_pending_and_all_nodes_in_story(user_id, story_id):
         story_id: str. The id of the story.
 
     Returns:
-        list(StoryNode). The list of story nodes, pending for the user.
+        Dict[str, List[story_domain.StoryNode]]. The list of story nodes,
+        pending for the user.
     """
-    story = get_story_by_id(story_id)
+    story = get_story_by_id(story_id, strict=True)
     pending_nodes = []
 
     completed_node_ids = get_completed_node_ids(user_id, story_id)
@@ -318,7 +637,7 @@ def get_pending_and_all_nodes_in_story(user_id, story_id):
     }
 
 
-def get_completed_node_ids(user_id, story_id):
+def get_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     """Returns the ids of the nodes completed in the story.
 
     Args:
@@ -331,10 +650,19 @@ def get_completed_node_ids(user_id, story_id):
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)
 
-    return progress_model.completed_node_ids if progress_model else []
+    # TODO(#15621): The explicit declaration of type for ndb properties should
+    # be removed. Currently, these ndb properties are annotated with Any return
+    # type. Once we have proper return type we can remove this.
+    if progress_model:
+        completed_node_ids: List[str] = progress_model.completed_node_ids
+        return completed_node_ids
+    else:
+        return []
 
 
-def get_node_index_by_story_id_and_node_id(story_id, node_id):
+def get_node_index_by_story_id_and_node_id(
+    story_id: str, node_id: str
+) -> int:
     """Returns the index of the story node with the given story id
     and node id.
 
@@ -347,14 +675,10 @@ def get_node_index_by_story_id_and_node_id(story_id, node_id):
 
     Raises:
         Exception. The given story does not exist.
-        Exception. The given node does not exist in the story.
     """
     story = get_story_by_id(story_id, strict=False)
     if story is None:
         raise Exception('Story with id %s does not exist.' % story_id)
 
     node_index = story.story_contents.get_node_index(node_id)
-    if node_index is None:
-        raise Exception(
-            'Story node with id %s does not exist in this story.' % node_id)
     return node_index

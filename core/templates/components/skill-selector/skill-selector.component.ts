@@ -24,6 +24,7 @@ import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import cloneDeep from 'lodash/cloneDeep';
 import { GroupedSkillSummaries } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { UserService } from 'services/user.service';
 
 interface SubTopicFilterDict {
   [topicName: string]: { subTopicName: string; checked: boolean }[];
@@ -37,22 +38,28 @@ export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
   // have the initial 'countOfSkillsToPrioritize' entries of skills with
   // the same priority.
-  @Input() sortedSkillSummaries: GroupedSkillSummaries;
-  @Input() selectedSkillId: string;
-  @Input() countOfSkillsToPrioritize: number;
-  @Input() categorizedSkills: CategorizedSkills;
-  @Input() untriagedSkillSummaries: SkillSummary[];
-  @Input() allowSkillsFromOtherTopics: boolean;
+
+  // Some properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() sortedSkillSummaries!: GroupedSkillSummaries;
+  @Input() selectedSkillId!: string;
+  @Input() countOfSkillsToPrioritize!: number;
+  @Input() categorizedSkills!: CategorizedSkills;
+  @Input() untriagedSkillSummaries!: SkillSummary[];
+  @Input() allowSkillsFromOtherTopics!: boolean;
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
-  currCategorizedSkills: CategorizedSkills = null;
-  selectedSkill: string = null;
+  currCategorizedSkills!: CategorizedSkills;
+  selectedSkill!: string;
   skillFilterText: string = '';
   topicFilterList: { topicName: string ; checked: boolean }[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
+  userCanEditSkills: boolean = false;
 
   constructor(
-    private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe
+    private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -74,6 +81,11 @@ export class SkillSelectorComponent implements OnInit {
       }
     }
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
+
+    this.userService.canUserAccessTopicsAndSkillsDashboard()
+      .then((canUserAccessTopicsAndSkillsDashboard) => {
+        this.userCanEditSkills = canUserAccessTopicsAndSkillsDashboard;
+      });
   }
 
   checkIfEmpty(skills: Object[]): boolean {

@@ -11,14 +11,14 @@
       <span class="oppia-icon-accessibility-label">Twitter</span>
     </a>
   </div>
-  <div class="fx-main-center fx-cross-center padding-0-2">
+  <div class="fx-main-center fx-cross-center padding-0-2 classroom-icon">
     <a class="fx-main-center fx-cross-center" title="Google Classroom" [href]="getUrl('classroom')"  (click)="registerShareEvent('classroom')" target="_window">
       <img class="share-option-img share-icons" [ngClass]="smallFont ? 'font-small' : 'font-big'"  [src]="classroomUrl" alt="Classroom">
     </a>
   </div>
-  <div *ngIf="shareType === 'exploration'" title="Embed this Exploration" class="fx-main-center fx-cross-center padding-0-2">
+  <div *ngIf="shareType === 'exploration'" title="Embed this Exploration" class="fx-main-center fx-cross-center padding-0-2 embed-button-icon">
     <a class="fx-main-center fx-cross-center" (click)="showEmbedExplorationModal()" tabindex="0">
-      <i class="material-icons embed-link share-icons embed-icon" [ngClass]="smallFont ? 'font-small' : 'font-big'">&#xE86F;</i>
+      <i class="fas fa-code embed-link share-icons embed-icon" [ngClass]="smallFont ? 'font-small' : 'font-big'"></i>
       <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
   </div>
@@ -56,15 +56,16 @@
   }
 
   .oppia-sharing-links .embed-link.font-big {
-    font-size: 2rem;
-    height: 2rem;
-    width: 2rem;
+    font-size: 1.4rem;
+    height: 1.8rem;
+    padding-top: 0.2rem;
+    width: 1.8rem;
   }
 
   .oppia-sharing-links .embed-link.font-small {
-    font-size: 0.9375rem;
-    height: 1.125rem;
-    width: 1.125rem;
+    font-size: 1.6rem;
+    height: 1.9rem;
+    width: 2.2rem;
   }
 
   .oppia-sharing-links .share-option-img {
@@ -89,14 +90,12 @@
 
   i.oppia-share-icons.fab.fa-facebook-square {
     color: #3b5998;
-    font-size: 19.5px;
-    margin-top: 3px;
+    font-size: 2.01rem;
   }
 
   i.oppia-share-icons.fab.fa-twitter-square {
     color: #1da1f2;
-    font-size: 19.5px;
-    margin-top: 3px;
+    font-size: 2.01rem;
   }
 
   i.oppia-share-icons.fab.fa-chalkboard-teacher {
@@ -114,8 +113,7 @@
   i.material-icons.embed-link.share-icons.embed-icon {
     font-size: 1.8rem;
     height: 1.75rem;
-    margin-bottom: 0.15rem;
-    padding: 0 1px;
+    margin-bottom: 0.2em;
     width: 1.8rem;
   }
   .oppia-sharing-links .share-option-img.font-big {
@@ -123,7 +121,19 @@
     margin-top: 0.02rem;
     width: 1.8rem;
   }
-  .fx-main-center.fx-cross-center.padding-0-2.twitter-icon {
-    height: 1.78125rem;
+  .post-publish-modal-sharing-links .classroom-icon {
+    margin-top: -5px;
+  }
+  .post-publish-modal-sharing-links .embed-button-icon {
+    margin-top: -3px;
+  }
+  .fx-row.wrap .classroom-icon {
+    margin-top: -2px;
+  }
+  .fx-row.wrap .embed-button-icon {
+    margin-top: 1px;
+  }
+  .fx-row.collection-footer-sharing-links .classroom-icon {
+    margin-top: 1.5px;
   }
 </style>

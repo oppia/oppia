@@ -23,20 +23,24 @@ import re
 
 from core import feconf
 from core import utils
-from core.domain import app_feedback_report_constants as constants
-from core.domain import exp_services
+from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
-from core.platform import models
 
-from typing import Dict, Optional, Type, List, Any, Match # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Match, Optional
+
+from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
+from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
+# TODO(#14537): Refactor this file and remove imports marked
+# with 'invalid-import-from'.
+
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT])
 
 
 class AppFeedbackReport:
@@ -119,7 +123,7 @@ class AppFeedbackReport:
             NotImplementedError. The full validation for web report domain
                 objects is not implemented yet.
         """
-        if self.platform == constants.PLATFORM_CHOICE_WEB:
+        if self.platform == app_feedback_report_constants.PLATFORM_CHOICE_WEB:
             raise NotImplementedError(
                 'Domain objects for web reports have not been implemented yet.')
 
@@ -130,14 +134,14 @@ class AppFeedbackReport:
             self.require_valid_scrubber_id(self.scrubbed_by)
 
         if not (
-                constants.TIMEZONE_MINIMUM_OFFSET <=
+                app_feedback_report_constants.TIMEZONE_MINIMUM_OFFSET <=
                 self.local_timezone_offset_hrs <=
-                constants.TIMEZONE_MAXIMUM_OFFSET):
+                app_feedback_report_constants.TIMEZONE_MAXIMUM_OFFSET):
             raise utils.ValidationError(
                 'Expected local timezone offset to be in [%d, %d], '
                 'received: %d' % (
-                    constants.TIMEZONE_MINIMUM_OFFSET,
-                    constants.TIMEZONE_MAXIMUM_OFFSET,
+                    app_feedback_report_constants.TIMEZONE_MINIMUM_OFFSET,
+                    app_feedback_report_constants.TIMEZONE_MAXIMUM_OFFSET,
                     self.local_timezone_offset_hrs))
 
         if self.ticket_id is not None:
@@ -169,10 +173,10 @@ class AppFeedbackReport:
         """
         if platform is None:
             raise utils.ValidationError('No platform supplied.')
-        if platform not in constants.PLATFORM_CHOICES:
+        if platform not in app_feedback_report_constants.PLATFORM_CHOICES:
             raise utils.ValidationError(
                 'Report platform should be one of %s, received: %s' % (
-                    constants.PLATFORM_CHOICES, platform))
+                    app_feedback_report_constants.PLATFORM_CHOICES, platform))
 
     @classmethod
     def require_valid_schema_version(
@@ -189,7 +193,7 @@ class AppFeedbackReport:
             ValidationError. No schema version supplied.
             ValidationError. The schema version is not supported.
         """
-        assert platform == constants.PLATFORM_CHOICE_ANDROID
+        assert platform == app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
         minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
         current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
         if not isinstance(schema_version, int) or schema_version <= 0:
@@ -235,8 +239,12 @@ class AppFeedbackReport:
         Returns:
             AppFeedbackReport. The corresponding AppFeedbackReport domain
             object.
+
+        Raises:
+            NotImplementedError. Domain objects for web reports not implemented.
         """
-        if report_dict['platform_type'] == constants.PLATFORM_CHOICE_ANDROID:
+        if report_dict['platform_type'] == (
+            app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
             return cls.get_android_report_from_dict(report_dict)
         else:
             raise NotImplementedError(
@@ -310,7 +318,7 @@ class AppFeedbackReport:
     @classmethod
     def get_report_type_from_string(
         cls, report_type_name: str
-    ) -> constants.REPORT_TYPE:
+    ) -> app_feedback_report_constants.ReportType:
         """Determines the report type based on the JSON value.
 
         Args:
@@ -319,14 +327,16 @@ class AppFeedbackReport:
         Returns:
             REPORT_TYPE. The enum representing this report type.
         """
-        for report_type in constants.ALLOWED_REPORT_TYPES:
-            if report_type_name == report_type.name:
+        for report_type in app_feedback_report_constants.ALLOWED_REPORT_TYPES:
+            if report_type_name == report_type.value:
                 return report_type
         raise utils.InvalidInputException(
             'The given report type %s is invalid.' % report_type_name)
 
     @classmethod
-    def get_category_from_string(cls, category_name: str) -> constants.CATEGORY:
+    def get_category_from_string(
+        cls, category_name: str
+    ) -> app_feedback_report_constants.Category:
         """Determines the category based on the JSON value.
 
         Args:
@@ -335,8 +345,8 @@ class AppFeedbackReport:
         Returns:
             CATEGORY. The enum representing this category.
         """
-        for category_type in constants.ALLOWED_CATEGORIES:
-            if category_name == category_type.name:
+        for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
+            if category_name == category_type.value:
                 return category_type
         raise utils.InvalidInputException(
             'The given category %s is invalid.' % category_name)
@@ -344,17 +354,18 @@ class AppFeedbackReport:
     @classmethod
     def get_android_text_size_from_string(
         cls, text_size_name: str
-    ) -> constants.ANDROID_TEXT_SIZE:
+    ) -> app_feedback_report_constants.AndroidTextSize:
         """Determines the app text size based on the JSON value.
 
         Args:
             text_size_name: str. The name of the app's text size set.
 
         Returns:
-            ANDROID_TEXT_SIZE. The enum representing the text size.
+            AndroidTextSize. The enum representing the text size.
         """
-        for text_size_type in constants.ALLOWED_ANDROID_TEXT_SIZES:
-            if text_size_name == text_size_type.name:
+        for text_size_type in (
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
+            if text_size_name == text_size_type.value:
                 return text_size_type
         raise utils.InvalidInputException(
             'The given Android app text size %s is invalid.' % text_size_name)
@@ -376,18 +387,22 @@ class AppFeedbackReport:
             InvalidInputException. The given entry point is invalid.
         """
         entry_point_name = entry_point_json['entry_point_name']
-        if entry_point_name == constants.ENTRY_POINT.navigation_drawer.name:
+        if entry_point_name == (
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value):
             return NavigationDrawerEntryPoint()
-        elif entry_point_name == constants.ENTRY_POINT.lesson_player.name:
+        elif entry_point_name == (
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value):
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
-        elif entry_point_name == constants.ENTRY_POINT.revision_card.name:
+        elif entry_point_name == (
+            app_feedback_report_constants.EntryPoint.REVISION_CARD.value):
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
-        elif entry_point_name == constants.ENTRY_POINT.crash.name:
+        elif entry_point_name == (
+            app_feedback_report_constants.EntryPoint.CRASH.value):
             return CrashEntryPoint()
         else:
             raise utils.InvalidInputException(
@@ -396,17 +411,18 @@ class AppFeedbackReport:
     @classmethod
     def get_android_network_type_from_string(
         cls, network_type_name: str
-    ) -> constants.ANDROID_NETWORK_TYPE:
+    ) -> app_feedback_report_constants.AndroidNetworkType:
         """Determines the network type based on the JSON value.
 
         Args:
             network_type_name: str. The name of the network type.
 
         Returns:
-            ANDROID_NETWORK_TYPE. The enum representing the network type.
+            AndroidNetworkType. The enum representing the network type.
         """
-        for network_type in constants.ALLOWED_ANDROID_NETWORK_TYPES:
-            if network_type_name == network_type.name:
+        for network_type in (
+            app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
+            if network_type_name == network_type.value:
                 return network_type
         raise utils.InvalidInputException(
             'The given Android network type %s is invalid.' % network_type_name)
@@ -417,17 +433,17 @@ class UserSuppliedFeedback:
 
     def __init__(
         self,
-        report_type: constants.REPORT_TYPE,
-        category: constants.CATEGORY,
+        report_type: app_feedback_report_constants.ReportType,
+        category: app_feedback_report_constants.Category,
         user_feedback_selected_items: List[str],
         user_feedback_other_text_input: str
     ) -> None:
         """Constructs a UserSuppliedFeedback domain object.
 
         Args:
-            report_type: REPORT_TYPE. The type of feedback submitted by the user
+            report_type: ReportType. The type of feedback submitted by the user
                 as an enum.
-            category: CATEGORY. The category enum that this specific report_type
+            category: Category. The category enum that this specific report_type
                 is providing feedback on that correponds.
             user_feedback_selected_items: list(str). A list of strings that
                 represent any options selected by the user for the feedback
@@ -447,8 +463,8 @@ class UserSuppliedFeedback:
             dict. A dict, mapping all fields of UserSuppliedFeedback instance.
         """
         return {
-            'report_type': self.report_type.name,
-            'category': self.category.name,
+            'report_type': self.report_type.value,
+            'category': self.category.value,
             'user_feedback_selected_items': self.user_feedback_selected_items,
             'user_feedback_other_text_input': (
                 self.user_feedback_other_text_input)
@@ -477,12 +493,12 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_report_type(
-        cls, report_type: constants.REPORT_TYPE
+        cls, report_type: app_feedback_report_constants.ReportType
     ) -> None:
         """Checks whether the report_type is valid.
 
         Args:
-            report_type: REPORT_TYPE. The report type enum to validate.
+            report_type: ReportType. The report type enum to validate.
 
         Raises:
             ValidationError. No report_type supplied.
@@ -490,14 +506,17 @@ class UserSuppliedFeedback:
         """
         if report_type is None:
             raise utils.ValidationError('No report_type supplied.')
-        if report_type not in constants.ALLOWED_REPORT_TYPES:
+        if report_type not in (
+            app_feedback_report_constants.ALLOWED_REPORT_TYPES):
             raise utils.ValidationError(
                 'Invalid report type %s, must be one of %s.' % (
                     report_type,
-                    constants.ALLOWED_REPORT_TYPES))
+                    app_feedback_report_constants.ALLOWED_REPORT_TYPES))
 
     @classmethod
-    def require_valid_category(cls, category: str) -> None:
+    def require_valid_category(
+        cls, category: app_feedback_report_constants.Category
+    ) -> None:
         """Checks whether the category is valid.
 
         Args:
@@ -509,15 +528,15 @@ class UserSuppliedFeedback:
         """
         if category is None:
             raise utils.ValidationError('No category supplied.')
-        if category not in constants.ALLOWED_CATEGORIES:
+        if category not in app_feedback_report_constants.ALLOWED_CATEGORIES:
             raise utils.ValidationError(
                 'Invalid category %s, must be one of %s.' % (
-                    category, constants.ALLOWED_CATEGORIES))
+                    category, app_feedback_report_constants.ALLOWED_CATEGORIES))
 
     @classmethod
     def require_valid_user_feedback_items_for_category(
         cls,
-        category: str,
+        category: app_feedback_report_constants.Category,
         selected_items: List[str],
         other_text_input: str
     ) -> None:
@@ -536,7 +555,8 @@ class UserSuppliedFeedback:
             ValidationError. The given selection items and text input for the
                 category are not valid.
         """
-        if category in constants.ALLOWED_SELECTION_ITEMS_CATEGORIES:
+        if category in (
+            app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES):
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
             cls.require_valid_selected_items_for_category(selected_items)
@@ -544,7 +564,8 @@ class UserSuppliedFeedback:
         # If the report category only allows users to provide input text,
         # validate that the user_feedback_selected_items is None and that
         # there is a user_feedback_other_text_input.
-        if category in constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES:
+        if category in (
+            app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES):
             if len(selected_items) != 0:
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' % (
@@ -631,7 +652,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         device_model: str,
         sdk_version: int,
         build_fingerprint: str,
-        network_type: constants.ANDROID_NETWORK_TYPE
+        network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Constructs an AndroidDeviceSystemContext domain object.
 
@@ -650,10 +671,10 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             sdk_version: int. The Android SDK version running on the device.
             build_fingerprint: str. The unique build fingerprint of this app
                 version.
-            network_type: ANDROID_NETWORK_TYPE. The enum for the network type
+            network_type: AndroidNetworkType. The enum for the network type
                 the device was connected to.
         """
-        super(AndroidDeviceSystemContext, self).__init__(
+        super().__init__(
             version_name, device_country_locale_code)
         self.package_version_code = package_version_code
         self.device_language_locale_code = device_language_locale_code
@@ -678,7 +699,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             'device_model': self.device_model,
             'sdk_version': self.sdk_version,
             'build_fingerprint': self.build_fingerprint,
-            'network_type': self.network_type.name
+            'network_type': self.network_type.value
         }
 
     def validate(self) -> None:
@@ -728,8 +749,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if not isinstance(version_name, str):
             raise utils.ValidationError(
                 'Version name must be a string, received: %r.' % version_name)
-        if len(version_name.split(
-                constants.ANDROID_VERSION_NAME_DELIMITER)) != 3:
+        delimiter = app_feedback_report_constants.ANDROID_VERSION_NAME_DELIMITER
+        if len(version_name.split(delimiter)) != 3:
             raise utils.ValidationError(
                 'The version name is not a valid string format, received: '
                 '%s.' % version_name)
@@ -817,18 +838,18 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             raise utils.ValidationError(
                 'SDK version must be an int, received: %r.' % sdk_version)
         if sdk_version < (
-                constants.MINIMUM_ANDROID_SDK_VERSION):
+                app_feedback_report_constants.MINIMUM_ANDROID_SDK_VERSION):
             raise utils.ValidationError(
                 'Invalid SDK version, received: %s.' % sdk_version)
 
     @classmethod
     def require_valid_network_type(
-        cls, network_type: Type[constants.ANDROID_NETWORK_TYPE]
+        cls, network_type: app_feedback_report_constants.AndroidNetworkType
     ) -> None:
         """Checks that the Android device's network type is valid.
 
         Args:
-            network_type: ANDROID_NETWORK_TYPE. The network type the device
+            network_type: AndroidNetworkType. The network type the device
                 was connected to when sending the report, as an enum.
 
         Raises:
@@ -838,7 +859,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if network_type is None:
             raise utils.ValidationError('No network type supplied.')
         if network_type not in (
-                constants.ALLOWED_ANDROID_NETWORK_TYPES):
+                app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
             raise utils.ValidationError(
                 'Invalid network type, received: %s.' % network_type)
 
@@ -903,7 +924,7 @@ class AndroidAppContext(AppContext):
         entry_point: EntryPoint,
         text_language_code: str,
         audio_language_code: str,
-        text_size: Type[constants.ANDROID_TEXT_SIZE],
+        text_size: app_feedback_report_constants.AndroidTextSize,
         only_allows_wifi_download_and_update: bool,
         automatically_update_topics: bool,
         account_is_profile_admin: bool,
@@ -919,7 +940,7 @@ class AndroidAppContext(AppContext):
                 in the app.
             audio_language_code: str. The ISO-639 code for the audio language
                 set in the app.
-            text_size: ANDROID_TEXT_SIZE. The enum type for text size set by
+            text_size: AndroidTextSize. The enum type for text size set by
                 the user in the app.
             only_allows_wifi_download_and_update: bool. True if the user only
                 allows downloads and updates when connected to wifi.
@@ -934,7 +955,7 @@ class AndroidAppContext(AppContext):
                 recorded in the app; the list is empty if this instance has been
                 scrubbed.
         """
-        super(AndroidAppContext, self).__init__(
+        super().__init__(
             entry_point, text_language_code, audio_language_code)
         self.entry_point = entry_point
         self.text_language_code = text_language_code
@@ -957,7 +978,7 @@ class AndroidAppContext(AppContext):
             'entry_point': self.entry_point.to_dict(),
             'text_language_code': self.text_language_code,
             'audio_language_code': self.audio_language_code,
-            'text_size': self.text_size.name,
+            'text_size': self.text_size.value,
             'only_allows_wifi_download_and_update': (
                 self.only_allows_wifi_download_and_update
             ),
@@ -1047,13 +1068,13 @@ class AndroidAppContext(AppContext):
 
     @classmethod
     def require_valid_text_size(
-        cls, text_size: constants.ANDROID_TEXT_SIZE
+        cls, text_size: app_feedback_report_constants.AndroidTextSize
     ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
         Args:
-            text_size: ANDROID_TEXT_SIZE. The enum type for the text size set by
+            text_size: AndroidTextSize. The enum type for the text size set by
                 the user in the app.
 
         Raises:
@@ -1061,10 +1082,11 @@ class AndroidAppContext(AppContext):
         """
         if text_size is None:
             raise utils.ValidationError('No text size supplied.')
-        if text_size not in constants.ALLOWED_ANDROID_TEXT_SIZES:
+        if text_size not in (
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
             raise utils.ValidationError(
                 'App text size should be one of %s, received: %s' % (
-                    constants.ALLOWED_ANDROID_TEXT_SIZES,
+                    app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES,
                     text_size))
 
 
@@ -1075,7 +1097,7 @@ class EntryPoint:
 
     def __init__(
         self,
-        entry_point: Type[constants.ENTRY_POINT],
+        entry_point: app_feedback_report_constants.EntryPoint,
         topic_id: Optional[str] = None,
         story_id: Optional[str] = None,
         exploration_id: Optional[str] = None,
@@ -1094,7 +1116,7 @@ class EntryPoint:
             subtopic_id: int|None. The id for the current subtopic if the report
                 was sent during a revision session.
         """
-        self.entry_point_name = entry_point.name
+        self.entry_point_name = entry_point.value
         self.topic_id = topic_id
         self.story_id = story_id
         self.exploration_id = exploration_id
@@ -1127,7 +1149,7 @@ class EntryPoint:
     def require_valid_entry_point_name(
         cls,
         actual_name: str,
-        expected_entry_point: Type[constants.ENTRY_POINT]
+        expected_entry_point: app_feedback_report_constants.EntryPoint
     ) -> None:
         """Validates this EntryPoint name.
 
@@ -1139,7 +1161,7 @@ class EntryPoint:
         Raises:
             ValidationError. The name is not valid for the type.
         """
-        expected_name = expected_entry_point.name
+        expected_name = expected_entry_point.value
         if actual_name is None:
             raise utils.ValidationError('No entry point name supplied.')
         if not isinstance(actual_name, str):
@@ -1170,7 +1192,7 @@ class EntryPoint:
             raise utils.ValidationError(
                 'Exploration id should be a string, received: %r' % (
                     exploration_id))
-        expected_story_id = exp_services.get_story_id_linked_to_exploration( # type: ignore[no-untyped-call]
+        expected_story_id = exp_services.get_story_id_linked_to_exploration(
             exploration_id)
         if expected_story_id != story_id:
             raise utils.ValidationError(
@@ -1184,8 +1206,8 @@ class NavigationDrawerEntryPoint(EntryPoint):
 
     def __init__(self) -> None:
         """Constructs an NavigationDrawerEntryPoint domain object."""
-        super(NavigationDrawerEntryPoint, self).__init__(
-            constants.ENTRY_POINT.navigation_drawer, None,
+        super().__init__(
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER, None,
             None, None, None)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1209,7 +1231,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            constants.ENTRY_POINT.navigation_drawer)
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER)
 
 
 class LessonPlayerEntryPoint(EntryPoint):
@@ -1228,9 +1250,9 @@ class LessonPlayerEntryPoint(EntryPoint):
             exploration_id: str. The unique ID for the current exploration the
                 user is playing when intiating the report.
         """
-        super(LessonPlayerEntryPoint, self).__init__(
-            constants.ENTRY_POINT.lesson_player, topic_id=topic_id,
-            story_id=story_id, exploration_id=exploration_id)
+        super().__init__(
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER,
+            topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
     def to_dict(self) -> Dict[str, Any]:
         """Returns a dict representing this LessonPlayerEntryPoint domain
@@ -1254,9 +1276,13 @@ class LessonPlayerEntryPoint(EntryPoint):
                 LessonPlayerEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
-            self.entry_point_name, constants.ENTRY_POINT.lesson_player)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
-        story_domain.Story.require_valid_story_id(self.story_id) # type: ignore[no-untyped-call]
+            self.entry_point_name,
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER)
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
+        if self.story_id is None:
+            raise utils.ValidationError(
+                'The story_id must be a string value, received None')
+        story_domain.Story.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
             self.exploration_id, self.story_id)
 
@@ -1273,8 +1299,8 @@ class RevisionCardEntryPoint(EntryPoint):
             subtopic_id: int. The ID for the current subtopic the user is
                 reviewing when intiating the report.
         """
-        super(RevisionCardEntryPoint, self).__init__(
-            constants.ENTRY_POINT.revision_card,
+        super().__init__(
+            app_feedback_report_constants.EntryPoint.REVISION_CARD,
             topic_id, None, None, subtopic_id)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1300,8 +1326,8 @@ class RevisionCardEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            constants.ENTRY_POINT.revision_card)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
+            app_feedback_report_constants.EntryPoint.REVISION_CARD)
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % (
@@ -1313,9 +1339,8 @@ class CrashEntryPoint(EntryPoint):
 
     def __init__(self) -> None:
         """Constructs an CrashEntryPoint domain object."""
-        super(
-            CrashEntryPoint, self).__init__(
-                constants.ENTRY_POINT.crash, None, None,
+        super().__init__(
+                app_feedback_report_constants.EntryPoint.CRASH, None, None,
                 None, None)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1338,7 +1363,7 @@ class CrashEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            constants.ENTRY_POINT.crash)
+            app_feedback_report_constants.EntryPoint.CRASH)
 
 
 class AppFeedbackReportTicket:
@@ -1443,7 +1468,8 @@ class AppFeedbackReportTicket:
             raise utils.ValidationError(
                 'The ticket id should be a string, received: %s' % (
                     ticket_id))
-        if len(ticket_id.split(constants.TICKET_ID_DELIMITER)) != 3:
+        if len(ticket_id.split(
+            app_feedback_report_constants.TICKET_ID_DELIMITER)) != 3:
             raise utils.ValidationError('The ticket id %s is invalid' % (
                 ticket_id))
 
@@ -1463,12 +1489,13 @@ class AppFeedbackReportTicket:
             raise utils.ValidationError(
                 'The ticket name should be a string, received: %s' % (
                     ticket_name))
-        if len(ticket_name) > constants.MAXIMUM_TICKET_NAME_LENGTH:
+        if len(ticket_name) > (
+            app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH):
             raise utils.ValidationError(
                 'The ticket name is too long, has %d characters but only '
                 'allowed %d characters' % (
                     len(ticket_name),
-                    constants.MAXIMUM_TICKET_NAME_LENGTH))
+                    app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH))
 
     @classmethod
     def require_valid_report_ids(cls, report_ids: List[str]) -> None:
@@ -1508,11 +1535,11 @@ class AppFeedbackReportTicket:
             raise utils.ValidationError(
                 'The Github repo name should be a string, received: %s' % (
                     repo_name))
-        if repo_name not in constants.GITHUB_REPO_CHOICES:
+        if repo_name not in app_feedback_report_constants.GITHUB_REPO_CHOICES:
             raise utils.ValidationError(
                 'The Github repo %s is invalid, must be one of %s.' % (
                     repo_name,
-                    constants.GITHUB_REPO_CHOICES))
+                    app_feedback_report_constants.GITHUB_REPO_CHOICES))
 
 
 class AppFeedbackReportDailyStats:
@@ -1605,7 +1632,8 @@ class AppFeedbackReportDailyStats:
         if not isinstance(stats_id, str):
             raise utils.ValidationError(
                 'The stats id should be a string, received: %r' % stats_id)
-        if len(stats_id.split(constants.STATS_ID_DELIMITER)) != 3:
+        if len(stats_id.split(
+            app_feedback_report_constants.STATS_ID_DELIMITER)) != 3:
             raise utils.ValidationError('The stats id %s is invalid' % stats_id)
 
     @classmethod
@@ -1626,7 +1654,8 @@ class AppFeedbackReportDailyStats:
                 'The parameter stats should be a dict, '
                 'received: %r' % param_stats)
         allowed_parameter_names = [
-            parameter.name for parameter in constants.ALLOWED_STATS_PARAMETERS]
+            parameter.value for parameter in (
+                app_feedback_report_constants.ALLOWED_STATS_PARAMETERS)]
         for (param_name, param_count_obj) in param_stats.items():
             if param_name not in allowed_parameter_names:
                 raise utils.ValidationError(
@@ -1686,13 +1715,13 @@ class AppFeedbackReportFilter:
 
     def __init__(
         self,
-        filter_field: Type[constants.FILTER_FIELD_NAMES],
+        filter_field: app_feedback_report_constants.FilterFieldNames,
         filter_options: List[str]
     ) -> None:
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
-            filter_field: FILTER_FIELD_NAMES. The enum type for the filter
+            filter_field: FilterFieldNames. The enum type for the filter
                 category, correponding to a field in the AppFeedbackReport
                 object.
             filter_options: list(str). The possible values for the given filter.
@@ -1721,10 +1750,12 @@ class AppFeedbackReportFilter:
             ValidationError. One or more attributes of the
                 AppFeedbackReportFilter are not valid.
         """
-        if self.filter_field not in constants.ALLOWED_FILTERS:
+        if self.filter_field not in (
+            app_feedback_report_constants.ALLOWED_FILTERS):
             raise utils.ValidationError(
                 'The filter field should be one of %s, received: %s' % (
-                    [item.name for item in constants.ALLOWED_FILTERS],
+                    [item.name for item in (
+                        app_feedback_report_constants.ALLOWED_FILTERS)],
                     self.filter_field.name))
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(

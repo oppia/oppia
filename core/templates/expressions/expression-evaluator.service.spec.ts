@@ -128,6 +128,16 @@ describe('Expression evaluator service', () => {
           .toEqual(expected);
       });
     });
+
+    it('should throw an error when parser generates ' +
+        'intermediate node with zero children', () => {
+      spyOn(expressionParserService, 'parse').and.returnValue([]);
+      expect(() => expressionSyntaxTreeService.applyFunctionToParseTree(
+        expressionParserService.parse('+10'), ENVS,
+        (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs))
+      ).toThrowError(
+        'Parser generated an intermediate node with zero children');
+    });
   });
 
   describe('Evaluating invalid expressions', () => {

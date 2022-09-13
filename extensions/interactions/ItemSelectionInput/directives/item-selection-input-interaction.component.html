@@ -1,34 +1,44 @@
 <div class="item-selection-input-form-container">
   <form>
-    <small class="item-selection-info-text" ng-if="$ctrl.displayCheckboxes">
-      <span ng-if="$ctrl.notEnoughSelections">
-        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber: $ctrl.minAllowableSelectionCount}" translate-interpolation="messageformat"></span>
+    <small class="item-selection-info-text" *ngIf="displayCheckboxes">
+      <span *ngIf="notEnoughSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH' | translate: {
+                    minChoiceNumber: minAllowableSelectionCount,
+                    messageFormat: true
+        }"></span>
       </span>
 
-      <span ng-if="$ctrl.preventAdditionalSelections">
-        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" translate-values="{maxAllowableSelectionCount: $ctrl.maxAllowableSelectionCount}" translate-interpolation="messageformat">
-        </span>
+      <span *ngIf="preventAdditionalSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE' | translate: {
+                    maxAllowableSelectionCount: maxAllowableSelectionCount,
+                    messageFormat: true
+        }"></span>
       </span>
 
-      <span ng-if="!$ctrl.notEnoughSelections && !$ctrl.preventAdditionalSelections">
-        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_MORE"></span>
+      <span *ngIf="!notEnoughSelections && !preventAdditionalSelections">
+        <span [innerHTML]="'I18N_INTERACTIONS_ITEM_SELECTION_MORE' | translate"></span>
       </span>
     </small>
-    <div class="item-selection-input-container" ng-repeat="choice in $ctrl.choices track by $index">
-      <div ng-if="$ctrl.displayCheckboxes">
-        <label dir="auto" class="item-selection-input-item protractor-test-item-selection-input-item">
-          <md-checkbox class="item-selection-input-checkbox protractor-test-item-selection-input-checkbox" ng-model="$ctrl.userSelections[choice]" ng-checked="$ctrl.userSelections[choice]"
-                       ng-change="$ctrl.onToggleCheckbox()" ng-disabled="$ctrl.preventAdditionalSelections && !$ctrl.userSelections[choice]" tabindex="0">
+    <div class="e2e-test-item-selection-input-container" *ngFor="let choice of choices; index as idx">
+      <div *ngIf="displayCheckboxes">
+        <label dir="auto" class="item-selection-input-item e2e-test-item-selection-input-item">
+          <mat-checkbox class="item-selection-input-checkbox e2e-test-item-selection-input-checkbox"
+                        [(ngModel)]="userSelections[choice]"
+                        [checked]="userSelections[choice]"
+                        (change)="onToggleCheckbox()"
+                        [disabled]="preventAdditionalSelections && !userSelections[choice]"
+                        tabindex="0"
+                        [ngModelOptions]="{standalone: true}">
             <span dir="auto">
-              <angular-html-bind class="protractor-test-item-selection-option" html-data="choice">
-              </angular-html-bind>
+              <oppia-rte-output-display class="e2e-test-item-selection-option" [rteString]="choice">
+              </oppia-rte-output-display>
             </span>
-          </md-checkbox>
+          </mat-checkbox>
         </label>
       </div>
 
-      <div dir="auto" ng-if="!$ctrl.displayCheckboxes">
-        <button class="multiple-choice-option" ng-click="$ctrl.submitMultipleChoiceAnswer($event, $index)">
+      <div *ngIf="!displayCheckboxes">
+        <button class="multiple-choice-option" (click)="submitMultipleChoiceAnswer($event, idx)">
           <div class="multiple-choice-radio-button-container">
             <span class="multiple-choice-outer-radio-button">
               <span class="multiple-choice-inner-radio-button"></span>
@@ -36,8 +46,8 @@
           </div>
           <div class="multiple-choice-content-container">
             <span>
-              <angular-html-bind class="protractor-test-multiple-choice-option" html-data="choice">
-              </angular-html-bind>
+              <oppia-rte-output-display class="e2e-test-multiple-choice-option" [rteString]="choice">
+              </oppia-rte-output-display>
             </span>
           </div>
         </button>

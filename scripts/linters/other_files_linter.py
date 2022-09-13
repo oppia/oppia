@@ -23,7 +23,7 @@ import json
 import os
 import re
 
-from core import python_utils
+from core import utils
 
 import yaml
 
@@ -48,7 +48,8 @@ WORKFLOWS_DIR = os.path.join(os.getcwd(), '.github', 'workflows')
 WORKFLOW_FILENAME_REGEX = r'\.(yaml)|(yml)$'
 MERGE_STEP = {'uses': './.github/actions/merge'}
 WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT = (
-    'backend_tests.yml', 'pending-review-notification.yml')
+    'backend_tests.yml', 'pending-review-notification.yml',
+    'revert-web-wiki-updates.yml')
 
 THIRD_PARTY_LIBS = [
     {
@@ -139,10 +140,10 @@ class CustomLintChecksManager:
         failed = False
         error_messages = []
 
-        dependencies_json = json.load(python_utils.open_file(
+        dependencies_json = json.load(utils.open_file(
             DEPENDENCIES_JSON_FILE_PATH, 'r'))['dependencies']['frontend']
 
-        package = json.load(python_utils.open_file(
+        package = json.load(utils.open_file(
             PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
 
         files_in_typings_dir = os.listdir(
@@ -249,37 +250,6 @@ class CustomLintChecksManager:
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_filenames_in_tsconfig_strict_are_sorted(self):
-        """Checks if the files in strict TS config are sorted
-        alphabetically.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Sorted strict TS config'
-
-        failed = False
-        error_messages = []
-
-        with python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
-            strict_ts_config = json.load(f)
-
-        # Remove .ts extension from filepath for sorting to ensure that
-        # spec files are always below the main files.
-        files = [path[:-3] for path in strict_ts_config['files']]
-        sorted_files = sorted(files)
-
-        if files != sorted_files:
-            failed = True
-            error_message = (
-                'Files in %s are not alphabetically sorted.' % (
-                    STRICT_TS_CONFIG_FILE_NAME))
-            error_messages.append(error_message)
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def check_github_workflows_use_merge_action(self):
         """Checks that all github actions workflows use the merge action.
 
@@ -341,8 +311,6 @@ class CustomLintChecksManager:
         linter_stdout.append(self.check_skip_files_in_app_dev_yaml())
         linter_stdout.append(self.check_third_party_libs_type_defs())
         linter_stdout.append(self.check_webpack_config_file())
-        linter_stdout.append(
-            self.check_filenames_in_tsconfig_strict_are_sorted())
         linter_stdout.append(self.check_github_workflows_use_merge_action())
 
         return linter_stdout

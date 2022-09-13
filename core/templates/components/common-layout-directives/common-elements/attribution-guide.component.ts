@@ -27,6 +27,9 @@ import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
+import './attribution-guide.component.css';
+
+
 @Component({
   selector: 'attribution-guide',
   templateUrl: './attribution-guide.component.html',
@@ -54,8 +57,8 @@ export class AttributionGuideComponent implements OnInit {
       '<a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" ' +
       'rel=\"noopener\" target=\"_blank\"><span ' +
       'class=\"oppia-attribution-licence-link\">CC BY SA 4.0 license</span>' +
-      '<span class=\"material-icons oppia-open-new-tab-icon\">' +
-      'open_in_new</span></a>');
+      '<span class=\"fas fa-external-link-alt oppia-open-new-tab-icon\">' +
+      '</span></a>');
     this.generateAttibutionIsAllowed = (
       this.attributionService.isGenerateAttributionAllowed());
     if (this.generateAttibutionIsAllowed) {
@@ -74,10 +77,6 @@ export class AttributionGuideComponent implements OnInit {
   showAttributionModal(): void {
     this.attributionService.showAttributionModal();
     this.maskIsShown = true;
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   hideAttributionModal(): void {

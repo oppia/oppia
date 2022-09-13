@@ -1,0 +1,210 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+.home-tab .greeting {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 32px;
+}
+.home-tab .continue-where-you-left-off {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin: 18px 0 25px 0;
+  min-height: 179px;
+  padding: 32px 0 30px 40px;
+  width: 736px;
+}
+.home-tab .suggested-for-you .classroom-name {
+  color: #333;
+  font-size: 19px;
+  font-weight: 500;
+  padding: 24px 0 8px 0;
+  text-transform: capitalize;
+}
+.home-tab .suggested-for-you .oppia-classroom-link {
+  text-decoration: none;
+}
+.home-tab .suggested-for-you .topic-summary-tile {
+  display: inline-block;
+  padding-right: 20px;
+}
+.home-tab .suggested-for-you .untracked-topics {
+  width: fit-content;
+}
+.home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
+.home-tab .suggested-for-you .suggested-for-you-heading,
+.home-tab .empty-suggested-for-you .suggested-for-you-heading {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  margin: 0;
+}
+.home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
+  color: #333;
+  font-size: 18px;
+  padding-top: 32px;
+}
+.home-tab .suggested-for-you .classroom-card {
+  background-color: #eee ;
+  border-radius: 4px;
+  float: right;
+  height: 210px;
+  margin: 0 2px 30px 6px;
+  padding: 0;
+  position: relative;
+  width: 144px;
+  z-index: 5;
+}
+.home-tab .suggested-for-you .classroom-text {
+  color: #333;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 0.25px;
+  position: relative;
+  text-align: center;
+  text-transform: capitalize;
+  top: 85px;
+}
+.home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
+  display: inline-block;
+}
+#setting-a-goal-link {
+  color: #00645c;
+  font-weight: bold;
+}
+.home-tab .empty-suggested-for-you-section {
+  color: #333;
+  font-size: 18px;
+  padding: 30px 0;
+}
+
+.home-tab .empty-suggested-for-you.learn-something-new-section {
+  padding: 32px 23px 0 32px;
+}
+
+.home-tab .suggested-for-you,
+.home-tab .empty-suggested-for-you {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin: 18px 0 25px 0;
+  min-height: 206px;
+  padding: 32px 30px 30px 40px;
+  width: 736px;
+}
+.home-tab .suggested-for-you .suggested-for-you-section {
+  display: inline-block;
+  padding: 8px 16px 0 0;
+}
+.home-tab .continue-where-you-left-off .topic-summary {
+  display: inline-block;
+  padding-right: 30px;
+  width: 228px;
+}
+@media screen and (max-width: 1200px) {
+  .home-tab .greeting {
+    margin-left: 0;
+    padding-top: 30px;
+  }
+  .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
+  .home-tab .empty-suggested-for-you {
+    margin-left: 0;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
+    overflow: scroll;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar,
+  .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb,
+  .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar-thumb {
+    background-color: #eee;
+    border: 1px solid #fff;
+    border-radius: 8px;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal,
+  .home-tab .suggested-for-you .topic-summary-tile-scroll::-webkit-scrollbar:horizontal {
+    height: 5px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .home-tab .greeting {
+    font-size: 23px;
+    margin: 24px 0 0 20px;
+  }
+  .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
+  .home-tab .empty-suggested-for-you {
+    margin-left: auto;
+    width: 465px;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
+  .home-tab .suggested-for-you .suggested-for-you-heading {
+    font-size: 20px;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
+    overflow: scroll;
+  }
+  .home-tab .suggested-for-you .topic-summary-tile-section {
+    width: 656px;
+  }
+  .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section-text {
+    margin-bottom: 0;
+  }
+  .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {
+    font-size: 15px;
+  }
+  .home-tab .empty-suggested-for-you-section {
+    padding: 32px 32px 32px 0;
+  }
+  .home-tab .suggested-for-you .topic-summary-tile-scroll {
+    overflow: scroll;
+    width: 305px;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 1000px) {
+  .home-tab .greeting {
+    font-size: 25px;
+    margin-left: 0;
+  }
+  .home-tab .continue-where-you-left-off,
+  .home-tab .suggested-for-you,
+  .home-tab .empty-suggested-for-you {
+    margin: 18px 0 25px 0;
+    padding: 40px 0 20px 32px;
+    width: 500px;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
+  .home-tab .suggested-for-you .suggested-for-you-heading {
+    font-size: 20px;
+  }
+  .home-tab .suggested-for-you .topic-summary-tile-scroll {
+    overflow: scroll;
+    width: 440px;
+  }
+  .home-tab .continue-where-you-left-off .continue-where-you-left-off-scroll {
+    overflow: scroll;
+  }
+  .home-tab .empty-suggested-for-you-section {
+    padding: 17px 32px 17px 0;
+  }
+}
+
+@media(max-width: 500px) {
+  .home-tab .continue-where-you-left-off, .home-tab .suggested-for-you,
+  .home-tab .empty-suggested-for-you {
+    margin-left: auto;
+    width: 335px;
+  }
+
+  .home-tab .suggested-for-you .topic-summary-tile-scroll {
+    width: 265px;
+  }
+
+  .home-tab .greeting {
+    margin-left: 0;
+  }
+}

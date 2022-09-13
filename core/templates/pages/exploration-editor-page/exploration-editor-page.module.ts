@@ -21,6 +21,10 @@ import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser'
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
@@ -45,6 +49,38 @@ import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/
 import { EditorReloadingModalComponent } from './modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from './modal-templates/confirm-discard-changes-modal.component';
 import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/create-feedback-thread-modal.component';
+import { PreviewSummaryTileModalComponent } from './settings-tab/templates/preview-summary-tile-modal.component';
+import { WelcomeTranslationModalComponent } from './translation-tab/modal-templates/welcome-translation-modal.component';
+import { DeleteExplorationModalComponent } from './settings-tab/templates/delete-exploration-modal.component';
+import { RemoveRoleConfirmationModalComponent } from './settings-tab/templates/remove-role-confirmation-modal.component';
+import { ReassignRoleConfirmationModalComponent } from './settings-tab/templates/reassign-role-confirmation-modal.component';
+import { ModeratorUnpublishExplorationModalComponent } from './settings-tab/templates/moderator-unpublish-exploration-modal.component';
+import { TransferExplorationOwnershipModalComponent } from './settings-tab/templates/transfer-exploration-ownership-modal.component';
+import { HelpModalComponent } from './modal-templates/help-modal.component';
+import { DeleteAudioTranslationModalComponent } from './translation-tab/modal-templates/delete-audio-translation-modal.component';
+import { TranslationTabBusyModalComponent } from './translation-tab/modal-templates/translation-tab-busy-modal.component';
+import { ConfirmDeleteStateModalComponent } from './editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import { PreviewSetParametersModalComponent } from './preview-tab/templates/preview-set-parameters-modal.component';
+import { CheckRevertExplorationModalComponent } from './history-tab/modal-templates/check-revert-exploration-modal.component';
+import { RevertExplorationModalComponent } from './history-tab/modal-templates/revert-exploration-modal.component';
+import { ExplorationMetadataDiffModalComponent } from './modal-templates/exploration-metadata-diff-modal.component';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { ExplorationTitleEditorComponent } from './exploration-title-editor/exploration-title-editor.component';
+import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor/exploration-objective-editor.component';
+import { ExplorationMetadataModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { ExplorationSaveModalComponent } from './modal-templates/exploration-save-modal.component';
+import { EditorNavbarBreadcrumbComponent } from './editor-navigation/editor-navbar-breadcrumb.component';
+import { ExplorationGraphModalComponent } from './editor-tab/templates/modal-templates/exploration-graph-modal.component';
+import { ExplorationGraphComponent } from './editor-tab/graph-directives/exploration-graph.component';
+import { StateNameEditorComponent } from './editor-tab/state-name-editor/state-name-editor.component';
+import { EditorNavigationComponent } from './editor-navigation/editor-navigation.component';
+import { TeachOppiaModalComponent } from './editor-tab/templates/modal-templates/teach-oppia-modal.component';
+import { SettingsTabComponent } from './settings-tab/settings-tab.component';
+import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
+import { PreviewTabComponent } from './preview-tab/preview-tab.component';
+import { HistoryTabComponent } from './history-tab/history-tab.component';
 
 @NgModule({
   imports: [
@@ -52,6 +88,14 @@ import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/cre
     BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatPaginatorModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -71,7 +115,36 @@ import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/cre
     ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
-    CreateFeedbackThreadModalComponent
+    CreateFeedbackThreadModalComponent,
+    PreviewSummaryTileModalComponent,
+    DeleteExplorationModalComponent,
+    RemoveRoleConfirmationModalComponent,
+    ReassignRoleConfirmationModalComponent,
+    ModeratorUnpublishExplorationModalComponent,
+    TransferExplorationOwnershipModalComponent,
+    HelpModalComponent,
+    ConfirmDeleteStateModalComponent,
+    PreviewSetParametersModalComponent,
+    CheckRevertExplorationModalComponent,
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    DeleteAudioTranslationModalComponent,
+    TranslationTabBusyModalComponent,
+    ExplorationMetadataDiffModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
+    ExplorationMetadataModalComponent,
+    ExplorationSaveModalComponent,
+    EditorNavbarBreadcrumbComponent,
+    ExplorationGraphModalComponent,
+    ExplorationGraphComponent,
+    StateNameEditorComponent,
+    EditorNavigationComponent,
+    TeachOppiaModalComponent,
+    SettingsTabComponent,
+    UnresolvedAnswersOverviewComponent,
+    PreviewTabComponent,
+    HistoryTabComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -88,7 +161,36 @@ import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/cre
     ConfirmDiscardChangesModalComponent,
     ExplorationPublishModalComponent,
     EditorReloadingModalComponent,
-    CreateFeedbackThreadModalComponent
+    CreateFeedbackThreadModalComponent,
+    PreviewSummaryTileModalComponent,
+    DeleteExplorationModalComponent,
+    RemoveRoleConfirmationModalComponent,
+    ReassignRoleConfirmationModalComponent,
+    ModeratorUnpublishExplorationModalComponent,
+    TransferExplorationOwnershipModalComponent,
+    HelpModalComponent,
+    ConfirmDeleteStateModalComponent,
+    PreviewSetParametersModalComponent,
+    CheckRevertExplorationModalComponent,
+    RevertExplorationModalComponent,
+    WelcomeTranslationModalComponent,
+    DeleteAudioTranslationModalComponent,
+    TranslationTabBusyModalComponent,
+    ExplorationMetadataDiffModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
+    ExplorationMetadataModalComponent,
+    ExplorationSaveModalComponent,
+    EditorNavbarBreadcrumbComponent,
+    ExplorationGraphModalComponent,
+    ExplorationGraphComponent,
+    StateNameEditorComponent,
+    EditorNavigationComponent,
+    TeachOppiaModalComponent,
+    SettingsTabComponent,
+    UnresolvedAnswersOverviewComponent,
+    PreviewTabComponent,
+    HistoryTabComponent
   ],
   providers: [
     {
@@ -105,6 +207,11 @@ import { CreateFeedbackThreadModalComponent } from './feedback-tab/templates/cre
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })
@@ -117,6 +224,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

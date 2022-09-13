@@ -9,13 +9,13 @@
 <div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
   <div class="oppia-content-wrapper">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition" disabled>
-      <i class="material-icons">play_arrow</i>
+      <i class="fas fa-play oppia-play-icon"></i>
     </button>
   </div>
   <div class="d-block d-xl-none oppia-content-wrapper oppia-audio-bar-info">
     <div class="padding-small-screen">
       <div ng-if="!cannotRecord && !checkingMicrophonePermission">
-        <span ng-if="canVoiceover"> Press <i class="material-icons">mic</i>  to record.</span>
+        <span ng-if="canVoiceover"> Press <i class="fas fa-microphone"></i>  to record.</span>
       </div>
       <div ng-if="checkingMicrophonePermission">
         Loading microphone.<loading-dots></loading-dots>
@@ -31,7 +31,7 @@
   <div class="d-none d-xl-block oppia-content-wrapper oppia-audio-bar-info">
     <div class="padding-large-screen">
       <div ng-if="!cannotRecord && !checkingMicrophonePermission">
-        No audio recorded.<span ng-if="canVoiceover"> Press <i class="material-icons">mic</i>  to start recording.</span>
+        No audio recorded.<span ng-if="canVoiceover"> Press <i class="fas fa-microphone"></i>  to start recording.</span>
       </div>
       <div ng-if="checkingMicrophonePermission">
         Loading microphone.<loading-dots></loading-dots>
@@ -45,34 +45,39 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-start-record"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-accessibility-translation-start-record"
             uib-tooltip="Record"
             tooltip-placement="above"
             ng-click="checkAndStartRecording()"
             ng-hide="!canVoiceover || cannotRecord"
             aria-label="Start recording"
             for="Recording">
-      <i class="material-icons">&#xE029;</i>
+      <i class="fas fa-microphone oppia-microphone-icon"></i>
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio-button protractor-test-accessibility-translation-upload-audio"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-upload-audio-button e2e-test-accessibility-translation-upload-audio"
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
             ng-hide="!canVoiceover"
             aria-label="Upload voiceovered file">
-      <i class="material-icons">&#xE2C6;</i>
+      <i class="fas fa-upload"></i>
     </button>
   </div>
 </div>
 <div class="oppia-audio-recording-bar" ng-show="selectedRecording  && !audioIsCurrentlyBeingSaved">
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-play-recorded-audio"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-accessibility-translation-play-recorded-audio"
             ng-click="playAndPauseUnsavedAudio()"
             ng-disabled="voiceoverRecorder.status().isRecording"
             aria-label="Play recorded audio">
-      <i class="material-icons"><[unsavedAudioIsPlaying ? 'pause' : 'play_arrow']></i>
+      <div ng-if="unsavedAudioIsPlaying">
+        <i class="fas fa-pause"></i>
+      </div>
+      <div ng-if="!unsavedAudioIsPlaying">
+        <i class="fas fa-play oppia-play-icon"></i>
+      </div>
     </button>
   </div>
   <div class="oppia-content-wrapper oppia-flex-1-wrapper">
@@ -92,12 +97,12 @@
     </div>
   </div>
   <div class="oppia-content-wrapper" ng-if="voiceoverRecorder.status().isRecording">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-stop-record-button"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-stop-record-button"
             uib-tooltip="Stop"
             tooltip-placement="above"
             ng-click="stopRecording()"
             aria-label="Stop recording">
-      <i class="material-icons">stop</i>
+      <i class="fas fa-stop"></i>
     </button>
   </div>
   <div class="oppia-content-wrapper">
@@ -109,7 +114,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!voiceoverRecorder.status().isRecording && audioBlob">
-    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition protractor-test-confirm-record"
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition e2e-test-confirm-record"
             ng-click="saveRecordedAudio()"
             aria-label="Save the recorded audio">
       Confirm
@@ -126,7 +131,7 @@
 <div class="oppia-audio-recording-bar" ng-if="audioIsCurrentlyBeingSaved">
   <div class="oppia-content-wrapper">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition" disabled>
-      <i class="material-icons">play_arrow</i>
+      <i class="fas fa-play oppia-play-icon"></i>
     </button>
   </div>
   <div class="oppia-content-wrapper oppia-flex-1-wrapper">
@@ -137,9 +142,14 @@
 </div>
 <div ng-if="isAudioAvailable && !audioIsUpdating" class="oppia-audio-recording-bar">
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-play-pause-audio-button"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-play-pause-audio-button"
             ng-click="playPauseUploadedAudioTranslation()">
-      <i class="material-icons"><[isPlayingUploadedAudio() ? 'pause' : 'play_arrow']></i>
+      <div ng-if="!isPlayingUploadedAudio()">
+        <i class="fas fa-play oppia-play-icon"></i>
+      </div>
+      <div ng-if="isPlayingUploadedAudio()">
+        <i class="fas fa-pause"></i>
+      </div>
     </button>
   </div>
   <div class="oppia-slider-section oppia-content-wrapper fx-main-center fx-cross-center full-height">
@@ -168,21 +178,21 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio-button"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-upload-audio-button"
             uib-tooltip="Upload audio"
             tooltip-placement="above"
             ng-hide="!canVoiceover"
             ng-click="openAddAudioTranslationModal()">
-      <i class="material-icons">&#xE2C6;</i>
+      <i class="fas fa-upload oppia-upload-icon"></i>
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-delete-record"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition e2e-test-delete-record"
             uib-tooltip="Delete"
             tooltip-placement="above"
             ng-hide="!canVoiceover"
             ng-click="openDeleteAudioTranslationModal()">
-      <i class="material-icons">&#xE872;</i>
+      <i class="fas fa-trash oppia-delete-icon"></i>
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!audioNeedsUpdate">
@@ -191,7 +201,7 @@
             tooltip-placement="above"
             ng-hide="!canVoiceover"
             ng-click="toggleAudioNeedsUpdate()">
-      <i class="material-icons">warning</i>
+      <i class="fas fa-exclamation-triangle"></i>
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="audioNeedsUpdate">
@@ -200,7 +210,7 @@
             tooltip-placement="top"
             ng-hide="!canVoiceover"
             ng-click="toggleAudioNeedsUpdate()">
-      <i class="material-icons">warning</i>
+      <i class="fas fa-exclamation-triangle"></i>
     </button>
   </div>
 </div>
@@ -288,8 +298,8 @@
     background-color: #009688;
     border-radius: 20px;
     color: white;
-    padding-left: 6px;
-    width: 38px;
+    padding-left: 10px;
+    width: 36px;
   }
   .oppia-audio-bar-button-transition {
     -webkit-transition: background-color .2s cubic-bezier(.35,0,.25,1);
@@ -370,6 +380,15 @@
     position: relative;
     text-align: center;
     top: 10px;
+  }
+  .oppia-microphone-icon {
+    padding-left: 1px;
+  }
+  .oppia-play-icon {
+    padding-left: 2px;
+  }
+  .oppia-delete-icon {
+    padding-left: 1px;
   }
   audio-translation-bar .audio-update-needed-button {
     background-color: red;

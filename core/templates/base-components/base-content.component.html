@@ -15,7 +15,7 @@
     <div tabindex="0"
          aria-label="Oppia Main Content"
          id="oppia-main-content"
-         class="protractor-test-main-content">
+         class="e2e-test-main-content">
       <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
       <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
       <div [hidden]="loadingMessage">
@@ -26,22 +26,22 @@
   </div>
   <div *ngIf="!iframed">
     <div role="button" tabindex="0" (click)="skipToMainContent()"
-         class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content
+         class="oppia-skip-to-content e2e-test-skip-link">Skip to Main Content
     </div>
     <oppia-promo-bar>
     </oppia-promo-bar>
     <div *ngIf="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
     </div>
-    <div class="oppia-base-container protractor-test-base-container"
+    <div class="oppia-base-container e2e-test-base-container"
          [ngClass]="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
          (swipeleft)="closeSidebarOnSwipe()">
-      <div class="oppia-content-container protractor-test-content-container">
+      <div class="oppia-content-container e2e-test-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
             <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
                  role="navigation"
                  headroom>
-              <div class="navbar-container">
+              <div class="navbar-container" dir="auto">
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>
                 </div>
@@ -70,7 +70,7 @@
               </div>
             </div>
             <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
-                 class="protractor-test-main-content">
+                 class="e2e-test-main-content">
               <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
               <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
               <div *ngIf="!loadingMessage" aria-hidden="false">
@@ -90,91 +90,14 @@
     <div class="oppia-cookie-banner">
       <p class="oppia-cookie-banner-explanation" [innerHTML]="'I18N_COOKIE_BANNER_EXPLANATION' | translate"></p>
       <button (click)="acknowledgeCookies()"
-              class="btn oppia-cookie-banner-accept-button protractor-test-oppia-cookie-banner-accept-button"
+              class="btn oppia-cookie-banner-accept-button e2e-test-oppia-cookie-banner-accept-button"
               [innerHTML]="'I18N_COOKIE_BANNER_ACKNOWLEDGE' | translate">
       </button>
       <div class="clearfix"></div>
     </div>
   </div>
 
-  <div *ngIf="DEV_MODE" class="oppia-dev-mode protractor-test-dev-mode">
+  <div *ngIf="DEV_MODE" class="oppia-dev-mode e2e-test-dev-mode">
     Dev Mode
   </div>
 </main>
-
-<style>
-  .oppia-base-content-pre-logo-container {
-    align-items: center;
-    display: flex;
-    float: left;
-    height: 56px;
-    transform: translateX(50%);
-    width: 20px;
-  }
-  .navbar-mobile-container {
-    bottom: 0;
-    display: block;
-    position: fixed;
-    right: 0;
-    text-align: right;
-    width: 100%;
-    z-index: 999;
-  }
-  .navbar-mobile-options {
-    background-color: #e6e6e6;
-    border-top: 1px solid #000;
-  }
-  .show-mobile-navbar-icon {
-    background-color: #e6e6e6;
-    border-left: 1.5px solid #000;
-    border-radius: 10px 0;
-    border-top: 1.5px solid #000;
-    color: #000;
-    font-size: 25px;
-    padding: 10px;
-  }
-  .oppia-cookie-banner-container {
-    background: rgb(0,0,0,0.9);
-    bottom: 0;
-    color: #FFF;
-    font-family: 'Roboto', Arial, sans-serif;
-    padding: 24px 0;
-    position: fixed;
-    width: 100%;
-    z-index: 2000;
-  }
-  .oppia-cookie-banner-container .oppia-cookie-banner-explanation /deep/ a {
-    color: #AED2E9;
-  }
-
-  .oppia-cookie-banner-container .oppia-cookie-banner {
-    margin: auto;
-    width: 704px;
-  }
-
-  .oppia-cookie-banner-container .oppia-cookie-banner-accept-button {
-    background-color: #00609C;
-    color: #fff;
-    display: block;
-    float: right;
-    text-transform: uppercase;
-    width: 168px;
-  }
-
-  @media(max-width: 1024px) {
-    .oppia-cookie-banner-container .oppia-cookie-banner {
-      width: 80vw;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .oppia-cookie-banner-container .oppia-cookie-banner {
-      padding: 15px 24px 0 24px;
-      width: 90vw;
-    }
-    .oppia-cookie-banner-container .oppia-cookie-banner-accept-button {
-      float: none;
-      margin: 0 auto;
-    }
-  }
-</style>

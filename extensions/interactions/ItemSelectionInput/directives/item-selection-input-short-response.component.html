@@ -1,19 +1,19 @@
-<div ng-if="$ctrl.answer.length === 0">
+<div *ngIf="responses.length === 0">
   <em>No choices selected.</em>
 </div>
 
-<div ng-if="$ctrl.answer.length === 1">
+<div *ngIf="responses.length === 1">
   <span>
-    <angular-html-bind html-data="$ctrl.answer[0]">
-    </angular-html-bind>
+    <oppia-rte-output-display [rteString]="responses[0]">
+    </oppia-rte-output-display>
   </span>
 </div>
 
-<ul ng-if="$ctrl.answer.length > 1">
-  <li ng-repeat="response in $ctrl.answer track by $index">
+<ul *ngIf="responses.length > 1">
+  <li *ngFor="let response of responses; index as idx">
     <span>
-      <angular-html-bind html-data="response">
-      </angular-html-bind>
+      <oppia-rte-output-display [rteString]="response">
+      </oppia-rte-output-display>
     </span>
   </li>
 </ul>

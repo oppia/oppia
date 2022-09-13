@@ -24,6 +24,8 @@ import json
 from core import schema_utils
 from core.constants import constants
 
+from typing import Any, Dict
+
 
 class BaseObject:
     """Base object class.
@@ -59,6 +61,21 @@ class BaseObject:
             TypeError. The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.get_schema())
+
+    # Here we used Any type because get_schema() returns a schema dictionary and
+    # values in a schema dictionary can be of type str, List, Dict and other
+    # types too.
+    @classmethod
+    def get_schema(cls) -> Dict[str, Any]:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The get_schema() method is missing from the derived class. It '
+            'should be implemented in the derived class.')
 
 
 class Boolean(BaseObject):
@@ -306,6 +323,9 @@ class CodeString(BaseObject):
 
         Returns:
             unicode. The normalized object containing string in unicode format.
+
+        Raises:
+            TypeError. Unexpected tab characters in given python object 'raw'.
         """
         if '\t' in raw:
             raise TypeError(
@@ -744,8 +764,8 @@ class CheckedProof(BaseObject):
                 assert isinstance(raw['error_message'], str)
                 assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
-        except Exception:
-            raise TypeError('Cannot convert to checked proof %s' % raw)
+        except Exception as e:
+            raise TypeError('Cannot convert to checked proof %s' % raw) from e
 
 
 class Graph(BaseObject):
@@ -861,8 +881,8 @@ class Graph(BaseObject):
                 )
             assert len(set(edge_pairs)) == len(edge_pairs)
 
-        except Exception:
-            raise TypeError('Cannot convert to graph %s' % raw)
+        except Exception as e:
+            raise TypeError('Cannot convert to graph %s' % raw) from e
 
         return raw
 
@@ -965,8 +985,9 @@ class NormalizedRectangle2D(BaseObject):
             raw[1][0] = clamp(raw[1][0])
             raw[1][1] = clamp(raw[1][1])
 
-        except Exception:
-            raise TypeError('Cannot convert to Normalized Rectangle %s' % raw)
+        except Exception as e:
+            raise TypeError(
+                'Cannot convert to Normalized Rectangle %s' % raw) from e
 
         return raw
 
@@ -1260,7 +1281,7 @@ class OskCharacters(BaseObject):
         """
         return {
             'type': 'unicode',
-            'choices': constants.VALID_CUSTOM_OSK_LETTERS
+            'choices': constants.VALID_ALLOWED_VARIABLES
         }
 
 
@@ -1403,7 +1424,7 @@ class RatioExpression(BaseObject):
         }
 
 
-class CustomOskLetters(BaseObject):
+class AllowedVariables(BaseObject):
     """Class for custom OSK letters. These are the letters that will be
     displayed to the learner for AlgebraicExpressionInput and MathEquationInput
     interactions when the on-screen keyboard is being used. This includes Latin
@@ -1515,6 +1536,10 @@ class BaseTranslatableObject(BaseObject):
 
         Returns:
             *. The normalized value.
+
+        Raises:
+            NotImplementedError. The _value_key_name or _value_schema
+                is not set.
         """
         if cls._value_key_name is None or cls._value_schema is None:
             raise NotImplementedError(
@@ -1528,6 +1553,10 @@ class BaseTranslatableObject(BaseObject):
 
         Returns:
             dict. The object schema.
+
+        Raises:
+            NotImplementedError. The _value_key_name or _value_schema
+                is not set.
         """
         if cls._value_key_name is None or cls._value_schema is None:
             raise NotImplementedError(
@@ -1605,6 +1634,9 @@ class JsonEncodedInString(BaseObject):
         Returns:
             *. The normalized value of any type, it depends on the raw value
             which we want to load from json.
+
+        Raises:
+            Exception. Given arg is not of type str.
         """
         if not isinstance(raw, str):
             raise Exception('Expected string received %s of type %s' % (

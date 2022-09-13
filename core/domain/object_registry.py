@@ -20,19 +20,21 @@ import copy
 import inspect
 import json
 
+from core import constants
 from core import feconf
-from core import python_utils
 from extensions.objects.models import objects
+
+from typing import Any, Dict, Type
 
 
 class Registry:
     """Registry of all objects."""
 
     # Dict mapping object class names to their classes.
-    objects_dict = {}
+    objects_dict: Dict[str, Type[objects.BaseObject]] = {}
 
     @classmethod
-    def _refresh_registry(cls):
+    def _refresh_registry(cls) -> None:
         """Refreshes the registry by adding new object classes to the
         registry.
         """
@@ -51,13 +53,15 @@ class Registry:
             cls.objects_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_object_classes(cls):
+    def get_all_object_classes(cls) -> Dict[str, Type[objects.BaseObject]]:
         """Get the dict of all object classes."""
         cls._refresh_registry()
         return copy.deepcopy(cls.objects_dict)
 
     @classmethod
-    def get_object_class_by_type(cls, obj_type):
+    def get_object_class_by_type(
+        cls, obj_type: str
+    ) -> Type[objects.BaseObject]:
         """Gets an object class by its type. Types are CamelCased.
 
         Refreshes once if the class is not found; subsequently, throws an
@@ -70,9 +74,16 @@ class Registry:
         return cls.objects_dict[obj_type]
 
 
-def get_default_object_values():
+# Here we used Any type, because this method returns a dictionary that contains
+# default object values and these object values can be of type str, int, bool,
+# list, and other types too.
+def get_default_object_values() -> Dict[str, Any]:
     """Returns a dictionary containing the default object values."""
     # TODO(wxy): Cache this as it is accessed many times.
 
-    return json.loads(python_utils.get_package_file_contents(
-        'extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH))
+    default_object_values: Dict[str, Any] = json.loads(
+        constants.get_package_file_contents(
+            'extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH
+        )
+    )
+    return default_object_values

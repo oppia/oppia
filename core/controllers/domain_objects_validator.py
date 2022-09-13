@@ -23,41 +23,80 @@ from __future__ import annotations
 from core.constants import constants
 from core.controllers import base
 from core.domain import blog_domain
-from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import image_validation_services
+from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import stats_domain
 
 from typing import Dict, Optional, Union
 
 
-def validate_exploration_change(obj):
-    """Validates exploration change.
+def validate_suggestion_change(obj):
+    """Validates Exploration or Question change.
 
     Args:
         obj: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns suggestion change dict after validation.
     """
-    # No explicit call to validate_dict method is necessary, because
-    # ExplorationChange calls validate method while initialization.
-    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
+    # No explicit call to validate_dict is required, because
+    # ExplorationChange or QuestionSuggestionChange calls
+    # validate method while initialization.
+    if obj.get('cmd') is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Missing cmd key in change dict')
+
+    exp_change_commands = [
+        command['name'] for command in
+        exp_domain.ExplorationChange.ALLOWED_COMMANDS
+    ]
+    question_change_commands = [
+        command['name'] for command in
+        question_domain.QuestionChange.ALLOWED_COMMANDS
+    ]
+
+    if obj['cmd'] in exp_change_commands:
+        exp_domain.ExplorationChange(obj)
+    elif obj['cmd'] in question_change_commands:
+        question_domain.QuestionSuggestionChange(obj)
+    else:
+        raise base.BaseHandler.InvalidInputException(
+            '%s cmd is not allowed.' % obj['cmd'])
+    return obj
 
 
-def validate_new_config_property_values(obj):
+def validate_new_config_property_values(new_config_property):
     """Validates new config property values.
 
     Args:
-        obj: dict. Data that needs to be validated.
+        new_config_property: dict. Data that needs to be validated.
+
+    Returns:
+        dict(str, *). Returns a dict for new config properties.
+
+    Raises:
+        Exception. The config property name is not a string.
+        Exception. The value corresponding to config property name
+            don't have any schema.
     """
-    for (name, value) in obj.items():
+    for (name, value) in new_config_property.items():
         if not isinstance(name, str):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
         config_property.normalize(value)
+    # The new_config_property values do not represent a domain class directly
+    # and in the handler these dict values are used to set config properties
+    # individually. Hence conversion of dicts to domain objects is not required
+    # for new_config_properties.
+    return new_config_property
 
 
 def validate_change_dict_for_blog_post(change_dict):
@@ -65,6 +104,12 @@ def validate_change_dict_for_blog_post(change_dict):
 
     Args:
         change_dict: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the change_dict after validation.
+
+    Raises:
+        Exception. Invalid tags provided.
     """
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title( # type: ignore[no-untyped-call]
@@ -77,32 +122,34 @@ def validate_change_dict_for_blog_post(change_dict):
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property( # type: ignore[no-untyped-call]
+        list_of_default_tags = config_domain.Registry.get_config_property(
             'list_of_default_tags_for_blog_post').value
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
-
-
-def validate_collection_change(obj):
-    """Validates collection change.
-
-    Args:
-        obj: dict. Data that needs to be validated.
-    """
-    # No explicit call to validate_dict method is necessary, because
-    # CollectionChange calls validate method while initialization.
-    collection_domain.CollectionChange(obj) # type: ignore[no-untyped-call]
+    # The method returns a dict containing blog post properties, they are used
+    # to update blog posts in the domain layer. This dict does not correspond
+    # to any domain class so we are validating the fields of change_dict
+    # as a part of schema validation.
+    return change_dict
 
 
 def validate_state_dict(state_dict):
     """Validates state dict.
 
     Args:
-        state_dict: dict. Data that needs to be validated.
+        state_dict: dict. The dict representation of State object.
+
+    Returns:
+        State. The corresponding State domain object.
     """
-    validation_class = state_domain.State.from_dict(state_dict) # type: ignore[no-untyped-call]
-    validation_class.validate(None, True)
+    state_object = state_domain.State.from_dict(state_dict) # type: ignore[no-untyped-call]
+    state_object.validate(
+        exp_param_specs_dict=None, allow_null_interaction=True)
+    # State dict is used as dictionary form in the handler and the data is not
+    # transferred into the domain layer. Hence dict form of the data is returned
+    # after schema validation.
+    return state_dict
 
 
 def validate_email_dashboard_data(
@@ -112,6 +159,12 @@ def validate_email_dashboard_data(
 
     Args:
         data: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the dict after validation.
+
+    Raises:
+        Exception. The key in 'data' is not one of the allowed keys.
     """
     predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
@@ -122,6 +175,11 @@ def validate_email_dashboard_data(
         if key not in possible_keys:
             # Raise exception if key is not one of the allowed keys.
             raise Exception('400 Invalid input for query.')
+    # The method returns a dict containing fields of email dashboard
+    # query params. This dict represents the UserQueryParams class, which is a
+    # namedtuple. Hence the fields of the dict are being validated as a part of
+    # schema validation before saving new user queries in the handler.
+    return data
 
 
 def validate_task_entries(task_entries):
@@ -129,6 +187,9 @@ def validate_task_entries(task_entries):
 
     Args:
         task_entries: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the task entries dict after validation.
     """
     entity_version = task_entries.get('entity_version', None)
     if entity_version is None:
@@ -143,6 +204,12 @@ def validate_task_entries(task_entries):
     status = task_entries.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
+    # For creating the TaskEntry domain object, we have to include the
+    # exploration_id and the user_id which are not included in the
+    # task_entry_dict. Thus, it is not possible to create the full
+    # domain object at the payload validation stage. Hence, the key-value pairs
+    # of task_entry_dict are being validated as a part of schema validation.
+    return task_entries
 
 
 def validate_aggregated_stats(aggregated_stats):
@@ -151,40 +218,28 @@ def validate_aggregated_stats(aggregated_stats):
     Args:
         aggregated_stats: dict. Data that needs to be validated.
 
+    Returns:
+        dict. Data after validation.
+
     Raises:
         InvalidInputException. Property not in aggregated stats dict.
     """
-    exploration_stats_properties = [
-        'num_starts',
-        'num_actual_starts',
-        'num_completions'
-    ]
-    state_stats_properties = [
-        'total_answers_count',
-        'useful_feedback_count',
-        'total_hit_count',
-        'first_hit_count',
-        'num_times_solution_viewed',
-        'num_completions'
-    ]
-    for exp_stats_property in exploration_stats_properties:
-        if exp_stats_property not in aggregated_stats:
-            raise base.BaseHandler.InvalidInputException(
-                '%s not in aggregated stats dict.' % (exp_stats_property))
-    state_stats_mapping = aggregated_stats['state_stats_mapping']
-    for state_name in state_stats_mapping:
-        for state_stats_property in state_stats_properties:
-            if state_stats_property not in state_stats_mapping[state_name]:
-                raise base.BaseHandler.InvalidInputException(
-                    '%s not in state stats mapping of %s in aggregated '
-                    'stats dict.' % (state_stats_property, state_name))
+    return stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+        aggregated_stats)
 
 
-def validate_params_dict(params):
-    """validates params data type
+def validate_suggestion_images(files):
+    """Validates the files dict.
 
     Args:
-        params: dict. Data that needs to be validated.
+        files: dict. Data that needs to be validated.
+
+    Returns:
+        dict. Returns the dict after validation.
     """
-    if not isinstance(params, dict):
-        raise Exception('Excepted dict, received %s' % params)
+    for filename, raw_image in files.items():
+        image_validation_services.validate_image_and_filename(
+            raw_image, filename)
+    # The files argument do not represent any domain class, hence dict form
+    # of the data is returned from here.
+    return files

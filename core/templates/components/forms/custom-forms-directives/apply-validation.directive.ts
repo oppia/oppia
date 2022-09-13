@@ -16,65 +16,54 @@
  * @fileoverview Directive for applying validation.
  */
 
-require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+import { Directive, Input } from '@angular/core';
+import { NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
+import cloneDeep from 'lodash/cloneDeep';
+import { SchemaValidators } from '../validators/schema-validators';
 
-interface InteractionValidator {
-  'id': string;
-  'min_value': number;
-  'max_value': number;
-}
-
-interface ApplyValidationCustomScope extends ng.IScope {
-  $ctrl: {
-    validators: () => InteractionValidator[];
-  };
-}
-
-/* eslint-disable-next-line angular/directive-restrict */
-angular.module('oppia').directive('applyValidation', [
-  '$filter', function($filter) {
-    return {
-      require: 'ngModel',
-      restrict: 'A',
-      scope: {},
-      bindToController: {
-        validators: '&'
-      },
-      controllerAs: '$ctrl',
-      controller: [function() {}],
-      link: function(scope: ApplyValidationCustomScope, elm, attrs, ctrl) {
-        // Add validators in reverse order.
-        if (scope.$ctrl.validators()) {
-          scope.$ctrl.validators().forEach(function(validatorSpec) {
-            var frontendName = $filter('underscoresToCamelCase')(
-              validatorSpec.id);
-
-            // Note that there may not be a corresponding frontend filter for
-            // each backend validator.
-            try {
-              $filter(frontendName);
-            } catch (err) {
-              return;
-            }
-
-            var filterArgs = {};
-            for (var key in validatorSpec) {
-              if (key !== 'id') {
-                filterArgs[$filter('underscoresToCamelCase')(key)] =
-                  angular.copy(validatorSpec[key]);
-              }
-            }
-
-            var customValidator = function(viewValue) {
-              ctrl.$setValidity(
-                frontendName, $filter(frontendName)(viewValue, filterArgs));
-              return viewValue;
-            };
-
-            ctrl.$parsers.unshift(customValidator);
-            ctrl.$formatters.unshift(customValidator);
-          });
+@Directive({
+  selector: '[applyValidation]',
+  providers: [{
+    provide: NG_VALIDATORS,
+    useExisting: ApplyValidationDirective,
+    multi: true
+  }]
+})
+export class ApplyValidationDirective implements Validator {
+  @Input() validators: OppiaValidator[];
+  underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (!this.validators || this.validators.length === 0) {
+      return null;
+    }
+    let errorsPresent = false;
+    let allValidationErrors: ValidationErrors = {};
+    for (const validatorSpec of this.validators) {
+      const validatorName = this.underscoresToCamelCasePipe.transform(
+        validatorSpec.id
+      );
+      const filterArgs = {};
+      for (let key in validatorSpec) {
+        if (key !== 'id') {
+          filterArgs[this.underscoresToCamelCasePipe.transform(key)] = (
+            cloneDeep(validatorSpec[key]));
         }
       }
-    };
-  }]);
+      if (SchemaValidators[validatorName]) {
+        const error = SchemaValidators[validatorName](filterArgs)(control);
+        if (error !== null) {
+          errorsPresent = true;
+          allValidationErrors = {...allValidationErrors, ...error};
+        }
+      } else {
+        // TODO(#15190): Throw an error if validator not found.
+      }
+    }
+    if (!errorsPresent) {
+      return null;
+    }
+    return allValidationErrors;
+  }
+}

@@ -38,15 +38,19 @@ export class TopicRights {
   canEditTopic(): boolean {
     return this._canEditTopic;
   }
+
   isPublished(): boolean {
     return this._published;
   }
+
   canPublishTopic(): boolean {
     return this._canPublishTopic;
   }
+
   canEditName(): boolean {
     return this._canPublishTopic;
   }
+
   markTopicAsPublished(): void {
     if (this._canPublishTopic) {
       this._published = true;
@@ -54,6 +58,7 @@ export class TopicRights {
       throw new Error('User is not allowed to publish this topic.');
     }
   }
+
   markTopicAsUnpublished(): void {
     if (this._canPublishTopic) {
       this._published = false;
@@ -61,6 +66,7 @@ export class TopicRights {
       throw new Error('User is not allowed to unpublish this topic.');
     }
   }
+
   // Reassigns all values within this topic to match the existing
   // topic rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic rights.

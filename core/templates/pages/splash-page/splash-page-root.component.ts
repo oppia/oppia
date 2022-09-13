@@ -16,7 +16,10 @@
  * @fileoverview Root component for Splash Page.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { AppConstants } from 'app.constants';
 import { PageHeadService } from 'services/page-head.service';
 
@@ -24,11 +27,30 @@ import { PageHeadService } from 'services/page-head.service';
   selector: 'oppia-splash-page-root',
   templateUrl: './splash-page-root.component.html'
 })
-export class SplashPageRootComponent {
-  constructor(private pageHeadService: PageHeadService) {}
+export class SplashPageRootComponent implements OnDestroy {
+  directiveSubscriptions = new Subscription();
+  constructor(
+    private pageHeadService: PageHeadService,
+    private translateService: TranslateService
+  ) {}
+
+  setPageTitleAndMetaTags(): void {
+    let translatedTitle = this.translateService.instant(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.TITLE);
+    this.pageHeadService.updateTitleAndMetaTags(
+      translatedTitle,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.META);
+  }
 
   ngOnInit(): void {
-    this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH);
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitleAndMetaTags();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }

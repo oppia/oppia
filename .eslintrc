@@ -16,18 +16,21 @@
   "overrides": [
     {
       // We exclude test files from dependency injection format checks because
-      // they are never minified.
-      "files": ["*Spec.js", "*Spec.ts"],
+      // they are never minified. Also, we exclude no-loss-of-precision check as
+      // it is only relevant for non-test files, since when running
+      // frontend tests there is no loss of precision.
+      "files": ["*Spec.js", "*Spec.ts", "*.spec.ts"],
       "rules": {
-        "angular/di": "off"
+        "angular/di": "off",
+        "no-loss-of-precision": "off"
       }
     },
     {
       "files": ["*.js", "*.ts"],
       "excludedFiles": [
-      "complete.spec.ts",
-      "student.spec.ts",
-      "teacher.spec.ts"
+        "complete.spec.ts",
+        "student.spec.ts",
+        "teacher.spec.ts"
       ],
       "rules": {
         "oppia/no-to-throw": "error"
@@ -39,7 +42,10 @@
       "files": [
         "core/tests/protractor/*.js",
         "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js"
+        "core/tests/protractor_desktop/*.js",
+        "core/tests/webdriverio/*.js",
+        "core/tests/webdriverio_utils/*.js",
+        "core/tests/webdriverio_desktop/*.js"
       ],
       "excludedFiles": [
         "ClassroomPage.js",
@@ -110,14 +116,18 @@
       }
     },
     {
-      // We only run the protractor practices checks on protractor end-to-end test files.
+      // We only run the e2e practices checks on protractor and webdriverio
+      // end-to-end test files.
       "files": [
         "core/tests/protractor/*.js",
         "core/tests/protractor_utils/*.js",
-        "core/tests/protractor_desktop/*.js"
+        "core/tests/protractor_desktop/*.js",
+        "core/tests/webdriverio/*.js",
+        "core/tests/webdriverio_utils/*.js",
+        "core/tests/webdriverio_desktop/*.js"
       ],
       "rules": {
-        "oppia/protractor-practices": "error"
+        "oppia/e2e-practices": "error"
       }
     },
     {
@@ -138,12 +148,12 @@
      {
       "files": ["*.js", "*.ts"],
       "excludedFiles": [
-      "Polyfills.ts",
-      "ck-editor-copy-content.service.spec.ts",
-      "unit-test-utils.ajs.ts",
-      "mathjax.directive.ts",
-      "math-expression-content-editor.component.ts",
-      "core/tests/*"
+        "Polyfills.ts",
+        "ck-editor-copy-content.service.spec.ts",
+        "unit-test-utils.ajs.ts",
+        "mathjax.directive.ts",
+        "math-expression-content-editor.component.ts",
+        "core/tests/*"
       ],
       "rules": {
         "oppia/no-inner-html": "error"
@@ -152,7 +162,7 @@
     {
       "files": ["*.js", "*.ts"],
       "excludedFiles": [
-      "core/tests/**"
+        "core/tests/**"
       ],
       "rules": {
         "oppia/no-relative-import": "error"
@@ -252,7 +262,9 @@
         "MemberExpression": 1,
         "SwitchCase": 1,
         "ignoredNodes": [
-          "ConditionalExpression"
+          "ConditionalExpression",
+          // TODO(#14575): Remove once we have linting for class declaration.
+          "ClassDeclaration"
         ]
       }
     ],
@@ -350,6 +362,7 @@
     // The following must be off so that we can enable
     // "@typescript-eslint/no-extra-semi".
     "no-extra-semi": "off",
+    "lines-between-class-members": "off",
     "semi-spacing": "error",
     "space-before-blocks": [
       "error",
@@ -456,6 +469,15 @@
         "before": false,
         "after": true
       }
-    ]
+    ],
+    "@typescript-eslint/lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
+    "no-dupe-class-members": "off",
+    "@typescript-eslint/no-dupe-class-members": ["error"]
   }
 }

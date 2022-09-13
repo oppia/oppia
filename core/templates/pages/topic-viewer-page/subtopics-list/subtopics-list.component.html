@@ -1,11 +1,23 @@
 <div class="subtopics-list">
   <div class="oppia-subtopics-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
+      <!-- Add topic translation key to replace <topicName> in language constants so topic name is
+        also translated in selected language -->
       <h2 class="tab-title">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName}"></span>
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName}">
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicNameTranslationKey | translate}">
+        </span>
       </h2>
       <div class="subtopic-subheading">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName}"></span>
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName}">
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()"
+              [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicNameTranslationKey | translate}">
+        </span>
       </div>
       <div class="subtopics-container">
         <div *ngFor="let subtopic of subtopicsList">
@@ -20,67 +32,3 @@
     </mat-card>
   </div>
 </div>
-<style>
-  .oppia-page-card.oppia-long-text {
-    padding: 30px 30px 30px 40px;
-    width: 50vw;
-  }
-
-  .oppia-page-card {
-    margin-top: 10em;
-  }
-
-  .tab-title {
-    margin: .83em 0;
-  }
-
-  .subtopic-subheading {
-    font-family: Roboto, Arial, sans-serif;
-    font-size: 1.2em;
-    margin-bottom: 2.5vh;
-  }
-
-  .subtopics-container {
-    display: grid;
-    grid-row-gap: 2vh;
-    grid-template-columns: 170px 170px 170px;
-    justify-content: space-between;
-    margin-left: 20px;
-  }
-
-  .subtopic-summary-tile {
-    margin-right: 2vw;
-  }
-
-  @media(max-width: 1024px) {
-    .subtopics-container {
-      grid-template-columns: 150px 150px 150px;
-      margin-left: 2vw;
-    }
-  }
-
-  @media(max-width: 680px) {
-    .subtopics-container {
-      grid-template-columns: 130px 130px 130px;
-      margin-left: 0;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .subtopics-container {
-      display: grid;
-      grid-template-columns: 130px 130px;
-      justify-content: space-between;
-      margin-left: -10px;
-    }
-  }
-
-  @media(max-width: 350px) {
-    .subtopics-container {
-      display: grid;
-      grid-template-columns: 120px 120px;
-      justify-content: space-between;
-      margin-left: -10px;
-    }
-  }
-</style>

@@ -52,7 +52,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             )
 
         for item, error_msg in invalid_items_with_error_messages:
-            with self.assertRaisesRegexp(Exception, error_msg):
+            with self.assertRaisesRegex(Exception, error_msg):
                 object_class.normalize(item)
 
     def test_boolean_validation(self):
@@ -882,10 +882,28 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     continue
 
                 if hasattr(member, 'get_schema'):
-                    schema_utils_test.validate_schema(member.get_schema())
-                    count += 1
+                    # Here we are excluding all the classes where get_schema
+                    # is no implemented, because accessing get_schema() method
+                    # on these classes will throw an NotImplementedError
+                    # exception.
+                    try:
+                        schema_utils_test.validate_schema(member.get_schema())
+                    except NotImplementedError:
+                        continue
+                    else:
+                        count += 1
 
         self.assertEqual(count, 53)
+
+    def test_get_schema_method_raises_error_in_base_object(self):
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            NotImplementedError,
+            re.escape(
+                'The get_schema() method is missing from the derived class. It '
+                'should be implemented in the derived class.'
+            )
+        ):
+            objects.BaseObject.get_schema()
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -949,7 +967,7 @@ class NormalizedRectangleTests(test_utils.GenericTestBase):
         self.assertEqual(normalized_rectangle.normalize(
             [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, 'Cannot convert to Normalized Rectangle '):
             normalized_rectangle.normalize('')
 
@@ -960,7 +978,7 @@ class CodeStringTests(test_utils.GenericTestBase):
         code_string = objects.CodeString()
         self.assertEqual(code_string.normalize(code_string.default_value), '')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             TypeError, 'Unexpected tab characters in code string: \t'):
             code_string.normalize('\t')
 
@@ -984,14 +1002,14 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                 self.assertNotIn('Translatable', name)
 
     def test_abstract_base_class_raises_not_implemented_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             'The _value_key_name and _value_schema for this class must both '
             'be set'):
             objects.BaseTranslatableObject.get_schema()
 
         with self.swap(objects.BaseTranslatableObject, '_value_key_name', 'a'):
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 NotImplementedError,
                 'The _value_key_name and _value_schema for this class must '
                 'both be set'):
@@ -1001,7 +1019,7 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                 })
 
     def test_base_translatable_object_normalization(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             'The _value_key_name and _value_schema for this class must both '
             'be set'):
@@ -1009,7 +1027,7 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                 'contentId': 5
             })
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NotImplementedError,
             'The _value_key_name and _value_schema for this class must both '
             'be set'):
@@ -1019,14 +1037,14 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
 class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 5'):
             objects.TranslatableUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStr': 5
             })
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError,
             re.escape('Expected unicode string, received [\'abc\']')
         ):
@@ -1044,11 +1062,11 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
         })
 
     def test_normalize_value(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
                 AssertionError, 'Expected unicode string, received 5'):
             objects.TranslatableUnicodeString.normalize_value(5)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError,
             re.escape('Expected unicode string, received [\'abc\']')
         ):
@@ -1061,13 +1079,13 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 class TranslatableHtmlTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
-        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+        with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
             objects.TranslatableHtml.normalize({
                 'contentId': 'rule_input',
                 'html': 5
             })
 
-        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+        with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
             objects.TranslatableHtml.normalize({
                 'contentId': 'rule_input',
                 'html': ['abc']
@@ -1098,13 +1116,13 @@ class TranslatableHtmlTests(test_utils.GenericTestBase):
         })
 
     def test_normalize_value(self):
-        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+        with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
             objects.TranslatableHtml.normalize_value(5)
 
-        with self.assertRaisesRegexp(AssertionError, 'Expected unicode HTML'):
+        with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML'):
             objects.TranslatableHtml.normalize_value(['abc'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError,
             re.escape('Expected unicode string, received [\'abc\']')
         ):
@@ -1129,21 +1147,21 @@ class TranslatableHtmlTests(test_utils.GenericTestBase):
 class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfNormalizedString.normalize({
                 'contentId': 'rule_input',
                 'normalizedStrSet': 5
             })
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfNormalizedString.normalize({
                 'contentId': 'rule_input',
                 'normalizedStrSet': ['1', 2, '3']
             })
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'):
             objects.TranslatableSetOfNormalizedString.normalize({
                 'contentId': 'rule_input',
@@ -1159,16 +1177,16 @@ class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
         })
 
     def test_normalize_value(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfNormalizedString.normalize_value(5)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfNormalizedString.normalize_value(
                 ['1', 2, '3'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'):
             objects.TranslatableSetOfNormalizedString.normalize_value(
                 ['1', '1'])
@@ -1182,21 +1200,21 @@ class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
 class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStrSet': 5
             })
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStrSet': ['1', 2, '3']
             })
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'):
             objects.TranslatableSetOfUnicodeString.normalize({
                 'contentId': 'rule_input',
@@ -1212,16 +1230,16 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
         })
 
     def test_normalize_value(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected list, received 5'):
             objects.TranslatableSetOfUnicodeString.normalize_value(5)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Expected unicode string, received 2'):
             objects.TranslatableSetOfUnicodeString.normalize_value(
                 ['1', 2, '3'])
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'):
             objects.TranslatableSetOfUnicodeString.normalize_value(['1', '1'])
 
@@ -1234,7 +1252,7 @@ class JsonEncodedInStringTests(test_utils.GenericTestBase):
 
     def test_normalization(self):
         list_of_ids = ['0', '1']
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Expected string received 2 of type %s' % type(2)
         ):
             objects.JsonEncodedInString.normalize(2)

@@ -33,7 +33,9 @@ angular.module('oppia').directive('schemaBasedCustomViewer', [
         'components/forms/schema-viewers/' +
         'schema-based-custom-viewer.directive.html'),
       restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }
 ]);

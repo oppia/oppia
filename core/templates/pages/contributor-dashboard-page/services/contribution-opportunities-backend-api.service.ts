@@ -33,6 +33,7 @@ import {
   FeaturedTranslationLanguage,
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
+import { UserService } from 'services/user.service';
 
 import constants from 'assets/constants';
 
@@ -54,6 +55,10 @@ interface VoiceoverContributionOpportunitiesBackendDict {
   'more': boolean;
 }
 
+interface ReviewableTranslationOpportunitiesBackendDict {
+  'opportunities': ExplorationOpportunitySummaryBackendDict[];
+}
+
 interface SkillContributionOpportunities {
   opportunities: SkillOpportunity[];
   nextCursor: string;
@@ -72,12 +77,20 @@ interface VoiceoverContributionOpportunities {
   more: boolean;
 }
 
+interface FetchedReviewableTranslationOpportunitiesResponse {
+  opportunities: ExplorationOpportunitySummary[];
+}
+
 interface FeaturedTranslationLanguagesBackendDict {
   'featured_translation_languages': FeaturedTranslationLanguageBackendDict[];
 }
 
 interface TopicNamesBackendDict {
   'topic_names': string[];
+}
+
+interface PreferredTranslationLanguageBackendDict {
+  'preferred_translation_language_code': string|null;
 }
 
 @Injectable({
@@ -88,6 +101,7 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
+    private userService: UserService,
   ) {}
 
   private _getExplorationOpportunityFromDict(
@@ -135,7 +149,8 @@ export class ContributionOpportunitiesBackendApiService {
   async fetchTranslationOpportunitiesAsync(
       languageCode: string, topicName: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
-    topicName = (topicName === 'All') ? '' : topicName;
+    topicName = (
+      topicName === constants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName);
 
     const params = {
       language_code: languageCode,
@@ -188,6 +203,29 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
+  async fetchReviewableTranslationOpportunitiesAsync(
+      topicName: string
+  ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
+    const params: {
+      topic_name?: string;
+    } = {};
+    if (topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
+      params.topic_name = topicName;
+    }
+    return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
+      '/getreviewableopportunitieshandler', {
+        params
+      }).toPromise().then(data => {
+      const opportunities = data.opportunities.map(
+        dict => this._getExplorationOpportunityFromDict(dict));
+      return {
+        opportunities: opportunities
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
   async fetchFeaturedTranslationLanguagesAsync():
   Promise<FeaturedTranslationLanguage[]> {
     try {
@@ -203,17 +241,56 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
-  async fetchAllTopicNamesAsync():
+  async fetchTranslatableTopicNamesAsync():
   Promise<string[]> {
     try {
       const response = await this.http
-        .get<TopicNamesBackendDict>('/getalltopicnames').toPromise();
-      response.topic_names.unshift('All');
+        .get<TopicNamesBackendDict>('/gettranslatabletopicnames').toPromise();
+      // TODO(#15648): Re-enable "All Topics" after fetching latency is fixed.
+      // response.topic_names.unshift('All');
 
       return response.topic_names;
     } catch {
       return [];
     }
+  }
+
+  async savePreferredTranslationLanguageAsync(
+      languageCode: string
+  ): Promise<void> {
+    return this.userService.getUserInfoAsync().then(
+      (userInfo) => {
+        if (userInfo.isLoggedIn()) {
+          return this.http.post<void>(
+            '/preferredtranslationlanguage',
+            {language_code: languageCode}
+          ).toPromise().catch((errorResponse) => {
+            throw new Error(errorResponse.error.error);
+          });
+        }
+      }
+    );
+  }
+
+  async getPreferredTranslationLanguageAsync(
+  ): Promise<string|null> {
+    const emptyResponse = {
+      preferred_translation_language_code: null
+    };
+    return this.userService.getUserInfoAsync().then(
+      async(userInfo) => {
+        if (userInfo.isLoggedIn()) {
+          const res = (
+            await this.http.get<PreferredTranslationLanguageBackendDict>(
+              '/preferredtranslationlanguage'
+            ).toPromise().catch(() => emptyResponse)
+          );
+          return res.preferred_translation_language_code;
+        } else {
+          return null;
+        }
+      }
+    );
   }
 }
 

@@ -23,33 +23,37 @@ from core.jobs.batch_jobs import blog_validation_jobs
 from core.jobs.types import blog_validation_errors
 from core.platform import models
 
+from typing import Type
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostTitlesJob
+    JOB_CLASS: Type[
+        blog_validation_jobs.FindDuplicateBlogPostTitlesJob
+    ] = blog_validation_jobs.FindDuplicateBlogPostTitlesJob
 
     def test_run_with_same_titles_for_blog_posts(self) -> None:
-        blog_post_model_1 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_model_1 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid1',
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
             url_fragment='url_fragment_1')
-        blog_post_model_2 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_model_2 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid2',
             title='Sample Title',
             content='<p>hello tho</p>,',
             author_id='user',
             url_fragment='url_fragment_2')
-        blog_post_model_3 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_model_3 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid3',
             title='Sample Diff Title',
@@ -57,7 +61,7 @@ class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='url_fragment_2')
 
-        self.put_multi( # type: ignore[no-untyped-call]
+        self.put_multi(
             [
                 blog_post_model_1,
                 blog_post_model_2,
@@ -65,7 +69,7 @@ class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        self.assert_job_output_is( # type: ignore[no-untyped-call]
+        self.assert_job_output_is(
             [
                 blog_validation_errors.DuplicateBlogTitleError(
                     blog_post_model_1
@@ -79,24 +83,26 @@ class FindDuplicateBlogPostTitlesJobTests(job_test_utils.JobTestBase):
 
 class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
+    JOB_CLASS: Type[
+        blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
+    ] = blog_validation_jobs.FindDuplicateBlogPostSummaryTitlesJob
 
     def test_run_with_same_titles_for_blog_posts(self) -> None:
-        blog_post_summary_model_1 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_summary_model_1 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid1',
             title='Sample Title',
             summary='<p>hello</p>,',
             author_id='user',
             url_fragment='url_fragment_1')
-        blog_post_summary_model_2 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_summary_model_2 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid2',
             title='Sample Title',
             summary='<p>hello tho</p>,',
             author_id='user',
             url_fragment='url_fragment_2')
-        blog_post_summary_model_3 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_summary_model_3 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid3',
             title='Sample Diff Title',
@@ -104,14 +110,14 @@ class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='url_fragment_2')
 
-        self.put_multi( # type: ignore[no-untyped-call]
+        self.put_multi(
             [
                 blog_post_summary_model_1,
                 blog_post_summary_model_2,
                 blog_post_summary_model_3,
             ])
 
-        self.assert_job_output_is( # type: ignore[no-untyped-call]
+        self.assert_job_output_is(
             [
                 blog_validation_errors.DuplicateBlogTitleError(
                     blog_post_summary_model_1
@@ -124,24 +130,26 @@ class FindDuplicateBlogPostSummaryTitlesJobTests(job_test_utils.JobTestBase):
 
 class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostUrlsJob
+    JOB_CLASS: Type[
+        blog_validation_jobs.FindDuplicateBlogPostUrlsJob
+    ] = blog_validation_jobs.FindDuplicateBlogPostUrlsJob
 
     def test_run_with_same_url_for_blog_posts(self) -> None:
-        blog_post_model_1 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_model_1 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid1',
             title='Sample Title 1',
             content='<p>hello</p>,',
             author_id='user',
             url_fragment='url_fragment')
-        blog_post_model_2 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_model_2 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid2',
             title='Sample Title 2',
             content='<p>hello tho</p>,',
             author_id='user',
             url_fragment='url_fragment')
-        blog_post_model_3 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_model_3 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid3',
             title='Sample Diff Title',
@@ -149,14 +157,14 @@ class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='diff_url_fragment')
 
-        self.put_multi( # type: ignore[no-untyped-call]
+        self.put_multi(
             [
                 blog_post_model_1,
                 blog_post_model_2,
                 blog_post_model_3,
             ])
 
-        self.assert_job_output_is( # type: ignore[no-untyped-call]
+        self.assert_job_output_is(
             [
                 blog_validation_errors.DuplicateBlogUrlError(
                     blog_post_model_1
@@ -169,24 +177,26 @@ class FindDuplicateBlogPostUrlsJobTests(job_test_utils.JobTestBase):
 
 class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
+    JOB_CLASS: Type[
+        blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
+    ] = blog_validation_jobs.FindDuplicateBlogPostSummaryUrlsJob
 
     def test_run_with_same_url_for_blog_posts(self) -> None:
-        blog_post_summary_model_1 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_summary_model_1 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid1',
             title='Sample Title 1',
             summary='<p>hello</p>,',
             author_id='user',
             url_fragment='url_fragment')
-        blog_post_summary_model_2 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_summary_model_2 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid2',
             title='Sample Title 2',
             summary='<p>hello tho</p>,',
             author_id='user',
             url_fragment='url_fragment')
-        blog_post_summary_model_3 = self.create_model( # type: ignore[no-untyped-call]
+        blog_post_summary_model_3 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid3',
             title='Sample Diff Title',
@@ -194,7 +204,7 @@ class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='diff_url_fragment')
 
-        self.put_multi( # type: ignore[no-untyped-call]
+        self.put_multi(
             [
                 blog_post_summary_model_1,
                 blog_post_summary_model_2,
@@ -202,7 +212,7 @@ class FindDuplicateBlogPostSummaryUrlsJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        self.assert_job_output_is(# type: ignore[no-untyped-call]
+        self.assert_job_output_is(
             [
                 blog_validation_errors.DuplicateBlogUrlError(
                     blog_post_summary_model_1

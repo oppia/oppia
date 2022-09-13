@@ -20,41 +20,41 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ReadOnlyTopicObjectFactory } from
+import { ReadOnlyTopic, ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Topic viewer backend API service', () => {
-  let topicViewerBackendApiService:
-    TopicViewerBackendApiService = null;
+  let topicViewerBackendApiService: TopicViewerBackendApiService;
   let httpTestingController: HttpTestingController;
-  let sampleDataResults = null;
-  let sampleDataResultsObjects = null;
-  let readOnlyTopicObjectFactory = null;
-
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory());
-  }));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    let ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  let sampleDataResultsObjects: ReadOnlyTopic;
+  let sampleDataResults: ReadOnlyTopicBackendDict;
+  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
 
   beforeEach(() => {
+    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
-    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
+
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
 
     // Sample topic object returnable from the backend.
     sampleDataResults = {
@@ -68,26 +68,32 @@ describe('Topic viewer backend API service', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true,
+        story_is_published: true,
+        url_fragment: 'story-title',
         completed_node_titles: ['Chapter 1'],
-        all_node_dicts: []
+        all_node_dicts: [nodeDict]
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: ['Chapter 1'],
+        node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true,
+        story_is_published: true,
         completed_node_titles: ['Chapter 1'],
-        all_node_dicts: []
+        url_fragment: 'story-title-one',
+        all_node_dicts: [nodeDict]
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
         skill_ids: ['skill_id_2'],
         id: 1,
-        title: 'subtopic_name'}],
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
+      }],
       degrees_of_mastery: {
         skill_id_1: 0.5,
         skill_id_2: 0.3
@@ -96,7 +102,9 @@ describe('Topic viewer backend API service', () => {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
       },
-      practice_tab_is_displayed: false
+      practice_tab_is_displayed: false,
+      meta_tag_content: 'Topic meta tag content',
+      page_title_fragment_for_web: 'topic page title'
     };
 
     sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(

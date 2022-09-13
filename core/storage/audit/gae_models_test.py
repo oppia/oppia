@@ -22,27 +22,29 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import base_models
 
 (audit_models, base_models) = models.Registry.import_models(
-    [models.NAMES.audit, models.NAMES.base_model])
+    [models.Names.AUDIT, models.Names.BASE_MODEL])
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     """Unit tests for the RoleQueryAuditModel class."""
 
-    NONEXISTENT_USER_ID = 'id_x'
-    USER_ID = 'user_id'
-    ID = 'user_id.111.update.111'
-    USERNAME = 'username'
-    ROLE = 'role'
+    NONEXISTENT_USER_ID: Final = 'id_x'
+    USER_ID: Final = 'user_id'
+    ID: Final = 'user_id.111.update.111'
+    USERNAME: Final = 'username'
+    ROLE: Final = 'role'
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(RoleQueryAuditModelUnitTests, self).setUp()
+        super().setUp()
 
         audit_models.RoleQueryAuditModel(
             id=self.ID,
@@ -57,6 +59,26 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             audit_models.RoleQueryAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
+    def test_get_export_policy(self) -> None:
+        sample_dict = {
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             audit_models.RoleQueryAuditModel
@@ -69,8 +91,6 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model(self) -> None:
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
-        # Ruling out the possibility of None for mypy type checking.
-        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_ADD)
@@ -82,15 +102,15 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
 class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
     """Unit tests for the UsernameChangeAuditModel class."""
 
-    NONEXISTENT_COMMITTER_ID = 'id_x'
-    COMMITTER_ID = 'committer_id'
-    ID = 'committer_id.111.222'
-    OLD_USERNAME = 'old_username'
-    NEW_USERNAME = 'new_username'
+    NONEXISTENT_COMMITTER_ID: Final = 'id_x'
+    COMMITTER_ID: Final = 'committer_id'
+    ID: Final = 'committer_id.111.222'
+    OLD_USERNAME: Final = 'old_username'
+    NEW_USERNAME: Final = 'new_username'
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UsernameChangeAuditModelUnitTests, self).setUp()
+        super().setUp()
 
         audit_models.UsernameChangeAuditModel(
             id=self.ID,
@@ -104,6 +124,25 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
             audit_models.UsernameChangeAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
+    def test_get_export_policy(self) -> None:
+        sample_dict = {
+            'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'old_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'new_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            audit_models.UsernameChangeAuditModel.get_export_policy(),
+            sample_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            audit_models.UsernameChangeAuditModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_has_reference_to_user_id(self) -> None:
         self.assertTrue(
             audit_models.UsernameChangeAuditModel
@@ -116,8 +155,6 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model(self) -> None:
         audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
-        # Ruling out the possibility of None for mypy type checking.
-        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)

@@ -13,36 +13,60 @@
       </div>
     </div>
     <div class="oppia-splash-section-one-right">
-      <picture class="oppia-splash-main-image image-desktop">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainDesktop.webp')">
-        <source type="image/jpeg" [srcset]="getStaticImageUrl('/splash/splashMainDesktop.png')">
-        <img [src]="getStaticImageUrl('/splash/splashMainDesktop.png')" alt="">
+      <picture class="oppia-splash-main-image" *ngIf="!isWindowNarrow">
+        <source type="image/webp" [srcset]="getImageSet('/splash/splashMainDesktop', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/splashMainDesktop', 'png')">
+        <img [src]="getStaticImageUrl('/splash/splashMainDesktop1x.png')"
+             width="800"
+             height="663"
+             alt="Photo of two kids and a tutor">
       </picture>
-      <picture class="oppia-splash-main-image image-mobile">
+      <picture class="oppia-splash-main-image" *ngIf="isWindowNarrow">
         <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainMobile.webp')">
-        <source type="image/jpeg" [srcset]="getStaticImageUrl('/splash/splashMainMobile.png')">
-        <img [src]="getStaticImageUrl('/splash/splashMainMobile.png')" alt="">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/splashMainMobile.png')">
+        <img [src]="getStaticImageUrl('/splash/splashMainMobile.png')"
+             width="629"
+             height="415"
+             alt="Photo of a girl in front of computer">
       </picture>
     </div>
   </div>
 
   <div class="oppia-splash-section-two">
     <div class="oppia-splash-icon-1-container">
-      <img [src]="getStaticImageUrl('/splash/userIcon.svg')" class="oppia-splash-icon-1" alt="">
+      <img [src]="getStaticImageUrl('/splash/userIcon.svg')"
+           class="oppia-splash-icon-1"
+           width="35"
+           height="35"
+           alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_ONE_TEXT' | translate"></span>
+        <span class="splash-icon-text"
+              [innerHTML]="'I18N_SPLASH_ICON_ONE_TEXT' | translate">
+        </span>
       </div>
     </div>
     <div class="oppia-splash-icon-2-container">
-      <img [src]="getStaticImageUrl('/splash/languageIcon.svg')" class="oppia-splash-icon-2" alt="">
+      <img [src]="getStaticImageUrl('/splash/languageIcon.svg')"
+           class="oppia-splash-icon-2"
+           width="35"
+           height="35"
+           alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_TWO_TEXT' | translate:{languageCount: 4}"></span>
+        <span class="splash-icon-text"
+              [innerHTML]="'I18N_SPLASH_ICON_TWO_TEXT' | translate:{languageCount: 4}">
+        </span>
       </div>
     </div>
     <div class="oppia-splash-icon-3-container">
-      <img [src]="getStaticImageUrl('/splash/lessonIcon.svg')" class="oppia-splash-icon-3" alt="">
+      <img [src]="getStaticImageUrl('/splash/lessonIcon.svg')"
+           class="oppia-splash-icon-3"
+           width="35"
+           height="35"
+           alt="">
       <div class="splash-icon-text-container">
-        <span class="splash-icon-text" [innerHTML]="'I18N_SPLASH_ICON_THREE_TEXT' | translate:{lessonCount: 40}"></span>
+        <span class="splash-icon-text"
+              [innerHTML]="'I18N_SPLASH_ICON_THREE_TEXT' | translate:{lessonCount: 40}">
+        </span>
       </div>
     </div>
   </div>
@@ -51,25 +75,38 @@
   <div class="oppia-splash-section-three">
     <div class="oppia-splash-section-three-left">
       <h3 *ngIf="isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
-      <picture class="splash-matthew-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
-        <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
-      </picture>
+      <img class="splash-matthew-image"
+           [src]="getStaticImageUrl('/splash/matthew_fractions.svg')"
+           width="600"
+           height="340"
+           loading="lazy"
+           alt="Illustration of a young person in front of part of Oppia fraction lesson">
     </div>
     <div class="oppia-splash-section-three-right">
       <h3 *ngIf="!isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
-      <div class="splash-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
-        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_ONE' | translate" class="splash-benefits"></h2>
-      </div>
-      <div class="splash-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
-        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_TWO' | translate" class="splash-benefits"></h2>
-      </div>
-      <div class="splash-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
-        <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_THREE' | translate" class="splash-benefits"></h2>
+      <div class="splash-benefits-list">
+        <div class="splash-benefit-bullets-column">
+          <img [src]="getStaticImageUrl('/splash/bullet1.svg')"
+               width="17"
+               height="33"
+               loading="lazy"
+               alt="">
+          <img [src]="getStaticImageUrl('/splash/bullet2.svg')"
+               width="25"
+               height="33"
+               loading="lazy"
+               alt="">
+          <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
+               width="39"
+               height="33"
+               loading="lazy"
+               alt="">
+        </div>
+        <div class="splash-benefit-text-items-column">
+          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_ONE' | translate" class="splash-benefits"></h2>
+          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_TWO' | translate" class="splash-benefits"></h2>
+          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_THREE' | translate" class="splash-benefits"></h2>
+        </div>
       </div>
     </div>
   </div>
@@ -79,7 +116,11 @@
       <picture class="splash-student-desk-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/splash/student_desk_mobile.webp')">
         <source type="image/png" [srcset]="getStaticImageUrl('/splash/student_desk_mobile.png')">
-        <img [src]="getStaticImageUrl('/splash/student_desk_mobile.png')" alt="">
+        <img [src]="getStaticImageUrl('/splash/student_desk_mobile.png')"
+             width="500"
+             height="520"
+             loading="lazy"
+             alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-four-left">
@@ -89,15 +130,20 @@
       <div class="oppia-splash-button-container">
         <button type="submit"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_LEARNING' | translate" (click)="onClickBrowseLessonsButton()">
+                [innerHTML]="'I18N_SPLASH_START_LEARNING' | translate"
+                (click)="onClickBrowseLessonsButton()">
         </button>
       </div>
     </div>
     <div class="oppia-splash-section-four-right" *ngIf="!isWindowNarrow">
       <picture class="splash-student-desk-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/student_desk.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/student_desk.png')">
-        <img [src]="getStaticImageUrl('/splash/student_desk.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/student_desk', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/student_desk', 'png')">
+        <img [src]="getStaticImageUrl('/splash/student_desk1x.png')"
+             width="500"
+             height="520"
+             loading="lazy"
+             alt="Photo of a kid thinking about fractions">
       </picture>
     </div>
   </div>
@@ -107,7 +153,12 @@
       <picture class="splash-student-image">
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
         <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng" ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
+             ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
+             width="350"
+             height="350"
+             loading="lazy"
+             alt="">
       </picture>
     </div>
     <div class="oppia-splash-section-five-left">
@@ -116,11 +167,9 @@
         <p class="testimonial-student-details" [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></p>
       </div>
       <div class="splash-arrows-container">
-        <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
-          arrow_back_ios
+        <span (click)="decrementDisplayedTestimonialId()" class="fas fa-angle-left oppia-splash-testimonial-arrow">
         </span>
-        <span (click)="incrementDisplayedTestimonialId()" class="material-icons">
-          arrow_forward_ios
+        <span (click)="incrementDisplayedTestimonialId()" class="fas fa-angle-right oppia-splash-testimonial-arrow">
         </span>
       </div>
     </div>
@@ -128,18 +177,24 @@
       <picture class="splash-student-image">
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
         <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
+             [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
+             width="350"
+             height="350"
+             loading="lazy"
+             alt="">
       </picture>
     </div>
   </div>
 
   <div class="oppia-splash-section-six">
     <div class="oppia-splash-section-six-left">
-      <picture class="splash-books-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/books_dsk.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/books_dsk.png')">
-        <img [src]="getStaticImageUrl('/splash/books_dsk.png')" alt="">
-      </picture>
+      <img class="splash-books-image"
+           [src]="getStaticImageUrl('/splash/books_dsk.svg')"
+           width="500"
+           height="390"
+           loading="lazy"
+           alt="Illustration of a book">
     </div>
     <div class="oppia-splash-section-six-right">
       <h2 [innerHTML]="'I18N_SPLASH_FOR_TEACHERS' | translate"></h2>
@@ -148,7 +203,8 @@
       <div class="oppia-splash-button-container">
         <button type="submit"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_TEACHING' | translate" (click)="onClickStartTeachingButton()">
+                [innerHTML]="'I18N_SPLASH_START_TEACHING' | translate"
+                (click)="onClickStartTeachingButton()">
         </button>
       </div>
     </div>
@@ -157,9 +213,13 @@
   <div class="oppia-splash-section-seven" [ngStyle]="{'background-image': 'getCommunityBackgroundUrl()'}">
     <div class="oppia-splash-section-seven-image" *ngIf="isWindowNarrow">
       <picture class="splash-vol-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/volunteer_section.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/volunteer_section.png')">
-        <img [src]="getStaticImageUrl('/splash/volunteer_section.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
+        <img [src]="getStaticImageUrl('/splash/volunteer_section1x.png')"
+             width="400"
+             height="428"
+             loading="lazy"
+             alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
     <div class="oppia-splash-section-seven-left">
@@ -169,566 +229,21 @@
       <div class="oppia-splash-button-container">
         <button type="submit"
                 class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_CONTRIBUTING' | translate" (click)="onClickStartContributingButton()">
+                [innerHTML]="'I18N_SPLASH_START_CONTRIBUTING' | translate"
+                (click)="onClickStartContributingButton()">
         </button>
       </div>
     </div>
     <div class="oppia-splash-section-seven-right" *ngIf="!isWindowNarrow">
       <picture class="splash-vol-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/volunteer_section.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/volunteer_section.png')">
-        <img [src]="getStaticImageUrl('/splash/volunteer_section.png')" alt="">
+        <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
+        <img [src]="getStaticImageUrl('/splash/volunteer_section1x.png')"
+             width="400"
+             height="428"
+             loading="lazy"
+             alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
   </div>
 </div>
-
-<style>
-  .splash-page .image-mobile {
-    display: none;
-  }
-
-  .splash-page .image-with-border {
-    border-radius: 11em;
-  }
-
-  .splash-page .oppia-splash-section-one {
-    background-color: #e7f6ff;
-    display: flex;
-    height: 75vh;
-    max-height: 75vw;
-    overflow: hidden;
-  }
-
-  .splash-page .oppia-splash-section-two {
-    background-color: #fff;
-    padding: 30px;
-  }
-
-  .splash-page .oppia-splash-h1,
-  .splash-page .oppia-splash-h2 {
-    color: #005c5e;
-    display: flex;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-  }
-
-  .splash-page .oppia-splash-h1 {
-    margin-left: 10vw;
-  }
-
-  .splash-page .oppia-splash-h2-container {
-    margin-left: 10vw;
-    max-width: 900px;
-  }
-
-  .splash-page .oppia-splash-h2 {
-    line-height: 1.6em;
-    padding-bottom: 72px;
-  }
-
-  .splash-page .oppia-splash-section-three {
-    background-color: #f4f4f4;
-    color: #2c4841;
-    display: flex;
-    padding: 50px 5vw 50px 10vw;
-    width: 100vw;
-  }
-
-  .splash-page .oppia-splash-button {
-    background-color: #015c53;
-    border-radius: 0;
-    color: #fff;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    margin-top: -20px;
-    min-width: 250px;
-    padding: 10px;
-    text-transform: uppercase;
-  }
-
-  .splash-page .oppia-splash-button:hover,
-  .splash-page .oppia-splash-button:focus,
-  .splash-page .oppia-splash-button:active {
-    background-color: rgba(5, 190, 178, 1);
-    color: #fff;
-  }
-
-  @media only screen and (max-width: 500px) {
-    .splash-page button.btn.oppia-splash-button {
-      font-size: 3.6vw;
-    }
-  }
-
-  .splash-page .oppia-splash-button-container {
-    margin-left: 10vw;
-    margin-right: auto;
-    max-width: 500px;
-    position: relative;
-    transform: translate(0, 10px);
-    width: 100%;
-    z-index: 10;
-  }
-
-  @media (min-width: 768px) {
-    .splash-page .oppia-splash-button-browse {
-      left: -webkit-calc(50% - 200px);
-      left: -moz-calc(50% - 200px);
-      left: -o-calc(50% - 200px);
-      left: calc(50% - 200px);
-    }
-  }
-
-  @media (min-width: 575px) {
-    .splash-page .oppia-splash-button {
-      left: -webkit-calc(130px - -15%);
-      left: -moz-calc(130px - -15%);
-      left: -o-calc(130px - -15%);
-      left: calc(130px - -15%);
-    }
-  }
-
-  @media (max-width: 365px) {
-    .splash-page .oppia-splash-button {
-      min-width: 95%;
-    }
-  }
-
-  .splash-page .oppia-splash-section-four {
-    background-color: #fff;
-    display: flex;
-    padding-bottom: 50px;
-    padding-top: 40px;
-    width: 100vw;
-  }
-
-  .splash-page .splash-arrows-container {
-    position: absolute;
-  }
-
-  .splash-page .oppia-splash-section-one-left {
-    margin-bottom: auto;
-    margin-top: auto;
-    position: relative;
-    width: 45vw;
-  }
-
-  .splash-page .splash-icon-text-container {
-    padding-left: 5px;
-    padding-top: 5px;
-  }
-
-  .splash-page .oppia-splash-section-one-right {
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-top: auto;
-  }
-
-  .splash-page .material-icons {
-    color: #6d6d6d;
-    cursor: pointer;
-    font-size: 2.5em;
-    margin-top: 50px;
-  }
-
-  .splash-page .splash-vol-image img {
-    max-width: 400px;
-    width: 100%;
-  }
-
-  .splash-page .splash-books-image img {
-    max-width: 500px;
-    width: 100%;
-  }
-
-  .splash-page .splash-student-image img {
-    max-width: 350px;
-    width: 100%;
-  }
-
-  .splash-page .oppia-splash-section-five,
-  .splash-page .oppia-splash-section-seven {
-    background-color: #fff;
-    background-size: cover;
-    display: flex;
-    margin-bottom: -1px;
-    margin-top: -1px;
-    padding-bottom: 15vh;
-    padding-top: 20vh;
-    width: 100vw;
-  }
-
-  .splash-page .oppia-splash-section-five {
-    background-image: url(/assets/images/splash/dsk_testimonial_background.png);
-  }
-
-  .splash-page .oppia-splash-section-seven {
-    background-image: url(/assets/images/splash/dsk_community_background.png);
-    padding-top: 30vh;
-  }
-
-  .splash-page .oppia-splash-section-six .oppia-splash-button-container,
-  .splash-page .oppia-splash-section-seven .oppia-splash-button-container {
-    margin-left: 0;
-    margin-top: 50px;
-  }
-
-  .splash-page .oppia-splash-section-six {
-    background-color: #fff;
-    display: flex;
-    padding-top: 50px;
-    width: 100vw;
-  }
-
-  .splash-page .oppia-splash-section-seven-right {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: -5vh;
-    width: 50vw;
-  }
-
-  .splash-page .oppia-splash-section-five-left {
-    margin-bottom: auto;
-    margin-left: 10vw;
-    margin-top: auto;
-    width: 50vw;
-  }
-
-  .splash-page .oppia-splash-section-seven-left {
-    margin-bottom: auto;
-    margin-left: 10vw;
-    margin-top: auto;
-    width: 50vw;
-  }
-
-  .splash-page .oppia-splash-section-six-left {
-    margin-left: 2vw;
-    margin-right: 5vw;
-  }
-
-  .splash-page .oppia-splash-section-five-right {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .splash-page .oppia-splash-section-six-right {
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-top: auto;
-    width: 40vw;
-  }
-
-  .splash-page .oppia-splash-section-four .oppia-splash-button-container {
-    margin-left: 0;
-    margin-top: 7.5vh;
-  }
-
-  .splash-page .splash-student-desk-image img {
-    max-width: 500px;
-    width: 100%;
-  }
-
-  .splash-page .oppia-splash-section-three-right h3 {
-    color: #6d6d6d;
-  }
-
-  .splash-page .oppia-splash-section-four-left h2,
-  .splash-page .oppia-splash-section-five-left .testimonial-student-details,
-  .splash-page .oppia-splash-section-six-right h2,
-  .splash-page .oppia-splash-section-seven-left h2 {
-    color: #6d6d6d;
-    font-size: 1.17em;
-    font-weight: bold;
-    line-height: 1.1;
-  }
-
-  .splash-page .oppia-splash-section-four-left h3,
-  .splash-page .oppia-splash-section-five-left .testimonial-quote-details,
-  .splash-page .oppia-splash-section-six-right h3,
-  .splash-page .oppia-splash-section-seven-left h3 {
-    color: #094142;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 2.1em;
-    font-weight: 400;
-    line-height: 1.2;
-  }
-
-  .splash-page .oppia-splash-section-five-left .testimonial-quote-details {
-    line-height: 1.75em;
-  }
-
-  .splash-page .oppia-splash-section-four-left p,
-  .splash-page .oppia-splash-section-six-right p,
-  .splash-page .oppia-splash-section-seven-left p {
-    font-family: "Roboto", Arial, sans-serif;
-    line-height: 1.5;
-    padding-right: 10vw;
-  }
-
-  .splash-page .oppia-splash-section-four-right {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .splash-page .oppia-splash-section-four-left {
-    margin-bottom: auto;
-    margin-left: 10vw;
-    margin-top: auto;
-    width: 40vw;
-  }
-
-  .splash-page .splash-benefits-section {
-    margin-top: 30px;
-  }
-
-  .splash-page .oppia-splash-section-three-right {
-    color: #6d6d6d;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 50px;
-  }
-
-  .splash-page .splash-matthew-image img {
-    max-width: 600px;
-    width: 100%;
-  }
-
-  .splash-page .splash-benefits {
-    color: #094142;
-    display: inline;
-    font-size: 1.4em;
-    padding-left: 25px;
-  }
-
-  .splash-page .oppia-splash-icon-1-container {
-    display: flex;
-    float: left;
-    margin-left: 10vw;
-    width: 20vw;
-  }
-
-  .splash-page .oppia-splash-icon-2-container {
-    display: flex;
-    float: left;
-    margin-left: 12vw;
-    width: 30vw;
-  }
-
-  .splash-page .oppia-splash-icon-3-container {
-    display: flex;
-  }
-
-  .splash-page .splash-icon-text {
-    color: #6d6d6d;
-    font-size: 1.2em;
-    font-weight: bold;
-  }
-
-  .splash-page .oppia-splash-main-image img,
-  .splash-page .oppia-splash-main-image source {
-    max-width: 800px;
-    width: 100%;
-  }
-
-  .splash-page .oppia-splash-browse-button-position {
-    bottom: 210px;
-    z-index: 10;
-  }
-  .splash-page .oppia-splash-create-button-position {
-    bottom: 150px;
-    z-index: 10;
-  }
-  .splash-page .oppia-splash-h2-text {
-    color: #4c4c4c;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 1.3em;
-    font-weight: 500;
-    max-width: 700px;
-    padding-bottom: 30px;
-    padding-top: 0;
-  }
-
-  @media (max-width: 768px) {
-    .splash-page .oppia-splash-section-one ,
-    .splash-page .oppia-splash-section-three,
-    .splash-page .oppia-splash-section-four,
-    .splash-page .oppia-splash-section-five,
-    .splash-page .oppia-splash-section-six,
-    .splash-page .oppia-splash-section-seven {
-      display: block;
-      height: auto;
-      max-height: fit-content;
-    }
-
-    .splash-page .image-mobile {
-      display: inherit;
-    }
-
-    .splash-page .oppia-splash-section-five {
-      background-image: url(/assets/images/splash/m_testimonial_background.png);
-    }
-
-    .splash-page .image-desktop {
-      display: none;
-    }
-
-    .splash-page .oppia-splash-button-browse {
-      left: 50%;
-    }
-
-    .splash-page .oppia-splash-button-container {
-      margin-left: 0;
-      max-width: none;
-      transform: translate(0, 0);
-      width: 100%;
-      z-index: 10;
-    }
-
-    .splash-page .oppia-splash-button {
-      min-width: auto;
-    }
-
-    .splash-page .oppia-splash-section-seven-image {
-      margin-left: auto;
-      margin-right: auto;
-      padding-top: 50px;
-      width: 50vw;
-    }
-
-    .splash-page .oppia-splash-section-seven {
-      background-image: url(/assets/images/splash/m_community_background.png);
-      padding-top: 20vh;
-    }
-
-    .splash-page .splash-vol-image img {
-      max-width: fit-content;
-    }
-
-    .splash-page .oppia-splash-section-four-image-mobile {
-      margin-left: 10vw;
-    }
-
-    .splash-page .oppia-splash-section-three {
-      padding-bottom: 50px;
-      padding-top: 15px;
-    }
-
-    .splash-page .oppia-splash-section-five-image {
-      margin-left: auto;
-      margin-right: auto;
-      width: 10em;
-    }
-
-    .splash-page .oppia-splash-section-three-left,
-    .splash-page .oppia-splash-section-six-right,
-    .splash-page .oppia-splash-section-seven-left {
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-    }
-
-    .splash-page .oppia-splash-section-six-right,
-    .splash-page .oppia-splash-section-seven-left {
-      width: 90vw;
-    }
-
-    .splash-page .oppia-splash-section-one-left {
-      margin-left: auto;
-      margin-right: auto;
-      margin-top: 7.5vh;
-      text-align: center;
-      width: 75vw;
-    }
-
-    .splash-page .oppia-splash-section-six-right p,
-    .splash-page .oppia-splash-section-seven-left p {
-      padding-right: 0;
-      text-align: center;
-    }
-
-    .splash-page .oppia-splash-section-five-left {
-      margin-right: 10vw;
-      text-align: center;
-      width: auto;
-    }
-
-    .splash-page .oppia-splash-section-four-left h3,
-    .splash-page .oppia-splash-section-five-left .testimonial-quote-details,
-    .splash-page .oppia-splash-section-six-right h3,
-    .splash-page .oppia-splash-section-seven-left h3 {
-      font-size: 1.5em;
-    }
-
-    .splash-page .splash-student-image img {
-      max-width: 150px;
-    }
-
-    .splash-page .oppia-splash-section-four-left {
-      width: auto;
-    }
-
-    .splash-page .splash-arrows-container {
-      position: relative;
-    }
-
-    .splash-page .oppia-splash-section-four-left .oppia-splash-button,
-    .splash-page .oppia-splash-section-six-right .oppia-splash-button,
-    .splash-page .oppia-splash-section-seven-left .oppia-splash-button {
-      width: 90%;
-    }
-
-    .splash-page .oppia-splash-section-six-left {
-      margin-left: auto;
-      margin-right: auto;
-      width: 70vw;
-    }
-
-    .splash-page .splash-icon-text {
-      display: block;
-      font-size: 0.8em;
-    }
-
-    .splash-page .oppia-splash-icon-1-container {
-      display: block;
-      margin-left: 0;
-    }
-
-    .splash-page .oppia-splash-icon-2-container {
-      display: block;
-    }
-
-    .splash-page .oppia-splash-section-two img {
-      margin-left: 5vw;
-    }
-
-    .splash-page .oppia-splash-icon-3-container {
-      display: block;
-      margin-left: 70vw;
-    }
-
-    .splash-page .oppia-splash-h1,
-    .splash-page .oppia-splash-h2 {
-      display: block;
-      margin-left: 0;
-    }
-
-    .splash-page .oppia-splash-h1 {
-      font-size: 1.7em;
-      line-height: 1.5;
-    }
-
-    .splash-page .splash-benefits-section {
-      margin-left: auto;
-      margin-right: auto;
-      width: 20em;
-    }
-
-    .splash-page .oppia-splash-h2-container {
-      margin-left: 0;
-    }
-
-    .splash-page .oppia-splash-h2-text {
-      font-size: 1.05em;
-      font-weight: 600;
-    }
-  }
-</style>

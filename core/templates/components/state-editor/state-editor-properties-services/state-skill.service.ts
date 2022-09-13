@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
@@ -27,10 +27,17 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StateLinkedSkillIdService extends StatePropertyService<string> {
+export class StateLinkedSkillIdService
+    // Until a skill is selected, the state attribute is null. Also used to
+    // avoid circular dependencies.
+    extends StatePropertyService<string | null> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveLinkedSkillId';
+  }
+
+  get onStateLinkedSkillIdInitialized(): EventEmitter<string> {
+    return this.statePropertyInitializedEmitter;
   }
 }
 

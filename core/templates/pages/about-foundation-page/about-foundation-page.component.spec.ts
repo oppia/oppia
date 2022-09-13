@@ -16,28 +16,47 @@
  * @fileoverview Unit tests for about foundation page.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { AboutFoundationPageComponent } from './about-foundation-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { PageTitleService } from 'services/page-title.service';
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
 describe('About foundation page', () => {
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [AboutFoundationPageComponent],
       providers: [
         UrlInterpolationService,
+        PageTitleService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
-  let component;
+  let component: AboutFoundationPageComponent;
 
   beforeEach(() => {
     const aboutFoundationPageComponent = TestBed.createComponent(
       AboutFoundationPageComponent);
     component = aboutFoundationPageComponent.componentInstance;
+    translateService = TestBed.inject(TranslateService);
+    pageTitleService = TestBed.inject(PageTitleService);
   });
 
   it('should successfully instantiate the component from beforeEach block',
@@ -46,6 +65,44 @@ describe('About foundation page', () => {
     });
 
   it('should set component properties when ngOnInit() is called', () => {
+    spyOn(translateService.onLangChange, 'subscribe');
+
     component.ngOnInit();
+
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+  });
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', () => {
+    component.ngOnInit();
+    spyOn(component, 'setPageTitle');
+
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set new page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    component.directiveSubscriptions.add(
+      translateService.onLangChange.subscribe(() => {
+        component.setPageTitle();
+      })
+    );
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
   });
 });

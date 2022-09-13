@@ -27,28 +27,32 @@ from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, List, Tuple, Union # isort:skip
+from typing import Dict, List, Tuple, Type, Union
+from typing_extensions import Final
 
 MYPY = False
 if MYPY:
     from mypy_imports import exp_models
     from mypy_imports import recommendations_models
 
-(exp_models, recommendations_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.recommendations])
+(exp_models, recommendations_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.RECOMMENDATIONS
+])
 
 StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
 class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = (
-        exp_recommendation_computation_jobs
-        .ComputeExplorationRecommendationsJob)
+    JOB_CLASS: Type[
+        exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
+    ] = (
+        exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
+    )
 
-    EXP_1_ID = 'exp_1_id'
-    EXP_2_ID = 'exp_2_id'
-    EXP_3_ID = 'exp_3_id'
+    EXP_1_ID: Final = 'exp_1_id'
+    EXP_2_ID: Final = 'exp_2_id'
+    EXP_3_ID: Final = 'exp_3_id'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -77,7 +81,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         self.assertIsNone(exp_recommendations_model)
 
     def test_creates_recommendations_for_similar_explorations(self) -> None:
-        recommendations_services.create_default_topic_similarities() # type: ignore[no-untyped-call]
+        recommendations_services.create_default_topic_similarities()
         exp_summary_1 = self.create_model(
             exp_models.ExpSummaryModel,
             id=self.EXP_1_ID,
@@ -130,7 +134,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         )
 
     def test_skips_private_explorations(self) -> None:
-        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
+        recommendations_services.create_default_topic_similarities()
         exp_summary_1 = self.create_model(
             exp_models.ExpSummaryModel,
             id=self.EXP_1_ID,
@@ -171,9 +175,9 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         self.assertIsNone(exp_recommendations_model_2)
 
     def test_does_not_create_recommendations_for_different_explorations(
-            self
+        self
     ) -> None:
-        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
+        recommendations_services.create_default_topic_similarities()
         exp_summary_1 = self.create_model(
             exp_models.ExpSummaryModel,
             id=self.EXP_1_ID,
@@ -214,7 +218,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         self.assertIsNone(exp_recommendations_model_2)
 
     def test_creates_recommendations_for_three_explorations(self) -> None:
-        recommendations_services.create_default_topic_similarities()  # type: ignore[no-untyped-call]
+        recommendations_services.create_default_topic_similarities()
         exp_summary_1 = self.create_model(
             exp_models.ExpSummaryModel,
             id=self.EXP_1_ID,

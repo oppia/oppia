@@ -46,14 +46,14 @@ class ManagedProcessTests(test_utils.TestBase):
         collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
 
     def setUp(self):
-        super(ManagedProcessTests, self).setUp()
+        super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
             self.exit_stack.close()
         finally:
-            super(ManagedProcessTests, self).tearDown()
+            super().tearDown()
 
     @contextlib.contextmanager
     def swap_popen(self, unresponsive=False, num_children=0, outputs=()):
@@ -220,13 +220,31 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
-    def test_reports_killed_processes_as_warnings(self):
+    def test_killing_process_raises_exception(self):
         self.exit_stack.enter_context(self.swap_popen(
             unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(servers.managed_process(
             ['a'], timeout_secs=10))
+        with self.assertRaisesRegex(
+                Exception,
+                'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
+
+        self.assert_proc_was_managed_as_expected(
+            logs, proc.pid,
+            manager_should_have_sent_terminate_signal=True,
+            manager_should_have_sent_kill_signal=True)
+
+    def test_killing_process_raises_no_exception_if_disabled(self):
+        self.exit_stack.enter_context(self.swap_popen(
+            unresponsive=True))
+        logs = self.exit_stack.enter_context(self.capture_logging())
+
+        proc = self.exit_stack.enter_context(servers.managed_process(
+            ['a'], timeout_secs=10, raise_on_nonzero_exit=False))
+        # Should not raise an exception.
         self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
@@ -255,7 +273,9 @@ class ManagedProcessTests(test_utils.TestBase):
         proc = self.exit_stack.enter_context(servers.managed_process(
             ['a'], timeout_secs=10))
         pids = [c.pid for c in proc.children()] + [proc.pid]
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception, 'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(set(pids)), 4)
         for pid in pids:
@@ -273,7 +293,9 @@ class ManagedProcessTests(test_utils.TestBase):
         time.sleep(1)
         proc.kill()
         proc.wait()
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception, 'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
             logs, proc.pid,
@@ -304,7 +326,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_terminate_signal=True,
             manager_should_have_sent_kill_signal=False)
 
-    def test_does_not_raise_when_exit_fails(self):
+    def test_raise_when_process_errors(self):
         self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap_to_always_raise(
             psutil, 'wait_procs', error=Exception('uh-oh')))
@@ -312,8 +334,9 @@ class ManagedProcessTests(test_utils.TestBase):
             min_level=logging.ERROR))
 
         self.exit_stack.enter_context(servers.managed_process(['a', 'bc']))
-        # Should not raise.
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception, 'Process .* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assert_matches_regexps(logs, [
             r'Failed to stop Process\(pid=1\) gracefully!\n'
@@ -428,7 +451,10 @@ class ManagedProcessTests(test_utils.TestBase):
             '%s/bin/elasticsearch -q' % common.ES_PATH)
         self.assertEqual(popen_calls[0].kwargs, {
             'shell': True,
-            'env': {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR},
+            'env': {
+                'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
+                'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR
+            },
         })
 
     def test_start_server_removes_elasticsearch_data(self):
@@ -469,13 +495,13 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_to_always_return(
             common, 'wait_for_port_to_be_in_use'))
 
-        self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The redis command line interface is not installed because '
             'your machine is on the Windows operating system. The redis '
-            'server cannot start.',
-            lambda: self.exit_stack.enter_context(
-                servers.managed_redis_server()))
+            'server cannot start.'
+        ):
+            self.exit_stack.enter_context(servers.managed_redis_server())
 
     def test_managed_redis_server(self):
         original_os_remove = os.remove
@@ -609,7 +635,10 @@ class ManagedProcessTests(test_utils.TestBase):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception,
+                'Process Portserver.* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
@@ -644,7 +673,10 @@ class ManagedProcessTests(test_utils.TestBase):
             os, 'remove', mock_os_remove))
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception,
+                'Process Portserver.* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
@@ -679,7 +711,10 @@ class ManagedProcessTests(test_utils.TestBase):
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())
         proc.unresponsive = True
-        self.exit_stack.close()
+        with self.assertRaisesRegex(
+                Exception,
+                'Process Portserver.* exited unexpectedly with exit code 1'):
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
@@ -722,10 +757,12 @@ class ManagedProcessTests(test_utils.TestBase):
         str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
-        self.assertRaisesRegexp(
-            IOError, 'First build never completed',
-            lambda: self.exit_stack.enter_context(
-                servers.managed_webpack_compiler(watch_mode=True)))
+        with self.assertRaisesRegex(
+            IOError, 'First build never completed'
+        ):
+            self.exit_stack.enter_context(
+                servers.managed_webpack_compiler(watch_mode=True)
+            )
         self.assert_matches_regexps(str_io.getvalue().strip().split('\n'), [
             'Starting new Webpack Compiler',
             'abc',
@@ -919,7 +956,7 @@ class ManagedProcessTests(test_utils.TestBase):
             common, 'wait_for_port_to_be_in_use', lambda _: None, called=False))
 
         expected_regexp = 'Failed to execute "google-chrome --version" command'
-        with self.assertRaisesRegexp(Exception, expected_regexp):
+        with self.assertRaisesRegex(Exception, expected_regexp):
             self.exit_stack.enter_context(servers.managed_webdriver_server())
 
         self.assertEqual(len(popen_calls), 0)
@@ -965,11 +1002,11 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_protractor_with_invalid_sharding_instances(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        with self.assertRaisesRegexp(ValueError, 'should be larger than 0'):
+        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
             self.exit_stack.enter_context(
                 servers.managed_protractor_server(sharding_instances=0))
 
-        with self.assertRaisesRegexp(ValueError, 'should be larger than 0'):
+        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
             self.exit_stack.enter_context(
                 servers.managed_protractor_server(sharding_instances=-1))
 
@@ -1012,6 +1049,60 @@ class ManagedProcessTests(test_utils.TestBase):
         # From sharding_instances=3.
         self.assertIn('--capabilities.shardTestFiles=True', program_args)
         self.assertIn('--capabilities.maxInstances=3', program_args)
+        # From dev_mode=True.
+        self.assertIn('--params.devMode=False', program_args)
+        # From suite='full'.
+        self.assertIn('--suite abc', program_args)
+
+    def test_managed_webdriverio_with_invalid_sharding_instances(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+
+        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
+            self.exit_stack.enter_context(
+                servers.managed_webdriverio_server(sharding_instances=0))
+
+        with self.assertRaisesRegex(ValueError, 'should be larger than 0'):
+            self.exit_stack.enter_context(
+                servers.managed_webdriverio_server(sharding_instances=-1))
+
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 0)
+
+    def test_managed_webdriverio(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+
+        self.exit_stack.enter_context(servers.managed_webdriverio_server())
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+        program_args = popen_calls[0].program_args
+        self.assertIn(
+            '%s --unhandled-rejections=strict %s %s' % (
+                common.NPX_BIN_PATH, common.NODEMODULES_WDIO_BIN_PATH,
+                common.WEBDRIVERIO_CONFIG_FILE_PATH),
+            program_args)
+        self.assertNotIn('DEBUG=true', program_args)
+        self.assertIn('--suite full', program_args)
+        self.assertIn('--params.devMode=True', program_args)
+
+    def test_managed_webdriverio_with_explicit_args(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+
+        self.exit_stack.enter_context(servers.managed_webdriverio_server(
+            suite_name='abc', sharding_instances=3, debug_mode=True,
+            dev_mode=False, stdout=subprocess.PIPE))
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
+        program_args = popen_calls[0].program_args
+        # From debug_mode=True.
+        self.assertIn('DEBUG=true', program_args)
+        # From sharding_instances=3.
+        self.assertIn('--capabilities[0].maxInstances=3', program_args)
         # From dev_mode=True.
         self.assertIn('--params.devMode=False', program_args)
         # From suite='full'.

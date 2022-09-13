@@ -21,7 +21,9 @@ import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -34,6 +36,15 @@ describe('Solution Verification Service', () => {
   let mockInteractionState;
   importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
   beforeEach(() => {
     mockInteractionState = {
       TextInput: {
@@ -97,6 +108,7 @@ describe('Solution Verification Service', () => {
           answer_groups: [{
             outcome: {
               dest: 'End State',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -124,6 +136,7 @@ describe('Solution Verification Service', () => {
           },
           default_outcome: {
             dest: 'First State',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -174,6 +187,7 @@ describe('Solution Verification Service', () => {
             rule_specs: [],
             outcome: {
               dest: 'default',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -194,6 +208,7 @@ describe('Solution Verification Service', () => {
           },
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -255,5 +270,17 @@ describe('Solution Verification Service', () => {
       'First State', state.interaction,
       ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(false);
+  });
+
+  it('should throw an error if Interaction\'s id is null', () => {
+    const interaction = new Interaction([], [], {
+      choices: {
+        value: [new SubtitledHtml('This is a choice', '')]
+      }
+    }, null, [], null, null);
+
+    expect(() => {
+      svs.verifySolution('State 1', interaction, 'Answer');
+    }).toThrowError('Interaction ID must not be null');
   });
 });

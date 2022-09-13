@@ -115,6 +115,7 @@ export class CkEditorInitializerService {
                   customizationArgSpecs,
                   customizationArgs,
                   function(customizationArgsDict) {
+                    that.data.isCopied = false;
                     for (var arg in customizationArgsDict) {
                       if (customizationArgsDict.hasOwnProperty(arg)) {
                         that.setData(arg, customizationArgsDict[arg]);
@@ -149,13 +150,16 @@ export class CkEditorInitializerService {
                     }
                   },
                   function(widgetShouldBeRemoved) {
-                    if (widgetShouldBeRemoved) {
+                    if (widgetShouldBeRemoved || that.data.isCopied) {
+                      that.data.isCopied = false;
                       var newWidgetSelector = (
                         '[data-cke-widget-id="' + that.id + '"]');
-                      var widgetElement = editor.editable().findOne(
-                        newWidgetSelector);
-                      if (widgetElement) {
-                        widgetElement.remove();
+                      if (newWidgetSelector !== null) {
+                        var widgetElement = editor.editable().findOne(
+                          newWidgetSelector);
+                        if (widgetElement) {
+                          widgetElement.remove();
+                        }
                       }
                     }
                   });

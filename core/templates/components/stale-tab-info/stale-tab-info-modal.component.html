@@ -1,0 +1,12 @@
+<div class="e2e-test-stale-tab-info-modal">
+  <div class="modal-header">
+    <h3>Warning: Tab is stale</h3>
+  </div>
+  <div class="modal-body">
+    <p>Due to recent changes in another {{ entity }} editor tab of the same URL, this tab has become stale.</p>
+    <p>Please refresh this tab to get the latest changes.</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger" (click)="closeModal()">Reload</button>
+  </div>
+</div>

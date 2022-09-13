@@ -26,15 +26,20 @@ from core.jobs.types import base_validation_errors_test
 from core.jobs.types import user_validation_errors
 from core.platform import models
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import user_models
+
 (base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+    [models.Names.BASE_MODEL, models.Names.USER])
 
 datastore_services = models.Registry.import_datastore_services()
 
 
 class ModelExpiringErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = user_models.UserQueryModel(
             id='test',
             submitter_id='submitter',
@@ -51,9 +56,10 @@ class ModelExpiringErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
 
 class ModelIncorrectKeyErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = user_models.PendingDeletionRequestModel(
             id='test'
         )
@@ -70,7 +76,7 @@ class ModelIncorrectKeyErrorTests(
 
 class ModelIdRegexErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = base_models.BaseModel(
             id='?!"',
             created_on=self.YEAR_AGO,
@@ -84,9 +90,10 @@ class ModelIdRegexErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
 
 class DraftChangeListLastUpdatedNoneErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
-    def test_message(self):
+    def test_message(self) -> None:
         draft_change_list = [{
             'cmd': 'edit_exploration_property',
             'property_name': 'objective',
@@ -113,9 +120,10 @@ class DraftChangeListLastUpdatedNoneErrorTests(
 
 
 class DraftChangeListLastUpdatedInvalidErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
-    def test_message(self):
+    def test_message(self) -> None:
         draft_change_list = [{
             'cmd': 'edit_exploration_property',
             'property_name': 'objective',
@@ -144,9 +152,10 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
 
 
 class ArchivedModelNotMarkedDeletedErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = user_models.UserQueryModel(
             id='test',
             submitter_id='submitter',

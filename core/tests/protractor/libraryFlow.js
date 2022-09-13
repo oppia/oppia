@@ -84,7 +84,7 @@ describe('Library pages tour', function() {
     // exploration has to be rated by the user.
     await rateExploration();
     await libraryPage.get();
-    var topRatedButton = element(by.css('.protractor-test-library-top-rated'));
+    var topRatedButton = element(by.css('.e2e-test-library-top-rated'));
     await action.click('Top Rated Button', topRatedButton);
     await waitFor.pageToFullyLoad();
     expect(await browser.getCurrentUrl()).toContain(
@@ -136,6 +136,16 @@ describe('Rating', function() {
      'submitted', async function() {
     await users.createAndLoginSuperAdminUser(
       'user11@explorationRating.com', 'user11Rating');
+
+    // The below lines of code enable the user checkpoints feature on the
+    // config tab. This is required to enable the lesson-info modal button
+    // on the exploration footer, which in turn is required to view the ratings.
+    // This should be removed when the user checkpoints feature is no longer
+    // gated behind a config option.
+    await adminPage.editConfigProperty(
+      'Enable checkpoints feature.', 'Boolean',
+      async(elem) => await (await elem).setValue(true));
+
     // Create a test exploration.
 
     // We need a test exploration here.

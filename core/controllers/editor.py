@@ -31,7 +31,6 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -138,8 +137,7 @@ class ExplorationHandler(EditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
@@ -156,7 +154,9 @@ class ExplorationHandler(EditorHandler):
         version = self.normalized_request.get('v')
         apply_draft = self.normalized_request.get('apply_draft')
 
-        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False
+        )
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
         if user_settings is not None:
@@ -176,8 +176,8 @@ class ExplorationHandler(EditorHandler):
             exploration_data['exploration_is_linked_to_story'] = (
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
-        except:
-            raise self.PageNotFoundException
+        except Exception as e:
+            raise self.PageNotFoundException from e
 
         self.values.update(exploration_data)
         self.render_json(self.values)
@@ -193,14 +193,12 @@ class ExplorationHandler(EditorHandler):
                 'Trying to update version %s of exploration from version %s, '
                 'which is not possible. Please reload the page and try again.'
                 % (exploration.version, version))
+        if not exploration.edits_allowed:
+            raise base.BaseHandler.InvalidInputException(
+                'This exploration cannot be edited. Please contact the admin.')
 
         commit_message = self.normalized_payload.get('commit_message')
-        change_list_dict = self.normalized_payload.get('change_list')
-
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
+        change_list = self.normalized_payload.get('change_list')
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
@@ -449,7 +447,7 @@ class ExplorationStatusHandler(EditorHandler):
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id):
-        make_public = self.payload.get('make_public')
+        make_public = self.normalized_payload.get('make_public')
 
         if make_public:
             self._publish_exploration(exploration_id)
@@ -712,6 +710,28 @@ class ExplorationSnapshotsHandler(EditorHandler):
         })
 
 
+class ExplorationCheckRevertValidHandler(EditorHandler):
+    """Checks if an older version of an exploration is valid."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': SCHEMA_FOR_EXPLORATION_ID
+        },
+        'version': {
+            'schema': SCHEMA_FOR_VERSION
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exploration_id, version):
+        """Handles GET requests."""
+        info = exp_services.get_exploration_validation_error(
+            exploration_id, version)
+        self.render_json({'valid': not info, 'details': info})
+
+
 class ExplorationRevertHandler(EditorHandler):
     """Reverts an exploration to an older version."""
 
@@ -827,7 +847,9 @@ class FetchIssuesHandler(EditorHandler):
     def get(self, exp_id):
         """Handles GET requests."""
         exp_version = self.normalized_request.get('exp_version')
-        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        exp_issues = stats_services.get_exp_issues(
+            exp_id, exp_version, strict=False
+        )
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid version %s for exploration ID %s'
@@ -884,7 +906,8 @@ class ResolveIssueHandler(EditorHandler):
             'exp_issue_dict': {
                 'schema': {
                     'type': 'object_dict',
-                    'object_class': stats_domain.ExplorationIssue
+                    'object_class': stats_domain.ExplorationIssue,
+                    'new_key_for_argument': 'exp_issue_object'
                 },
                 'default_value': None
             },
@@ -897,10 +920,12 @@ class ResolveIssueHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exp_id):
         """Handles POST requests."""
-        exp_issue_dict = self.normalized_payload.get('exp_issue_dict')
+        exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload.get('exp_version')
 
-        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        exp_issues = stats_services.get_exp_issues(
+            exp_id, exp_version, strict=False
+        )
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid exploration ID %s' % (exp_id))
@@ -909,7 +934,7 @@ class ResolveIssueHandler(EditorHandler):
         # issues instance.
         issue_to_remove = None
         for issue in exp_issues.unresolved_issues:
-            if issue.to_dict() == exp_issue_dict:
+            if issue == exp_issue_object:
                 issue_to_remove = issue
                 break
 
@@ -986,9 +1011,7 @@ class ImageUploadHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            entity_type, entity_id))
+        fs = fs_services.GcsFileSystem(entity_type, entity_id)
         filepath = '%s/%s' % (
             filename_prefix, filename)
 
@@ -1042,8 +1065,7 @@ class EditorAutosaveHandler(ExplorationHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (
-                            objects_validator.validate_exploration_change)
+                        'object_class': exp_domain.ExplorationChange
                     }
                 }
             }
@@ -1071,12 +1093,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
         # validation.
-        change_list_dict = self.normalized_payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in change_list_dict
-        ]
-
+        change_list = self.normalized_payload.get('change_list')
         version = self.normalized_payload.get('version')
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
@@ -1151,6 +1168,34 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         """Handles GET requests for unresolved answers."""
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'unresolved_answers': []})
+
+
+class ExplorationEditsAllowedHandler(EditorHandler):
+    """Toggles whether exploration can be edited."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': SCHEMA_FOR_EXPLORATION_ID
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'edits_are_allowed': {
+                'schema': {
+                    'type': 'bool',
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self, exploration_id):
+        """Handles PUT request to set whether exploration can be edited."""
+        exp_services.set_exploration_edits_allowed(
+            exploration_id,
+            self.normalized_payload.get('edits_are_allowed'))
+        self.render_json({})
 
 
 class LearnerAnswerInfoHandler(EditorHandler):

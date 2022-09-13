@@ -8,7 +8,7 @@
   <div class="modal-body create-new-topic-form">
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Name*</span></div>
-      <input class="protractor-test-new-topic-name-field required"
+      <input class="e2e-test-new-topic-name-field required"
              [(ngModel)]="newlyCreatedTopic.name"
              [ngModelOptions]="{standalone: true}"
              [maxlength]="MAX_CHARS_IN_TOPIC_NAME"
@@ -26,7 +26,7 @@
     </div>
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Topic URL Fragment*</span></div>
-      <input class="protractor-test-new-topic-url-fragment-field required"
+      <input class="e2e-test-new-topic-url-fragment-field required"
              [(ngModel)]="newlyCreatedTopic.urlFragment"
              [ngModelOptions]="{standalone: true}"
              [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
@@ -48,8 +48,22 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Web Title Fragment for Web*</span></div>
+      <div>
+        <input class="e2e-test-new-page-title-fragm-field required"
+               [(ngModel)]="newlyCreatedTopic.pageTitleFragment"
+               [ngModelOptions]="{standalone: true}">
+      </div>
+      <span class="oppia-input-box-subtitle">
+        <em>
+          Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ newlyCreatedTopic.name }} | Add, Subtract, Multiply and Divide | Oppia".
+          It should be at least {{ minWebTitleFrag }} and at most {{ maxWebTitleFrag }} characters.
+        </em>
+      </span>
+    </div>
+    <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Description*</span></div>
-      <textarea class="protractor-test-new-topic-description-field required"
+      <textarea class="e2e-test-new-topic-description-field required"
                 rows="4" cols="50" placeholder="Enter description"
                 [maxlength]="MAX_CHARS_IN_TOPIC_DESCRIPTION"
                 [(ngModel)]="newlyCreatedTopic.description"
@@ -75,7 +89,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" [disabled]="!isValid()">
+    <button class="btn btn-success e2e-test-confirm-topic-creation-button" type="submit" [disabled]="!isValid()">
       <span>Create Topic</span>
     </button>
   </div>
@@ -83,7 +97,7 @@
 <style>
   .create-new-topic-form .ng-touched.invalid-field,
   .create-new-topic-form .ng-touched.ng-empty.required {
-     outline: 1px solid #F00;
+     outline: 1px solid #f00;
   }
   .create-new-topic-form .create-new-topic-input-field {
      margin: 10px 0;
@@ -115,17 +129,17 @@
     }
     .create-new-topic .modal-header {
       align-items: center;
-      background-color: #00609C;
+      background-color: #00609c;
       display: flex;
     }
     .create-new-topic .modal-header h3 {
-      color: #FFF;
+      color: #fff;
     }
     .create-new-topic .create-new-topic-input-field {
       margin: 25px 0;
     }
     .create-new-topic .modal-close-button {
-      color: #FFF;
+      color: #fff;
       display: block;
       font-size: 20px;
     }

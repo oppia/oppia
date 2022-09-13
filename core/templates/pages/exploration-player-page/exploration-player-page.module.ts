@@ -22,6 +22,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -35,15 +38,15 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
-import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
-import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { ToastrModule } from 'ngx-toastr';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -55,29 +58,33 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     NgbPopoverModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
-    LearnerAnswerInfoCard,
+    ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
+    LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
+    LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent,
-    LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
@@ -96,6 +103,11 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })
@@ -106,7 +118,9 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
+import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
+import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

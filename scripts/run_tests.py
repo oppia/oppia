@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+from typing import Optional, Sequence
 
 from . import run_backend_tests
 from . import run_frontend_tests
@@ -44,11 +45,11 @@ This script runs all the tests, in this order:
 """)
 
 
-def main(args=None):
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Run all the tests."""
     unused_parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])
+    setup.main(args=[])  # type: ignore[no-untyped-call]
     setup_gae.main(args=[])
 
     # Run frontend unit tests.
@@ -58,7 +59,7 @@ def main(args=None):
 
     # Run backend tests.
     print('Running backend tests')
-    run_backend_tests.main(args=[])
+    run_backend_tests.main(args=[])  # type: ignore[no-untyped-call]
     print('Backend tests passed.')
 
     # Run end-to-end tests.
@@ -68,5 +69,5 @@ def main(args=None):
     print('SUCCESS    All frontend, backend and end-to-end tests passed!')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

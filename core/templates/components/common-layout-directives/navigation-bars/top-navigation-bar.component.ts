@@ -32,11 +32,16 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { SearchService } from 'services/search.service';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { I18nService } from 'i18n/i18n.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+
+import './top-navigation-bar.component.css';
+
 
 interface LanguageInfo {
   id: string;
@@ -48,16 +53,20 @@ interface LanguageInfo {
   templateUrl: './top-navigation-bar.component.html',
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
-  // The properties below are initialized in Angular lifecycle hooks
+  // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
+  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
   currentLanguageText!: string;
+  classroomData: CreatorTopicSummary[] = [];
+  topicTitlesTranslationKeys: string[] = [];
+  learnDropdownOffset: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
@@ -70,6 +79,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   inClassroomPage: boolean = false;
   showLanguageSelector: boolean = false;
   standardNavIsShown: boolean = false;
+  getInvolvedMenuOffset: number = 0;
+  donateMenuOffset: number = 0;
   ACTION_OPEN!: string;
   ACTION_CLOSE!: string;
   KEYBOARD_EVENT_TO_KEY_CODES!: {
@@ -86,6 +97,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       keyCode: number;
       };
     };
+
   labelForClearingFocus!: string;
   sidebarIsShown: boolean = false;
   windowIsNarrow: boolean = false;
@@ -111,21 +123,26 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     'create', 'explore', 'collection', 'collection_editor',
     'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
     'story_editor', 'blog-dashboard'];
+
   currentWindowWidth = this.windowDimensionsService.getWidth();
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
-    'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN',
+    'I18N_TOPNAV_ABOUT', 'I18N_TOPNAV_LIBRARY',
+    'I18N_TOPNAV_HOME'];
 
   CLASSROOM_PROMOS_ARE_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
+
   navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
+    private accessValidationBackendApiService:
+      AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
@@ -158,7 +175,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         return languageInfo;
       }
     );
-
     this.showLanguageSelector = (
       !this.contextService.getPageContext().endsWith('editor'));
 
@@ -177,8 +193,30 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     service.fetchClassroomPromosAreEnabledStatusAsync().then(
       (classroomPromosAreEnabled) => {
         this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
+        if (classroomPromosAreEnabled) {
+          this.accessValidationBackendApiService.validateAccessToClassroomPage(
+            this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
+            this.classroomBackendApiService.fetchClassroomDataAsync(
+              this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+              .then((classroomData) => {
+                this.classroomData = classroomData.getTopicSummaries();
+                this.classroomBackendApiService.onInitializeTranslation.emit();
+                // Store hacky tranlation keys of topics.
+                for (let i = 0; i < this.classroomData.length; i++) {
+                  let topicSummary = this.classroomData[i];
+                  let hackyTopicTranslationKey = (
+                    this.i18nLanguageCodeService.getTopicTranslationKey(
+                      topicSummary.getId(), TranslationKeyType.TITLE
+                    )
+                  );
+                  this.topicTitlesTranslationKeys.push(
+                    hackyTopicTranslationKey
+                  );
+                }
+              });
+          });
+        }
       });
-
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that
@@ -258,6 +296,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           }
         })
     );
+
+    let langCode = this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+
+    if (this.currentLanguageCode !== langCode) {
+      this.currentLanguageCode = langCode;
+      this.supportedSiteLanguages.forEach(element => {
+        if (element.id === this.currentLanguageCode) {
+          this.currentLanguageText = element.text;
+        }
+      });
+      this.changeDetectorRef.detectChanges();
+    }
+
     // The function needs to be run after i18n. A timeout of 0 appears
     // to run after i18n in Chrome, but not other browsers. The
     // will check if i18n is complete and set a new timeout if it is
@@ -266,6 +317,32 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     setTimeout(function() {
       that.truncateNavbar();
     }, 0);
+  }
+
+  ngAfterViewChecked(): void {
+    this.getInvolvedMenuOffset = this
+      .getDropdownOffset('.get-involved', 574);
+    this.donateMenuOffset = this
+      .getDropdownOffset('.donate-tab', 286);
+    this.learnDropdownOffset = this.getDropdownOffset(
+      '.learn-tab', (this.CLASSROOM_PROMOS_ARE_ENABLED) ? 688 : 300);
+    // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
+    this.changeDetectorRef.detectChanges();
+  }
+
+  // This function is required to shift the dropdown towards left if
+  // there isn't enough space on the right to fit the entire dropdown.
+  // This function compares the width of the dropdown with the space
+  // available on the right to calculate the offset. It returns zero if
+  // there is enough space to fit the content.
+  getDropdownOffset(cssClass: string, width: number): number {
+    let learnTab: HTMLElement | null = document.querySelector(cssClass);
+    if (learnTab) {
+      let leftOffset = learnTab.getBoundingClientRect().left;
+      let space = window.innerWidth - leftOffset;
+      return (space < width) ? (Math.round(space - width)) : 0;
+    }
+    return 0;
   }
 
   async getProfileImageDataAsync(): Promise<void> {
@@ -350,8 +427,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.sidebarStatusService.isSidebarShown();
   }
 
-  toggleSidebar(): void {
+  toggleSidebar(event: Event): void {
     this.sidebarStatusService.toggleSidebar();
+    this.sidebarStatusService.toggleHamburgerIconStatus(event);
+    if (this.isSidebarShown()) {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'hidden';
+    } else {
+      this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
+    }
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
@@ -423,6 +506,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+
+  isHackyTopicTitleTranslationDisplayed(index: number): boolean {
+    return (
+      this.i18nLanguageCodeService.isHackyTranslationAvailable(
+        this.topicTitlesTranslationKeys[index]
+      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
   }
 
   ngOnDestroy(): void {

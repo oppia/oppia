@@ -34,9 +34,10 @@ describe('Blog Dashboard Page Component', () => {
     nativeWindow = {
       location: {
         href: '',
-        hash: '/'
+        hash: '/',
+        _hashChange: null
       },
-      open: (url) => { },
+      open: (url: string) => { },
       onhashchange() {
         return this.location._hashChange;
       },

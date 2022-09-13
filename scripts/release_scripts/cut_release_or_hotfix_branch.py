@@ -43,9 +43,12 @@ import json
 import re
 import subprocess
 
-from core import constants
-from core import utils
-from scripts import common
+# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
+from core import constants  # isort:skip  # pylint: disable=wrong-import-position
+from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
 
 def require_release_version_to_have_correct_format(
@@ -260,7 +263,7 @@ def execute_branch_cut(target_version, hotfix_number):
 
     # Update the local repo.
     remote_alias = common.get_remote_alias(
-        constants.release_constants.REMOTE_URL)
+        constants.release_constants.REMOTE_URLS)
     subprocess.check_call(['git', 'pull', remote_alias, 'develop'])
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
@@ -296,6 +299,8 @@ def execute_branch_cut(target_version, hotfix_number):
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
                 target_version, hotfix_number - 1)
         print('Cutting a new hotfix branch: %s' % new_branch_name)
+        subprocess.check_call(['git', 'checkout', branch_to_cut_from])
+        common.update_branch_with_upstream()
         subprocess.check_call([
             'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
     else:
@@ -314,16 +319,6 @@ def execute_branch_cut(target_version, hotfix_number):
             'to Github once this script is done.\n'
             'Note: It is fine to push the branch only after creating the '
             'branch protection rule and doing all the cherrypicks.')
-
-    common.ask_user_to_confirm(
-        'Ask Sean (or Ben, if Sean isn\'t available) to create '
-        'a new branch protection rule by:\n'
-        '1. Going to this page: https://github.com/oppia/oppia/'
-        'settings/branch_protection_rules/new.\n'
-        '2. Typing in the full branch name %s.\n'
-        '3. Checking the box: Restrict who can push to matching '
-        'branches (then add the oppia/release-coordinators team)\n' % (
-            new_branch_name))
 
     print('')
     print(

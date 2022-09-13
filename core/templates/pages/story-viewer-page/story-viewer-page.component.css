@@ -1,0 +1,93 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+oppia-story-viewer-page .login-buttons {
+  margin-top: 40px;
+}
+oppia-story-viewer-page .skip-container {
+  margin-top: 50px;
+}
+
+oppia-story-viewer-page .skip-btn {
+  border: 1px solid #eee;
+  color: #fff;
+  font-weight: bold;
+}
+
+oppia-story-viewer-page .skip-btn:focus,
+oppia-story-viewer-page .skip-btn:hover {
+  background-color: #444;
+}
+
+oppia-story-viewer-page .skip-btn:focus {
+  border: 2px solid #fff;
+}
+
+oppia-story-viewer-page .login-text {
+  color: #fff;
+  font-weight: bold;
+}
+
+oppia-story-viewer-page.oppia-login-or-signup-text {
+  font-weight: bold;
+}
+
+.oppia-story-viewer-container a {
+  text-decoration: none;
+}
+
+.oppia-story-viewer-container a:hover, a:hover span {
+  color: #0844aa;
+}
+
+.oppia-story-description-text {
+  font-size: 20px;
+}
+
+.oppia-story-viewer-card-description-box {
+  margin-left: 10px;
+}
+
+.story-viewer-login-container {
+  background-color: #000000e1;
+  bottom: 0;
+  color: #fff;
+  padding: 2em;
+  position: sticky;
+  text-align: center;
+  width: 100%;
+}
+
+.story-viewer-login-container .md-raised {
+  font-size: 1.2em;
+  min-width: max-content;
+  padding: 1em;
+  width: 8em;
+}
+
+.story-viewer-login-container .oppia-login-button.mat-raised-button {
+  background-color: #00645c;
+  font-size: 19.2px;
+  height: 60px;
+  width: 154px;
+}
+
+.story-viewer-login-container .oppia-login-or-signup-text {
+  display: inline;
+  padding: 10px;
+}
+
+.story-viewer-login-container .oppia-sign-up-button.mat-raised-button {
+  background-color: #00609c;
+  font-size: 19.2px;
+  height: 60px;
+  width: 154px;
+}
+
+@media screen and (max-width: 450px) {
+  .story-viewer-login-container .oppia-login-or-signup-text {
+    display: block;
+  }
+}

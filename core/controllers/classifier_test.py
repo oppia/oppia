@@ -23,7 +23,7 @@ import json
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import classifier_services
 from core.domain import config_domain
@@ -37,21 +37,21 @@ from core.tests import test_utils
 from proto_files import text_classifier_pb2
 from proto_files import training_job_response_payload_pb2
 
-(classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+(classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
 
 
 class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
-        super(TrainedClassifierHandlerTests, self).setUp()
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
         self.category = 'Test'
         yaml_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with python_utils.open_file(yaml_path, 'r') as yaml_file:
+        with utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('moderator@example.com', 'mod')
@@ -518,7 +518,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
     """Test the handler for fetching next training job."""
 
     def setUp(self):
-        super(NextJobHandlerTest, self).setUp()
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'

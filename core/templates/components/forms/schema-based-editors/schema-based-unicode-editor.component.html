@@ -1,0 +1,44 @@
+<span>
+  <textarea *ngIf="!getCodingMode() && getRows()"
+            class="form-control"
+            [(ngModel)]="localValue"
+            (input)="updateLocalValue($event)"
+            [disabled]="disabled"
+            (blur)="inputBlur.emit()"
+            (focus)="inputFocus.emit()"
+            [oppiaFocusOn]="labelForFocusTarget"
+            attr.placeholder="{{getPlaceholder()}}"
+            applyValidation [validators]="validators"
+            (keydown)="onKeypress($event)"
+            rows="{{getRows()}}">
+  </textarea>
+
+  <span *ngIf="!getCodingMode() && !getRows()">
+    <input type="text"
+           class="form-control display-inline"
+           [(ngModel)]="localValue"
+           (input)="updateLocalValue($event)"
+           [disabled]="disabled"
+           (blur)="inputBlur.emit()"
+           (focus)="inputFocus.emit()"
+           [oppiaFocusOn]="labelForFocusTarget"
+           attr.placeholder="{{getPlaceholder()}}"
+           applyValidation [validators]="validators"
+           (keydown)="onKeypress($event)"
+           aria-label="text input">
+  </span>
+
+  <!-- Note that we do not yet support ng-blur for the code editor. -->
+  <div *ngIf="getCodingMode()" class="oppia-coding-editor">
+    <oppia-codemirror [(value)]="localValue"
+                      [options]="codemirrorOptions"
+                      [refresh]="codemirrorStatus"
+                      (valueChange)="updateLocalValue($event)">
+    </oppia-codemirror>
+  </div>
+</span>
+<style>
+  .oppia-coding-editor {
+    border: 1px solid #ccc;
+  }
+</style>

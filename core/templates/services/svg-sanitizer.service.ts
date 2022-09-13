@@ -154,6 +154,62 @@ export class SvgSanitizerService {
     return { tags: invalidTags, attrs: invalidAttrs };
   }
 
+  // SVG is considered an XMLDocument and DOMParser's parseFromString method
+  // returns either a HTMLDocument or XMLDocument. Visit here for more info:
+  // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString
+  // Document is the interface that both HTMLDocument and XMLDocument inherit
+  // properties from.
+  getSvgFromDataUri(dataURI: string): Document {
+    // Convert base64/URLEncoded data component to raw binary data
+    // held in a string.
+    const svgString = this.convertBase64ToUnicodeString(dataURI.split(',')[1]);
+    const domParser = new DOMParser();
+    return domParser.parseFromString(svgString, 'image/svg+xml');
+  }
+
+  convertBase64ToUnicodeString(base64String: string): string {
+    // Coverting base64 to unicode string. This technique converts bytestream
+    // to percent-encoding, to original string.
+    // See https://stackoverflow.com/a/30106551
+    return decodeURIComponent(atob(base64String).split('').map(char => {
+      return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
+
+  removeAllInvalidTagsAndAttributes(svgDataURI: string): string {
+    // We are removing the attributes which are currently not in
+    // the allowlist of valid attributes. The allowlist is based on
+    // the list of tags and attributes specified in this project:
+    // https://github.com/cure53/DOMPurify
+    // Complete list is present at 'assets/constants.ts'.
+    let svg = this.getSvgFromDataUri(svgDataURI);
+    let invalidTagsAndAttributes = this._getInvalidSvgTagsAndAttrs(svg);
+    let tagsToBeRemoved = invalidTagsAndAttributes.tags;
+    let attrsToBeRemoved = invalidTagsAndAttributes.attrs;
+    svg.querySelectorAll('*').forEach((node) => {
+      const nodeTagName: string = node.tagName;
+      if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
+        node.remove();
+      } else {
+        for (let i = 0; i < node.attributes.length; i++) {
+          const nodeAttrName: string = node.attributes[i].name;
+          // Check if the tag name and attribute combination matches any value
+          // in attrsToBeRemoved. If so, remove that attribute from the node.
+          // Values in attrsToBeRemoved follow the format <tagName>:<attrName>
+          // where the tagName and attrName is in the original letter casing
+          // as in the node.
+          if (
+            attrsToBeRemoved.indexOf(nodeTagName + ':' + nodeAttrName) !== -1) {
+            node.removeAttribute(nodeAttrName);
+          }
+        }
+      }
+    });
+    return (
+      'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(svg.documentElement.outerHTML))));
+  }
+
   getInvalidSvgTagsAndAttrs(
       svg: Document
   ): { tags: string[]; attrs: string[] } {
@@ -161,41 +217,23 @@ export class SvgSanitizerService {
   }
 
   getInvalidSvgTagsAndAttrsFromDataUri(
-      dataURI: string
-  ): { tags: string[]; attrs: string[] } {
-    // Convert base64/URLEncoded data component to raw binary data
-    // held in a string.
-    let svgString = atob(dataURI.split(',')[1]);
-    let domParser = new DOMParser();
-    let doc = domParser.parseFromString(svgString, 'image/svg+xml');
+      dataURI: string): { tags: string[]; attrs: string[] } {
+    let doc = this.getSvgFromDataUri(dataURI);
     return this._getInvalidSvgTagsAndAttrs(doc);
   }
 
   /**
-   * Checks the input for malicious or invalid SVG code.
-   * The checks:
-   * 1. Is base64 encoded.
-   * 2. Has no invalid tags or attributes. This check is performed by the
-   *    getInvalidSvgTagsAndAttrsFromDataUri function in this file.
+   * Checks if the input is base64-encoded.
    *
    * @returns {boolean} True if all the checks pass. False Otherwise.
    */
-  isValidBase64Svg(base64ImageData: string): boolean {
+  isBase64Svg(base64ImageData: string): boolean {
     const DATA_URL_PATTERN = /^data:image\/svg\+xml;base64,[a-z0-9+\/]+=*$/i;
     // Check if data passed is a valid bse64 SVG.
     if (!base64ImageData.match(DATA_URL_PATTERN)) {
       return false;
     }
 
-    // Check for malicious SVG.
-    const { tags: invalidTags, attrs: invalidAttributes } = (
-      this.getInvalidSvgTagsAndAttrsFromDataUri(base64ImageData));
-
-    if (invalidTags.length > 0 || invalidAttributes.length > 0) {
-      return false;
-    }
-
-    // The SVG is safe and valid.
     return true;
   }
 
@@ -211,11 +249,47 @@ export class SvgSanitizerService {
    * trusted. Otherwise returns null.
    */
   getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl | null {
-    if (this.isValidBase64Svg(base64ImageData)) {
+    if (this.isBase64Svg(base64ImageData)) {
+      const sanitizedBase64ImageData = this.removeAllInvalidTagsAndAttributes(
+        base64ImageData);
+
       // eslint-disable-next-line oppia/no-bypass-security-phrase
-      return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
+      return this.sanitizer.bypassSecurityTrustResourceUrl(
+        sanitizedBase64ImageData);
     }
     return null;
+  }
+
+  getIssueURL(
+      invalidTagsAndAttributes: { tags: string[]; attrs: string[] }): string {
+    const invalidTags = invalidTagsAndAttributes.tags;
+    const invalidAttributes = invalidTagsAndAttributes.attrs;
+    const spaceBetweenValues = ', ';
+    const unencodedIssueTitle = 'Uploaded SVG image looks distorted in the ' +
+      'preview';
+    let unencodedIssueBody = 'The image file is attached below:\n\n' +
+      '{{ IMAGE_HERE }}\n\nScreenshots of the problem:\n\n' +
+      '{{ SCREENSHOTS_HERE }}\n\nThe invalid tags and attributes reported:';
+
+    if (invalidTags.length) {
+      unencodedIssueBody += '\nTags: ';
+      for (let i = 0; i < Math.min(invalidTags.length, 20); i++) {
+        unencodedIssueBody += invalidTags[i] + spaceBetweenValues;
+      }
+    }
+    if (invalidAttributes.length) {
+      unencodedIssueBody += '\nAttributes: ';
+      for (let i = 0; i < Math.min(invalidAttributes.length, 20); i++) {
+        unencodedIssueBody += invalidAttributes[i] + spaceBetweenValues;
+      }
+    }
+    unencodedIssueBody = unencodedIssueBody.substring(
+      0, unencodedIssueBody.length - spaceBetweenValues.length);
+
+    return (
+      'https://github.com/oppia/oppia/issues/new?title=' +
+      encodeURIComponent(unencodedIssueTitle) +
+      '&body=' + encodeURIComponent(unencodedIssueBody));
   }
 }
 

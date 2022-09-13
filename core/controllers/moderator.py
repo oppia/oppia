@@ -72,12 +72,8 @@ class FeaturedActivitiesHandler(base.BaseHandler):
     @acl_decorators.can_access_moderator_page
     def post(self):
         """Handles POST requests."""
-        featured_activity_reference_dicts = self.normalized_payload.get(
+        featured_activity_references = self.normalized_payload.get(
             'featured_activity_reference_dicts')
-        featured_activity_references = [
-            activity_domain.ActivityReference(
-                reference_dict['type'], reference_dict['id'])
-            for reference_dict in featured_activity_reference_dicts]
 
         try:
             summary_services.require_activities_to_be_public(

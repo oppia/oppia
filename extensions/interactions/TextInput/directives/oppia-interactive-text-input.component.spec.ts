@@ -18,8 +18,10 @@
 
 import { NO_ERRORS_SCHEMA, ChangeDetectorRef } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { TextInputAnswer } from 'interactions/answer-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { InteractiveTextInputComponent } from './oppia-interactive-text-input.component';
 
 describe('InteractiveTextInputComponent', () => {
@@ -28,7 +30,9 @@ describe('InteractiveTextInputComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         placeholder: {
           value: {
@@ -43,9 +47,10 @@ describe('InteractiveTextInputComponent', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {
-    },
-    registerCurrentInteraction: (submitAnswer, validateExpressionFn) => {
+    onSubmit: (
+        answer: TextInputAnswer, rulesService: CurrentInteractionService) => {},
+    registerCurrentInteraction: (
+        submitAnswer: Function, validateExpressionFn: Function) => {
       submitAnswer();
       validateExpressionFn();
     }
@@ -74,7 +79,7 @@ describe('InteractiveTextInputComponent', () => {
     component = fixture.componentInstance;
 
     component.placeholderWithValue = 'Placeholder text';
-    component.rowsWithValue = 2;
+    component.rowsWithValue = '2';
   });
 
   it('should initialise when the user saves the interaction', () => {
@@ -85,13 +90,13 @@ describe('InteractiveTextInputComponent', () => {
     component.ngOnInit();
 
     expect(component.placeholder).toBe('Placeholder text');
-    expect(component.rows).toBe(2);
+    expect(component.rows).toBe('2');
     expect(component.answer).toBe('');
     expect(component.labelForFocusTarget).toBe('label');
     expect(component.schema).toEqual({
       type: 'unicode',
       ui_config: {
-        rows: 2,
+        rows: '2',
         placeholder: 'Placeholder text',
       }
     });

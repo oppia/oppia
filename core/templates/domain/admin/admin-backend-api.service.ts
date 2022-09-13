@@ -35,6 +35,11 @@ import { UrlInterpolationService } from
 import { Schema } from 'services/schema-default-value.service';
 
 
+export interface NewConfigPropertyValues {
+  [property: string]: (
+    number | boolean | string | string[] | Object | Object[]);
+}
+
 export interface UserRolesBackendResponse {
   roles: string[];
   'managed_topic_ids': string[];
@@ -197,7 +202,8 @@ export class AdminBackendApiService {
 
   // Admin Roles Tab Services.
   async viewUsersRoleAsync(
-      username: string): Promise<UserRolesBackendResponse> {
+      username: string
+  ): Promise<UserRolesBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<UserRolesBackendResponse>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
@@ -310,6 +316,21 @@ export class AdminBackendApiService {
         }
       ).toPromise().then(response => {
         resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async rollbackExplorationToSafeState(expId: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.http.post<{version: number}>(
+        AdminPageConstants.ADMIN_HANDLER_URL, {
+          action: 'rollback_exploration_to_safe_state',
+          exp_id: expId
+        }
+      ).toPromise().then(response => {
+        resolve(response.version);
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
@@ -437,7 +458,7 @@ export class AdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues):
+      newConfigPropertyValues: NewConfigPropertyValues):
       Promise<void> {
     let action = 'save_config_properties';
     let payload = {

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
-from core.domain import app_feedback_report_constants as constants
+from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
@@ -32,11 +32,11 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT])
 transaction_services = models.Registry.import_transaction_services()
 
-PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
-PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
+PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
+PLATFORM_WEB = app_feedback_report_constants.PLATFORM_CHOICE_WEB
 
 
 def get_report_models(
@@ -77,6 +77,10 @@ def store_incoming_report_stats(
 
     Args:
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
+
+    Raises:
+        NotImplementedError. Stats aggregation for the domain object
+            have not been implemented yet.
     """
     if report_obj.platform == PLATFORM_WEB:
         raise NotImplementedError(
@@ -84,8 +88,10 @@ def store_incoming_report_stats(
             'implemented yet.')
 
     platform = PLATFORM_ANDROID
-    unticketed_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    all_reports_id = constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID
+    unticketed_id = (
+        app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID) # pylint: disable=line-too-long
+    all_reports_id = (
+        app_feedback_report_constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID)
 
     stats_date = report_obj.submitted_on_timestamp.date()
     _update_report_stats_model_in_transaction(
@@ -109,7 +115,7 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
             report is added or removed from the model.
     """
     # The stats we want to aggregate on.
-    report_type = report_obj.user_supplied_feedback.report_type.name
+    report_type = report_obj.user_supplied_feedback.report_type.value
     country_locale_code = (
         report_obj.device_system_context.device_country_locale_code)
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
@@ -128,31 +134,34 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
     stats_model = (
         app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
             stats_id))
+
+    stats_parameter_names = (
+        app_feedback_report_constants.StatsParameterNames)
     if stats_model is None:
         assert delta > 0
         # Create new stats model entity. These are the individual report fields
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            constants.STATS_PARAMETER_NAMES.report_type.name: {
+            stats_parameter_names.REPORT_TYPE.value: {
                 report_type: 1
             },
-            constants.STATS_PARAMETER_NAMES.country_locale_code.name: {
+            stats_parameter_names.COUNTRY_LOCALE_CODE.value: {
                 country_locale_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.entry_point_name.name: {
+            stats_parameter_names.ENTRY_POINT_NAME.value: {
                 entry_point_name: 1
             },
-            constants.STATS_PARAMETER_NAMES.text_language_code.name: {
+            stats_parameter_names.TEXT_LANGUAGE_CODE.value: {
                 text_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.audio_language_code.name: {
+            stats_parameter_names.AUDIO_LANGUAGE_CODE.value: {
                 audio_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
+            stats_parameter_names.ANDROID_SDK_VERSION.value: {
                 sdk_version: 1
             },
-            constants.STATS_PARAMETER_NAMES.version_name.name: {
+            stats_parameter_names.VERSION_NAME.value: {
                 version_name: 1
             }
         }
@@ -165,38 +174,47 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         # Update existing stats model.
         stats_dict = stats_model.daily_param_stats
 
-        stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name] = (
+        stats_dict[
+            stats_parameter_names.REPORT_TYPE.value] = (
             calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name],
+                stats_dict[
+                    stats_parameter_names.REPORT_TYPE.value],
                 report_type, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code.name] = (
+        stats_dict[
+            stats_parameter_names.COUNTRY_LOCALE_CODE.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.country_locale_code.name],
+                    stats_parameter_names.COUNTRY_LOCALE_CODE.value],
                 country_locale_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name.name] = (
+        stats_dict[
+            stats_parameter_names.ENTRY_POINT_NAME.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.entry_point_name.name],
+                    stats_parameter_names.ENTRY_POINT_NAME.value],
                 entry_point_name, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code.name] = (
+        stats_dict[
+            stats_parameter_names.AUDIO_LANGUAGE_CODE.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.audio_language_code.name],
+                    stats_parameter_names.AUDIO_LANGUAGE_CODE.value],
                 audio_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code.name] = (
+        stats_dict[
+            stats_parameter_names.TEXT_LANGUAGE_CODE.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.text_language_code.name],
+                    stats_parameter_names.TEXT_LANGUAGE_CODE.value],
                 text_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version.name] = (
+        stats_dict[
+            stats_parameter_names.ANDROID_SDK_VERSION.value] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    constants.STATS_PARAMETER_NAMES.android_sdk_version.name],
+                    stats_parameter_names.ANDROID_SDK_VERSION.value],
                 sdk_version, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name] = (
+        stats_dict[
+            stats_parameter_names.VERSION_NAME.value] = (
             calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name],
+                stats_dict[
+                    stats_parameter_names.VERSION_NAME.value],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
@@ -347,6 +365,10 @@ def get_android_report_from_model(
 
     Returns:
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
+
+    Raises:
+        NotImplementedError. Android app feedback report migrations not added
+            for new report schemas to be implemented.
     """
     feedback_report = app_feedback_report_domain.AppFeedbackReport
     if android_report_model.android_report_info_schema_version < (
@@ -494,8 +516,8 @@ def save_feedback_report_to_storage(
         'android_device_language_locale_code': (
             device_system_context.device_language_locale_code),
         'build_fingerprint': device_system_context.build_fingerprint,
-        'network_type': device_system_context.network_type.name,
-        'text_size': app_context.text_size.name,
+        'network_type': device_system_context.network_type.value,
+        'text_size': app_context.text_size.value,
         'only_allows_wifi_download_and_update': str(
             app_context.only_allows_wifi_download_and_update),
         'automatically_update_topics': str(
@@ -508,8 +530,8 @@ def save_feedback_report_to_storage(
             report.report_id, report.platform,
             report.submitted_on_timestamp,
             report.local_timezone_offset_hrs,
-            user_supplied_feedback.report_type.name,
-            user_supplied_feedback.category.name,
+            user_supplied_feedback.report_type.value,
+            user_supplied_feedback.category.value,
             device_system_context.version_name,
             device_system_context.device_country_locale_code,
             device_system_context.sdk_version,
@@ -538,10 +560,10 @@ def get_all_filter_options() -> List[
     """
     filter_list = []
     model_class = app_feedback_report_models.AppFeedbackReportModel
-    for filter_field in constants.ALLOWED_FILTERS:
+    for filter_field in app_feedback_report_constants.ALLOWED_FILTERS:
         filter_values = model_class.get_filter_options_for_field(filter_field)
         filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(
-            filter_field.name, filter_values))
+            filter_field, filter_values))
     return filter_list
 
 
@@ -556,6 +578,10 @@ def reassign_ticket(
         new_ticket: AppFeedbackReportTicket|None. The ticket domain object to
             reassign the report to or None if removing the report form a ticket
             wihtout reassigning.
+
+    Raises:
+        NotImplementedError. Assigning web reports to tickets has not been
+            implemented.
     """
     if report.platform == PLATFORM_WEB:
         raise NotImplementedError(
@@ -567,8 +593,8 @@ def reassign_ticket(
     old_ticket_id = report.ticket_id
     if old_ticket_id is None:
         _update_report_stats_model_in_transaction(
-            constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, platform,
-            stats_date, report, -1)
+            app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, # pylint: disable=line-too-long
+            platform, stats_date, report, -1)
     else:
         # The report was ticketed so the report needs to be removed from its old
         # ticket in storage.
@@ -606,7 +632,8 @@ def reassign_ticket(
             old_ticket_id, platform, stats_date, report, -1)
 
     # Add the report to the new ticket.
-    new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    new_ticket_id = (
+        app_feedback_report_constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID) # pylint: disable=line-too-long
     if new_ticket is not None:
         new_ticket_id = new_ticket.ticket_id
     new_ticket_model = (

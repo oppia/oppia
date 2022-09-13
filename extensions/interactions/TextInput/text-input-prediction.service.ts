@@ -29,6 +29,8 @@ import { InteractionsExtensionsConstants } from 'interactions/interactions-exten
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { PredictionResult } from 'domain/classifier/prediction-result.model';
 
 @Injectable({
   providedIn: 'root'
@@ -36,13 +38,14 @@ import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 export class TextInputPredictionService {
   private TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD = (
     InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD);
+
   constructor(
     private countVectorizerService: CountVectorizerService,
     private svmPredictionService: SVMPredictionService,
     private textInputTokenizer: TextInputTokenizer) {
   }
 
-  predict(classifierBuffer: ArrayBuffer, textInput: string): number {
+  predict(classifierBuffer: ArrayBuffer, textInput: InteractionAnswer): number {
     // The model_json attribute in TextClassifierFrozenModel class can't be
     // changed to camelcase since the class definition is automatically compiled
     // with the help of protoc.
@@ -52,16 +55,24 @@ export class TextInputPredictionService {
     const svmData = classifierData.SVM;
 
     // Tokenize the text input.
-    textInput = textInput.toLowerCase();
-    const textInputTokens = this.textInputTokenizer.generateTokens(textInput);
-
-    const textVector = this.countVectorizerService.vectorize(
-      textInputTokens, cvVocabulary);
-    const predictionResult = this.svmPredictionService.predict(
-      svmData, textVector);
-    if (predictionResult.predictionConfidence >
-        this.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
-      return predictionResult.predictionLabel;
+    let textVector: number[];
+    let textInputTokens;
+    let predictionResult: PredictionResult;
+    if (typeof textInput === 'string') {
+      textInput = textInput.toLowerCase();
+      textInputTokens = this.textInputTokenizer.generateTokens(textInput);
+      if (textInputTokens) {
+        textVector = this.countVectorizerService.vectorize(
+          textInputTokens, cvVocabulary);
+        predictionResult = this.svmPredictionService.predict(
+          svmData, textVector);
+        if (
+          predictionResult.predictionConfidence >
+          this.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD
+        ) {
+          return predictionResult.predictionLabel;
+        }
+      }
     }
     return -1;
   }

@@ -16,10 +16,11 @@
 
 from __future__ import annotations
 
+import base64
 import os
 
 from core import feconf
-from core import python_utils
+from core import utils
 from core.constants import constants
 from core.domain import config_services
 from core.domain import question_services
@@ -28,6 +29,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.tests import test_utils
 
 
@@ -35,7 +37,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicsAndSkillsDashboardTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -55,7 +57,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.subtopic_skill_id, self.admin_id, description='Subtopic Skill')
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title')
+            1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = [self.subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
@@ -173,6 +175,44 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.logout()
 
 
+class CategorizedAndUntriagedSkillsDataHandlerTests(
+    BaseTopicsAndSkillsDashboardTests):
+
+    def test_get(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
+
+        # Check that logged out users can access the categorized and
+        # untriaged skills data.
+        json_response = self.get_json(
+            '/topics_and_skills_dashboard/' +
+            'categorized_and_untriaged_skills_data',
+            expected_status_int=200)
+        self.assertEqual(
+            len(json_response['untriaged_skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['skill_id'],
+            skill_id)
+        self.assertEqual(
+            len(json_response['categorized_skills_dict']), 1)
+
+        # Check that logged in users can access the categorized and
+        # untriaged skills data.
+        self.login(self.NEW_USER_EMAIL)
+        json_response = self.get_json(
+            '/topics_and_skills_dashboard/' +
+            'categorized_and_untriaged_skills_data',
+            expected_status_int=200)
+        self.assertEqual(
+            len(json_response['untriaged_skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['skill_id'],
+            skill_id)
+        self.assertEqual(
+            len(json_response['categorized_skills_dict']), 1)
+        self.logout()
+
+
 class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def test_get(self):
@@ -193,7 +233,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[], next_subtopic_id=1,
+            page_title_fragment_for_web='testing')
         subtopic = topic_domain.Subtopic.from_dict({
             'id': 1,
             'title': 'subtopic1',
@@ -209,7 +250,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
-            subtopics=[subtopic], next_subtopic_id=2)
+            subtopics=[subtopic], next_subtopic_id=2,
+            page_title_fragment_for_web='testing')
 
         json_response = self.get_json(
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
@@ -236,7 +278,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'sort': 'Oldest Created'
+                'sort': 'Oldest Created',
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -251,7 +296,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'sort': 'Newly Created'
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -264,7 +312,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'sort': 'Most Recently Updated'
+                'sort': 'Most Recently Updated',
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -283,7 +334,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'keywords': ['description']
+                'keywords': ['description'],
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'status': 'All',
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
@@ -298,7 +352,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'keywords': ['subtopic']
+                'keywords': ['subtopic'],
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'status': 'All',
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
@@ -318,7 +375,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'status': 'Assigned'
+                'status': 'Assigned',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 2)
@@ -328,7 +388,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
-                'status': 'Unassigned'
+                'status': 'Unassigned',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 0)
@@ -345,6 +408,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         # Default sort is "Newly created first". So, the skill with id-skill_id
@@ -368,6 +435,10 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
                 'next_cursor': next_cursor,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token)
 
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
@@ -380,13 +451,22 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
-                'num_skills_to_fetch': '1',
+                'num_skills_to_fetch': 'string',
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': [],
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'num_skills_to_fetch\' '
+            'failed: Could not convert str to int: string'
+        )
+
         self.assertEqual(
             json_response['error'],
-            'Number of skills to fetch should be a number.')
+            expected_error)
 
     def test_fetch_filtered_skills_with_invalid_cursor_type(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -398,12 +478,21 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
-                'next_cursor': 40
+                'next_cursor': 40,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'next_cursor\' failed: '
+            'Expected string, received 40'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Next Cursor should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_cursor_value(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -415,7 +504,11 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
-                'next_cursor': 'kfsdkam43k4334'
+                'next_cursor': 'kfsdkam43k4334',
+                'status': 'All',
+                'sort': 'Newly Created',
+                'classroom_name': 'All',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=500)
 
@@ -427,11 +520,19 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'classroom_name': 20,
+                'status': 'All',
+                'sort': 'Newly Created',
+                'keywords': [],
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'classroom_name\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Classroom name should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_keywords(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -441,21 +542,37 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'keywords': 20,
+                'classroom_name': 'All',
+                'status': 'All',
+                'sort': 'Newly Created',
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'keywords\' failed: '
+            'Expected list, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Keywords should be a list of strings.')
+            json_response['error'], expected_error)
 
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'keywords': ['apple', 20],
+                'classroom_name': 'All',
+                'status': 'All',
+                'sort': 'Newly Created',
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'keywords\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Keywords should be a list of strings.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_status(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -465,11 +582,19 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'status': 20,
+                'classroom_name': 'All',
+                'sort': 'Newly Created',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'status\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'Status should be a string.')
+            json_response['error'], expected_error)
 
     def test_fetch_filtered_skills_with_invalid_sort(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -479,17 +604,25 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 10,
                 'sort': 20,
+                'classroom_name': 'All',
+                'status': 'All',
+                'keywords': []
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
+        expected_error = (
+            'Schema validation for \'sort\' failed: '
+            'Expected string, received 20'
+        )
+
         self.assertEqual(
-            json_response['error'], 'The value of sort_by should be a string.')
+            json_response['error'], expected_error)
 
 
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(NewTopicHandlerTests, self).setUp()
+        super().setUp()
         self.url = feconf.NEW_TOPIC_URL
 
     def test_topic_creation(self):
@@ -501,10 +634,11 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
-            'url_fragment': 'name-one'
+            'url_fragment': 'name-one',
+            'page_title_fragment': 'testing'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None
         ) as f:
@@ -539,10 +673,11 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',
-            'url_fragment': 'name-three'
+            'url_fragment': 'name-three',
+            'page_title_fragment': 'testing'
         }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
             'rb', encoding=None
         ) as f:
@@ -561,9 +696,9 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(NewSkillHandlerTests, self).setUp()
+        super().setUp()
         self.url = feconf.NEW_SKILL_URL
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None
         ) as f:
@@ -588,11 +723,16 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'rubrics': rubrics,
                 'explanation_dict': state_domain.SubtitledHtml(
                     '1', '<p>Explanation</p>').to_dict(),
-                'thumbnail_filename': 'image.svg'
+                'linked_topic_ids': [],
+                'files': {
+                    'img.png': (
+                        base64.b64encode(
+                            self.original_image_content
+                        ).decode('utf-8')
+                    )
+                }
             },
-            csrf_token=csrf_token,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            csrf_token=csrf_token)
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -604,17 +744,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'description': 'Skill Description',
-            'linked_topic_ids': ['topic'],
             'rubrics': [],
+            'linked_topic_ids': [topic_fetchers.get_new_topic_id()],
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            expected_status_int=400)
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -641,7 +779,10 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', explanation_html).to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'linked_topic_ids': [],
+            'files': {
+                'img.svg': None
+            }
         }
 
         response_dict = self.post_json(
@@ -650,7 +791,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         self.assertIn(
-            'No image data provided for file with name img.svg',
+            'Schema validation for \'files\' failed: No image supplied',
             response_dict['error'])
 
         large_image = '<svg><path d="%s" /></svg>' % (
@@ -660,14 +801,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', explanation_html).to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'linked_topic_ids': [],
+            'files': {
+                'img.svg': large_image
+            }
         }
         response_dict = self.post_json(
             self.url, post_data,
             csrf_token=csrf_token,
-            upload_files=(
-                ('img.svg', 'img.svg', large_image),
-            ), expected_status_int=400)
+            expected_status_int=400)
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
@@ -677,8 +819,6 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_with_valid_images(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        filename = 'img.png'
-        filename_2 = 'img_2.png'
         explanation_html = (
             '<oppia-noninteractive-image filepath-with-value='
             '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
@@ -699,26 +839,28 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'difficulty': constants.SKILL_DIFFICULTIES[2],
             'explanations': ['Explanation 3']
         }]
-        post_data = {
-            'description': 'Skill Description',
-            'rubrics': rubrics,
-            'explanation_dict': state_domain.SubtitledHtml(
-                '1', explanation_html).to_dict(),
-            'thumbnail_filename': 'image.svg'
-        }
 
-        with python_utils.open_file(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None
         ) as f:
             raw_image = f.read()
 
+        post_data = {
+            'description': 'Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'linked_topic_ids': [],
+            'files': {
+                'img.png': base64.b64encode(raw_image).decode('utf-8'),
+                'img_2.png': base64.b64encode(raw_image).decode('utf-8')
+            }
+        }
+
         json_response = self.post_json(
             self.url, post_data,
-            csrf_token=csrf_token,
-            upload_files=(
-                (filename, filename, raw_image),
-                (filename_2, filename_2, raw_image),)
+            csrf_token=csrf_token
         )
         skill_id = json_response['skillId']
         self.assertIsNotNone(
@@ -732,13 +874,13 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': 'invalid',
-            'thumbnail_filename': 'image.svg'
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict(),
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            expected_status_int=400)
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -749,14 +891,11 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
-            'explanation_dict': 'explanation',
-            'thumbnail_filename': 'image.svg'
+            'explanation_dict': 'explanation'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            expected_status_int=400)
         self.assertEqual(json_response['status_code'], 400)
 
         payload = {
@@ -766,7 +905,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'explanation_dict': {
                 'explanation': 'Explanation'
             },
-            'thumbnail_filename': 'image.svg'
+            'files': {}
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -793,12 +932,10 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'files': {}
         }
         json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
+            self.url, payload, csrf_token=csrf_token)
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -827,7 +964,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'linked_topic_ids': [],
+            'files': {}
         }
 
         # No errors when we publish the skill description for the first time.
@@ -851,7 +989,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(MergeSkillHandlerTests, self).setUp()
+        super().setUp()
         self.url = feconf.MERGE_SKILLS_URL
 
         self.question_id = question_services.get_new_question_id()
@@ -926,3 +1064,53 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=404)
 
         self.logout()
+
+
+class TopicIdToDiagnosticTestSkillIdsHandlerTests(
+    BaseTopicsAndSkillsDashboardTests):
+    """Tests TopicIdToDiagnosticTestSkillIdsHandler class."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER, 'topic_id')
+
+        self.topic = topic_domain.Topic.create_default_topic(
+            'topic_id', 'topic', 'abbrev', 'description', 'fragm')
+        self.topic.thumbnail_filename = 'thumbnail.svg'
+        self.topic.thumbnail_bg_color = '#C6DCDA'
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-three')]
+        self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.admin_id, self.topic)
+
+    def test_topic_id_to_diagnostic_test_skill_ids_handler_returns_correctly(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(
+            json_response['topic_id_to_diagnostic_test_skill_ids'],
+            {'topic_id': ['skill_id_1']}
+        )
+
+        url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
+            'incorrect_topic_id')
+        json_response = self.get_json(url, expected_status_int=500)
+        self.assertEqual(
+            json_response['error'],
+            'No corresponding topic models exist for these topic IDs: '
+            'incorrect_topic_id.'
+        )
+
+        url = '%s/?comma_separated_topic_ids=%s' % (
+            feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER, '')
+        json_response = self.get_json(url)
+        self.assertEqual(
+            json_response['topic_id_to_diagnostic_test_skill_ids'], {})

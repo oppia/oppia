@@ -1,0 +1,43 @@
+<div class="music-notes-input-container">
+  <div class="oppia-music-input-valid-note-area">
+    <button type="button"
+            class="btn btn-secondary oppia-music-input-btn oppia-music-input-play-btn"
+            (click)="playCurrentSequence()">
+      <span><i class="fas fa-play music-notes-play"></i></span>
+      <span [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY' | translate"></span>
+    </button>
+    <div class="oppia-music-input-note-choices"></div>
+    <div class="oppia-music-input-staff"></div>
+  </div>
+
+  <div class="oppia-music-input-control-buttons">
+    <button type="button"
+            class="btn btn-secondary oppia-music-input-btn"
+            (click)="playSequenceToGuess()"
+            [innerHTML]="'I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE' | translate">
+    </button>
+    <div class="float-right">
+      <button type="button"
+              class="btn btn-secondary oppia-music-input-btn"
+              [disabled]="!interactionIsActive"
+              (click)="clearSequence()"
+              [innerHTML]="'I18N_INTERACTIONS_MUSIC_CLEAR' | translate">
+      </button>
+    </div>
+  </div>
+</div>
+<style>
+  .music-notes-input-container {
+    background: #fff;
+    padding: 8px;
+  }
+  @media screen and (max-width: 959px) {
+    .music-notes-input-container {
+      max-width: 100vw;
+      width: 560px;
+    }
+  }
+  .music-notes-play {
+    padding-right: 5px;
+  }
+</style>

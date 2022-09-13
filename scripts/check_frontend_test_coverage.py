@@ -22,7 +22,9 @@ import os
 import re
 import sys
 
-from core import python_utils
+from core import utils
+
+from typing import List
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
@@ -39,50 +41,25 @@ EXCLUDED_DIRECTORIES = [
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
-    'answer-classification.service.ts',
     'App.ts',
-    'audio-preloader.service.ts',
     'Base.ts',
     'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'collection-player-page.directive.ts',
-    'collection.model.ts',
-    'contribution-and-review.service.ts',
-    'conversation-skin.directive.ts',
-    'current-interaction.service.ts',
     'exploration-states.service.ts',
-    'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
-    'fatigue-detection.service.ts',
     'google-analytics.initializer.ts',
-    'language-util.service.ts',
     'learner-answer-info.service.ts',
     'mathjax-bind.directive.ts',
-    'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
-    'oppia-footer.component.ts',
-    'oppia-interactive-music-notes-input.directive.ts',
-    'oppia-interactive-pencil-code-editor.directive.ts',
+    'oppia-interactive-music-notes-input.component.ts',
+    'oppia-interactive-pencil-code-editor.component.ts',
     'oppia-root.directive.ts',
     'parameterize-rule-description.filter.ts',
     'python-program.tokenizer.ts',
     'question-update.service.ts',
-    'refresher-exploration-confirmation-modal.service.ts',
     'rule-type-selector.directive.ts',
-    'schema-based-custom-viewer.directive.ts',
-    'schema-based-html-viewer.directive.ts',
-    'schema-based-list-viewer.directive.ts',
     'select2-dropdown.directive.ts',
-    'state-card.model.ts',
-    'state-content-editor.directive.ts',
-    'state-interaction-editor.directive.ts',
-    'story-node.model.ts',
-    'subtopic.model.ts',
     'translation-file-hash-loader-backend-api.service.ts',
-    'truncate-and-capitalize.filter.ts',
-    'truncate-and-capitalize.pipe.ts',
-    'truncate-input-based-on-interaction-answer-type.filter.ts',
-    'truncate.filter.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
@@ -92,7 +69,7 @@ NOT_FULLY_COVERED_FILENAMES = [
 class LcovStanzaRelevantLines:
     """Gets the relevant lines from a lcov stanza."""
 
-    def __init__(self, stanza):
+    def __init__(self, stanza: str) -> None:
         """Initialize the object which provides relevant data of a lcov
         stanza in order to calculate any decrease in frontend test coverage.
 
@@ -131,7 +108,7 @@ class LcovStanzaRelevantLines:
         self.covered_lines = int(match.group(1))
 
 
-def get_stanzas_from_lcov_file():
+def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
     """Get all stanzas from a lcov file. The lcov file gather all the frontend
     files that has tests and each one has the following structure:
     TN: test name
@@ -147,7 +124,7 @@ def get_stanzas_from_lcov_file():
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
-    f = python_utils.open_file(LCOV_FILE_PATH, 'r')
+    f = utils.open_file(LCOV_FILE_PATH, 'r')
     lcov_items_list = f.read().split('end_of_record')
     stanzas_list = []
 
@@ -159,7 +136,7 @@ def get_stanzas_from_lcov_file():
     return stanzas_list
 
 
-def check_not_fully_covered_filenames_list_is_sorted():
+def check_not_fully_covered_filenames_list_is_sorted() -> None:
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
             NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
@@ -169,7 +146,7 @@ def check_not_fully_covered_filenames_list_is_sorted():
         sys.exit(1)
 
 
-def check_coverage_changes():
+def check_coverage_changes() -> None:
     """Checks if the denylist for not fully covered files needs to be changed
     by:
     - File renaming
@@ -237,7 +214,7 @@ def check_coverage_changes():
     check_not_fully_covered_filenames_list_is_sorted()
 
 
-def main():
+def main() -> None:
     """Runs all the steps for checking if there is any decrease of 100% covered
     files in the frontend.
     """

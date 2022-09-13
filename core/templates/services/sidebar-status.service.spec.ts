@@ -60,12 +60,22 @@ describe('SidebarStatusService', () => {
     expect(sss.isSidebarShown()).toBe(false);
   });
 
+  it('should toggle hamburger status when clicking on hamburger icon', () => {
+    const clickEvent = new CustomEvent('click');
+    expect(sss.isHamburgerIconclicked()).toBeFalse();
+    sss.toggleHamburgerIconStatus(clickEvent);
+    expect(sss.isHamburgerIconclicked()).toBeTrue();
+    sss.toggleHamburgerIconStatus(clickEvent);
+    expect(sss.isHamburgerIconclicked()).toBeFalse();
+  });
 
-  it('should falsify pendingSidebarClick on document click', () => {
+  it('should close the siderbar on document click when its open', () => {
+    const clickEvent = new CustomEvent('click');
+    sss.toggleHamburgerIconStatus(clickEvent);
+    expect(sss.isHamburgerIconclicked()).toBe(true);
     sss.openSidebar();
     sss.onDocumentClick();
-    expect(sss.isSidebarShown()).toBe(true);
-    sss.onDocumentClick();
     expect(sss.isSidebarShown()).toBe(false);
+    expect(sss.isHamburgerIconclicked()).toBe(false);
   });
 });

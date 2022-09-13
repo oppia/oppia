@@ -22,15 +22,18 @@ from __future__ import annotations
 import argparse
 import contextlib
 import time
+from typing import Iterator, Optional, Sequence
 
-
+# Do not import any Oppia modules here,
+# import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
+# libraries that use the builtins python module (e.g. build).
 install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -79,7 +82,7 @@ PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
 @contextlib.contextmanager
-def alert_on_exit():
+def alert_on_exit() -> Iterator[None]:
     """Context manager that alerts developers to wait for a graceful shutdown.
 
     Yields:
@@ -102,7 +105,7 @@ def alert_on_exit():
         time.sleep(5)
 
 
-def notify_about_successful_shutdown():
+def notify_about_successful_shutdown() -> None:
     """Notifies developers that the servers have shutdown gracefully."""
     print(
         '\n\n'
@@ -117,7 +120,13 @@ def notify_about_successful_shutdown():
         '\n\n')
 
 
-def main(args=None):
+def call_extend_index_yaml() -> None:
+    """Calls the extend_index_yaml.py script."""
+    print('\033[94m' + 'Extending index.yaml...' + '\033[0m')
+    extend_index_yaml.main()
+
+
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -134,6 +143,7 @@ def main(args=None):
     with contextlib.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
+        stack.callback(call_extend_index_yaml)
 
         build_args = []
         if parsed_args.prod_env:
@@ -170,7 +180,7 @@ def main(args=None):
 
         managed_web_browser = (
             None if parsed_args.no_browser else
-            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
+            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))  # type: ignore[no-untyped-call]
 
         if managed_web_browser is None:
             common.print_each_string_after_two_new_lines([
@@ -191,5 +201,5 @@ def main(args=None):
         dev_appserver.wait()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

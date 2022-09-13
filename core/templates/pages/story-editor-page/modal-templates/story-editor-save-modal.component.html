@@ -8,7 +8,7 @@
               cols="50"
               maxlength="MAX_COMMIT_MESSAGE_LENGTH"
               [(ngModel)]="bindedMessage"
-              class="protractor-test-commit-message-input"
+              class="e2e-test-commit-message-input"
               autofocus>
     </textarea>
   </p>
@@ -19,8 +19,8 @@
           type="button">
           Cancel
   </button>
-  <button class="btn btn-success protractor-test-close-save-modal-button"
-          [attr.disbaled]="!bindedMessage"
+  <button class="btn btn-success e2e-test-close-save-modal-button"
+          [disabled]="!bindedMessage"
           (click)="confirm(bindedMessage)">
     Save Draft
   </button>

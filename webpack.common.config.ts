@@ -18,6 +18,8 @@
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
@@ -96,12 +98,23 @@ module.exports = {
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
+    facilitator_dashboard:
+      commonPrefix + '/pages/facilitator-dashboard-page/' +
+      'facilitator-dashboard-page.import.ts',
+    learner_group_creator:
+      commonPrefix + '/pages/learner-group-pages/create-group/' +
+      'create-learner-group-page.import.ts',
+    learner_group_editor:
+      commonPrefix + '/pages/learner-group-pages/edit-group/' +
+      'edit-learner-group-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
     oppia_root:
       commonPrefix + '/pages/oppia-root/index.ts',
+    lightweight_oppia_root:
+      commonPrefix + '/pages/lightweight-oppia-root/index.ts',
     practice_session:
       commonPrefix +
       '/pages/practice-session-page/practice-session-page.import.ts',
@@ -373,6 +386,17 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['lightweight_oppia_root'],
+      filename: 'lightweight-oppia-root.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix +
+        '/pages/lightweight-oppia-root/lightweight-oppia-root.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      lightweight: true
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['practice_session'],
       filename: 'practice-session-page.mainpage.html',
       hybrid: true,
@@ -461,6 +485,39 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
+    new HtmlWebpackPlugin({
+      chunks: ['facilitator_dashboard'],
+      filename: 'facilitator-dashboard-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/facilitator-dashboard-page/' +
+        'facilitator-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['learner_group_creator'],
+      filename: 'create-learner-group-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/learner-group-pages/create-group/' +
+        'create-learner-group-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['learner_group_editor'],
+      filename: 'edit-learner-group-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/learner-group-pages/edit-group/' +
+        'edit-learner-group-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
@@ -472,6 +529,27 @@ module.exports = {
         },
       },
     }),
+    // Here we insert the CSS files depending on key-value stored on
+    // the local storage. This only works for dynamically inserted bundles.
+    // For statically inserted bundles we handle this logic in
+    // core/templates/pages/footer_js_libs.html.
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css',
+      ignoreOrder: false,
+      insert: function(linkTag) {
+        if (localStorage.getItem('direction') === 'rtl') {
+          linkTag.href = linkTag.href.replace('.css', '.rtl.css');
+        }
+        document.head.appendChild(linkTag);
+      }
+    }),
+    // This generates the RTL version for all CSS bundles.
+    new WebpackRTLPlugin({
+      minify: {
+        zindex: false
+      }
+    })
   ],
   module: {
     rules: [{
@@ -519,24 +597,19 @@ module.exports = {
     {
       test: /\.css$/,
       include: [
+        path.resolve(__dirname, 'core/templates'),
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'node_modules'),
       ],
       use: [
-        'cache-loader',
-        {
-          loader: 'style-loader',
-          options: {
-            esModule: false
-          }
-        },
+        MiniCssExtractPlugin.loader,
         {
           loader: 'css-loader',
           options: {
             url: false,
           }
-        }
-      ]
+        },
+      ],
     }]
   },
   externals: {
@@ -544,6 +617,8 @@ module.exports = {
   },
   optimization: {
     runtimeChunk: 'single',
+    sideEffects: true,
+    usedExports: true,
     splitChunks: {
       chunks: 'all'
     },

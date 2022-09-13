@@ -33,8 +33,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import question_models
 
-(base_models, question_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.question])
+(base_models, question_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.QUESTION
+])
 
 
 class QuestionSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -53,8 +54,33 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            question_models.QuestionModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_state_data_schema_version': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'inapplicable_skill_misconception_ids': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        }
+        self.assertEqual(
+            question_models.QuestionModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
     def test_create_question_empty_skill_id_list(self) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
@@ -64,10 +90,10 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
-        self.assertItemsEqual(question_model.linked_skill_ids, []) # type: ignore[no-untyped-call]
+        self.assertItemsEqual(question_model.linked_skill_ids, [])
 
     def test_create_question_with_skill_ids(self) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         language_code = 'en'
@@ -79,13 +105,13 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             question_model.linked_skill_ids, linked_skill_ids)
 
     def test_create_question_with_inapplicable_skill_misconception_ids(
-            self
+        self
     ) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         inapplicable_skill_misconception_ids = ['skill_id-1', 'skill_id-2']
@@ -95,33 +121,29 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_state_data, language_code, version,
             linked_skill_ids, inapplicable_skill_misconception_ids)
 
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             question_model.inapplicable_skill_misconception_ids,
             inapplicable_skill_misconception_ids)
 
     def test_put_multi_questions(self) -> None:
-        question_state_data = self._create_valid_question_data('ABC') # type: ignore[no-untyped-call]
+        question_state_data = self._create_valid_question_data('ABC')
         linked_skill_ids = ['skill_id1', 'skill_id2']
-        self.save_new_question( # type: ignore[no-untyped-call]
+        self.save_new_question(
             'question_id1', 'owner_id',
             question_state_data,
             linked_skill_ids)
-        self.save_new_question( # type: ignore[no-untyped-call]
+        self.save_new_question(
             'question_id2', 'owner_id',
             question_state_data,
             linked_skill_ids)
         question_ids = ['question_id1', 'question_id2']
 
         question_model1 = question_models.QuestionModel.get(question_ids[0])
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_model1 is not None
         question_model2 = question_models.QuestionModel.get(question_ids[1])
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_model2 is not None
 
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             question_model1.linked_skill_ids, ['skill_id1', 'skill_id2'])
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             question_model2.linked_skill_ids, ['skill_id1', 'skill_id2'])
 
         question_model1.linked_skill_ids = ['skill_id3']
@@ -132,24 +154,20 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 
         updated_question_model1 = question_models.QuestionModel.get(
             question_ids[0])
-        # Ruling out the possibility of None for mypy type checking.
-        assert updated_question_model1 is not None
         updated_question_model2 = question_models.QuestionModel.get(
             question_ids[1])
-        # Ruling out the possibility of None for mypy type checking.
-        assert updated_question_model2 is not None
         self.assertEqual(
             updated_question_model1.linked_skill_ids, ['skill_id3'])
         self.assertEqual(
             updated_question_model2.linked_skill_ids, ['skill_id3'])
 
     def test_raise_exception_by_mocking_collision(self) -> None:
-        state = state_domain.State.create_default_state('ABC') # type: ignore[no-untyped-call]
+        state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
 
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The id generator for QuestionModel is producing too '
             'many collisions.'
             ):
@@ -171,6 +189,27 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_difficulty': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
     def test_create_question_skill_link(self) -> None:
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'
@@ -182,6 +221,36 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(questionskilllink_model.skill_id, skill_id)
         self.assertEqual(
             questionskilllink_model.skill_difficulty, skill_difficulty)
+
+    def test_get_all_question_ids_linked_to_skill_id(self) -> None:
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
+
+        # Testing that no question is linked to a skill.
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel
+            .get_all_question_ids_linked_to_skill_id(skill_id_1),
+            []
+        )
+
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', skill_id_1, 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_1, 0.2)
+            )
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2]
+        )
+
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel
+            .get_all_question_ids_linked_to_skill_id(skill_id_1),
+            ['question_id1', 'question_id2']
+        )
 
     def test_put_multi_question_skill_link(self) -> None:
         questionskilllink_model1 = (
@@ -251,6 +320,24 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 1)
         self.assertEqual(question_skill_links[0].question_id, 'question_id3')
 
+    def test_cannot_link_same_question_to_given_skill(self) -> None:
+        question_skill_link_model = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.1)
+            )
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links([
+            question_skill_link_model
+        ])
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The question with ID question_id1 is already linked to '
+            'skill skill_id1'
+        ):
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.1)
+
     def test_get_models_by_question_id(self) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -281,10 +368,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 0)
 
     def test_get_total_question_count_for_skill_ids(self) -> None:
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
-        skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_2, 'user', description='Description 2') # type: ignore[no-untyped-call]
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
 
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -334,10 +421,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_count, 3)
 
     def test_get_question_skill_links_by_skill_ids(self) -> None:
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
-        skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_2, 'user', description='Description 2') # type: ignore[no-untyped-call]
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
 
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -377,14 +464,14 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_question_skill_links_by_skill_ids_many_skills(self) -> None:
         # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
-        skill_id_1 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_1, 'user', description='Description 1') # type: ignore[no-untyped-call]
-        skill_id_2 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_2, 'user', description='Description 2') # type: ignore[no-untyped-call]
-        skill_id_3 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_3, 'user', description='Description 3') # type: ignore[no-untyped-call]
-        skill_id_4 = skill_services.get_new_skill_id() # type: ignore[no-untyped-call]
-        self.save_new_skill(skill_id_4, 'user', description='Description 4') # type: ignore[no-untyped-call]
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
+        skill_id_3 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_3, 'user', description='Description 3')
+        skill_id_4 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_4, 'user', description='Description 4')
 
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -526,10 +613,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model4])
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
-            self
+        self
     ) -> None:
         skill_ids = ['skill_id%s' % number for number in range(25)]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Please keep the number of skill IDs below 20.'):
             (
                 question_models.QuestionSkillLinkModel.
@@ -595,7 +682,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model3 in question_skill_links)
 
     def test_get_question_skill_links_when_count_not_evenly_divisible(
-            self
+        self
     ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -626,7 +713,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(questionskilllink_model3 in question_skill_links)
 
     def test_get_question_skill_links_equidistributed_by_skill(
-            self
+        self
     ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -663,7 +750,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_ids.count('question_id2'), 1)
 
     def test_get_random_question_skill_links_equidistributed_by_skill(
-            self
+        self
     ) -> None:
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -737,7 +824,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_request_too_many_skills_raises_error(self) -> None:
         skill_ids = ['skill_id%s' % number for number in range(25)]
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Please keep the number of skill IDs below 20.'):
             (
                 question_models.QuestionSkillLinkModel.
@@ -762,6 +849,34 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            question_models.QuestionCommitLogEntryModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_is_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            question_models.QuestionCommitLogEntryModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
 
 class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSummaryModel class."""
@@ -770,3 +885,28 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_models.QuestionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            question_models.QuestionSummaryModel
+            .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_model_last_updated': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'question_model_created_on': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'question_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            question_models.QuestionSummaryModel.get_export_policy(),
+            expected_export_policy_dict
+        )

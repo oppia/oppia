@@ -42,22 +42,38 @@ class QuestionsListHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'offset': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_none': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
-        try:
-            offset = int(self.request.get('offset'))
-        except Exception:
-            raise self.InvalidInputException('Invalid offset')
+
+        offset = self.normalized_request.get('offset')
 
         skill_ids = comma_separated_skill_ids.split(',')
         skill_ids = list(set(skill_ids))
 
         try:
             _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError:
-            raise self.InvalidInputException('Invalid skill id')
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(
+                'Invalid skill id') from e
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
@@ -126,8 +142,9 @@ class QuestionCountDataHandler(base.BaseHandler):
 
         try:
             _require_valid_skill_ids(skill_ids)
-        except utils.ValidationError:
-            raise self.InvalidInputException('Invalid skill id')
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(
+                'Invalid skill id') from e
 
         total_question_count = (
             question_services.get_total_question_count_for_skill_ids(skill_ids))

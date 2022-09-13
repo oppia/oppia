@@ -40,13 +40,15 @@ interface GraphAdjacencyLists {
   [node: string]: string[];
 }
 
-interface AugmentedLink {
+export interface AugmentedLink {
   source: NodeData;
   target: NodeData;
   d?: string;
+  style?: string;
+  connectsDestIfStuck: boolean;
 }
 
-interface NodeData {
+export interface NodeData {
   depth: number;
   offset: number;
   reachable: boolean;
@@ -59,9 +61,13 @@ interface NodeData {
   id: string;
   label: string;
   reachableFromEnd: boolean;
+  style: string;
+  secondaryLabel: string;
+  nodeClass: string;
+  canDelete: boolean;
 }
 
-interface NodeDataDict {
+export interface NodeDataDict {
   [nodeId: string]: NodeData;
 }
 
@@ -73,18 +79,22 @@ export class StateGraphLayoutService {
 
   // The last result of a call to computeLayout(). Used for determining the
   // order in which to specify states in rules.
-  lastComputedArrangement: NodeDataDict = null;
+  // If we haven't called the computeLayout() function
+  // then it is expected to stay null.
+  lastComputedArrangement: NodeDataDict | null = null;
 
   getGraphAsAdjacencyLists(
       nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
-    var adjacencyLists = {};
+    var adjacencyLists: GraphAdjacencyLists = {};
 
     for (var nodeId in nodes) {
       adjacencyLists[nodeId] = [];
     }
     for (var i = 0; i < links.length; i++) {
-      if (links[i].source !== links[i].target &&
-          adjacencyLists[links[i].source].indexOf(links[i].target) === -1) {
+      if (
+        links[i].source !== links[i].target &&
+        adjacencyLists[links[i].source].indexOf(links[i].target) === -1
+      ) {
         adjacencyLists[links[i].source].push(links[i].target);
       }
     }
@@ -94,8 +104,7 @@ export class StateGraphLayoutService {
 
   getIndentationLevels(
       adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
-    var indentationLevels = [];
-
+    var indentationLevels: number[] = [];
     // Recursively find and indent the longest shortcut for the segment of
     // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
     // (inclusive). It's possible that this shortcut starts from a trunk
@@ -146,6 +155,7 @@ export class StateGraphLayoutService {
     indentLongestShortcut(0, trunkNodeIds.length - 1);
     return indentationLevels;
   }
+
   // Returns an object representing the nodes of the graph. The keys of the
   // object are the node labels. The corresponding values are objects with
   // the following keys:
@@ -183,7 +193,7 @@ export class StateGraphLayoutService {
     var bestPath = [initNodeId];
     // Note that this is a 'global variable' for the purposes of the
     // backtracking computation.
-    var currentPath = [];
+    var currentPath: string[] = [];
 
     var backtrack = (currentNodeId: string) => {
       currentPath.push(currentNodeId);
@@ -238,24 +248,15 @@ export class StateGraphLayoutService {
 
     var nodeData: NodeDataDict = {};
     for (var nodeId in nodes) {
-      nodeData[nodeId] = {
-        depth: SENTINEL_DEPTH,
-        offset: SENTINEL_OFFSET,
-        reachable: false,
-        x0: null,
-        y0: null,
-        xLabel: null,
-        yLabel: null,
-        id: null,
-        label: null,
-        height: null,
-        width: null,
-        reachableFromEnd: false
-      };
+      nodeData[nodeId] = {} as NodeData;
+      nodeData[nodeId].depth = SENTINEL_DEPTH;
+      nodeData[nodeId].offset = SENTINEL_OFFSET;
+      nodeData[nodeId].reachable = false;
+      nodeData[nodeId].reachableFromEnd = false;
     }
 
     var maxDepth = 0;
-    var maxOffsetInEachLevel = {
+    var maxOffsetInEachLevel: {[id: number]: number} = {
       0: 0
     };
     var trunkNodesIndentationLevels = this.getIndentationLevels(
@@ -286,10 +287,14 @@ export class StateGraphLayoutService {
         // If the target node is a trunk node, but isn't at the correct
         // depth to process now, we ignore it for now and stick it back in
         // the queue to be processed later.
-        if (bestPath.indexOf(linkTarget) !== -1 &&
-            nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1) {
-          if (seenNodes.indexOf(linkTarget) === -1 &&
-              queue.indexOf(linkTarget) === -1) {
+        if (
+          bestPath.indexOf(linkTarget) !== -1 &&
+          nodeData[linkTarget].depth !== nodeData[currNodeId].depth + 1
+        ) {
+          if (
+            seenNodes.indexOf(linkTarget) === -1 &&
+            queue.indexOf(linkTarget) === -1
+          ) {
             queue.push(linkTarget);
           }
           continue;
@@ -485,7 +490,9 @@ export class StateGraphLayoutService {
     return nodeData;
   }
 
-  getLastComputedArrangement(): NodeDataDict {
+  // It is expected to return null if we haven't executed the
+  // computeLayout() function.
+  getLastComputedArrangement(): NodeDataDict | null {
     return cloneDeep(this.lastComputedArrangement);
   }
 
@@ -519,13 +526,19 @@ export class StateGraphLayoutService {
     };
   }
 
+  /* We are expecting it to return undefined when
+     State1.xLabel === State2.xLabel and State1.yLabel === State2.yLabel
+     where State1 and State2 refers to objects inside nodeData. */
   getAugmentedLinks(
-      nodeData: NodeDataDict, nodeLinks: GraphLink[]): AugmentedLink[] {
+      nodeData: NodeDataDict,
+      nodeLinks: GraphLink[]
+  ): AugmentedLink[] | undefined {
     var links = cloneDeep(nodeLinks);
     var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
         source: cloneDeep(nodeData[link.source]),
-        target: cloneDeep(nodeData[link.target])
+        target: cloneDeep(nodeData[link.target]),
+        connectsDestIfStuck: cloneDeep(link.connectsDestIfStuck)
       };
     });
 
@@ -586,22 +599,18 @@ export class StateGraphLayoutService {
   }
 
   modifyPositionValues(
-      nodeData: NodeDataDict, graphWidth: number,
-      graphHeight: number): NodeDataDict {
-    var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
-    var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
-
-    // Change the position values in nodeData to use pixels.
-    for (var nodeId in nodeData) {
-      for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
-        nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
-          graphWidth *
-          nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
-        nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
-          graphHeight *
-          nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
-      }
-    }
+      nodeData: NodeDataDict,
+      graphWidth: number,
+      graphHeight: number
+  ): NodeDataDict {
+    Object.keys(nodeData).forEach(nodeId => {
+      nodeData[nodeId].x0 *= graphWidth;
+      nodeData[nodeId].width *= graphWidth;
+      nodeData[nodeId].xLabel *= graphWidth;
+      nodeData[nodeId].y0 *= graphHeight;
+      nodeData[nodeId].height *= graphHeight;
+      nodeData[nodeId].yLabel *= graphHeight;
+    });
     return nodeData;
   }
 

@@ -22,15 +22,8 @@ import datetime
 
 from core import utils
 from core.jobs import base_jobs
-from core.platform import models
 
-from typing import Dict, List, Type, Union # isort: skip
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import beam_job_models
-
-(beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
+from typing import Dict, List, Type, Union
 
 
 class BeamJob:
@@ -117,22 +110,6 @@ class BeamJobRun:
         self.job_started_on = job_started_on
         self.job_updated_on = job_updated_on
         self.job_is_synchronous = job_is_synchronous
-
-    @property
-    def in_terminal_state(self) -> bool:
-        """Returns whether the job run has reached a terminal state and is no
-        longer executing.
-
-        Returns:
-            bool. Whether the job has reached a terminal state.
-        """
-        return self.job_state in (
-            beam_job_models.BeamJobState.CANCELLED.value,
-            beam_job_models.BeamJobState.DRAINED.value,
-            beam_job_models.BeamJobState.UPDATED.value,
-            beam_job_models.BeamJobState.DONE.value,
-            beam_job_models.BeamJobState.FAILED.value,
-        )
 
     def to_dict(self) -> Dict[str, Union[bool, float, str, List[str]]]:
         """Returns a dict representation of the BeamJobRun.

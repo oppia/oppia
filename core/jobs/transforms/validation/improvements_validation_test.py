@@ -25,13 +25,17 @@ from core.platform import models
 
 import apache_beam as beam
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import improvements_models
+
 (improvements_models,) = models.Registry.import_models(
-    [models.NAMES.improvements])
+    [models.Names.IMPROVEMENTS])
 
 
 class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
 
-    def test_model_with_invalid_composite_entity(self):
+    def test_model_with_invalid_composite_entity(self) -> None:
         model = improvements_models.TaskEntryModel(
             id='123',
             entity_id='999',
@@ -54,7 +58,7 @@ class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
             improvements_validation_errors.InvalidCompositeEntityError(model)
         ])
 
-    def test_model_with_valid_composite_entity(self):
+    def test_model_with_valid_composite_entity(self) -> None:
         # Value has the form: "[entity_type].[entity_id].[entity_version]".
         model = improvements_models.TaskEntryModel(
             id='23',

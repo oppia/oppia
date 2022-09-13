@@ -1,14 +1,15 @@
 <div class="oppia-opportunities-list">
   <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
     <oppia-opportunities-list-item [opportunity]="opportunity"
-                             (clickActionButton)="clickActionButton.emit($event)"
-                             [progressBarRequired]="progressBarRequired"
-                             [labelRequired]="labelRequired"
-                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
-                             [opportunityType]="opportunityType">
+                                   (clickActionButton)="clickActionButton.emit($event)"
+                                   [progressBarRequired]="progressBarRequired"
+                                   [labelRequired]="labelRequired"
+                                   [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
+                                   [opportunityType]="opportunityType"
+                                   [showOpportunityButton]="showOpportunityButton">
     </oppia-opportunities-list-item>
   </div>
-  <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
+  <div [hidden]="!loadingOpportunityData" class="e2e-test-opportunity-loading-placeholder">
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
@@ -22,13 +23,13 @@
     <button type="button"
             class="oppia-pagination-button"
             (click)="gotoPage(activePageNumber + 1)"
-            [disabled]="loadingOpportunityData || activePageNumber >= lastPageNumber">
+            [disabled]="loadingOpportunityData || userIsOnLastPage">
       Next<span class="material-icons">navigate_next</span>
     </button>
   </div>
   <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message e2e-test-opportunity-list-empty-availability-message">No opportunity available!</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
@@ -39,7 +40,6 @@
     font-style: italic;
     overflow: hidden;
     padding: 0 2%;
-    white-space: nowrap;
   }
   .oppia-end-availability {
     align-items: center;
@@ -49,13 +49,13 @@
   }
   .oppia-end-availability-line {
     border: 1px solid #ababab;
-    width: 35%;
+    flex-grow: 1;
   }
   .oppia-opportunities-list {
     margin: auto;
     max-width: 1200px;
     overflow: auto;
-    width: 80%;
+    width: 95%;
   }
   .oppia-opportunity-pagination-container {
     display: flex;
@@ -74,7 +74,6 @@
     min-width: 100px;
     text-align: center;
   }
-
   .oppia-pagination-button:hover {
     border: 2px solid #009688;
     border-radius: 5px;
@@ -84,5 +83,11 @@
   }
   .oppia-pagination-button[disabled]:hover {
     border: none;
+  }
+  @media only screen and (max-width: 700px) {
+    .oppia-opportunities-list {
+      margin: auto 0;
+      width: 100%;
+    }
   }
 </style>

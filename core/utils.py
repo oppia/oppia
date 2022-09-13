@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import base64
+import binascii
 import collections
 import datetime
 import hashlib
@@ -26,27 +27,25 @@ import json
 import os
 import random
 import re
+import ssl
 import string
-import sys
 import time
 import unicodedata
-import urllib
+import urllib.parse
+import urllib.request
 import zlib
 
 from core import feconf
-from core import python_utils
 from core.constants import constants
 
-from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, TypeVar,
-    Union)
+import certifi
+import yaml
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
-sys.path.insert(0, _YAML_PATH)
+from typing import ( # isort:skip
+    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
+    Optional, TextIO, Tuple, TypeVar, Union, overload)
+from typing_extensions import Literal # isort:skip
 
-import yaml  # isort:skip  # pylint: disable=wrong-import-position
-import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -56,8 +55,10 @@ SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
 
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
+
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
-# because python_utils is untyped and will be removed in python3.
 # These will be removed after python3 migration and adding stubs for new python3
 # libraries.
 
@@ -90,9 +91,73 @@ class ExplorationConversionError(Exception):
     pass
 
 
+@overload
+def open_file(
+    filename: str,
+    mode: TextModeTypes,
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None
+) -> TextIO: ...
+
+
+@overload
+def open_file(
+    filename: str,
+    mode: BinaryModeTypes,
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> BinaryIO: ...
+
+
+def open_file(
+    filename: str,
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> IO[Any]:
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: Literal. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        IO[Any]. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    file = open(filename, mode, encoding=encoding, newline=newline)
+    return file
+
+
+@overload
+def get_file_contents(filepath: str) -> str: ...
+
+
+@overload
 def get_file_contents(
-        filepath: str, raw_bytes: bool = False, mode: str = 'r'
-) -> bytes:
+    filepath: str, *, mode: str = 'r'
+) -> str: ...
+
+
+@overload
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[False], mode: str = 'r'
+) -> str: ...
+
+
+@overload
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[True], mode: str = 'r'
+) -> bytes: ...
+
+
+def get_file_contents(
+    filepath: str, raw_bytes: bool = False, mode: str = 'r'
+) -> Union[str, bytes]:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -102,8 +167,9 @@ def get_file_contents(
         mode: str. File opening mode, default is in read mode.
 
     Returns:
-        *. Either the raw_bytes stream if the flag is set or the
-        decoded stream in utf-8 format.
+        Union[str, bytes]. Either the raw_bytes stream ( bytes type ) if
+        the raw_bytes is True or the decoded stream ( string type ) in
+        utf-8 format if raw_bytes is False.
     """
     if raw_bytes:
         mode = 'rb'
@@ -111,14 +177,17 @@ def get_file_contents(
     else:
         encoding = 'utf-8'
 
-    with python_utils.open_file( # type: ignore[no-untyped-call]
+    with open(
         filepath, mode, encoding=encoding) as f:
-        return f.read() # type: ignore[no-any-return]
+        file_contents = f.read()
+        # Ruling out the possibility of Any other type for mypy type checking.
+        assert isinstance(file_contents, (str, bytes))
+        return file_contents
 
 
 def get_exploration_components_from_dir(
         dir_path: str
-) -> Tuple[bytes, List[Tuple[str, bytes]]]:
+) -> Tuple[str, List[Tuple[str, bytes]]]:
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
@@ -158,13 +227,13 @@ def get_exploration_components_from_dir(
                         raise Exception(
                             'More than one non-asset file specified '
                             'for %s' % dir_path)
-                    elif not filepath.endswith('.yaml'):
+                    if not filepath.endswith('.yaml'):
                         raise Exception(
                             'Found invalid non-asset file %s. There '
                             'should only be a single non-asset file, '
                             'and it should have a .yaml suffix.' % filepath)
-                    else:
-                        yaml_content = get_file_contents(filepath)
+
+                    yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
@@ -222,7 +291,7 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         dict. Parsed dict representation of the yaml string.
 
     Raises:
-        InavlidInputException. If the yaml string sent as the
+        InvalidInputException. If the yaml string sent as the
             parameter is unable to get parsed, them this error gets
             raised.
     """
@@ -231,7 +300,27 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
     except (AssertionError, yaml.YAMLError) as e:
-        raise InvalidInputException(e)
+        raise InvalidInputException(e) from e
+
+
+# Here, Mapping is used so that both Dict and TypedDict types of values
+# are accepted by yaml_from_dict() method.
+def yaml_from_dict(dictionary: Mapping[str, Any], width: int = 80) -> str:
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
+    # The type ignore is needed, because typestubs define the return type
+    # of 'dump' as 'Any' which is wrong.
+    return yaml.dump( # type: ignore[no-any-return]
+        dictionary, allow_unicode=True, width=width
+    )
 
 
 # Here obj has a recursive structure. The list element or dictionary value
@@ -269,8 +358,9 @@ def get_random_int(upper_bound: int) -> int:
     Returns:
         int. Randomly generated integer less than the upper_bound.
     """
-    assert upper_bound >= 0 and isinstance(upper_bound, int)
-
+    assert upper_bound >= 0 and isinstance(upper_bound, int), (
+        'Only positive integers allowed'
+    )
     generator = random.SystemRandom()
     return generator.randrange(0, stop=upper_bound)
 
@@ -284,8 +374,9 @@ def get_random_choice(alist: List[T]) -> T:
     Returns:
         *. Random element choosen from the passed input list.
     """
-    assert isinstance(alist, list) and len(alist) > 0
-
+    assert isinstance(alist, list) and len(alist) > 0, (
+        'Only non-empty lists allowed'
+    )
     index = get_random_int(len(alist))
     return alist[index]
 
@@ -305,7 +396,7 @@ def convert_png_data_url_to_binary(image_data_url: str) -> bytes:
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote(
+            urllib.parse.unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
@@ -329,6 +420,22 @@ def convert_png_binary_to_data_url(content: bytes) -> str:
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
+
+
+def is_base64_encoded(content: str) -> bool:
+    """Checks if a string is base64 encoded.
+
+    Args:
+        content: str. String to check.
+
+    Returns:
+        bool. True if a string is base64 encoded, False otherwise.
+    """
+    try:
+        base64.b64decode(content, validate=True)
+        return True
+    except binascii.Error:
+        return False
 
 
 def convert_png_to_data_url(filepath: str) -> str:
@@ -393,12 +500,12 @@ def set_url_query_parameter(
             % param_name)
 
     scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
-    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
+    query_params = urllib.parse.parse_qs(query_string)
 
     query_params[param_name] = [param_value]
     new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
-    return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
+    return urllib.parse.urlunsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -412,8 +519,7 @@ class JSONEncoderForHTML(json.JSONEncoder):
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
     def iterencode(self, o: str, _one_shot: bool = False) -> Iterator[str]:
-        chunks = super(
-            JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
+        chunks = super().iterencode(o, _one_shot=_one_shot)
         for chunk in chunks:
             yield chunk.replace('&', '\\u0026').replace(
                 '<', '\\u003c').replace('>', '\\u003e')
@@ -473,7 +579,7 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-any-return, no-untyped-call]
+    return msecs + (datetime_obj.microsecond / 1000.0)
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -527,8 +633,12 @@ def get_human_readable_time_string(time_msec: float) -> str:
     """
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
+
+    assert time_msec >= 0, (
+        'Time cannot be negative'
+    )
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[arg-type, no-untyped-call]
+        '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
 def create_string_from_largest_unit_in_timedelta(
@@ -556,7 +666,7 @@ def create_string_from_largest_unit_in_timedelta(
     if total_seconds <= 0:
         raise Exception(
             'Expected a positive timedelta, received: %s.' % total_seconds)
-    elif timedelta_obj.days != 0:
+    if timedelta_obj.days != 0:
         return '%s day%s' % (
             int(timedelta_obj.days), 's' if timedelta_obj.days > 1 else '')
     else:
@@ -680,7 +790,7 @@ def require_valid_name(
     for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
-                'Invalid character %s in %s: %s' %
+                r'Invalid character %s in %s: %s' %
                 (character, name_type, name))
 
 
@@ -820,9 +930,13 @@ def require_valid_page_title_fragment_for_web(
     Raises:
         ValidationError. Page title fragment is not a string.
         ValidationError. Page title fragment is too lengthy.
+        ValidationError. Page title fragment is too small.
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    min_chars_in_page_title_frag_for_web = (
+        constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+
     if not isinstance(page_title_fragment_for_web, str):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -831,6 +945,11 @@ def require_valid_page_title_fragment_for_web(
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    if len(page_title_fragment_for_web) < min_chars_in_page_title_frag_for_web:
+        raise ValidationError(
+            'Page title fragment should not be shorter than %s characters.'
+            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        )
 
 
 def capitalize_string(input_string: str) -> str:
@@ -976,7 +1095,46 @@ def unescape_encoded_uri_component(escaped_string: str) -> str:
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string)
+    return urllib.parse.unquote(escaped_string)
+
+
+def get_formatted_query_string(escaped_string: str) -> str:
+    """Returns a formatted query string that can be used to perform search
+    operations from escaped query string in url.
+
+    Args:
+        escaped_string: str. Query string that is encoded with
+            encodeURIComponent.
+
+    Returns:
+        str. Formatted query string which can be directly used to perform
+        search.
+    """
+    query_string = unescape_encoded_uri_component(escaped_string)
+    # Remove all punctuation from the query string, and replace it with
+    # spaces. See http://stackoverflow.com/a/266162 and
+    # http://stackoverflow.com/a/11693937
+    remove_punctuation_map = dict(
+        (ord(char), None) for char in string.punctuation)
+    return query_string.translate(remove_punctuation_map)
+
+
+def convert_filter_parameter_string_into_list(filter_string: str) -> List[str]:
+    """Converts the filter parameter string into a list of applied filter
+    values. Filter string should be in the following form:
+    ("Algebra" OR "Math" OR "Geometry"), ("hi" OR "en"), ("Fractions")
+
+    Args:
+        filter_string: str. The filter parameter string.
+
+    Returns:
+        list(str). The list of strings.
+    """
+    # The 2 and -2 account for the '("" and '")' characters at the beginning and
+    # end.
+    return (
+        filter_string[2:-2].split('" OR "') if filter_string else []
+    )
 
 
 def snake_case_to_camel_case(snake_str: str) -> str:

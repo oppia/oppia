@@ -28,20 +28,20 @@ import { AlertsService } from 'services/alerts.service';
 import { CollectionEditorStateService } from './collection-editor-state.service';
 
 describe('Collection editor state service', () => {
-  let collectionEditorStateService: CollectionEditorStateService = null;
+  let collectionEditorStateService: CollectionEditorStateService;
   let collectionRightsBackendApiService:
-    CollectionRightsBackendApiService = null;
+    CollectionRightsBackendApiService;
   let undoRedoService: UndoRedoService;
   let alertsService: AlertsService;
   let editableCollectionBackendApiService: EditableCollectionBackendApiService;
 
   let sampleCollectionRightsDict: CollectionRightsBackendDict;
   let sampleCollectionRights: CollectionRights;
-  let sampleCollectionBackendDict: CollectionBackendDict = null;
-  let sampleCollection: Collection = null;
+  let sampleCollectionBackendDict: CollectionBackendDict;
+  let sampleCollection: Collection;
 
   let testSubscriptions: Subscription;
-  let alertsSpy: jasmine.Spy = null;
+  let alertsSpy: jasmine.Spy;
   const collectionInitializedSpy = jasmine.createSpy('collectionInitialized');
 
   beforeEach(waitForAsync(() => {
@@ -98,7 +98,7 @@ describe('Collection editor state service', () => {
       collectionEditorStateService.onCollectionInitialized.subscribe(
         collectionInitializedSpy));
 
-    alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
+    alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
   });
 
   afterEach(() => {
@@ -275,17 +275,16 @@ describe('Collection editor state service', () => {
   }));
 
   it('should fail to save the collection without first loading one',
-    () => {
-      expect(() => {
-        collectionEditorStateService.saveCollection(
-          'Commit message');
-      }).toThrowError('Cannot save a collection before one is loaded.');
-    }
-  );
+    fakeAsync(() => {
+      let savedChanges = collectionEditorStateService.saveCollection(
+        'Commit message');
+      tick();
+      expect(savedChanges).toBeFalse();
+    }));
 
   it('should check whether a collection is being saved', () => {
     let result = collectionEditorStateService.isSavingCollection();
 
-    expect(result).toBe(false);
+    expect(result).toBeFalse();
   });
 });

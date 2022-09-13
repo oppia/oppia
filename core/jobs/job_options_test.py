@@ -35,5 +35,5 @@ class JobOptionsTests(test_utils.TestBase):
         self.assertEqual(options.namespace, 'abc')
 
     def test_unsupported_values(self) -> None:
-        with self.assertRaisesRegexp(ValueError, r'Unsupported option\(s\)'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, r'Unsupported option\(s\)'):
             job_options.JobOptions(a='a', b='b')

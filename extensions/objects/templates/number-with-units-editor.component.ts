@@ -30,14 +30,14 @@ import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 })
 export class NumberWithUnitsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   // 'value' will be null if user has not input any value.
   @Input() value!: NumberWithUnitsAnswer | null;
   @Output() valueChanged = new EventEmitter();
   numberWithUnitsString!: string;
-  errorMessage: string = '';
+  errorMessageI18nKey: string = '';
   eventBusGroup: EventBusGroup;
 
   constructor(
@@ -47,9 +47,12 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.value !== null) {
+    if (this.value === null || this.value === undefined) {
+      return;
+    } else {
       const defaultNumberWithUnits =
-        this.numberWithUnitsObjectFactory.fromDict(this.value);
+        this.numberWithUnitsObjectFactory.fromDict(
+          this.value);
       this.numberWithUnitsString = defaultNumberWithUnits.toString();
       this.valueChanged.emit(this.value);
     }
@@ -65,13 +68,14 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         value: false,
         modalId: this.modalId
       }));
+      this.errorMessageI18nKey = '';
     } catch (parsingError: unknown) {
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         value: true,
         modalId: this.modalId
       }));
       if (parsingError instanceof Error) {
-        this.errorMessage = parsingError.message;
+        this.errorMessageI18nKey = parsingError.message;
       }
     }
   }

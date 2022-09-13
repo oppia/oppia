@@ -462,8 +462,12 @@ angular.module('oppia').component('stateTranslation', {
         const interactionRuleTranslatableContent = [];
         allRules.forEach(rule => {
           Object.keys(rule.inputs).forEach(inputName => {
-            if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
-              const contentId = rule.inputs[inputName].contentId;
+            const ruleInput = rule.inputs[inputName];
+            // All rules input types which are translatable are subclasses of
+            // BaseTranslatableObject having dict structure with contentId
+            // as a key.
+            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+              const contentId = ruleInput.contentId;
               interactionRuleTranslatableContent.push({
                 rule, inputName, contentId
               });
@@ -549,7 +553,7 @@ angular.module('oppia').component('stateTranslation', {
           $scope.stateInteractionId ? (
             ExplorationHtmlFormatterService.getInteractionHtml(
               $scope.stateInteractionId,
-              $scope.stateInteractionCustomizationArgs, false, undefined, null)
+              $scope.stateInteractionCustomizationArgs, false, null, null)
           ) : '');
         $scope.interactionCustomizationArgTranslatableContent = (
           $scope.getInteractionCustomizationArgTranslatableContents(

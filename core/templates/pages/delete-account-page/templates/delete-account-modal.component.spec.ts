@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserService } from 'services/user.service';
 import { DeleteAccountModalComponent } from './delete-account-modal.component';
@@ -62,6 +62,9 @@ describe('Delete account modal', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+  });
+
+  it('should check if the username is valid', fakeAsync(() => {
     const UserInfoObject = {
       roles: ['USER_ROLE'],
       is_moderator: false,
@@ -74,13 +77,11 @@ describe('Delete account modal', () => {
       email: 'test@test.com',
       user_is_logged_in: true
     };
+
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       UserInfo.createFromBackendDict(UserInfoObject)));
 
     component.ngOnInit();
-  });
-
-  it('should check if the username is valid', fakeAsync(() => {
     component.expectedUsername = 'username';
     expect(component.isValid()).toBeFalse();
 
@@ -91,13 +92,62 @@ describe('Delete account modal', () => {
     expect(component.isValid()).toBeTrue();
   }));
 
+  it('should throw error if username is invalid', fakeAsync(() => {
+    let userInfo = {
+      isModerator: () => true,
+      getUsername: () => null,
+      isSuperAdmin: () => true
+    };
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+
+    expect(() => {
+      component.ngOnInit();
+      tick();
+    }).not.toThrowError('Cannot fetch username.');
+  }));
+
   it('should close the modal when confirmed', () => {
+    const UserInfoObject = {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'username',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject)));
+
+    component.ngOnInit();
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.confirm();
     expect(closeSpy).toHaveBeenCalled();
   });
 
   it('should close the modal when dismissed', () => {
+    const UserInfoObject = {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'username',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject)));
+
+    component.ngOnInit();
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();

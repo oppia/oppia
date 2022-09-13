@@ -20,14 +20,18 @@ from __future__ import annotations
 
 import copy
 import datetime
+import enum
 import os
 
 from core.constants import constants
 
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, Union
+from typing_extensions import Final, TypedDict
 
-CommandType = (
-    Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
+MYPY = False
+if MYPY:  # pragma: no cover
+    # Here, we are importing 'state_domain' only for type checking.
+    from core.domain import state_domain
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -38,19 +42,50 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
+
+class ValidCmdDict(TypedDict):
+    """Dictionary representing valid commands specs."""
+
+    name: str
+    required_attribute_names: List[str]
+    optional_attribute_names: List[str]
+    user_id_attribute_names: List[str]
+    allowed_values: Dict[str, List[str]]
+    deprecated_values: Dict[str, List[str]]
+
+
+class RteTypeTextAngularDict(TypedDict):
+    """Dict representing RTE_TYPE_TEXTANGULAR Dictionary."""
+
+    ALLOWED_PARENT_LIST: Dict[str, List[str]]
+    ALLOWED_TAG_LIST: List[str]
+
+
+# Supported object types for ParamSpec.
+SUPPORTED_OBJ_TYPES = {
+    'UnicodeString',
+}
+
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# When DEV_MODE is true check that we are running in development environment.
-# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
-# need for an explicit check.
-if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
-    server_software = os.getenv('SERVER_SOFTWARE')
-    if (
-            server_software and
-            not server_software.startswith(('Development', 'gunicorn'))
-    ):
-        raise Exception('DEV_MODE can\'t be true on production.')
+
+def check_dev_mode_is_true() -> None:
+    """When DEV_MODE is true check that we are running in development
+    environment. The SERVER_SOFTWARE environment variable does not exist
+    in Travis, hence the need for an explicit check.
+    """
+    if constants.DEV_MODE and os.getenv('SERVER_SOFTWARE'):
+        server_software = os.getenv('SERVER_SOFTWARE')
+        if (
+                server_software and
+                not server_software.startswith(('Development', 'gunicorn'))
+        ):
+            raise Exception('DEV_MODE can\'t be true on production.')
+
+
+check_dev_mode_is_true()
 
 CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
@@ -69,8 +104,6 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
-INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
-    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs_by_state_version'))
 INTERACTIONS_SPECS_FILE_PATH = (
     os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
@@ -105,13 +138,56 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH = os.path.join(
 LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR = os.path.join(
     'interactions', 'legacy_html_field_types_to_rule_specs_by_state_version')
 
+
+class ValidModelNames(enum.Enum):
+    """Enum for valid model names."""
+
+    ACTIVITY = 'activity'
+    APP_FEEDBACK_REPORT = 'app_feedback_report'
+    AUDIT = 'audit'
+    BASE_MODEL = 'base_model'
+    BEAM_JOB = 'beam_job'
+    BLOG = 'blog'
+    CLASSIFIER = 'classifier'
+    CLASSROOM = 'classroom'
+    COLLECTION = 'collection'
+    CONFIG = 'CONFIG'
+    EMAIL = 'email'
+    EXPLORATION = 'exploration'
+    FEEDBACK = 'feedback'
+    IMPROVEMENTS = 'improvements'
+    JOB = 'job'
+    LEARNER_GROUP = 'learner_group'
+    OPPORTUNITY = 'opportunity'
+    QUESTION = 'question'
+    RECOMMENDATIONS = 'recommendations'
+    SKILL = 'skill'
+    STATISTICS = 'statistics'
+    AUTH = 'auth'
+    STORY = 'story'
+    SUBTOPIC = 'subtopic'
+    SUGGESTION = 'suggestion'
+    TOPIC = 'topic'
+    TRANSLATION = 'translation'
+    USER = 'user'
+
+
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
 # However, we do have the necessary storage infrastructure to support multiple
 # algorithms per interaction. Hence, whenever we find a secondary algorithm
 # candidate for any of the supported interactions, the logical functions to
 # support multiple algorithms need to be implemented.
-INTERACTION_CLASSIFIER_MAPPING = {
+
+
+class ClassifierDict(TypedDict):
+    """Representing INTERACTION_CLASSIFIER_MAPPING dict values."""
+
+    algorithm_id: str
+    algorithm_version: int
+
+
+INTERACTION_CLASSIFIER_MAPPING: Dict[str, ClassifierDict] = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
         'algorithm_version': 1
@@ -125,7 +201,7 @@ TRAINING_JOB_STATUS_FAILED = 'FAILED'
 TRAINING_JOB_STATUS_NEW = 'NEW'
 TRAINING_JOB_STATUS_PENDING = 'PENDING'
 
-ALLOWED_TRAINING_JOB_STATUSES = [
+ALLOWED_TRAINING_JOB_STATUSES: List[str] = [
     TRAINING_JOB_STATUS_COMPLETE,
     TRAINING_JOB_STATUS_FAILED,
     TRAINING_JOB_STATUS_NEW,
@@ -149,7 +225,7 @@ ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
-ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+ALLOWED_TRAINING_JOB_STATUS_CHANGES: Dict[str, List[str]] = {
     TRAINING_JOB_STATUS_COMPLETE: [],
     TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
     TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
@@ -261,7 +337,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 49
+CURRENT_STATE_SCHEMA_VERSION = 52
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -341,14 +417,14 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_RECORDED_VOICEOVERS: state_domain.RecordedVoiceoversDict = {
     'voiceovers_mapping': {
         'content': {},
         'default_outcome': {}
     }
 }
 # Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: Dict[str, Dict[str, Dict[str, str]]] = {
+DEFAULT_WRITTEN_TRANSLATIONS: state_domain.WrittenTranslationsDict = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
@@ -359,7 +435,10 @@ DEFAULT_INIT_STATE_CONTENT_STR = ''
 
 # Whether new explorations should have automatic text-to-speech enabled
 # by default.
-DEFAULT_AUTO_TTS_ENABLED = True
+DEFAULT_AUTO_TTS_ENABLED = False
+# Whether new explorations should have correctness-feedback enabled
+# by default.
+DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -500,7 +579,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.1'
+OPPIA_VERSION = '3.2.8'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -599,6 +678,9 @@ EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
 )
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
+EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
+    'notify_contributor_dashboard_achievements'
+)
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -612,19 +694,22 @@ MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-DEFAULT_SALUTATION_HTML_FN = (
+DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
-DEFAULT_SIGNOFF_HTML_FN = (
+DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
     lambda sender_username: (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
+DEFAULT_EMAIL_SUBJECT_FN: Callable[[str], str] = (
+    lambda exp_title: (
+        'Your Oppia exploration "%s" has been unpublished' % exp_title))
 
-VALID_MODERATOR_ACTIONS = {
+VALID_MODERATOR_ACTIONS: Dict[
+    str,
+    Dict[str, Union[str, Callable[[str], str]]]
+] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been unpublished' % exp_title)
-        ),
+        'email_subject_fn': DEFAULT_EMAIL_SUBJECT_FN,
         'email_intent': 'unpublish_exploration',
         'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
         'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
@@ -671,6 +756,10 @@ MAX_NUMBER_OF_SKILL_IDS = 20
 # The maximum number of blog post cards to be visible on each page in blog
 # homepage.
 MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in blog
+# search results homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
 
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
@@ -824,6 +913,7 @@ BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
+BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
 AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
@@ -849,6 +939,7 @@ CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
+EXPLORATION_IMAGE_UPLOAD_PREFIX = '/createhandler/imageupload'
 EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_LEARNER_ANSWER_DETAILS = (
@@ -878,6 +969,8 @@ LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
     '/learnerdashboardtopicsandstoriesprogresshandler/data')
+LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
+    '/learnercompletedchapterscounthandler/data')
 LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
@@ -898,6 +991,7 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
+METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -922,6 +1016,7 @@ EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
+REVIEWABLE_OPPORTUNITIES_URL = '/getreviewableopportunitieshandler'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -934,6 +1029,9 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
+DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
+    '/diagnostic_test_skill_assignment_handler')
+STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -967,6 +1065,8 @@ TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPIC_URL_FRAGMENT_HANDLER = '/topic_url_fragment_handler'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 UNASSIGN_SKILL_DATA_HANDLER_URL = '/topics_and_skills_dashboard/unassign_skill'
+TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER = (
+    '/topic_id_to_diagnostic_test_skill_ids_handler')
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
@@ -974,6 +1074,13 @@ USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
+FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
+FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
+CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
+EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
+CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
+CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+CLASSROOM_HANDLER_URL = '/classroom'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1143,7 +1250,7 @@ RTE_FORMAT_TEXTANGULAR = 'text-angular'
 RTE_FORMAT_CKEDITOR = 'ck-editor'
 
 # RTE content specifications according to the type of the editor.
-RTE_CONTENT_SPEC = {
+RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
         'ALLOWED_PARENT_LIST': {
@@ -1303,49 +1410,62 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
     'optional_attribute_names': [],
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
-        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES}
+        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES
+    },
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_ROLE,
     'required_attribute_names': ['removed_user_id', 'old_role'],
     'optional_attribute_names': [],
     'user_id_attribute_names': ['removed_user_id'],
-    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES}
+    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
     'required_attribute_names': [
         'old_viewable_if_private', 'new_viewable_if_private'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_RELEASE_OWNERSHIP,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
     'required_attribute_names': [
         'old_first_published_msec', 'new_first_published_msec'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = copy.deepcopy(
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1356,7 +1476,8 @@ COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
-    }
+    },
+    'deprecated_values': {}
 })
 
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
@@ -1388,11 +1509,13 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
@@ -1400,27 +1523,36 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
         'new_role': ALLOWED_TOPIC_ROLES, 'old_role': ALLOWED_TOPIC_ROLES
-    }
+    },
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_MANAGER_ROLE,
     'required_attribute_names': ['removed_user_id'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': ['removed_user_id']
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_PUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UNPUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
 USER_ID_RANDOM_PART_LENGTH = 32
@@ -1452,9 +1584,15 @@ CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
 }
 
 # Constants defining various suggestion types.
-SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
-SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
-SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+SUGGESTION_TYPE_EDIT_STATE_CONTENT: Final = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT: Final = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION: Final = 'add_question'
+
+CONTRIBUTION_TYPE_TRANSLATION: Final = 'translation'
+CONTRIBUTION_TYPE_QUESTION: Final = 'question'
+CONTRIBUTION_SUBTYPE_ACCEPTANCE: Final = 'acceptance'
+CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
+CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
@@ -1488,3 +1626,39 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 # '/access_validation_handler/<handler_name>'
 # example '/access_validation_handler/validate_access_to_splash_page'.
 ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'
+
+# The possible commit types.
+COMMIT_TYPE_CREATE = 'create'
+COMMIT_TYPE_REVERT = 'revert'
+COMMIT_TYPE_EDIT = 'edit'
+COMMIT_TYPE_DELETE = 'delete'
+
+# Interaction IDs of math related interactions.
+MATH_INTERACTION_IDS = [
+    'NumericExpressionInput', 'AlgebraicExpressionInput', 'MathEquationInput']
+
+# The task entry ID template used by the task entry model.
+TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
+
+# The composite entity ID template used by the task entry model.
+COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
+
+# The data type for the translated or translatable content in any
+# BaseTranslatableObject.
+ContentValueType = Union[str, List[str]]
+
+
+class TranslatableEntityType(enum.Enum):
+    """Represents all possible entity types which support new translations
+    architecture.
+    """
+
+    EXPLORATION = 'exploration'
+    QUESTION = 'question'
+
+
+class TranslatedContentDict(TypedDict):
+    """Dictionary representing TranslatedContent object."""
+
+    content_value: ContentValueType
+    needs_update: bool

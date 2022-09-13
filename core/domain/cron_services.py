@@ -21,8 +21,16 @@ import datetime
 from core import feconf
 from core.platform import models
 
+from typing import List, Sequence
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import user_models
+
 (base_models, job_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.job, models.NAMES.user])
+    models.Names.BASE_MODEL, models.Names.JOB, models.Names.USER])
 datastore_services = models.Registry.import_datastore_services()
 
 # Only non-versioned models should be included in this list. Activities that
@@ -30,7 +38,7 @@ datastore_services = models.Registry.import_datastore_services()
 MODEL_CLASSES_TO_MARK_AS_DELETED = (user_models.UserQueryModel,)
 
 
-def delete_models_marked_as_deleted():
+def delete_models_marked_as_deleted() -> None:
     """Hard-delete all models that are marked as deleted (have deleted field set
     to True) and were last updated more than eight weeks ago.
     """
@@ -38,15 +46,15 @@ def delete_models_marked_as_deleted():
     date_before_which_to_hard_delete = (
         date_now - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
     for model_class in models.Registry.get_all_storage_model_classes():
-        deleted_models = model_class.query(
+        deleted_models: Sequence[base_models.BaseModel] = model_class.query(
             model_class.deleted == True  # pylint: disable=singleton-comparison
         ).fetch()
-        models_to_hard_delete = [
+        models_to_hard_delete: List[base_models.BaseModel] = [
             deleted_model for deleted_model in deleted_models
             if deleted_model.last_updated < date_before_which_to_hard_delete
         ]
         if issubclass(model_class, base_models.VersionedModel):
-            model_ids_to_hard_delete = [
+            model_ids_to_hard_delete: List[str] = [
                 model.id for model in models_to_hard_delete
             ]
             model_class.delete_multi(
@@ -55,13 +63,13 @@ def delete_models_marked_as_deleted():
             model_class.delete_multi(models_to_hard_delete)
 
 
-def mark_outdated_models_as_deleted():
+def mark_outdated_models_as_deleted() -> None:
     """Mark models in MODEL_CLASSES_TO_MARK_AS_DELETED, as deleted if they were
     last updated more than four weeks ago.
     """
     date_before_which_to_mark_as_deleted = (
         datetime.datetime.utcnow() - feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
-    models_to_mark_as_deleted = []
+    models_to_mark_as_deleted: List[base_models.BaseModel] = []
     for model_class in MODEL_CLASSES_TO_MARK_AS_DELETED:
         models_to_mark_as_deleted.extend(
             model_class.query(

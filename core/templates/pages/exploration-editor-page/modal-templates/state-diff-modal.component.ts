@@ -16,16 +16,14 @@
  * @fileoverview Component for state diff modal.
  */
 
-import { OnInit } from '@angular/core';
+import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { State } from 'domain/state/StateObjectFactory';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
+import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 
-interface headersAndYamlStrs {
+export interface headersAndYamlStrs {
   leftPane: string;
   rightPane: string;
 }
@@ -43,65 +41,47 @@ interface mergeviewOptions {
 })
 export class StateDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    newState: State | null;
-    oldState: State | null;
-    newStateName: string;
-    oldStateName: string;
-    headers: headersAndYamlStrs;
-    yamlStrs: headersAndYamlStrs = {
-      leftPane: '',
-      rightPane: '',
-    };
-    CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
-      lineNumbers: true,
-      readOnly: true,
-      mode: 'yaml',
-      viewportMargin: 100
-    };
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
 
-    constructor(
-        private ngbActiveModal: NgbActiveModal,
-        private contextService: ContextService,
-        private urlInterpolationService: UrlInterpolationService,
-        private stateDiffModalBackendApiService:
-        StateDiffModalBackendApiService,
-    ) {
-      super(ngbActiveModal);
-    }
+  // The following properties will be null when there is no change introduced
+  // in either of the state. It remains same as original State.
+  @Input() newState!: State | null;
+  @Input() oldState!: State | null;
+  @Input() newStateName!: string;
+  @Input() oldStateName!: string;
+  @Input() headers!: headersAndYamlStrs;
+  yamlStrs: headersAndYamlStrs = {
+    leftPane: '',
+    rightPane: '',
+  };
 
-    ngOnInit(): void {
-      const url = this.urlInterpolationService.interpolateUrl(
-        '/createhandler/state_yaml/<exploration_id>', {
-          exploration_id: (
-            this.contextService.getExplorationId())
-        });
+  CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
+    lineNumbers: true,
+    readOnly: true,
+    mode: 'yaml',
+    viewportMargin: 100
+  };
 
-      if (this.oldState) {
-        this.stateDiffModalBackendApiService.fetchYaml(
-          this.oldState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.leftPane = response.yaml;
-        });
-      } else {
-        // Note: the timeout is needed or the string will be sent
-        // before codemirror has fully loaded and will not be
-        // displayed. This causes issues with the e2e tests.
-        setTimeout(() => {
-          this.yamlStrs.leftPane = '';
-        }, 200);
-      }
+  constructor(
+      private ngbActiveModal: NgbActiveModal,
+      private historyTabYamlConversionService: HistoryTabYamlConversionService
+  ) {
+    super(ngbActiveModal);
+  }
 
-      if (this.newState) {
-        this.stateDiffModalBackendApiService.fetchYaml(
-          this.newState.toBackendDict(), 50, url).then(response => {
-          this.yamlStrs.rightPane = response.yaml;
-        });
-      } else {
-        // Note: the timeout is needed or the string will be sent
-        // before codemirror has fully loaded and will not be
-        // displayed. This causes issues with the e2e tests.
-        setTimeout(() => {
-          this.yamlStrs.rightPane = '';
-        }, 200);
-      }
-    }
+  ngOnInit(): void {
+    this.historyTabYamlConversionService
+      .getYamlStringFromStateOrMetadata(this.oldState)
+      .then((result) => {
+        this.yamlStrs.leftPane = result;
+      });
+
+    this.historyTabYamlConversionService
+      .getYamlStringFromStateOrMetadata(this.newState)
+      .then((result) => {
+        this.yamlStrs.rightPane = result;
+      });
+  }
 }

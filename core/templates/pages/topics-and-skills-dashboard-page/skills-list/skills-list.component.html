@@ -1,5 +1,5 @@
 <mat-card class="list-view-item">
-  <table class="dashboard-table protractor-test-skills-table">
+  <table class="dashboard-table e2e-test-skills-table">
     <colgroup>
       <col class="dashboard-table-index-column">
       <col class="dashboard-table-description-column">
@@ -23,9 +23,9 @@
       <td>
         {{ getSerialNumberForSkill(idx) }}.
       </td>
-      <td class="protractor-test-skills-list-item">
-        <a [href]="getSkillEditorUrl(skill.id)" class="list-summary">
-          <div class="skill-description protractor-test-skill-description">{{ skill.description }}</div>
+      <td class="e2e-test-skills-list-item">
+        <a [href]="getSkillEditorUrl(skill.id)" class="list-summary e2e-test-open-skill-editor">
+          <div class="skill-description e2e-test-skill-description">{{ skill.description }}</div>
           <div class="skill-topic">
             <span *ngIf="!skill.topicNames.length">
               Unassigned
@@ -52,12 +52,12 @@
           <span *ngIf="skill.topicNames.length">
             Assigned
           </span>
-          <span *ngIf="!skill.topicNames.length" class="skill-topic-unassigned protractor-test-assign-skill-to-topic-button" (click)="assignSkillToTopic(skill)">
+          <span *ngIf="!skill.topicNames.length" class="skill-topic-unassigned e2e-test-assign-skill-to-topic-button" (click)="assignSkillToTopic(skill)">
             UNASSIGNED
           </span>
         </span>
         <div class="skill-list-options-container">
-          <p class="fas fa-ellipsis-v skill-edit-box-icon protractor-test-skill-edit-box" attr.aria-label="Edit option for skill, {{ skill.description }}" (click)="changeEditOptions(skill.id)"></p>
+          <p class="fas fa-ellipsis-v skill-edit-box-icon e2e-test-skill-edit-box" attr.aria-label="Edit option for skill, {{ skill.description }}" (click)="changeEditOptions(skill.id)"></p>
           <div *ngIf="showEditOptions(skill.id)" class="skill-edit-options" (mouseleave)="changeEditOptions(null)">
             <div class="assign-skill-box" *ngIf="editableTopicSummaries.length > 0 && !isUnpublishedSkill" (click)="assignSkillToTopic(skill)">
               <span class="skills-list-action-button">
@@ -66,18 +66,18 @@
               </span>
             </div>
             <div class="merge-skill-box" *ngIf="mergeableSkillSummaries.length > 0" (click)="mergeSkill(skill)">
-              <div class="protractor-test-merge-skills-button">
+              <div class="e2e-test-merge-skills-button">
                 <i class="fa fa-plus"></i>
                 <span>Merge Skill</span>
               </div>
             </div>
-            <div class="unassign-skill-box protractor-test-unassign-skill-button" *ngIf="skill.topicNames.length" (click)="unassignSkill(skill.id)">
+            <div class="unassign-skill-box e2e-test-unassign-skill-button" *ngIf="skill.topicNames.length" (click)="unassignSkill(skill.id)">
               <div>
                 <i class="fa fa-minus"></i>
                 <span>Unassign Skill</span>
               </div>
             </div>
-            <div class="delete-icon-box protractor-test-delete-skill-button" (click)="deleteSkill(skill.id)">
+            <div class="delete-icon-box e2e-test-delete-skill-button" (click)="deleteSkill(skill.id)">
               <a *ngIf="userCanDeleteSkill">
                 <span class="fa fa-trash-alt"></span>
                 <span>Delete</span>
@@ -109,7 +109,7 @@
                   </span>
                 </div>
                 <div class="merge-skill-box" *ngIf="mergeableSkillSummaries.length > 0" (click)="mergeSkill(skill)">
-                  <div class="protractor-test-merge-skills-button">
+                  <div class="e2e-test-merge-skills-button">
                     <i class="fa fa-plus"></i>
                     <span>Merge Skill</span>
                   </div>
@@ -198,7 +198,7 @@
   }
 
   .skill-topic-unassigned {
-    color: #00645C;
+    color: #00645c;
     cursor: pointer;
     font-weight: bold;
   }
@@ -224,7 +224,7 @@
   }
 
   .skill-topic i {
-    color: #D57B00;
+    color: #d57b00;
   }
 
   .dashboard-table {
@@ -350,7 +350,7 @@
       margin: 7px 0;
     }
     .assign-btn {
-      border: 2px solid #00645C;
+      border: 2px solid #00645c;
     }
 
     .skill-item-description-mobile {

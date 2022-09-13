@@ -21,10 +21,13 @@ from __future__ import annotations
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'platform_parameter_domain' only for type checking.
+    from core.domain import platform_parameter_domain  # pylint: disable=invalid-import # isort:skip
+    from mypy_imports import base_models
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
@@ -82,11 +85,11 @@ class ConfigPropertyModel(base_models.VersionedModel):
     # doesn't match with VersionedModel.commit().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def commit( # type: ignore[override]
-            self,
-            committer_id: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
-        super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+        super().commit(committer_id, '', commit_cmds)
 
 
 class PlatformParameterSnapshotMetadataModel(
@@ -139,13 +142,11 @@ class PlatformParameterModel(base_models.VersionedModel):
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'rule_dicts' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
     def create(
         cls,
         param_name: str,
-        rule_dicts: List[Dict[str, Any]],
+        rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
         rule_schema_version: int
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
@@ -161,8 +162,10 @@ class PlatformParameterModel(base_models.VersionedModel):
                         PlatformParameterFilter objects, having the following
                         structure:
                             - type: str. The type of the filter.
-                            - value: *. The value of the filter to match
-                                against.
+                            - conditions: list((str, str)). Each element of the
+                                list is a 2-tuple (op, value), where op is the
+                                operator for comparison and value is the value
+                                used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
 
         Returns:

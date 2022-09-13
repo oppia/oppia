@@ -18,20 +18,179 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models(
-    [models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([
+    models.Names.BASE_MODEL
+])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class EntityTranslationsModel(base_models.BaseModel):
+    """Model for storing entity translations."""
+
+    # The id of the corresponding entity.
+    entity_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The type of the corresponding entity.
+    entity_type = datastore_services.StringProperty(
+        required=True, indexed=True, choices=[
+            feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_QUESTION
+        ])
+    # The version of the corresponding entity.
+    entity_version = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The ISO 639-1 code for the language an entity is written in.
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # A dict representing content-id as keys and dict(TranslatedContent)
+    # as values.
+    translations = datastore_services.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translations': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
+
+    @staticmethod
+    def _generate_id(
+        entity_type: feconf.TranslatableEntityType,
+        entity_id: str,
+        entity_version: int,
+        language_code: str
+    ) -> str:
+        """Generates the ID for an entity translations model.
+
+        Args:
+            entity_type: TranslatableEntityType. The type of the entity.
+            entity_id: str. The ID of the entity.
+            entity_version: int. The version of the entity.
+            language_code: str. The language code for the entity.
+
+        Returns:
+            str. Returns a unique id of the form
+            [entity_type]-[entity_id]-[entity_version]-[language_code].
+        """
+        return '%s-%s-%s-%s' % (
+            entity_type.value, entity_id, entity_version, language_code)
+
+    @classmethod
+    def get_model(
+        cls,
+        entity_type: feconf.TranslatableEntityType,
+        entity_id: str,
+        entity_version: int,
+        language_code: str
+    ) -> EntityTranslationsModel:
+        """Gets EntityTranslationsModel by help of entity_type, entity_id,
+        entity_version and language_code.
+
+        Args:
+            entity_type: TranslatableEntityType. The type of the entity whose
+                translations are to be fetched.
+            entity_id: str. The ID of the entity whose translations are to be
+                fetched.
+            entity_version: int. The version of the entity whose translations
+                are to be fetched.
+            language_code: str. The language code of the entity whose
+                translations are to be fetched.
+
+        Returns:
+            EntityTranslationsModel. The EntityTranslationsModel
+            instance corresponding to the given inputs, if such a translation
+            exists, or None if no translation is found.
+        """
+        model_id = cls._generate_id(
+            entity_type, entity_id, entity_version, language_code)
+        return cls.get_by_id(model_id)
+
+    @classmethod
+    def get_all_for_entity(
+        cls,
+        entity_type: feconf.TranslatableEntityType,
+        entity_id: str,
+        entity_version: int
+    ) -> Sequence[Optional[EntityTranslationsModel]]:
+        """Gets EntityTranslationsModels corresponding to the given entity, for
+        all languages in which such models exist.
+
+        Args:
+            entity_type: TranslatableEntityType. The type of the entity whose
+                translations are to be fetched.
+            entity_id: str. The ID of the entity whose translations are to be
+                fetched.
+            entity_version: int. The version of the entity whose translations
+                are to be fetched.
+
+        Returns:
+            list(EntityTranslationsModel|None). The EntityTranslationsModel
+            instances corresponding to the given inputs, if such translations
+            exist.
+        """
+        return cls.query(
+            cls.entity_type == entity_type.value,
+            cls.entity_id == entity_id,
+            cls.entity_version == entity_version
+        ).fetch()
+
+    @classmethod
+    def create_new(
+        cls,
+        entity_type: feconf.TranslatableEntityType,
+        entity_id: str,
+        entity_version: int,
+        language_code: str,
+        translations: Dict[str, feconf.TranslatedContentDict]
+    ) -> EntityTranslationsModel:
+        """Creates and returns a new EntityTranslationsModel instance.
+
+        Args:
+            entity_type: TranslatableEntityType. The type of the entity.
+            entity_id: str. The ID of the entity.
+            entity_version: int. The version of the entity.
+            language_code: str. The language code for the entity.
+            translations: dict(str, TranslatedContentDict). A dict representing
+                content-id as keys and dict(TranslatedContent) as values.
+
+        Returns:
+            EntityTranslationsModel. Returns a new EntityTranslationsModel.
+        """
+        return cls(
+            id=cls._generate_id(
+                entity_type, entity_id, entity_version, language_code),
+            entity_type=entity_type.value,
+            entity_id=entity_id,
+            entity_version=entity_version,
+            language_code=language_code,
+            translations=translations
+        )
 
 
 class MachineTranslationModel(base_models.BaseModel):
@@ -70,11 +229,11 @@ class MachineTranslationModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            source_language_code: str,
-            target_language_code: str,
-            source_text: str,
-            translated_text: str
+        cls,
+        source_language_code: str,
+        target_language_code: str,
+        source_text: str,
+        translated_text: str
     ) -> Optional[str]:
         """Creates a new MachineTranslationModel instance and returns its ID.
 
@@ -112,9 +271,9 @@ class MachineTranslationModel(base_models.BaseModel):
 
     @staticmethod
     def _generate_id(
-            source_language_code: str,
-            target_language_code: str,
-            hashed_source_text: str
+        source_language_code: str,
+        target_language_code: str,
+        hashed_source_text: str
     ) -> str:
         """Generates a valid, deterministic key for a MachineTranslationModel
         instance.

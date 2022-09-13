@@ -54,6 +54,9 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
         self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_MISCONCEPTION_NAME,
             constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
+        self.assertEqual(
+            android_validation_constants.MAX_CHARS_IN_STORY_DESCRIPTION,
+            constants.MAX_CHARS_IN_STORY_DESCRIPTION)
 
     def test_exploration_constants_in_both_files_are_equal(self) -> None:
         interaction_ids_in_constants = []
@@ -67,12 +70,12 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
         for obj in constants_languages_list:
             language_ids_in_constants.append(obj['code'])
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             interaction_ids_in_constants,
             android_validation_constants.VALID_INTERACTION_IDS)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             constants.VALID_RTE_COMPONENTS_FOR_ANDROID,
             android_validation_constants.VALID_RTE_COMPONENTS)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             language_ids_in_constants,
             android_validation_constants.SUPPORTED_LANGUAGES)

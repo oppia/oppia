@@ -27,8 +27,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import activity_models
     from mypy_imports import base_models
 
-(base_models, activity_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.activity])
+(base_models, activity_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.ACTIVITY
+])
 
 
 class ActivityListModelTest(test_utils.GenericTestBase):
@@ -39,6 +40,20 @@ class ActivityListModelTest(test_utils.GenericTestBase):
             activity_models.ActivityReferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            activity_models.ActivityReferencesModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        sample_dict = base_models.BaseModel.get_export_policy()
+        sample_dict.update(
+            {'activity_references': base_models.EXPORT_POLICY.NOT_APPLICABLE})
+        self.assertEqual(
+            activity_models.ActivityReferencesModel.get_export_policy(),
+            sample_dict)
+
     def test_featured_activity_list_always_exists(self) -> None:
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
@@ -47,7 +62,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         self.assertEqual(featured_model_instance.activity_references, [])
 
     def test_retrieving_non_existent_list(self) -> None:
-        with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Invalid ActivityListModel'):
             activity_models.ActivityReferencesModel.get_or_create(
                 'nonexistent_key')
 

@@ -62,17 +62,6 @@ describe('Outcome Feedback Editor Component', () => {
     });
   });
 
-  it('should get schema', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('question');
-    component.ngOnInit();
-    expect(component.getSchema()).toEqual({
-      type: 'html',
-      ui_config: {
-        hide_complex_extensions: true
-      }
-    });
-  });
-
   it('should update html', () => {
     const changeDetectorRef = fixture.debugElement.injector.get(
       ChangeDetectorRef);
@@ -80,6 +69,7 @@ describe('Outcome Feedback Editor Component', () => {
       changeDetectorRef.constructor.prototype, 'detectChanges');
     component.outcome = new Outcome(
       'default',
+      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       false,
       [],
@@ -104,6 +94,7 @@ describe('Outcome Feedback Editor Component', () => {
       changeDetectorRef.constructor.prototype, 'detectChanges');
     component.outcome = new Outcome(
       'default',
+      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       false,
       [],

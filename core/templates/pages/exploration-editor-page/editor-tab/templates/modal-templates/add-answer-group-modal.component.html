@@ -1,0 +1,139 @@
+<div class="modal-header e2e-test-add-response-modal-header" ngbAutofocus>
+  <h3>Add Response</h3>
+  <i class="fa fa-times" (click)="cancel()"></i>
+</div>
+
+<div class="modal-body">
+  <form name="addAnswerGroupForm.outcomeDetailsForm" class="e2e-test-add-response-details">
+    <div class="oppia-rule-details-header">
+      <strong>If the learner's answer...</strong>
+    </div>
+
+    <oppia-rule-editor class="rule-editor-add-answer"
+                       [modalId]="modalId"
+                       [(rule)]="tmpRule"
+                       [isEditable]="isEditable"
+                       [isEditingRuleInline]="false">
+    </oppia-rule-editor>
+
+    <br>
+
+    <div *ngIf="!feedbackEditorIsOpen"
+         title="Edit feedback" class="oppia-edit-feedback">
+      <div class="oppia-rule-details-header oppia-editable-section">
+        <div class="oppia-rule-preview oppia-transition-200">
+          <div class="oppia-click-to-start-editing e2e-test-open-feedback-editor" (click)="openFeedbackEditor()">
+            <i class="material-icons oppia-editor-edit-icon" title="Edit Feedback">&#xE254;</i>
+          </div>
+          <strong>Oppia tells the learner...</strong>
+          <div class="position-relative">
+            <span class="oppia-nothing-text">
+              <em>Nothing</em>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="feedbackEditorIsOpen">
+      <oppia-outcome-feedback-editor class="oppia-outcome-feedback-editor-add-answer" [outcome]="tmpOutcome">
+      </oppia-outcome-feedback-editor>
+    </div>
+    <div *ngIf="isFeedbackLengthExceeded(tmpOutcome)" class="oppia-length-validation-error">
+      The feedback length is too long. Please use at most 500 characters.
+    </div>
+    <br>
+
+    <oppia-outcome-destination-editor [outcome]="tmpOutcome"
+                                      *ngIf="!questionModeEnabled"
+                                      [outcomeHasFeedback]="true"
+                                      (getChanges)="validateChanges($event)"
+                                      (addState)="updateState($event)">
+    </oppia-outcome-destination-editor>
+
+    <oppia-outcome-if-stuck-destination-editor [outcome]="tmpOutcome"
+                                               *ngIf="!questionModeEnabled && destIfStuckFeatEnabled && !tmpOutcome.labelledAsCorrect"
+                                               (getChanges)="validateChanges($event)"
+                                               (addState)="updateState($event)">
+    </oppia-outcome-if-stuck-destination-editor>
+  </form>
+
+  <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+    <input class="e2e-test-editor-correctness-toggle mr-2"
+           type="checkbox"
+           [(ngModel)]="tmpOutcome.labelledAsCorrect">
+    <strong>The answers in this group are correct</strong>
+  </div>
+
+  <oppia-question-misconception-editor *ngIf="questionModeEnabled"
+                                       (saveTaggedMisconception)="updateTaggedMisconception($event)"
+                                       (saveAnswerGroupFeedback)="updateAnswerGroupFeedback($event)"
+                                       [isEditable]="true"
+                                       [outcome]="tmpOutcome"
+                                       [rules]="tmpRule"
+                                       [taggedSkillMisconceptionId]="tmpTaggedSkillMisconceptionId">
+  </oppia-question-misconception-editor>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-close-add-response-modal" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-add-new-response" (click)="saveResponse(false)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
+  <button class="btn btn-success" (click)="saveResponse(true)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
+</div>
+
+<style>
+  .modal-footer {
+    display: flex;
+    justify-content: end;
+  }
+  .oppia-click-to-start-editing {
+    width: 95%;
+  }
+  .oppia-outcome-feedback-editor-add-answer {
+    margin-top: 50px;
+  }
+  .rule-editor-add-answer {
+    width: 100%;
+  }
+  .add-answer-group-modal .modal-header i {
+    display: none;
+  }
+  .add-answer-group-modal .oppia-edit-feedback {
+    height: 100%;
+    margin-right: 22px;
+    width: 100%;
+  }
+  .add-answer-group-modal .oppia-nothing-text {
+    color: #888;
+  }
+  @media screen and (max-width: 768px) {
+    .add-answer-group-modal .modal-dialog ,
+    .add-answer-group-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      margin: auto;
+    }
+    .add-answer-group-modal .modal-content {
+      min-height: 100vh;
+    }
+    .add-answer-group-modal .modal-header {
+      background-color: #00609c;
+    }
+    .add-answer-group-modal .modal-header i {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+    .add-answer-group-modal .modal-header h3 {
+      color: #fff;
+    }
+  }
+  @media screen and (max-width: 500px) {
+    strong {
+      font-size: 18px;
+    }
+    .oppia-correctness-label-editor {
+      margin-top: 0;
+    }
+  }
+</style>

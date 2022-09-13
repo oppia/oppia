@@ -36,7 +36,7 @@
  * on the fly.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -79,6 +79,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
   );
+
+  @ViewChild('oppiaRTE') oppiaRTE: ElementRef;
+
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
@@ -102,6 +105,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           }
         }));
   }
+
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
     // change listener, value is set and it triggers the ngOnChanges
@@ -119,7 +123,14 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
-    let value = this.value;
+
+    // Angular lifecycle methods on NgModel write null to the value property.
+    // Initializing this properly won't work as Angular will overwrite the
+    // value after it has been initialized.
+    // Since string methods are used on value variable, so it can't be null or
+    // undefined. When we move to reactive forms, this won't be a problem.
+    // TODO(#15458): Change the ternary statement to "let value = this.value".
+    let value = this.value ? this.value : '';
     // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<oppia-noninteractive-/g,
@@ -234,7 +245,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       return html;
     }
     return html.replace(this.componentRe, (match, p1, p2, p3) => {
-      if (this.rteHelperService.isInlineComponent(p3)) {
+      // Here we remove the 'ckeditor' part of the string p3 to get the name
+      // of the RTE Component.
+      let rteComponentName = p3.split('-')[1];
+
+      if (this.rteHelperService.isInlineComponent(rteComponentName)) {
         return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
       } else {
         return (
@@ -500,6 +515,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       }
     });
   }
+
   enableRTEicons(): void {
     this.componentsThatRequireInternet.forEach((name) => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(

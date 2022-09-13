@@ -45,6 +45,7 @@ export class TopicsAndSkillsDashboardFilter {
     this.sort = sort;
     this.status = status;
   }
+
   /**
    * Resets the filter object values
    */

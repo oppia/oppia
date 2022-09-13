@@ -36,26 +36,31 @@ import re
 
 from core.constants import constants
 
-_OPENING_PARENS = ['[', '{', '(']
-_CLOSING_PARENS = [')', '}', ']']
-_VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
+from typing import List, Optional
+from typing_extensions import Final
 
-_TOKEN_CATEGORY_IDENTIFIER = 'identifier'
-_TOKEN_CATEGORY_FUNCTION = 'function'
-_TOKEN_CATEGORY_NUMBER = 'number'
-_TOKEN_CATEGORY_OPERATOR = 'operator'
+_OPENING_PARENS: List[str] = ['[', '{', '(']
+_CLOSING_PARENS: List[str] = [')', '}', ']']
+_VALID_OPERATORS: List[str] = (
+    _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
+)
 
-_OPENING_CATEGORIES = (
+_TOKEN_CATEGORY_IDENTIFIER: Final = 'identifier'
+_TOKEN_CATEGORY_FUNCTION: Final = 'function'
+_TOKEN_CATEGORY_NUMBER: Final = 'number'
+_TOKEN_CATEGORY_OPERATOR: Final = 'operator'
+
+_OPENING_CATEGORIES: Final = (
     _TOKEN_CATEGORY_IDENTIFIER,
     _TOKEN_CATEGORY_FUNCTION,
     _TOKEN_CATEGORY_NUMBER)
 
-_CLOSING_CATEGORIES = (
+_CLOSING_CATEGORIES: Final = (
     _TOKEN_CATEGORY_IDENTIFIER,
     _TOKEN_CATEGORY_NUMBER)
 
 
-def contains_balanced_brackets(expression):
+def contains_balanced_brackets(expression: str) -> bool:
     """Checks if the given expression contains a balanced bracket sequence.
 
     Args:
@@ -78,9 +83,9 @@ def contains_balanced_brackets(expression):
     return len(stack) == 0
 
 
-def is_algebraic(expression):
-    """Checks if the given expression is algebraic. An algebraic expression must
-    contain at least one valid identifier (latin letter or greek symbol name).
+def contains_at_least_one_variable(expression: str) -> bool:
+    """Checks if the given expression contains at least one valid identifier
+    (latin letter or greek symbol name).
 
     Args:
         expression: str. A math expression.
@@ -100,7 +105,7 @@ def is_algebraic(expression):
         token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list)
 
 
-def tokenize(expression):
+def tokenize(expression: str) -> List[Token]:
     """Splits the given expression into separate tokens based on the grammar
     definitions.
 
@@ -178,7 +183,7 @@ def tokenize(expression):
     return final_token_list
 
 
-def get_variables(expression):
+def get_variables(expression: str) -> List[str]:
     """Extracts all variables along with pi and e from a given expression.
 
     Args:
@@ -204,7 +209,7 @@ def get_variables(expression):
 class Token:
     """Class for tokens of the math expression."""
 
-    def __init__(self, text):
+    def __init__(self, text: str) -> None:
         """Initializes a Token object.
 
         Args:
@@ -227,7 +232,7 @@ class Token:
         else:
             raise Exception('Invalid token: %s.' % text)
 
-    def is_function(self, text):
+    def is_function(self, text: str) -> bool:
         """Checks if the given token represents a valid math function.
 
         Args:
@@ -238,7 +243,7 @@ class Token:
         """
         return text in constants.MATH_FUNCTION_NAMES
 
-    def is_identifier(self, text):
+    def is_identifier(self, text: str) -> bool:
         """Checks if the given token represents a valid identifier. A valid
         identifier could be a single latin letter (uppercase/lowercase) or a
         greek letter represented by the symbol name.
@@ -251,7 +256,7 @@ class Token:
         """
         return text in constants.VALID_ALGEBRAIC_IDENTIFIERS
 
-    def is_number(self, text):
+    def is_number(self, text: str) -> bool:
         """Checks if the given token represents a valid real number without a
         '+'/'-' sign. 'pi' and 'e' are also considered as numeric values.
 
@@ -263,7 +268,7 @@ class Token:
         """
         return text.replace('.', '', 1).isdigit() or text in ('pi', 'e')
 
-    def is_operator(self, text):
+    def is_operator(self, text: str) -> bool:
         """Checks if the given token represents a valid math operator.
 
         Args:
@@ -286,7 +291,7 @@ class Node:
     the operator nodes, the class name should represent the type of operator.
     """
 
-    def __init__(self, children):
+    def __init__(self, children: List[Node]) -> None:
         """Initializes a Node object. For ex. 'a + b' will have root node as
         '+' and children as ['a', 'b'].
 
@@ -299,66 +304,66 @@ class Node:
 class AdditionOperatorNode(Node):
     """Class representing the addition operator node."""
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         """Initializes an AdditionOperatorNode object.
 
         Args:
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(AdditionOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class SubtractionOperatorNode(Node):
     """Class representing the subtraction operator node."""
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         """Initializes an SubtractionOperatorNode object.
 
         Args:
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(SubtractionOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class MultiplicationOperatorNode(Node):
     """Class representing the multiplication operator node."""
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         """Initializes an MultiplicationOperatorNode object.
 
         Args:
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(MultiplicationOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class DivisionOperatorNode(Node):
     """Class representing the division operator node."""
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         """Initializes an DivisionOperatorNode object.
 
         Args:
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(DivisionOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class PowerOperatorNode(Node):
     """Class representing the power operator node."""
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         """Initializes an PowerOperatorNode object.
 
         Args:
             left: Node. Left child of the operator.
             right: Node. Right child of the operator.
         """
-        super(PowerOperatorNode, self).__init__([left, right])
+        super().__init__([left, right])
 
 
 class IdentifierNode(Node):
@@ -367,27 +372,27 @@ class IdentifierNode(Node):
     symbol name.
     """
 
-    def __init__(self, token):
+    def __init__(self, token: Token) -> None:
         """Initializes an IdentifierNode object.
 
         Args:
             token: Token. The token representing the identifier.
         """
         self.token = token
-        super(IdentifierNode, self).__init__([])
+        super().__init__([])
 
 
 class NumberNode(Node):
     """Class representing the number node."""
 
-    def __init__(self, token):
+    def __init__(self, token: Token) -> None:
         """Initializes a NumberNode object.
 
         Args:
             token: Token. The token representing a real number.
         """
         self.token = token
-        super(NumberNode, self).__init__([])
+        super().__init__([])
 
 
 class UnaryFunctionNode(Node):
@@ -395,7 +400,7 @@ class UnaryFunctionNode(Node):
     class must have exactly one parameter.
     """
 
-    def __init__(self, token, child):
+    def __init__(self, token: Token, child: Node) -> None:
         """Initializes a UnaryFunctionNode object.
 
         Args:
@@ -403,7 +408,7 @@ class UnaryFunctionNode(Node):
             child: Node. The parameter of the function.
         """
         self.token = token
-        super(UnaryFunctionNode, self).__init__([child])
+        super().__init__([child])
 
 
 class Parser:
@@ -414,7 +419,7 @@ class Parser:
     https://en.wikipedia.org/wiki/Recursive_descent_parser
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the Parser object."""
         # Stores the index of the next token to be parsed. This attribute is
         # global to this class, i.e., all methods operate on the same instance
@@ -422,7 +427,7 @@ class Parser:
         # upon parsing the current token from the token list.
         self._next_token_index = 0
 
-    def parse(self, expression):
+    def parse(self, expression: str) -> Node:
         """A wrapper around the _parse_expr method. This method creates a list
         of tokens present in the expression and calls the _parse_expr method.
 
@@ -454,7 +459,7 @@ class Parser:
 
         return self._parse_expr(token_list)
 
-    def _parse_expr(self, token_list):
+    def _parse_expr(self, token_list: List[Token]) -> Node:
         """Function representing the following production rule of the grammar:
         <expr> ::= <mul_expr> (('+' | '-') <mul_expr>)*
 
@@ -478,7 +483,7 @@ class Parser:
                 ['+', '-'], token_list)
         return parsed_expr
 
-    def _parse_mul_expr(self, token_list):
+    def _parse_mul_expr(self, token_list: List[Token]) -> Node:
         """Function representing the following production rule of the grammar:
         <mul_expr> ::= <pow_expr> (('*' | '/') <pow_expr>)*
 
@@ -503,7 +508,7 @@ class Parser:
                 ['*', '/'], token_list)
         return parsed_expr
 
-    def _parse_pow_expr(self, token_list):
+    def _parse_pow_expr(self, token_list: List[Token]) -> Node:
         """Function representing the following production rule of the grammar:
         <pow_expr> ::= '-' <pow_expr> | '+' <pow_expr> |
         <unit> ('^' <pow_expr>)?
@@ -528,7 +533,7 @@ class Parser:
             return PowerOperatorNode(parsed_expr, parsed_right)
         return parsed_expr
 
-    def _parse_unit(self, token_list):
+    def _parse_unit(self, token_list: List[Token]) -> Node:
         """Function representing the following production rule of the grammar:
         <unit> ::= <identifier> | <number> | '(' <expr> ')' |
         <function> '(' <expr> ')'
@@ -550,20 +555,24 @@ class Parser:
         if token.category == _TOKEN_CATEGORY_FUNCTION:
             if self._get_next_token_if_text_in(['('], token_list):
                 parsed_child = self._parse_expr(token_list)
-                token = self._get_next_token_if_text_in([')'], token_list)
-                return UnaryFunctionNode(token, parsed_child)
+                next_token = self._get_next_token_if_text_in([')'], token_list)
+                # Here, we are asserting that next_token is never going to be
+                # None, because before reaching this line of code we are already
+                # checking if token exists or not with method `_get_next_token`.
+                assert next_token is not None
+                return UnaryFunctionNode(next_token, parsed_child)
 
         if token.category == _TOKEN_CATEGORY_NUMBER:
             return NumberNode(token)
 
         if token.text == '(':
             parsed_expr = self._parse_expr(token_list)
-            token = self._get_next_token_if_text_in([')'], token_list)
+            next_token = self._get_next_token_if_text_in([')'], token_list)
             return parsed_expr
 
         raise Exception('Invalid token: %s.' % token.text)
 
-    def _get_next_token(self, token_list):
+    def _get_next_token(self, token_list: List[Token]) -> Token:
         """Function to retrieve the token at the next position and then
         increment the _next_token_index.
 
@@ -584,7 +593,9 @@ class Parser:
 
         raise Exception('Invalid syntax: Unexpected end of expression.')
 
-    def _get_next_token_if_text_in(self, allowed_token_texts, token_list):
+    def _get_next_token_if_text_in(
+        self, allowed_token_texts: List[str], token_list: List[Token]
+    ) -> Optional[Token]:
         """Function to verify that there is at least one more token remaining
         and that the next token text is among the allowed_token_texts provided.
         If true, returns the token; otherwise, returns None.
@@ -609,7 +620,7 @@ class Parser:
         return None
 
 
-def is_valid_expression(expression):
+def is_valid_expression(expression: str) -> bool:
     """Checks if the given math expression is syntactically valid.
 
     Args:

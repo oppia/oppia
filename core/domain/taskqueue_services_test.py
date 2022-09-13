@@ -18,25 +18,38 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
-from core import python_utils
+from core import utils
 from core.domain import taskqueue_services
+from core.platform import models
 from core.tests import test_utils
+
+from typing import Any, Dict, Optional, Set
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import platform_taskqueue_services
+
+platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
     """Tests for domain taskqueue services."""
 
-    def test_exception_raised_when_deferred_payload_is_not_serializable(self):
+    def test_exception_raised_when_deferred_payload_is_not_serializable(
+        self
+    ) -> None:
         class NonSerializableArgs:
             """Object that is not JSON serializable."""
 
-            def __init__(self):
+            def __init__(self) -> None:
                 self.x = 1
                 self.y = 2
 
         arg1 = NonSerializableArgs()
-        serialization_exception = self.assertRaisesRegexp(
+        serialization_exception = self.assertRaisesRegex(
             ValueError,
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
@@ -46,11 +59,13 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
                 taskqueue_services.FUNCTION_ID_UPDATE_STATS,
                 taskqueue_services.QUEUE_NAME_DEFAULT, arg1)
 
-    def test_exception_raised_when_email_task_params_is_not_serializable(self):
-        params = {
+    def test_exception_raised_when_email_task_params_is_not_serializable(
+        self
+    ) -> None:
+        params: Dict[str, Set[str]] = {
             'param1': set()
         }
-        serialization_exception = self.assertRaisesRegexp(
+        serialization_exception = self.assertRaisesRegex(
             ValueError,
             'The params added to the email task call cannot be json serialized')
         with serialization_exception:
@@ -59,7 +74,38 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
                 params,
                 0)
 
-    def test_enqueue_task_makes_the_correct_request(self):
+    def test_defer_makes_the_correct_request(self) -> None:
+        correct_fn_identifier = '/task/deferredtaskshandler'
+        correct_args = (1, 2, 3)
+        correct_kwargs = {'a': 'b', 'c': 'd'}
+
+        expected_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
+        expected_url = feconf.TASK_URL_DEFERRED
+        expected_payload = {
+            'fn_identifier': correct_fn_identifier,
+            'args': correct_args,
+            'kwargs': correct_kwargs
+        }
+
+        create_http_task_swap = self.swap_with_checks(
+            platform_taskqueue_services,
+            'create_http_task',
+            lambda queue_name, url, payload=None, scheduled_for=None: None,
+            expected_kwargs=[{
+                'queue_name': expected_queue_name,
+                'url': expected_url,
+                'payload': expected_payload
+            }]
+        )
+
+        with create_http_task_swap:
+            taskqueue_services.defer(
+                correct_fn_identifier,
+                taskqueue_services.QUEUE_NAME_EMAILS,
+                *correct_args, **correct_kwargs
+            )
+
+    def test_enqueue_task_makes_the_correct_request(self) -> None:
         correct_payload = {
             'user_id': '1'
         }
@@ -67,8 +113,12 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         correct_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
 
         def mock_create_http_task(
-                queue_name, url, payload=None, scheduled_for=None,
-                task_name=None):
+            queue_name: str,
+            url: str,
+            payload: Optional[Dict[str, Any]] = None,
+            scheduled_for: Optional[datetime.datetime] = None,
+            task_name: Optional[str] = None
+        ) -> None:
             self.assertEqual(queue_name, correct_queue_name)
             self.assertEqual(url, correct_url)
             self.assertEqual(payload, correct_payload)
@@ -76,21 +126,21 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             self.assertIsNone(task_name)
 
         swap_create_http_task = self.swap(
-            taskqueue_services.platform_taskqueue_services, 'create_http_task',
+            platform_taskqueue_services, 'create_http_task',
             mock_create_http_task)
 
         with swap_create_http_task:
             taskqueue_services.enqueue_task(
                 correct_url, correct_payload, 0)
 
-    def test_that_queue_names_are_in_sync_with_queue_yaml_file(self):
+    def test_that_queue_names_are_in_sync_with_queue_yaml_file(self) -> None:
         """Checks that all of the queues that are instantiated in the queue.yaml
         file has a corresponding QUEUE_NAME_* constant instantiated in
         taskqueue_services.
         """
         queue_name_dict = {}
         # Parse the queue.yaml file for the correct queue names.
-        with python_utils.open_file('queue.yaml', 'r') as f:
+        with utils.open_file('queue.yaml', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 if 'name' in line:

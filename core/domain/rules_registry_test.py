@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import os
 
-from core import python_utils
+from core import utils
 from core.domain import rules_registry
 from core.tests import test_utils
 
@@ -29,20 +29,24 @@ from core.tests import test_utils
 class RulesRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the rules registry."""
 
-    def test_get_html_field_types_to_rule_specs_for_current_state_schema_version(self): # pylint: disable=line-too-long
+    def test_get_html_field_types_to_rule_specs_for_current_state_schema_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         html_field_types_to_rule_specs = (
             rules_registry.Registry.get_html_field_types_to_rule_specs())
 
         spec_file = os.path.join(
             'extensions', 'interactions', 'html_field_types_to_rule_specs.json')
-        with python_utils.open_file(spec_file, 'r') as f:
+        with utils.open_file(spec_file, 'r') as f:
             specs_from_json = json.loads(f.read())
 
         self.assertDictEqual(
             html_field_types_to_rule_specs,
             specs_from_json)
 
-    def test_get_html_field_types_to_rule_specs_for_previous_state_schema_version(self): # pylint: disable=line-too-long
+    def test_get_html_field_types_to_rule_specs_for_previous_state_schema_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         html_field_types_to_rule_specs_v41 = (
             rules_registry.Registry.get_html_field_types_to_rule_specs(
                 state_schema_version=41))
@@ -51,15 +55,17 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             'extensions', 'interactions',
             'legacy_html_field_types_to_rule_specs_by_state_version',
             'html_field_types_to_rule_specs_state_v41.json')
-        with python_utils.open_file(spec_file_v41, 'r') as f:
+        with utils.open_file(spec_file_v41, 'r') as f:
             specs_from_json_v41 = json.loads(f.read())
 
         self.assertDictEqual(
             html_field_types_to_rule_specs_v41,
             specs_from_json_v41)
 
-    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(self): # pylint: disable=line-too-long
-        with self.assertRaisesRegexp(
+    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
             Exception,
             'No specs json file found for state schema'
         ):

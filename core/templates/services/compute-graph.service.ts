@@ -25,13 +25,15 @@ import { States } from 'domain/exploration/StatesObjectFactory';
 export interface GraphLink {
   source: string;
   target: string;
+  linkProperty: string | null;
+  connectsDestIfStuck: boolean;
 }
 
 export interface GraphNodes {
   [stateName: string]: string;
 }
 
-interface GraphData {
+export interface GraphData {
   finalStateIds: string[];
   initStateId: string;
   links: GraphLink[];
@@ -44,7 +46,7 @@ interface GraphData {
 export class ComputeGraphService {
   _computeGraphData(initStateId: string, states: States): GraphData {
     let nodes: Record<string, string> = {};
-    let links: { source: string; target: string }[] = [];
+    let links: GraphLink[] = [];
     let finalStateIds = states.getFinalStateNames();
 
     states.getStateNames().forEach(function(stateName) {
@@ -56,18 +58,41 @@ export class ComputeGraphService {
           links.push({
             source: stateName,
             target: groups[h].outcome.dest,
+            linkProperty: null,
+            connectsDestIfStuck: false
           });
+          if (groups[h].outcome.destIfReallyStuck) {
+            links.push({
+              source: stateName,
+              // This throws "TS2322: Type 'string | null' is not assignable
+              // to type 'string'" We need to suppress this error because the
+              // value is explicitly checked above in the if condition.
+              // @ts-ignore
+              target: groups[h].outcome.destIfReallyStuck,
+              linkProperty: null,
+              connectsDestIfStuck: true
+            });
+          }
         }
 
         if (interaction.defaultOutcome) {
           links.push({
             source: stateName,
             target: interaction.defaultOutcome.dest,
+            linkProperty: null,
+            connectsDestIfStuck: false
           });
+          if (interaction.defaultOutcome.destIfReallyStuck) {
+            links.push({
+              source: stateName,
+              target: interaction.defaultOutcome.destIfReallyStuck,
+              linkProperty: null,
+              connectsDestIfStuck: true
+            });
+          }
         }
       }
     });
-
     return {
       finalStateIds: finalStateIds,
       initStateId: initStateId,

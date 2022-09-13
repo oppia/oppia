@@ -16,8 +16,10 @@
  * @fileoverview Component for the about foundation page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -28,15 +30,30 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   templateUrl: './about-foundation-page.component.html',
   styleUrls: []
 })
-export class AboutFoundationPageComponent implements OnInit {
+export class AboutFoundationPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
   constructor(
     private pageTitleService: PageTitleService,
     private urlInterpolationService: UrlInterpolationService,
+    private translateService: TranslateService
   ) {}
+
   ngOnInit(): void {
-    this.pageTitleService.setDocumentTitle(
-      'About the Oppia Foundation | Oppia'
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
     );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 

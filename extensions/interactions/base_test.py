@@ -25,8 +25,8 @@ import re
 import string
 import struct
 
+from core import constants
 from core import feconf
-from core import python_utils
 from core import schema_utils
 from core import schema_utils_test
 from core import utils
@@ -57,13 +57,14 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'ItemSelectionInput',
     'MathEquationInput',
     'MultipleChoiceInput',
+    'MusicNotesInput',
     'NumericExpressionInput',
-    'RatioExpressionInput',
     'NumericInput',
     'NumberWithUnits',
+    'PencilCodeEditor',
+    'RatioExpressionInput',
     'SetInput',
     'TextInput',
-    'MathEquationInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [
@@ -87,14 +88,14 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
         interaction.answer_type = 'NonnegativeInt'
         interaction.normalize_answer('15')
 
-        with self.assertRaisesRegexp(Exception, 'not a valid object class'):
+        with self.assertRaisesRegex(Exception, 'not a valid object class'):
             interaction.answer_type = 'FakeObjType'
             interaction.normalize_answer('15')
 
     def test_get_rule_description_with_invalid_rule_name_raises_error(self):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'CodeRepl')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Could not find rule with name invalid_rule_name'):
             interaction.get_rule_description('invalid_rule_name')
 
@@ -102,7 +103,7 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
             self):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             'CodeRepl')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'Rule CodeEquals has no param called invalid_rule_param_name'):
             interaction.get_rule_param_type(
@@ -258,7 +259,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         _check_num_interaction_rules('MultipleChoiceInput', 1)
         _check_num_interaction_rules('NumericInput', 7)
         _check_num_interaction_rules('Continue', 0)
-        with self.assertRaisesRegexp(KeyError, '\'FakeObjType\''):
+        with self.assertRaisesRegex(KeyError, '\'FakeObjType\''):
             _check_num_interaction_rules('FakeObjType', 0)
 
     def test_interaction_rule_descriptions_in_dict(self):
@@ -285,7 +286,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # The file having the information about the assembly of the html in the
         # rule specs.
         html_field_types_to_rule_specs_dict = json.loads(
-            python_utils.get_package_file_contents(
+            constants.get_package_file_contents(
                 'extensions',
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH))
 
@@ -293,7 +294,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # Contents of the file html_field_types_to_rule_specs.json will be
         # verified against this file.
         rule_descriptions_dict = json.loads(
-            python_utils.get_package_file_contents(
+            constants.get_package_file_contents(
                 'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
 
         # In the following part, we generate the html_field_types_to_rule_specs
@@ -389,6 +390,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # The interaction directory should contain the following files:
             #  Required:
             #    * A python file called {InteractionName}.py.
+            #    * A python test file called {InteractionName}_test.py.
             #    * An __init__.py file used to import the Python file.
             #    * A TypeScript file called {InteractionName}.ts.
             #    * If migrated to Angular2+, a module.ts file called
@@ -406,6 +408,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir, 'protractor.js')))
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir, 'webdriverio.js')))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -435,7 +444,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                interaction_dir_optional_dirs_and_files_count + 5,
+                interaction_dir_optional_dirs_and_files_count + 6,
                 len(interaction_dir_contents)
             )
 
@@ -546,7 +555,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             png_file = os.path.join(
                 interaction_dir, 'static', '%s.png' % interaction_id)
             self.assertTrue(os.path.isfile(png_file))
-            with python_utils.open_file(png_file, 'rb', encoding=None) as f:
+            with utils.open_file(png_file, 'rb', encoding=None) as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)

@@ -22,7 +22,7 @@ import io
 import multiprocessing
 import os
 
-from core import python_utils
+from core import utils
 from core.tests import test_utils
 
 from . import other_files_linter
@@ -40,7 +40,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     """Tests for CustomLintChecksManager."""
 
     def setUp(self):
-        super(CustomLintChecksManagerTests, self).setUp()
+        super().setUp()
         self.verbose_mode_enabled = False
         self.dependencies_file = io.StringIO(
             '{\"dependencies\":{\"frontend\":{\"guppy\":'
@@ -62,7 +62,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         def mock_listdir(unused_path):
             return self.files_in_typings_dir
         self.open_file_swap = self.swap(
-            python_utils, 'open_file', mock_open_file)
+            utils, 'open_file', mock_open_file)
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
 
     def test_check_valid_pattern_in_app_dev_yaml(self):
@@ -251,39 +251,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'are for version 0.2. Please refer typings/README.md '
                 'for more details.'], error_messages.get_report())
             self.assertEqual('Third party type defs', error_messages.name)
-            self.assertTrue(error_messages.failed)
-
-    def test_check_valid_strict_checks(self):
-        strict_ts_config_path_swap = self.swap(
-            other_files_linter,
-            'STRICT_TS_CONFIG_FILEPATH',
-            os.path.join(LINTER_TESTS_DIR, 'valid_strict_ts_config.json'))
-        expected_error_messages = (
-            'SUCCESS  Sorted strict TS config check passed')
-        with strict_ts_config_path_swap, self.print_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
-            self.assertEqual(
-                error_messages.get_report()[0], expected_error_messages)
-            self.assertEqual('Sorted strict TS config', error_messages.name)
-            self.assertFalse(error_messages.failed)
-
-    def test_check_invalid_strict_checks(self):
-        strict_ts_config_path_swap = self.swap(
-            other_files_linter,
-            'STRICT_TS_CONFIG_FILEPATH',
-            os.path.join(LINTER_TESTS_DIR, 'invalid_strict_ts_config.json'))
-        expected_error_messages = 'FAILED  Sorted strict TS config check failed'
-        with strict_ts_config_path_swap, self.print_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
-            self.assertEqual(
-                error_messages.get_report()[1], expected_error_messages)
-            self.assert_same_list_elements(
-                ['Files in %s are not alphabetically sorted.' % (
-                    other_files_linter.STRICT_TS_CONFIG_FILE_NAME)],
-                error_messages.get_report())
-            self.assertEqual('Sorted strict TS config', error_messages.name)
             self.assertTrue(error_messages.failed)
 
     def test_check_github_workflows_use_merge_action_checks(self):

@@ -1,10 +1,168 @@
+<div class="navbar-mobile-container">
+  <i class="fa fa-book show-mobile-navbar-icon" (click)="toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
+  <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
+    <div class="exp-nav-dropdown-container">
+      <div class="exp-nav-dropdown-content" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a>
+          <i class="material-icons">&#xE254;</i>
+          Options
+        </a>
+        <div class="exp-nav-dropdown-icon">
+          <i class="fa fa-caret-down"></i>
+        </div>
+        <ul class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'uib-dropdown': countWarnings()}">
+            <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE254;</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
+            </a>
+            <div [hidden]="!countWarnings()" class="oppia-editor-warnings-indicator" (click)="selectMainTab()" [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+              <span class="oppia-editor-warnings-count">
+                {{ countWarnings() }}
+              </span>
+            </div>
+          </li>
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'translation'}">
+            <a href="#" ngbTooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" placement="bottom" (click)="selectTranslationTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE029;</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
+            </a>
+          </li>
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
+            <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE037;</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
+            </a>
+          </li>
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'settings'}">
+            <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE8B8;</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
+            </a>
+          </li>
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'stats'}">
+            <a href="#" ngbTooltip="Statistics" placement="bottom" (click)="selectStatsTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE24B;</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
+            </a>
+          </li>
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'improvements'}" *ngIf="isImprovementsTabEnabled()">
+            <a href="#" ngbTooltip="Improvements" placement="bottom" (click)="selectImprovementsTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
+            </a>
+          </li>
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'history'}">
+            <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
+               disabled="ExplorationRightsService.isCloned()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE192;</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
+            </a>
+          </li>
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'feedback'}">
+            <a href="#" ngbTooltip="Feedback" placement="bottom" (click)="selectFeedbackTab()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE87F;</i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
+            </a>
+            <div [hidden]="!getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+              <span class="oppia-exploration-open-threads-count">
+                  {{ getOpenThreadsCount() }}&nbsp;open
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-nav-dropdown-container">
+      <div class="exp-nav-dropdown-content right-container">
+
+        <div *ngIf="isEditableOutsideTutorialMode()">
+          <div [ngClass]="{'disable-save-button': !connectedToInternet || !isExplorationSaveable()}">
+            <button class="btn publish-button e2e-test-save-changes-for-small-screens"
+                    [ngClass]="{'btn-success': connectedToInternet && isExplorationSaveable()}"
+                    (click)="saveChanges()"
+                    [disabled]="!connectedToInternet || !isExplorationSaveable()">
+              <span *ngIf="!saveIsInProcess">
+                <span *ngIf="isPrivate()">
+                  <i class="material-icons md-18 oppia-save-publish-button-icon"
+                     alt="Save Draft">
+                      &#xE161;
+                  </i>
+                  <span>Save Draft</span>
+                  <span class="d-none d-md-block" *ngIf="getChangeListLength()">({{getChangeListLength()}})</span>
+                </span>
+                <span class="oppia-publish-label-container" *ngIf="!isPrivate()" title="Publish Changes">
+                  <span>Publish</span>
+                  <span *ngIf="getChangeListLength()">({{getChangeListLength()}})</span>
+                </span>
+              </span>
+              <span *ngIf="saveIsInProcess">
+                <span *ngIf="isPrivate()">
+                  Saving
+                </span>
+                <span *ngIf="!isPrivate()">
+                  Publishing
+                </span>
+                <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="exp-nav-dropdown-icon" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-caret-down"></i>
+        </div>
+
+        <ul class="dropdown-menu" aria-labelledby="discardButtonPopup">
+          <div (click)="discardChanges()">
+            <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE254;</i>
+            Discard
+          </div>
+          <div *ngIf="showPublishButton()" [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
+            <button type="button" class="btn btn-light"
+                    [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
+                    (click)="showPublishExplorationModal()"
+                    [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
+              <span *ngIf="!publishIsInProcess">
+                <i class="material-icons"
+                   alt="Publish to Oppia Library">
+                  &#xE2C3;
+                </i>
+                <span>Publish</span>
+              </span>
+              <span *ngIf="publishIsInProcess">
+                <i class="oppia-save-publish-loading"
+                   alt="Publish to Oppia Library">
+                  <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+                </i>
+                <span>
+                  Publishing
+                  <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
+                </span>
+              </span>
+            </button>
+          </div>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   /* Overwrite the Bootstrap defaults. */
   .nav > li > a.oppia-editor-navbar-tab-anchor {
     padding: 15px 11px;
   }
-  editor-navigation .oppia-exploration-open-threads-count {
-    background-color: #4078C0;
+  .oppia-exploration-open-threads-count {
+    background-color: #4078c0;
     border: 1px solid;
     border-radius: 10px;
     bottom: 8px;
@@ -16,10 +174,10 @@
     position: relative;
     text-shadow: 0 1px rgba(0, 0, 0, 0.25);
   }
-  editor-navigation .oppia-exploration-open-threads-color {
-    background-color: #4078C0;
+  .oppia-exploration-open-threads-color {
+    background-color: #4078c0;
   }
-  editor-navigation .oppia-exploration-open-threads-indicator {
+  .oppia-exploration-open-threads-indicator {
     border-radius: 50%;
     bottom: 5px;
     height: 15px;
@@ -27,7 +185,7 @@
     right: 3px;
     text-align: center;
   }
-  editor-navigation .oppia-exploration-open-threads-indicator-dropdown {
+  .oppia-exploration-open-threads-indicator-dropdown {
     border-radius: 10%;
     bottom: 25%;
     height: 15px;
@@ -80,7 +238,7 @@
     -webkit-transform: translateY(-50%);
     transform: translateY(-50%);
   }
-  editor-navigation .navbar-mobile-container {
+  .navbar-mobile-container {
     bottom: 0;
     display: none;
     position: fixed;
@@ -90,18 +248,18 @@
     z-index: 1040;
   }
   @media screen and (max-width: 600px) {
-    editor-navigation .navbar-mobile-container {
+    .navbar-mobile-container {
       display: block;
     }
   }
-  editor-navigation .navbar-mobile-options {
+  .navbar-mobile-options {
     background-color: #e6e6e6;
     border-top: 1px solid #000;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
   }
-  editor-navigation .show-mobile-navbar-icon {
+  .show-mobile-navbar-icon {
     background-color: #e6e6e6;
     border-left: 1.5px solid #000;
     border-radius: 10px 0;
@@ -110,15 +268,15 @@
     font-size: 25px;
     padding: 10px;
   }
-  editor-navigation .exp-nav-dropdown-container {
+  .exp-nav-dropdown-container {
     padding: 10px 0;
     position: relative;
     text-align: left;
     width: 45%;
   }
-  editor-navigation .exp-nav-dropdown-content {
+  .exp-nav-dropdown-content {
     align-items: center;
-    background-color: #FFF;
+    background-color: #fff;
     border: 1.5px solid #6d6969;
     border-radius: 5px;
     display: flex;
@@ -126,11 +284,11 @@
     height: 100%;
     justify-content: space-between;
   }
-  editor-navigation .right-container {
+  .right-container {
     background-color: #419889;
-    color: #FFF;
+    color: #fff;
   }
-  editor-navigation .exp-nav-dropdown-icon {
+  .exp-nav-dropdown-icon {
     align-items: center;
     background-color: #e6e6e6;
     border-left: 1.5px solid #6d6969;
@@ -141,174 +299,8 @@
     text-align: center;
     width: 20%;
   }
-  editor-navigation .publish-button {
+  .publish-button {
     background-color: #419889;
-    color: #FFF;
+    color: #fff;
   }
 </style>
-<div class="navbar-mobile-container">
-  <i class="fa fa-book show-mobile-navbar-icon" ng-click="toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
-  <div class="navbar-mobile-options" ng-if="mobileNavOptionsAreShown">
-    <div class="exp-nav-dropdown-container">
-      <div class="exp-nav-dropdown-content" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <a>
-          <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
-          Options
-        </a>
-        <div class="exp-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
-          <i class="fa fa-caret-down"></i>
-        </div>
-        <ul class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
-            <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE254;</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
-            </a>
-            <div ng-show="countWarnings()" class="oppia-editor-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
-              <span class="oppia-editor-warnings-count">
-                <[countWarnings()]>
-              </span>
-            </div>
-            <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
-              <span class="oppia-editor-warnings-header">Warnings</span>
-              <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
-                <hr class="oppia-editor-warnings-separator">
-                <span ng-if="warning.type === 'critical'">
-                  <strong><[warning.message]></strong>
-                </span>
-                <span ng-if="warning.type !== 'critical'">
-                  <[warning.message]>
-                </span>
-              </li>
-            </ul>
-          </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isUserLoggedIn()" ng-class="{'active': getActiveTabName() === 'translation'}">
-            <a href="#" uib-tooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE029;</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
-            </a>
-          </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isUserLoggedIn()" ng-class="{'active': getActiveTabName() === 'preview'}">
-            <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE037;</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
-            </a>
-          </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'settings'}">
-            <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE8B8;</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
-            </a>
-          </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'stats'}">
-            <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE24B;</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
-            </a>
-          </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="isImprovementsTabEnabled()">
-            <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
-            </a>
-          </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'history'}">
-            <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
-               disabled="ExplorationRightsService.isCloned()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE192;</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
-            </a>
-          </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'feedback'}">
-            <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE87F;</i>
-              <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
-            </a>
-            <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
-              <span class="oppia-exploration-open-threads-count">
-                  <[getOpenThreadsCount()]>&nbsp;open
-              </span>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="exp-nav-dropdown-container">
-      <div class="exp-nav-dropdown-content right-container">
-
-        <div ng-if="isEditableOutsideTutorialMode()">
-          <div title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !connectedToInternet || !isExplorationSaveable()}">
-            <button class="btn publish-button protractor-test-save-changes-for-small-screens" ng-class="{'btn-success': connectedToInternet && isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable()">
-              <span ng-if="!saveIsInProcess">
-                <span ng-if="isPrivate()">
-                  <i class="material-icons md-18 oppia-save-publish-button-icon"
-                     alt="Save Draft">
-                      &#xE161;
-                  </i>
-                  <span>Save Draft</span>
-                  <span class="d-none d-md-block" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
-                </span>
-                <span class="oppia-publish-label-container" ng-if="!isPrivate()" title="Publish Changes">
-                  <span>Publish</span>
-                  <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
-                </span>
-              </span>
-              <span ng-if="saveIsInProcess">
-                <span ng-if="isPrivate()">
-                  Saving
-                </span>
-                <span ng-if="!isPrivate()">
-                  Publishing
-                </span>
-                <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <div class="exp-nav-dropdown-icon" ng-click="toggleNavigationOptions()" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fa fa-caret-down"></i>
-        </div>
-
-        <ul class="dropdown-menu" aria-labelledby="discardButtonPopup">
-          <div ng-click="discardChanges()">
-            <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE254;</i>
-            Discard
-          </div>
-          <div ng-if="showPublishButton()" ng-class="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
-            <button type="button" class="btn btn-light"
-                    ng-class="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
-                    ng-click="showPublishExplorationModal()"
-                    ng-disabled="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
-              <span ng-if="!publishIsInProcess">
-                <i class="material-icons"
-                   alt="Publish to Oppia Library">
-                  &#xE2C3;
-                </i>
-                <span>Publish</span>
-              </span>
-              <span ng-if="publishIsInProcess">
-                <i class="oppia-save-publish-loading"
-                   alt="Publish to Oppia Library">
-                  <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-                </i>
-                <span>
-                  Publishing
-                  <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
-                </span>
-              </span>
-            </button>
-          </div>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>

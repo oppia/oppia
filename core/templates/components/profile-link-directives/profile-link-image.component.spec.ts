@@ -14,8 +14,11 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ProfileLinkImageBackendApiService } from './profile-link-image-backend-api.service';
 import { ProfileLinkImageComponent } from './profile-link-image.component';
 
@@ -33,11 +36,18 @@ describe('ProfileLinkImageComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule,
+        RouterModule.forRoot([])
       ],
       declarations: [
         ProfileLinkImageComponent
-      ]
+      ],
+      providers: [{
+        provide: APP_BASE_HREF,
+        useValue: '/'
+      }]
     }).compileComponents();
   }));
 

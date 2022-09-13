@@ -23,6 +23,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { NumberConversionService } from 'services/number-conversion.service';
 
 @Component({
   selector: 'oppia-short-response-numeric-input',
@@ -30,18 +31,22 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   styleUrls: []
 })
 export class ShortResponseNumericInput implements OnInit {
-  @Input() answer: string;
-  displayAnswer: Object;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  displayAnswer!: Object;
 
   constructor(
-    private htmlEscaperService: HtmlEscaperService
+    private htmlEscaperService: HtmlEscaperService,
+    private numberConversionService: NumberConversionService
   ) {}
 
   ngOnInit(): void {
-    this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
-    if ((this.displayAnswer as number) % 1 === 0) {
-      this.displayAnswer = Math.round(this.displayAnswer as number);
-    }
+    let escapedAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
+    let recievedAnswer = escapedAnswer as number;
+    this.displayAnswer = this.numberConversionService.convertToLocalizedNumber(
+      recievedAnswer);
   }
 }
 

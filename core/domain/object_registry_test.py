@@ -25,21 +25,21 @@ from extensions.objects.models import objects
 class ObjectRegistryUnitTests(test_utils.GenericTestBase):
     """Test the Registry class in object_registry."""
 
-    def test_get_object_class_by_type_method(self):
+    def test_get_object_class_by_type_method(self) -> None:
         """Tests the normal behavior of get_object_class_by_type()."""
         self.assertEqual(
             object_registry.Registry.get_object_class_by_type('Int').__name__,
             'Int')
 
-    def test_fake_class_is_not_gettable(self):
+    def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
-        with self.assertRaisesRegexp(TypeError, 'not a valid object class'):
+        with self.assertRaisesRegex(TypeError, 'not a valid object class'):
             object_registry.Registry.get_object_class_by_type('FakeClass')
 
-    def test_base_object_is_not_gettable(self):
+    def test_base_object_is_not_gettable(self) -> None:
         """Tests that BaseObject exists and cannot be set as an obj_type."""
         assert getattr(objects, 'BaseObject')
-        with self.assertRaisesRegexp(TypeError, 'not a valid object class'):
+        with self.assertRaisesRegex(TypeError, 'not a valid object class'):
             object_registry.Registry.get_object_class_by_type('BaseObject')
 
 
@@ -50,7 +50,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
     are used in rules.
     """
 
-    def test_all_rule_input_fields_have_default_values(self):
+    def test_all_rule_input_fields_have_default_values(self) -> None:
         """Checks that all rule input fields have a default value, and this
         is provided in get_default_values().
         """
@@ -59,7 +59,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
 
         for interaction in interactions:
             for rule_name in interaction.rules_dict:
-                param_list = interaction.get_rule_param_list(rule_name)
+                param_list = interaction.get_rule_param_list(rule_name)  # type: ignore[no-untyped-call]
 
                 for (_, param_obj_type) in param_list:
                     param_obj_type_name = param_obj_type.__name__
@@ -72,7 +72,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
                     self.assertEqual(
                         default_value, object_default_vals[param_obj_type_name])
 
-    def test_get_object_default_values_is_valid(self):
+    def test_get_object_default_values_is_valid(self) -> None:
         """Checks that the default values provided by get_default_values()
         correspond to the ones defined in objects.py.
         """

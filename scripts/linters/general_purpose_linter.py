@@ -49,6 +49,7 @@ GENERATED_FILE_PATHS = (
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
+    'core/tests/wdio.conf.js',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
@@ -210,10 +211,17 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'urllib(2)?\..*Request\('),
-        'message': 'Please use python_utils.url_request().',
-        'excluded_files': ('core/python_utils.py', 'core/python_utils_test.py'),
-        'excluded_dirs': ()
+        'regexp': re.compile(r'urlretrieve\('),
+        'message': 'Please use scripts.common.url_retrieve instead of '
+                   'urllib.request.urlretrieve.',
+        'excluded_files': (),
+        'excluded_dirs': (
+            'assets/',
+            'core/',
+            'data/',
+            'extensions/',
+            'jobs/',
+        ),
     },
 ]
 
@@ -353,6 +361,9 @@ class GeneralPurposeLinter:
 
         Returns:
             bool. The failure status of the check.
+
+        Raises:
+            Exception. Given file at filepath is not readable.
         """
         # This boolean list keeps track of the regex matches
         # found in the file.
@@ -362,7 +373,7 @@ class GeneralPurposeLinter:
         try:
             file_content = self.file_cache.readlines(filepath)
         except Exception as e:
-            raise Exception('%s %s' % (filepath, e))
+            raise Exception('%s %s' % (filepath, e)) from e
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any(filepath.endswith(
@@ -535,7 +546,8 @@ class GeneralPurposeLinter:
                 ('.js')) and filepath.startswith(
                     ('core/templates', 'extensions')) and (
                         filepath not in build.JS_FILEPATHS_NOT_TO_BUILD
-                        ) and not filepath.endswith('protractor.js'):
+                        ) and not filepath.endswith(
+                        ('protractor.js', 'webdriverio.js')):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)

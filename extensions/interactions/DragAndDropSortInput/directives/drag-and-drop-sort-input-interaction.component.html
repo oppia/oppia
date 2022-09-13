@@ -1,57 +1,57 @@
+<form (submit)="submitAnswer()">
+  <div class="drag-and-drop-sort-container conversation-skin-interaction-container">
+    <!-- Drag and drop, when we allow multiple items in same position of list -->
+    <div *ngIf="allowMultipleItemsInSamePosition" cdkDropList (cdkDropListDropped)="dropList($event)">
+      <ng-container cdkDropListGroup>
+        <div *ngFor="let items of multipleItemsInSamePositionArray; let idx = index"
+             class="child-dnd child-dnd-{{idx}}">
+          <div cdkDrag
+               cdkDropList
+               [cdkDropListData]="items"
+               (cdkDropListExited)="hideElement($event)"
+               [ngClass]="{
+                 'child-dnd-border': isChildElementHaveBorder(idx),
+                 'child-dnd-borderless': !isChildElementHaveBorder(idx) || isChildElementHaveZeroHeight(idx),
+                 'zero-height': isChildElementHaveZeroHeight(idx)
+               }"
+               [class]="isChildElementHaveBorder(idx) ? 'child-dnd-border' : 'child-dnd-borderless'"
+               (cdkDropListDropped)="dropItemInAnyList($event)">
+            <div class="root-dnd-placeholder"
+                 [ngStyle]="{ 'height': (rootHeight-30) + 'px' }"
+                 *cdkDragPlaceholder>
+            </div>
+            <div *ngIf="isChildElementHaveBorder(idx) && items.length > 1"
+                 class="example-handle"
+                 cdkDragHandle
+                 (mouseover)="addHighlight(idx)"
+                 (mouseout)="removeHighlight()"
+                 (mousedown)="setRootPlaceHolderHeight(idx)">
+            </div>
+            <div *ngFor="let item of items"
+                 class="child-dnd-item-box"
+                 [ngClass]="{'highlight-group': idx === highlightedGroup}"
+                 cdkDrag>
+              <div class="child-dnd-placeholder" *cdkDragPlaceholder></div>
+              <oppia-rte-output-display [rteString]="item"></oppia-rte-output-display>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <!-- Drag and drop, when we allow only single item in same position of list -->
+    <div *ngIf="!allowMultipleItemsInSamePosition"
+         class="child-dnd-single-item"
+         (cdkDropListDropped)="dropItemInSameList($event)"
+         cdkDropList>
+      <div class="child-dnd-item-box" *ngFor="let item of singleItemInSamePositionArray" cdkDrag>
+        <div class="child-dnd-single-item-placeholder" *cdkDragPlaceholder></div>
+        <oppia-rte-output-display [rteString]="item"></oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+</form>
+
 <style>
-  @media screen and (max-width: 959px) {
-    .drag-and-drop-item .drag-and-drop-subitem {
-      width: inherit;
-    }
-
-    .angular-ui-tree-placeholder {
-      width: inherit;
-    }
-  }
-
-  .angular-ui-tree-placeholder {
-    border: 2px dashed #add8e6;
-    border-radius: 10px;
-    height: 70px;
-    margin-left: 50px;
-    max-width: 300px;
-  }
-
-  .drag-and-drop-sort-container {
-    border: 1px solid #000000;
-    margin: auto;
-  }
-
-  .drag-and-drop-item {
-    background-color: #add8e6;
-    border: 1px solid #000000;
-    border-radius: 10px;
-    margin: 10px 0 0 70px;
-    max-height: 200px;
-    max-width: 300px;
-    min-height: 50px;
-    overflow: hidden;
-    padding-left: 10px;
-  }
-
-  .drag-and-drop-subitem {
-    background-color: #add8e6;
-    border: 1px solid #000000;
-    border-radius: 10px;
-    margin: -5px 0 0 50px;
-    max-height: 200px;
-    max-width: 300px;
-    min-height: 50px;
-    overflow: hidden;
-    padding-left: 10px;
-    position: relative;
-  }
-
-  .drag-and-drop-sort-container img {
-    max-height: 200px;
-    object-fit: contain;
-  }
-
   .conversation-skin-interaction-container {
     /* This CSS class is essential for auto-scrolling in the Drag and Drop Sort
        interaction to work correctly. The class is intentionally defined here so
@@ -66,30 +66,160 @@
        and drop interactions on mobile (see issue #5607), while also maintaining
        vertical touch movements and zoom touch actions.
     */
-    margin: auto;
-    max-height: 400px;
-    overflow-y: scroll;
-    padding: 10px 10px 25px 10px;
+    height: 540px;
+    margin: 16px;
+    overflow-y: auto;
+    padding: 10px 10px 25px 80px;
     touch-action: manipulation;
   }
+
+  .drag-and-drop-sort-container {
+    border: 1px solid #000;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0.5;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+      0 8px 10px 1px rgba(0, 0, 0, 0.14),
+      0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+    opacity: 0.5;
+  }
+
+  .child-dnd {
+    display: inline-block;
+    margin: -10px 0 0 0;
+    max-width: 100%;
+    position: relative;
+    vertical-align: top;
+    width: 300px;
+  }
+
+  .child-dnd-single-item {
+    display: inline-block;
+    margin: 80px 0 0 0;
+    max-width: 100%;
+    position: relative;
+    vertical-align: top;
+    width: 300px;
+  }
+
+  .child-dnd .zero-height {
+    height: 0;
+    margin: 0;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .child-dnd.cdk-drop-list-dragging .child-dnd-item-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .child-dnd-border {
+    background: #fff0;
+    border-radius: 4px;
+    border-top: solid 1px #ccc;
+    display: block;
+    margin-top: 20px;
+    overflow: hidden;
+    padding-bottom: 25px;
+  }
+
+  .child-dnd-border .child-dnd-placeholder {
+    background: #ccc0;
+    border: dotted 3px #3db0d6;
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .child-dnd-borderless {
+    background: transparent;
+    border: solid 0 #ccc;
+    border-radius: 4px;
+    display: block;
+    margin: 2.5px 0 2.5px 0;
+    min-height: 15px;
+    overflow: hidden;
+  }
+
+  .child-dnd-borderless .child-dnd-placeholder {
+    background: #ccc0;
+    border: dotted 3px #3db0d6;
+    margin: 20px 0 0 0;
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .child-dnd-item-box {
+    align-items: center;
+    background-color: #add8e6;
+    border-bottom: solid 1px #000;
+    border-left: solid 1px #000;
+    border-right: solid 1px #000;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: move;
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    justify-content: space-between;
+    padding: 20px 10px;
+  }
+
+  .child-dnd-item-box:last-child {
+    border-bottom: solid 1px #000;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .child-dnd-item-box:first-child {
+    border-top: solid 1px #000;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  .highlight-group.child-dnd-item-box:first-child {
+    border-top: solid 1px black;
+  }
+
+  .highlight-group.child-dnd-item-box:last-child {
+    border-bottom: solid 1px black;
+  }
+
+  .example-handle {
+    background-color: #adacac;
+    border-radius: 4px 4px 0 0;
+    cursor: move;
+    height: 10px;
+    margin: 0 2px 0 2px;
+    position: absolute;
+    width: calc(100% - 4px);
+    z-index: 1;
+  }
+
+  .root-dnd-placeholder {
+    background: #ccc;
+    border: dotted 3px black;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .highlight-group {
+    border-left: solid 1px black;
+    border-right: solid 1px black;
+  }
+
+  .child-dnd-single-item-placeholder {
+    background: #ccc;
+    border: dotted 3px black;
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
 </style>
-
-
-<form ng-submit="$ctrl.submitAnswer()">
-  <div ui-tree="$ctrl.treeOptions" class="drag-and-drop-sort-container" data-max-depth="$ctrl.dataMaxDepth">
-    <ol ui-tree-nodes="" class="mb-2" ng-model="$ctrl.list">
-      <li ng-repeat="item in $ctrl.list" ui-tree-node data-scroll-container=".conversation-skin-interaction-container">
-        <div ui-tree-handle class="drag-and-drop-item">
-          <angular-html-bind html-data="item.title"></angular-html-bind>
-        </div>
-        <ol ui-tree-nodes="" ng-model="item.items">
-          <li ng-repeat="subItem in item.items" ui-tree-node data-scroll-container=".conversation-skin-interaction-container">
-            <div ui-tree-handle class="drag-and-drop-subitem">
-              <angular-html-bind html-data="subItem.title"></angular-html-bind>
-            </div>
-          </li>
-        </ol>
-      </li>
-    </ol>
-  </div>
-</form>

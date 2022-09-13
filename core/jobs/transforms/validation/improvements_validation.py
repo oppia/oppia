@@ -25,15 +25,27 @@ from core.platform import models
 
 import apache_beam as beam
 
+from typing import Iterator
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import improvements_models
+
 (improvements_models,) = models.Registry.import_models(
-    [models.NAMES.improvements])
+    [models.Names.IMPROVEMENTS])
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 @validation_decorators.AuditsExisting(improvements_models.TaskEntryModel)
-class ValidateCompositeEntityId(beam.DoFn):
+class ValidateCompositeEntityId(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the composite entity id."""
 
-    def process(self, input_model):
+    def process(
+        self, input_model: improvements_models.TaskEntryModel
+    ) -> Iterator[improvements_validation_errors.InvalidCompositeEntityError]:
         """Function that checks if the composite entity id is valid
 
         Args:

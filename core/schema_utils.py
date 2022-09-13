@@ -31,7 +31,6 @@ import re
 import urllib
 
 from core import feconf
-from core import python_utils
 from core import utils
 from core.constants import constants
 from core.domain import expression_parser
@@ -47,16 +46,20 @@ SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
 SCHEMA_KEY_CHOICES = 'choices'
 SCHEMA_KEY_NAME = 'name'
+SCHEMA_KEY_KEYS = 'keys'
+SCHEMA_KEY_VALUES = 'values'
 SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 SCHEMA_KEY_VALIDATORS = 'validators'
 SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
 SCHEMA_KEY_OBJECT_CLASS = 'object_class'
 SCHEMA_KEY_VALIDATION_METHOD = 'validation_method'
+SCHEMA_KEY_OPTIONS = 'options'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
 SCHEMA_TYPE_DICT = 'dict'
+SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS = 'variable_keys_dict'
 SCHEMA_TYPE_FLOAT = 'float'
 SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
@@ -65,9 +68,22 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_BASESTRING = 'basestring'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
+SCHEMA_TYPE_WEAK_MULTIPLE = 'weak_multiple'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
+ALL_SCHEMAS: Dict[str, type] = {
+    SCHEMA_TYPE_BOOL: bool,
+    SCHEMA_TYPE_DICT: dict,
+    SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS: dict,
+    SCHEMA_TYPE_FLOAT: float,
+    SCHEMA_TYPE_HTML: str,
+    SCHEMA_TYPE_INT: int,
+    SCHEMA_TYPE_LIST: list,
+    SCHEMA_TYPE_UNICODE: str,
+    SCHEMA_TYPE_BASESTRING: str,
+    SCHEMA_TYPE_UNICODE_OR_NONE: str
+}
 
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
@@ -96,11 +112,19 @@ def normalize_against_schema(
         *. The normalized object.
 
     Raises:
-        AssertionError. The object fails to validate against the schema.
+        Exception. The object fails to validate against the schema.
     """
     normalized_obj: Any = None
 
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
+    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_WEAK_MULTIPLE:
+        for i in schema[SCHEMA_KEY_OPTIONS]:
+            if isinstance(obj, ALL_SCHEMAS[i]):
+                normalized_obj = obj
+                break
+        if normalized_obj is None:
+            raise Exception(
+                'Type of %s is not present in options' % obj)
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
@@ -108,13 +132,13 @@ def normalize_against_schema(
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
         from core.domain import object_registry
-        obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
+        obj_class = object_registry.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
                 obj, obj_class.get_schema(), apply_custom_validators=False)
         else:
-            normalized_obj = obj_class.normalize(obj)
+            normalized_obj = obj_class.normalize(obj)  # type: ignore[no-untyped-call]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
@@ -134,21 +158,35 @@ def normalize_against_schema(
                 prop[SCHEMA_KEY_SCHEMA],
                 global_validators=global_validators
             )
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT_WITH_VARIABLE_NO_OF_KEYS:
+        assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
+        normalized_obj = {}
+        for key, value in obj.items():
+            normalized_key = normalize_against_schema(
+                key, schema[SCHEMA_KEY_KEYS][SCHEMA_KEY_SCHEMA],
+                global_validators=global_validators
+            )
+            normalized_obj[normalized_key] = normalize_against_schema(
+                value, schema[SCHEMA_KEY_VALUES][SCHEMA_KEY_SCHEMA],
+                global_validators=global_validators
+            )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
+        if isinstance(obj, bool):
+            raise Exception('Expected float, received %s' % obj)
         try:
             obj = float(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to float: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Real), (
             'Expected float, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
         try:
             obj = int(obj)
-        except Exception:
+        except Exception as e:
             raise Exception('Could not convert %s to int: %s' % (
-                type(obj).__name__, obj))
+                type(obj).__name__, obj)) from e
         assert isinstance(obj, numbers.Integral), (
             'Expected int, received %s' % obj)
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
@@ -163,7 +201,7 @@ def normalize_against_schema(
             obj = str(obj)
         assert isinstance(obj, str), (
             'Expected unicode, received %s' % obj)
-        normalized_obj = html_cleaner.clean(obj) # type: ignore[no-untyped-call]
+        normalized_obj = html_cleaner.clean(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
@@ -219,11 +257,12 @@ def normalize_against_schema(
             validate_class = schema[SCHEMA_KEY_OBJECT_CLASS]
             domain_object = validate_class.from_dict(obj)
             domain_object.validate()
+            normalized_obj = domain_object
         else:
             validation_method = schema[SCHEMA_KEY_VALIDATION_METHOD]
-            validation_method(obj)
+            normalized_obj = validation_method(obj)
 
-        normalized_obj = obj
+        return normalized_obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
 
@@ -334,15 +373,15 @@ class Normalizers:
         if obj == '':
             return obj
         url_components = urllib.parse.urlsplit(obj)
-        quoted_url_components = (
-            urllib.parse.quote(component) for component in url_components)
-        raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
+        quoted_url_components = [
+            urllib.parse.quote(component) for component in url_components]
+        raw = urllib.parse.urlunsplit(quoted_url_components)
 
-        acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
+        acceptable = html_cleaner.filter_a('a', 'href', obj)
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
-        return raw # type: ignore[no-any-return]
+        return raw
 
     @staticmethod
     def normalize_spaces(obj: str) -> str:
@@ -383,6 +422,9 @@ class _Validators:
         Returns:
             function. The validator method corresponding to the specified
             validator_id.
+
+        Raises:
+            Exception. Given validator method is invalid.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
@@ -541,14 +583,13 @@ class _Validators:
         if len(obj) == 0:
             return True
 
-        if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
+        if not expression_parser.is_valid_expression(obj):
             return False
 
-        expression_is_algebraic = expression_parser.is_algebraic(obj) # type: ignore[no-untyped-call]
-        # If the algebraic flag is true, expression_is_algebraic should
-        # also be true, otherwise both should be false which would imply
-        # that the expression is numeric.
-        return not algebraic ^ expression_is_algebraic
+        expression_contains_at_least_one_variable = (
+            expression_parser.contains_at_least_one_variable(obj))
+        # This ensures that numeric expressions don't contain variables.
+        return algebraic or not expression_contains_at_least_one_variable
 
     @staticmethod
     def is_valid_algebraic_expression(obj: str) -> bool:
@@ -593,25 +634,24 @@ class _Validators:
 
         is_valid_algebraic_expression = get_validator(
             'is_valid_algebraic_expression')
-        is_valid_numeric_expression = get_validator(
-            'is_valid_numeric_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
-        # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_algebraic_expression(lhs)
-        rhs_is_algebraically_valid = is_valid_algebraic_expression(rhs)
+        # to have at least one variable.
+        lhs_is_valid = is_valid_algebraic_expression(lhs)
+        rhs_is_valid = is_valid_algebraic_expression(rhs)
 
-        lhs_is_numerically_valid = is_valid_numeric_expression(lhs)
-        rhs_is_numerically_valid = is_valid_numeric_expression(rhs)
+        if not lhs_is_valid or not rhs_is_valid:
+            return False
 
-        if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
-            return True
-        if lhs_is_algebraically_valid and rhs_is_numerically_valid:
-            return True
-        if lhs_is_numerically_valid and rhs_is_algebraically_valid:
-            return True
-        return False
+        lhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(lhs))
+        rhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(rhs))
+
+        if not lhs_contains_variable and not rhs_contains_variable:
+            return False
+        return True
 
     @staticmethod
     def is_supported_audio_language_code(obj: str) -> bool:

@@ -27,26 +27,26 @@ var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage = require('./SkillEditorPage');
 
 var imageUploadInput = element(
-  by.css('.protractor-test-photo-upload-input'));
+  by.css('.e2e-test-photo-upload-input'));
 var imageSubmitButton = element(
-  by.css('.protractor-test-photo-upload-submit'));
+  by.css('.e2e-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
-  '.protractor-test-thumbnail-reset-button'));
+  '.e2e-test-thumbnail-reset-button'));
 var stateNameText = element(
-  by.css('.protractor-test-state-name-text'));
-var activityCreationModal = element(by.css('.protractor-test-creation-modal'));
+  by.css('.e2e-test-state-name-text'));
+var activityCreationModal = element(by.css('.e2e-test-creation-modal'));
 var createExplorationButton = element(
-  by.css('.protractor-test-create-exploration'));
+  by.css('.e2e-test-create-exploration'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
-  return await element(by.css('.protractor-test-save-role')).isEnabled();
+  return await element(by.css('.e2e-test-save-role')).isEnabled();
 };
 
 // Check if exploration is community owned.
 var isExplorationCommunityOwned = async function() {
   return await element(
-    by.css('.protractor-test-is-community-owned')
+    by.css('.e2e-test-is-community-owned')
   ).isPresent();
 };
 
@@ -54,25 +54,25 @@ var isExplorationCommunityOwned = async function() {
 // Check if the warning message is visible when the title is ''.
 var checkForAddTitleWarning = async function() {
   return await element(
-    by.className('protractor-test-title-warning')).isDisplayed();
+    by.className('e2e-test-title-warning')).isDisplayed();
 };
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
   var explorationTitleInput = element(
-    by.css('.protractor-test-exploration-title-input'));
+    by.css('.e2e-test-exploration-title-input'));
   await action.click('Exploration Title Input', explorationTitleInput);
   var explorationObjectiveInput = element(
-    by.css('.protractor-test-exploration-objective-input'));
+    by.css('.e2e-test-exploration-objective-input'));
   await action.click('Exploration Objective Input', explorationObjectiveInput);
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
-  var testEditRoles = element(by.css('.protractor-test-edit-roles'));
+  var testEditRoles = element(by.css('.e2e-test-edit-roles'));
   await action.click('Test edit roles', testEditRoles);
   await action.sendKeys('Test Role Username', element(
-    by.css('.protractor-test-role-username')), 'Chuck Norris');
+    by.css('.e2e-test-role-username')), 'Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
@@ -131,26 +131,26 @@ var createExplorationAsAdmin = async function() {
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
   await waitFor.elementToBeClickable(element(by.css(
-    '.protractor-test-publish-exploration')));
-  await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
+    '.e2e-test-publish-exploration')));
+  await element(by.css('.e2e-test-publish-exploration')).isDisplayed();
   var testPublishExploration = element(
-    by.css('.protractor-test-publish-exploration'));
+    by.css('.e2e-test-publish-exploration'));
   await action.click('Test Publish Exploration', testPublishExploration);
   var prePublicationButtonElem = element(by.css(
-    '.protractor-test-confirm-pre-publication'));
+    '.e2e-test-confirm-pre-publication'));
   await action.click(
     'Pre Publication Button Element', prePublicationButtonElem);
 
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  var testConfirmPublish = element(by.css('.protractor-test-confirm-publish'));
+  var testConfirmPublish = element(by.css('.e2e-test-confirm-publish'));
   await action.click('Test Confirm Publish', testConfirmPublish);
 
   var sharePublishModal = element(
-    by.css('.protractor-test-share-publish-modal'));
+    by.css('.e2e-test-share-publish-modal'));
   var closePublishModalButton = element(
-    by.css('.protractor-test-share-publish-close'));
+    by.css('.e2e-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
   await action.click('Close Publish Modal Button', closePublishModalButton);
@@ -215,8 +215,8 @@ var createAndPublishTwoCardExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
-  if (correctnessFeedbackIsEnabled) {
-    await explorationEditorSettingsTab.enableCorrectnessFeedback();
+  if (!correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.disableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
@@ -227,15 +227,15 @@ var createAndPublishTwoCardExploration = async function(
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {
   await action.click(
-    'Edit roles', element(by.css('.protractor-test-edit-roles')));
+    'Edit roles', element(by.css('.e2e-test-edit-roles')));
   await action.sendKeys(
     'Username input',
-    element(by.css('.protractor-test-role-username')),
+    element(by.css('.e2e-test-role-username')),
     username);
-  await action.select(
-    'Role select', element(by.css('.protractor-test-role-select')), roleName);
+  await action.matSelect(
+    'Role select', element(by.css('.e2e-test-role-select')), roleName);
   await action.click(
-    'Save role', element(by.css('.protractor-test-save-role')));
+    'Save role', element(by.css('.e2e-test-save-role')));
 };
 
 var addExplorationManager = async function(username) {
@@ -248,14 +248,14 @@ var addExplorationCollaborator = async function(username) {
 
 var addExplorationVoiceArtist = async function(username) {
   await action.click('Edit voice artist role button', element(
-    by.css('.protractor-test-edit-voice-artist-roles')));
+    by.css('.e2e-test-edit-voice-artist-roles')));
   await action.sendKeys(
     'New voice artist username input',
-    element(by.css('.protractor-test-new-voice-artist-username')), username);
+    element(by.css('.e2e-test-new-voice-artist-username')), username);
   await action.click('Add voice artist button', element(
-    by.css('.protractor-test-add-voice-artist-role-button')));
+    by.css('.e2e-test-add-voice-artist-role-button')));
   await waitFor.visibilityOf(element(by.css(
-    '.protractor-test-voice-artist-' + username)));
+    '.e2e-test-voice-artist-' + username)));
 };
 
 var addExplorationPlaytester = async function(username) {
@@ -264,12 +264,8 @@ var addExplorationPlaytester = async function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
-  var itemName = roleName + 'Name';
-  var listName = roleName + 'Names';
-  return await element.all(by.repeater(
-    itemName + ' in $ctrl.ExplorationRightsService.' + listName +
-    ' track by $index'
-  )).map(async function(elem) {
+  var listName = '.e2e-test-' + roleName + '-role-names';
+  return await element.all(by.css(listName)).map(async function(elem) {
     return await elem.getText();
   });
 };

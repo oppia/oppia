@@ -19,25 +19,24 @@
 from __future__ import annotations
 
 import os
-import re
 import subprocess
 
 from .. import common
 from .. import concurrent_task_utils
 
+STYLELINT_CONFIG = os.path.join('.stylelintrc')
+
 
 class ThirdPartyCSSLintChecksManager:
     """Manages all the third party Python linting functions."""
 
-    def __init__(self, config_path, files_to_lint):
+    def __init__(self, files_to_lint):
         """Constructs a ThirdPartyCSSLintChecksManager object.
 
         Args:
-            config_path: str. Path to the configuration file.
             files_to_lint: list(str). A list of filepaths to lint.
         """
-        super(ThirdPartyCSSLintChecksManager, self).__init__()
-        self.config_path = config_path
+        super().__init__()
         self.files_to_lint = files_to_lint
 
     @property
@@ -55,20 +54,7 @@ class ThirdPartyCSSLintChecksManager:
         Returns:
             str. A string with the trimmed error messages.
         """
-        trimmed_error_messages = []
-        # We need to extract messages from the list and split them line by
-        # line so we can loop through them.
-        css_output_lines = css_lint_output.split('\n')
-        for line in css_output_lines:
-            # Stylelint messages starts with line numbers and then a
-            # "x"(\u2716) and a message-id in the end. We are capturing these
-            # and then replacing them with empty string('').
-            if re.search(r'^\d+:\d+', line.lstrip()):
-                error_message = line.replace(u'\u2716 ', '')
-            else:
-                error_message = line
-            trimmed_error_messages.append(error_message)
-        return '\n'.join(trimmed_error_messages) + '\n'
+        return '%s\n' % css_lint_output
 
     def lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
@@ -76,13 +62,16 @@ class ThirdPartyCSSLintChecksManager:
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
+
+        Raises:
+            Exception. The start.py file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
             'node_modules', 'stylelint', 'bin', 'stylelint.js')
         if not os.path.exists(stylelint_path):
             raise Exception(
-                'ERROR    Please run start.sh first to install node-eslint '
+                'ERROR    Please run start.py first to install node-eslint '
                 'or node-stylelint and its dependencies.')
 
         failed = False
@@ -91,7 +80,7 @@ class ThirdPartyCSSLintChecksManager:
         name = 'Stylelint'
 
         stylelint_cmd_args = [
-            node_path, stylelint_path, '--config=' + self.config_path]
+            node_path, stylelint_path, '--config=' + STYLELINT_CONFIG]
         proc_args = stylelint_cmd_args + self.all_filepaths
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -131,18 +120,14 @@ class ThirdPartyCSSLintChecksManager:
         return [self.lint_css_files()]
 
 
-def get_linters(config_path, files_to_lint):
+def get_linters(files_to_lint):
     """Creates ThirdPartyCSSLintChecksManager and returns it.
 
     Args:
-        config_path: str. Path to the configuration file.
         files_to_lint: list(str). A list of filepaths to lint.
 
     Returns:
         tuple(None, ThirdPartyCSSLintChecksManager). A 2-tuple of custom and
         third_party linter objects.
     """
-    third_party_linter = ThirdPartyCSSLintChecksManager(
-        config_path, files_to_lint)
-
-    return None, third_party_linter
+    return None, ThirdPartyCSSLintChecksManager(files_to_lint)

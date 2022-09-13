@@ -33,6 +33,7 @@ class MockRouterService {
   get onRefreshStatisticsTab() {
     return this.refreshStatisticsTabEventEmitter;
   }
+
   set refreshStatisticsTabEmitter(val) {
     this.refreshStatisticsTabEventEmitter = val;
   }
@@ -64,6 +65,7 @@ describe('Statistics Tab Component', function() {
       answer_groups: [{
         outcome: {
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content2',
             html: ''
@@ -77,6 +79,7 @@ describe('Statistics Tab Component', function() {
       }, {
         outcome: {
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content3',
             html: ''
@@ -206,10 +209,14 @@ describe('Statistics Tab Component', function() {
       initStateId: 'State1',
       links: [{
         source: 'State1',
-        target: 'outcome 1'
+        target: 'outcome 1',
+        linkProperty: null,
+        connectsDestIfStuck: false
       }, {
         source: 'State1',
-        target: 'outcome 2'
+        target: 'outcome 2',
+        linkProperty: null,
+        connectsDestIfStuck: false
       }],
       nodes: {
         State1: 'State1'

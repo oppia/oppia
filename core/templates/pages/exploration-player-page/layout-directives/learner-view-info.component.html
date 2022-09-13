@@ -3,67 +3,25 @@
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <div class="lesson-info-section">
       <h1 class="oppia-exploration-h1">
-        <span class="protractor-test-exploration-header oppia-exploration-header"
+        <span class="e2e-test-exploration-header oppia-exploration-header"
               itemprop="description">
-              {{ explorationTitle }}
+          <span *ngIf="!isHackyExpTitleTranslationDisplayed()">
+            {{ explorationTitle }}
+          </span>
+          <span *ngIf="isHackyExpTitleTranslationDisplayed()">
+            {{ explorationTitleTranslationKey | translate }}
+          </span>
         </span>
       </h1>
       <a class="oppia-topic-title" *ngIf="isLinkedToTopic == true"
          [href]="getTopicUrl()">
-         {{ topicName }}
+        <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+          {{ topicName }}
+        </span>
+        <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+          {{ topicNameTranslationKey | translate }}
+        </span>
       </a>
     </div>
   </li>
-  <li (click)="showInformationCard()" tabindex="0"
-      placement="bottom" [ngbTooltip]="'I18N_PLAYER_INFO_TOOLTIP' | translate"
-      class="oppia-exploration-info-icon protractor-test-exploration-info-icon">
-    <i class="material-icons oppia-navbar-breadcrumb-icon oppia-navbar-info-icon">&#xE88E;</i>
-    <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
-  </li>
 </ul>
-
-<style>
-  .oppia-navbar-breadcrumb {
-    padding-top: 10px;
-  }
-  .oppia-learner-navbar-container {
-    display: flex;
-  }
-  .lesson-info-section {
-    display: contents;
-  }
-  .oppia-navbar-title-container {
-    display: flex;
-    flex-direction: column;
-  }
-  .oppia-exploration-h1 {
-    color: #fff;
-    display: inline;
-    font-size: 18px;
-    font-weight: normal;
-    margin-bottom: 1px;
-  }
-  .oppia-topic-title {
-    color: #fff;
-    display: flex;
-    font-size: 12px;
-    font-weight: 200;
-    padding-left: 26px;
-  }
-  .oppia-topic-title:hover {
-    color: #fff;
-  }
-  .oppia-exploration-info-icon {
-    cursor: pointer;
-  }
-  .oppia-exploration-info-icon:hover {
-    background: #fff;
-    color: #009688;
-    height: 56px;
-    margin-top: -13px;
-    padding-top: 12px;
-  }
-  .oppia-navbar-info-icon {
-    font-size: 20px;
-  }
-</style>

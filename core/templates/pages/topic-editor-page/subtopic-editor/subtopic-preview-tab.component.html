@@ -3,8 +3,8 @@
     <div class="content">
       <span class="content-title">{{ editableTitle }}</span>
       <div class="html-content">
-        <angular-html-bind-wrapper [htmlData]="pageContents?.getHtml()">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display [rteString]="pageContents?.getHtml()">
+        </oppia-rte-output-display>
       </div>
     </div>
   </div>
@@ -20,20 +20,20 @@
     width: 70%;
   }
   .content {
-    background-color: #FFF;
+    background-color: #fff;
     border-radius: 5px;
     padding: 30px 35px;
     width: 65%;
   }
   .content-title {
-    color: #00645C;
+    color: #00645c;
     display: block;
     font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 30px;
     margin-bottom: 15px;
   }
   .html-content {
-    background-color: #ECF5FC;
+    background-color: #ecf5fc;
     padding: 15px 25px;
   }
 

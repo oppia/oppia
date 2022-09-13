@@ -32,7 +32,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicViewerControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -59,7 +59,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.story_2.node_titles = []
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name', 'public', 'description')
+            self.topic_id, 'public_topic_name', 'public', 'description',
+            'fragm')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
@@ -77,6 +78,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
                 self.story_id_2))
         self.topic.meta_tag_content = 'topic meta content'
         self.topic.page_title_fragment_for_web = 'topic page title'
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
 
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
@@ -106,7 +108,7 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
     def test_accessibility_of_unpublished_topic_viewer_page(self):
         topic = topic_domain.Topic.create_default_topic(
             'topic_id_1', 'private_topic_name',
-            'private_topic_name', 'description')
+            'private_topic_name', 'description', 'fragm')
         topic.thumbnail_filename = 'Image.svg'
         topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -233,7 +235,6 @@ class TopicPageDataHandlerTests(
                     self.skill_id_2: 0.5
                 },
                 'skill_descriptions': {
-                    self.skill_id_1: None,
                     self.skill_id_2: 'Skill Description 2'
                 },
                 'practice_tab_is_displayed': False
@@ -245,7 +246,7 @@ class TopicPageDataHandlerTests(
     def test_get_with_meta_tag_content(self):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_with_meta',
-            'topic-with-meta', 'description')
+            'topic-with-meta', 'description', 'fragm')
         self.topic.meta_tag_content = 'meta content'
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -258,8 +259,7 @@ class TopicPageDataHandlerTests(
     def test_get_with_page_title_fragment_for_web(self):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_with_page_title_fragment_for_web',
-            'topic-page-title', 'description')
-        self.topic.page_title_fragment_for_web = 'topic page title'
+            'topic-page-title', 'description', 'topic page title')
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         json_response = self.get_json(
@@ -273,7 +273,7 @@ class TopicPageDataHandlerTests(
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_with_no_skills',
-            'topic-with-no-skills', 'description')
+            'topic-with-no-skills', 'description', 'fragm')
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         json_response = self.get_json(
@@ -298,18 +298,20 @@ class TopicPageDataHandlerTests(
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description')
+            self.topic_id, 'new_topic', 'new-topic', 'description',
+            'fragm')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -335,8 +337,7 @@ class TopicPageDataHandlerTests(
                 self.skill_id_2: None
             },
             'skill_descriptions': {
-                self.skill_id_1: 'Skill Description 1',
-                self.skill_id_2: None
+                self.skill_id_1: 'Skill Description 1'
             },
             'practice_tab_is_displayed': True
         }
@@ -349,18 +350,20 @@ class TopicPageDataHandlerTests(
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description')
+            self.topic_id, 'new_topic', 'new-topic', 'description',
+            'fragm')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -387,7 +390,6 @@ class TopicPageDataHandlerTests(
             },
             'skill_descriptions': {
                 self.skill_id_1: 'Skill Description 1',
-                self.skill_id_2: None
             },
             'practice_tab_is_displayed': True
         }
@@ -402,7 +404,7 @@ class TopicPageDataHandlerTests(
             [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm')
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
@@ -410,11 +412,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -451,7 +454,7 @@ class TopicPageDataHandlerTests(
             [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm')
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
@@ -459,11 +462,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = False
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -502,7 +506,7 @@ class TopicPageDataHandlerTests(
             [skill_services.get_new_skill_id() for _ in range(
                 number_of_skills)])
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm')
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
@@ -510,11 +514,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):

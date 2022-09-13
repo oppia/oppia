@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview End-to-end testing utilities for Algebraic Expression Input
- * interaction
+ * interaction in protractor.
  */
 
 var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
@@ -24,7 +24,7 @@ var waitFor = require(
 
 var customizeInteraction = async function(elem, customLetters) {
   await waitFor.presenceOf(elem.element(by.css(
-    '.protractor-test-custom-letters-div')),
+    '.e2e-test-custom-letters-div')),
   'The custom letters div took too long to load.');
   for (let letter of customLetters) {
     if (letter.match(/[a-z]/)) {
@@ -51,23 +51,24 @@ var expectInteractionDetailsToMatch = async function(elem) {
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.element(by.tagName(
     'oppia-interactive-algebraic-expression-input'))).setValue(answer);
-  await element(by.css('.protractor-test-submit-answer-button')).click();
+  await element(by.css('.e2e-test-submit-answer-button')).click();
 };
 
 var answerObjectType = 'AlgebraicExpression';
 
 var testSuite = [{
   interactionArguments: [['a', 'b']],
-  ruleArguments: ['MatchesExactlyWith', '((a+b))^(2)'],
+  ruleArguments: ['MatchesExactlyWith', '(a+b)^2'],
   expectedInteractionDetails: [],
   wrongAnswers: ['(a-b)^2', '(a-b)^3', 'a^2+2*a*b+b^2'],
-  correctAnswers: ['(a+b)^2', '(b+a)^2', '(a+b)*(a+b)']
+  correctAnswers: ['(a+b)^2']
 }, {
   interactionArguments: [['x', 'z']],
   ruleArguments: ['MatchesExactlyWith', '((x^2)-x)/z'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z'],
-  correctAnswers: ['((x^2)-x)/z', '((x*x)-x)*z^(-1)']
+  wrongAnswers: [
+    '((x^3)-x)/z', 'x(x-1)/z', '((x^2)/z)-x/z', '((x*x)-x)*z^(-1)'],
+  correctAnswers: ['((x^2)-x)/z']
 }, {
   interactionArguments: [['π', 'r']],
   ruleArguments: ['IsEquivalentTo', 'pi*r^2'],
@@ -78,8 +79,8 @@ var testSuite = [{
   interactionArguments: [['x']],
   ruleArguments: ['IsEquivalentTo', '(9*x^2)-6*x+1'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['sqrt((3x-1)^(2))', '9*(x)^(2)-6*x-1', '((3*x-1))^(4)'],
-  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^(2)']
+  wrongAnswers: ['sqrt(3x-1)^(2)', '9*(x)^(2)-6*x-1', '(3*x-1)^(4)'],
+  correctAnswers: ['(9*x^2)-6*x+1', '(1-3x)^2']
 }];
 
 exports.customizeInteraction = customizeInteraction;

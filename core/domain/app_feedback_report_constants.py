@@ -18,7 +18,8 @@
 
 from __future__ import annotations
 
-from core import python_utils
+import enum
+
 from core.platform import models
 
 MYPY = False
@@ -26,7 +27,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.Names.APP_FEEDBACK_REPORT])
 
 
 PLATFORM_CHOICE_ANDROID = app_feedback_report_models.PLATFORM_CHOICE_ANDROID
@@ -51,69 +52,120 @@ TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
-# Ignoring the untyped call error because python_utils is untyped.
-REPORT_TYPE = python_utils.create_enum('suggestion', 'issue', 'crash') # type: ignore[no-untyped-call]
-CATEGORY = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'feature_suggestion', 'language_suggestion', 'other_suggestion',
-    'lesson_question_issue', 'language_general_issue', 'language_audio_issue',
-    'language_text_issue', 'topics_issue', 'profile_issue', 'other_issue',
-    'lesson_player_crash', 'practice_questions_crash', 'options_page_crash',
-    'profile_page_crash', 'other_crash')
-ENTRY_POINT = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
-STATS_PARAMETER_NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'platform', 'report_type', 'country_locale_code',
-    'entry_point_name', 'text_language_code', 'audio_language_code',
-    'android_sdk_version', 'version_name')
-ANDROID_TEXT_SIZE = python_utils.create_enum( # type: ignore[no-untyped-call]
-    'text_size_unspecified', 'small_text_size', 'medium_text_size',
-    'large_text_size', 'extra_large_text_size')
-ANDROID_NETWORK_TYPE = python_utils.create_enum('wifi', 'cellular', 'none') # type: ignore[no-untyped-call]
-FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
+
+class ReportType(enum.Enum):
+    """Enum for report types."""
+
+    SUGGESTION = 'suggestion'
+    ISSUE = 'issue'
+    CRASH = 'crash'
+
+
+class Category(enum.Enum):
+    """Enum for categories."""
+
+    FEATURE_SUGGESTION = 'feature_suggestion'
+    LANGUAGE_SUGGESTION = 'language_suggestion'
+    OTHER_SUGGESTION = 'other_suggestion'
+    LESSON_QUESTION_ISSUE = 'lesson_question_issue'
+    LANGUAGE_GENERAL_ISSUE = 'language_general_issue'
+    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue'
+    LANGUAGE_TEXT_ISSUE = 'language_text_issue'
+    TOPICS_ISSUE = 'topics_issue'
+    PROFILE_ISSUE = 'profile_issue'
+    OTHER_ISSUE = 'other_issue'
+    LESSON_PLAYER_CRASH = 'lesson_player_crash'
+    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash'
+    OPTIONS_PAGE_CRASH = 'options_page_crash'
+    PROFILE_PAGE_CRASH = 'profile_page_crash'
+    OTHER_CRASH = 'other_crash'
+
+
+class EntryPoint(enum.Enum):
+    """Enum for entry points."""
+
+    NAVIGATION_DRAWER = 'navigation_drawer'
+    LESSON_PLAYER = 'lesson_player'
+    REVISION_CARD = 'revision_card'
+    CRASH = 'crash'
+
+
+class StatsParameterNames(enum.Enum):
+    """Enum for stats parameter names."""
+
+    PLATFORM = 'platform'
+    REPORT_TYPE = 'report_type'
+    COUNTRY_LOCALE_CODE = 'country_locale_code'
+    ENTRY_POINT_NAME = 'entry_point_name'
+    TEXT_LANGUAGE_CODE = 'text_language_code'
+    AUDIO_LANGUAGE_CODE = 'audio_language_code'
+    ANDROID_SDK_VERSION = 'android_sdk_version'
+    VERSION_NAME = 'version_name'
+
+
+class AndroidTextSize(enum.Enum):
+    """Enum for android text sizes."""
+
+    TEXT_SIZE_UNSPECIFIED = 'text_size_unspecified'
+    SMALL_TEXT_SIZE = 'small_text_size'
+    MEDIUM_TEXT_SIZE = 'medium_text_size'
+    LARGE_TEXT_SIZE = 'large_text_size'
+    EXTRA_LARGE_TEXT_SIZE = 'extra_large_text_size'
+
+
+class AndroidNetworkType(enum.Enum):
+    """Enum for android network types."""
+
+    WIFI = 'wifi'
+    CELLULAR = 'cellular'
+    NONE = 'none'
+
+
+FilterFieldNames = app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
-    ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
-    ENTRY_POINT.revision_card, ENTRY_POINT.crash]
+    EntryPoint.NAVIGATION_DRAWER, EntryPoint.LESSON_PLAYER,
+    EntryPoint.REVISION_CARD, EntryPoint.CRASH]
 ALLOWED_REPORT_TYPES = [
-    REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
+    ReportType.SUGGESTION, ReportType.ISSUE, ReportType.CRASH]
 ALLOWED_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.language_general_issue,
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
+    Category.OTHER_SUGGESTION, Category.LANGUAGE_GENERAL_ISSUE,
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
+    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE, Category.OTHER_ISSUE,
+    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTIONS_CRASH,
+    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
+    Category.OTHER_CRASH]
 ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.FEATURE_SUGGESTION, Category.LANGUAGE_SUGGESTION,
+    Category.OTHER_SUGGESTION, Category.OTHER_ISSUE,
+    Category.LESSON_PLAYER_CRASH, Category.PRACTICE_QUESTIONS_CRASH,
+    Category.OPTIONS_PAGE_CRASH, Category.PROFILE_PAGE_CRASH,
+    Category.OTHER_CRASH]
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue]
+    Category.LANGUAGE_AUDIO_ISSUE, Category.LANGUAGE_TEXT_ISSUE,
+    Category.TOPICS_ISSUE, Category.PROFILE_ISSUE]
 ALLOWED_STATS_PARAMETERS = [
-    STATS_PARAMETER_NAMES.platform,
-    STATS_PARAMETER_NAMES.report_type,
-    STATS_PARAMETER_NAMES.country_locale_code,
-    STATS_PARAMETER_NAMES.entry_point_name,
-    STATS_PARAMETER_NAMES.text_language_code,
-    STATS_PARAMETER_NAMES.audio_language_code,
-    STATS_PARAMETER_NAMES.android_sdk_version,
-    STATS_PARAMETER_NAMES.version_name]
+    StatsParameterNames.PLATFORM,
+    StatsParameterNames.REPORT_TYPE,
+    StatsParameterNames.COUNTRY_LOCALE_CODE,
+    StatsParameterNames.ENTRY_POINT_NAME,
+    StatsParameterNames.TEXT_LANGUAGE_CODE,
+    StatsParameterNames.AUDIO_LANGUAGE_CODE,
+    StatsParameterNames.ANDROID_SDK_VERSION,
+    StatsParameterNames.VERSION_NAME]
 ALLOWED_FILTERS = [
-    FILTER_FIELD_NAMES.report_type, FILTER_FIELD_NAMES.platform,
-    FILTER_FIELD_NAMES.entry_point, FILTER_FIELD_NAMES.submitted_on,
-    FILTER_FIELD_NAMES.android_device_model,
-    FILTER_FIELD_NAMES.android_sdk_version,
-    FILTER_FIELD_NAMES.text_language_code,
-    FILTER_FIELD_NAMES.audio_language_code, FILTER_FIELD_NAMES.platform_version,
-    FILTER_FIELD_NAMES.android_device_country_locale_code]
+    FilterFieldNames.REPORT_TYPE, FilterFieldNames.PLATFORM,
+    FilterFieldNames.ENTRY_POINT, FilterFieldNames.SUBMITTED_ON,
+    FilterFieldNames.ANDROID_DEVICE_MODEL,
+    FilterFieldNames.ANDROID_SDK_VERSION,
+    FilterFieldNames.TEXT_LANGUAGE_CODE,
+    FilterFieldNames.AUDIO_LANGUAGE_CODE, FilterFieldNames.PLATFORM_VERSION,
+    FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE]
 ALLOWED_ANDROID_NETWORK_TYPES = [
-    ANDROID_NETWORK_TYPE.wifi, ANDROID_NETWORK_TYPE.cellular,
-    ANDROID_NETWORK_TYPE.none]
+    AndroidNetworkType.WIFI, AndroidNetworkType.CELLULAR,
+    AndroidNetworkType.NONE]
 ALLOWED_ANDROID_TEXT_SIZES = [
-    ANDROID_TEXT_SIZE.text_size_unspecified, ANDROID_TEXT_SIZE.small_text_size,
-    ANDROID_TEXT_SIZE.medium_text_size, ANDROID_TEXT_SIZE.large_text_size,
-    ANDROID_TEXT_SIZE.extra_large_text_size]
+    AndroidTextSize.TEXT_SIZE_UNSPECIFIED, AndroidTextSize.SMALL_TEXT_SIZE,
+    AndroidTextSize.MEDIUM_TEXT_SIZE, AndroidTextSize.LARGE_TEXT_SIZE,
+    AndroidTextSize.EXTRA_LARGE_TEXT_SIZE]

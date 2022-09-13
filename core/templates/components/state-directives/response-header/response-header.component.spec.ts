@@ -12,89 +12,107 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
 /**
  * @fileoverview Unit tests for Response Header Component.
  */
 
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ResponseHeaderComponent } from './response-header.component';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+
+const mockInteractionState = {
+  TextInput: {
+    is_linear: false
+  }
+};
+class MockStateInteractionIdService {
+  savedMemento = 'TextInput';
+}
+
 describe('Response Header Component', () => {
-  let ctrl = null;
-  let $scope = null;
-  let $rootScope = null;
+  let component: ResponseHeaderComponent;
+  let fixture: ComponentFixture<ResponseHeaderComponent>;
+  let stateEditorService: StateEditorService;
+  let outcomeObjectFactory: OutcomeObjectFactory;
 
-  let StateEditorService = null;
-  let StateInteractionIdService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    StateEditorService = $injector.get('StateEditorService');
-    StateInteractionIdService = $injector.get('StateInteractionIdService');
-
-    ctrl = $componentController('responseHeader', {
-      $scope: $scope
-    }, {
-      getOutcome: () => {
-        return {
-          labelledAsCorrect: true,
-          dest: '/'
-        };
-      },
-      getOnDeleteFn: () => {
-        return () => {};
-      },
-      getIndex: () => 0
-    });
-    ctrl.$onInit();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        ResponseHeaderComponent
+      ],
+      providers: [
+        StateEditorService,
+        OutcomeObjectFactory,
+        {
+          provide: INTERACTION_SPECS,
+          useValue: mockInteractionState
+        },
+        {
+          provide: StateInteractionIdService,
+          useClass: MockStateInteractionIdService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should check if state is in question mode', () => {
-    spyOn(StateEditorService, 'isInQuestionMode').and.returnValue(true);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ResponseHeaderComponent);
+    component = fixture.componentInstance;
 
-    expect(ctrl.isInQuestionMode()).toBe(true);
+    stateEditorService = TestBed.inject(StateEditorService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+
+    component.outcome = outcomeObjectFactory.createNew('/', '0', '0', []);
+    component.index = 0;
+
+    fixture.detectChanges();
+  });
+
+  it('should check if state is in question mode', () => {
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+
+    expect(component.isInQuestionMode()).toBe(true);
   });
 
   it('should get current interaction ID', () => {
-    StateInteractionIdService.savedMemento = 'TextInteraction';
-
-    expect(ctrl.getCurrentInteractionId()).toBe('TextInteraction');
+    expect(component.getCurrentInteractionId()).toBe('TextInput');
   });
 
   it('should check if correctness feedback is enabled', () => {
-    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
+    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
       false);
 
-    expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
+    expect(component.isCorrectnessFeedbackEnabled()).toBe(false);
   });
 
   it('should check if current interaction is linear or not', () => {
-    StateInteractionIdService.savedMemento = 'TextInput';
+    expect(component.isCurrentInteractionLinear()).toBe(false);
+  });
 
-    expect(ctrl.isCurrentInteractionLinear()).toBe(false);
+  it('should navigate to state after user click on outcome dest', () => {
+    spyOn(component.navigateToState, 'emit').and.callThrough();
+
+    component.returnToState();
+
+    expect(component.navigateToState.emit).toHaveBeenCalled();
   });
 
   it('should check if current response is outcome is correct', () => {
-    expect(ctrl.isCorrect()).toBe(true);
+    expect(component.isCorrect()).toBe(false);
   });
 
   it('should check if outcome is in a loop', () => {
-    spyOn(StateEditorService, 'getActiveStateName').and.returnValue('Hola');
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
-    expect(ctrl.isOutcomeLooping()).toBe(false);
+    expect(component.isOutcomeLooping()).toBe(false);
   });
 
   it('should check if a new state is being created', () => {
-    expect(ctrl.isCreatingNewState()).toBe(true);
-  });
-
-  it('should delete response when user clicks delete button', () => {
-    spyOn(ctrl, 'getIndex');
-    ctrl.deleteResponse(new Event(''));
-    expect(ctrl.getIndex).toHaveBeenCalled();
+    expect(component.isCreatingNewState()).toBe(true);
   });
 });

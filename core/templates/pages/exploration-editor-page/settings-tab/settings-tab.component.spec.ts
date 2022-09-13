@@ -16,77 +16,67 @@
  * @fileoverview Unit tests for settingsTab.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
-
-import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationEditsAllowedBackendApiService } from '../services/exploration-edits-allowed-backend-api.service';
+import { EditabilityService } from 'services/editability.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { ContextService } from 'services/context.service';
+import { UserService } from 'services/user.service';
+import { ExplorationCategoryService } from '../services/exploration-category.service';
+import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
+import { ExplorationLanguageCodeService } from '../services/exploration-language-code.service';
+import { ExplorationObjectiveService } from '../services/exploration-objective.service';
+import { ExplorationRightsService } from '../services/exploration-rights.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { ExplorationTagsService } from '../services/exploration-tags.service';
+import { ExplorationTitleService } from '../services/exploration-title.service';
+import { ExplorationWarningsService } from '../services/exploration-warnings.service';
+import { RouterService } from '../services/router.service';
+import { SettingTabBackendApiService } from '../services/setting-tab-backend-api.service';
+import { UserEmailPreferencesService } from '../services/user-email-preferences.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { SettingsTabComponent } from './settings-tab.component';
+import { UserInfo } from 'domain/user/user-info.model';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import { State } from 'domain/state/StateObjectFactory';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
-class MockRouterService {
-  private refreshSettingsTabEventEmitter: EventEmitter<void>;
-  get onRefreshSettingsTab() {
-    return this.refreshSettingsTabEventEmitter;
-  }
-  set refreshSettingsTabEmitter(val) {
-    this.refreshSettingsTabEventEmitter = val;
-  }
-}
 describe('Settings Tab Component', () => {
-  let ctrl = null;
-  let $q = null;
-  let $rootScope = null;
-  let $scope = null;
-  let $uibModal = null;
-  let alertsService = null;
-  let changeListService = null;
-  let explorationDataService = null;
-  let contextService = null;
-  let editableExplorationBackendApiService = null;
-  let explorationCategoryService = null;
-  let explorationInitStateNameService = null;
-  let explorationLanguageCodeService = null;
-  let explorationObjectiveService = null;
-  let explorationRightsService = null;
-  let explorationStatesService = null;
-  let explorationTagsService = null;
-  let explorationTitleService = null;
-  let explorationWarningsService = null;
-  let userEmailPreferencesService = null;
-  let userExplorationPermissionsService = null;
-  let userService = null;
-  let windowRef = null;
-  let routerService = null;
-  let settingTabBackendApiService = null;
-
-  let testSubscriptipns = null;
-  let refreshGraphSpy = null;
-
+  let component: SettingsTabComponent;
+  let fixture: ComponentFixture<SettingsTabComponent>;
+  let alertsService: AlertsService;
+  let changeListService: ChangeListService;
+  let explorationDataService: ExplorationDataService;
+  let contextService: ContextService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
+  let explorationCategoryService: ExplorationCategoryService;
+  let explorationInitStateNameService: ExplorationInitStateNameService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
+  let explorationObjectiveService: ExplorationObjectiveService;
+  let explorationRightsService: ExplorationRightsService;
+  let explorationStatesService: ExplorationStatesService;
+  let explorationTagsService: ExplorationTagsService;
+  let explorationTitleService: ExplorationTitleService;
+  let explorationWarningsService: ExplorationWarningsService;
+  let userEmailPreferencesService: UserEmailPreferencesService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let windowDimensionsService: WindowDimensionsService;
+  let userService: UserService;
+  let windowRef: WindowRef;
+  let settingTabBackendApiService: SettingTabBackendApiService;
+  let ngbModal: NgbModal = null;
+  let eeabas: ExplorationEditsAllowedBackendApiService = null;
+  let editabilityService: EditabilityService = null;
   let explorationId = 'exp1';
   let userPermissions = {
     canDelete: true,
@@ -95,15 +85,41 @@ describe('Settings Tab Component', () => {
     canUnpublish: true,
     canManageVoiceArtist: true
   };
-  let mockWindowDimensionsService = {
-    isWindowNarrow: () => true
-  };
+  let mockExplorationTagsServiceonPropertyChanged = new EventEmitter();
+  let mockEventEmitterRouterService = new EventEmitter();
+  let mockEventEmitteruserExplorationPermissionsService = new EventEmitter();
 
-  importAllAngularServices();
+  class MockChangeDetectorRef {
+    detectChanges(): void {}
+  }
 
-  beforeEach(() => {
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve()
+      };
+    }
+  }
+
+  class MockRouterService {
+    onRefreshSettingsTab = mockEventEmitterRouterService;
+  }
+
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        SettingsTabComponent
+      ],
       providers: [
+        {
+          provide: ChangeDetectorRef,
+          useClass: MockChangeDetectorRef
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
         {
           provide: ExplorationDataService,
           useValue: {
@@ -111,854 +127,859 @@ describe('Settings Tab Component', () => {
             data: {
               param_changes: []
             },
-            getDataAsync: () => $q.resolve(),
+            getDataAsync: () => Promise.resolve(),
             autosaveChangeListAsync() {
               return;
             }
           }
+        },
+        WindowDimensionsService,
+        ExplorationTitleService,
+        FocusManagerService,
+        {
+          provide: RouterService,
+          useClass: MockRouterService
         }
-      ]
-    });
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SettingsTabComponent);
+    component = fixture.componentInstance;
 
     alertsService = TestBed.inject(AlertsService);
     changeListService = TestBed.inject(ChangeListService);
     userExplorationPermissionsService = (
       TestBed.inject(UserExplorationPermissionsService));
     windowRef = TestBed.inject(WindowRef);
-    routerService = new MockRouterService();
-    mockWindowDimensionsService = {
-      isWindowNarrow: () => true
-    };
+    ngbModal = TestBed.inject(NgbModal);
+    eeabas = TestBed.inject(ExplorationEditsAllowedBackendApiService);
+    editabilityService = TestBed.inject(EditabilityService);
+    ngbModal = TestBed.inject(NgbModal);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    explorationDataService = TestBed.inject(ExplorationDataService);
+    contextService = TestBed.inject(ContextService);
+    settingTabBackendApiService = TestBed.inject(
+      SettingTabBackendApiService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
+    explorationCategoryService = TestBed.inject(ExplorationCategoryService);
+    explorationInitStateNameService = TestBed.inject(
+      ExplorationInitStateNameService);
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService);
+    explorationObjectiveService = TestBed.inject(
+      ExplorationObjectiveService);
+    explorationRightsService = TestBed.inject(ExplorationRightsService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    explorationTagsService = TestBed.inject(ExplorationTagsService);
+    explorationTitleService = TestBed.inject(ExplorationTitleService);
+    explorationWarningsService = TestBed.inject(ExplorationWarningsService);
+    userEmailPreferencesService = TestBed.inject(
+      UserEmailPreferencesService);
+    userService = TestBed.inject(UserService);
+
+    spyOn(explorationTagsService, 'onExplorationPropertyChanged')
+      .and.returnValue(mockExplorationTagsServiceonPropertyChanged);
+    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
+    spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+      .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
+    spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
+    spyOn(explorationStatesService, 'getStateNames').and.returnValue([
+      'Introduction']);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve({
+      getUsername: () => 'username1',
+      isSuperAdmin: () => true
+    } as UserInfo));
+    explorationCategoryService.init('Astrology');
+    spyOnProperty(
+      userExplorationPermissionsService, 'onUserExplorationPermissionsFetched')
+      .and.returnValue(mockEventEmitteruserExplorationPermissionsService);
+
+    fixture.detectChanges();
   });
 
-  beforeEach(angular.mock.module('oppia', ($provide) => {
-    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
-    $provide.value('WindowDimensionsService', TestBed.inject(
-      WindowDimensionsService));
-    $provide.value(
-      'TextInputRulesService',
-      TestBed.inject(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
-    $provide.value(
-      'StateCustomizationArgsService',
-      TestBed.inject(StateCustomizationArgsService));
-    $provide.value(
-      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
-    $provide.value(
-      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
-    $provide.value(
-      'StateSolutionService', TestBed.inject(StateSolutionService));
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.inject(ReadOnlyExplorationBackendApiService));
-    $provide.value(
-      'ExplorationDataService',
-      TestBed.inject(ExplorationDataService));
-  }));
+  it('should initialize controller properties after its initialization',
+    fakeAsync(() => {
+      component.ngOnInit();
+      mockExplorationTagsServiceonPropertyChanged.emit();
+      tick(600);
+      jasmine.createSpy('hasState').and.stub();
 
-  afterEach(() => {
-    ctrl.$onDestroy();
-  });
+      expect(component.isRolesFormOpen).toBe(false);
+      expect(component.canDelete).toBe(true);
+      expect(component.canModifyRoles).toBe(true);
+      expect(component.canReleaseOwnership).toBe(true);
+      expect(component.canUnpublish).toBe(true);
+      expect(component.explorationId).toBe(explorationId);
+      expect(component.canManageVoiceArtist).toBe(true);
+      expect(component.loggedInUser).toBe('username1');
 
-  describe('when the device is narrow', () => {
-    beforeEach(angular.mock.inject(($injector, $componentController) => {
-      $q = $injector.get('$q');
-      $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
-      explorationDataService = $injector.get('ExplorationDataService');
-      contextService = $injector.get('ContextService');
-      settingTabBackendApiService = $injector.get(
-        'SettingTabBackendApiService');
+      mockEventEmitterRouterService.emit();
+      tick(600);
 
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      editableExplorationBackendApiService = $injector.get(
-        'EditableExplorationBackendApiService');
-      explorationCategoryService = $injector.get('ExplorationCategoryService');
-      explorationInitStateNameService = $injector.get(
-        'ExplorationInitStateNameService');
-      explorationLanguageCodeService = $injector.get(
-        'ExplorationLanguageCodeService');
-      explorationObjectiveService = $injector.get(
-        'ExplorationObjectiveService');
-      explorationRightsService = $injector.get('ExplorationRightsService');
-      explorationStatesService = $injector.get('ExplorationStatesService');
-      explorationTagsService = $injector.get('ExplorationTagsService');
-      explorationTitleService = $injector.get('ExplorationTitleService');
-      explorationWarningsService = $injector.get('ExplorationWarningsService');
-      userEmailPreferencesService = $injector.get(
-        'UserEmailPreferencesService');
-      userService = $injector.get('UserService');
-
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve(userPermissions));
-      spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
-        .returnValue($q.resolve(userPermissions));
-      spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
-      spyOn(explorationStatesService, 'getStateNames').and.returnValue([
-        'Introduction']);
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        getUsername: () => 'username1'
-      }));
-
-      explorationCategoryService.init('Astrology');
-
-      routerService.refreshSettingsTabEmitter = new EventEmitter();
-      $scope = $rootScope.$new();
-      ctrl = $componentController('settingsTab', {
-        $scope: $scope,
-        AlertsService: alertsService,
-        UserExplorationPermissionsService: userExplorationPermissionsService,
-        RouterService: routerService,
-        WindowRef: windowRef,
-        WindowDimensionsService: mockWindowDimensionsService
+      expect(component.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
+        id: 'Astrology',
+        text: 'Astrology'
       });
-      ctrl.$onInit();
-      $scope.$apply();
+
+      component.filterChoices('English');
+      component.updateCategoryListWithUserData();
+      expect(component.newCategory).toEqual({
+        id: 'English',
+        text: 'English',
+      });
+
+      component.filterChoices('');
+
+      component.add({
+        value: 'shivam',
+        input: {
+          value: ''
+        }
+      } as MatChipInputEvent);
+      component.remove('shivam');
+      expect(component.stateNames).toEqual(['Introduction']);
+      expect(component.hasPageLoaded).toBe(true);
+
+      flush();
     }));
 
-    beforeEach(() => {
-      testSubscriptipns = new Subscription();
-      refreshGraphSpy = jasmine.createSpy('refreshGraph');
-      testSubscriptipns.add(
-        explorationStatesService.onRefreshGraph.subscribe(refreshGraphSpy));
+  it('should get explore page url based on the exploration id', () => {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        protocol: 'https:',
+        host: 'oppia.org'
+      }
+    });
+    expect(component.getExplorePageUrl()).toBe('https://oppia.org/explore/exp1');
+  });
+
+  it('should save exploration title', () => {
+    spyOn(explorationTitleService, 'saveDisplayedValue');
+    explorationTitleService.init('New title');
+
+    component.saveExplorationTitle();
+
+    expect(explorationTitleService.saveDisplayedValue).toHaveBeenCalled();
+    expect(component.isTitlePresent()).toBe(true);
+  });
+
+
+  it('should save exploration language code', () => {
+    spyOn(explorationLanguageCodeService, 'saveDisplayedValue');
+    explorationLanguageCodeService.init('hi-en');
+
+    component.saveExplorationLanguageCode();
+
+    expect(explorationLanguageCodeService.saveDisplayedValue)
+      .toHaveBeenCalled();
+  });
+
+  it('should save exploration objective', () => {
+    spyOn(explorationObjectiveService, 'saveDisplayedValue');
+    explorationObjectiveService.init('New Objective');
+
+    component.saveExplorationObjective();
+
+    expect(explorationObjectiveService.saveDisplayedValue).toHaveBeenCalled();
+  });
+
+  it('should save exploration tags', fakeAsync(() => {
+    spyOn(explorationTagsService, 'saveDisplayedValue');
+    explorationTagsService.init('testing');
+
+    component.saveExplorationTags();
+    tick();
+
+    expect(explorationTagsService.saveDisplayedValue).toHaveBeenCalled();
+  }));
+
+  it('should not save exploration init state name if it\'s invalid',
+    () => {
+      explorationInitStateNameService.init('First State');
+      spyOn(explorationStatesService, 'getState').and.returnValue(
+        null);
+      spyOn(alertsService, 'addWarning');
+
+      component.saveExplorationInitStateName();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid initial state name: First State');
     });
 
-    afterEach(() => {
-      testSubscriptipns.unsubscribe();
-    });
+  it('should save exploration init state name successfully and refresh graph',
+    () => {
+      explorationInitStateNameService.init('Introduction');
+      spyOn(explorationStatesService, 'getState').and.returnValue(
+        new State(
+          null, null, null, null, null,
+          null, null, null, null, null, null));
+      spyOn(explorationInitStateNameService, 'saveDisplayedValue');
 
-    it('should initialize controller properties after its initialization',
-      () => {
-        expect(ctrl.isRolesFormOpen).toBe(false);
-        expect(ctrl.canDelete).toBe(true);
-        expect(ctrl.canModifyRoles).toBe(true);
-        expect(ctrl.canReleaseOwnership).toBe(true);
-        expect(ctrl.canUnpublish).toBe(true);
-        expect(ctrl.explorationId).toBe(explorationId);
-        expect(ctrl.canManageVoiceArtist).toBe(true);
+      component.saveExplorationInitStateName();
 
-        expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
-          id: 'Astrology',
-          text: 'Astrology'
-        });
-
-        expect(ctrl.stateNames).toEqual(['Introduction']);
-        expect(ctrl.hasPageLoaded).toBe(true);
-        expect(ctrl.loggedInUser).toBe('username1');
-      });
-
-    it('should refresh settings tab when refreshSettingsTab flag is ' +
-        'broadcasted', () => {
-      routerService.onRefreshSettingsTab.emit();
-      $scope.$apply();
-
-      expect(ctrl.stateNames).toEqual(['Introduction']);
-      expect(ctrl.hasPageLoaded).toBe(true);
-    });
-
-    it('should get explore page url based on the exploration id', () => {
-      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-        location: {
-          protocol: 'https:',
-          host: 'oppia.org'
-        }
-      });
-      expect(ctrl.getExplorePageUrl()).toBe('https://oppia.org/explore/exp1');
-    });
-
-    it('should save exploration title', () => {
-      spyOn(explorationTitleService, 'saveDisplayedValue');
-      explorationTitleService.init('New title');
-
-      ctrl.saveExplorationTitle();
-
-      expect(explorationTitleService.saveDisplayedValue).toHaveBeenCalled();
-      expect(ctrl.isTitlePresent()).toBe(true);
-    });
-
-    it('should save exploration category', () => {
-      spyOn(explorationCategoryService, 'saveDisplayedValue');
-      explorationCategoryService.init('New Category');
-
-      ctrl.saveExplorationCategory();
-
-      expect(explorationCategoryService.saveDisplayedValue).toHaveBeenCalled();
-    });
-
-    it('should save exploration language code', () => {
-      spyOn(explorationLanguageCodeService, 'saveDisplayedValue');
-      explorationLanguageCodeService.init('hi-en');
-
-      ctrl.saveExplorationLanguageCode();
-
-      expect(explorationLanguageCodeService.saveDisplayedValue)
+      expect(explorationInitStateNameService.saveDisplayedValue)
         .toHaveBeenCalled();
     });
 
-    it('should save exploration objective', () => {
-      spyOn(explorationObjectiveService, 'saveDisplayedValue');
-      explorationObjectiveService.init('New Objective');
+  it('should delete exploration when closing delete exploration modal',
+    fakeAsync(() => {
+      spyOn(editableExplorationBackendApiService, 'deleteExplorationAsync')
+        .and.returnValue(Promise.resolve());
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        location: {
+          reload: () => {}
+        }
+      });
 
-      ctrl.saveExplorationObjective();
+      component.deleteExploration();
+      tick();
 
-      expect(explorationObjectiveService.saveDisplayedValue).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location).toBe('/creator-dashboard');
+    }));
+
+  it('should not delete exploration when dismissing delete exploration modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          result: Promise.reject()
+        } as NgbModalRef);
+      });
+      spyOn(alertsService, 'clearWarnings');
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        location: ''
+      });
+
+      component.deleteExploration();
+      tick();
+
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      expect(windowRef.nativeWindow.location).toBe('');
+    }));
+
+  it('should open a modal when removeRole is called', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef);
     });
 
-    it('should save exploration tags', () => {
-      spyOn(explorationTagsService, 'saveDisplayedValue');
-      explorationTagsService.init('testing');
+    component.removeRole('username', 'editor');
+    tick();
 
-      ctrl.saveExplorationTags();
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
-      expect(explorationTagsService.saveDisplayedValue).toHaveBeenCalled();
+  it('should remove role when resolving remove-role-modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef);
     });
+    spyOn(explorationRightsService, 'removeRoleAsync').and
+      .returnValue(Promise.resolve());
 
-    it('should not save exploration init state name if it\'s invalid',
-      () => {
-        explorationInitStateNameService.init('First State');
-        spyOn(explorationStatesService, 'getState').and.returnValue(false);
-        spyOn(alertsService, 'addWarning');
+    component.removeRole('username', 'editor');
+    tick();
 
-        ctrl.saveExplorationInitStateName();
-        expect(alertsService.addWarning).toHaveBeenCalledWith(
-          'Invalid initial state name: First State');
-      });
+    expect(
+      explorationRightsService.removeRoleAsync).toHaveBeenCalled();
+  }));
 
-    it('should save exploration init state name successfully and refresh graph',
-      () => {
-        explorationInitStateNameService.init('Introduction');
-        spyOn(explorationStatesService, 'getState').and.returnValue(true);
-        spyOn(explorationInitStateNameService, 'saveDisplayedValue');
-
-        ctrl.saveExplorationInitStateName();
-
-        expect(explorationInitStateNameService.saveDisplayedValue)
-          .toHaveBeenCalled();
-        expect(refreshGraphSpy).toHaveBeenCalled();
-      });
-
-    it('should delete exploration when closing delete exploration modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
-        });
-        spyOn(editableExplorationBackendApiService, 'deleteExplorationAsync')
-          .and.returnValue($q.resolve());
-        spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-          location: {
-            reload: () => {}
-          }
-        });
-
-        ctrl.deleteExploration();
-        $scope.$apply();
-
-        expect(windowRef.nativeWindow.location).toBe('/creator-dashboard');
-      });
-
-    it('should not delete exploration when dismissing delete exploration modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        spyOn(alertsService, 'clearWarnings');
-        spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-          location: ''
-        });
-
-        ctrl.deleteExploration();
-        $scope.$apply();
-
-        expect(alertsService.clearWarnings).toHaveBeenCalled();
-        expect(windowRef.nativeWindow.location).toBe('');
-      });
-
-    it('should open a modal when removeRole is called', function() {
-      spyOn($uibModal, 'open').and.callThrough();
-
-      ctrl.removeRole('username', 'editor');
-
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should remove role when resolving remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      spyOn(explorationRightsService, 'removeRoleAsync').and
-        .returnValue($q.resolve());
-
-      ctrl.removeRole('username', 'editor');
-      $scope.$apply();
-
-      expect(
-        explorationRightsService.removeRoleAsync).toHaveBeenCalled();
-    });
-
-    it('should not remove role when rejecting remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+  it('should not remove role when rejecting remove-role-modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.reject()
+        } as NgbModalRef);
       });
       spyOn(explorationRightsService, 'removeRoleAsync');
 
-      ctrl.removeRole('username', 'editor');
-      $scope.$apply();
+      component.removeRole('username1', 'editor');
+      tick();
 
       expect(
         explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
+    }));
+
+  it('should remove role when user accept remove-role-modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
+      spyOn(explorationRightsService, 'removeRoleAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.removeRole('username1', 'editor');
+      tick();
+
+      expect(
+        explorationRightsService.removeRoleAsync).toHaveBeenCalled();
+    }));
+
+  it('should open a modal when removeVoiceArtist is called', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef);
     });
+    spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync')
+      .and.returnValue(Promise.resolve());
+    component.removeVoiceArtist('username');
+    tick();
 
-    it('should open a modal when removeVoiceArtist is called', function() {
-      spyOn($uibModal, 'open').and.callThrough();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(explorationRightsService.removeVoiceArtistRoleAsync)
+      .toHaveBeenCalled();
+  }));
 
-      ctrl.removeVoiceArtist('username');
-
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should remove voice artist when resolving remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('username', 'voice artist')
+  it('should remove voice artist when resolving remove-role-modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
       });
       spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync').and
-        .returnValue($q.resolve());
+        .returnValue(Promise.resolve());
 
-      ctrl.removeVoiceArtist('username');
-      $scope.$apply();
+      component.removeVoiceArtist('username');
+      tick();
 
       expect(
         explorationRightsService.removeVoiceArtistRoleAsync)
         .toHaveBeenCalledWith('username');
+    }));
+
+  it('should not remove voice artist when rejecting remove-role-modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.reject()
+        } as NgbModalRef);
+      });
+      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
+
+      component.removeVoiceArtist('username');
+      tick();
+
+      expect(
+        explorationRightsService.removeVoiceArtistRoleAsync)
+        .not.toHaveBeenCalled();
+    }));
+
+  it('should open a modal when reassignRole is called', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef);
     });
 
-    it('should not remove voice artist when rejecting remove-role-modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
+    component.openEditRolesForm();
+    explorationRightsService.init(
+      ['owner'], [], [], [], '', '', false, true);
 
-        ctrl.removeVoiceArtist('username');
-        $scope.$apply();
+    spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+      .and.returnValue(true);
+    spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+      Promise.resolve());
+    component.editRole('Username1', 'editor');
+    tick();
+    component.editRole('Username1', 'owner');
+    tick();
 
-        expect(
-          explorationRightsService.removeVoiceArtistRoleAsync)
-          .not.toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
+
+  it('should reassign role when resolving reassign-role-modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
       });
 
-    it('should open a modal when reassignRole is called', () => {
-      spyOn($uibModal, 'open').and.callThrough();
-
-      ctrl.openEditRolesForm();
+      component.openEditRolesForm();
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
-      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-        result: $q.resolve()
-      });
-      ctrl.editRole('Username1', 'editor');
-      ctrl.editRole('Username1', 'owner');
+        .and.returnValue(false);
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve());
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should reassign role when resolving reassign-role-modal', () => {
-      ctrl.openEditRolesForm();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
-
-      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
-      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-        result: $q.resolve()
-      });
-      ctrl.editRole('Username1', 'editor');
-      $scope.$apply();
-      ctrl.editRole('Username1', 'owner');
-      $scope.$apply();
+      component.editRole('Username1', 'editor');
+      tick();
+      component.editRole('Username1', 'owner');
+      tick();
 
       expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
         'Username1', 'owner');
-    });
+    }));
 
-    it('should not reassign role when rejecting remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+  it('should not reassign role when rejecting remove-role-modal', fakeAsync(
+    () => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.reject()
+        } as NgbModalRef);
       });
+
       explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
+        ['owner'], [], [], [], '', '', false, true);
 
       spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
-      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
-        result: $q.resolve()
-      });
-      ctrl.editRole('Username1', 'editor');
-      $scope.$apply();
-      ctrl.editRole('Username1', 'owner');
-      $scope.$apply();
+        .and.returnValue(true);
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+        Promise.resolve());
+      component.editRole('Username1', 'editor');
+      tick();
+      component.editRole('Username1', 'owner');
+      tick();
 
       expect(
         explorationRightsService.saveRoleChanges).not.toHaveBeenCalled();
+    }));
+
+  it('should transfer exploration ownership when closing transfer ownership' +
+    ' modal', fakeAsync(() => {
+    spyOn(explorationRightsService, 'makeCommunityOwned').and.returnValue(
+      Promise.resolve()
+    );
+
+    component.showTransferExplorationOwnershipModal();
+    tick();
+
+    expect(explorationRightsService.makeCommunityOwned).toHaveBeenCalled();
+  }));
+
+  it('should not transfer exploration ownership when dismissing transfer' +
+    ' ownership modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.reject()
+      } as NgbModalRef);
     });
+    spyOn(alertsService, 'clearWarnings');
 
-    it('should transfer exploration ownership when closing transfer ownership' +
-    ' modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      spyOn(explorationRightsService, 'makeCommunityOwned');
+    component.showTransferExplorationOwnershipModal();
+    tick();
 
-      ctrl.showTransferExplorationOwnershipModal();
-      $scope.$apply();
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+  }));
 
-      expect(explorationRightsService.makeCommunityOwned).toHaveBeenCalled();
-    });
+  it('should open preview summary tile modal with ngbModal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve()
+      } as NgbModalRef);
+      component.previewSummaryTile();
+      tick();
 
-    it('should not transfer exploration ownership when dismissing transfer' +
-    ' ownership modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+  it('should clear alerts warning when dismissing preview summary tile modal',
+    () => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
       spyOn(alertsService, 'clearWarnings');
 
-      ctrl.showTransferExplorationOwnershipModal();
-      $scope.$apply();
+      component.previewSummaryTile();
 
       expect(alertsService.clearWarnings).toHaveBeenCalled();
     });
 
-    it('should open preview summary tile modal with $uibModal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
-        });
-
-        ctrl.previewSummaryTile();
-        $scope.$apply();
-
-        expect($uibModal.open).toHaveBeenCalled();
+  it('should open preview summary tile modal with ngbModal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.resolve()
+        } as NgbModalRef);
       });
-
-    it('should clear alerts warning when dismissing preview summary tile modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        spyOn(alertsService, 'clearWarnings');
-
-        ctrl.previewSummaryTile();
-        $scope.$apply();
-
-        expect(alertsService.clearWarnings).toHaveBeenCalled();
-      });
-
-    it('should open preview summary tile modal with $uibModal', () => {
-      spyOn($uibModal, 'open').and.callThrough();
-      spyOn(
-        settingTabBackendApiService, 'getData')
-        .and.returnValue($q.resolve({
+      spyOn(settingTabBackendApiService, 'getData')
+        .and.returnValue(Promise.resolve({
           draft_email_body: 'Draf message'
         }));
 
-      ctrl.unpublishExplorationAsModerator();
-      $scope.$apply();
+      component.unpublishExplorationAsModerator();
+      tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should save moderator changes to backend when closing preview summary' +
-    ' tile modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('Email body')
-      });
-      spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
-        .callFake((emailBody) => {
-          return $q.resolve();
-        });
-      spyOn(
-        settingTabBackendApiService, 'getData')
-        .and.returnValue($q.resolve({
-          draft_email_body: 'Draf message'
-        }));
-
-      ctrl.canUnpublish = false;
-      ctrl.canReleaseOwnership = false;
-      ctrl.unpublishExplorationAsModerator();
-      $scope.$apply();
-
-      expect(explorationRightsService.saveModeratorChangeToBackendAsync)
-        .toHaveBeenCalledWith('Email body');
-      expect(userExplorationPermissionsService.fetchPermissionsAsync)
-        .toHaveBeenCalled();
-      expect(ctrl.canUnpublish).toBe(true);
-      expect(ctrl.canReleaseOwnership).toBe(true);
-    });
-
-    it('should clear alerts warning when dismissing preview summary tile modal',
-      () => {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        spyOn(alertsService, 'clearWarnings');
-        spyOn(
-          settingTabBackendApiService, 'getData')
-          .and.returnValue($q.resolve({
-            draft_email_body: 'Draf message'
-          }));
-
-        ctrl.unpublishExplorationAsModerator();
-        $scope.$apply();
-
-        expect(alertsService.clearWarnings).toHaveBeenCalled();
-      });
-
-    it('should toggle notifications', () => {
-      let feedbackNotificationsSpy = spyOn(
-        userEmailPreferencesService, 'setFeedbackNotificationPreferences')
-        .and.callFake((mute: boolean, callb: () => void) => {
-          callb();
-        });
-      let suggestionNotificationsSpy = spyOn(
-        userEmailPreferencesService, 'setSuggestionNotificationPreferences')
-        .and.callFake((mute: boolean, callb: () => void) => {
-          callb();
-        });
-      ctrl.muteFeedbackNotifications();
-      expect(feedbackNotificationsSpy)
-        .toHaveBeenCalledWith(true, ctrl._successCallback);
-
-      ctrl.unmuteFeedbackNotifications();
-      expect(feedbackNotificationsSpy)
-        .toHaveBeenCalledWith(false, ctrl._successCallback);
-
-      ctrl.muteSuggestionNotifications();
-      expect(suggestionNotificationsSpy)
-        .toHaveBeenCalledWith(true, ctrl._successCallback);
-
-      ctrl.unmuteSuggestionNotifications();
-      expect(suggestionNotificationsSpy)
-        .toHaveBeenCalledWith(false, ctrl._successCallback);
-    });
-
-    it('should open edit roles form and edit username and role', () => {
-      ctrl.openEditRolesForm();
-      explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
-
-      expect(ctrl.isRolesFormOpen).toBe(true);
-      expect(ctrl.newMemberUsername).toBe('');
-      expect(ctrl.newMemberRole.value).toBe('owner');
-
-      spyOn(explorationRightsService, 'saveRoleChanges');
-      ctrl.editRole('Username1', 'editor');
-
-      expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
-        'Username1', 'editor');
-      expect(ctrl.isRolesFormOpen).toBe(false);
-    });
-
-    it('should open edit roles form and close it', () => {
-      ctrl.openEditRolesForm();
-
-      expect(ctrl.isRolesFormOpen).toBe(true);
-      expect(ctrl.newMemberUsername).toBe('');
-      expect(ctrl.newMemberRole.value).toBe('owner');
-
-      ctrl.closeEditRolesForm();
-
-      expect(ctrl.isRolesFormOpen).toBe(false);
-      expect(ctrl.newMemberUsername).toBe('');
-      expect(ctrl.newMemberRole.value).toBe('owner');
-    });
-
-    it('should open voice artist edit roles form and edit username', () => {
-      ctrl.openVoiceoverRolesForm();
-      explorationRightsService.init(
-        ['owner'], [], [], [], '', false, false, true);
-
-      expect(ctrl.isVoiceoverFormOpen).toBe(true);
-      expect(ctrl.newVoiceArtistUsername).toBe('');
-
-      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync');
-      ctrl.editVoiseArtist('Username1');
-
-      expect(explorationRightsService.assignVoiceArtistRoleAsync)
-        .toHaveBeenCalledWith('Username1');
-      expect(ctrl.isVoiceoverFormOpen).toBe(false);
-    });
-
-    it('should open voice artist edit roles form and close it', () => {
-      ctrl.openVoiceoverRolesForm();
-
-      expect(ctrl.isVoiceoverFormOpen).toBe(true);
-      expect(ctrl.newVoiceArtistUsername).toBe('');
-
-      ctrl.closeVoiceoverForm();
-
-      expect(ctrl.isVoiceoverFormOpen).toBe(false);
-      expect(ctrl.newVoiceArtistUsername).toBe('');
-    });
-
-    it('should evaluate when parameters are enabled', () => {
-      ctrl.enableParameters();
-      expect(ctrl.areParametersEnabled()).toBe(true);
-    });
-
-    it('should evaluate when automatic text to speech is enabled', () => {
-      ctrl.toggleAutomaticTextToSpeech();
-      expect(ctrl.isAutomaticTextToSpeechEnabled()).toBe(true);
-      ctrl.toggleAutomaticTextToSpeech();
-      expect(ctrl.isAutomaticTextToSpeechEnabled()).toBe(false);
-    });
-
-    it('should evaluate when correctness feedback is enabled', () => {
-      ctrl.toggleCorrectnessFeedback();
-      expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(true);
-      ctrl.toggleCorrectnessFeedback();
-      expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
-    });
-
-    it('should check if exploration is locked for editing', () => {
-      let changeListSpy = spyOn(
-        changeListService, 'isExplorationLockedForEditing');
-
-      changeListSpy.and.returnValue(true);
-      expect(ctrl.isExplorationLockedForEditing()).toBe(true);
-
-      changeListSpy.and.returnValue(false);
-      expect(ctrl.isExplorationLockedForEditing()).toBe(false);
-    });
-
-    it('should update warnings when save param changes hook', () => {
-      spyOn(explorationWarningsService, 'updateWarnings');
-
-      ctrl.postSaveParamChangesHook();
-      expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
-    });
-
-    it('should check if parameters are used', () => {
-      let paramChangeBackendDict = {
-        customization_args: {
-          parse_with_jinja: false,
-          value: 'test value'
-        },
-        generator_id: '123',
-        name: 'test',
-      };
-
-      expect(ctrl.areParametersUsed()).toBe(false);
-      explorationDataService.data.param_changes.push(paramChangeBackendDict);
-      expect(ctrl.areParametersUsed()).toBe(true);
-    });
-
-    describe('on calling onRolesFormUsernameBlur', function() {
-      it('should disable save button when exploration title is empty', () => {
-        ctrl.newMemberUsername = 'newUser';
-        ctrl.rolesSaveButtonEnabled = true;
-        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-          .and.returnValue(false);
-
-        explorationTitleService.init('');
-        ctrl.saveExplorationTitle();
-
-        expect(ctrl.rolesSaveButtonEnabled).toBe(false);
-        expect(ctrl.errorMessage).toBe(
-          'Please provide a title before inviting.');
-      });
-
-      it('should disable save button when adding same role to existing users.',
-        () => {
-          ctrl.openEditRolesForm();
-          ctrl.rolesSaveButtonEnabled = true;
-          explorationRightsService.init(
-            ['Username1'], [], [], [], '', false, false, true);
-          ctrl.newMemberUsername = 'Username1';
-          explorationTitleService.init('Exploration title');
-          ctrl.saveExplorationTitle();
-          spyOn(explorationRightsService, 'getOldRole')
-            .and.returnValue('owner');
-
-          ctrl.onRolesFormUsernameBlur();
-
-          expect(ctrl.rolesSaveButtonEnabled).toBe(false);
-          expect(ctrl.errorMessage).toBe('User is already owner.');
-        });
-
-      it('should disable save button when adding another role to itself',
-        () => {
-          ctrl.newMemberUsername = ctrl.loggedInUser;
-          ctrl.rolesSaveButtonEnabled = true;
-          explorationTitleService.init('Exploration title');
-          ctrl.saveExplorationTitle();
-
-          spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-            .and.returnValue(true);
-
-          ctrl.onRolesFormUsernameBlur();
-
-          expect(ctrl.rolesSaveButtonEnabled).toBe(false);
-          expect(ctrl.errorMessage).toBe(
-            'Users are not allowed to assign other roles to themselves.');
-        });
-
-      it('should enable save button when tile and username are valid', () => {
-        ctrl.newMemberUsername = 'newUser';
-        ctrl.newMemberRole = 'owner';
-        ctrl.rolesSaveButtonEnabled = true;
-        explorationTitleService.init('Exploration title');
-        ctrl.saveExplorationTitle();
-        spyOn(explorationRightsService, 'getOldRole')
-          .and.returnValue('editor');
-        expect(ctrl.rolesSaveButtonEnabled).toBe(true);
-        expect(ctrl.errorMessage).toBe('');
-      });
-    });
-
-    it('should toggle exploration visibility', () => {
-      spyOn(explorationRightsService, 'setViewability');
-      spyOn(explorationRightsService, 'viewableIfPrivate').and.returnValue(
-        false);
-      ctrl.toggleViewabilityIfPrivate();
-
-      expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
-        true);
-    });
-
-    it('should refresh settings tab when refreshSettingsTab event occurs',
-      () => {
-        spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
-        routerService.onRefreshSettingsTab.emit();
-        expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
-      });
-
-    it('should toggle the preview cards', () => {
-      expect(ctrl.basicSettingIsShown).toEqual(false);
-      ctrl.toggleCards('settings');
-      expect(ctrl.basicSettingIsShown).toEqual(true);
-
-      expect(ctrl.advancedFeaturesIsShown).toEqual(false);
-      ctrl.toggleCards('advanced_features');
-      expect(ctrl.advancedFeaturesIsShown).toEqual(true);
-
-      expect(ctrl.rolesCardIsShown).toEqual(false);
-      ctrl.toggleCards('roles');
-      expect(ctrl.rolesCardIsShown).toEqual(true);
-
-      expect(ctrl.permissionsCardIsShown).toEqual(false);
-      ctrl.toggleCards('permissions');
-      expect(ctrl.permissionsCardIsShown).toEqual(true);
-
-      expect(ctrl.feedbackCardIsShown).toEqual(false);
-      ctrl.toggleCards('feedback');
-      expect(ctrl.feedbackCardIsShown).toEqual(true);
-
-      expect(ctrl.controlsCardIsShown).toEqual(false);
-      ctrl.toggleCards('controls');
-      expect(ctrl.controlsCardIsShown).toEqual(true);
-    });
-  });
-
-  describe('when device is not narrow', () => {
-    beforeEach(() => {
-      mockWindowDimensionsService = {
-        isWindowNarrow: () => false
-      };
-    });
-    beforeEach(angular.mock.inject(($injector, $componentController) => {
-      $q = $injector.get('$q');
-      $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
-      contextService = $injector.get('ContextService');
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      editableExplorationBackendApiService = $injector.get(
-        'EditableExplorationBackendApiService');
-      explorationCategoryService = $injector.get('ExplorationCategoryService');
-      explorationDataService = $injector.get('ExplorationDataService');
-      explorationInitStateNameService = $injector.get(
-        'ExplorationInitStateNameService');
-      explorationLanguageCodeService = $injector.get(
-        'ExplorationLanguageCodeService');
-      explorationObjectiveService = $injector.get(
-        'ExplorationObjectiveService');
-      explorationRightsService = $injector.get('ExplorationRightsService');
-      explorationStatesService = $injector.get('ExplorationStatesService');
-      explorationTagsService = $injector.get('ExplorationTagsService');
-      explorationTitleService = $injector.get('ExplorationTitleService');
-      explorationWarningsService = $injector.get('ExplorationWarningsService');
-      userEmailPreferencesService = $injector.get(
-        'UserEmailPreferencesService');
-      settingTabBackendApiService = $injector.get(
-        'SettingTabBackendApiService');
-
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve(userPermissions));
-      spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
-      spyOn(explorationStatesService, 'getStateNames').and.returnValue([
-        'Introduction']);
-
-      explorationCategoryService.init('Astrology');
-      routerService.refreshSettingsTabEmitter = new EventEmitter();
-      $scope = $rootScope.$new();
-      ctrl = $componentController('settingsTab', {
-        $scope: $scope,
-        AlertsService: alertsService,
-        UserExplorationPermissionsService: userExplorationPermissionsService,
-        RouterService: routerService,
-        WindowRef: windowRef,
-        WindowDimensionsService: mockWindowDimensionsService
-      });
-      ctrl.$onInit();
-      $scope.$apply();
+      expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-    beforeEach(() => {
-      testSubscriptipns = new Subscription();
-      refreshGraphSpy = jasmine.createSpy('refreshGraph');
-      testSubscriptipns.add(
-        explorationStatesService.onRefreshGraph.subscribe(refreshGraphSpy));
+  it('should save moderator changes to backend when closing preview summary' +
+      ' tile modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        componentInstance: NgbModalRef,
+        result: Promise.resolve()
+      } as NgbModalRef);
     });
+    spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
+      .callFake((emailBody) => {
+        return Promise.resolve();
+      });
+    spyOn(
+      settingTabBackendApiService, 'getData')
+      .and.returnValue(Promise.resolve({
+        draft_email_body: 'Draf message'
+      }));
 
-    afterEach(() => {
-      testSubscriptipns.unsubscribe();
-    });
+    component.canUnpublish = false;
+    component.canReleaseOwnership = false;
+    component.unpublishExplorationAsModerator();
+    tick();
 
-    it('should not toggle the preview cards', () => {
-      expect(ctrl.basicSettingIsShown).toEqual(true);
-      ctrl.toggleCards('settings');
-      expect(ctrl.basicSettingIsShown).toEqual(true);
-    });
+    expect(explorationRightsService.saveModeratorChangeToBackendAsync)
+      .toHaveBeenCalled();
+    expect(userExplorationPermissionsService.fetchPermissionsAsync)
+      .toHaveBeenCalled();
+    expect(component.canUnpublish).toBe(true);
+    expect(component.canReleaseOwnership).toBe(true);
+  }));
 
-    it('should display Unpublish button', function() {
-      ctrl.canUnpublish = false;
-      expect(ctrl.canUnpublish).toBe(false);
+  it('should clear alerts warning when dismissing preview summary tile modal',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return ({
+          componentInstance: NgbModalRef,
+          result: Promise.reject()
+        } as NgbModalRef);
+      });
+      spyOn(alertsService, 'clearWarnings');
+      spyOn(
+        settingTabBackendApiService, 'getData')
+        .and.returnValue(Promise.resolve({
+          draft_email_body: 'Draf message'
+        }));
 
-      userExplorationPermissionsService.
-        onUserExplorationPermissionsFetched.emit();
-      $scope.$apply();
+      component.unpublishExplorationAsModerator();
+      tick();
 
-      expect(userExplorationPermissionsService.getPermissionsAsync)
-        .toHaveBeenCalled();
-      expect(ctrl.canUnpublish).toBe(true);
-    });
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+    }));
 
-    it('should display Transfer ownership button', function() {
-      ctrl.canReleaseOwnership = false;
-      expect(ctrl.canReleaseOwnership).toBe(false);
+  it('should toggle notifications', () => {
+    let feedbackNotificationsSpy = spyOn(
+      userEmailPreferencesService, 'setFeedbackNotificationPreferences')
+      .and.callFake((mute: boolean, callb: () => void) => {
+        callb();
+      });
+    let suggestionNotificationsSpy = spyOn(
+      userEmailPreferencesService, 'setSuggestionNotificationPreferences')
+      .and.callFake((mute: boolean, callb: () => void) => {
+        callb();
+      });
+    component.muteFeedbackNotifications();
+    expect(feedbackNotificationsSpy)
+      .toHaveBeenCalled();
 
-      userExplorationPermissionsService.
-        onUserExplorationPermissionsFetched.emit();
-      $scope.$apply();
+    component.unmuteFeedbackNotifications();
+    expect(feedbackNotificationsSpy)
+      .toHaveBeenCalled();
 
-      expect(userExplorationPermissionsService.getPermissionsAsync)
-        .toHaveBeenCalled();
-      expect(ctrl.canReleaseOwnership).toBe(true);
-    });
+    component.muteSuggestionNotifications();
+    expect(suggestionNotificationsSpy)
+      .toHaveBeenCalled();
+
+    component.unmuteSuggestionNotifications();
+    expect(suggestionNotificationsSpy)
+      .toHaveBeenCalled();
   });
+
+  it('should open edit roles form and edit username and role', () => {
+    component.openEditRolesForm();
+    explorationRightsService.init(
+      ['owner'], [], [], [], '', '', false, true);
+
+    expect(component.isRolesFormOpen).toBe(true);
+    expect(component.newMemberUsername).toBe('');
+    expect(component.newMemberRole.value).toBe('owner');
+
+    spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+      Promise.resolve());
+    component.editRole('Username1', 'editor');
+
+    expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
+      'Username1', 'editor');
+    expect(component.isRolesFormOpen).toBe(false);
+  });
+
+  it('should open edit roles form and close it', () => {
+    component.openEditRolesForm();
+
+    expect(component.isRolesFormOpen).toBe(true);
+    expect(component.newMemberUsername).toBe('');
+    expect(component.newMemberRole.value).toBe('owner');
+
+    component.closeEditRolesForm();
+
+    expect(component.isRolesFormOpen).toBe(false);
+    expect(component.newMemberUsername).toBe('');
+    expect(component.newMemberRole.value).toBe('owner');
+  });
+
+  it('should open voice artist edit roles form and edit username', () => {
+    component.openVoiceoverRolesForm();
+    explorationRightsService.init(
+      ['owner'], [], [], [], '', '', false, true);
+
+    expect(component.isVoiceoverFormOpen).toBe(true);
+    expect(component.newVoiceArtistUsername).toBe('');
+
+    spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync')
+      .and.returnValue(Promise.resolve());
+    component.editVoiseArtist('Username1');
+
+    expect(explorationRightsService.assignVoiceArtistRoleAsync)
+      .toHaveBeenCalledWith('Username1');
+    expect(component.isVoiceoverFormOpen).toBe(false);
+  });
+
+  it('should open voice artist edit roles form and close it', () => {
+    component.openVoiceoverRolesForm();
+
+    expect(component.isVoiceoverFormOpen).toBe(true);
+    expect(component.newVoiceArtistUsername).toBe('');
+
+    component.closeVoiceoverForm();
+
+    expect(component.isVoiceoverFormOpen).toBe(false);
+    expect(component.newVoiceArtistUsername).toBe('');
+  });
+
+  it('should evaluate when parameters are enabled', () => {
+    component.enableParameters();
+    expect(component.areParametersEnabled()).toBe(true);
+  });
+
+  it('should evaluate when automatic text to speech is enabled', () => {
+    component.toggleAutomaticTextToSpeech();
+    expect(component.isAutomaticTextToSpeechEnabled()).toBe(true);
+    component.toggleAutomaticTextToSpeech();
+    expect(component.isAutomaticTextToSpeechEnabled()).toBe(false);
+  });
+
+  it('should evaluate when correctness feedback is enabled', () => {
+    component.toggleCorrectnessFeedback();
+    expect(component.isCorrectnessFeedbackEnabled()).toBe(true);
+    component.toggleCorrectnessFeedback();
+    expect(component.isCorrectnessFeedbackEnabled()).toBe(false);
+  });
+
+  it('should evaluate when edits are allowed', fakeAsync(() => {
+    spyOn(eeabas, 'setEditsAllowed').and.callFake(
+      async(unusedValue, unusedId, cb) => cb());
+    spyOn(editabilityService, 'lockExploration');
+    component.enableEdits();
+    tick();
+
+    expect(editabilityService.lockExploration).toHaveBeenCalledWith(false);
+    expect(component.isExplorationEditable()).toEqual(true);
+  }));
+
+  it('should evaluate when edits are not allowed', fakeAsync(() => {
+    spyOn(eeabas, 'setEditsAllowed').and.callFake(
+      async(unusedValue, unusedId, cb) => cb());
+    spyOn(editabilityService, 'lockExploration');
+    component.disableEdits();
+    tick();
+
+    expect(editabilityService.lockExploration).toHaveBeenCalledWith(true);
+    expect(component.isExplorationEditable()).toEqual(false);
+  }));
+
+  it('should check if exploration is locked for editing', () => {
+    let changeListSpy = spyOn(
+      changeListService, 'isExplorationLockedForEditing');
+
+    changeListSpy.and.returnValue(true);
+    expect(component.isExplorationLockedForEditing()).toBe(true);
+
+    changeListSpy.and.returnValue(false);
+    expect(component.isExplorationLockedForEditing()).toBe(false);
+  });
+
+  it('should check edit-modal has been open ' +
+    'when editRole function has been called', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: NgbModalRef,
+      result: Promise.resolve()
+    } as NgbModalRef);
+
+    component.openEditRolesForm();
+    expect(component.isRolesFormOpen).toEqual(true);
+    tick();
+    explorationRightsService.init(
+      ['owner'], [], [], [], '', '', false, true);
+    tick();
+    spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+      .and.returnValue(true);
+    spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue(
+      Promise.resolve()
+    );
+    component.editRole('Username1', 'editor');
+    tick();
+    component.editRole('Username1', 'owner');
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(explorationRightsService.saveRoleChanges).toHaveBeenCalled();
+    expect(component.isRolesFormOpen).toEqual(false);
+  }));
+
+  it('should update warnings when save param changes hook', () => {
+    spyOn(explorationWarningsService, 'updateWarnings');
+
+    component.postSaveParamChangesHook();
+    expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
+  });
+
+  it('should check if parameters are used', fakeAsync(() => {
+    let paramChangeBackendDict = {
+      customization_args: {
+        parse_with_jinja: false,
+        value: 'test value'
+      },
+      generator_id: '123',
+      name: 'test',
+    };
+
+    component.refreshSettingsTab();
+
+    tick(500);
+
+    expect(component.areParametersUsed()).toBe(false);
+    explorationDataService.data.param_changes.push(paramChangeBackendDict);
+    expect(component.areParametersUsed()).toBe(true);
+  }));
+
+  it('should disable save button when exploration title is empty', () => {
+    component.newMemberUsername = 'newUser';
+    component.rolesSaveButtonEnabled = true;
+    spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+      .and.returnValue(false);
+
+    explorationTitleService.init('');
+    component.saveExplorationTitle();
+
+    expect(component.rolesSaveButtonEnabled).toBe(false);
+    expect(component.errorMessage).toBe(
+      'Please provide a title before inviting.');
+  });
+
+  it('should disable save button when adding same role to existing users.',
+    () => {
+      component.openEditRolesForm();
+      component.rolesSaveButtonEnabled = true;
+      explorationRightsService.init(
+        ['Username1'], [], [], [], '', 'false', false, true);
+      component.newMemberUsername = 'Username1';
+      explorationTitleService.init('Exploration title');
+      component.saveExplorationTitle();
+      spyOn(explorationRightsService, 'getOldRole')
+        .and.returnValue('owner');
+
+      component.onRolesFormUsernameBlur();
+
+      expect(component.rolesSaveButtonEnabled).toBe(false);
+      expect(component.errorMessage).toBe('User is already owner.');
+    });
+
+  it('should disable save button when adding another role to itself',
+    () => {
+      component.newMemberUsername = component.loggedInUser;
+      component.rolesSaveButtonEnabled = true;
+      explorationTitleService.init('Exploration title');
+      component.saveExplorationTitle();
+
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue(true);
+
+      component.onRolesFormUsernameBlur();
+
+      expect(component.rolesSaveButtonEnabled).toBe(false);
+      expect(component.errorMessage).toBe(
+        'Users are not allowed to assign other roles to themselves.');
+    });
+
+  it('should enable save button when tile and username are valid', () => {
+    component.newMemberUsername = 'newUser';
+    component.newMemberRole = { name: 'owner', value: 'owner'};
+    component.rolesSaveButtonEnabled = true;
+    explorationTitleService.init('Exploration title');
+    component.saveExplorationTitle();
+    spyOn(explorationRightsService, 'getOldRole')
+      .and.returnValue('editor');
+    expect(component.rolesSaveButtonEnabled).toBe(true);
+    expect(component.errorMessage).toBe('');
+  });
+
+  it('should toggle exploration visibility', () => {
+    spyOn(explorationRightsService, 'setViewability');
+    spyOn(explorationRightsService, 'viewableIfPrivate').and.returnValue(
+      false);
+    component.toggleViewabilityIfPrivate();
+
+    expect(explorationRightsService.setViewability).toHaveBeenCalledWith(
+      true);
+  });
+
+  it('should toggle the preview cards', fakeAsync(() => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    component.toggleCards('settings');
+    tick();
+    expect(component.basicSettingIsShown).toEqual(false);
+
+    component.toggleCards('advanced_features');
+    tick();
+    expect(component.advancedFeaturesIsShown).toEqual(false);
+
+    component.toggleCards('roles');
+    tick();
+    expect(component.rolesCardIsShown).toEqual(false);
+
+    component.toggleCards('permissions');
+    tick();
+    expect(component.permissionsCardIsShown).toEqual(false);
+
+    component.toggleCards('feedback');
+    tick();
+    expect(component.feedbackCardIsShown).toEqual(false);
+
+    component.toggleCards('voice_artists');
+    component.toggleCards('controls');
+    tick();
+    expect(component.controlsCardIsShown).toEqual(false);
+  }));
+
+  it('should not toggle the preview cards', fakeAsync(() => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+
+    mockEventEmitteruserExplorationPermissionsService.emit();
+    component.toggleCards('settings');
+    tick();
+    expect(component.basicSettingIsShown).toEqual(true);
+  }));
 });

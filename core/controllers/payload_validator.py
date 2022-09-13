@@ -25,14 +25,42 @@ from core import schema_utils
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 
+# Here Dict[str, Any] is used for arg_schema because the value field of the
+# schema is itself a dict that can further contain several nested dicts.
+def get_schema_type(arg_schema: Dict[str, Any]) -> str:
+    """Returns the schema type for an argument.
+
+    Args:
+        arg_schema: dict(str, *). Schema for an argument.
+
+    Returns:
+        str. Returns schema type by extracting it from schema.
+    """
+    return arg_schema['schema']['type']
+
+
+# Here Dict[str, Any] is used for arg_schema because the value field of the
+# schema is itself a dict that can further contain several nested dicts.
+def get_corresponding_key_for_object(arg_schema: Dict[str, Any]) -> str:
+    """Returns the new key for an argument from its schema.
+
+    Args:
+        arg_schema: dict(str, *). Schema for an argument.
+
+    Returns:
+        str. The new argument name.
+    """
+    return arg_schema['schema']['new_key_for_argument']
+
+
 # This function recursively uses the schema dictionary and handler_args, and
 # passes their values to itself as arguments, so their type is Any.
 # See: https://github.com/python/mypy/issues/731
-def validate(
-        handler_args: Any,
-        handler_args_schemas: Any,
-        allowed_extra_args: bool,
-        allow_string_to_bool_conversion: bool = False
+def validate_arguments_against_schema(
+    handler_args: Any,
+    handler_args_schemas: Any,
+    allowed_extra_args: bool,
+    allow_string_to_bool_conversion: bool = False
 ) -> Tuple[Dict[str, Any], List[str]]:
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -51,18 +79,18 @@ def validate(
     """
     # Collect all errors and present them at once.
     errors = []
-    normalized_value = {}
+    # Dictionary to hold normalized values of arguments after validation.
+    normalized_values = {}
     for arg_key, arg_schema in handler_args_schemas.items():
-
         if arg_key not in handler_args or handler_args[arg_key] is None:
-            if ('default_value' in arg_schema and
-                    arg_schema['default_value'] is None):
-                # Skip validation for optional cases.
-                continue
-            elif ('default_value' in arg_schema and
-                  arg_schema['default_value'] is not None):
-                handler_args[arg_key] = arg_schema['default_value']
-            elif 'default_value' not in arg_schema:
+            if 'default_value' in arg_schema:
+                if arg_schema['default_value'] is None:
+                    # Skip validation because the argument is optional.
+                    continue
+
+                if arg_schema['default_value'] is not None:
+                    handler_args[arg_key] = arg_schema['default_value']
+            else:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
 
@@ -70,15 +98,21 @@ def validate(
         # but from API request they are received as string type.
         if (
                 allow_string_to_bool_conversion and
-                arg_schema['schema']['type'] == schema_utils.SCHEMA_TYPE_BOOL
+                get_schema_type(arg_schema) == schema_utils.SCHEMA_TYPE_BOOL
                 and isinstance(handler_args[arg_key], str)
         ):
             handler_args[arg_key] = (
                 convert_string_to_bool(handler_args[arg_key]))
 
         try:
-            normalized_value[arg_key] = schema_utils.normalize_against_schema(
+            normalized_value = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
+
+            # Modification of argument name if new_key_for_argument
+            # field is present in the schema.
+            if 'new_key_for_argument' in arg_schema['schema']:
+                arg_key = get_corresponding_key_for_object(arg_schema)
+            normalized_values[arg_key] = normalized_value
         except Exception as e:
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
@@ -88,7 +122,7 @@ def validate(
     if not allowed_extra_args and extra_args:
         errors.append('Found extra args: %s.' % (list(extra_args)))
 
-    return normalized_value, errors
+    return normalized_values, errors
 
 
 def convert_string_to_bool(param: str) -> Optional[Union[bool, str]]:

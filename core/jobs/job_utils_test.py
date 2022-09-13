@@ -32,7 +32,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -114,7 +114,7 @@ class GetModelClassTests(test_utils.TestBase):
             job_utils.get_model_class('BaseModel'), base_models.BaseModel)
 
     def test_get_from_non_existing_model(self) -> None:
-        with self.assertRaisesRegexp(Exception, 'No model class found'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'No model class found'):
             job_utils.get_model_class('InvalidModel')
 
 
@@ -129,10 +129,14 @@ class GetModelKindTests(test_utils.TestBase):
         self.assertEqual(
             job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_get_from_bad_value(self) -> None:
-        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            TypeError, 'not a model type or instance',
-            lambda: job_utils.get_model_kind(123)) # type: ignore[arg-type]
+        with self.assertRaisesRegex(
+            TypeError, 'not a model type or instance'
+        ):
+            job_utils.get_model_kind(123) # type: ignore[arg-type]
 
 
 class GetModelPropertyTests(test_utils.TestBase):
@@ -153,7 +157,7 @@ class GetModelPropertyTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_model_property(model, 'prop'), None)
 
     def test_get_property_from_bad_value(self) -> None:
-        with self.assertRaisesRegexp(TypeError, 'not a model instance'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not a model instance'):
             job_utils.get_model_property(123, 'prop') # type: ignore[arg-type]
 
 
@@ -165,7 +169,7 @@ class GetModelIdTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_model_id(model), '123')
 
     def test_get_id_from_bad_value(self) -> None:
-        with self.assertRaisesRegexp(TypeError, 'not a model instance'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'not a model instance'):
             job_utils.get_model_id(123) # type: ignore[arg-type]
 
 
@@ -190,6 +194,19 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         self.assertEqual(
             FooModel(id='abc', project=feconf.OPPIA_PROJECT_ID, prop='123'),
             job_utils.get_ndb_model_from_beam_entity(beam_entity))
+
+    def test_get_beam_key_from_ndb_key(self) -> None:
+        beam_key = beam_datastore_types.Key(
+            ('FooModel', 'abc'),
+            project=feconf.OPPIA_PROJECT_ID,
+            namespace=self.namespace
+        )
+
+        # We use private _from_ds_key here because it provides functionality
+        # for obtaining an NDB key from a Beam key, and writing it ourselves
+        # would be too complicated.
+        ndb_key = datastore_services.Key._from_ds_key(beam_key.to_client_key())  # pylint: disable=protected-access
+        self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
 
     def test_get_model_from_beam_entity_with_time(self) -> None:
         utcnow = datetime.datetime.utcnow()
@@ -280,19 +297,19 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
         query = datastore_services.Query(filters=datastore_services.any_of(
             BarModel.prop == 1, BarModel.prop == 2))
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'forbidden filter'):
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_in_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=BarModel.prop.IN([1, 2, 3]))
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'forbidden filter'):
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_not_equal_filter_raises_type_error(self) -> None:
         query = datastore_services.Query(filters=BarModel.prop != 1)
 
-        with self.assertRaisesRegexp(TypeError, 'forbidden filter'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(TypeError, 'forbidden filter'):
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_order(self) -> None:

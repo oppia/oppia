@@ -25,8 +25,11 @@ import { ImprovementsConstants } from 'domain/improvements/improvements.constant
   templateUrl: './completion-graph.component.html',
 })
 export class CompletionGraphComponent implements OnInit {
-  @Input() completionRate: number;
-  completionBarStyle: {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() completionRate!: number;
+  completionBarStyle!: {
     'stroke-dasharray': number;
     'stroke-dashoffset': number;
   };

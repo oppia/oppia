@@ -19,10 +19,12 @@
 import { EventEmitter } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { InteractiveMapAnswer } from 'interactions/answer-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { icon, LatLng, LeafletMouseEvent, tileLayer } from 'leaflet';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { InteractiveInteractiveMapComponent } from './oppia-interactive-interactive-map.component';
 
 describe('InteractiveInteractiveMapComponent', () => {
@@ -35,7 +37,9 @@ describe('InteractiveInteractiveMapComponent', () => {
   let mockNewCardAvailableEmitter = new EventEmitter();
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         latitude: {
           value: JSON.parse(attributes.latitudeWithValue)
@@ -51,9 +55,13 @@ describe('InteractiveInteractiveMapComponent', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {
+    onSubmit: (
+        answer: InteractiveMapAnswer, rulesService: CurrentInteractionService
+    ) => {
     },
-    registerCurrentInteraction: (submitAnswer, validateExpressionFn) => {}
+    registerCurrentInteraction: (
+        submitAnswer: Function, validateExpressionFn: Function,
+    ) => {}
   };
 
   beforeEach(async(() => {
@@ -238,7 +246,9 @@ describe('InteractiveInteractiveMapComponent', () => {
     component.leafletMouseOut();
 
     expect(component.overlayStyle).toEqual({
-      'background-color': '#fff'
+      'background-color': '#fff',
+      opacity: 0,
+      'z-index': 0
     });
   });
 

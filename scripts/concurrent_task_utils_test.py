@@ -22,21 +22,20 @@ import builtins
 import threading
 import time
 
-from core import python_utils
 from core.tests import test_utils
 
 from . import concurrent_task_utils
 
 
 def test_function(unused_arg):
-    return python_utils.OBJECT
+    return object
 
 
 class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
     """Test for concurrent_task_utils.py flie."""
 
     def setUp(self):
-        super(ConcurrentTaskUtilsTests, self).setUp()
+        super().setUp()
         self.semaphore = threading.Semaphore(1)
         self.task_stdout = []
 
@@ -131,7 +130,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        self.assertRegexpMatches(
+        self.assertRegex(
             self.task_stdout[0],
             r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
             'name check failed')

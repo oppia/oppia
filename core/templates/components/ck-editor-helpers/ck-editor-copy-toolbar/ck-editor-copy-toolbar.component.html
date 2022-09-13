@@ -11,7 +11,7 @@
     </span>
   </div>
   <button type="button"
-          class="btn btn-secondary"
+          class="btn btn-secondary e2e-test-copy-button"
           [ngClass]="{'oppia-ck-editor-copy-toolbar-tip-button-active': ckEditorCopyContentService.copyModeActive}"
           (click)="toggleToolActive()">
     {{ckEditorCopyContentService.copyModeActive ? "On" : "Off"}}
@@ -36,5 +36,11 @@
   }
   .oppia-ck-editor-copy-toolbar-tip-sublabel {
     color: #757575;
+  }
+  @media screen and (max-width: 700px) {
+    .oppia-ck-editor-copy-toolbar-label,
+    .oppia-ck-editor-copy-toolbar-tip-sublabel {
+      font-size: 16px;
+    }
   }
 </style>

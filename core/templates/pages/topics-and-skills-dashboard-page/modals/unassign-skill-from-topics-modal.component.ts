@@ -20,7 +20,8 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 export interface TopicAssignmentsSummary {
   subtopicId: number;
@@ -28,7 +29,7 @@ export interface TopicAssignmentsSummary {
   topicId: string;
 }
 
-export interface TopicAssignments {
+export interface TopicNameToTopicAssignments {
   [key: string]: TopicAssignmentsSummary;
 }
 
@@ -39,35 +40,84 @@ export interface TopicAssignments {
 export class UnassignSkillFromTopicsModalComponent
   extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
-  topicsAssignments!: TopicAssignments;
   topicsAssignmentsAreFetched: boolean = false;
   selectedTopicNames: string[] = [];
   selectedTopics: TopicAssignmentsSummary[] = [];
+  // The topics that do not contain the given skill as their only diagnostic
+  // test skill are eligible for the unassignment.
+  eligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
+  ineligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
+  eligibleTopicsCount: number = 0;
+  ineligibleTopicsCount: number = 0;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService
+    TopicsAndSkillsDashboardBackendApiService,
+    private urlInterpolationService: UrlInterpolationService
   ) {
     super(ngbActiveModal);
+  }
+
+  fetchTopicIdToDiagnosticTestSkillIds(
+      topicAssignments: AssignedSkill[]): void {
+    let allTopicIds = [];
+    for (let topic of topicAssignments) {
+      allTopicIds.push(topic.topicId);
+    }
+    this.eligibleTopicNameToTopicAssignments = {};
+    this.ineligibleTopicNameToTopicAssignments = {};
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
+        (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
+          for (let topic of topicAssignments) {
+            let diagnosticTestSkillIds = (
+              responseDict.topicIdToDiagnosticTestSkillIds[topic.topicId]);
+
+            if (
+              diagnosticTestSkillIds.length === 1 &&
+              diagnosticTestSkillIds.indexOf(this.skillId) !== -1
+            ) {
+              this.ineligibleTopicNameToTopicAssignments[topic.topicName] = {
+                topicId: topic.topicId,
+                subtopicId: topic.subtopicId,
+                topicVersion: topic.topicVersion
+              };
+            } else {
+              this.eligibleTopicNameToTopicAssignments[topic.topicName] = {
+                topicId: topic.topicId,
+                subtopicId: topic.subtopicId,
+                topicVersion: topic.topicVersion
+              };
+            }
+          }
+
+          this.eligibleTopicsCount = Object.keys(
+            this.eligibleTopicNameToTopicAssignments).length;
+          this.ineligibleTopicsCount = Object.keys(
+            this.ineligibleTopicNameToTopicAssignments).length;
+        });
   }
 
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
-        this.skillId).then((response: AssignedSkill[]) => {
-        this.topicsAssignments = {};
-        response.map((topic) => {
-          this.topicsAssignments[topic.topicName] = {
-            subtopicId: topic.subtopicId,
-            topicVersion: topic.topicVersion,
-            topicId: topic.topicId,
-          };
-        });
+        this.skillId
+      ).then((response: AssignedSkill[]) => {
+        this.fetchTopicIdToDiagnosticTestSkillIds(response);
         this.topicsAssignmentsAreFetched = true;
+      });
+  }
+
+  getTopicEditorUrl(topicAssignment: TopicAssignmentsSummary): string {
+    let topicId = topicAssignment.topicId;
+    const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
+    return this.urlInterpolationService.interpolateUrl(
+      TOPIC_EDITOR_URL_TEMPLATE, {
+        topic_id: topicId
       });
   }
 
@@ -75,18 +125,20 @@ export class UnassignSkillFromTopicsModalComponent
     this.fetchTopicAssignmentsForSkill();
   }
 
-  selectedTopicToUnassign(topicId: string): void {
-    let index: number = this.selectedTopicNames.indexOf(topicId);
+  selectedTopicToUnassign(topicName: string): void {
+    let index: number = this.selectedTopicNames.indexOf(topicName);
     if (index !== -1) {
       this.selectedTopicNames.splice(index, 1);
     } else {
-      this.selectedTopicNames.push(topicId);
+      this.selectedTopicNames.push(topicName);
     }
   }
+
   close(): void {
     for (let index in this.selectedTopicNames) {
       this.selectedTopics.push(
-        this.topicsAssignments[this.selectedTopicNames[index]]);
+        this.eligibleTopicNameToTopicAssignments[
+          this.selectedTopicNames[index]]);
     }
     this.ngbActiveModal.close(this.selectedTopics);
   }

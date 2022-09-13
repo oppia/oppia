@@ -71,8 +71,8 @@ export class TopicUpdateService {
   // Applies a topic property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
   private _applyTopicPropertyChange(
-      topic: Topic, propertyName: string, newValue: string|boolean,
-      oldValue: string|boolean,
+      topic: Topic, propertyName: string, newValue: string|string[]|boolean,
+      oldValue: string|string[]|boolean,
       apply: TopicUpdateApply, reverse: TopicUpdateReverse) {
     this._applyChange(topic, TopicDomainConstants.CMD_UPDATE_TOPIC_PROPERTY, {
       property_name: propertyName,
@@ -242,6 +242,7 @@ export class TopicUpdateService {
         topic.setUrlFragment(oldUrlFragment);
       });
   }
+
   /**
    * Changes the thumbnail filename of a topic and records the change in the
    * undo/redo service.
@@ -329,11 +330,12 @@ export class TopicUpdateService {
    * the undo/redo service.
    */
   addSubtopic(
-      topic: Topic, title: string): void {
+      topic: Topic, title: string, urlFragment: string): void {
     let nextSubtopicId = topic.getNextSubtopicId();
     this._applyChange(topic, TopicDomainConstants.CMD_ADD_SUBTOPIC, {
       subtopic_id: nextSubtopicId,
-      title: title
+      title: title,
+      url_fragment: urlFragment
     }, (changeDict, topic) => {
       // ---- Apply ----
       topic.addSubtopic(title);
@@ -791,6 +793,39 @@ export class TopicUpdateService {
           changeDict, 'uncategorized_skill_id');
         topic.addUncategorizedSkill(
           newSkillId, skillSummary.getDescription());
+      });
+  }
+
+  /**
+   * Update the skill ids for the diagnostic test from a topic and records
+   * the change in the undo/redo service.
+   */
+  updateDiagnosticTestSkills(
+      topic: Topic,
+      newSkillSummariesForDiagnosticTest: ShortSkillSummary[]
+  ): void {
+    let oldSkillSummariesForDiagnosticTest = cloneDeep(
+      topic.getSkillSummariesForDiagnosticTest());
+    let oldSkillIdsForDiagnosticTest = oldSkillSummariesForDiagnosticTest.map((
+        skillSummary: ShortSkillSummary) => {
+      return skillSummary.getId();
+    });
+    let newSkillIdsForDiagnosticTest = newSkillSummariesForDiagnosticTest.map((
+        skillSummary: ShortSkillSummary) => {
+      return skillSummary.getId();
+    });
+
+    this._applyTopicPropertyChange(
+      topic,
+      TopicDomainConstants.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST,
+      newSkillIdsForDiagnosticTest,
+      oldSkillIdsForDiagnosticTest,
+      (changeDict, topic) => {
+        topic.setSkillSummariesForDiagnosticTest(
+          newSkillSummariesForDiagnosticTest);
+      }, (changeDict, topic) => {
+        topic.setSkillSummariesForDiagnosticTest(
+          oldSkillSummariesForDiagnosticTest);
       });
   }
 }

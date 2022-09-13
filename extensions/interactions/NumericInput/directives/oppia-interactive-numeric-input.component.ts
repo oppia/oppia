@@ -24,11 +24,11 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumericInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { NumericInputRulesService } from './numeric-input-rules.service';
 import { NumericInputValidationService } from './numeric-input-validation.service';
+import { NumericInputAnswer } from 'interactions/answer-defs';
 
 interface NumericInputFormSchema {
   type: string;
@@ -40,13 +40,18 @@ interface NumericInputFormSchema {
   templateUrl: './numeric-input-interaction.component.html'
 })
 export class InteractiveNumericInput implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() requireNonnegativeInputWithValue: string = '';
-  @Input() savedSolution;
-  @Input() labelForFocusTarget;
-  errorString = '';
+  @Input() savedSolution!: NumericInputAnswer;
+  @Input() labelForFocusTarget!: string;
+  // Answer is empty string if the user has not yet entered an answer. This is
+  // the case when the user has not yet clicked the submit button.
+  answer!: number | string;
+  NUMERIC_INPUT_FORM_SCHEMA!: NumericInputFormSchema;
+  errorString: string = '';
   requireNonnegativeInput: boolean = false;
-  answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: NumericInputFormSchema;
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -57,20 +62,21 @@ export class InteractiveNumericInput implements OnInit {
   ) { }
 
   private isAnswerValid(): boolean {
+    if (typeof this.answer === 'string') {
+      return false;
+    }
     return (
       this.answer !== undefined &&
       this.answer !== null &&
-      this.answer !== '' &&
       isUndefined(
-        this.numericInputValidationService.getErrorString(
+        this.numericInputValidationService.validateNumber(
           this.answer, this.requireNonnegativeInput)));
   }
 
-  submitAnswer(answer: number): void {
+  submitAnswer(answer: number | string): void {
     if (this.isAnswerValid()) {
       this.currentInteractionService.onSubmit(
-        answer as unknown as string,
-        this.numericInputRulesService as unknown as InteractionRulesService);
+        answer, this.numericInputRulesService);
     }
   }
 
@@ -81,7 +87,7 @@ export class InteractiveNumericInput implements OnInit {
     };
   }
 
-  onAnswerChange(answer: string | number): void {
+  onAnswerChange(answer: number | string): void {
     if (this.answer === answer) {
       return;
     }
@@ -93,7 +99,7 @@ export class InteractiveNumericInput implements OnInit {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 
-  getLabelForFocusTarget(): string | null {
+  getLabelForFocusTarget(): string {
     return this.labelForFocusTarget;
   }
 
@@ -109,7 +115,6 @@ export class InteractiveNumericInput implements OnInit {
       this.savedSolution !== undefined ?
       this.savedSolution : ''
     );
-    this.labelForFocusTarget = this.labelForFocusTarget || null;
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',

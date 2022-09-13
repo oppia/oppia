@@ -53,7 +53,7 @@ export interface EventToCodes {
 })
 export class NavigationService {
   // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeMenuName!: string;
   ACTION_OPEN: string = 'open';
@@ -89,6 +89,7 @@ export class NavigationService {
   closeSubmenu(evt: KeyboardEvent): void {
     this.activeMenuName = '';
   }
+
   /**
    * Handles keydown events on menus.
    * @param {object} evt

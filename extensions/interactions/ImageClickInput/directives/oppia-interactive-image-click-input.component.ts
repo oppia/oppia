@@ -27,13 +27,15 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { ImageClickAnswer } from 'interactions/answer-defs';
 import { ImageClickInputCustomizationArgs, ImageWithRegions, LabeledRegion } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ServicesConstants } from 'services/services.constants';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { ImageClickInputRulesService } from './image-click-input-rules.service';
 
 interface RectangleRegion extends ImagePoint {
@@ -48,7 +50,7 @@ interface ImagePoint {
 
 @Component({
   selector: 'oppia-interactive-image-click-input',
-  templateUrl: './image-click-input-interaction.component',
+  templateUrl: './image-click-input-interaction.component.html',
   styleUrls: []
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
@@ -81,7 +83,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
     private playerPositionService: PlayerPositionService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   private _getAttrs() {
@@ -149,9 +153,26 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       // preview mode. We don't have loading indicator or try again for
       // showing images in the exploration editor or in preview mode. So
       // we directly assign the url to the imageUrl.
-      this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-        this.contextService.getEntityType(), this.contextService.getEntityId(),
-        this.filepath);
+      if (
+        this.contextService.getImageSaveDestination() ===
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+        this.imageLocalStorageService.isInStorage(this.filepath)
+      ) {
+        const base64Url = this.imageLocalStorageService.getRawImageData(
+          this.filepath);
+        const mimeType = base64Url.split(';')[0];
+        if (mimeType === AppConstants.SVG_MIME_TYPE) {
+          this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+            base64Url) as string;
+        } else {
+          this.imageUrl = base64Url;
+        }
+      } else {
+        this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+          this.contextService.getEntityType(),
+          this.contextService.getEntityId(),
+          encodeURIComponent(this.filepath));
+      }
     }
 
     this.mouseX = 0;
@@ -261,22 +282,21 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
     const image: HTMLImageElement = images[0];
-    this.mouseX =
-      (event.pageX - image.getBoundingClientRect().left) / image.width;
-    this.mouseY =
-      (event.pageY - image.getBoundingClientRect().top) / image.height;
+    this.mouseX = (
+      (event.clientX - image.getBoundingClientRect().left) / image.width);
+    this.mouseY = (
+      (event.clientY - image.getBoundingClientRect().top) / image.height);
     this.currentlyHoveredRegions = [];
     this.updateCurrentlyHoveredRegions();
   }
 
   onClickImage(): void {
-    const answer = {
+    const answer: ImageClickAnswer = {
       clickPosition: [this.mouseX, this.mouseY],
       clickedRegions: this.currentlyHoveredRegions
     };
     this.currentInteractionService.onSubmit(
-      answer as unknown as string,
-      this.imageClickInputRulesService as unknown as InteractionRulesService);
+      answer, this.imageClickInputRulesService);
   }
 
   ngOnDestroy(): void {

@@ -1,5 +1,5 @@
 <mat-card layout="row" class="list-view-item">
-  <table class="dashboard-table protractor-test-topics-table">
+  <table class="dashboard-table e2e-test-topics-table">
     <colgroup>
       <col class="dashboard-table-index-column">
       <col class="dashboard-table-name-column">
@@ -25,20 +25,20 @@
       </td>
       <td>
         <div class="topic-primary-information-container">
-          <div class="list-summary list-summary-name protractor-test-topics-list-item">
+          <div class="list-summary list-summary-name e2e-test-topics-list-item">
             <div>
-              <a class="topic-name protractor-test-topic-name"
+              <a class="topic-name e2e-test-topic-name"
                  [href]="getTopicEditorUrl(topic.id)">
                 {{topic.name}}
               </a>
             </div>
             <div>
-              <span class="topic-classroom protractor-test-topic-classroom">
+              <span class="topic-classroom e2e-test-topic-classroom">
                 <span *ngIf="topic.classroom">{{topic.classroom}}</span>
                 <span ngbTooltip="Assign this topic to a classroom from the admin page" placement="bottom" *ngIf="!topic.classroom">No classroom assigned.</span>
               </span>
             </div>
-            <div><span class="topic-description protractor-test-topic-description">{{topic.description}}</span></div>
+            <div><span class="topic-description e2e-test-topic-description">{{topic.description}}</span></div>
           </div>
         </div>
       </td>
@@ -68,18 +68,18 @@
       <td class="text-center topic-list-status">
         <span class="topic-list-status-text" *ngIf="topic.isPublished"> Published </span>
         <span class="topic-list-status-text" *ngIf="!topic.isPublished"> Not Published </span>
-        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" (click)="changeEditOptions(topic.id)" attr.aria-label="Topic edit"></p>
+        <p class="fas fa-ellipsis-v topic-edit-box-icon e2e-test-topic-edit-box" (click)="changeEditOptions(topic.id)" attr.aria-label="Topic edit"></p>
         <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
-          <a class="topic-edit-options-edit protractor-test-edit-topic-button" [href]="getTopicEditorUrl(topic.id)">
+          <a class="topic-edit-options-edit e2e-test-edit-topic-button" [href]="getTopicEditorUrl(topic.id)">
             <i class="fa fa-pen"></i>
             <span>Edit</span>
           </a>
-          <span *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
+          <div *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
             <a>
-              <i class="fas fa-trash-alt protractor-test-delete-topic-button"></i>
+              <i class="fas fa-trash-alt e2e-test-delete-topic-button"></i>
               <span>Delete</span>
             </a>
-          </span>
+          </div>
         </div>
       </td>
     </tr>
@@ -208,9 +208,19 @@
   .topic-edit-options a {
     display: block;
     padding: 5px;
+    padding-left: 10px;
     text-align: left;
     text-decoration: none;
     width: 100%;
+  }
+
+  .topic-edit-options div {
+    display: block;
+    width: 100%;
+  }
+
+  .topic-edit-options span {
+    padding-left: 8px;
   }
   .topic-primary-information-container {
     height: 100%;

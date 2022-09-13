@@ -63,6 +63,7 @@ export class CollectionValidationService {
       return tags.indexOf(tag, idx + 1) === -1;
     });
   }
+
   // Validates that the tags for the collection are normalized,
   // returns true if all tags were normalized.
   validateTagsNormalized(tags: string[]): boolean {

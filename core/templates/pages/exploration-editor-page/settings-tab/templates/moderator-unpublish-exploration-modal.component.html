@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h3>Unpublish exploration (as moderator)</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    You are about to unpublish this exploration.
+  </p>
+
+  <div *ngIf="willEmailBeSent">
+    <br>
+    <p>
+      Doing so will send the following email to all exploration owners;
+      please edit it as needed. (NB: do not include a salutation or a
+      signoff -- the text "Hi [username]" and "Thanks! [your username] (Oppia moderator)" will
+      be auto-added.)
+    </p>
+
+    <schema-based-editor [schema]="EMAIL_BODY_SCHEMA"
+                         [localValue]="emailBody"
+                         (localValueChange)="updateValue($event)">
+    </schema-based-editor>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success" (click)="confirm(emailBody)">
+    <span>Unpublish Exploration</span>
+  </button>
+</div>

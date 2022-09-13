@@ -33,57 +33,58 @@ var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
 
-var emailInput = '.protractor-test-sign-in-email-input';
-var signInButton = '.protractor-test-sign-in-button';
-var usernameInput = '.protractor-test-username-input';
-var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
-var registerUser = '.protractor-test-register-user:not([disabled])';
+var emailInput = '.e2e-test-sign-in-email-input';
+var signInButton = '.e2e-test-sign-in-button';
+var usernameInput = '.e2e-test-username-input';
+var agreeToTermsCheckBox = '.e2e-test-agree-to-terms-checkbox';
+var registerUser = '.e2e-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
-var createButtonSelector = '.protractor-test-create-activity';
-var dismissWelcomeModalSelector = '.protractor-test-dismiss-welcome-modal';
+var createButtonSelector = '.e2e-test-create-activity';
+var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
 
-var createCollectionButtonSelector = '.protractor-test-create-collection';
-var addExplorationInput = '.protractor-test-add-exploration-input';
+var createCollectionButtonSelector = '.e2e-test-create-collection';
+var addExplorationInput = '.e2e-test-add-exploration-input';
 
-var createTopicButtonSelector = '.protractor-test-create-topic-button';
-var topicNameField = '.protractor-test-new-topic-name-field';
-var topicUrlFragmentField = '.protractor-test-new-topic-url-fragment-field';
-var topicDescriptionField = '.protractor-test-new-topic-description-field';
-var topicThumbnailButton = '.protractor-test-photo-button';
-var topicUploadButton = '.protractor-test-photo-upload-input';
-var topicPhotoSubmit = '.protractor-test-photo-upload-submit';
-var thumbnailContainer = '.protractor-test-thumbnail-container';
+var createTopicButtonSelector = '.e2e-test-create-topic-button';
+var topicNameField = '.e2e-test-new-topic-name-field';
+var topicUrlFragmentField = '.e2e-test-new-topic-url-fragment-field';
+var topicDescriptionField = '.e2e-test-new-topic-description-field';
+var topicPageTitleFragmField = '.e2e-test-new-page-title-fragm-field';
+var topicThumbnailButton = '.e2e-test-photo-button';
+var topicUploadButton = '.e2e-test-photo-upload-input';
+var topicPhotoSubmit = '.e2e-test-photo-upload-submit';
+var thumbnailContainer = '.e2e-test-thumbnail-container';
 var confirmTopicCreationButton =
-  '.protractor-test-confirm-topic-creation-button';
-var createdTopicLink = '.protractor-test-topic-name';
+  '.e2e-test-confirm-topic-creation-button';
+var createdTopicLink = '.e2e-test-topic-name';
 
-var createStoryButtonSelector = '.protractor-test-create-story-button';
-var storyNameField = '.protractor-test-new-story-title-field';
-var storyUrlFragmentField = '.protractor-test-new-story-url-fragment-field';
-var storyDescriptionField = '.protractor-test-new-story-description-field';
-var storyThumbnailButton = '.protractor-test-photo-button';
-var storyUploadButton = '.protractor-test-photo-upload-input';
-var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
+var createStoryButtonSelector = '.e2e-test-create-story-button';
+var storyNameField = '.e2e-test-new-story-title-field';
+var storyUrlFragmentField = '.e2e-test-new-story-url-fragment-field';
+var storyDescriptionField = '.e2e-test-new-story-description-field';
+var storyThumbnailButton = '.e2e-test-photo-button';
+var storyUploadButton = '.e2e-test-photo-upload-input';
+var storyPhotoSubmit = '.e2e-test-photo-upload-submit';
 var confirmStoryCreationButton =
-  '.protractor-test-confirm-story-creation-button';
+  '.e2e-test-confirm-story-creation-button';
 
 var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
-var skillDescriptionField = '.protractor-test-new-skill-description-field';
-var skillOpenConceptCard = '.protractor-test-open-concept-card';
+var skillDescriptionField = '.e2e-test-new-skill-description-field';
+var skillOpenConceptCard = '.e2e-test-open-concept-card';
 var confirmSkillCreationButton =
-  '.protractor-test-confirm-skill-creation-button';
+  '.e2e-test-confirm-skill-creation-button';
 var skillReviewMaterialInput = '.oppia-rte';
-var skillCkEditor = '.protractor-test-ck-editor';
+var skillCkEditor = '.e2e-test-ck-editor';
 
 var usernameInputFieldForRolesEditing = (
-  '.protractor-test-username-for-role-editor');
-var editUserRoleButton = '.protractor-test-role-edit-button';
-var roleEditorContainer = '.protractor-test-roles-editor-card-container';
-var addNewRoleButton = '.protractor-test-add-new-role-button';
-var roleSelect = '.protractor-test-new-role-selector';
+  '.e2e-test-username-for-role-editor');
+var editUserRoleButton = '.e2e-test-role-edit-button';
+var roleEditorContainer = '.e2e-test-roles-editor-card-container';
+var addNewRoleButton = '.e2e-test-add-new-role-button';
+var roleSelect = '.e2e-test-new-role-selector';
 var cookieBannerAcceptButton = (
-  '.protractor-test-oppia-cookie-banner-accept-button');
+  '.e2e-test-oppia-cookie-banner-accept-button');
 
 const login = async function(browser, page) {
   try {
@@ -194,6 +195,7 @@ const getTopicEditorUrl = async function(browser, page) {
     await page.type(topicNameField, 'Topic1 TASD');
     await page.type(topicUrlFragmentField, 'topic-tasd-one');
     await page.type(topicDescriptionField, 'Topic 1 description');
+    await page.type(topicPageTitleFragmField, 'page-fragment');
     await page.click(topicThumbnailButton);
     await page.waitForSelector(topicUploadButton, {visible: true});
 
@@ -235,7 +237,7 @@ const getStoryEditorUrl = async function(browser, page) {
 
     await page.waitForSelector(storyNameField, {visible: true});
     await page.type(storyNameField, 'Story TASD');
-    await page.type(storyUrlFragmentField, 'story-url-one');
+    await page.type(storyUrlFragmentField, 'storyurlone');
     await page.type(storyDescriptionField, 'Story 1 description');
     await page.click(storyThumbnailButton);
     await page.waitForSelector(storyUploadButton, {visible: true});

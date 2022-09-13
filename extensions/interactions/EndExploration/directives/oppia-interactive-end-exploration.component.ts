@@ -20,95 +20,97 @@
  * followed by the name of the arg.
  */
 
-require('domain/collection/read-only-collection-backend-api.service.ts');
-require('services/context.service.ts');
-require(
-  'interactions/interaction-attributes-extractor.service.ts');
-require('services/contextual/url.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { EndExplorationCustomizationArgs } from 'interactions/customization-args-defs';
 
-angular.module('oppia').component('oppiaInteractiveEndExploration', {
-  template: require('./end-exploration-interaction.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    '$attrs', '$http', 'ContextService',
-    'InteractionAttributesExtractorService',
-    'ReadOnlyCollectionBackendApiService', 'UrlService',
-    'EXPLORATION_EDITOR_TAB_CONTEXT',
-    'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'PAGE_CONTEXT',
-    function(
-        $attrs, $http, ContextService,
-        InteractionAttributesExtractorService,
-        ReadOnlyCollectionBackendApiService, UrlService,
-        EXPLORATION_EDITOR_TAB_CONTEXT,
-        EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, PAGE_CONTEXT) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        const {
-          recommendedExplorationIds
-        } = InteractionAttributesExtractorService.getValuesFromAttributes(
-          'EndExploration',
-          $attrs
-        );
-        var authorRecommendedExplorationIds = recommendedExplorationIds;
+import { ContextService } from 'services/context.service';
+import { EndExplorationBackendApiService } from './end-exploration-backend-api.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 
-        ctrl.isIframed = UrlService.isIframed();
-        ctrl.isInEditorPage = (
-          ContextService.getPageContext() === (
-            PAGE_CONTEXT.EXPLORATION_EDITOR));
-        ctrl.isInEditorPreviewMode = ctrl.isInEditorPage && (
-          ContextService.getEditorTabContext() ===
-          EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW);
-        ctrl.isInEditorMainTab = ctrl.isInEditorPage && (
-          ContextService.getEditorTabContext() ===
-          EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR);
+import { ServicesConstants } from 'services/services.constants';
 
-        ctrl.collectionId = UrlService.getCollectionIdFromExplorationUrl();
-        if (ctrl.collectionId) {
-          ReadOnlyCollectionBackendApiService
-            .loadCollectionAsync(ctrl.collectionId)
-            .then(function(collection) {
-              ctrl.getCollectionTitle = function() {
-                return collection.getTitle();
-              };
-            });
+@Component({
+  selector: 'oppia-interactive-end-exploration',
+  templateUrl: './end-exploration-interaction.component.html',
+  styleUrls: []
+})
+export class InteractiveEndExplorationComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() recommendedExplorationIdsWithValue!: string;
+  errorMessage!: string;
+  isInEditorPage: boolean = false;
+  isInEditorPreviewMode: boolean = false;
+  isInEditorMainTab: boolean = false;
+
+  constructor(
+    private contextService: ContextService,
+    private endExplorationBackendApiService: EndExplorationBackendApiService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
+  ) {}
+
+  ngOnInit(): void {
+    const {
+      recommendedExplorationIds
+    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
+      'EndExploration',
+      {
+        recommendedExplorationIdsWithValue:
+          this.recommendedExplorationIdsWithValue,
+      }
+    ) as EndExplorationCustomizationArgs;
+
+    const authorRecommendedExplorationIds = recommendedExplorationIds.value;
+
+    this.isInEditorPage = (
+      this.contextService.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
+    );
+    this.isInEditorPreviewMode = this.isInEditorPage && (
+      this.contextService.getEditorTabContext() ===
+      ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
+    );
+    this.isInEditorMainTab = this.isInEditorPage && (
+      this.contextService.getEditorTabContext() ===
+      ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR
+    );
+
+    if (this.isInEditorPage) {
+      // Display a message if any author-recommended explorations are
+      // invalid.
+      this.endExplorationBackendApiService.getRecommendExplorationsData(
+        authorRecommendedExplorationIds
+      ).then((response) => {
+        let foundExpIds: string[] = [];
+        response.summaries.map((expSummary) => {
+          foundExpIds.push(expSummary.id);
+        });
+
+        let missingExpIds: string[] = [];
+        authorRecommendedExplorationIds.forEach((expId) => {
+          if (!foundExpIds.includes(expId)) {
+            missingExpIds.push(expId);
+          }
+        });
+
+        if (missingExpIds.length === 0) {
+          this.errorMessage = '';
+        } else {
+          let listOfIds = missingExpIds.join('", "');
+          this.errorMessage = (
+            `Warning: exploration(s) with the IDs "${listOfIds}" ` +
+            'will not be shown as recommendations because ' +
+            'they either do not exist, or are not publicly viewable.');
         }
-
-        ctrl.errorMessage = '';
-
-        if (ctrl.isInEditorPage) {
-          // Display a message if any author-recommended explorations are
-          // invalid.
-          $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-            params: {
-              stringified_exp_ids: JSON.stringify(
-                authorRecommendedExplorationIds)
-            }
-          }).then(function(response) {
-            var data = response.data;
-            var foundExpIds = [];
-            data.summaries.map(function(expSummary) {
-              foundExpIds.push(expSummary.id);
-            });
-
-            var missingExpIds = [];
-            authorRecommendedExplorationIds.forEach(function(expId) {
-              if (foundExpIds.indexOf(expId) === -1) {
-                missingExpIds.push(expId);
-              }
-            });
-
-            if (missingExpIds.length === 0) {
-              ctrl.errorMessage = '';
-            } else {
-              var listOfIds = missingExpIds.join('", "');
-              ctrl.errorMessage = (
-                'Warning: exploration(s) with the IDs "' + listOfIds +
-                '" will not be shown as recommendations because ' +
-                'they either do not exist, or are not publicly viewable.');
-            }
-          });
-        }
-      };
+      });
     }
-  ]
-});
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaInteractiveEndExploration', downgradeComponent({
+    component: InteractiveEndExplorationComponent
+  }) as angular.IDirectiveFactory);

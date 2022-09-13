@@ -21,10 +21,10 @@ import { ObjectsDomainConstants } from
 import { Fraction } from 'domain/objects/fraction.model';
 
 describe('Fraction', () => {
-  let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
+  let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS;
 
   beforeEach(() => {
-    errors = ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
+    errors = ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS;
   });
 
   it('should create a new object from dict', () => {

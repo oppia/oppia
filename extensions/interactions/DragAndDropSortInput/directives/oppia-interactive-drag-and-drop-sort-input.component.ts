@@ -16,133 +16,286 @@
  * @fileoverview Component for the DragAndDropSortInput interaction.
  */
 
-require(
-  'interactions/interaction-attributes-extractor.service.ts');
-require(
-  'interactions/DragAndDropSortInput/directives/' +
-  'drag-and-drop-sort-input-rules.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
+import { Component, Input, OnInit, ElementRef } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { CdkDragDrop, CdkDragExit, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
 
-angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
-  bindings: {
-    savedSolution: '<'
-  },
-  template: require('./drag-and-drop-sort-input-interaction.component.html'),
-  controllerAs: '$ctrl',
-  controller: [
-    '$attrs', 'CurrentInteractionService',
-    'DragAndDropSortInputRulesService',
-    'InteractionAttributesExtractorService',
-    function(
-        $attrs, CurrentInteractionService,
-        DragAndDropSortInputRulesService,
-        InteractionAttributesExtractorService) {
-      var ctrl = this;
-      var answers = [];
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 
-      const getContentIdOfHtml = function(html) {
-        const {
-          choices
-        } = InteractionAttributesExtractorService.getValuesFromAttributes(
-          'DragAndDropSortInput',
-          $attrs
-        );
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { DragAndDropAnswer } from 'interactions/answer-defs';
 
-        return choices[ctrl.choices.indexOf(html)].contentId;
-      };
+@Component({
+  selector: 'oppia-interactive-drag-and-drop-sort-input',
+  templateUrl: './drag-and-drop-sort-input-interaction.component.html',
+  styleUrls: []
+})
+export class InteractiveDragAndDropSortInputComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() allowMultipleItemsInSamePositionWithValue!: string;
+  @Input() choicesWithValue!: string;
+  // Save solution is null until the solution is set.
+  @Input() savedSolution!: InteractionAnswer | null;
+  choices!: string[];
+  choicesValue!: SubtitledHtml[];
+  multipleItemsInSamePositionArray!: string[][];
+  singleItemInSamePositionArray!: string[];
+  allowMultipleItemsInSamePosition: boolean = false;
+  dragStarted: boolean = false;
+  hide: number[] = [];
+  highlightedGroup: number = -1;
+  noShow: number = -1;
+  rootHeight: number = 40;
 
-      const getHtmlOfContentId = function(contentId) {
-        const {
-          choices
-        } = InteractionAttributesExtractorService.getValuesFromAttributes(
-          'DragAndDropSortInput',
-          $attrs
-        );
-        for (let choice of choices) {
-          if (choice.contentId === contentId) {
-            return choice.html;
-          }
+  constructor(
+    private currentInteractionService: CurrentInteractionService,
+    private dragAndDropSortInputRulesService: DragAndDropSortInputRulesService,
+    private el: ElementRef,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService) {}
+
+  resetArray(): void {
+    // Resets the array into the correct format.
+    // For example, [[], [1, 2, 3], []].
+    const res: string[][] = [[]];
+    for (let i = 0; i < this.multipleItemsInSamePositionArray.length; i++) {
+      if (this.multipleItemsInSamePositionArray[i].length !== 0) {
+        res.push(this.multipleItemsInSamePositionArray[i]);
+        res.push([]);
+      }
+    }
+    this.highlightedGroup = -1;
+    this.multipleItemsInSamePositionArray = res;
+    this.noShow = -1;
+    this.hide = [];
+    this.dragStarted = false;
+  }
+
+  isChildElementHaveBorder(idx: number): boolean {
+    // Checks if the child has a border.
+    return idx % 2 === 1 && idx !== this.noShow;
+  }
+
+  isChildElementHaveZeroHeight(idx: number): boolean {
+    // Checks if the child has zero height.
+    return this.hide.indexOf(idx) >= 0;
+  }
+
+  addHighlight(i: number): void {
+    if (i === this.highlightedGroup && this.dragStarted) {
+      return;
+    }
+    this.highlightedGroup = i;
+  }
+
+  removeHighlight(): void {
+    this.highlightedGroup = -1;
+  }
+
+  dropList(event: CdkDragDrop<string[][]>): void {
+    // Handles the drop event. Drop whole list which is part of list of lists.
+    // If the drop is valid, then the list of lists is reset, otherwise the
+    // drag is cancelled.
+    moveItemInArray(
+      this.multipleItemsInSamePositionArray,
+      event.previousIndex, event.currentIndex);
+    this.resetArray();
+  }
+
+  dropItemInAnyList(event: CdkDragDrop<string[]>): void {
+    // Handles the drop event. Drop item in any list. If the drop is valid,
+    // then the list of lists is reset, otherwise the drag is cancelled.
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+      this.noShow = -1;
+      this.hide = [];
+      this.dragStarted = false;
+    } else {
+      const data = event.previousContainer.data[event.previousIndex];
+      for (
+        let i = event.previousIndex;
+        i < event.previousContainer.data.length - 1;
+        i++
+      ) {
+        event.previousContainer.data[i] = event.previousContainer.data[i + 1];
+      }
+      event.previousContainer.data.pop();
+      for (let i in this.multipleItemsInSamePositionArray) {
+        if (this.multipleItemsInSamePositionArray[i] === event.container.data) {
+          this.multipleItemsInSamePositionArray[i].splice(
+            event.currentIndex, 0, data);
         }
-      };
+      }
+      this.resetArray();
+    }
+  }
 
-      ctrl.submitAnswer = function() {
-        // Converting list of dicts to list of lists to make it consistent
-        // with the ListOfSetsOfTranslatableHtmlContentIds object.
-        answers = [];
-        for (var i = 0; i < ctrl.list.length; i++) {
-          answers.push([getContentIdOfHtml(ctrl.list[i].title)]);
-          for (var j = 0; j < ctrl.list[i].items.length; j++) {
-            answers[i].push(
-              getContentIdOfHtml(ctrl.list[i].items[j].title));
-          }
+  dropItemInSameList(event: CdkDragDrop<string[]>): void {
+    // Handles the drop event. Drop item in the same list. If the drop is
+    // valid, then the list is reset, otherwise the drag is cancelled.
+    moveItemInArray(
+      this.singleItemInSamePositionArray,
+      event.previousIndex, event.currentIndex);
+  }
+
+  hideElement(event: CdkDragExit<string[]>): void {
+    // Emits when the user removes an element from the container
+    // by dragging it into another container.
+    if (this.dragStarted) {
+      return;
+    }
+    this.dragStarted = true;
+    for (let i = 0; i < this.multipleItemsInSamePositionArray.length; i++) {
+      if (event.container.data === this.multipleItemsInSamePositionArray[i]) {
+        if (this.multipleItemsInSamePositionArray[i].length === 1) {
+          this.noShow = i;
+          this.hide.push(i, i + 1);
         }
+      }
+    }
+  }
 
-        CurrentInteractionService.onSubmit(
-          answers, DragAndDropSortInputRulesService);
-      };
-      ctrl.$onInit = function() {
-        const {
-          choices,
-          allowMultipleItemsInSamePosition
-        } = InteractionAttributesExtractorService.getValuesFromAttributes(
-          'DragAndDropSortInput',
-          $attrs
-        );
-        ctrl.choices = choices.map(choice => choice.html);
+  setRootPlaceHolderHeight(i: number): void {
+    // Sets the root placeholder height.
+    const el: HTMLDivElement = this.el.nativeElement.getElementsByClassName(
+      'child-dnd-' + i
+    )[0];
+    this.rootHeight = el.offsetHeight;
+  }
 
-        ctrl.list = [];
-        ctrl.dataMaxDepth = 1;
+  ngOnInit(): void {
+    const {
+      choices,
+      allowMultipleItemsInSamePosition
+    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
+      'DragAndDropSortInput',
+      {
+        choicesWithValue: this.choicesWithValue,
+        allowMultipleItemsInSamePositionWithValue:
+          this.allowMultipleItemsInSamePositionWithValue,
+      }
+    ) as DragAndDropSortInputCustomizationArgs;
 
-        ctrl.allowMultipleItemsInSamePosition = (
-          allowMultipleItemsInSamePosition);
+    this.multipleItemsInSamePositionArray = [];
+    this.singleItemInSamePositionArray = [];
+    this.choicesValue = choices.value;
+    this.choices = this.choicesValue.map(choice => choice.html);
+    this.allowMultipleItemsInSamePosition = (
+      allowMultipleItemsInSamePosition.value);
 
-        if (ctrl.allowMultipleItemsInSamePosition) {
-          ctrl.dataMaxDepth = 2;
-        } else {
-          ctrl.dataMaxDepth = 1;
+    let savedSolution = (
+      this.savedSolution !== null ? this.savedSolution : []
+    ) as DragAndDropAnswer;
+
+    if (this.allowMultipleItemsInSamePosition) {
+      // Use list of lists to store the multiple items in the same position.
+      // Push empty list along with the list of items in the same position,
+      // to enable the drag and drop in different positions from items in the
+      // same position.
+      // For example, if the list of items in the same position is [1, 2, 3],
+      // then the list of lists will be [[], [1, 2, 3], []].
+      if (savedSolution.length) {
+        // Pre populate with the saved solution, if present.
+        for (let i = 0; i < savedSolution.length; i++) {
+          let items = [];
+          for (let j = 0; j < savedSolution[i].length; j++) {
+            let htmlContent = this.getHtmlOfContentId(savedSolution[i][j]);
+            items.push(htmlContent);
+          }
+          this.multipleItemsInSamePositionArray.push([]);
+          this.multipleItemsInSamePositionArray.push(items);
         }
-
-        let savedSolution = (
-          ctrl.savedSolution !== undefined ? ctrl.savedSolution : []
-        );
-
-        if (savedSolution.length) {
-          // Pre populate with the saved solution, if present.
-          for (let contentIds of savedSolution) {
-            let item = {
-              title: getHtmlOfContentId(contentIds[0]),
-              items: []
-            };
-            for (let i = 1; i < contentIds.length; i++) {
-              item.items.push({
-                title: getHtmlOfContentId(contentIds[i]),
-                items: []
-              });
-            }
-            ctrl.list.push(item);
-          }
-        } else {
-          // Make list of dicts from the list of choices.
-          for (let choice of ctrl.choices) {
-            ctrl.list.push({title: choice, items: []});
-          }
+        this.multipleItemsInSamePositionArray.push([]);
+      } else {
+        // Pre populate with the choices, if no saved solution is present.
+        for (let choice of this.choices) {
+          this.multipleItemsInSamePositionArray.push([]);
+          this.multipleItemsInSamePositionArray.push([choice]);
         }
+        this.multipleItemsInSamePositionArray.push([]);
+      }
+    } else {
+      // Use Array to store the single item in same position.
+      if (savedSolution.length) {
+        // Pre populate with the saved solution, if present.
+        for (let i = 0; i < savedSolution.length; i++) {
+          let htmlContent = this.getHtmlOfContentId(savedSolution[i][0]);
+          this.singleItemInSamePositionArray.push(htmlContent);
+        }
+      } else {
+        // Pre populate with the choices, if no saved solution is present.
+        for (let choice of this.choices) {
+          this.singleItemInSamePositionArray.push(choice);
+        }
+      }
+    }
 
-        ctrl.treeOptions = {
-          dragMove: function(e) {
-            // Change the color of the placeholder based on the position of
-            // the dragged item.
-            if (e.dest.nodesScope.$childNodesScope !== undefined) {
-              e.elements.placeholder[0].style.borderColor = '#add8e6';
-            } else {
-              e.elements.placeholder[0].style.borderColor = '#000000';
-            }
+    const submitAnswerFn = () => this.submitAnswer();
+    this.currentInteractionService.registerCurrentInteraction(
+      submitAnswerFn, null);
+  }
+
+  getContentIdOfHtml(html: string): string {
+    let contentId = this.choicesValue[this.choices.indexOf(html)].contentId;
+
+    if (contentId === null) {
+      throw new Error('contentId cannot be null');
+    }
+    // Returns the content id of the html.
+    return contentId;
+  }
+
+  getHtmlOfContentId(contentId: string): string {
+    // Return the html of the content id.
+    for (let choice of this.choicesValue) {
+      if (choice.contentId === contentId) {
+        return choice.html;
+      }
+    }
+    throw new Error('contentId not found');
+  }
+
+  submitAnswer(): void {
+    // Convert the list of lists of html content to a list of lists
+    // of content ids.
+    const answer = [];
+    if (this.allowMultipleItemsInSamePosition) {
+      for (let i = 0; i < this.multipleItemsInSamePositionArray.length; i++) {
+        if (this.multipleItemsInSamePositionArray[i].length) {
+          let items = [];
+          for (
+            let j = 0;
+            j < this.multipleItemsInSamePositionArray[i].length;
+            j++
+          ) {
+            items.push(this.getContentIdOfHtml(
+              this.multipleItemsInSamePositionArray[i][j]));
           }
-        };
+          answer.push(items);
+        }
+      }
+    } else {
+      for (let i = 0; i < this.singleItemInSamePositionArray.length; i++) {
+        answer.push(
+          [this.getContentIdOfHtml(this.singleItemInSamePositionArray[i])]);
+      }
+    }
+    this.currentInteractionService.onSubmit(
+      answer, this.dragAndDropSortInputRulesService);
+  }
+}
 
-        CurrentInteractionService.registerCurrentInteraction(
-          ctrl.submitAnswer, null);
-      };
-    }]
-});
+angular.module('oppia').directive(
+  'oppiaInteractiveDragAndDropSortInput', downgradeComponent({
+    component: InteractiveDragAndDropSortInputComponent
+  }) as angular.IDirectiveFactory);

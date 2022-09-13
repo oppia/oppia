@@ -22,14 +22,18 @@ from core.jobs.types import base_validation_errors_test
 from core.jobs.types import improvements_validation_errors
 from core.platform import models
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import improvements_models
+
 (improvements_models,) = models.Registry.import_models(
-    [models.NAMES.improvements])
+    [models.Names.IMPROVEMENTS])
 
 
 class InvalidCompositeEntityErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
-    def test_message(self):
+    def test_message(self) -> None:
         model = improvements_models.TaskEntryModel(
             id='23',
             entity_id='999',

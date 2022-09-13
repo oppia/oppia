@@ -18,6 +18,7 @@
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 @Component({
   selector: 'subtitled-unicode-editor',
@@ -25,22 +26,26 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SubtitledUnicodeEditorComponent {
   // These property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() value!: { _unicode: string };
+  @Input() value!: SubtitledUnicode;
   @Output() valueChanged = new EventEmitter();
-  schema: { type: string } ={
+  schema: { type: string } = {
     type: 'unicode',
   };
+
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(val: string): void {
-    if (this.value._unicode === val) {
-      return;
+    if (this.value) {
+      if (this.value.unicode === val) {
+        return;
+      }
+
+      this.value.unicode = val;
+      this.valueChanged.emit(this.value);
+      this.changeDetectorRef.detectChanges();
     }
-    this.value._unicode = val;
-    this.valueChanged.emit(this.value);
-    this.changeDetectorRef.detectChanges();
   }
 
   getSchema(): { type: string } {

@@ -24,20 +24,27 @@ import json
 from core import feconf
 from core.platform import models
 
+from typing import Any, Dict
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import platform_taskqueue_services
+
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 # NOTE: The following constants should match the queue names in queue.yaml.
 # Taskqueue for backing up state.
-QUEUE_NAME_BACKUPS = 'backups'
+QUEUE_NAME_BACKUPS: Final = 'backups'
 # Default queue for processing tasks (including MapReduce ones).
-QUEUE_NAME_DEFAULT = 'default'
+QUEUE_NAME_DEFAULT: Final = 'default'
 # Taskqueue for sending email.
-QUEUE_NAME_EMAILS = 'emails'
+QUEUE_NAME_EMAILS: Final = 'emails'
 # Taskqueue for running one-off jobs.
-QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
+QUEUE_NAME_ONE_OFF_JOBS: Final = 'one-off-jobs'
 # Taskqueue for updating stats models.
-QUEUE_NAME_STATS = 'stats'
+QUEUE_NAME_STATS: Final = 'stats'
 
 # Function identifiers inform the deferred task handler of which deferred
 # function should be run for the relevant task.
@@ -48,19 +55,31 @@ QUEUE_NAME_STATS = 'stats'
 #    correct FUNCTION_ID and defer the function using that FUNCTION_ID.
 # 2. If the function does not exist in the handler, add it to the handler and
 #    add another FUNCTION_ID to this list.
-FUNCTION_ID_UPDATE_STATS = 'update_stats'
-FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS = 'delete_exps_from_user_models'
-FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES = 'delete_exps_from_activities'
-FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED = (
+FUNCTION_ID_UPDATE_STATS: Final = 'update_stats'
+FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: Final = 'delete_exps_from_user_models'
+FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: Final = 'delete_exps_from_activities'
+FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED: Final = (
     'delete_users_pending_to_be_deleted')
-FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION = (
+FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION: Final = (
     'check_completion_of_user_deletion')
-FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY = 'regenerate_exploration_summary'
-FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS = 'untag_deleted_misconceptions'
-FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS = 'remove_user_from_rights_models'
+FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: Final = (
+    'regenerate_exploration_summary')
+FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: Final = 'untag_deleted_misconceptions'
+FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = (
+    'remove_user_from_rights_models')
 
 
-def defer(fn_identifier, queue_name, *args, **kwargs):
+# Here we used type Any because in defer() function '*args' points to the
+# positional arguments of any other function and those arguments can be of
+# type str, list, int and other types too. Similarly, '**kwargs' points to
+# the keyword arguments of any other function and those can also accept
+# different types of values like '*args'.
+def defer(
+    fn_identifier: str,
+    queue_name: str,
+    *args: Any,
+    **kwargs: Any
+) -> None:
     """Adds a new task to a specified deferred queue scheduled for immediate
     execution.
 
@@ -74,7 +93,7 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
         **kwargs: dict(str : *). Keyword arguments for fn.
 
     Raises:
-        Exception. The arguments and keyword arguments that are passed in are
+        ValueError. The arguments and keyword arguments that are passed in are
             not JSON serializable.
     """
     payload = {
@@ -84,11 +103,11 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
     }
     try:
         json.dumps(payload)
-    except TypeError:
+    except TypeError as e:
         raise ValueError(
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
-            fn_identifier)
+            fn_identifier) from e
     # This is a workaround for a known python bug.
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
@@ -96,7 +115,10 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
 
 
-def enqueue_task(url, params, countdown):
+# Here we used type Any because the argument 'params' can accept payload
+# dictionaries which can hold the values of type string, set, int and
+# other types too.
+def enqueue_task(url: str, params: Dict[str, Any], countdown: int) -> None:
     """Adds a new task for sending email.
 
     Args:
@@ -107,13 +129,14 @@ def enqueue_task(url, params, countdown):
             task.
 
     Raises:
-        Exception. The params that are passed in are not JSON serializable.
+        ValueError. The params that are passed in are not JSON serializable.
     """
     try:
         json.dumps(params)
-    except TypeError:
+    except TypeError as e:
         raise ValueError(
-            'The params added to the email task call cannot be json serialized')
+            'The params added to the email task call cannot be json serialized'
+        ) from e
     scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
         seconds=countdown)
     platform_taskqueue_services.create_http_task(

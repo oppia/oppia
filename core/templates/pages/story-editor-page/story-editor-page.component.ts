@@ -16,6 +16,11 @@
  * @fileoverview Component for the story editor page.
  */
 
+import { Subscription } from 'rxjs';
+import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
+import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+
 require('objects/objectComponentsRequires.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -23,7 +28,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+  'components/forms/schema-based-editors/schema-based-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.component.ts');
@@ -43,25 +48,34 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 require('services/loader.service.ts');
+require('services/ngb-modal.service.ts');
 require('services/prevent-page-unload-event.service.ts');
-
-import { Subscription } from 'rxjs';
+require('services/local-storage.service.ts');
+require(
+  'pages/story-editor-page/services/' +
+  'story-editor-staleness-detection.service.ts');
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
-    '$uibModal', '$window', 'BottomNavbarStatusService',
+    '$rootScope', '$window', 'BottomNavbarStatusService',
     'EditableStoryBackendApiService', 'LoaderService',
+    'LocalStorageService', 'NgbModal',
     'PageTitleService', 'PreventPageUnloadEventService',
-    'StoryEditorNavigationService', 'StoryEditorStateService',
+    'StoryEditorNavigationService',
+    'StoryEditorStalenessDetectionService',
+    'StoryEditorStateService',
     'StoryValidationService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'MAX_COMMIT_MESSAGE_LENGTH',
     function(
-        $uibModal, $window, BottomNavbarStatusService,
+        $rootScope, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService, LoaderService,
+        LocalStorageService, NgbModal,
         PageTitleService, PreventPageUnloadEventService,
-        StoryEditorNavigationService, StoryEditorStateService,
+        StoryEditorNavigationService,
+        StoryEditorStalenessDetectionService,
+        StoryEditorStateService,
         StoryValidationService, UndoRedoService,
         UrlInterpolationService, UrlService,
         MAX_COMMIT_MESSAGE_LENGTH) {
@@ -71,13 +85,15 @@ angular.module('oppia').component('storyEditorPage', {
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
         if (UndoRedoService.getChangeCount() > 0) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/story-editor-page/modal-templates/' +
-              'story-save-pending-changes-modal.template.html'),
-            backdrop: true,
-            controller: 'ConfirmOrCancelModalController'
-          }).result.then(function() {}, function() {
+          const modalRef = NgbModal.open(
+            SavePendingChangesModalComponent, {
+              backdrop: true
+            });
+
+          modalRef.componentInstance.body = (
+            'Please save all pending changes before returning to the topic.');
+
+          modalRef.result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
             // No further action is needed.
@@ -201,18 +217,96 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorNavigationService.navigateToStoryEditor();
       };
 
+      ctrl.onClosingStoryEditorBrowserTab = function() {
+        const story = StoryEditorStateService.getStory();
+
+        const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+        if (storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+            UndoRedoService.getChangeCount() > 0) {
+          storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+        }
+        storyEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          storyEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS);
+      };
+
+      let createStoryEditorBrowserTabsInfo = function() {
+        const story = StoryEditorStateService.getStory();
+
+        let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+        if (storyEditorBrowserTabsInfo) {
+          storyEditorBrowserTabsInfo.setLatestVersion(story.getVersion());
+          storyEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+        } else {
+          storyEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+            'story', story.getId(), story.getVersion(), 1, false);
+        }
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          storyEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS);
+      };
+
+      let updateStoryEditorBrowserTabsInfo = function() {
+        const story = StoryEditorStateService.getStory();
+
+        const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+          LocalStorageService.getEntityEditorBrowserTabsInfo(
+            EntityEditorBrowserTabsInfoDomainConstants
+              .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+
+        storyEditorBrowserTabsInfo.setLatestVersion(story.getVersion());
+        storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+
+        LocalStorageService.updateEntityEditorBrowserTabsInfo(
+          storyEditorBrowserTabsInfo,
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS);
+      };
+
+      let onCreateOrUpdateStoryEditorBrowserTabsInfo = function(event) {
+        if (event.key === (
+          EntityEditorBrowserTabsInfoDomainConstants
+            .OPENED_STORY_EDITOR_BROWSER_TABS)
+        ) {
+          StoryEditorStalenessDetectionService
+            .staleTabEventEmitter.emit();
+          StoryEditorStalenessDetectionService
+            .presenceOfUnsavedChangesEventEmitter.emit();
+          $rootScope.$applyAsync();
+        }
+      };
+
       ctrl.$onInit = function() {
         LoaderService.showLoadingScreen('Loading Story');
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryInitialized.subscribe(
             () => {
               _initPage();
+              createStoryEditorBrowserTabsInfo();
               LoaderService.hideLoadingScreen();
+              $rootScope.$applyAsync();
             }
           ));
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryReinitialized.subscribe(
-            () => _initPage()
+            () => {
+              _initPage();
+              updateStoryEditorBrowserTabsInfo();
+              $rootScope.$applyAsync();
+            }
           ));
         ctrl.validationIssues = [];
         ctrl.prepublishValidationIssues = [];
@@ -238,6 +332,12 @@ angular.module('oppia').component('storyEditorPage', {
             () => _initPage()
           )
         );
+
+        StoryEditorStalenessDetectionService.init();
+        $window.addEventListener(
+          'beforeunload', ctrl.onClosingStoryEditorBrowserTab);
+        LocalStorageService.registerNewStorageEventListener(
+          onCreateOrUpdateStoryEditorBrowserTabsInfo);
       };
 
       ctrl.$onDestroy = function() {

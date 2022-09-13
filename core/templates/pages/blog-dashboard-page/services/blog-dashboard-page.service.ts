@@ -31,11 +31,15 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
   providedIn: 'root'
 })
 export class BlogDashboardPageService {
+  // This property is initialized using getters and setters
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _blogPostData!: BlogPostData;
   private _blogPostId: string = '';
   private _authorPictureUrl: string = '';
-  private _blogPostData: null | BlogPostData = null;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
+
   private _activeTab = 'main';
   private _blogPostAction: string = '';
   private _updateViewEventEmitter = new EventEmitter<void>();
@@ -105,11 +109,11 @@ export class BlogDashboardPageService {
     this._blogPostId = id;
   }
 
-  set blogPostData(data: BlogPostData | null) {
+  set blogPostData(data: BlogPostData) {
     this._blogPostData = data;
   }
 
-  get blogPostData(): BlogPostData | null {
+  get blogPostData(): BlogPostData {
     return this._blogPostData;
   }
 

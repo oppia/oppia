@@ -23,13 +23,23 @@ from core.domain import subscription_services
 from core.domain import user_domain
 from core.platform import models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+from typing import List, Optional, Tuple
+from typing_extensions import Final
 
-MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = (
-    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
+(user_models,) = models.Registry.import_models([models.Names.USER])
+
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT: Final = (
+    feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT
+)
 
 
-def get_learner_playlist_from_model(learner_playlist_model):
+def get_learner_playlist_from_model(
+    learner_playlist_model: user_models.LearnerPlaylistModel
+) -> user_domain.LearnerPlaylist:
     """Returns the learner playlist domain object given the learner playlist
     model loaded from the datastore.
 
@@ -47,7 +57,9 @@ def get_learner_playlist_from_model(learner_playlist_model):
         learner_playlist_model.collection_ids)
 
 
-def save_learner_playlist(learner_playlist):
+def save_learner_playlist(
+    learner_playlist: user_domain.LearnerPlaylist
+) -> None:
     """Save a learner playlist domain object as an LearnerPlaylistModel entity
     in the datastore.
 
@@ -72,7 +84,10 @@ def save_learner_playlist(learner_playlist):
 
 
 def mark_exploration_to_be_played_later(
-        user_id, exploration_id, position_to_be_inserted=None):
+    user_id: str,
+    exploration_id: str,
+    position_to_be_inserted: Optional[int] = None
+) -> Tuple[bool, bool]:
     """Adds the exploration id to the learner playlist of the user at the given
     position. If the position is not specified, the exploration gets added at
     the end. If the exploration is created or has been edited by the user it is
@@ -136,7 +151,10 @@ def mark_exploration_to_be_played_later(
 
 
 def mark_collection_to_be_played_later(
-        user_id, collection_id, position_to_be_inserted=None):
+    user_id: str,
+    collection_id: str,
+    position_to_be_inserted: Optional[int] = None
+) -> Tuple[bool, bool]:
     """Adds the collection id to the learner playlist of the user at the given
     position. If the position is not specified, the collection gets added at
     the end. If the collection is created or has been edited by the user it is
@@ -199,7 +217,9 @@ def mark_collection_to_be_played_later(
     return playlist_limit_exceeded, collection_belongs_to_subscribed_collections
 
 
-def remove_exploration_from_learner_playlist(user_id, exploration_id):
+def remove_exploration_from_learner_playlist(
+    user_id: str, exploration_id: str
+) -> None:
     """Removes the exploration from the learner playlist of the user
     (if present).
 
@@ -218,7 +238,9 @@ def remove_exploration_from_learner_playlist(user_id, exploration_id):
             save_learner_playlist(learner_playlist)
 
 
-def remove_collection_from_learner_playlist(user_id, collection_id):
+def remove_collection_from_learner_playlist(
+    user_id: str, collection_id: str
+) -> None:
     """Removes the collection from the learner playlist of the user
     (if present).
 
@@ -237,7 +259,7 @@ def remove_collection_from_learner_playlist(user_id, collection_id):
             save_learner_playlist(learner_playlist)
 
 
-def get_all_exp_ids_in_learner_playlist(user_id):
+def get_all_exp_ids_in_learner_playlist(user_id: str) -> List[str]:
     """Returns a list with the ids of all the explorations that are in the
     playlist of the user.
 
@@ -260,7 +282,7 @@ def get_all_exp_ids_in_learner_playlist(user_id):
         return []
 
 
-def get_all_collection_ids_in_learner_playlist(user_id):
+def get_all_collection_ids_in_learner_playlist(user_id: str) -> List[str]:
     """Returns a list with the ids of all the collections that are in the
     playlist of the user.
 

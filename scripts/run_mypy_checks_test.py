@@ -38,7 +38,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     """Tests for MyPy type check runner script."""
 
     def setUp(self):
-        super(MypyScriptChecks, self).setUp()
+        super().setUp()
 
         self.install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
@@ -112,6 +112,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.mypy_install_swap = self.swap_with_checks(
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites)
+
+    def test_all_files_and_folders_in_not_fully_covered_files_exist(
+        self
+    ) -> None:
+        for path in run_mypy_checks.NOT_FULLY_COVERED_FILES:
+            self.assertTrue(
+                os.path.exists(path), msg='"%s" does not exist' % path)
 
     def test_install_third_party_libraries_with_skip_install_as_true(self):
         run_mypy_checks.install_third_party_libraries(True)
@@ -203,13 +210,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_main_with_files_with_mypy_errors(self):
         with self.install_mypy_prereq_swap_success:
             with self.install_swap, self.popen_swap_failure:
-                with self.assertRaisesRegexp(SystemExit, '2'):
+                with self.assertRaisesRegex(SystemExit, '2'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self):
         with self.popen_swap_failure:
             with self.install_swap, self.install_mypy_prereq_swap_success:
-                with self.assertRaisesRegexp(SystemExit, '2'):
+                with self.assertRaisesRegex(SystemExit, '2'):
                     run_mypy_checks.main(args=[])
 
     def test_main_with_install_prerequisites_success(self):
@@ -220,5 +227,5 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_install_prerequisites_failure(self):
         with self.popen_swap_failure, self.install_swap:
-            with self.assertRaisesRegexp(SystemExit, '1'):
+            with self.assertRaisesRegex(SystemExit, '1'):
                 run_mypy_checks.main(args=[])

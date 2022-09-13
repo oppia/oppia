@@ -33,12 +33,15 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   templateUrl: './blog-dashboard-page.component.html'
 })
 export class BlogDashboardPageComponent implements OnInit, OnDestroy {
-  activeTab: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  activeTab!: string;
+  authorProfilePictureUrl!: string;
+  blogDashboardData!: BlogDashboardData;
+  windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
-  authorProfilePictureUrl: string;
-  blogDashboardData: BlogDashboardData;
   directiveSubscriptions = new Subscription();
-  windowIsNarrow: boolean;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   constructor(
     private alertsService: AlertsService,

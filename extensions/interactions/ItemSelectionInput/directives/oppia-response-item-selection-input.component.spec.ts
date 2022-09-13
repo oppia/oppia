@@ -13,48 +13,68 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the ItemSelectionInput response.
+ * @fileoverview Component for the ItemSelectionInput response.
  */
 
-describe('oppiaResponseItemSelectionInput', function() {
-  let ctrl = null;
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ResponseItemSelectionInputComponent } from './oppia-response-item-selection-input.component';
 
-  let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
-      return answer;
+describe('ResponseItemSelectionInput', () => {
+  let component: ResponseItemSelectionInputComponent;
+  let fixture: ComponentFixture<ResponseItemSelectionInputComponent>;
+
+  class mockHtmlEscaperService {
+    escapedJsonToObj(answer: string): string {
+      return JSON.parse(answer);
     }
-  };
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('HtmlEscaperService', mockHtmlEscaperService);
-
-    $provide.value('$attrs', {
-      choices: [
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ResponseItemSelectionInputComponent],
+      providers: [
         {
-          _html: 'choice 1',
-          _contentId: 'ca_choices_1'
-        },
-        {
-          _html: 'choice 2',
-          _contentId: 'ca_choices_2'
-        },
-        {
-          _html: 'choice 3',
-          _contentId: 'ca_choices_3'
-        },
+          provide: HtmlEscaperService,
+          useClass: mockHtmlEscaperService
+        }
       ],
-      answer: [
-        'ca_choices_1'
-      ]
-    });
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaResponseItemSelectionInput');
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should initialise the component when', () => {
-    ctrl.$onInit();
-    expect(ctrl.answer).toEqual(['choice 1']);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ResponseItemSelectionInputComponent);
+    component = fixture.componentInstance;
+    component.answer = '["ca_choices_1"]';
+    component.choices = '[{' +
+      '"_html": "choice 1",' +
+      '"_contentId": "ca_choices_1"' +
+    '}, {' +
+      '"_html": "choice 2",' +
+      '"_contentId": "ca_choices_2"' +
+    '}, {' +
+      '"_html": "choice 3",' +
+      '"_contentId": "ca_choices_3"' +
+    '}]';
+  });
+
+  it('should result in an empty responses array if the learner submits with ' +
+    'no answer selected', () => {
+    expect(component.responses).toBeUndefined();
+
+    // The value that is received when the learner submits with no options
+    // selected is an empty string.
+    component.answer = '""';
+    component.ngOnInit();
+
+    expect(component.responses).toEqual([]);
+  });
+
+  it('should initialise component when user submits answer', () => {
+    component.ngOnInit();
+
+    expect(component.responses).toEqual(['choice 1']);
   });
 });

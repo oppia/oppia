@@ -19,8 +19,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
 
@@ -29,7 +29,7 @@ describe('StorySummaryTileComponent', () => {
   let component: StorySummaryTileComponent;
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
-  let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -45,7 +45,10 @@ describe('StorySummaryTileComponent', () => {
     fixture = TestBed.createComponent(StorySummaryTileComponent);
     component = fixture.componentInstance;
     wds = TestBed.inject(WindowDimensionsService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true);
   });
 
   it('should set properties on initialization', () => {
@@ -61,18 +64,31 @@ describe('StorySummaryTileComponent', () => {
       story_is_published: true,
       completed_node_titles: ['node1'],
       url_fragment: 'story1',
-      all_node_dicts: []
+      all_node_dicts: [
+        {
+          id: 'node_1',
+          title: 'node1',
+          description: 'This is node 1',
+          destination_node_ids: [],
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          outline: '',
+          outline_is_finalized: true,
+          exploration_id: null,
+          thumbnail_bg_color: null,
+          thumbnail_filename: null
+        }
+      ]
     });
 
-    expect(component.nodeCount).toBe(undefined);
-    expect(component.completedStoriesCount).toBe(undefined);
-    expect(component.storyProgress).toBe(undefined);
-    expect(component.storyLink).toBe(undefined);
-    expect(component.storyTitle).toBe(undefined);
-    expect(component.strokeDashArrayValues).toBe(undefined);
-    expect(component.completedStrokeDashArrayValues).toBe(undefined);
-    expect(component.thumbnailBgColor).toBe(undefined);
-    expect(component.nodeTitles).toEqual(undefined);
+    spyOn(i18nLanguageCodeService, 'getStoryTranslationKey')
+      .and.returnValue('I18N_STORY_storyId_TITLE');
+    spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey')
+      .and.returnValue('I18N_EXPLORATION_explId_TITLE');
+    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
+      .and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
+      .and.returnValues(false, false);
 
     component.ngOnInit();
 
@@ -81,7 +97,18 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyProgress).toBe(33);
     expect(component.storyLink).toBe('#');
     expect(component.storyTitle).toBe('Story Title');
-
+    expect(component.storyTitleTranslationKey).toEqual(
+      'I18N_STORY_storyId_TITLE');
+    expect(component.nodeTitlesTranslationKeys).toEqual(
+      ['I18N_EXPLORATION_explId_TITLE']);
+    // Translation is only displayed if the language is not English
+    // and it's hacky translation is available.
+    let hackyStoryTitleTranslationIsDisplayed =
+      component.isHackyStoryTitleTranslationDisplayed();
+    expect(hackyStoryTitleTranslationIsDisplayed).toBe(false);
+    let hackyNodeTitleTranslationIsDisplayed =
+      component.isHackyNodeTitleTranslationDisplayed(0);
+    expect(hackyNodeTitleTranslationIsDisplayed).toBe(true);
     // Here the value is calculated by the formula -> (circumference -
     // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5)) / 3
     // = 36.88790204786391. Along with this value, gapLength (5) is also
@@ -142,8 +169,8 @@ describe('StorySummaryTileComponent', () => {
       .toBe('/assetsdevhandler/story/storyId/assets/thumbnail/thumbnail.jpg');
   });
 
-  it('should display only 2 chapters if window width is less' +
-    ' than equal to 800px', () => {
+  it('should display only 1 chapters if window width is less' +
+    ' than equal to 500px', () => {
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -156,7 +183,30 @@ describe('StorySummaryTileComponent', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     });
-    spyOn(wds, 'getWidth').and.returnValue(790);
+    spyOn(wds, 'getWidth').and.returnValue(460);
+
+    expect(component.chaptersDisplayed).toBe(undefined);
+
+    component.ngOnInit();
+
+    expect(component.chaptersDisplayed).toBe(1);
+  });
+
+  it('should display only 2 chapters if window width is greater' +
+    ' than 500px and less than 768px', () => {
+    component.storySummary = StorySummary.createFromBackendDict({
+      id: 'storyId',
+      title: 'Story Title',
+      node_titles: ['node1', 'node2', 'node3'],
+      thumbnail_filename: 'thumbnail.jpg',
+      thumbnail_bg_color: '#FF9933',
+      description: 'This is the story description',
+      story_is_published: true,
+      completed_node_titles: ['node1'],
+      url_fragment: 'story1',
+      all_node_dicts: []
+    });
+    spyOn(wds, 'getWidth').and.returnValue(650);
 
     expect(component.chaptersDisplayed).toBe(undefined);
 
@@ -166,7 +216,7 @@ describe('StorySummaryTileComponent', () => {
   });
 
   it('should display 3 chapters if window width is greater' +
-  ' than 800px', () => {
+  ' than 768px', () => {
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -179,13 +229,34 @@ describe('StorySummaryTileComponent', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     });
-    spyOn(wds, 'getWidth').and.returnValue(801);
+    spyOn(wds, 'getWidth').and.returnValue(800);
 
     expect(component.chaptersDisplayed).toBe(undefined);
 
     component.ngOnInit();
 
     expect(component.chaptersDisplayed).toBe(3);
+  });
+
+  it('should return correct story status', () => {
+    component.storyProgress = 0;
+    component.getStoryStatus();
+    expect(component.storyStatus).toBe('Not Started');
+    component.storyProgress = 67;
+    component.getStoryStatus();
+    expect(component.storyStatus).toBe('In Progress');
+    component.storyProgress = 100;
+    component.getStoryStatus();
+    expect(component.storyStatus).toBe('Completed');
+  });
+
+  it('should check if the view is tablet or not', () => {
+    var widthSpy = spyOn(wds, 'getWidth');
+    widthSpy.and.returnValue(700);
+    expect(component.checkTabletView()).toBe(true);
+
+    widthSpy.and.returnValue(800);
+    expect(component.checkTabletView()).toBe(false);
   });
 
   it('should show \'View All\' button if number of nodes is not same as the' +
@@ -404,7 +475,7 @@ describe('StorySummaryTileComponent', () => {
   });
 
   it('should show all chapters when user click on \'View All\' button', () => {
-    spyOn(wds, 'getWidth').and.returnValue(790);
+    spyOn(wds, 'getWidth').and.returnValue(460);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -424,17 +495,17 @@ describe('StorySummaryTileComponent', () => {
     component.ngOnInit();
 
     expect(component.initialCount).toBe(undefined);
-    expect(component.chaptersDisplayed).toBe(2);
+    expect(component.chaptersDisplayed).toBe(1);
 
     component.showAllChapters();
 
-    expect(component.initialCount).toBe(2);
+    expect(component.initialCount).toBe(1);
     expect(component.chaptersDisplayed).toBe(3);
   });
 
   it('should hide extra chapters when user click on \'View less\'' +
     ' button', () => {
-    spyOn(wds, 'getWidth').and.returnValue(790);
+    spyOn(wds, 'getWidth').and.returnValue(460);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -452,7 +523,7 @@ describe('StorySummaryTileComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.chaptersDisplayed).toBe(2);
+    expect(component.chaptersDisplayed).toBe(1);
 
     component.showAllChapters();
 
@@ -460,26 +531,6 @@ describe('StorySummaryTileComponent', () => {
 
     component.hideExtraChapters();
 
-    expect(component.chaptersDisplayed).toBe(2);
-  });
-
-  it('should return \'#\' for storyLink if UrlInterpolation' +
-    ' returns null', () => {
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'fractions';
-    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(null);
-    component.storySummary = StorySummary.createFromBackendDict({
-      id: 'storyId',
-      title: 'Story Title',
-      node_titles: ['node1'],
-      thumbnail_filename: 'thumbnail.jpg',
-      thumbnail_bg_color: '#FF9933',
-      description: 'This is the story description',
-      story_is_published: true,
-      completed_node_titles: ['node1'],
-      url_fragment: 'story1',
-      all_node_dicts: []
-    });
-    expect(component.getStoryLink()).toBe('#');
+    expect(component.chaptersDisplayed).toBe(1);
   });
 });

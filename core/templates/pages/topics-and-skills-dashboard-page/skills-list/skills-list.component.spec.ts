@@ -22,7 +22,8 @@ import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { AugmentedSkillSummary, AugmentedSkillSummaryBackendDict } from 'domain/skill/augmented-skill-summary.model';
@@ -34,7 +35,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { AlertsService } from 'services/alerts.service';
 import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
-import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
+import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 import { SelectTopicsComponent } from '../topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list.component';
 
@@ -58,7 +59,7 @@ describe('Skills List Component', () => {
     topic_names: ['a'],
     classroom_names: ['a']
   };
-  let topicAssignmentsSummary: { [key: string]: TopicAssignmentsSummary } = {
+  let topicAssignmentsSummary: TopicNameToTopicAssignments = {
     topic1: {
       subtopicId: 12,
       topicVersion: 7,
@@ -68,9 +69,20 @@ describe('Skills List Component', () => {
 
 
   class MockNgbModal {
-    modal: string;
+    // Avoiding non-null assertion for modal below by suffixing '!' symbol.
+    // It was done as the value of modal is not being initialized right away.
+    // The modal is initialized to different values to test various components.
+    modal!: string;
     success: boolean = true;
-    open(content, options) {
+    open(
+        content: (
+          AssignSkillToTopicModalComponent |
+          DeleteSkillModalComponent |
+          MergeSkillModalComponent |
+          UnassignSkillFromTopicsModalComponent
+        ),
+        options: NgbModalOptions
+    ) {
       if (this.modal === 'delete_skill') {
         return {
           componentInstance: {
@@ -105,7 +117,12 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (result) => void,
+                successCallback: (
+                  result: {
+                    skill: {};
+                    supersedingSkillId: string;
+                  }
+                ) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -126,7 +143,8 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (topicsToUnassign) => void,
+                successCallback: (
+                  topicsToUnassign: TopicNameToTopicAssignments) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -144,7 +162,7 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (topicsToUnassign) => void,
+                successCallback: (skillsToAssign: string[]) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {
@@ -181,8 +199,9 @@ describe('Skills List Component', () => {
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     error: boolean = false;
-    onTopicsAndSkillsDashboardReinitialized: EventEmitter<boolean> =
-    new EventEmitter();
+    onTopicsAndSkillsDashboardReinitialized: EventEmitter<boolean> = (
+      new EventEmitter());
+
     mergeSkillsAsync(skillId: string, supersedingSkillId: string) {
       return {
         then: (
@@ -231,6 +250,7 @@ describe('Skills List Component', () => {
         MatCardModule,
         MatCheckboxModule,
         MatRadioModule,
+        MatProgressSpinnerModule,
         FormsModule
       ],
       declarations: [
@@ -276,15 +296,15 @@ describe('Skills List Component', () => {
     componentInstance.untriagedSkillSummaries = [];
 
     topicsAndSkillsDashboardBackendApiService = (
-      TestBed.inject(TopicsAndSkillsDashboardBackendApiService) as
-    unknown) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
+      TestBed.inject(TopicsAndSkillsDashboardBackendApiService) as unknown
+    ) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
     alertsService = TestBed.inject(AlertsService);
     alertsService = (alertsService as unknown) as jasmine.SpyObj<AlertsService>;
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as
       jasmine.SpyObj<MockNgbModal>;
     mockSkillBackendApiService = (
-      TestBed.inject(SkillBackendApiService) as
-    unknown) as jasmine.SpyObj<MockSkillBackendApiService>;
+      TestBed.inject(SkillBackendApiService) as unknown
+    ) as jasmine.SpyObj<MockSkillBackendApiService>;
   });
 
   it('should create', () => {
@@ -343,7 +363,7 @@ describe('Skills List Component', () => {
     tick(500);
   }));
 
-  it('should cancel delete skil modal', () => {
+  it('should cancel delete skill modal', () => {
     mockNgbModal.modal = 'delete_skill';
     mockNgbModal.success = false;
     componentInstance.deleteSkill('test_skill');

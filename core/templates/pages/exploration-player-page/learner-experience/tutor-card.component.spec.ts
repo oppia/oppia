@@ -19,7 +19,8 @@
 import { SimpleChanges } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync, flush } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -43,14 +44,39 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerPositionService } from '../services/player-position.service';
 import { TutorCardComponent } from './tutor-card.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
       hash: '',
       pathname: '/path/name'
+    },
+    matchMedia: function(query: string) {
+      return {
+        matches: false
+      };
     }
   };
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EndChapterCelebration: {
+        isEnabled: true
+      }
+    };
+  }
+}
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
 }
 
 describe('Tutor card component', () => {
@@ -72,6 +98,9 @@ describe('Tutor card component', () => {
   let urlService: UrlService;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
+  let windowRef: WindowRef;
+  let platformFeatureService: PlatformFeatureService;
+  let translateService: TranslateService;
 
   let mockDisplayedCard = new StateCard(
     '', '', '', new Interaction([], [], null, null, [], null, null)
@@ -105,6 +134,14 @@ describe('Tutor card component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -132,6 +169,9 @@ describe('Tutor card component', () => {
     userService = TestBed.inject(UserService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    windowRef = TestBed.inject(WindowRef);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    translateService = TestBed.inject(TranslateService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
@@ -187,17 +227,363 @@ describe('Tutor card component', () => {
   it('should refresh displayed card on changes', fakeAsync(() => {
     let updateDisplayedCardSpy = spyOn(
       componentInstance, 'updateDisplayedCard');
+    spyOn(componentInstance, 'isOnTerminalCard');
     const changes: SimpleChanges = {
       displayedCard: {
         previousValue: false,
         currentValue: true,
         firstChange: false,
-        isFirstChange: () => false
+        isFirstChange: () => false,
       }
     };
     componentInstance.ngOnChanges(changes);
     expect(updateDisplayedCardSpy).toHaveBeenCalled();
+    expect(componentInstance.isOnTerminalCard).toHaveBeenCalled();
   }));
+
+  it('should trigger celebratory animation if on the last card of a chapter',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+      spyOn(componentInstance, 'triggerCelebratoryAnimation');
+      componentInstance.animationHasPlayedOnce = false;
+      componentInstance.inStoryMode = true;
+      const changes: SimpleChanges = {
+        displayedCard: {
+          previousValue: false,
+          currentValue: true,
+          firstChange: false,
+          isFirstChange: () => false
+        }
+      };
+
+      componentInstance.ngOnChanges(changes);
+
+      expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+      expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalled();
+    }));
+
+  it('should not trigger celebratory animation if the feature is not enabled',
+    () => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+        {
+          EndChapterCelebration: {
+            isEnabled: false
+          }
+        }
+      );
+      spyOn(componentInstance, 'triggerCelebratoryAnimation');
+      componentInstance.animationHasPlayedOnce = false;
+      componentInstance.inStoryMode = true;
+      const changes: SimpleChanges = {
+        displayedCard: {
+          previousValue: false,
+          currentValue: true,
+          firstChange: false,
+          isFirstChange: () => false
+        }
+      };
+
+      componentInstance.ngOnChanges(changes);
+
+      expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+      expect(
+        componentInstance.triggerCelebratoryAnimation).not.toHaveBeenCalled();
+    });
+
+  it('should not trigger celebratory animation if not in story mode',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+      spyOn(componentInstance, 'triggerCelebratoryAnimation');
+      componentInstance.animationHasPlayedOnce = false;
+      componentInstance.inStoryMode = false;
+      const changes: SimpleChanges = {
+        displayedCard: {
+          previousValue: false,
+          currentValue: true,
+          firstChange: false,
+          isFirstChange: () => false
+        }
+      };
+
+      componentInstance.ngOnChanges(changes);
+
+      expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+      expect(
+        componentInstance.triggerCelebratoryAnimation).not.toHaveBeenCalled();
+    }));
+
+  it('should animate the check mark and the confetti ' +
+      'if animations are enabled', fakeAsync(() => {
+    expect(componentInstance.checkMarkHidden).toBe(true);
+    expect(componentInstance.animationHasPlayedOnce).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
+
+    spyOn(windowRef.nativeWindow, 'matchMedia').and.callThrough();
+    componentInstance.checkMarkComponent =
+      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
+        'EndChapterCheckMarkComponent', ['animateCheckMark']);
+    componentInstance.confettiComponent =
+      jasmine.createSpyObj<EndChapterConfettiComponent>(
+        'EndChapterConfettiComponent', ['animateConfetti']);
+
+    componentInstance.triggerCelebratoryAnimation();
+
+    tick(1);
+    expect(componentInstance.checkMarkComponent.animateCheckMark)
+      .toHaveBeenCalled();
+    expect(componentInstance.animationHasPlayedOnce).toBe(true);
+
+    tick(2000);
+    expect(componentInstance.confettiComponent.animateConfetti)
+      .toHaveBeenCalled();
+
+    tick(4000);
+    expect(componentInstance.checkMarkHidden).toBe(true);
+  }));
+
+  it('should not animate the confetti if animations ' +
+      'are not enabled', fakeAsync(() => {
+    expect(componentInstance.checkMarkHidden).toBe(true);
+    expect(componentInstance.animationHasPlayedOnce).toBe(false);
+    expect(componentInstance.checkMarkSkipped).toBe(false);
+
+    spyOn(windowRef.nativeWindow, 'matchMedia').and.returnValue({
+      matches: true,
+      media: 'prefers-reduced-motion',
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      onchange: () => {},
+      dispatchEvent: (ev: Event) => true
+    });
+    componentInstance.checkMarkComponent =
+      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
+        'EndChapterCheckMarkComponent', ['animateCheckMark']);
+    componentInstance.confettiComponent =
+      jasmine.createSpyObj<EndChapterConfettiComponent>(
+        'EndChapterConfettiComponent', ['animateConfetti']);
+
+    componentInstance.triggerCelebratoryAnimation();
+
+    tick(1);
+    expect(componentInstance.checkMarkComponent.animateCheckMark)
+      .toHaveBeenCalled();
+    expect(componentInstance.animationHasPlayedOnce).toBe(true);
+
+    tick(2000);
+    expect(componentInstance.confettiComponent.animateConfetti)
+      .not.toHaveBeenCalled();
+
+    tick(500);
+    expect(componentInstance.checkMarkHidden).toBe(true);
+  }));
+
+  it('should skip animation when a click is made onscreen', fakeAsync(() => {
+    expect(componentInstance.checkMarkSkipped).toBe(false);
+
+    spyOn(window, 'clearTimeout');
+    componentInstance.checkMarkComponent =
+      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
+        'EndChapterCheckMarkComponent', ['animateCheckMark']);
+    componentInstance.confettiComponent =
+      jasmine.createSpyObj<EndChapterConfettiComponent>(
+        'EndChapterConfettiComponent', ['animateConfetti']);
+    componentInstance.triggerCelebratoryAnimation();
+    let fakeClickEvent = new MouseEvent('click');
+    document.dispatchEvent(fakeClickEvent);
+
+    tick(1);
+    expect(clearTimeout).toHaveBeenCalled();
+    expect(componentInstance.checkMarkSkipped).toBe(true);
+    tick(500);
+    expect(componentInstance.checkMarkHidden).toBe(true);
+
+    flush();
+  }));
+
+  it('should not skip animation if it hasn\'t been triggered yet',
+    fakeAsync(() => {
+      let fakeClickEvent = new MouseEvent('click');
+      document.dispatchEvent(fakeClickEvent);
+
+      expect(componentInstance.checkMarkSkipped).toBe(false);
+    }));
+
+  it('should correctly generate the milestone message', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 1;
+    spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
+    spyOn(translateService, 'instant').and.callThrough();
+
+    expect(componentInstance.generateMilestoneMessage()).toBe(
+      'I18N_END_CHAPTER_MILESTONE_MESSAGE_1');
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_END_CHAPTER_MILESTONE_MESSAGE_1');
+
+    componentInstance.completedChaptersCount = 5;
+
+    expect(componentInstance.generateMilestoneMessage()).toBe(
+      'I18N_END_CHAPTER_MILESTONE_MESSAGE_2');
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_END_CHAPTER_MILESTONE_MESSAGE_2');
+  });
+
+  it('should generate an empty message if the milestone is not to be displayed',
+    () => {
+      componentInstance.inStoryMode = true;
+      componentInstance.completedChaptersCount = 1;
+      componentInstance.milestoneMessageIsToBeDisplayed = false;
+      spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
+      spyOn(translateService, 'instant').and.callThrough();
+
+      expect(componentInstance.generateMilestoneMessage()).toBe('');
+      expect(translateService.instant).not.toHaveBeenCalled();
+    });
+
+  it('should generate an empty message if not in story mode', () => {
+    componentInstance.inStoryMode = false;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 1;
+    spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
+    spyOn(translateService, 'instant').and.callThrough();
+
+    expect(componentInstance.generateMilestoneMessage()).toBe('');
+    expect(translateService.instant).not.toHaveBeenCalled();
+  });
+
+  it('should generate an empty message if completed chapters count ' +
+  'is not eligible for a milestone', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 2;
+    spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
+    spyOn(translateService, 'instant').and.callThrough();
+
+    expect(componentInstance.generateMilestoneMessage()).toBe('');
+    expect(translateService.instant).not.toHaveBeenCalled();
+  });
+
+  it('should correctly show milestone progress bar', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 2;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
+    expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+
+    componentInstance.completedChaptersCount = 4;
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
+    expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+
+    spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone')
+      .and.returnValue(false);
+    spyOn(
+      componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed')
+      .and.returnValue(false);
+    componentInstance.completedChaptersCount = 55;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+  });
+
+  it('should not show milestone progress bar if completed chapters count ' +
+    'is greater than 50', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 51;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+    expect(componentInstance.nextMilestoneChapterCount).toBeNull();
+  });
+
+  it('should not show milestone progress bar if not in story mode', () => {
+    componentInstance.inStoryMode = false;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 1;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+    expect(componentInstance.nextMilestoneChapterCount).toBeNull();
+  });
+
+  it('should not show milestone progress bar if milestone message is to be ' +
+    'displayed, and completed chapters count is a milestone', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 1;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+    expect(componentInstance.nextMilestoneChapterCount).toBeNull();
+  });
+
+  it('should show milestone progress bar even if the completed chapters count' +
+    ' is a milestone, if the milestone message is not to be displayed', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 10;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
+    expect(componentInstance.nextMilestoneChapterCount).toBe(25);
+  });
+
+  it('should correctly determine if new milestone is reached and message is ' +
+  'to be displayed', () => {
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 1;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(true);
+
+    componentInstance.completedChaptersCount = 2;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(false);
+
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 1;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(false);
+  });
+
+  it('should correctly determine if completed chapters count is greater than ' +
+  'last milestone', () => {
+    componentInstance.completedChaptersCount = 1;
+
+    expect(componentInstance.isCompletedChaptersCountGreaterThanLastMilestone())
+      .toBe(false);
+
+    componentInstance.completedChaptersCount = 51;
+
+    expect(componentInstance.isCompletedChaptersCountGreaterThanLastMilestone())
+      .toBe(true);
+  });
 
   it('should update displayed card', fakeAsync(() => {
     mockDisplayedCard.markAsCompleted();
@@ -214,7 +600,7 @@ describe('Tutor card component', () => {
     spyOn(audioPreloaderService, 'clearMostRecentlyRequestedAudioFilename');
     spyOn(autogeneratedAudioPlayerService, 'cancel');
 
-    componentInstance.ngOnInit();
+    componentInstance.updateDisplayedCard();
     mockOnNewCardAvailableEventEmitter.emit();
     tick();
 
@@ -227,6 +613,17 @@ describe('Tutor card component', () => {
       .toHaveBeenCalled();
     expect(autogeneratedAudioPlayerService.cancel).toHaveBeenCalled();
   }));
+
+  it('should get the static image url from the image path', () => {
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      '/assets/images/general/milestone-message-star-icon.svg');
+
+    expect(componentInstance.getStaticImageUrl(
+      '/general/milestone-message-star-icon.svg')).toBe(
+      '/assets/images/general/milestone-message-star-icon.svg');
+    expect(urlInterpolationService.getStaticImageUrl)
+      .toHaveBeenCalledWith('/general/milestone-message-star-icon.svg');
+  });
 
   it('should tell if audio bar is expanded on mobile device', () => {
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
@@ -313,7 +710,7 @@ describe('Tutor card component', () => {
     expect(componentInstance.isContentAudioTranslationAvailable()).toBeTrue();
   });
 
-  it('should if current card is at end of transcript', () => {
+  it('should check if current card is at end of transcript', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
     expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalse();

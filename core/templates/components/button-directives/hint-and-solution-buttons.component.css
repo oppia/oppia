@@ -1,0 +1,195 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+oppia-hint-and-solution-buttons .list-inline {
+  right: 0;
+}
+
+oppia-hint-and-solution-buttons .close {
+  bottom: 10px;
+  font-size: 22px;
+  margin-left: 10px;
+  position: relative;
+}
+
+oppia-hint-and-solution-buttons .hint-box-add-ons {
+  left: -5.5px;
+}
+
+oppia-hint-and-solution-buttons .hint-box-add-ons .close {
+  left: 0;
+}
+
+oppia-hint-and-solution-buttons .hint-box-add-ons::after {
+  margin-left: 163px;
+}
+
+oppia-hint-and-solution-buttons .hint-box-add-ons::before {
+  margin-left: 161px;
+}
+
+oppia-hint-and-solution-buttons .hint-box {
+  -webkit-animation: bounce 4s infinite;
+  animation: bounce 4s infinite;
+  background-color: #f0ffff;
+  border: 1px solid #2d4a9d;
+  border-radius: 5px;
+  bottom: 135px;
+  box-shadow: 0 0 6px #2d4a9d;
+  color: #2d4a9d;
+  display: flex;
+  font-size: 17px;
+  height: 40px;
+  min-width: 395px;
+  padding: 20px 10px 20px 10px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+  width: max-content;
+  z-index: 2;
+}
+
+oppia-hint-and-solution-buttons .hint-box::after,
+oppia-hint-and-solution-buttons .hint-box::before {
+  border: solid transparent;
+  content: " ";
+  left: 50%;
+  position: absolute;
+  top: 100%;
+}
+
+oppia-hint-and-solution-buttons .hint-box::after {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 25px solid #f0ffff;
+}
+
+oppia-hint-and-solution-buttons .hint-box::before {
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 32px solid #2d4a9d;
+}
+
+@keyframes bounce {
+  0% {
+    -webkit-transform: translateY(0);
+  }
+  8% {
+    -webkit-transform: translateY(-75px);
+  }
+  10% {
+    -webkit-transform: translateY(0);
+  }
+  15% {
+    -webkit-transform: translateY(-13px);
+  }
+  20% {
+    -webkit-transform: translateY(0);
+  }
+  25% {
+    -webkit-transform: translateY(-5px);
+  }
+  30% {
+    -webkit-transform: translateY(0);
+  }
+  35% {
+    -webkit-transform: translateY(-2px);
+  }
+  40% {
+    -webkit-transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  oppia-hint-and-solution-buttons .hint-box-add-ons .close {
+    bottom: 10px;
+    font-size: 22px;
+    left: 295px;
+    margin: 0 10px;
+    position: fixed;
+  }
+
+  oppia-hint-and-solution-buttons .hint-box-add-ons {
+    left: -18px;
+  }
+
+  oppia-hint-and-solution-buttons .hint-box-add-ons::before {
+    margin-left: 125px;
+  }
+
+  oppia-hint-and-solution-buttons .hint-box-add-ons::after {
+    margin-left: 127px;
+  }
+
+  oppia-hint-and-solution-buttons .hint-box {
+    font-size: 14px;
+    text-align: left;
+    width: 325px;
+  }
+
+  oppia-hint-and-solution-buttons .hint-container {
+    position: absolute;
+    right: 0;
+  }
+
+  .oppia-hint-and-solution-buttons ul {
+    bottom: -17px;
+    padding: 0 10px;
+    position: fixed;
+  }
+}
+
+.oppia-hint-and-solution-buttons ul {
+  padding: 0 10px 0 10px;
+}
+
+.oppia-hint-and-solution-buttons .footer-hints-label {
+  cursor: default;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 21px;
+  text-transform: uppercase;
+}
+
+.oppia-hint-and-solution-buttons .list-inline {
+  display: flex;
+}
+
+.oppia-hint-and-solution-buttons .list-inline > li {
+  float: left;
+}
+
+.oppia-hint-and-solution-buttons .uib-position-measure {
+  visibility: visible !important;
+}
+
+.md-button.md-default-theme.oppia-learner-hint-solution-button {
+  border-radius: 50%;
+  height: 32px;
+  line-height: 32px;
+  margin-top: 5px;
+  min-height: 32px;
+  min-width: 22px;
+  padding: inherit;
+  width: 32px;
+}
+
+.md-button.md-default-theme.oppia-learner-hint-solution-button.viewed {
+  background: #009688;
+}
+
+.md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:hover,
+.md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:focus {
+  background: #038a7d;
+}
+
+.md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons {
+  font-size: 22px;
+}
+
+.md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
+  color: #f5da57;
+  font-size: 23px;
+}

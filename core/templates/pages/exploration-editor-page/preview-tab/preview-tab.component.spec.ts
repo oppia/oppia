@@ -16,48 +16,72 @@
  * @fileoverview Unit tests for previewTab.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { ContextService } from 'services/context.service';
+import { ExplorationFeaturesService } from 'services/exploration-features.service';
+import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
+import { ExplorationParamChangesService } from '../services/exploration-param-changes.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { GraphDataService } from '../services/graph-data.service';
+import { ParameterMetadataService } from '../services/parameter-metadata.service';
+import { PreviewTabComponent } from './preview-tab.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
+import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
+import { RouterService } from '../services/router.service';
 
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Preview Tab Component', function() {
-  importAllAngularServices();
+class MockNgbModalRef {
+  componentInstance: {
+    manualParamChanges: null;
+  };
+}
 
-  var ctrl = null;
-  var $flushPendingTasks = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $uibModal = null;
-  var contextService = null;
-  var editableExplorationBackendApiService = null;
-  var explorationEngineService = null;
-  var explorationInitStateNameService = null;
-  var explorationFeaturesService = null;
-  var explorationPlayerStateService = null;
-  var explorationParamChangesService = null;
-  var explorationStatesService = null;
-  var graphDataService = null;
-  var learnerParamsService = null;
-  var numberAttemptsService = null;
-  var routerService = null;
-  var stateEditorService = null;
-  var stateObjectFactory = null;
-  var paramChangeObjectFactory = null;
-  var parameterMetadataService = null;
-  var mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
-  var mockPlayerStateChangeEventEmitter = new EventEmitter();
+class MockNgbModal {
+  open(): object {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
 
-  var explorationId = 'exp1';
-  var stateName = 'State1';
-  var changeObjectName = 'change';
-  var exploration = {
+describe('Preview Tab Component', () => {
+  let component: PreviewTabComponent;
+  let fixture: ComponentFixture<PreviewTabComponent>;
+  let ngbModal: NgbModal;
+  let contextService: ContextService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
+  let explorationEngineService: ExplorationEngineService;
+  let explorationInitStateNameService: ExplorationInitStateNameService;
+  let explorationFeaturesService: ExplorationFeaturesService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationParamChangesService: ExplorationParamChangesService;
+  let explorationStatesService: ExplorationStatesService;
+  let graphDataService: GraphDataService;
+  let routerService: RouterService;
+  let stateEditorService: StateEditorService;
+  let stateObjectFactory: StateObjectFactory;
+  let paramChangeObjectFactory: ParamChangeObjectFactory;
+  let parameterMetadataService: ParameterMetadataService;
+  let mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
+  let mockPlayerStateChangeEventEmitter = new EventEmitter();
+  let numberAttemptsService: NumberAttemptsService;
+
+  let getUnsetParametersInfo;
+  let explorationId = 'exp1';
+  let stateName = 'State1';
+  let changeObjectName = 'change';
+  let exploration = {
     init_state_name: stateName,
     param_changes: [],
     param_specs: {},
@@ -66,299 +90,223 @@ describe('Preview Tab Component', function() {
     language_code: 'en',
     correctness_feedback_enabled: true
   };
-  var parameters = [{
-    paramName: 'paramName1'
+  let parameters = [{
+    paramName: 'paramName1',
+    stateName: null,
   }, {
-    paramName: 'paramName2'
+    paramName: 'paramName2',
+    stateName: null,
   }];
 
-  beforeEach(function() {
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
-  });
-
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.value('ExplorationDataService', {
-      getDataAsync: () => $q.resolve({
-        param_changes: [
-          paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
-        ],
-        states: [stateObjectFactory.createDefaultState(stateName)],
-        init_state_name: stateName
-      })
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        PreviewTabComponent
+      ],
+      providers: [
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            getDataAsync: () => Promise.resolve({
+              param_changes: [
+                paramChangeObjectFactory
+                  .createEmpty(changeObjectName).toBackendDict()
+              ],
+              states: [stateObjectFactory.createDefaultState(stateName)],
+              init_state_name: stateName
+            })
+          }
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  describe('when there are manual param changes', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      $rootScope = $injector.get('$rootScope');
-      $q = $injector.get('$q');
-      $uibModal = $injector.get('$uibModal');
-      contextService = $injector.get('ContextService');
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PreviewTabComponent);
+    component = fixture.componentInstance;
+    numberAttemptsService = TestBed.inject(NumberAttemptsService);
+    routerService = TestBed.inject(RouterService);
+    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
+    explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
+    explorationInitStateNameService = TestBed.inject(
+      ExplorationInitStateNameService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
+    explorationParamChangesService = TestBed.inject(
+      ExplorationParamChangesService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    graphDataService = TestBed.inject(GraphDataService);
+    parameterMetadataService = TestBed.inject(ParameterMetadataService);
+    stateEditorService = TestBed.inject(StateEditorService);
 
-      editableExplorationBackendApiService = $injector.get(
-        'EditableExplorationBackendApiService');
-      explorationEngineService = $injector.get('ExplorationEngineService');
-      explorationFeaturesService = $injector.get('ExplorationFeaturesService');
-      explorationInitStateNameService = $injector.get(
-        'ExplorationInitStateNameService');
-      explorationPlayerStateService = $injector.get(
-        'ExplorationPlayerStateService');
-      explorationParamChangesService = $injector.get(
-        'ExplorationParamChangesService');
-      explorationStatesService = $injector.get('ExplorationStatesService');
-      graphDataService = $injector.get('GraphDataService');
-      learnerParamsService = $injector.get('LearnerParamsService');
-      parameterMetadataService = $injector.get('ParameterMetadataService');
-      routerService = $injector.get('RouterService');
-      stateEditorService = $injector.get('StateEditorService');
-      spyOn(parameterMetadataService, 'getUnsetParametersInfo').and.returnValue(
-        parameters);
-      spyOn(
-        editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
-        .and.returnValue($q.resolve(exploration));
-      explorationParamChangesService.savedMemento = [
-        paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
-      ];
-      spyOnProperty(
-        explorationEngineService,
-        'onUpdateActiveStateIfInEditor').and.returnValue(
-        mockUpdateActiveStateIfInEditorEventEmitter);
-      spyOnProperty(
-        explorationPlayerStateService,
-        'onPlayerStateChange').and.returnValue(
-        mockPlayerStateChangeEventEmitter);
-      $scope = $rootScope.$new();
-      ctrl = $componentController('previewTab', {
-        $scope: $scope,
-        ParamChangeObjectFactory: paramChangeObjectFactory
-      });
-      ctrl.$onInit();
-    }));
+    ngbModal = TestBed.inject(NgbModal);
+    contextService = TestBed.inject(ContextService);
+    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    getUnsetParametersInfo = spyOn(
+      parameterMetadataService, 'getUnsetParametersInfo');
+    getUnsetParametersInfo.and.returnValue(
+      parameters);
+    spyOn(
+      editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
+      .and.returnValue(Promise.resolve(
+        exploration as ExplorationBackendDict));
+    explorationParamChangesService.savedMemento = [
+      paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
+    ];
+    spyOnProperty(
+      explorationEngineService,
+      'onUpdateActiveStateIfInEditor').and.returnValue(
+      mockUpdateActiveStateIfInEditorEventEmitter);
+    spyOnProperty(
+      explorationPlayerStateService,
+      'onPlayerStateChange').and.returnValue(
+      mockPlayerStateChangeEventEmitter);
+    spyOn(explorationEngineService, 'initSettingsFromEditor').and.stub();
 
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
+    explorationInitStateNameService.savedMemento = 'state';
+    explorationParamChangesService.savedMemento = null;
+  });
 
-    it('should initialize controller properties after its initialization',
-      function() {
-        spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-          stateName);
+  it('should initialize controller properties after its initialization',
+    fakeAsync(() => {
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue('state');
+      spyOn(explorationParamChangesService, 'init').and.stub();
+      spyOn(explorationStatesService, 'init').and.stub();
+      spyOn(explorationInitStateNameService, 'init').and.stub();
+      spyOn(graphDataService, 'recompute').and.stub();
+      spyOn(explorationStatesService, 'getState').and.returnValue(null);
+      spyOn(component, 'getManualParamChanges').and.returnValue(
+        Promise.resolve(null));
+      spyOn(component, 'loadPreviewState').and.stub();
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve()
+      } as NgbModalRef);
 
-        // Get data from exploration data service.
-        $scope.$apply();
-
-        expect(ctrl.isExplorationPopulated).toBe(false);
-        expect(ctrl.previewWarning).toBe('Preview started from \"State1\"');
-      });
-
-    it('should init param changes if they are undefined', function() {
-      spyOn(explorationParamChangesService, 'init').and.callThrough();
-      spyOn(explorationStatesService, 'init');
-      spyOn(explorationInitStateNameService, 'init').and.callThrough();
-      spyOn(graphDataService, 'recompute');
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
-      spyOn(stateEditorService, 'setActiveStateName');
-      explorationParamChangesService.savedMemento = undefined;
+      component.ngOnInit();
+      tick();
+      flush();
 
       // Get data from exploration data service.
-      $scope.$apply();
+      expect(component.isExplorationPopulated).toBe(false);
+      expect(component.previewWarning).toBe('');
 
-      expect(explorationParamChangesService.init).toHaveBeenCalledWith(
-        [paramChangeObjectFactory.createEmpty(changeObjectName)]
-      );
-      expect(explorationStatesService.init).toHaveBeenCalledWith(
-        [stateObjectFactory.createDefaultState(stateName)]
-      );
-      expect(explorationInitStateNameService.init).toHaveBeenCalledWith(
-        stateName
-      );
-      expect(graphDataService.recompute).toHaveBeenCalled();
-      expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
-        stateName
-      );
-      expect(explorationParamChangesService.savedMemento).toEqual(
-        [paramChangeObjectFactory.createEmpty(changeObjectName)]
-      );
-      expect(explorationInitStateNameService.savedMemento).toEqual(stateName);
-    });
+      component.ngOnDestroy();
+    }));
 
-    it('should set active state name when broadcasting' +
-      ' updateActiveStateIfInEditor', function() {
-      spyOn(stateEditorService, 'setActiveStateName');
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      mockUpdateActiveStateIfInEditorEventEmitter.emit('State2');
+  it('should initialize controller properties after its initialization',
+    fakeAsync(() => {
+      explorationInitStateNameService.savedMemento = 'state2';
+      explorationParamChangesService.savedMemento = null;
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue('state');
+      spyOn(explorationParamChangesService, 'init').and.stub();
+      spyOn(explorationStatesService, 'init').and.stub();
+      spyOn(explorationInitStateNameService, 'init').and.stub();
+      spyOn(graphDataService, 'recompute').and.stub();
+      spyOn(explorationStatesService, 'getState').and.returnValue(null);
+      spyOn(component, 'getManualParamChanges').and.returnValue(
+        Promise.resolve(null));
+      spyOn(component, 'loadPreviewState').and.stub();
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve()
+      } as NgbModalRef);
 
-      expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
-        'State2');
-    });
-
-    it('should get all learner params when broadcasting playerStateChange',
-      function() {
-        spyOn(learnerParamsService, 'getAllParams').and.returnValue({
-          foo: []
-        });
-        mockPlayerStateChangeEventEmitter.emit();
-
-        expect(ctrl.allParams).toEqual({
-          foo: []
-        });
-      });
-
-    it('should evaluate whenever parameter summary is shown', function() {
-      spyOn(explorationFeaturesService, 'areParametersEnabled')
-        .and.returnValue(true);
-      expect(ctrl.showParameterSummary()).toBe(false);
-
-      spyOn(learnerParamsService, 'getAllParams').and.returnValue({
-        foo: []
-      });
+      component.ngOnInit();
+      tick();
+      mockUpdateActiveStateIfInEditorEventEmitter.emit('stateName');
       mockPlayerStateChangeEventEmitter.emit();
-      expect(ctrl.showParameterSummary()).toBe(true);
-    });
-
-    it('should open set params modal', function() {
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      spyOn($uibModal, 'open').and.callThrough();
+      tick();
+      flush();
 
       // Get data from exploration data service.
-      $scope.$apply();
-
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should load preview state when closing set params modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
-      spyOn(explorationEngineService, 'initSettingsFromEditor');
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      // Get data from exploration data service and resolve promise in open
-      // modal.
-      $scope.$apply();
-
-      var expectedParamChanges = parameters.map(parameter => (
-        paramChangeObjectFactory.createEmpty(parameter.paramName)));
-      expect(
-        explorationEngineService.initSettingsFromEditor).toHaveBeenCalledWith(
-        stateName, expectedParamChanges);
-      expect(ctrl.isExplorationPopulated).toBeTrue();
-    });
-
-    it('should go to main tab when dismissing set params modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      spyOn(routerService, 'navigateToMainTab');
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-
-      // Get data from exploration data service and resolve promise in open
-      // modal.
-      $scope.$apply();
-
-      expect(routerService.navigateToMainTab).toHaveBeenCalled();
-    });
-  });
-
-  describe('when there are no manual param changes', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      var $rootScope = $injector.get('$rootScope');
-      $q = $injector.get('$q');
-      $uibModal = $injector.get('$uibModal');
-      contextService = $injector.get('ContextService');
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      editableExplorationBackendApiService = $injector.get(
-        'EditableExplorationBackendApiService');
-      explorationInitStateNameService = $injector.get(
-        'ExplorationInitStateNameService');
-      explorationEngineService = $injector.get('ExplorationEngineService');
-      explorationParamChangesService = $injector.get(
-        'ExplorationParamChangesService');
-      numberAttemptsService = $injector.get('NumberAttemptsService');
-      parameterMetadataService = $injector.get('ParameterMetadataService');
-      routerService = $injector.get('RouterService');
-      stateEditorService = $injector.get('StateEditorService');
-
-      explorationInitStateNameService.init(stateName);
-
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      spyOn(parameterMetadataService, 'getUnsetParametersInfo')
-        .and.returnValue([]);
-      spyOn(
-        editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
-        .and.returnValue($q.resolve(exploration));
-      explorationParamChangesService.savedMemento = [
-        paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
-      ];
-
-      // Mock init just to call the callback directly.
-      spyOn(explorationEngineService, 'init').and.callFake(function(
-          explorationDict, explorationVersion, preferredAudioLanguage,
-          autoTtsEnabled, preferredContentLanguageCodes,
-          successCallback) {
-        successCallback();
-      });
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('previewTab', {
-        $scope: $scope,
-        ParamChangeObjectFactory: paramChangeObjectFactory
-      });
-      ctrl.$onInit();
+      expect(component.isExplorationPopulated).toBe(false);
+      expect(component.previewWarning).toBe(
+        'Preview started from "state"');
     }));
 
-    it('should initialize controller properties after its initialization',
-      function() {
-        // Get data from exploration data service.
-        $scope.$apply();
+  it('should initialize open ngbModal and navigate to mainTab',
+    fakeAsync(() => {
+      spyOn(explorationFeaturesService, 'areParametersEnabled')
+        .and.returnValue(false);
+      spyOn(routerService, 'navigateToMainTab');
+      component.allParams = {};
 
-        expect(ctrl.isExplorationPopulated).toBe(false);
-        expect(ctrl.previewWarning).toBe('');
-      });
+      expect(component.showParameterSummary()).toBe(false);
 
-    it('should load preview state when closing set params modal', function() {
-      spyOn($uibModal, 'open');
-      spyOn(explorationEngineService, 'initSettingsFromEditor');
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          manualParamChanges: null,
+        },
+        result: Promise.reject()
+      } as NgbModalRef);
 
-      // Get data from exploration data service and resolve promise in open
-      // modal.
-      $scope.$apply();
+      component.loadPreviewState('', '');
+      component.showSetParamsModal(null, () => {});
+      tick();
+      tick();
+      flush();
+      flushMicrotasks();
 
-      expect($uibModal.open).not.toHaveBeenCalled();
-      expect(
-        explorationEngineService.initSettingsFromEditor)
-        .toHaveBeenCalledWith(stateName, []);
-      expect(ctrl.isExplorationPopulated).toBe(true);
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(routerService.navigateToMainTab).toHaveBeenCalled();
+    }));
+
+  it('should getManualParamChanges', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        manualParamChanges: null,
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+    component.getManualParamChanges('state');
+    tick();
+    flush();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
+
+  it('should exmpty getManualParamChanges', () => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        manualParamChanges: null,
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+    getUnsetParametersInfo.and.returnValue([]);
+
+    component.getManualParamChanges('state').then((value) => {
+      expect(value).toEqual([]);
     });
 
-    it('should reset preview settings', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      spyOn(numberAttemptsService, 'reset').and.callThrough();
-      spyOn(explorationEngineService, 'initSettingsFromEditor');
-
-      // Get data from exploration data service and resolve promise in open
-      // modal.
-      $scope.$apply();
-
-      ctrl.resetPreview();
-
-      $flushPendingTasks();
-
-      expect(numberAttemptsService.reset).toHaveBeenCalled();
-      expect(
-        explorationEngineService.initSettingsFromEditor)
-        .toHaveBeenCalledWith(stateName, []);
-      expect(ctrl.isExplorationPopulated).toBe(true);
-    });
+    expect(ngbModal.open).not.toHaveBeenCalled();
   });
+
+  it('should reset preview settings', fakeAsync(() => {
+    spyOn(component, 'loadPreviewState');
+    explorationInitStateNameService.savedMemento = 'state';
+    spyOn(numberAttemptsService, 'reset').and.stub();
+    spyOn(explorationEngineService, 'init').and.callFake(
+      (value, value1, value2, value3, value4, callback) => {
+        callback(null, null);
+      });
+
+    // Get data from exploration data service and resolve promise in open
+    // modal.
+    component.resetPreview();
+    tick(300);
+    flush();
+
+    expect(component.loadPreviewState).toHaveBeenCalled();
+  }));
 });

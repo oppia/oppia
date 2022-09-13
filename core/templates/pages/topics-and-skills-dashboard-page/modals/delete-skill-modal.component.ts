@@ -20,7 +20,18 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+
+export interface TopicAssignmentsSummary {
+  subtopicId: number;
+  topicVersion: number;
+  topicId: string;
+}
+
+export interface TopicNameToTopicAssignments {
+  [key: string]: TopicAssignmentsSummary;
+}
 
 @Component({
   selector: 'oppia-delete-skill-modal',
@@ -28,26 +39,72 @@ import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_ski
 })
 export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
+  // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
-  topicsAssignments!: AssignedSkill[];
+  ineligibleTopicNameToTopicAssignments: TopicNameToTopicAssignments = {};
+  ineligibleTopicsCount: number = 0;
+  topicsAssignments: AssignedSkill[] = [];
   topicsAssignmentsAreFetched: boolean = false;
+  skillCanBeDeleted: boolean = true;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService,
+    private urlInterpolationService: UrlInterpolationService
   ) {
     super(ngbActiveModal);
+  }
+
+  fetchTopicIdToDiagnosticTestSkillIds(
+      topicAssignments: AssignedSkill[]): void {
+    let allTopicIds = [];
+    for (let topic of topicAssignments) {
+      allTopicIds.push(topic.topicId);
+    }
+    this.ineligibleTopicNameToTopicAssignments = {};
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
+        (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
+          for (let topic of topicAssignments) {
+            let diagnosticTestSkillIds = (
+              responseDict.topicIdToDiagnosticTestSkillIds[topic.topicId]);
+
+            if (
+              diagnosticTestSkillIds.length === 1 &&
+              diagnosticTestSkillIds.indexOf(this.skillId) !== -1
+            ) {
+              this.ineligibleTopicNameToTopicAssignments[topic.topicName] = {
+                topicId: topic.topicId,
+                subtopicId: topic.subtopicId,
+                topicVersion: topic.topicVersion
+              };
+              this.skillCanBeDeleted = false;
+            }
+          }
+          this.ineligibleTopicsCount = Object.keys(
+            this.ineligibleTopicNameToTopicAssignments).length;
+          this.topicsAssignments = topicAssignments;
+        });
   }
 
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
-        this.skillId).then((response: AssignedSkill[]) => {
-        this.topicsAssignments = response;
+        this.skillId
+      ).then((response: AssignedSkill[]) => {
+        this.fetchTopicIdToDiagnosticTestSkillIds(response);
         this.topicsAssignmentsAreFetched = true;
+      });
+  }
+
+  getTopicEditorUrl(topicAssignment: TopicAssignmentsSummary): string {
+    let topicId = topicAssignment.topicId;
+    const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
+    return this.urlInterpolationService.interpolateUrl(
+      TOPIC_EDITOR_URL_TEMPLATE, {
+        topic_id: topicId
       });
   }
 

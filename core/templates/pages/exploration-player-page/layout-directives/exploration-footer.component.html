@@ -1,47 +1,29 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
+  <div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode && !hasLearnerHasViewedLessonInfoTooltip() && getMostRecentlyReachedCheckpointIndex() == 2">
+    <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()"></div>
+    <div class="lesson-info-tooltip lesson-info-tooltip-add-ons"
+         [innerHTML]="'I18N_LESSON_INFO_TOOLTIP_MESSAGE' | translate">
+    </div>
+  </div>
   <div class="row">
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
-      <ul class="author-profile">
-        <li>
-          <img [src]="getStaticImageUrl('/general/apple.svg')"
-               class="exploration-footer-img"
-               alt="">
+      <button class="oppia-lesson-info"
+              (click)="showInformationCard()"
+              *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
+        <img [src]="getStaticImageUrl('/general/apple.svg')"
+             class="exploration-footer-img"
+             alt=""
+             role="presentation">
+        <h1>
+          <span class="oppia-lesson-info-header">
+              {{ 'I18N_LESSON_INFO_HEADER' | translate }}
+          </span>
+        </h1>
+        <li class="oppia-exploration-info-icon e2e-test-exploration-info-icon">
+          <i class="material-icons oppia-navbar-breadcrumb-icon oppia-footer-info-icon">&#xE88E;</i>
+          <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
         </li>
-        <li class="hover-link"
-            (mouseenter)="hovering = true; dropUp.open()"
-            (mouseleave)="hovering = false; dropUp.close()"
-            tabindex="0"
-            aria-haspopup="true"
-            aria-expanded="false">
-          <div ngbDropdown
-               class="dropup"
-               placement="top"
-               [ngClass]="{'open': hovering}"
-               #dropUp="ngbDropdown">
-            <a ngbDropdownAnchor id="dropdownMenu2"
-               [ngClass]="{'hovered-text': hovering}"
-               *ngIf="contributorNames.length > 0"
-               aria-haspopup="true"
-               aria-expanded="false">
-              <h4 [ngStyle]="isLanguageRTL() ? {'text-align': 'right'} : {'text-align': 'left'}" class="author-profile-text protractor-test-author-profile-text"
-                  [ngClass]="{'hovered-text': hovering, 'not-hovered' : !hovering}">
-                  {{ 'I18N_FOOTER_AUTHOR_PROFILES' | translate }}
-              </h4>
-            </a>
-            <ul ngbDropdownMenu class="author-profile-dropdown-menu"
-                aria-labelledby="dropdownMenu2">
-              <li *ngFor="let name of contributorNames | limitTo: 5" ngbDropdownItem>
-                <a href="/profile/{{ name }}"
-                   [routerLink]="'/profile/' + name"
-                   target="_blank"
-                   rel="noopener">
-                   {{ name }}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
+      </button>
       <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
       </oppia-hint-and-solution-buttons>
     </div>
@@ -53,173 +35,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .oppia-exploration-footer {
-    background-color: #094142;
-    color: #FFF;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 13px;
-    height: 42px;
-    line-height: 0;
-    margin-top: 30px;
-    width: 100%;
-  }
-
-  .oppia-exploration-footer .exploration-footer-img {
-    height: 60px;
-    margin: -25px 0 0 10px;
-    width: 60px;
-  }
-
-  .oppia-exploration-footer .author-profile {
-    color: #fff;
-    display: flex;
-    list-style-type: none;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu li > a {
-    color: #094142;
-    padding: 3px 6px;
-  }
-
-  .oppia-exploration-footer .author-profile a:hover {
-    text-decoration: none;
-  }
-
-  .oppia-exploration-footer .author-profile li {
-    float: left;
-  }
-
-  .oppia-exploration-footer .author-profile .hover-link {
-    background-color: #094142;
-    width: 190px;
-  }
-
-  .oppia-exploration-footer .author-profile.hovered-text h4 {
-    color: #094142;
-  }
-
-  .oppia-exploration-footer .author-profile .hover-link:hover,
-  .oppia-exploration-footer .author-profile .hover-link:focus {
-    background-color: #fff;
-    color: #094142;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu {
-    border: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
-    float: left;
-    list-style-type: none;
-    /** ngbDropdownMenu adds inline styles which conflicts with our own.
-     *  The usage of !important is unavoidable here to override inline styles.
-     */
-    top: auto !important;
-    transform: none !important;
-    will-change: auto !important;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu li {
-    background: #fff;
-    color: #094142;
-    float: none;
-    padding: 15px 0;
-    text-overflow: clip;
-    white-space: nowrap;
-    width: 100%;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
-    background-color: #eee;
-    color: #888;
-  }
-
-  .oppia-exploration-footer .author-profile-text {
-    cursor: default;
-    font-size: 13px;
-    line-height: 1.5;
-    margin: 12px 0 17px 0;
-    padding-left: 6px;
-    text-overflow: clip;
-    white-space: nowrap;
-  }
-
-  .oppia-exploration-footer .author-profile-text.not-hovered {
-    color: #fff;
-    text-transform: uppercase;
-  }
-
-  .oppia-exploration-footer .author-profile-text.hovered-text,
-  .oppia-exploration-footer .author-profile .hover-link:focus .author-profile-text {
-    color: #094142;
-    text-decoration: none;
-    text-transform: uppercase;
-  }
-
-  .oppia-exploration-footer .oppia-share-exploration-footer {
-    line-height: 0.6;
-    padding-right: 20px;
-    text-transform: uppercase;
-  }
-
-  .oppia-exploration-footer .oppia-exploration-footer-container {
-    max-width: 800px;
-  }
-
-  .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
-    display: block;
-    float: right;
-    margin: -8px;
-    padding-right: 20px;
-  }
-
-  @media (max-width: 650px) {
-    .oppia-exploration-footer .oppia-exploration-footer-sharing-links ul {
-      margin: 0 -8px;
-    }
-  }
-
-  .oppia-exploration-footer .oppia-exploration-footer-sharing-links li {
-    float: left;
-  }
-
-  .oppia-exploration-footer .oppia-navbar-footer-info-icon {
-    height: 56px;
-    padding: 12px;
-  }
-
-  .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
-    background: #fff;
-    color: #009688;
-    height: 56px;
-    padding: 12px;
-  }
-
-  @media (max-width: 475px) {
-    .oppia-exploration-footer-sharing-links {
-      display: none;
-    }
-  }
-
-  @media (max-width: 658px) {
-    .oppia-exploration-footer .oppia-share-exploration-footer {
-      display: none;
-    }
-    .oppia-exploration-footer .oppia-navbar-footer-info-icon {
-      margin-top: -3px;
-    }
-    .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
-      margin-top: -3px;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .oppia-exploration-footer .oppia-exploration-footer-info-icon {
-      display: none;
-    }
-  }
-</style>

@@ -30,6 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Any, Dict, List
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -37,8 +38,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import collection_models
     from mypy_imports import user_models
 
-(base_models, collection_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.collection, models.NAMES.user])
+(base_models, collection_models, user_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.COLLECTION, models.Names.USER
+])
 
 
 class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -59,20 +61,20 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_collection_count(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
 
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
         self.assertEqual(num_collections, 1)
 
     def test_reconstitute(self) -> None:
-        collection = collection_domain.Collection.create_default_collection( # type: ignore[no-untyped-call]
+        collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
         collection_model = collection_models.CollectionModel.get_by_id('id')
         snapshot_dict = collection_model.compute_snapshot()
         snapshot_dict['nodes'] = ['node0', 'node1']
@@ -84,10 +86,10 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
 class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 
-    COLLECTION_ID_1 = '1'
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_COMMITTER = 'id_committer'
+    COLLECTION_ID_1: Final = '1'
+    USER_ID_1: Final = 'id_1'
+    USER_ID_2: Final = 'id_2'
+    USER_ID_COMMITTER: Final = 'id_committer'
 
     def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
         self.assertEqual(
@@ -127,29 +129,29 @@ class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionRightsModel class."""
 
-    COLLECTION_ID_1 = '1'
-    COLLECTION_ID_2 = '2'
-    COLLECTION_ID_3 = '3'
-    COLLECTION_ID_4 = '4'
+    COLLECTION_ID_1: Final = '1'
+    COLLECTION_ID_2: Final = '2'
+    COLLECTION_ID_3: Final = '3'
+    COLLECTION_ID_4: Final = '4'
     # Related to all three collections.
-    USER_ID_1 = 'id_1'
+    USER_ID_1: Final = 'id_1'
     # Related to a subset of the three collections.
-    USER_ID_2 = 'id_2'
+    USER_ID_2: Final = 'id_2'
     # Related to no collections.
-    USER_ID_3 = 'id_3'
+    USER_ID_3: Final = 'id_3'
     # Related to one collection and then removed from it.
-    USER_ID_4 = 'id_4'
+    USER_ID_4: Final = 'id_4'
     # User id used in commits.
-    USER_ID_COMMITTER = 'id_5'
-    USER_ID_4_OLD = 'id_4_old'
-    USER_ID_4_NEW = 'id_4_new'
-    USER_ID_5_OLD = 'id_5_old'
-    USER_ID_5_NEW = 'id_5_new'
-    USER_ID_6_OLD = 'id_6_old'
-    USER_ID_6_NEW = 'id_6_new'
+    USER_ID_COMMITTER: Final = 'id_5'
+    USER_ID_4_OLD: Final = 'id_4_old'
+    USER_ID_4_NEW: Final = 'id_4_new'
+    USER_ID_5_OLD: Final = 'id_5_old'
+    USER_ID_5_NEW: Final = 'id_5_new'
+    USER_ID_6_OLD: Final = 'id_6_old'
+    USER_ID_6_NEW: Final = 'id_6_new'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
@@ -253,8 +255,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 self.USER_ID_COMMITTER, 'Created new collection',
                 [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
-        # Ruling out the possibility of None for mypy type checking.
-        assert collection_model is not None
 
         self.assertEqual('id', collection_model.id)
         self.assertEqual(
@@ -341,8 +341,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         collection_rights_model = (
             collection_models.CollectionRightsModel.get('id')
             )
-        # Ruling out the possibility of None for mypy type checking.
-        assert collection_rights_model is not None
         snapshot_dict = collection_rights_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['tid1', 'tid2']
         snapshot_dict = collection_rights_model.convert_to_valid_dict(
@@ -360,15 +358,15 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     """Test the revert method on CollectionRightsModel class."""
 
-    COLLECTION_ID_1 = '1'
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_3 = 'id_3'
+    COLLECTION_ID_1: Final = '1'
+    USER_ID_1: Final = 'id_1'
+    USER_ID_2: Final = 'id_2'
+    USER_ID_3: Final = 'id_3'
     # User id used in commits.
-    USER_ID_COMMITTER = 'id_4'
+    USER_ID_COMMITTER: Final = 'id_4'
 
     def setUp(self) -> None:
-        super(CollectionRightsModelRevertUnitTest, self).setUp()
+        super().setUp()
         self.collection_model = collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -408,7 +406,9 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             'name': feconf.CMD_REVERT_COMMIT,
             'required_attribute_names': [],
             'optional_attribute_names': [],
-            'user_id_attribute_names': []
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
         })
         self.allowed_commands_swap = self.swap(
             feconf,
@@ -457,7 +457,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_translator_ids_field_is_successful(
-            self
+        self
     ) -> None:
         # TODO(#13523): Use of Any in the type annotation below will be
         # removed when model_dict is converted to TypedDicts/domain objects.
@@ -531,7 +531,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_get_all_non_private_commits_with_invalid_max_age(self) -> None:
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
             # TODO(#13528): Remove this test after the backend is fully
@@ -572,18 +572,18 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     """Tests for the CollectionSummaryModel."""
 
-    COLLECTION_ID_1 = '1'
-    COLLECTION_ID_2 = '2'
-    COLLECTION_ID_3 = '3'
-    USER_ID_1_OLD = 'id_1_old'
-    USER_ID_1_NEW = 'id_1_new'
-    USER_ID_2_OLD = 'id_2_old'
-    USER_ID_2_NEW = 'id_2_new'
-    USER_ID_3_OLD = 'id_3_old'
-    USER_ID_3_NEW = 'id_3_new'
+    COLLECTION_ID_1: Final = '1'
+    COLLECTION_ID_2: Final = '2'
+    COLLECTION_ID_3: Final = '3'
+    USER_ID_1_OLD: Final = 'id_1_old'
+    USER_ID_1_NEW: Final = 'id_1_new'
+    USER_ID_2_OLD: Final = 'id_2_old'
+    USER_ID_2_NEW: Final = 'id_2_new'
+    USER_ID_3_OLD: Final = 'id_3_old'
+    USER_ID_3_NEW: Final = 'id_3_new'
 
     def setUp(self) -> None:
-        super(CollectionSummaryModelUnitTest, self).setUp()
+        super().setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',

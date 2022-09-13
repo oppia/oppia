@@ -1,9 +1,9 @@
 <div class="oppia-concept-card-viewer" *ngIf="!loadingMessage">
   <div class="concept-card-explanation">
     <div class="oppia-concept-card-explanation-container">
-      <angular-html-bind-wrapper classStr="protractor-test-concept-card-explanation"
-                                 [htmlData]="currentConceptCard.getExplanation().html">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display class="e2e-test-concept-card-explanation"
+                                [rteString]="currentConceptCard.getExplanation().html">
+      </oppia-rte-output-display>
       <div *ngIf="skillDeletedMessage">
         <div class="oppia-align-center">{{ skillDeletedMessage }}</div>
       </div>
@@ -15,9 +15,9 @@
       <div class="oppia-worked-examples-container"
            *ngIf="idx < numberOfWorkedExamplesShown">
         <strong> Question: </strong>
-        <angular-html-bind-wrapper classStr="example-content"
-                                   [htmlData]="example.getQuestion().html">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display class="example-content"
+                                  [rteString]="example.getQuestion().html">
+        </oppia-rte-output-display>
 
         <button class="btn btn-secondary show-example-explanation-button"
                 *ngIf="!explanationIsShown && idx == numberOfWorkedExamplesShown - 1"
@@ -26,9 +26,9 @@
         </button>
         <div *ngIf="explanationIsShown || idx < numberOfWorkedExamplesShown - 1">
           <strong> Explanation: </strong>
-          <angular-html-bind-wrapper classStr="example-content"
-                                     [htmlData]="example.getExplanation().html">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display class="example-content"
+                                    [rteString]="example.getExplanation().html">
+          </oppia-rte-output-display>
         </div>
       </div>
     </ng-container>
@@ -67,8 +67,8 @@
   }
 
   .oppia-concept-card-viewer .show-more-worked-examples-button {
-    background-color: #0D48A1;
-    color: #FFF;
+    background-color: #0d48a1;
+    color: #fff;
     display: block;
     margin-bottom: 10px;
     margin-top: 10px;

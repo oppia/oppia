@@ -27,8 +27,7 @@ import { ShortSkillSummary } from
 import {
   StoryReferenceBackendDict,
   StoryReference,
-  StoryReferenceObjectFactory
-} from 'domain/topic/StoryReferenceObjectFactory';
+} from 'domain/topic/story-reference-object.model';
 import {
   SkillIdToDescriptionMap,
   Subtopic,
@@ -53,12 +52,15 @@ export interface TopicBackendDict {
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
   'page_title_fragment_for_web': string;
+  'skill_ids_for_diagnostic_test': string[];
 }
 
 import constants from 'assets/constants';
 
 export class Topic {
-  _id: string;
+  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
+  // topic until the actual is fetched from the backend.
+  _id: string | null;
   _name: string;
   _abbreviatedName: string;
   _description: string;
@@ -69,26 +71,34 @@ export class Topic {
   _nextSubtopicId: number;
   _version: number;
   _subtopics: Subtopic[];
-  _thumbnailFilename: string;
+  _thumbnailFilename: string | null;
   _thumbnailBgColor: string;
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
-  storyReferenceObjectFactory: StoryReferenceObjectFactory;
+  _skillSummariesForDiagnosticTest: ShortSkillSummary[];
   constructor(
-      id: string, name: string, abbreviatedName: string, urlFragment: string,
-      description: string, languageCode: string,
+      id: string | null,
+      name: string,
+      abbreviatedName: string,
+      urlFragment: string,
+      description: string,
+      languageCode: string,
       canonicalStoryReferences: StoryReference[],
       additionalStoryReferences: StoryReference[],
       uncategorizedSkillIds: string[],
-      nextSubtopicId: number, version: number, subtopics: Subtopic[],
-      thumbnailFilename: string,
+      nextSubtopicId: number,
+      version: number,
+      subtopics: Subtopic[],
+      thumbnailFilename: string | null,
       thumbnailBgColor: string,
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string, pageTitleFragmentForWeb: string) {
+      metaTagContent: string,
+      pageTitleFragmentForWeb: string,
+      skillIdsForDiagnosticTest: string[]
+  ) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
@@ -107,14 +117,19 @@ export class Topic {
     this._subtopics = cloneDeep(subtopics);
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
-    this.storyReferenceObjectFactory = storyReferenceObjectFactory;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
+    this._skillSummariesForDiagnosticTest = skillIdsForDiagnosticTest.map(
+      (skillId: string) => {
+        return ShortSkillSummary.create(
+          skillId, skillIdToDescriptionMap[skillId]);
+      });
   }
 
-  // ---- Instance methods ----
-  getId(): string {
+  // Returns 'null' when the topic is not yet fetched from the backend,
+  // not saved.
+  getId(): string | null {
     return this._id;
   }
 
@@ -166,11 +181,11 @@ export class Topic {
     this._urlFragment = urlFragment;
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename(thumbnailFilename: string | null): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
@@ -315,6 +330,14 @@ export class Topic {
     if (!this._subtopics.length) {
       issues.push('Topic should have at least 1 subtopic.');
     }
+    if (this._skillSummariesForDiagnosticTest.length === 0) {
+      issues.push(
+        'The diagnostic test for the topic should test at least one skill.');
+    }
+    if (this._skillSummariesForDiagnosticTest.length > 3) {
+      issues.push(
+        'The diagnostic test for the topic should test at most 3 skills.');
+    }
     return issues;
   }
 
@@ -415,7 +438,7 @@ export class Topic {
         'Given story id already present in canonical story ids.');
     }
     this._canonicalStoryReferences.push(
-      this.storyReferenceObjectFactory.createFromStoryId(storyId));
+      StoryReference.createFromStoryId(storyId));
   }
 
   removeCanonicalStory(storyId: string): void {
@@ -438,10 +461,11 @@ export class Topic {
   rearrangeSkillInSubtopic(
       subtopicId: number, fromIndex: number, toIndex: number): void {
     const subtopic = this.getSubtopicById(subtopicId);
-    const skillToMove = cloneDeep(
-      subtopic.getSkillSummaries()[fromIndex]);
-    subtopic._skillSummaries.splice(fromIndex, 1);
-    subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
+    if (subtopic !== null) {
+      const skillToMove = cloneDeep(subtopic.getSkillSummaries()[fromIndex]);
+      subtopic._skillSummaries.splice(fromIndex, 1);
+      subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
+    }
   }
 
   rearrangeSubtopic(fromIndex: number, toIndex: number): void {
@@ -471,7 +495,7 @@ export class Topic {
         'Given story id already present in additional story ids.');
     }
     this._additionalStoryReferences.push(
-      this.storyReferenceObjectFactory.createFromStoryId(storyId));
+      StoryReference.createFromStoryId(storyId));
   }
 
   removeAdditionalStory(storyId: string): void {
@@ -533,6 +557,35 @@ export class Topic {
     return this._uncategorizedSkillSummaries.slice();
   }
 
+  getSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
+    return this._skillSummariesForDiagnosticTest.slice();
+  }
+
+  setSkillSummariesForDiagnosticTest(
+      skillSummariesForDiagnosticTest: ShortSkillSummary[]): void {
+    this._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
+  }
+
+  getAvailableSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
+    let skillSummaries = cloneDeep(this._uncategorizedSkillSummaries);
+    let subtopics = this._subtopics;
+    for (let i = 0; i < subtopics.length; i++) {
+      skillSummaries = skillSummaries.concat(
+        subtopics[i].getSkillSummaries());
+    }
+    let diagnosticTestSkillSummaries = (
+      this.getSkillSummariesForDiagnosticTest());
+
+    const skillIdToDiagnosticTestMap: {[id: string]: boolean} = {};
+    for (let skillSummary of diagnosticTestSkillSummaries) {
+      skillIdToDiagnosticTestMap[skillSummary.getId()] = true;
+    }
+
+    return skillSummaries.filter(skillSummary => {
+      return !skillIdToDiagnosticTestMap.hasOwnProperty(skillSummary.getId());
+    });
+  }
+
   // Reassigns all values within this topic to match the existing
   // topic. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic.
@@ -548,6 +601,8 @@ export class Topic {
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
     this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
+    this.setSkillSummariesForDiagnosticTest(
+      otherTopic.getSkillSummariesForDiagnosticTest());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -575,8 +630,8 @@ export class Topic {
   providedIn: 'root'
 })
 export class TopicObjectFactory {
-  constructor(
-      private storyReferenceObjectFactory: StoryReferenceObjectFactory) {}
+  constructor() {}
+
   create(
       topicBackendDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {
@@ -588,13 +643,13 @@ export class TopicObjectFactory {
     let canonicalStoryReferences =
         topicBackendDict.canonical_story_references.map(
           (reference: StoryReferenceBackendDict) => {
-            return this.storyReferenceObjectFactory.createFromBackendDict(
+            return StoryReference.createFromBackendDict(
               reference);
           });
     let additionalStoryReferences =
         topicBackendDict.additional_story_references.map(
           (reference: StoryReferenceBackendDict) => {
-            return this.storyReferenceObjectFactory.createFromBackendDict(
+            return StoryReference.createFromBackendDict(
               reference);
           });
     return new Topic(
@@ -608,21 +663,22 @@ export class TopicObjectFactory {
       subtopics, topicBackendDict.thumbnail_filename,
       topicBackendDict.thumbnail_bg_color,
       skillIdToDescriptionDict,
-      this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
       topicBackendDict.meta_tag_content,
-      topicBackendDict.page_title_fragment_for_web
+      topicBackendDict.page_title_fragment_for_web,
+      topicBackendDict.skill_ids_for_diagnostic_test
     );
   }
 
-  // Create an interstitial topic that would be displayed in the editor until
+  // TODO(#14309): Remove the interstitial topic so that full topic can be
+  // created from start.
+  // Create an interstitial topic that until
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(
       null, 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], null, '', {},
-      this.storyReferenceObjectFactory, false, '', ''
+      [], [], [], 1, 1, [], null, '', {}, false, '', '', []
     );
   }
 }

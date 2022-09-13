@@ -25,13 +25,20 @@ import fnmatch
 import os
 import sys
 
-from core import python_utils
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core import utils  # isort:skip
+
+from typing import List  # isort:skip
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000
 
 
-def _get_skip_files_list():
+def get_skip_files_list() -> List[str]:
     """This function returns the list of the files which are skipped when
     Oppia is deployed to GAE.
 
@@ -43,7 +50,7 @@ def _get_skip_files_list():
         IOError. If failed to open .gcloudignore in read mode.
     """
     try:
-        with python_utils.open_file('.gcloudignore', 'r') as gcloudignore:
+        with utils.open_file('.gcloudignore', 'r') as gcloudignore:
             gcloudignore_lines = gcloudignore.read().split('\n')
 
             skip_files_list = [
@@ -57,7 +64,7 @@ def _get_skip_files_list():
         sys.exit(1)
 
 
-def _check_size_in_dir(dir_path, skip_files_list):
+def _check_size_in_dir(dir_path: str, skip_files_list: List[str]) -> int:
     """Recursive method that checks the number of files inside the given
     directory.
 
@@ -89,9 +96,9 @@ def _check_size_in_dir(dir_path, skip_files_list):
     return number_of_files_in_dir
 
 
-def _check_third_party_size():
+def check_third_party_size() -> None:
     """Checks if the third-party size limit has been exceeded."""
-    skip_files_list = _get_skip_files_list()
+    skip_files_list = get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
         THIRD_PARTY_PATH, skip_files_list)
     print('')
@@ -114,8 +121,8 @@ def _check_third_party_size():
         print('')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     print('Running third-party size check')
-    _check_third_party_size()
+    check_third_party_size()
     print('Third-party folder size check passed.')
     print('')

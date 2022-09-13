@@ -1,4 +1,14 @@
 <style>
+  .oppia-sidebar-expand-icon {
+    float: right;
+    font-size: 22px;
+    height: 22px;
+    margin: 0 35px 3px 6px;
+    padding-left: 5px;
+    transition-duration: 0.5s;
+    vertical-align: middle;
+    width: 22px;
+  }
   .oppia-sidebar-menu {
     background: #fff;
     height: 100%;
@@ -8,8 +18,8 @@
     -ms-transform: translate(-100%, 0);
     -webkit-transform: translate3d(-100%, 0, 0);
     transform: translate3d(-100%, 0, 0);
-    width: 270px;
-    z-index: 100;
+    width: 100%;
+    z-index: 999;
   }
   .oppia-sidebar-menu-transition {
     -webkit-transition: all 0.5s;
@@ -28,8 +38,10 @@
     width: 100%;
   }
   .oppia-sidebar-menu-icon {
+    float: right;
     height: 22px;
-    margin: 0 16px 3px 6px;
+    margin: 7px 35px 3px 6px;
+    transition-duration: 0.5s;
     vertical-align: middle;
     width: 22px;
   }
@@ -38,7 +50,7 @@
     list-style: none;
     margin-bottom: 0;
     padding-left: 0;
-    padding-top: 10px;
+    padding-top: 0;
   }
   .oppia-sidebar-menu hr {
     margin-bottom: 0;
@@ -51,25 +63,42 @@
     padding: 1em 0 0 0;
     text-decoration: none;
   }
-  .oppia-sidebar-menu a {
+  .oppia-sidebar-expandable-button:hover {
+    cursor: pointer;
+  }
+  .oppia-sidebar-expandable-button:hover,
+  .oppia-sidebar-expandable-button:focus {
+    background: rgb(243, 248, 255);
+  }
+  .oppia-sidebar-menu a,
+  .oppia-sidebar-expandable-button,
+  .oppia-sidebar-menu button {
     color: #333;
     display: block;
     padding: 1em 0 1em 18px;
     text-decoration: none;
   }
   .oppia-sidebar-menu a:hover,
-  .oppia-sidebar-menu a:focus {
+  .oppia-sidebar-menu a:focus,
+  .oppia-sidebar-menu button:hover,
+  .oppia-sidebar-menu button:focus {
     background: rgb(243, 248, 255);
   }
-  .oppia-sidebar-menu li.active a {
+  .oppia-sidebar-menu li.active a,
+  .oppia-sidebar-menu li.active button {
     background: rgba(243, 248, 255, 0.5);
+  }
+  .oppia-sidebar-menu button {
+    background-color: transparent;
+    border: none;
+    text-align: start;
+    width: 100%;
   }
   .oppia-sidebar-logo-container {
     color: #333;
     margin: 0 auto;
     width: 120px;
   }
-
   .oppia-sidebar-header {
     background: #eee;
     border-bottom: 1px solid #ccc;
@@ -78,9 +107,6 @@
   }
   .oppia-sidebar-menu-icon.fa {
     font-size: 24px;
-  }
-  .classroom-submenu {
-    padding: 0 0 1em 18px;
   }
   .oppia-sidebar-menu-open {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
@@ -98,102 +124,224 @@
     transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
     width: 0;
   }
+  .oppia-sidebar-submenu-icon {
+    height: 22px;
+    margin: 4px 6px 3px -3px;
+    transition-duration: 0.5s;
+    vertical-align: middle;
+    width: 22px;
+  }
+  .oppia-sidebar-submenu-text {
+    color: #767676;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-left: 26px;
+    margin-right: 26px;
+  }
+  .oppia-sidebar-submenu-upperborder {
+    border-top: 1px solid #efeded;
+  }
+  .oppia-sidebar-menu-icon-transition {
+    transform: rotate(-180deg);
+  }
+  .oppia-sidebar-learn-subtext {
+    color: #767676;
+    font-family: "Roboto", Arial, sans-serif;
+    margin-top: 2px;
+    width: 75%;
+  }
+  .oppia-sidebar-menu li {
+    border-bottom: 1px solid #e3e3e3;
+  }
+  .oppia-submenu-image-position {
+    float: right;
+    margin-right: 5%;
+    margin-top: 2.5%;
+  }
+  .oppia-submenu-image {
+    height: 80px;
+    width: 64.54px;
+  }
+  .oppia-community-library-section {
+    background: #ededed;
+    border-radius: 0 0 8px 8px;
+    -webkit-box-shadow: 0 8px 6px -6px black;
+       -moz-box-shadow: 0 8px 6px -6px black;
+            box-shadow: 0 8px 6px -6px grey;
+  }
+  .learn-submenu-links {
+    color: #00645c;
+  }
+  .oppia-sidebar-menu .oppia-sidebar-submenu-title {
+    font-size: 16px;
+  }
+  .oppia-sidebar-menu span {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    line-height: 16px;
+  }
+  .oppia-sidebar-submenu-toggle {
+    border-bottom: 2px solid #27ae60;
+  }
+  .submenu-notop-margin {
+    margin-top: -10px;
+  }
+  i.expand-icon {
+    color: #27ae60;
+  }
+  i.partnerships-icon {
+    color: #f2994a;
+    font-size: 18px;
+  }
+  i.volunteer-icon {
+    color: #2d9cdb;
+    font-size: 16px;
+  }
+  i.donate-icon {
+    color: #eb5757;
+    font-size: 18px;
+  }
+  i.contact-icon {
+    color: #b4bbc4;
+    font-size: 18px;
+  }
 </style>
 
 <nav class="oppia-sidebar-menu oppia-sidebar-menu-transition"
-  [ngClass]="{'oppia-sidebar-menu-open': display}">
+  [ngClass]="{'oppia-sidebar-menu-open': display}" (swipeleft)="closeSidebarOnSwipeleft()">
   <div class="oppia-sidebar-header">
     <div class="oppia-sidebar-logo-container">
     </div>
   </div>
 
   <ul>
-    <li [ngClass]="{'active': currentUrl === '/learn/math'}">
-      <a (click)="toggleClassroomSubmenu()" class="protractor-mobile-test-classroom">
-        <i class="material-icons oppia-sidebar-menu-icon">school</i>
-        <span>{{ 'I18N_SIDEBAR_CLASSROOM' | translate }}</span>
-      </a>
-      <div [hidden]="!classroomSubmenuIsShown" class="classroom-submenu">
-        <a href="/learn/math" routerLink="/learn/math" class="protractor-mobile-test-mathematics-link">
+    <li class="oppia-sidebar-rows" *ngIf="userIsLoggedIn">
+      <button (click)="navigateToLearnerDashboard(); stopclickfurther($event)"
+              class="text-uppercase">
+        <span >{{ 'I18N_SIDEBAR_HOME' | translate }}</span>
+      </button>
+    </li>
+
+    <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
+      <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-learn" >
+        <i class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon oppia-sidebar-menu-icon-transition"
+          [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">
+        </i>
+        <span class="oppia-sidebar-submenu-toggle text-uppercase" [ngClass]="{'oppia-sidebar-submenu-toggle': learnSubmenuIsShown}">
+              {{ 'I18N_SIDEBAR_LEARN' | translate }}
+        </span>
+      </div>
+      <div [hidden]="!learnSubmenuIsShown" class="oppia-sidebar-submenu-upperborder" *ngIf="CLASSROOM_PROMOS_ARE_ENABLED">
+        <div class="oppia-submenu-image-position">
+          <picture>
+            <source type="image/webp"
+                    [srcset]="this.getStaticImageUrl('/sidebar/learn-math-logo.webp')">
+            <source type="image/png"
+                    [srcset]="this.getStaticImageUrl('/sidebar/learn-math-logo.png')">
+            <img [src]="getStaticImageUrl('/sidebar/learn-math-logo.png')"
+                 class="oppia-submenu-image"
+                 alt="learn-math-logo">
+          </picture>
+        </div>
+        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="e2e-mobile-test-mathematics-link mb-1">
           <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
+          <p class="oppia-sidebar-learn-subtext mt-2">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
+        </a>
+        <div *ngIf="classroomData.length > 0">
+          <div *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
+            <div class="submenu-notop-margin">
+              <a (click)="navigateToClassroomPage('/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/' + topicSummary.getUrlFragment())">
+                <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
+                  {{ topicSummary.getName() }}
+                </span>
+                <span *ngIf="isHackyTopicTitleTranslationDisplayed(idx)">
+                  {{ topicTitlesTranslationKeys[idx] | translate }}
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="submenu-notop-margin">
+          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+             smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+             class="e2e-mobile-test-mathematics-link">
+            <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
+            <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
+          </a>
+        </div>
+      </div>
+      <div [hidden]="!learnSubmenuIsShown" class="oppia-community-library-section">
+        <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" class="e2e-mobile-test-library-link">
+          <p class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</p>
+          <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY' | translate }}</span>
+          <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
         </a>
       </div>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/community-library'}">
-      <a href="/community-library"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE"
-         class="protractor-mobile-test-library-link">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE0E0;</i>
-        <span>{{ 'I18N_SIDEBAR_LIBRARY_LINK' | translate }}</span>
-      </a>
-    </li>
-
-    <li [ngClass]="{'active': currentUrl === '/about'}">
+    <li [ngClass]="{'active': currentUrl === '/about'}" class="oppia-sidebar-rows">
       <a href="/about"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
-         class="protractor-mobile-test-about-link">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
-        <span>{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
+         class="e2e-mobile-test-about-link text-uppercase">
+        <span >{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
       </a>
     </li>
 
-    <li>
-      <a href="/about-foundation" target="_blank" rel="noopener">
-        <picture>
-          <source type="image/webp"
-                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')">
-          <source type="image/png"
-                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')">
-          <img [src]="getStaticImageUrl('/sidebar/oppia-foundation-logo.png')"
-               class="oppia-sidebar-menu-icon"
-               alt="Oppia Foundation">
-        </picture>
-        <span>{{ 'I18N_SIDEBAR_OPPIA_FOUNDATION' | translate }}</span>
+    <li class="oppia-sidebar-rows">
+      <div (click)="togglegetinvolvedSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button">
+        <span [ngClass]="{'oppia-sidebar-submenu-toggle': getinvolvedSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_GET_INVOLVED' | translate }}</span>
+        <i [ngClass]="{'oppia-sidebar-menu-icon-transition': getinvolvedSubmenuIsShown}" class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon">
+        </i>
+      </div>
+      <div [hidden]="!getinvolvedSubmenuIsShown">
+        <div class="oppia-sidebar-submenu-upperborder">
+          <a href="/partnerships" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
+            <i class="fas fa-globe oppia-sidebar-submenu-icon partnerships-icon"></i>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
+          </a>
+        </div>
+        <div class="oppia-sidebar-submenu-upperborder">
+          <a href="/volunteer" smartRouterLink="/volunteer">
+            <i class="fas fa-user-friends oppia-sidebar-submenu-icon volunteer-icon"></i>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
+          </a>
+        </div>
+        <div class="oppia-sidebar-submenu-upperborder">
+          <a href="/donate" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
+            <i class="fas fa-heart oppia-sidebar-submenu-icon donate-icon"></i>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
+          </a>
+        </div>
+        <div class="oppia-sidebar-submenu-upperborder">
+          <a href="/contact" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
+            <i class="fas fa-envelope oppia-sidebar-submenu-icon contact-icon"></i>
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
+            <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <li [ngClass]="{'active': currentUrl === '/about-foundation'}" class="oppia-sidebar-rows">
+      <a href="/about-foundation"
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
+         class="e2e-mobile-test-about-link text-uppercase">
+        <span >{{ 'I18N_SIDEBAR_ABOUT_OPPIA_FOUNDATION' | translate }}</span>
       </a>
     </li>
 
-    <li>
-      <a href="https://medium.com/oppia-org" target="_blank" rel="noopener">
-        <picture>
-          <source type="image/webp" [srcset]="getStaticImageUrl('/sidebar/medium.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/sidebar/medium.png')">
-          <img [src]="getStaticImageUrl('/sidebar/medium.png')"
-               class="oppia-sidebar-menu-icon"
-               alt="Oppia Blog">
-        </picture>
-        <span>{{ 'I18N_SIDEBAR_BLOG' | translate }}</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/volunteer"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
-         target="_blank"
-         rel="noopener">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xF233;</i>
-        <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/partnerships"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
-         target="_blank"
-         rel="noopener">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE0Af;</i>
-        <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
-      </a>
-    </li>
-
-    <li [ngClass]="{'active': currentUrl === '/donate'}">
+    <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">
       <a href="/donate"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-         class="protractor-mobile-test-donate-link">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+         class="e2e-mobile-test-donate-link text-uppercase">
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
       </a>
     </li>
   </ul>
-
 </nav>

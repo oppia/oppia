@@ -1,4 +1,4 @@
-<div class="oppia-share-publish-modal protractor-test-share-publish-modal">
+<div class="oppia-share-publish-modal e2e-test-share-publish-modal">
   <div class="modal-header oppia-share-publish-header">
     <img [src]="congratsImgUrl">
     <h3>Awesome!</h3>
@@ -13,12 +13,12 @@
       <div (click)="selectText($event)">{{explorationLink}}</div>
       <span *ngIf="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
     </div>
-    <sharing-links layoutType="row"
+    <sharing-links layoutType="row post-publish-modal-sharing-links"
                    layoutAlignType="center center"
                    shareType="exploration"
                    [explorationId]="explorationId">
     </sharing-links>
-    <button class="btn btn-secondary oppia-share-publish-close protractor-test-share-publish-close"
+    <button class="btn btn-secondary oppia-share-publish-close e2e-test-share-publish-close"
             (click)="cancel()">
       Close
     </button>
@@ -55,7 +55,7 @@
   }
 
   .oppia-share-publish-modal .oppia-share-publish-header h3 {
-    color: #FFF;
+    color: #fff;
     font-size: 1.3em;
   }
 
@@ -93,7 +93,7 @@
   }
 
   .oppia-share-publish-body .oppia-share-publish-link i {
-    color: #3F9187;
+    color: #3f9187;
     padding-left: 6px;
   }
 </style>

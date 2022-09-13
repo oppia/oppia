@@ -29,9 +29,8 @@ var action = require('./action.js');
 var DictionaryEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(
-        await by.repeater('property in propertySchemas()').
-          row(index));
+      var entry = await elem.all(
+        by.css('.e2e-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }
@@ -40,12 +39,12 @@ var DictionaryEditor = function(elem) {
 
 var GraphEditor = function(graphInputContainer) {
   var addNodeButton = graphInputContainer.element(
-    by.css('.protractor-test-Add-Node-button'));
+    by.css('.e2e-test-Add-Node-button'));
   var addEdgeButton = graphInputContainer.element(
-    by.css('.protractor-test-Add-Edge-button'));
+    by.css('.e2e-test-Add-Edge-button'));
   var deleteButton = graphInputContainer.element(
-    by.css('.protractor-test-Delete-button'));
-  var allEdgesElement = element.all(by.css('.protractor-test-graph-edge'));
+    by.css('.e2e-test-Delete-button'));
+  var allEdgesElement = element.all(by.css('.e2e-test-graph-edge'));
   if (!graphInputContainer) {
     throw new Error('Please provide Graph Input Container element');
   }
@@ -53,7 +52,7 @@ var GraphEditor = function(graphInputContainer) {
     // Would throw incorrect element error if provided incorrect index number.
     // Node index starts at 0.
     return graphInputContainer.element(by.css(
-      '.protractor-test-graph-vertex-' + index));
+      '.e2e-test-graph-vertex-' + index));
   };
 
   var createVertex = async function(xOffset, yOffset) {
@@ -117,12 +116,14 @@ var GraphEditor = function(graphInputContainer) {
 };
 
 var ListEditor = function(elem) {
-  var deleteListEntryLocator = by.css('.protractor-test-delete-list-entry');
-  var addListEntryLocator = by.css('.protractor-test-add-list-entry');
+  var deleteListEntryLocator = by.css('.e2e-test-delete-list-entry');
+  var addListEntryLocator = by.css('.e2e-test-add-list-entry');
   // NOTE: this returns a promise, not an integer.
   var _getLength = async function() {
     var items = (
-      await elem.all(by.repeater('item in localValue track by $index')));
+      await elem.all(by.id(
+        'e2e-test-schema-based-list-editor-table-row')).all(
+        by.tagName('td')));
     return items.length;
   };
   // If objectType is specified this returns an editor for objects of that type
@@ -136,9 +137,10 @@ var ListEditor = function(elem) {
     await action.click('Add List Entry Button', addListEntryButton);
     if (objectType !== null) {
       return await getEditor(objectType)(
-        elem.element(
-          await by.repeater(
-            'item in localValue track by $index').row(listLength)));
+        elem.all(
+          by.css(
+            '.e2e-test-schema-based-list-editor-table-data'))
+          .get(listLength));
     }
   };
   var deleteItem = async function(index) {
@@ -152,8 +154,10 @@ var ListEditor = function(elem) {
 
   return {
     editItem: async function(index, objectType) {
-      var item = await elem.element(
-        await by.repeater('item in localValue track by $index').row(index));
+      var item = await elem.all(
+        by.css(
+          '.e2e-test-schema-based-list-editor-table-data'))
+        .get(index);
       var editor = getEditor(objectType);
       return await editor(item);
     },
@@ -161,8 +165,9 @@ var ListEditor = function(elem) {
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary.
     setLength: async function(desiredLength) {
-      var startingLength = await elem.all(
-        await by.repeater('item in localValue track by $index')).count();
+      var startingLength = await elem.all(by.id(
+        'e2e-test-schema-based-list-editor-table-row')).all(
+        by.tagName('td')).count();
       for (var i = startingLength; i < desiredLength; i++) {
         await addItem();
       }
@@ -184,12 +189,15 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = async function(elem) {
-  var rteElements = elem.all(by.css('.protractor-test-rte'));
+  var rteElements = elem.all(by.css('.e2e-test-rte'));
   var modalDialogElements = element.all(by.css('.modal-dialog'));
   var closeRteComponentButtonLocator = by.css(
-    '.protractor-test-close-rich-text-component-editor');
+    '.e2e-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(rteElements.first());
+  await waitFor.elementToBeClickable(
+    rteElements.first(),
+    'First RTE element taking too long to become clickable.'
+  );
   await (await rteElements.first()).click();
 
   var _appendContentText = async function(text) {
@@ -294,8 +302,8 @@ var RichTextEditor = async function(elem) {
 var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(
-        await by.repeater('property in propertySchemas()').row(index));
+      var entry = await elem.all(
+        by.css('.e2e-test-schema-based-dict-editor')).get(index);
       var editor = getEditor(objectType);
       return await editor(entry);
     }
@@ -314,9 +322,12 @@ var UnicodeEditor = function(elem) {
 };
 
 var AutocompleteDropdownEditor = function(elem) {
-  var containerLocator = by.css('.select2-container');
-  var dropdownElement = element(by.css('.select2-dropdown'));
-  var searchInputLocator = by.css('.select2-search input');
+  var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
+  var searchInputLocator = by.css(
+    '.mat-select-search-input.mat-input-element');
+  var categorySelectorChoice = by.css(
+    '.e2e-test-exploration-category-selector-choice');
+
   return {
     setValue: async function(text) {
       await action.click('Container Element', elem.element(containerLocator));
@@ -326,12 +337,20 @@ var AutocompleteDropdownEditor = function(elem) {
       // field when it is 'activated', i.e. when the dropdown is clicked.
       await action.sendKeys(
         'Dropdown Element',
-        dropdownElement.element(searchInputLocator),
-        text + '\n');
+        element(searchInputLocator),
+        text);
+
+      var searchInputLocatorText = element.all(by.cssContainingText(
+        '.e2e-test-exploration-category-selector-choice', text)).first();
+
+      await action.click(
+        'Dropdown Element Select',
+        searchInputLocatorText);
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click('Container Element', elem.element(containerLocator));
-      var actualOptions = await dropdownElement.all(by.tagName('li')).map(
+
+      var actualOptions = await element.all(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
         }
@@ -340,7 +359,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // Re-close the dropdown.
       await action.sendKeys(
         'Dropdown Element',
-        dropdownElement.element(searchInputLocator),
+        element(searchInputLocator),
         '\n');
     }
   };
@@ -388,10 +407,10 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 
 var MultiSelectEditor = function(elem) {
   var searchBarDropdownToggleElement = elem.element(
-    by.css('.protractor-test-search-bar-dropdown-toggle'));
+    by.css('.e2e-test-search-bar-dropdown-toggle'));
   var searchBarDropdownMenuLocator = by.css(
-    '.protractor-test-search-bar-dropdown-menu');
-  var selectedLocator = by.css('.protractor-test-selected');
+    '.e2e-test-search-bar-dropdown-menu');
+  var selectedLocator = by.css('.e2e-test-selected');
   // This function checks that the options corresponding to the given texts
   // have the expected class name, and then toggles those options accordingly.
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
@@ -405,7 +424,7 @@ var MultiSelectEditor = function(elem) {
     for (var i = 0; i < texts.length; i++) {
       var filteredElement = elem.element(
         by.cssContainingText(
-          '.protractor-test-search-bar-dropdown-menu span', texts[i]));
+          '.e2e-test-search-bar-dropdown-menu span', texts[i]));
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
@@ -429,11 +448,11 @@ var MultiSelectEditor = function(elem) {
   return {
     selectValues: async function(texts) {
       await _toggleElementStatusesAndVerifyExpectedClass(
-        texts, 'protractor-test-deselected');
+        texts, 'e2e-test-deselected');
     },
     deselectValues: async function(texts) {
       await _toggleElementStatusesAndVerifyExpectedClass(
-        texts, 'protractor-test-selected');
+        texts, 'e2e-test-selected');
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.

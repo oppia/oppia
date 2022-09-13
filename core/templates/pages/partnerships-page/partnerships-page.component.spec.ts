@@ -16,18 +16,36 @@
  * @fileoverview Unit tests for partnerships page.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { TranslateService } from '@ngx-translate/core';
+
 import { PartnershipsPageComponent } from './partnerships-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { PageTitleService } from 'services/page-title.service';
+
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
 describe('Partnerships page', () => {
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
+
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [PartnershipsPageComponent],
       providers: [
         UrlInterpolationService,
+        PageTitleService,
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -39,6 +57,8 @@ describe('Partnerships page', () => {
     const partnershipsPageComponent = TestBed.createComponent(
       PartnershipsPageComponent);
     component = partnershipsPageComponent.componentInstance;
+    pageTitleService = TestBed.inject(PageTitleService);
+    translateService = TestBed.inject(TranslateService);
   });
 
   it('should successfully instantiate the component from beforeEach block',
@@ -47,6 +67,7 @@ describe('Partnerships page', () => {
     });
 
   it('should set component properties when ngOnInit() is called', () => {
+    spyOn(translateService.onLangChange, 'subscribe');
     component.ngOnInit();
 
     expect(component.partnershipsImgUrl).toBe(
@@ -55,5 +76,37 @@ describe('Partnerships page', () => {
     expect(component.callIconUrl).toBe('/assets/images/icons/icon_call.png');
     expect(component.changeIconUrl).toBe(
       '/assets/images/icons/icon_change.png');
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+  });
+
+  it('should obtain translated page title whenever the selected' +
+  'language changes', () => {
+    component.ngOnInit();
+    spyOn(component, 'setPageTitle');
+    translateService.onLangChange.emit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
+  it('should set new page title', () => {
+    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(pageTitleService, 'setDocumentTitle');
+    component.setPageTitle();
+
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'I18N_PARTNERSHIPS_PAGE_TITLE');
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'I18N_PARTNERSHIPS_PAGE_TITLE');
+  });
+
+  it('should unsubscribe on component destruction', () => {
+    component.directiveSubscriptions.add(
+      translateService.onLangChange.subscribe(() => {
+        component.setPageTitle();
+      })
+    );
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.closed).toBe(true);
   });
 });

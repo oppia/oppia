@@ -25,14 +25,14 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
-        super(BaseVoiceArtistControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup('voiceoveradmin@app.com', 'voiceoverManager')
@@ -71,7 +71,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     }
 
     def setUp(self):
-        super(VoiceArtistTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(
@@ -90,7 +90,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         self.csrf_token = self.get_new_csrf_token()
 
     def test_put_with_no_payload_version_raises_error(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Missing key in handler args: version.'):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
@@ -105,7 +105,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_put_with_payload_version_different_from_exp_version_raises_error(
             self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception, 'Trying to update version 1 of exploration from version'
             ' 3, which is not possible. Please reload the page and try again.'):
 
@@ -196,7 +196,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         'new_value': 'New title'}]
 
     def setUp(self):
-        super(VoiceArtistAutosaveTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -289,7 +289,7 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     EXP_ID = 'exp1'
 
     def setUp(self):
-        super(TranslationFirstTimeTutorialTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -324,7 +324,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
-        super(VoiceArtistManagementTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)

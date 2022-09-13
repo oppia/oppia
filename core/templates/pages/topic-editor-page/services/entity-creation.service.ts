@@ -18,6 +18,8 @@
  * an entity.
  */
 
+import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
+
 require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -26,6 +28,7 @@ require(
   'components/review-material-editor/review-material-editor.component.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.component.ts');
 require(
@@ -33,31 +36,22 @@ require(
   'create-new-skill-modal.component.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require(
-  'pages/topic-editor-page/modal-templates/' +
-  'create-new-subtopic-modal.controller.ts');
+
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 require('pages/topic-editor-page/services/create-new-skill-modal.service');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').factory('EntityCreationService', [
-  '$uibModal', 'CreateNewSkillModalService',
+  'CreateNewSkillModalService', 'NgbModal',
   'TopicEditorRoutingService', 'TopicEditorStateService',
   function(
-      $uibModal, CreateNewSkillModalService,
+      CreateNewSkillModalService, NgbModal,
       TopicEditorRoutingService, TopicEditorStateService) {
     var createSubtopic = function(topic) {
-      $uibModal.open({
-        template: require(
-          'pages/topic-editor-page/modal-templates/' +
-          'create-new-subtopic-modal.template.html'),
+      NgbModal.open(CreateNewSubtopicModalComponent, {
         backdrop: 'static',
-        resolve: {
-          topic: () => topic
-        },
-        controllerAs: '$ctrl',
-        windowClass: 'create-new-subtopic',
-        controller: 'CreateNewSubtopicModalController'
+        windowClass: 'create-new-subtopic'
       }).result.then(function(subtopicId) {
         TopicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
       }, function() {
