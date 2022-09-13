@@ -21,8 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-
-declare const CAN_SEND_ANALYTICS_EVENTS: boolean;
+import analyticsConstants from 'analytics-constants';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +39,7 @@ export class DeleteAccountBackendApiService {
       setTimeout(() => {
         this.windowRef.nativeWindow.location.href = (
           '/logout?redirect_url=/pending-account-deletion');
-      }, CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
+      }, analyticsConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
     });
   }
 }

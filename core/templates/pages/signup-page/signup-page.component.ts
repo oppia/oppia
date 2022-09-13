@@ -29,8 +29,7 @@ import { UtilsService } from 'services/utils.service';
 import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
 import { RegistrationSessionExpiredModalComponent } from './modals/registration-session-expired-modal.component';
 import { SignupPageBackendApiService } from './services/signup-page-backend-api.service';
-
-declare const CAN_SEND_ANALYTICS_EVENTS: boolean;
+import analyticsConstants from 'analytics-constants';
 
 @Component({
   selector: 'oppia-signup-page',
@@ -216,7 +215,7 @@ export class SignupPageComponent {
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = (
             this.utilsService.getSafeReturnUrl(returnUrl));
-        }, CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
+        }, analyticsConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
       }, (rejection) => {
         if (rejection && rejection.status_code === 401) {
           this.showRegistrationSessionExpiredModal();
