@@ -30,7 +30,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models,) = models.Registry.import_models([models.Names.QUESTION])
 
 
 class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):

@@ -35,7 +35,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
-(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
+(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
 def _migrate_page_contents_to_latest_schema(
@@ -367,7 +367,7 @@ def get_multi_users_subtopic_pages_progress(
     """
 
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
 
     all_skill_ids_lists = [
         topic.get_all_skill_ids() for topic in topics if topic
@@ -389,8 +389,6 @@ def get_multi_users_subtopic_pages_progress(
         str, List[subtopic_page_domain.SubtopicPageSummaryDict]
     ] = {user_id: [] for user_id in user_ids}
     for topic in topics:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
         for subtopic in topic.subtopics:
             subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
             if subtopic_page_id not in subtopic_page_ids:
@@ -440,14 +438,12 @@ def get_learner_group_syllabus_subtopic_page_summaries(
         given subtopic page ids.
     """
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
 
     all_learner_group_subtopic_page_summaries: List[
         subtopic_page_domain.SubtopicPageSummaryDict
     ] = []
     for topic in topics:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
         for subtopic in topic.subtopics:
             subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
             if subtopic_page_id not in subtopic_page_ids:
