@@ -362,8 +362,8 @@ def main(args=None):
         options.release_dir_path, common.CONSTANTS_FILE_PATH)
     release_app_dev_yaml_path = os.path.join(
         options.release_dir_path, common.APP_DEV_YAML_PATH)
-    release_webpack_config_path = os.path.join(
-        options.release_dir_path, common.WEBPACK_COMMON_CONFIG)
+    release_webpack_config_constants_path = os.path.join(
+        options.release_dir_path, common.WEBPACK_CONFIG_CONSTANTS_FILE_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
         try:
@@ -381,7 +381,7 @@ def main(args=None):
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
     update_app_yaml(release_app_dev_yaml_path, feconf_config_path)
     update_analytics_id_in_webpack_config(
-        release_webpack_config_path,
+        release_webpack_config_constants_path,
         constants_config_path)
     verify_config_files(
         release_feconf_path,

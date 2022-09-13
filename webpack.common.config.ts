@@ -23,6 +23,9 @@ const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
+const webpackConfigConstants = require(
+  './assets/webpack-config-constants.json'
+);
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
@@ -37,12 +40,6 @@ var defaultMeta = {
   description: 'Oppia is a free, open-source learning platform. Join ' +
     'the community to create or try an exploration today!'
 };
-
-// These are populated during the deployment process. See update_configs.py.
-const GA_ANALYTICS_ID = '';
-const UA_ANALYTICS_ID = '';
-const SITE_NAME_FOR_ANALYTICS = '';
-const CAN_SEND_ANALYTICS_EVENTS = false;
 
 module.exports = {
   resolve: {
@@ -153,10 +150,14 @@ module.exports = {
     // must include the surrounding quotes. This is done using JSON.stringify.
     // See https://webpack.js.org/plugins/define-plugin/
     new webpack.DefinePlugin({
-      GA_ANALYTICS_ID: JSON.stringify(GA_ANALYTICS_ID),
-      UA_ANALYTICS_ID: JSON.stringify(UA_ANALYTICS_ID),
-      CAN_SEND_ANALYTICS_EVENTS: JSON.stringify(CAN_SEND_ANALYTICS_EVENTS),
-      SITE_NAME_FOR_ANALYTICS: JSON.stringify(SITE_NAME_FOR_ANALYTICS),
+      GA_ANALYTICS_ID: JSON.stringify(webpackConfigConstants.GA_ANALYTICS_ID),
+      UA_ANALYTICS_ID: JSON.stringify(webpackConfigConstants.UA_ANALYTICS_ID),
+      CAN_SEND_ANALYTICS_EVENTS: (
+        webpackConfigConstants.CAN_SEND_ANALYTICS_EVENTS
+      ),
+      SITE_NAME_FOR_ANALYTICS: JSON.stringify(
+        webpackConfigConstants.SITE_NAME_FOR_ANALYTICS
+      ),
     }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
