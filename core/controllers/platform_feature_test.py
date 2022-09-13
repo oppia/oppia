@@ -189,7 +189,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def tearDown(self):
         feature_services.update_feature_flag_rules(
-            param_list.PARAM_NAMES.dummy_feature.value, self.user_id,
+            param_list.ParamNames.DUMMY_FEATURE.value, self.user_id,
             'clear rule', []
         )
 
@@ -198,7 +198,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def _set_dummy_feature_status_for_mode(self, is_enabled, mode):
         """Enables the dummy_feature for the dev environment."""
         feature_services.update_feature_flag_rules(
-            param_list.PARAM_NAMES.dummy_feature.value, self.user_id,
+            param_list.ParamNames.DUMMY_FEATURE.value, self.user_id,
             'update rule for testing purpose',
             [param_domain.PlatformParameterRule.from_dict({
                 'value_when_matched': is_enabled,
@@ -215,10 +215,10 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         """
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
-            [param_list.PARAM_NAMES.dummy_feature.value])
+            [param_list.ParamNames.DUMMY_FEATURE.value])
 
         feature = registry.Registry.parameter_registry.get(
-            param_list.PARAM_NAMES.dummy_feature.value)
+            param_list.ParamNames.DUMMY_FEATURE.value)
         return self.swap(feature, '_feature_stage', stage.value)
 
     def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self):

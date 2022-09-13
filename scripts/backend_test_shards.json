@@ -53,7 +53,8 @@
         "core.controllers.voice_artist_test",
         "core.jobs.batch_jobs.skill_migration_jobs_test",
         "core.jobs.batch_jobs.story_migration_jobs_test",
-        "core.jobs.batch_jobs.email_deletion_jobs_test"
+        "core.jobs.batch_jobs.email_deletion_jobs_test",
+        "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -160,7 +161,13 @@
         "scripts.run_lighthouse_tests_test",
         "scripts.start_test",
         "setup_test",
-        "scripts.check_overall_backend_test_coverage_test"
+        "scripts.check_overall_backend_test_coverage_test",
+        "core.feconf_test",
+        "core.domain.cron_services_test",
+        "scripts.run_portserver_test",
+        "scripts.third_party_size_check_test",
+        "core.platform.transactions.cloud_transaction_services_test",
+        "core.platform.datastore.cloud_datastore_services_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
