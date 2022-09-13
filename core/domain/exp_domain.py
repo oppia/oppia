@@ -1344,7 +1344,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
-        self._cached_android_proto_size_in_bytes = True
+        self._cached_android_proto_size_is_stale = True
         self._cached_android_proto_size_in_bytes = 0
 
     def get_translatable_contents_collection(
@@ -4604,8 +4604,6 @@ class ExplorationMetadata:
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
         self.edits_allowed = edits_allowed
-        self._cached_android_proto_size_is_stale = True
-        self._cached_android_proto_size_in_bytes = 0
 
     def to_dict(self) -> ExplorationMetadataDict:
         """Gets the dict representation of ExplorationMetadata domain object.

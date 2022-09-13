@@ -44,6 +44,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/workflows/',
     '/core/android_validation_constants*.py',
     '/extensions/interactions/rule_templates.json',
+    '/buf_gen_backend.yaml',
     '/core/templates/services/svg-sanitizer.service.ts',
     '/scripts/linters/warranted_angular_security_bypasses.py',
     '/core/controllers/access_validators*.py',
