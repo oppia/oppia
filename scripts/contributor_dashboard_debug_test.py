@@ -205,9 +205,13 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
         questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                10, [
-                    skill_summaries[0].id, skill_summaries[1].id,
-                    skill_summaries[2].id], 0)
+                10,
+                [
+                    skill_summaries[0].id,
+                    skill_summaries[1].id,
+                    skill_summaries[2].id
+                ],
+                0)
         )
         self.assertEqual(len(questions), 3)
 
