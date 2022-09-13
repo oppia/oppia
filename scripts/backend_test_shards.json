@@ -53,8 +53,7 @@
         "core.controllers.voice_artist_test",
         "core.jobs.batch_jobs.skill_migration_jobs_test",
         "core.jobs.batch_jobs.story_migration_jobs_test",
-        "core.jobs.batch_jobs.email_deletion_jobs_test",
-        "scripts.contributor_dashboard_debug_test"
+        "core.jobs.batch_jobs.email_deletion_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
