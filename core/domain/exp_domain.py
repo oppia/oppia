@@ -3925,24 +3925,26 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for ans_group_idx, answer_group in enumerate(answer_groups):
             for rule_spec_idx, rule_spec in enumerate(
                 answer_group['rule_specs']):
-                if rule_spec in seen_rules:
+                if tuple(rule_spec) in seen_rules:
                     curr_rule_dest = answer_group['outcome']['dest']
-                    seen_rule_dest = seen_rules[rule_spec][0]
+                    seen_rule_dest = seen_rules[tuple(rule_spec)][0]
                     if (
                         curr_rule_dest != state_name and
                         seen_rule_dest == state_name
                     ):
-                        ans_group_idx_seen_rule = seen_rules[rule_spec][1]
-                        rule_spec_idx_seen_rule = seen_rules[rule_spec][2]
+                        ans_group_idx_seen_rule = seen_rules[
+                            tuple(rule_spec)][1]
+                        rule_spec_idx_seen_rule = seen_rules[
+                            tuple(rule_spec)][2]
                         rules_to_remove.append(
                             answer_groups[ans_group_idx_seen_rule][
                                 'rule_specs'][rule_spec_idx_seen_rule])
-                        seen_rules[rule_spec][1] = ans_group_idx
-                        seen_rules[rule_spec][2] = rule_spec_idx
+                        seen_rules[tuple(rule_spec)][1] = ans_group_idx
+                        seen_rules[tuple(rule_spec)][2] = rule_spec_idx
                     else:
                         rules_to_remove.append(rule_spec)
                 else:
-                    seen_rules[rule_spec] = [
+                    seen_rules[tuple(rule_spec)] = [
                         answer_group['outcome']['dest'], ans_group_idx,
                         rule_spec_idx]
 
@@ -3951,8 +3953,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for answer_group in answer_groups:
                 for rule_spec in answer_group['rule_specs']:
                     if rule_spec == rule_to_remove:
-                        answer_group['rule_specs'].remove(rule_spec)
-                if len(answer_group['rule_specs']) == 0:
+                        answer_group['rule_specs'].remove(rule_to_remove)
+                if (
+                    len(answer_group['rule_specs']) == 0 and
+                    answer_group not in empty_ans_groups
+                ):
                     empty_ans_groups.append(answer_group)
 
         # Remove empty answer groups.
