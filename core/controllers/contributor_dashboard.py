@@ -706,8 +706,8 @@ class TranslationPreferenceHandler(base.BaseHandler):
 
 
 class ContributorStatsSummariesHandler(base.BaseHandler):
-
     """Returns contribution statistics for the supplied contribution type."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
