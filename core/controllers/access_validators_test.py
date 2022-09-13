@@ -24,7 +24,7 @@ from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 ACCESS_VALIDATION_HANDLER_PREFIX = feconf.ACCESS_VALIDATION_HANDLER_PREFIX
 
