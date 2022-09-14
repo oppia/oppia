@@ -48,8 +48,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import transaction_services
 
 (email_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.email,
-    models.NAMES.suggestion
+    models.Names.EMAIL,
+    models.Names.SUGGESTION
 ])
 app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()

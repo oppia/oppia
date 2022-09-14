@@ -37,7 +37,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import beam_job_models
 
-(beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
+(beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 
 class NoOpJob(base_jobs.JobBase):
