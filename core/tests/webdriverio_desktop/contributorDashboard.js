@@ -165,7 +165,8 @@ describe('Contributor dashboard page', function() {
 
     // Creating an exploration with an image.
     await creatorDashboardPage.get();
-    await workflow.createExploration(true);
+    // Aawait workflow.createExploration(true);
+    // FAILING TESTS ON PURPOSE TO CHECK SCREEN RECORDING ON CI.
     let explorationEditorMainTab = explorationEditorPage.getMainTab();
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.addRteComponent(

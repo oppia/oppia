@@ -1031,7 +1031,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertNotIn('--inspect-brk', program_args)
         self.assertIn('--params.devMode=True', program_args)
         self.assertIn('--suite full', program_args)
-        self.assertEqual(os.environ["MOBILE"], 'false')
+        self.assertEqual(os.environ['MOBILE'], 'false')
 
     def test_managed_protractor_mobile(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1051,7 +1051,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertNotIn('--inspect-brk', program_args)
         self.assertIn('--params.devMode=True', program_args)
         self.assertIn('--suite full', program_args)
-        self.assertEqual(os.environ["MOBILE"], 'true')
+        self.assertEqual(os.environ['MOBILE'], 'true')
 
     def test_managed_protractor_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1111,7 +1111,8 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webdriverio_mobile(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(servers.managed_webdriverio_server(mobile=True))
+        self.exit_stack.enter_context(servers.managed_webdriverio_server(
+            mobile=True))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -1125,7 +1126,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertNotIn('DEBUG=true', program_args)
         self.assertIn('--suite full', program_args)
         self.assertIn('--params.devMode=True', program_args)
-        self.assertEqual(os.environ["MOBILE"], 'true')
+        self.assertEqual(os.environ['MOBILE'], 'true')
 
     def test_managed_webdriverio_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
