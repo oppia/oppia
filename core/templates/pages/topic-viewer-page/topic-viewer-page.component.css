@@ -52,9 +52,6 @@ topic-viewer-page .oppia-topic-viewer-container /deep/ .oppia-background-banner 
   margin-top: -50px;
 }
 
-topic-viewer-page .oppia-topic-viewer-container .headroom--unpinned {
-  transform: translateY(-150%);
-}
 
 topic-viewer-page .oppia-topic-viewer-container .headroom {
   transition: transform 200ms linear;
