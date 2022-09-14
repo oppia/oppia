@@ -2083,7 +2083,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     """
 
     EXCEPTIONAL_TYPE_STATUS_DICT = {
-        'type_comment_no_longer_pending': False,
+        'type_comment_pending': False,
         'type_comment_line_num': 0,
         'outside_function_signature_block': True,
         'outside_args_section': True,
@@ -2265,13 +2265,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         if type_status_dict['outside_function_signature_block']:
             if type_status_dict['type_present_in_function_signature']:
                 if (
-                    type_status_dict['type_comment_no_longer_pending'] and
+                    type_status_dict['type_comment_pending'] and
                     type_status_dict['func_def_start_line'] <= (
                         type_status_dict['type_comment_line_num'] +
                         ALLOWED_LINES_OF_GAP_IN_COMMENT
                     )
                 ):
-                    type_status_dict['type_comment_no_longer_pending'] = False
+                    type_status_dict['type_comment_pending'] = False
                 else:
                     self._add_exceptional_type_error_message(
                         exceptional_type,
@@ -2300,13 +2300,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                 # Checking if comment for exceptional_type is present and it's
                 # with in the range (minimum 15 line of gaps).
                 if (
-                    type_status_dict['type_comment_no_longer_pending'] and
+                    type_status_dict['type_comment_pending'] and
                     line_num <= (
                         type_status_dict['type_comment_line_num'] +
                         ALLOWED_LINES_OF_GAP_IN_COMMENT
                     )
                 ):
-                    type_status_dict['type_comment_no_longer_pending'] = False
+                    type_status_dict['type_comment_pending'] = False
                 else:
                     self._add_exceptional_type_error_message(
                         exceptional_type, line_num, node
@@ -2360,7 +2360,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             if token_type == tokenize.COMMENT:
                 if expected_object_class_comment_substring in line:
                     object_class_status_dict[
-                        'type_comment_no_longer_pending'
+                        'type_comment_pending'
                     ] = True
                     object_class_status_dict['type_comment_line_num'] = line_num
 
@@ -2450,7 +2450,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             if token_type == tokenize.COMMENT:
                 if expected_any_type_comment_substring in line:
                     any_type_status_dict[
-                        'type_comment_no_longer_pending'
+                        'type_comment_pending'
                     ] = True
                     any_type_status_dict['type_comment_line_num'] = line_num
 
