@@ -43,8 +43,8 @@ datastore_services = models.Registry.import_datastore_services()
 
 (exp_models, opportunity_models, suggestion_models) = (
     models.Registry.import_models(
-        [models.NAMES.exploration,
-        models.NAMES.opportunity, models.NAMES.suggestion])
+        [models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY, models.Names.SUGGESTION])
 )
 
 
