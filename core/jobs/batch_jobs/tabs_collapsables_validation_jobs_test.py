@@ -47,6 +47,7 @@ class TabsCollapsablesValidationJobTest(job_test_utils.JobTestBase):
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
+    EXPLORATION_ID_4 = '4'
 
     EXP_1_STATE_1 = state_domain.State.create_default_state(
         'EXP_1_STATE_1', is_initial_state=False).to_dict()
@@ -219,6 +220,17 @@ class TabsCollapsablesValidationJobTest(job_test_utils.JobTestBase):
       '</oppia-noninteractive-image>'
     )
 
+    EXP_4_STATE_1 = state_domain.State.create_default_state(
+        'EXP_4_STATE_1', is_initial_state=False).to_dict()
+    EXP_4_STATE_1['content']['html'] = (
+      '<p>Content</p><oppia-noninteractive-image alt-with-value=\'&amp;quot;'
+      'ds&amp;quot;\' caption-with-value=\'&amp;quot;sdds&amp;quot;'
+      '\' filepath-with-value=\'&amp;quot;img.png&amp;quot;\'>'
+      '</oppia-noninteractive-image>'
+      '<p>Content</p><oppia-noninteractive-image caption-with-value'
+      '=\'&amp;quot;sdds&amp;quot;\'></oppia-noninteractive-image>'
+    )
+
     TODAY_DATE = datetime.datetime.utcnow()
     YEAR_AGO_DATE = str((TODAY_DATE - datetime.timedelta(weeks=52)).date())
 
@@ -289,6 +301,27 @@ class TabsCollapsablesValidationJobTest(job_test_utils.JobTestBase):
             }
         )
 
+        self.exp_4 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_4,
+            title='title4',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_4_STATE_1': self.EXP_4_STATE_1
+            }
+        )
+
         self.opportunity_model_1 = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
             id=self.EXPLORATION_ID_3,
@@ -319,12 +352,49 @@ class TabsCollapsablesValidationJobTest(job_test_utils.JobTestBase):
             language_codes_with_assigned_voice_artists=[]
         )
 
+        self.opportunity_model_3 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_4,
+            topic_id='topic_id',
+            topic_name='a_topic name',
+            story_id='story_id',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
         self.mock_function_for_exp_fetcher()
 
         self.mock_convert_to_model_pair()
 
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
+
+    def test_curated_image_tag(self) -> None:
+        self.put_multi([self.exp_4, self.opportunity_model_3])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID CURATED IMAGE RTE TAG ALT '
+            'VALUES SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID CURATED IMAGE RTE TAG '
+            'FILEPATH VALUES SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of the exp is 4, created on {self.YEAR_AGO_DATE} and '
+            f'the invalid curated RTE image filepath values '
+            f'are [\'EXP_4_STATE_1\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of the exp is 4, created on {self.YEAR_AGO_DATE} and '
+            f'the invalid curated RTE image alt values are [\'EXP_4_STATE_1\']'
+          )
+        ])
 
     def test_run_with_restricted_tags_for_curated(self) -> None:
         self.put_multi([self.exp_3, self.opportunity_model_1])

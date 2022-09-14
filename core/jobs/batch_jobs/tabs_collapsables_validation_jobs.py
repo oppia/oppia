@@ -413,6 +413,51 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
         return errored_values
 
     @staticmethod
+    def filter_invalid_curated_image_tag(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """Filters curated exps image tags, filters the following:
+        - `alt-with-value` attribute have value less than 5
+        - `filepath-with-value` does not have `svg` extension
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            Tuple[List[str]]. The list of states that do not have svg as image
+            extension and list of states having alt value less than 5.
+        """
+        states_with_image_alt_value_less_than_5 = []
+        states_with_image_value_as_not_svg = []
+
+        for state_name, state in states_dict.items():
+            soup = bs4.BeautifulSoup(state.content.html, 'html.parser')
+            links = soup.find_all('oppia-noninteractive-image')
+            for link in links:
+                if link.get('alt-with-value') is not None:
+                    alt_value = link.get('alt-with-value')
+                    if (
+                        len(alt_value.strip().replace('&quot;', '')) < 5 and
+                        state_name not in
+                        states_with_image_alt_value_less_than_5
+                    ):
+                        states_with_image_alt_value_less_than_5.append(
+                            state_name)
+
+                if link.get('filepath-with-value') is not None:
+                    image = link.get('filepath-with-value')
+                    if (
+                        image.strip().replace('&quot;', '')[-4:] != '.svg'
+                        and state_name not in states_with_image_value_as_not_svg
+                    ):
+                        states_with_image_value_as_not_svg.append(state_name)
+
+        return (
+            states_with_image_alt_value_less_than_5,
+            states_with_image_value_as_not_svg
+        )
+
+    @staticmethod
     def get_exploration_from_models(
         model: Tuple[Any, Any] | Any
     ) -> None | exp_domain.Exploration:
@@ -637,6 +682,83 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
             )
         )
 
+        filter_curated_exps_invalid_images_alt_value = (
+            curated_explorations
+            | 'Get invalid image RTE values having alt value less than 5'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_date: (
+                    exp_id, self.filter_invalid_curated_image_tag(
+                        exp_states)[0],
+                    exp_date.date()
+                )
+            )
+            | 'Remove empty values in invalid curated exps image alt'
+            >> beam.Filter(
+                lambda exps: len(exps[1]) > 0
+            )
+        )
+
+        report_curated_exps_invalid_images_alt_value = (
+            filter_curated_exps_invalid_images_alt_value
+            | 'Report invalid curated RTE image alt value' >> beam.MapTuple(
+            lambda exp_id, rte_errors, exp_created_on: (
+                job_run_result.JobRunResult.as_stderr(
+                    f'The id of the exp is {exp_id}, created on '
+                    f'{exp_created_on} and the invalid curated RTE image '
+                    f'alt values are {rte_errors}'
+                )
+            )
+          )
+        )
+
+        report_count_curated_exps_invalid_images_alt_value = (
+            filter_curated_exps_invalid_images_alt_value
+            | 'Report count for invalid curated RTE image tag alt' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED IMAGE '
+                    'RTE TAG ALT VALUES')
+            )
+        )
+
+        filter_curated_exps_invalid_images_filepath_value = (
+            curated_explorations
+            | 'Get invalid image RTE values having filepath value less than 5'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_date: (
+                    exp_id, self.filter_invalid_curated_image_tag(
+                        exp_states)[1],
+                    exp_date.date()
+                )
+            )
+            | 'Remove empty values in invalid curated exps image filepath'
+            >> beam.Filter(
+                lambda exps: len(exps[1]) > 0
+            )
+        )
+
+        report_curated_exps_invalid_images_filepath_value = (
+            filter_curated_exps_invalid_images_filepath_value
+            | 'Report invalid curated RTE image filepath value'
+            >> beam.MapTuple(
+            lambda exp_id, rte_errors, exp_created_on: (
+                job_run_result.JobRunResult.as_stderr(
+                    f'The id of the exp is {exp_id}, created on '
+                    f'{exp_created_on} and the invalid curated RTE image '
+                    f'filepath values are {rte_errors}'
+                )
+            )
+          )
+        )
+
+        report_count_curated_exps_invalid_images_filepath_value = (
+            filter_curated_exps_invalid_images_filepath_value
+            | 'Report count for invalid curated RTE image filepath alt' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED IMAGE '
+                    'RTE TAG FILEPATH VALUES')
+            )
+        )
+
         return (
             (
                 report_invalid_tabs,
@@ -646,7 +768,13 @@ class TabsCollapsablesValidationJob(base_jobs.JobBase):
                 report_count_invalid_collapsibles,
 
                 report_curated_exps_having_restricted_tags,
-                report_count_curated_exps_having_restricted_tags
+                report_count_curated_exps_having_restricted_tags,
+
+                report_curated_exps_invalid_images_alt_value,
+                report_count_curated_exps_invalid_images_alt_value,
+
+                report_curated_exps_invalid_images_filepath_value,
+                report_count_curated_exps_invalid_images_filepath_value
             )
             | 'Combine results' >> beam.Flatten()
         )
