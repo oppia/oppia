@@ -4020,9 +4020,11 @@ class State(translation_domain.BaseTranslatableObject):
             subtitled_htmls = ca_dict.get_subtitled_html()
             for subtitled_html in subtitled_htmls:
                 html_string = subtitled_html.html
-                # Make sure we don't include content that only consists of
-                # numbers. See issue #13055.
-                if html_string != '' and not html_string.isnumeric():
+                stripped_html_string = html_cleaner.strip_html_tags(html_string)
+                if (
+                    stripped_html_string != '' and
+                    not stripped_html_string.isnumeric()
+                ):
                     content_id_to_translatable_item[
                         subtitled_html.content_id
                     ] = TranslatableItem(
