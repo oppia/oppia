@@ -453,6 +453,32 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
+    def test_blog_post_search_returns_the_right_num_of_docs_even_if_more_exist(
+        self
+    ) -> None:
+        elastic_search_services.add_documents_to_index([{
+            'id': 'doc_id1',
+            'title': 'blog post world'
+        }, {
+            'id': 'doc_id2',
+            'title': 'hello blog'
+        }], search_services.SEARCH_INDEX_BLOG_POSTS)
+        results, new_offset = (
+            elastic_search_services.blog_post_summaries_search(
+                'blog', [], offset=None, size=1
+            )
+        )
+        self.assertEqual(len(results), 1)
+        self.assertEqual(new_offset, 1)
+
+        results, new_offset = (
+            elastic_search_services.blog_post_summaries_search(
+                'blog', [], offset=1, size=1
+            )
+        )
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(new_offset)
+
     def test_blog_post_search_returns_without_error_when_index_does_not_exist(
         self
     ) -> None:

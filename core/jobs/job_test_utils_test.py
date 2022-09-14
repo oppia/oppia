@@ -93,11 +93,12 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
     def test_run_job(self) -> None:
         self.run_job()
 
-        # TODO(#16049): Here we use MyPy ignore because the method 'run'
-        # is of Callable type and Callable type does not contain any extra
-        # attributes but here we are accessing 'assert_called' method
-        # on Callable which causes MyPy to throw an error. Thus to avoid
-        # the error, we used ignore here.
+        # TODO(#16049): Here we use MyPy ignore because the method
+        # 'assert_called' is accessed on 'run' function and currently
+        # MyPy does not support for extra attributes on functions of
+        # Callable types. So, once this 'assert_called' method is
+        # replaced with some more standard method, we can remove this
+        # todo from here.
         self.job.run.assert_called() # type: ignore[attr-defined]
 
     def test_put_multi(self) -> None:
@@ -111,11 +112,12 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
             self.assertIsNotNone(model)
 
     def test_job_output_is(self) -> None:
-        # TODO(#16049): Here we use MyPy ignore because the method 'run'
-        # is of Callable type and Callable type does not contain any extra
-        # attributes but here we are accessing 'return_value' method
-        # on Callable which causes MyPy to throw an error. Thus to avoid
-        # the error, we used ignore here.
+        # TODO(#16049): Here we use MyPy ignore because the attribute
+        # 'return_value' is accessed on 'run' function and currently
+        # MyPy does not support for extra attributes on functions of
+        # Callable types. So, once this 'return_value' attribute is
+        # replaced with some more standard method, we can remove this
+        # todo from here.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce a non-empty PCollection.
             self.pipeline | beam.Create([123]) | beam.Map(lambda x: x))
@@ -123,11 +125,12 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([123])
 
     def test_job_output_is_empty(self) -> None:
-        # TODO(#16049): Here we use MyPy ignore because the method 'run'
-        # is of Callable type and Callable type does not contain any extra
-        # attributes but here we are accessing 'return_value' method
-        # on Callable which causes MyPy to throw an error. Thus to avoid
-        # the error, we used ignore here.
+        # TODO(#16049): Here we use MyPy ignore because the attribute
+        # 'return_value' is accessed on 'run' function and currently
+        # MyPy does not support for extra attributes on functions of
+        # Callable types. So, once this 'return_value' attribute is
+        # replaced with some more standard method, we can remove this
+        # todo from here.
         self.job.run.return_value = ( # type: ignore[attr-defined]
             # NOTE: Arbitrary operations that produce an empty PCollection.
             self.pipeline | beam.Create([]) | beam.Map(lambda x: x))
