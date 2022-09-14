@@ -40,13 +40,13 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
-import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -70,8 +70,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
     LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -81,8 +81,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
     LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -104,6 +104,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'
@@ -119,6 +120,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

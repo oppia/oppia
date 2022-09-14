@@ -56,6 +56,7 @@ import os
 import random
 import re
 import socket
+import string
 import subprocess
 import sys
 import threading
@@ -170,10 +171,10 @@ class TestingTaskSpec:
         if self.generate_coverage_report:
             exc_list = [
                 sys.executable, '-m', 'coverage', 'run',
-                TEST_RUNNER_PATH, test_target_flag
+                '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
-            rand = random.Random(os.urandom(8)).randint(0, 999999)
-            data_file = '.coverage.%s.%s.%06d' % (
+            rand = ''.join(random.choices(string.ascii_lowercase, k=16))
+            data_file = '.coverage.%s.%s.%s' % (
                 socket.gethostname(), os.getpid(), rand)
             env['COVERAGE_FILE'] = data_file
             concurrent_task_utils.log('Coverage data for %s is in %s' % (
@@ -201,7 +202,7 @@ class TestingTaskSpec:
             covered_path = covered_path[:-len('_test')]
             covered_path += '.py'
             if os.path.exists(covered_path):
-                report, coverage = _check_coverage(
+                report, coverage = check_coverage(
                     False, data_file=data_file, include=(covered_path,))
             else:
                 # Some test files (e.g. scripts/script_import_test.py)
@@ -217,7 +218,7 @@ class TestingTaskSpec:
             None, None, None, messages)]
 
 
-def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
+def get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -245,7 +246,7 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     return result
 
 
-def _get_all_test_targets_from_shard(shard_name):
+def get_all_test_targets_from_shard(shard_name):
     """Find all test modules in a shard.
 
     Args:
@@ -259,7 +260,7 @@ def _get_all_test_targets_from_shard(shard_name):
     return shards_spec[shard_name]
 
 
-def _check_shards_match_tests(include_load_tests=True):
+def check_shards_match_tests(include_load_tests=True):
     """Check whether the test shards match the tests that exist.
 
     Args:
@@ -276,7 +277,7 @@ def _check_shards_match_tests(include_load_tests=True):
         shards_spec = json.load(shards_file)
     shard_modules = sorted([
         module for shard in shards_spec.values() for module in shard])
-    test_modules = _get_all_test_targets_from_path(
+    test_modules = get_all_test_targets_from_path(
         include_load_tests=include_load_tests)
     test_modules_set = set(test_modules)
     test_modules = sorted(test_modules_set)
@@ -284,25 +285,36 @@ def _check_shards_match_tests(include_load_tests=True):
         return ''
     if len(set(shard_modules)) != len(shard_modules):
         # A module is duplicated, so we find the duplicate.
-        for module in shard_modules:
+        # All elements in a set are unique and when
+        # len(set(shard_modules)) != len(shard_modules), there has to be
+        # at least one duplicate module in shard_modules.
+        # We add no-cover for the branch condition where the loop terminates
+        # instead of being exited early by return statement.
+        for module in shard_modules: # pragma: no cover
             if shard_modules.count(module) != 1:
                 return '{} duplicated in {}'.format(
                     module, SHARDS_SPEC_PATH)
-        raise Exception('Failed to find  module duplicated in shards.')
+        raise Exception(
+            'Failed to find  module duplicated in shards.') # pragma: no cover
+
     # Since there are no duplicates among the shards, we know the
     # problem must be a module in one list but not the other.
     shard_modules_set = set(shard_modules)
     shard_extra = shard_modules_set - test_modules_set
     if shard_extra:
-        return 'Modules {} in shards not found. See {}.'.format(
-            shard_extra, SHARDS_WIKI_LINK)
+        return (
+            'Modules {} are in the backend test shards but missing from the '
+            'filesystem. See {}.'
+        ).format(shard_extra, SHARDS_WIKI_LINK)
     test_extra = test_modules_set - shard_modules_set
     assert test_extra
-    return 'Modules {} not in shards. See {}.'.format(
-        test_extra, SHARDS_WIKI_LINK)
+    return (
+        'Modules {} are present on the filesystem but are not listed in the '
+        'backend test shards. See {}.'
+    ).format(test_extra, SHARDS_WIKI_LINK)
 
 
-def _load_coverage_exclusion_list(path):
+def load_coverage_exclusion_list(path):
     """Load modules excluded from per-file coverage checks.
 
     Args:
@@ -317,10 +329,89 @@ def _load_coverage_exclusion_list(path):
     with open(path, 'r', encoding='utf-8') as exclusion_file:
         for line in exclusion_file:
             line = line.strip()
-            if line.startswith('#') or not line:
-                continue
-            exclusion_list.append(line)
+            if line and not line.startswith('#'):
+                exclusion_list.append(line)
     return exclusion_list
+
+
+def check_test_results(tasks, task_to_taskspec, generate_coverage_report):
+    """Run tests and parse coverage reports."""
+    coverage_exclusions = load_coverage_exclusion_list(
+        COVERAGE_EXCLUSION_LIST_PATH)
+
+    # Check we ran all tests as expected.
+    total_count = 0
+    total_errors = 0
+    total_failures = 0
+    incomplete_coverage = 0
+    for task in tasks:
+        test_count = 0
+        spec = task_to_taskspec[task]
+
+        if not task.finished:
+            print('CANCELED  %s' % spec.test_target)
+        elif task.exception and isinstance(
+                task.exception, subprocess.CalledProcessError):
+            print('ERROR: Error raised by subprocess.\n%s' % task.exception)
+            raise task.exception
+        elif task.exception and 'No tests were run' in task.exception.args[0]:
+            print('ERROR     %s: No tests found.' % spec.test_target)
+        elif task.exception:
+            exc_str = task.exception.args[0]
+            print(exc_str[exc_str.find('='): exc_str.rfind('-')])
+
+            tests_failed_regex_match = re.search(
+                r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
+                '([0-9]+) failures',
+                task.exception.args[0]
+            )
+
+            try:
+                test_count = int(tests_failed_regex_match.group(1))
+                errors = int(tests_failed_regex_match.group(2))
+                failures = int(tests_failed_regex_match.group(3))
+                total_errors += errors
+                total_failures += failures
+                print('FAILED    %s: %s errors, %s failures' % (
+                    spec.test_target, errors, failures))
+            except AttributeError as e:
+                # There was an internal error, and the tests did not run (The
+                # error message did not match `tests_failed_regex_match`).
+                total_errors += 1
+                print('')
+                print('------------------------------------------------------')
+                print('    WARNING: FAILED TO RUN %s' % spec.test_target)
+                print('')
+                print('    This is most likely due to an import error.')
+                print('------------------------------------------------------')
+                raise task.exception from e
+        else:
+            try:
+                tests_run_regex_match = re.search(
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
+                    task.task_results[0].get_report()[0])
+                test_count = int(tests_run_regex_match.group(1))
+                test_time = float(tests_run_regex_match.group(2))
+                print(
+                    'SUCCESS   %s: %d tests (%.1f secs)' %
+                    (spec.test_target, test_count, test_time))
+            except Exception:
+                print(
+                    'An unexpected error occurred. '
+                    'Task output:\n%s' % task.task_results[0].get_report()[0])
+            if generate_coverage_report:
+                coverage = task.task_results[0].get_report()[-2]
+                if (
+                        spec.test_target not in coverage_exclusions
+                        and coverage != 100):
+                    print('INCOMPLETE COVERAGE (%s%%): %s' % (
+                        coverage, spec.test_target))
+                    incomplete_coverage += 1
+                    print(task.task_results[0].get_report()[-3])
+
+        total_count += test_count
+
+    return total_count, total_errors, total_failures, incomplete_coverage
 
 
 def main(args=None):
@@ -338,19 +429,6 @@ def main(args=None):
 
     common.fix_third_party_imports()
 
-    test_specs_provided = sum([
-        1 if argument else 0
-        for argument in (
-            parsed_args.test_target,
-            parsed_args.test_path,
-            parsed_args.test_shard
-        )
-    ])
-
-    if test_specs_provided > 1:
-        raise Exception(
-            'At most one of test_path, test_target and test_shard may '
-            'be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
@@ -361,7 +439,7 @@ def main(args=None):
             servers.managed_cloud_datastore_emulator(clear_datastore=True))
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:
-            if '_test' in parsed_args.test_target:
+            if parsed_args.test_target.endswith('_test'):
                 all_test_targets = [parsed_args.test_target]
             else:
                 print('')
@@ -374,15 +452,15 @@ def main(args=None):
                 print('Redirecting to its corresponding test file...')
                 all_test_targets = [parsed_args.test_target + '_test']
         elif parsed_args.test_shard:
-            validation_error = _check_shards_match_tests(
+            validation_error = check_shards_match_tests(
                 include_load_tests=True)
             if validation_error:
                 raise Exception(validation_error)
-            all_test_targets = _get_all_test_targets_from_shard(
+            all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
         else:
             include_load_tests = not parsed_args.exclude_load_tests
-            all_test_targets = _get_all_test_targets_from_path(
+            all_test_targets = get_all_test_targets_from_path(
                 test_path=parsed_args.test_path,
                 include_load_tests=include_load_tests)
 
@@ -415,82 +493,10 @@ def main(args=None):
     print('+------------------+')
     print('')
 
-    coverage_exclusions = _load_coverage_exclusion_list(
-        COVERAGE_EXCLUSION_LIST_PATH)
-
-    # Check we ran all tests as expected.
-    total_count = 0
-    total_errors = 0
-    total_failures = 0
-    incomplete_coverage = 0
-    for task in tasks:
-        spec = task_to_taskspec[task]
-
-        if not task.finished:
-            print('CANCELED  %s' % spec.test_target)
-            test_count = 0
-        elif task.exception and isinstance(
-                task.exception, subprocess.CalledProcessError):
-            print('ERROR     %s: Error raised by subprocess.')
-            raise task.exception
-        elif task.exception and 'No tests were run' in task.exception.args[0]:
-            print('ERROR     %s: No tests found.' % spec.test_target)
-            test_count = 0
-        elif task.exception:
-            exc_str = task.exception.args[0]
-            print(exc_str[exc_str.find('='): exc_str.rfind('-')])
-
-            tests_failed_regex_match = re.search(
-                r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
-                '([0-9]+) failures',
-                task.exception.args[0]
-            )
-
-            try:
-                test_count = int(tests_failed_regex_match.group(1))
-                errors = int(tests_failed_regex_match.group(2))
-                failures = int(tests_failed_regex_match.group(3))
-                total_errors += errors
-                total_failures += failures
-                print('FAILED    %s: %s errors, %s failures' % (
-                    spec.test_target, errors, failures))
-            except AttributeError as e:
-                # There was an internal error, and the tests did not run (The
-                # error message did not match `tests_failed_regex_match`).
-                test_count = 0
-                total_errors += 1
-                print('')
-                print('------------------------------------------------------')
-                print('    WARNING: FAILED TO RUN %s' % spec.test_target)
-                print('')
-                print('    This is most likely due to an import error.')
-                print('------------------------------------------------------')
-                raise task.exception from e
-        else:
-            try:
-                tests_run_regex_match = re.search(
-                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
-                    task.task_results[0].get_report()[0])
-                test_count = int(tests_run_regex_match.group(1))
-                test_time = float(tests_run_regex_match.group(2))
-                print(
-                    'SUCCESS   %s: %d tests (%.1f secs)' %
-                    (spec.test_target, test_count, test_time))
-            except Exception:
-                print(
-                    'An unexpected error occurred. '
-                    'Task output:\n%s' % task.task_results[0].get_report()[0])
-            if parsed_args.generate_coverage_report:
-                coverage = task.task_results[0].get_report()[-2]
-                if (
-                        spec.test_target not in coverage_exclusions
-                        and coverage != 100):
-                    print('INCOMPLETE COVERAGE (%s%%): %s' % (
-                        coverage, spec.test_target))
-                    incomplete_coverage += 1
-                    print(task.task_results[0].get_report()[-3])
-
-        total_count += test_count
+    (
+        total_count, total_errors, total_failures, incomplete_coverage
+    ) = check_test_results(
+        tasks, task_to_taskspec, parsed_args.generate_coverage_report)
 
     print('')
     if total_count == 0:
@@ -519,7 +525,7 @@ def main(args=None):
 
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
-        report_stdout, coverage = _check_coverage(True)
+        report_stdout, coverage = check_coverage(True)
         print(report_stdout)
 
         if (coverage != 100
@@ -530,7 +536,7 @@ def main(args=None):
     print('Done!')
 
 
-def _check_coverage(
+def check_coverage(
         combine, data_file=None, include=tuple()):
     """Check code coverage of backend tests.
 
@@ -584,12 +590,12 @@ def _check_coverage(
         )
     else:
         coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
             process.stdout)
         coverage = float(coverage_result.group('total'))
 
     return process.stdout, coverage
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     main()

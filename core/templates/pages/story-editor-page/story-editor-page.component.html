@@ -10,7 +10,7 @@
             class="nav-item icon nav-list-item"
             ng-click="$ctrl.navigateToStoryEditor()">
           <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab">
-            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected()}">&#xE254;</i>
+            <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected()}"></i>
           </a>
           <div ng-show="$ctrl.getTotalWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -36,13 +36,13 @@
 
         <li ng-if="!($ctrl.getActiveTab() === 'chapter_editor')" ng-class="{'navbar-tab-active': $ctrl.getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.navigateToStoryPreviewTab()">
           <a class="nav-link navbar-tab" uib-tooltip="Preview" aria-label="Preview" tooltip-placement="bottom">
-            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}">&#xE037;</i>
+            <i class="fas fa-play navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}"></i>
           </a>
         </li>
       </div>
     </div>
   </div>
-  <div class="story-editor-parent">
+  <div ng-if="$ctrl.story" class="story-editor-parent">
     <div ng-if="$ctrl.getActiveTab() === 'story_editor'">
       <story-editor></story-editor>
     </div>
@@ -85,7 +85,7 @@
   story-editor-page .navbar-tab-icon {
     color: #fff;
     display: block;
-    font-size: 30px;
+    font-size: 22px;
     width: 100%;
   }
   story-editor-page .navbar-tab span {

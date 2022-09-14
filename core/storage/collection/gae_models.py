@@ -281,14 +281,12 @@ class CollectionModel(base_models.VersionedModel):
             'rights_model': CollectionRightsModel.get_by_id(self.id)
         }
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -303,7 +301,8 @@ class CollectionModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit message or None if unpublished
+                collection is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -352,11 +351,11 @@ class CollectionModel(base_models.VersionedModel):
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def delete_multi( # type: ignore[override]
-            cls,
-            entity_ids: List[str],
-            committer_id: str,
-            commit_message: str,
-            force_deletion: bool = False
+        cls,
+        entity_ids: List[str],
+        committer_id: str,
+        commit_message: str,
+        force_deletion: bool = False
     ) -> None:
         """Deletes the given cls instances with the given entity_ids.
 
@@ -544,13 +543,11 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def save(
-            self,
-            committer_id: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_message: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -565,7 +562,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and additional arguments for that command.
         """
-        super(CollectionRightsModel, self).commit(
+        super().commit(
             committer_id, commit_message, commit_cmds)
 
     # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
@@ -611,10 +608,12 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): This '_reconstitute' method accepts content NDB JSON
+    # properties and those NDB JSON properties have loose typing. So, once
+    # we explicitly typed those NDB JSON properties we can remove Any type
+    # from the argument of '_reconstitute' method.
     def _reconstitute(
-            self, snapshot_dict: Dict[str, Any]
+        self, snapshot_dict: Dict[str, Any]
     ) -> CollectionRightsModel:
         """Populates the model instance with the snapshot.
 
@@ -635,14 +634,12 @@ class CollectionRightsModel(base_models.VersionedModel):
             **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -657,7 +654,8 @@ class CollectionRightsModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit message or None if unpublished
+                collection is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -694,7 +692,11 @@ class CollectionRightsModel(base_models.VersionedModel):
                 if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
-                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+                user_id_name_value = commit_cmd[user_id_attribute_name]
+                # # Ruling out the possibility of any other type for mypy type
+                # checking.
+                assert isinstance(user_id_name_value, str)
+                commit_cmds_user_ids.add(user_id_name_value)
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 

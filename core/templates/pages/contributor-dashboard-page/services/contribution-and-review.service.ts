@@ -56,7 +56,7 @@ interface SuggestionDetailsDict {
 }
 
 // Represents a client-facing response to a fetch suggestion query.
-interface FetchSuggestionsResponse {
+export interface FetchSuggestionsResponse {
   // A dict mapping suggestion ID to suggestion metadata.
   suggestionIdToDetails: SuggestionDetailsDict;
   // Whether there are more results to return after the last query.
@@ -263,7 +263,7 @@ export class ContributionAndReviewService {
   }
 
   async updateQuestionSuggestionAsync(
-      suggestionId: string, skillDifficulty: string,
+      suggestionId: string, skillDifficulty: number,
       questionStateData: StateBackendDict, imagesData: ImagesData[],
       onSuccess: (suggestionId: string) => void,
       onFailure: (suggestionId: string) => void

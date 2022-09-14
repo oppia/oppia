@@ -32,13 +32,13 @@ if MYPY: # pragma: no cover
 translate_services = models.Registry.import_translate_services()
 
 (translation_models,) = models.Registry.import_models([
-    models.NAMES.translation])
+    models.Names.TRANSLATION])
 
 
 class TranslationServiceTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(TranslationServiceTests, self).setUp()
+        super().setUp()
         translation_models.MachineTranslationModel.create(
             'en', 'es', 'text to translate', 'texto para traducir')
 

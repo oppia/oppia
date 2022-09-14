@@ -33,6 +33,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -46,6 +47,12 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
+  ],
+  declarations: [
+    PracticeSessionPageComponent
+  ],
+  entryComponents: [
+    PracticeSessionPageComponent
   ],
   providers: [
     {
@@ -63,6 +70,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'
@@ -77,6 +85,7 @@ class PracticeSessionPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { PracticeSessionPageComponent } from './practice-session-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

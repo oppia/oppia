@@ -9,7 +9,7 @@
           class="nav-item icon nav-list-item"
           ng-click="$ctrl.selectMainTab()">
         <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab" tabindex="0">
-          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected() }">&#xE254;</i>
+          <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected() }"></i>
         </a>
         <div ng-show="$ctrl.getTotalWarningsCount()"
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -37,13 +37,13 @@
 
       <li ng-if="$ctrl.isInTopicEditorTabs()" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectQuestionsTab()">
         <a class="nav-link  navbar-tab e2e-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" aria-label="Question editor">
-          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}">import_contacts</i>
+          <i class="fas fa-book-open navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}"></i>
         </a>
       </li>
 
       <li ng-class="{'navbar-tab-active': $ctrl.isInPreviewTab()}" class="nav-item icon nav-list-item" ng-click="$ctrl.openTopicViewer()">
         <a class="nav-link navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0">
-          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isInPreviewTab()}">&#xE037;</i>
+          <i class="fas fa-play navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isInPreviewTab()}"></i>
         </a>
       </li>
     </div>
@@ -97,7 +97,7 @@
   topic-editor-page .navbar-tab-icon {
     color: #fff;
     display: block;
-    font-size: 30px;
+    font-size: 22px;
     width: 100%;
   }
   topic-editor-page .navbar-tab span {
