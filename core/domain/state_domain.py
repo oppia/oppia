@@ -913,7 +913,43 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             outcomes.append(self.default_outcome)
         return outcomes
 
-    def validate_numeric_input(self):
+    def _validate_continue_input(self):
+        """
+        """
+        text_value = self.customization_args['buttonText'].value.unicode_str
+        if len(text_value) > 20:
+            raise utils.ValidationError(
+                'The Continue button text should be at most 20 characters.'
+            )
+
+        if len(self.answer_groups) > 0:
+            raise utils.ValidationError(
+                'The Continue button does not require answer groups.'
+            )
+
+    def _validate_end_exploration_input(self):
+        """
+        """
+        if self.default_outcome is not None:
+            raise utils.ValidationError(
+                'The End interaction does not require any default outcome.'
+            )
+
+        if len(self.answer_groups) > 0:
+            raise utils.ValidationError(
+                'The End interaction does not require any answer groups.'
+            )
+
+        recc_exp_ids = (
+            self.customization_args['recommendedExplorationIds'].value
+        )
+        if len(recc_exp_ids) > 3:
+            raise utils.ValidationError(
+                'The End interaction should not have recommended '
+                'explorations more than 3'
+            )
+
+    def _validate_numeric_input(self):
         """Validates NumericInput interaction
 
         Raises:
@@ -945,7 +981,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'in NumericInput interaction.'
                         )
 
-    def validate_fraction_input(self):
+    def _validate_fraction_input(self):
         """Validates FractionInput interaction
 
         Raises:
@@ -1048,7 +1084,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'in FractionInput interaction.'
                         )
 
-    def validate_number_with_units_input(self):
+    def _validate_number_with_units_input(self):
         """Validates NumberWithUnitsInput interaction
 
         Raises:
@@ -1074,7 +1110,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                             f'in FractionInput interaction.'
                         )
 
-    def validate_multi_choice_input(self):
+    def _validate_multi_choice_input(self):
         """Validates MultipleChoiceInput interaction
 
         Raises:
@@ -1122,7 +1158,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'choices in MultipleChoiceInput interaction.'
             )
 
-    def validate_item_selec_input(self):
+    def _validate_item_selec_input(self):
         """Validates ItemSelectionInput interaction
 
         Raises:
@@ -1189,7 +1225,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'choices in ItemSelectionInput interaction.'
             )
 
-    def validate_drag_and_drop_input(self):
+    def _validate_drag_and_drop_input(self):
         """Validates DragAndDropInput interaction
 
         Raises:
@@ -1338,29 +1374,41 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
+        # Validation for Continue interaction.
+        if self.id == 'Continue':
+            self._validate_continue_input()
+
+        # Validation for EndExploration interaction.
+        if self.id == 'EndExploration':
+            self._validate_end_exploration_input()
+
         # Validation for NumericInput interaction.
         if self.id == 'NumericInput':
-            self.validate_numeric_input()
+            self._validate_numeric_input()
 
         # Validation for FractionInput interaction.
         if self.id == 'FractionInput':
-            self.validate_fraction_input()
+            self._validate_fraction_input()
 
-        # Validates for NumberWithUnits interaction.
+        # Validation for NumberWithUnits interaction.
         if self.id == 'NumberWithUnits':
-            self.validate_number_with_units_input()
+            self._validate_number_with_units_input()
 
-        # Validates for MultipleChoiceInput interaction.
+        # Validation for MultipleChoiceInput interaction.
         if self.id == 'MultipleChoiceInput':
-            self.validate_multi_choice_input()
+            self._validate_multi_choice_input()
 
-        # Validates for ItemSelectionInput interaction.
+        # Validation for ItemSelectionInput interaction.
         if self.id == 'ItemSelectionInput':
-            self.validate_item_selec_input()
+            self._validate_item_selec_input()
 
-        # Validates for DragAndDropSortInput interaction.
+        # Validation for DragAndDropSortInput interaction.
         if self.id == 'DragAndDropSortInput':
-            self.validate_drag_and_drop_input()
+            self._validate_drag_and_drop_input()
+
+        # Validation for TextInput interaction.
+        if self.id == 'TextInput':
+            self._validate_text_input()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
