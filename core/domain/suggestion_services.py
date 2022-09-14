@@ -2703,11 +2703,11 @@ def update_question_contribution_stats_at_review(
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
     """
+    suggestion_is_accepted = (
+        suggestion.status == suggestion_models.STATUS_ACCEPTED
+    )
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id):
-        suggestion_is_accepted = (
-            suggestion.status == suggestion_models.STATUS_ACCEPTED
-        )
         question_contribution_stat_model = (
             suggestion_models.QuestionContributionStatsModel.get(
                 suggestion.author_id, topic.topic_id

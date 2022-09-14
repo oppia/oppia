@@ -2566,15 +2566,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
-        # Contributor's stats are updated manually since contributor's stats are
-        # checked later.
-        suggestion_services.update_translation_contribution_stats_at_submission(
-            initial_suggestion
-        )
-        suggestion_services.update_translation_contribution_stats_at_submission(
-            latest_suggestion
-        )
-
         suggestion_services.reject_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
         suggestion_services.reject_suggestion(
@@ -2631,15 +2622,15 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count,
+            translation_contribution_stats_model.rejected_translations_count,
             2
         )
         self.assertEqual(
             (
                 translation_contribution_stats_model
-                .submitted_translation_word_count
+                .rejected_translations_count
             ),
-            6
+            2
         )
         self.assertEqual(
             translation_contribution_stats_model.accepted_translations_count,
