@@ -1682,7 +1682,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'The user %s is not allowed fetch other stats of other users.' % (
+            'The user %s is not allowed to fetch other stats of other users.' % (
                 self.OWNER_USERNAME))
 
         self.logout()
@@ -1848,7 +1848,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'The user %s is not allowed fetch other stats of other users.' % (
+            'The user %s is not allowed to fetch other stats of other users.' % (
                 self.OWNER_USERNAME))
 
         self.logout()
