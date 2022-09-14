@@ -302,14 +302,11 @@ exports.config = {
         console.log(`ffmpeg exited with code ${code}`);
       });
     }
-    // If the tests are running in debug mode,
-    // the mobile viewport information is passed as
-    // the 9th argument, else it is passed as the 8th argument.
     // eslint-disable-next-line eqeqeq
-    mobileViewportArg = (args[0] == 'DEBUG=true') ? args[8] : args[7];
+    mobileViewportArg = process.env.MOBILE == 'true';
 
     // eslint-disable-next-line eqeqeq
-    if (mobileViewportArg == '--params.mobile=True') {
+    if (mobileViewportArg) {
       browser.setWindowSize(600, 1000);
     } else {
       // Set a wide enough window size for the navbar in the library pages to

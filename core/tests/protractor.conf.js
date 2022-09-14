@@ -293,17 +293,16 @@ exports.config = {
       displaySpecDuration: true
     }));
 
-    // If the tests are running in debug mode, '--inspect-brk' is inserted
-    // as the 2nd argument and the mobile viewport information is passed as
-    // the 8th argument, else it is passed as the 7th argument.
-    mobileViewportArg = (args[1] == '--inspect-brk') ? args[7] : args[6];
-    
-    if(mobileViewportArg == '--params.mobile=False'){
+    // eslint-disable-next-line eqeqeq
+    mobileViewportArg = process.env.MOBILE == 'true';
+
+    // eslint-disable-next-line eqeqeq
+    if (mobileViewportArg) {
+      browser.driver.manage().window().setSize(600, 1000);
+    } else {
       // Set a wide enough window size for the navbar in the library pages to
       // display fully.
       browser.driver.manage().window().setSize(1285, 1000);
-    } else {
-      browser.driver.manage().window().setSize(600, 1000);
     }
 
     // Configure the Firebase Admin SDK to communicate with the emulator.

@@ -639,6 +639,11 @@ def managed_protractor_server(
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
 
+    if mobile:
+        os.environ["MOBILE"] = "true"
+    else:
+        os.environ["MOBILE"] = "false"
+
     protractor_args = [
         common.NODE_BIN_PATH,
         # This flag ensures tests fail if the `waitFor()` calls time out.
@@ -646,7 +651,6 @@ def managed_protractor_server(
         common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH,
         '--params.devMode=%s' % dev_mode,
         '--suite', suite_name,
-        '--params.mobile=%s' % mobile
     ]
 
     if debug_mode:
@@ -702,6 +706,11 @@ def managed_webdriverio_server(
     if chrome_version is None:
         chrome_version = get_chrome_verison()
 
+    if mobile:
+        os.environ["MOBILE"] = "true"
+    else:
+        os.environ["MOBILE"] = "false"
+
     webdriverio_args = [
         common.NPX_BIN_PATH,
         # This flag ensures tests fail if the `waitFor()` calls time out.
@@ -709,7 +718,6 @@ def managed_webdriverio_server(
         common.NODEMODULES_WDIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
         '--suite', suite_name, chrome_version,
         '--params.devMode=%s' % dev_mode,
-        '--params.mobile=%s' % mobile
     ]
 
     # Capabilities in wdio.conf.js are added as an array of object,
