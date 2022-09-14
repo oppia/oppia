@@ -50,7 +50,8 @@
 
     <div class="oppia-new-tab-button-container">
       <button
-              [ngClass]="(!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 'btn btn-secondary btn-sm ml-0 e2e-test-add-list-entry' : 'd-none'"
+              class="e2e-test-add-list-entry"
+              [ngClass]="(!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 'btn btn-secondary btn-sm ml-0' : 'd-none'"
               *ngIf="!len && (maxListLength === null || localValue && localValue.length < maxListLength)"
               type="button"
               (click)="addElement()"
