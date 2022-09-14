@@ -2524,33 +2524,45 @@ def update_translation_contribution_stats_at_review(
         suggestion.change.translation_html)
     content_word_count = len(content_plain_text.split())
 
+    suggestion_is_accepted = (
+        suggestion.status == suggestion_models.STATUS_ACCEPTED
+    )
+
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
             suggestion.change.language_code, suggestion.author_id, topic_id
         ))
 
     if translation_contribution_stat_model is None:
+        accepted_translations_count = 0
+        accepted_translation_word_count = 0
+        rejected_translations_count = 0
+        rejected_translation_word_count = 0
+
+        if suggestion_is_accepted:
+            accepted_translations_count += 1
+            accepted_translation_word_count += content_word_count
+        else:
+            rejected_translations_count += 1
+            rejected_translation_word_count += content_word_count
+
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=suggestion.change.language_code,
             contributor_user_id=suggestion.author_id,
             topic_id=topic_id,
             submitted_translations_count=1,
             submitted_translation_word_count=content_word_count,
-            accepted_translations_count=0,
+            accepted_translations_count=accepted_translations_count,
             accepted_translations_without_reviewer_edits_count=0,
-            accepted_translation_word_count=0,
-            rejected_translations_count=0,
-            rejected_translation_word_count=0,
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            rejected_translation_word_count=rejected_translation_word_count,
             contribution_dates=[suggestion.last_updated.date()]
         )
     else:
         translation_contribution_stat = (
             create_translation_contribution_stats_from_model(
                 translation_contribution_stat_model))
-
-        suggestion_is_accepted = (
-            suggestion.status == suggestion_models.STATUS_ACCEPTED
-        )
 
         increment_translation_contribution_stats_at_review(
             translation_contribution_stat, content_word_count,
@@ -2693,18 +2705,28 @@ def update_question_contribution_stats_at_review(
     """
     for topic in skill_services.get_all_topic_assignments_for_skill(
         suggestion.target_id):
+        suggestion_is_accepted = (
+            suggestion.status == suggestion_models.STATUS_ACCEPTED
+        )
         question_contribution_stat_model = (
             suggestion_models.QuestionContributionStatsModel.get(
                 suggestion.author_id, topic.topic_id
             ))
 
         if question_contribution_stat_model is None:
+            accepted_questions_count = 0
+            accepted_questions_without_reviewer_edits_count = 0
+            if suggestion_is_accepted:
+                accepted_questions_count += 1
+            if not suggestion.edited_by_reviewer:
+                accepted_questions_without_reviewer_edits_count += 1
             suggestion_models.QuestionContributionStatsModel.create(
                 contributor_user_id=suggestion.author_id,
                 topic_id=topic.topic_id,
                 submitted_questions_count=1,
-                accepted_questions_count=0,
-                accepted_questions_without_reviewer_edits_count=0,
+                accepted_questions_count=accepted_questions_count,
+                accepted_questions_without_reviewer_edits_count=(
+                    accepted_questions_without_reviewer_edits_count),
                 first_contribution_date=suggestion.last_updated.date(),
                 last_contribution_date=suggestion.last_updated.date()
             )
@@ -2714,13 +2736,9 @@ def update_question_contribution_stats_at_review(
             _create_question_contribution_stats_from_model(
                 question_contribution_stat_model))
 
-        suggestion_is_accepted = (
-            suggestion.status == suggestion_models.STATUS_ACCEPTED
-        )
-
         if suggestion_is_accepted:
             question_contribution_stat.accepted_questions_count += 1
-        if suggestion.edited_by_reviewer:
+        if not suggestion.edited_by_reviewer:
             (
                 question_contribution_stat
                 .accepted_questions_without_reviewer_edits_count
@@ -2861,32 +2879,6 @@ def increment_translation_review_stats(
         ) += 1
     translation_review_stat.last_contribution_date = (
         last_contribution_date.date())
-
-
-def increment_question_contribution_stats_at_review(
-    question_contribution_stat: (
-        suggestion_registry.QuestionContributionStats
-    ),
-    suggestion_is_accepted: bool,
-    edited_by_reviewer: bool
-) -> None:
-    """Updates QuestionContributionStats object.
-
-    Args:
-        question_contribution_stat: QuestionContributionStats. The stats
-            object to update.
-        suggestion_is_accepted: bool. A flag that indicates whether the
-            suggestion is accepted.
-        edited_by_reviewer: bool. A flag that indicates whether the suggestion
-            is edited by the reviewer.
-    """
-    if suggestion_is_accepted:
-        question_contribution_stat.accepted_questions_count += 1
-    if not edited_by_reviewer:
-        (
-            question_contribution_stat
-            .accepted_questions_without_reviewer_edits_count
-        ) += 1
 
 
 def increment_question_review_stats(

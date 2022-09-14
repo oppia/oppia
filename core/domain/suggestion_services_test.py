@@ -2487,14 +2487,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
-        # Contributor's stats are updated manually since contributor's stats are
-        # checked later.
-        suggestion_services.update_translation_contribution_stats_at_submission(
-            initial_suggestion
-        )
-        suggestion_services.update_translation_contribution_stats_at_submission(
-            latest_suggestion
-        )
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -2545,13 +2537,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count,
-            2
-        )
-        self.assertEqual(
             (
                 translation_contribution_stats_model
-                .submitted_translation_word_count
+                .accepted_translation_word_count
             ),
             6
         )
@@ -2717,6 +2705,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
         suggestion_services.update_translation_suggestion(
             initial_suggestion.suggestion_id, 'Edited')
+        suggestion_services.update_translation_suggestion(
+            latest_suggestion.suggestion_id, 'Edited')
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -2755,19 +2745,19 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             translation_review_stats_model.accepted_translation_word_count,
-            4
+            2
         )
         self.assertEqual(
             (
                 translation_review_stats_model
                 .reviewed_translation_word_count
             ),
-            4
+            2
         )
         self.assertEqual(
             translation_review_stats_model
             .accepted_translations_with_reviewer_edits_count,
-            1
+            2
         )
         # Assert translation contribution stats after the review.
         # At this point we can confirm that there should be an associated
@@ -2795,7 +2785,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 translation_contribution_stats_model
                 .accepted_translations_without_reviewer_edits_count
             ),
-            1
+            0
         )
 
     def _create_question_suggestion(
@@ -2918,14 +2908,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
-        # Contributor's stats are updated manually since contributor's stats are
-        # checked later.
-        suggestion_services.update_question_contribution_stats_at_submission(
-            initial_suggestion
-        )
-        suggestion_services.update_question_contribution_stats_at_submission(
-            latest_suggestion
-        )
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -2977,11 +2959,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,
+            question_contribution_stats_model.accepted_questions_count,
             2
         )
         self.assertEqual(
-            question_contribution_stats_model.accepted_questions_count,
+            (
+                question_contribution_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
             2
         )
 
@@ -3099,6 +3084,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'Accepted')
         suggestion_services.update_question_suggestion(
             initial_suggestion.suggestion_id, 0.6, question_state_data)
+        suggestion_services.update_question_suggestion(
+            latest_suggestion.suggestion_id, 0.6, question_state_data)
 
         # Actual action to update stats when reviewing.
         suggestion_services.update_question_review_stats(
@@ -3139,7 +3126,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 question_review_stats_model
                 .accepted_questions_with_reviewer_edits_count
             ),
-            1
+            2
         )
         # Assert question contribution stats after the review.
         # At this point we can confirm that there should be an associated
@@ -3160,7 +3147,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 question_contribution_stats_model
                 .accepted_questions_without_reviewer_edits_count
             ),
-            1
+            0
         )
 
     def test_create_and_reject_suggestion(self) -> None:
