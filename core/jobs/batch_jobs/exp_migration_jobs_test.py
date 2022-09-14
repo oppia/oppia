@@ -48,8 +48,8 @@ if MYPY: # pragma: no cover
     exp_models, opportunity_models,
     translation_models
 ) = models.Registry.import_models([
-    models.NAMES.EXPLORATION, models.NAMES.OPPORTUNITY,
-    models.NAMES.TRANSLATION
+    models.Names.EXPLORATION, models.Names.OPPORTUNITY,
+    models.Names.TRANSLATION
 ])
 
 

@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import translation_domain
 from core.platform import models
-import feconf
 
 from typing import List, Optional
 

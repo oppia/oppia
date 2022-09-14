@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import translation_models
 
 (exp_models, translation_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.translation])
+    [models.Names.EXPLORATION, models.Names.TRANSLATION])
 
 datastore_services = models.Registry.import_datastore_services()
 

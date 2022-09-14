@@ -53,7 +53,7 @@ export class Rule extends BaseTranslatableObject {
   }
 
   getTranslatableFields(): TranslatableField[] {
-    let translatableFields = [];
+    let translatableFields: TranslatableField[]  = [];
     Object.keys(this.inputs).forEach(inputName => {
       const ruleInput = this.inputs[inputName];
       // All rules input types which are translatable are subclasses of

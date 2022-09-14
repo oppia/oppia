@@ -39,7 +39,7 @@ if MYPY:
     from mypy_imports import datastore_services
 
 (exp_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.suggestion
+    models.Names.EXPLORATION, models.Names.SUGGESTION
 ])
 datastore_services = models.Registry.import_datastore_services()
 
