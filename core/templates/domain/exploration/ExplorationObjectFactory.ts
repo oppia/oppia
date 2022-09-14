@@ -61,6 +61,7 @@ export interface ExplorationBackendDict {
   'language_code': string;
   'draft_change_list_id': number;
   'version'?: number;
+  'edits_allowed'?: boolean;
 }
 
 export class Exploration {

@@ -21,17 +21,18 @@ from __future__ import annotations
 from core.platform import models
 
 from typing import Dict
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
-TOPIC_SIMILARITIES_ID = 'topics'
+TOPIC_SIMILARITIES_ID: Final = 'topics'
 
 
 class ExplorationRecommendationsModel(
