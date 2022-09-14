@@ -117,8 +117,8 @@
           </div>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" ng-if="chapterOutlineIsShown">
             Outline Finalized
-            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18 e2e-test-finalize-outline" aria-label="Finalize outline">check_box_outline_blank</i>
-            <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18" aria-label="Unfinalize outline">check_box</i>
+            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
+            <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
             <div tabindex="-1" ng-blur="toggleChapterOutlineButtons()" ng-click="toggleChapterOutlineButtons()">
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
@@ -159,7 +159,7 @@
                 <div class="skill-description-card e2e-test-prerequisite-skill-description-card">
                   <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
                   <span class="e2e-test-remove-prerequisite-skill" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
-                    <i class="material-icons md-18">&#xE14C;</i>
+                    <i class="fas fa-times md-18"></i>
                   </span>
                 </div>
               </div>
@@ -175,7 +175,7 @@
                 <div class="skill-description-card e2e-test-acquired-skill-description-card">
                   <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
                   <span class="e2e-test-remove-acquired-skill" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
-                    <i class="material-icons md-18">&#xE14C;</i>
+                    <i class="fas fa-times md-18"></i>
                   </span>
                 </div>
               </div>
@@ -212,7 +212,7 @@
                   <div class="skill-description-card">
                     <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
                     <span class="e2e-test-remove-prerequisite-skill" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
-                      <i class="material-icons md-18">&#xE14C;</i>
+                      <i class="fas fa-times md-18"></i>
                     </span>
                   </div>
                 </div>
@@ -248,7 +248,7 @@
                   <div class="skill-description-card">
                     <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
                     <span class="e2e-test-remove-acquired-skill" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
-                      <i class="material-icons md-18">&#xE14C;</i>
+                      <i class="fas fa-times md-18"></i>
                     </span>
                   </div>
                 </div>
