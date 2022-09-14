@@ -178,10 +178,10 @@ describe('Contributor dashboard page', function() {
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
     let width = (await browser.getWindowSize()).width;
-    if (width < 769) {
-      var basicSettings = $('.e2e-test-settings-container');
-      await action.click('Basic Settings', basicSettings);
-    }
+    // if (width < 769) {
+    //   var basicSettings = $('.e2e-test-settings-container');
+    //   await action.click('Basic Settings', basicSettings);
+    // }
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(

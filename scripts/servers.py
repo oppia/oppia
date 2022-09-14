@@ -640,9 +640,9 @@ def managed_protractor_server(
         raise ValueError('Sharding instance should be larger than 0')
 
     if mobile:
-        os.environ["MOBILE"] = "true"
+        os.environ['MOBILE'] = 'true'
     else:
-        os.environ["MOBILE"] = "false"
+        os.environ['MOBILE'] = 'false'
 
     protractor_args = [
         common.NODE_BIN_PATH,
@@ -707,9 +707,9 @@ def managed_webdriverio_server(
         chrome_version = get_chrome_verison()
 
     if mobile:
-        os.environ["MOBILE"] = "true"
+        os.environ['MOBILE'] = 'true'
     else:
-        os.environ["MOBILE"] = "false"
+        os.environ['MOBILE'] = 'false'
 
     webdriverio_args = [
         common.NPX_BIN_PATH,
