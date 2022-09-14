@@ -151,7 +151,7 @@ def get_question_from_model(
 
 def migrate_state_schema(
     versioned_question_state: question_domain.VersionedQuestionStateDict
-) -> None:
+) -> Optional[int]:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
     state dictionary. If the current State schema changes, a new

@@ -181,7 +181,18 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
     @staticmethod
     def _extract_required_translation_model(
-        exp_translation_models, exp_version):
+        exp_translation_models: List[List[
+            translation_models.EntityTranslationsModel]],
+        exp_version: int
+    ) -> List[translation_models.EntityTranslationsModel]:
+        """Extracts all the latets translation models from the given list of
+        translation models.
+
+        Args:
+            exp_translation_models: list(EntityTranslationsModel). The list of
+                given entity translation models.
+            exp_version: int. The latest version number of the exploration.
+        """
         if not exp_translation_models:
             return []
 
@@ -194,7 +205,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
     @staticmethod
     def _generate_new_translation_model(
             exp_translation_model: translation_models.EntityTranslationsModel
-        ):
+        ) -> result.Result[translation_models.EntityTranslationsModel]:
         """Generates new translation models for the given exploration
         model.
         """

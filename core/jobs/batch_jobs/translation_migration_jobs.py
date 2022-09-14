@@ -26,10 +26,12 @@ from core.domain import translation_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
+from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 import result
+from typing import Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -47,11 +49,16 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
     """Generate EntityTranslation models for explorations."""
 
     @staticmethod
-    def _generate_validated_entity_translations_for_exploration(exploration):
+    def _generate_validated_entity_translations_for_exploration(
+        exploration: exp_models.ExplorationModel
+    ) -> result.Result[
+        Tuple[str, translation_domain.EntityTranslation],
+        Tuple[str, Exception]
+    ]:
         """Generates EntityTranslation object for the given exploration.
 
         Args:
-            exploration: Exploration. The exploration.
+            exploration: ExplorationModel. The exploration model.
         """
         try:
             language_code_to_translation = {}
@@ -96,7 +103,10 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
     @staticmethod
     def _create_entity_translation_model(
         entity_translation: translation_domain.EntityTranslation
-    ):
+    ) -> result.Result[
+        translation_models.EntityTranslationsModel,
+        Tuple[str, Exception]
+    ]:
         """Creates the EntityTranslationsModel from the given EntityTranslation
         object.
 
@@ -110,13 +120,14 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
         try:
 
             with datastore_services.get_ndb_context():
-                translation_model = translation_models.EntityTranslationsModel.create_new(
+                translation_model = (
+                    translation_models.EntityTranslationsModel.create_new(
                     entity_translation.entity_type,
                     entity_translation.entity_id,
                     entity_translation.entity_version,
                     entity_translation.language_code,
                     entity_translation.to_dict()['translations']
-                )
+                ))
             translation_model.update_timestamps()
         except Exception as e:
             logging.exception(e)
@@ -124,7 +135,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
 
         return result.Ok(translation_model)
 
-    def run(self):
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         entity_translations_result = (
             self.pipeline
             | 'Get all exploration models' >> ndb_io.GetModels(

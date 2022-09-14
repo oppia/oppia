@@ -22,11 +22,13 @@ import collections
 import logging
 
 from core import feconf
-from core.domain import opportunity_services
+from core.domain import exp_domain, opportunity_services
 from core.domain import translation_fetchers
+from core.domain import translation_domain
+from core.domain.translation_domain import TranslatableContent
 from core.platform import models
 
-from typing import Optional
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -91,13 +93,25 @@ def get_and_cache_machine_translation(
 
 
 def add_new_translation(
-    entity_type,
-    entity_id,
-    entity_version,
-    language_code,
-    content_id,
-    translated_content
-):
+    entity_type: feconf.TranslatableEntityType,
+    entity_id: str,
+    entity_version: int,
+    language_code: str,
+    content_id: str,
+    translated_content: translation_domain.TranslatedContent
+) -> None:
+    """Adds new translated content for the entity in the EntityTranslation
+    model.
+
+    Args:
+        entity_type: TranslatableEntityType. The type of the entity.
+        entity_id: str. The ID of the entity.
+        entity_version: int. The version of the entity.
+        language_code: str. The language code for the entity.
+        content_id: str. The Id of the content.
+        translated_content: TranslatedContent. The translated content object.
+    """
+
     entity_translation = translation_fetchers.get_entity_translation(
         entity_type, entity_id, entity_version, language_code)
 
@@ -118,12 +132,23 @@ def add_new_translation(
     model.put()
 
 def update_translation_related_change(
-    exploration_id,
-    exploration_version,
-    content_ids_corresponding_translations_to_remove,
-    content_ids_corresponding_translations_to_mark_needs_update,
-    content_count
-):
+    exploration_id: str,
+    exploration_version: int,
+    content_ids_corresponding_translations_to_remove: List[str],
+    content_ids_corresponding_translations_to_mark_needs_update: List[str],
+    content_count: int
+) -> None:
+    """Updates the translation related changes in the EntityTranslation models.
+
+    Args:
+        exploration_id: str. The iId of the exploration.
+        exploration_version: int. The current version of exploration.
+        content_ids_corresponding_translations_to_remove: List[str]. The list of
+            content Ids for translation removal.
+        content_ids_corresponding_translations_to_mark_needs_update: List[str].
+            The list of content Ids to mark translation needs update.
+        content_count: int. The number of content present in the exploration.
+    """
     old_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(
             feconf.TranslatableEntityType.EXPLORATION,
@@ -161,7 +186,9 @@ def update_translation_related_change(
             exploration_id, content_count, translation_counts)
 
 
-def get_languages_with_complete_translation(exploration):
+def get_languages_with_complete_translation(
+    exploration: exp_domain.Exploration
+) -> List[str]:
     """Returns a list of language code in which the exploration translation
     is 100%.
 
@@ -182,7 +209,10 @@ def get_languages_with_complete_translation(exploration):
     return language_code_list
 
 
-def get_displayable_translation_languages(entity_type, entity):
+def get_displayable_translation_languages(
+    entity_type: feconf.TranslatableEntityType,
+    entity: exp_domain.Exploration
+) -> List[str]:
     """Returns a list of language code in which the exploration translation
     is 100%.
 
@@ -202,7 +232,11 @@ def get_displayable_translation_languages(entity_type, entity):
     return language_code_list
 
 
-def get_translation_counts(entity_type, entity_id, entity_version):
+def get_translation_counts(
+    entity_type: feconf.TranslatableEntityType,
+    entity_id: str,
+    entity_version: int
+) -> Dict[str, int]:
     """Returns a dict representing the number of translations available in a
     language for which there exists at least one translation in the
     exploration.
@@ -211,7 +245,8 @@ def get_translation_counts(entity_type, entity_id, entity_version):
         dict(str, int). A dict with language code as a key and number of
         translation available in that language as the value.
     """
-    exploration_translation_counts = collections.defaultdict(int)
+    exploration_translation_counts: Dict[str, int] = collections.defaultdict(
+        int)
     entity_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(
             entity_type,
@@ -229,7 +264,10 @@ def get_translation_counts(entity_type, entity_id, entity_version):
     return dict(exploration_translation_counts)
 
 
-def get_translatable_text(exploration, language_code):
+def get_translatable_text(
+    exploration: exp_domain.Exploration,
+    language_code: str
+) -> Dict[str, Dict[str, TranslatableContent]]:
     """Returns all the contents which needs translation in the given
     language.
 

@@ -450,20 +450,17 @@ class EntityTranslation:
         self.language_code = language_code
         self.translations = translations
 
-    def to_dict(
-        self,
-        entity_translation: EntityTranslation
-    ) -> EntityTranslationDict:
+    def to_dict(self) -> EntityTranslationDict:
         translations_dict = {}
         for content_id, translated_content in (
-                entity_translation.translations.items()):
+                self.translations.items()):
             translations_dict[content_id] = translated_content.to_dict()
 
         return {
-            'entity_id': entity_translation.entity_id,
-            'entity_type': entity_translation.entity_type,
-            'entity_version': entity_translation.entity_version,
-            'language_code': entity_translation.language_code,
+            'entity_id': self.entity_id,
+            'entity_type': self.entity_type,
+            'entity_version': self.entity_version,
+            'language_code': self.language_code,
             'translations': translations_dict
         }
 

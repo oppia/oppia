@@ -179,7 +179,7 @@ class DraftUpgradeUtil:
                         elif isinstance(value, str):
                             new_value['choices']['value'][value_index] = (
                                 conversion_fn(value))
-            elif (change.property_name == 'written_translations'): # type: ignore[call-overload]
+            elif (change.property_name == 'written_translations'):
                 # Here we use cast because this 'elif' condition forces change
                 # to have type EditExpStatePropertyWrittenTranslationsCmd.
                 edit_written_translations_dict_cmd = cast(

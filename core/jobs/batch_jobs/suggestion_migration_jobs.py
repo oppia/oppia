@@ -29,10 +29,12 @@ from core.domain import suggestion_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
+from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 import result
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -53,8 +55,9 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 
     @staticmethod
     def _update_content_id_in_translation_suggestion(
-        suggestion, exp_id_to_content_id_mapping
-    ):
+        suggestion: suggestion_registry.SuggestionTranslateContent,
+        exp_id_to_content_id_mapping: Dict[str, Dict[str, Dict[str, str]]]
+    ) -> result.Result[Tuple[str, suggestion_registry.SuggestionAddQuestion]]:
         """Updates content id in translation suggestion.
 
         Args:
@@ -96,7 +99,9 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
         return result.Ok((suggestion.suggestion_id, suggestion))
 
     @staticmethod
-    def _get_old_content_id_to_new_content_id_mapping(exploration):
+    def _get_old_content_id_to_new_content_id_mapping(
+        exploration: exp_models.ExplorationModel
+    ) -> Tuple[str, Dict[str, Dict[str, str]]]:
         """Returns the mapping of old content id to new content id.
 
         Args:
@@ -120,7 +125,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
     def _update_suggestion(
         suggestion_model: suggestion_models.GeneralSuggestionModel,
         migrated_suggestion: suggestion_registry.BaseSuggestion,
-    ):
+    ) -> List[suggestion_models.GeneralSuggestionModel]:
         """Updates the suggestion model with the new content id.
 
         Args:
@@ -134,7 +139,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
         datastore_services.update_timestamps_multi([suggestion_model])
         return [suggestion_model]
 
-    def run(self):
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         unmigrated_translation_suggestion_models = (
             self.pipeline
             | 'Get all GeneralSuggestionModels' >> ndb_io.GetModels(
@@ -236,7 +241,12 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
     """Migrate question dict in question suggestion to latest schema."""
     @staticmethod
-    def _migrate_question_dict(question_suggestion_model):
+    def _migrate_question_dict(
+        question_suggestion_model: suggestion_models.GeneralSuggestionModel
+    ) -> result.Result[
+        suggestion_models.GeneralSuggestionModel,
+        Tuple[str, Exception]
+    ]:
         """
         """
         question_dict = question_suggestion_model.change_cmd['question_dict']
@@ -264,7 +274,7 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
 
         return result.Ok(question_suggestion_model)
 
-    def run(self):
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         question_suggestions = (
             self.pipeline
             | 'Get all GeneralSuggestionModels' >> ndb_io.GetModels(

@@ -277,9 +277,10 @@ def _create_exploration_opportunities(
 
 
 def update_opportunity_with_updated_exploration(
-        exp_id: str,
-        content_count: int,
-        translation_counts: Dict[str, int]) -> None:
+    exp_id: str,
+    content_count: int,
+    translation_counts: Dict[str, int]
+) -> None:
     """Updates the opportunities models with the changes made in the
     exploration.
 
@@ -293,7 +294,7 @@ def update_opportunity_with_updated_exploration(
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
     complete_translation_language_list = []
-    for language_code, translation_count in translation_counts:
+    for language_code, translation_count in translation_counts.items():
         if translation_count == content_count:
             complete_translation_language_list.append(language_code)
 

@@ -35,7 +35,7 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, overload
+    Any, Callable, Dict, Iterator, List, Mapping, Optional, Tuple, Union, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 
@@ -3433,7 +3433,7 @@ class State(translation_domain.BaseTranslatableObject):
                 self.content.html])
         return html_list
 
-    def get_content_html(self, content_id: str) -> str:
+    def get_content_html(self, content_id: str) -> Union[str, List[str]]:
         """Returns the content belongs to a given content id of the object.
 
         Args:
@@ -3458,7 +3458,11 @@ class State(translation_domain.BaseTranslatableObject):
     def traverse_v52_state_dict_for_contents(
         cls,
         state_dict: StateDict
-    ):
+    ) -> Iterator[Tuple[
+        Union[SubtitledHtmlDict, Dict[str, Union[str, List[str]]]],
+        translation_domain.ContentType,
+        Union[str, None]
+    ]]:
         """This method iterates throughout the state dict and yields the value
         for each field. The yielded value is used for generating and updating
         the content-ids for the fields in the state in their respective methods.
@@ -3497,6 +3501,7 @@ class State(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group['rule_specs']:
                 for input_name in sorted(rule_spec['inputs'].keys()):
                     input_value = rule_spec['inputs'][input_name]
+                    assert isinstance(input_value, dict)
                     if 'normalizedStrSet' in input_value:
                         yield (
                             input_value,
@@ -3555,7 +3560,7 @@ class State(translation_domain.BaseTranslatableObject):
     def update_old_content_id_to_new_content_id_in_v52_states(
         cls,
         states_dict: Dict[str, StateDict]
-    ) -> Tuple[StateDict, int]:
+    ) -> Tuple[Dict[str, StateDict], int]:
         """Updates the old content-ids from the state fields like hints,
         solution, etc with the newly generated content id.
 
@@ -3640,13 +3645,14 @@ class State(translation_domain.BaseTranslatableObject):
                 'rule_descriptions']
             answer_type = interaction_specs[interaction_id]['answer_type']
 
-            if interaction['solution'] and (
-                    answer_type in OBJECT_CONTENT_IDS_REPLACERS):
-                interaction['solution']['correct_answer'] = (
-                    OBJECT_CONTENT_IDS_REPLACERS[answer_type](
-                        interaction['solution']['correct_answer'],
-                        old_to_new_content_id)
-                )
+            if interaction['solution']:
+                solution_dict =  interaction['solution']
+                if answer_type in OBJECT_CONTENT_IDS_REPLACERS:
+                    solution_dict['correct_answer'] = (
+                        OBJECT_CONTENT_IDS_REPLACERS[answer_type](
+                            solution_dict['correct_answer'], # type: ignore[arg-type]
+                            old_to_new_content_id)
+                    )
 
             if not rule_descriptions:
                 continue
@@ -3671,7 +3677,7 @@ class State(translation_domain.BaseTranslatableObject):
                             continue
 
                         rule_input[key] = OBJECT_CONTENT_IDS_REPLACERS[
-                            value_class](rule_input[key], old_to_new_content_id)
+                            value_class](rule_input[key], old_to_new_content_id) # type: ignore[arg-type]
 
         return states_dict, content_id_generator.next_content_id_index
 

@@ -743,7 +743,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
 
-    def accept(self, _) -> None:
+    def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
         translated_content = translation_domain.TranslatedContent(
             self.change.translation_html,
@@ -986,10 +986,17 @@ class SuggestionAddQuestion(BaseSuggestion):
         # provided as None which causes MyPy to throw 'invalid argument
         # type' error. Thus, to avoid the error, we used ignore here.
         question = question_domain.Question(
-            None, state_domain.State.from_dict(
-                self.change.question_dict['question_state_data']),
+            None, # type: ignore[arg-type]
+            state_domain.State.from_dict(
+                self.change.question_dict['question_state_data']
+            ),
             self.change.question_dict['question_state_data_schema_version'],
-            self.change.question_dict['language_code'], None,
+            self.change.question_dict['language_code'],
+            # Here we use MyPy ignore because here we are building Question
+            # domain object only for validation purpose, so 'version' is
+            # provided as None which causes MyPy to throw 'invalid argument
+            # type' error. Thus, to avoid the error, we use ignore here.
+            None,  # type: ignore[arg-type]
             self.change.question_dict['linked_skill_ids'],
             self.change.question_dict['inapplicable_skill_misconception_ids'],
             self.change.question_dict['next_content_id_index'])

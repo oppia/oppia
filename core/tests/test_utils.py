@@ -3031,6 +3031,11 @@ title: Title
             content_id_generator: ContentIdGenerator. A ContentIdGenerator
                 object to be used for generating new content Ids.
         """
+        # Here, argument 'value' is annotated with Any type because it can
+        # accept values of customization args and customization args can have
+        # int, str, bool and other types too. Also, Any is used for schema
+        # because values in schema dictionary can be of type str, List, Dict
+        # and other types too.
         def traverse_schema_and_assign_content_ids(
             value: Any, schema: Dict[str, Any], contentId: str
         ) -> None:
@@ -3220,6 +3225,12 @@ title: Title
             self.set_interaction_for_state(
                 from_state, next(iterable_interaction_ids),
                 content_id_generator)
+            # Here, from_state is a State domain object and it is created using
+            # 'create_default_state' method. So, 'from_state' is a default_state
+            # and it is always going to contain a default_outcome. Thus to
+            # narrow down the type from Optional[Outcome] to Outcome for
+            # default_outcome, we used assert here.
+            assert from_state.interaction.default_outcome is not None
             from_state.interaction.default_outcome.dest = dest_state_name
             if correctness_feedback_enabled:
                 from_state.interaction.default_outcome.labelled_as_correct = (

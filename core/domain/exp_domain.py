@@ -579,8 +579,8 @@ class EditExpStatePropertyWrittenTranslationsCmd(ExplorationChange):
 
     property_name: Literal['written_translations']
     state_name: str
-    new_value: state_domain.WrittenTranslationsDict
-    old_value: state_domain.WrittenTranslationsDict
+    new_value: translation_domain.WrittenTranslationsDict
+    old_value: translation_domain.WrittenTranslationsDict
 
 
 class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
@@ -2103,7 +2103,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
 
-    def get_content_html(self, state_name: str, content_id: str) -> str:
+    def get_content_html(
+            self, state_name: str, content_id: str) -> Union[str, List[str]]:
         """Return the content for a given content id of a state.
 
         Args:
@@ -3126,7 +3127,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         content-id.
         """
         for _, state_dict in states_dict.items():
-            del state_dict['next_content_id_index']
+            del state_dict['next_content_id_index'] # type: ignore[misc]
             del state_dict['written_translations'] # type: ignore[misc]
         states_dict, next_content_id_index = (
             state_domain.State
@@ -3141,7 +3142,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         versioned_exploration_states: VersionedExplorationStatesDict,
         current_states_schema_version: int,
         init_state_name: str
-    ) -> Union[int, None]:
+    ) -> Optional[int]:
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -3170,11 +3171,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         elif current_states_schema_version == 52:
             versioned_exploration_states['states'], next_content_id_index = (
                 conversion_fn(versioned_exploration_states['states']))
-            next_content_id_index = cast(int, next_content_id_index)
+            assert isinstance(next_content_id_index, int)
             return next_content_id_index
         else:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'])
+
+        return None
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML

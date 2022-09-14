@@ -37,7 +37,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union, cast
 from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -153,6 +153,17 @@ class UpdateQuestionPropertyLanguageCodeCmd(QuestionChange):
     property_name: Literal['language_code']
     new_value: str
     old_value: str
+
+
+class UpdateQuestionPropertyNextContentIdIndexCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX as allowed value.
+    """
+
+    property_name: Literal['next_content_id_index']
+    new_value: int
+    old_value: int
 
 
 class UpdateQuestionPropertyLinkedSkillIdsCmd(QuestionChange):
@@ -1592,7 +1603,7 @@ class Question(translation_domain.BaseTranslatableObject):
         content-ids for each translatable field in the state with its new
         content-id.
         """
-        del question_state_dict['next_content_id_index']
+        del question_state_dict['next_content_id_index'] # type: ignore[misc]
         del question_state_dict['written_translations'] # type: ignore[misc]
         states_dict, next_content_id_index = (
             state_domain.State
@@ -1608,7 +1619,7 @@ class Question(translation_domain.BaseTranslatableObject):
         cls,
         versioned_question_state: VersionedQuestionStateDict,
         current_state_schema_version: int
-    ) -> Optional[int]:
+    ) -> Union[int, None]:
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -1634,10 +1645,13 @@ class Question(translation_domain.BaseTranslatableObject):
             versioned_question_state['state'], next_content_id_index = (
                 conversion_fn(versioned_question_state['state'])
             )
+            assert isinstance(next_content_id_index, int)
             return next_content_id_index
 
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
+
+        return None
 
     def partial_validate(self) -> None:
         """Validates the Question domain object, but doesn't require the

@@ -50,7 +50,7 @@ from core.tests import test_utils
     models.Names.SUGGESTION, models.Names.FEEDBACK])
 
 
-class SuggestionUnitTests(test_utils.GenericTestBase):
+class SuggestionUnitTests_test(test_utils.GenericTestBase):
 
     ASSET_HANDLER_URL_PREFIX = '/assetsdevhandler'
     EXP_ID = 'exp1'
@@ -1002,7 +1002,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': 'solution',
+                'content_id': 'solution_2',
                 'html': '<p>This is the updated solution.</p>',
             },
         }

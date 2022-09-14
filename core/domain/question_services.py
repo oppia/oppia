@@ -679,7 +679,14 @@ def apply_change_list(
                         update_skill_misconception_ids_cmd.new_value)
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    question.update_next_content_id_index(change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type UpdateQuestionPropertyNextContentIdIndexCmd.
+                    cmd = cast(
+                        question_domain
+                        .UpdateQuestionPropertyNextContentIdIndexCmd,
+                        change
+                    )
+                    question.update_next_content_id_index(cmd.new_value)
 
         return question
 
