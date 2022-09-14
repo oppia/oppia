@@ -110,8 +110,14 @@ describe('Feature Gating Flow', function() {
 
       // Indicator in Angular component that is visible if the dummy_feature
       // is enabled, and the backend dummy handler is also enabled.
-      var agDummyHandlerIndicator = agDummyFeatureIndicator.$(
+      var agDummyHandlerIndicator = $(
         '.e2e-test-angular-dummy-handler-indicator');
+
+      // Indicator in AngularJS directive that is visible if the dummy_feature
+      // is enabled, and the feature status is successfully loaded in the
+      // AngularJS directive.
+      var ajsDummyFeatureIndicator = $(
+        '.e2e-test-angularjs-dummy-feature-indicator');
 
       expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
       expect(await agDummyHandlerIndicator.isExisting()).toBe(false);
