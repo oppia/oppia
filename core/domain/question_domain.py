@@ -37,7 +37,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 
-from typing import Dict, Final, List, Optional, Set, TypedDict, Union
+from typing import Dict, Final, List, Literal, Optional, Set, TypedDict, Union
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -123,6 +123,78 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
+class CreateNewQuestionCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_CREATE_NEW command.
+    """
+
+    pass
+
+
+class UpdateQuestionPropertyQuestionStateDataCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_QUESTION_STATE_DATA as allowed value.
+    """
+
+    property_name: Literal['question_state_data']
+    new_value: state_domain.StateDict
+    old_value: state_domain.StateDict
+
+
+class UpdateQuestionPropertyLanguageCodeCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class UpdateQuestionPropertyLinkedSkillIdsCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_LINKED_SKILL_IDS as allowed value.
+    """
+
+    property_name: Literal['linked_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateQuestionPropertySkillMisconceptionIdsCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_UPDATE_QUESTION_PROPERTY command with
+    QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS
+    as allowed value.
+    """
+
+    property_name: Literal['inapplicable_skill_misconception_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class CreateNewFullySpecifiedQuestionCmd(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
+    """
+
+    question_dict: QuestionDict
+    skill_id: str
+    topic_name: str
+
+
+class MigrateStateSchemaToLatestVersion(QuestionChange):
+    """Class representing the QuestionChange's
+    CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
 class QuestionSuggestionChange(change_domain.BaseChange):
     """Domain object for changes made to question suggestion object.
 
@@ -142,6 +214,16 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'deprecated_values': {}
         }
     ]
+
+
+class CreateNewFullySpecifiedQuestionSuggestionCmd(QuestionSuggestionChange):
+    """Class representing the QuestionSuggestionChange's
+    CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION command.
+    """
+
+    question_dict: QuestionDict
+    skill_id: str
+    skill_difficulty: float
 
 
 class QuestionDict(TypedDict):

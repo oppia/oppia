@@ -36,7 +36,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
-user_models, = models.Registry.import_models([models.NAMES.user])
+user_models, = models.Registry.import_models([models.Names.USER])
 
 
 class MockModifiableUserDataDict(TypedDict):

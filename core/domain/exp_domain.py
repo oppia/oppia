@@ -41,8 +41,8 @@ from core.domain import translation_domain
 from extensions.objects.models import objects
 
 from typing import (
-        Callable, Dict, Final, List, Mapping, Optional, Sequence, Set, Tuple,
-        TypedDict, Union, cast)
+        Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
+        Tuple, TypedDict, Union, cast)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -56,7 +56,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -420,6 +420,451 @@ class ExplorationChange(change_domain.BaseChange):
     DEPRECATED_COMMANDS: List[str] = [
         'clone', 'add_gadget', 'edit_gadget_property',
         'delete_gadget', 'rename_gadget']
+
+
+class CreateNewExplorationCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_CREATE_NEW command.
+    """
+
+    category: str
+    title: str
+
+
+class AddExplorationStateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_ADD_STATE command.
+    """
+
+    state_name: str
+
+
+class DeleteExplorationStateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_DELETE_STATE command.
+    """
+
+    state_name: str
+
+
+class RenameExplorationStateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_RENAME_STATE command.
+    """
+
+    new_state_name: str
+    old_state_name: str
+
+
+class AddWrittenTranslationCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_ADD_WRITTEN_TRANSLATION command.
+    """
+
+    state_name: str
+    content_id: str
+    language_code: str
+    content_html: str
+    translation_html: str
+    data_format: str
+
+
+class MarkWrittenTranslationAsNeedingUpdateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE command.
+    """
+
+    content_id: str
+    language_code: str
+    state_name: str
+
+
+class MarkWrittenTranslationsAsNeedingUpdateCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE command.
+    """
+
+    content_id: str
+    state_name: str
+
+
+class EditExpStatePropertyParamChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_PARAM_CHANGES as allowed value.
+    """
+
+    property_name: Literal['param_changes']
+    state_name: str
+    new_value: List[param_domain.ParamChangeDict]
+    old_value: List[param_domain.ParamChangeDict]
+
+
+class EditExpStatePropertyContentCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_CONTENT as allowed value.
+    """
+
+    property_name: Literal['content']
+    state_name: str
+    new_value: state_domain.SubtitledHtmlDict
+    old_value: Optional[state_domain.SubtitledHtmlDict]
+
+
+class EditExpStatePropertySolicitAnswerDetailsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_SOLICIT_ANSWER_DETAILS as allowed value.
+    """
+
+    property_name: Literal['solicit_answer_details']
+    state_name: str
+    new_value: bool
+    old_value: bool
+
+
+class EditExpStatePropertyCardIsCheckpointCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_CARD_IS_CHECKPOINT as allowed value.
+    """
+
+    property_name: Literal['card_is_checkpoint']
+    state_name: str
+    new_value: bool
+    old_value: bool
+
+
+class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_RECORDED_VOICEOVERS as allowed value.
+    """
+
+    property_name: Literal['recorded_voiceovers']
+    state_name: str
+    new_value: state_domain.RecordedVoiceoversDict
+    old_value: state_domain.RecordedVoiceoversDict
+
+
+class EditExpStatePropertyWrittenTranslationsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_WRITTEN_TRANSLATIONS as allowed value.
+    """
+
+    property_name: Literal['written_translations']
+    state_name: str
+    new_value: state_domain.WrittenTranslationsDict
+    old_value: state_domain.WrittenTranslationsDict
+
+
+class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_ID as allowed value.
+    """
+
+    property_name: Literal['widget_id']
+    state_name: str
+    new_value: str
+    old_value: str
+
+
+class EditExpStatePropertyNextContentIdIndexCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_NEXT_CONTENT_ID_INDEX as allowed value.
+    """
+
+    property_name: Literal['next_content_id_index']
+    state_name: str
+    new_value: int
+    old_value: int
+
+
+class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_LINKED_SKILL_ID as allowed value.
+    """
+
+    property_name: Literal['linked_skill_id']
+    state_name: str
+    new_value: str
+    old_value: str
+
+
+class EditExpStatePropertyInteractionCustArgsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_CUST_ARGS as allowed value.
+    """
+
+    property_name: Literal['widget_customization_args']
+    state_name: str
+    new_value: state_domain.CustomizationArgsDictType
+    old_value: state_domain.CustomizationArgsDictType
+
+
+class EditExpStatePropertyInteractionStickyCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_STICKY as allowed value.
+    """
+
+    property_name: Literal['widget_sticky']
+    state_name: str
+    new_value: bool
+    old_value: bool
+
+
+class EditExpStatePropertyInteractionHandlersCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_HANDLERS as allowed value.
+    """
+
+    property_name: Literal['widget_handlers']
+    state_name: str
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
+
+
+class EditExpStatePropertyInteractionAnswerGroupsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_ANSWER_GROUPS as allowed value.
+    """
+
+    property_name: Literal['answer_groups']
+    state_name: str
+    new_value: List[state_domain.AnswerGroupDict]
+    old_value: List[state_domain.AnswerGroupDict]
+
+
+class EditExpStatePropertyInteractionDefaultOutcomeCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME as allowed value.
+    """
+
+    property_name: Literal['default_outcome']
+    state_name: str
+    new_value: state_domain.OutcomeDict
+    old_value: state_domain.OutcomeDict
+
+
+class EditExpStatePropertyInteractionHintsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_HINTS as allowed value.
+    """
+
+    property_name: Literal['hints']
+    state_name: str
+    new_value: List[state_domain.HintDict]
+    old_value: List[state_domain.HintDict]
+
+
+class EditExpStatePropertyInteractionSolutionCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_INTERACTION_SOLUTION as allowed value.
+    """
+
+    property_name: Literal['solution']
+    state_name: str
+    new_value: state_domain.SolutionDict
+    old_value: state_domain.SolutionDict
+
+
+class EditExpStatePropertyUnclassifiedAnswersCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_UNCLASSIFIED_ANSWERS as allowed value.
+    """
+
+    property_name: Literal['confirmed_unclassified_answers']
+    state_name: str
+    new_value: List[state_domain.AnswerGroup]
+    old_value: List[state_domain.AnswerGroup]
+
+
+class EditExpStatePropertyContentIdsToAudioTranslationsDeprecatedCmd(
+    ExplorationChange
+):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
+    as allowed value.
+    """
+
+    property_name: Literal['content_ids_to_audio_translations']
+    state_name: str
+    new_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+    old_value: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+
+
+class EditExplorationPropertyTitleCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'title' as allowed value.
+    """
+
+    property_name: Literal['title']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyCategoryCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'category' as allowed value.
+    """
+
+    property_name: Literal['category']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyObjectiveCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'objective' as allowed value.
+    """
+
+    property_name: Literal['objective']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyLanguageCodeCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'language_code' as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyTagsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'tags' as allowed value.
+    """
+
+    property_name: Literal['tags']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class EditExplorationPropertyBlurbCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'blurb' as allowed value.
+    """
+
+    property_name: Literal['blurb']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyAuthorNotesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'author_notes' as allowed value.
+    """
+
+    property_name: Literal['author_notes']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyParamSpecsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'param_specs' as allowed value.
+    """
+
+    property_name: Literal['param_specs']
+    new_value: Dict[str, param_domain.ParamSpecDict]
+    old_value: Dict[str, param_domain.ParamSpecDict]
+
+
+class EditExplorationPropertyParamChangesCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'param_changes' as allowed value.
+    """
+
+    property_name: Literal['param_changes']
+    new_value: List[param_domain.ParamChangeDict]
+    old_value: List[param_domain.ParamChangeDict]
+
+
+class EditExplorationPropertyInitStateNameCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'init_state_name' as allowed value.
+    """
+
+    property_name: Literal['init_state_name']
+    new_value: str
+    old_value: str
+
+
+class EditExplorationPropertyAutoTtsEnabledCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'auto_tts_enabled' as allowed value.
+    """
+
+    property_name: Literal['auto_tts_enabled']
+    new_value: bool
+    old_value: bool
+
+
+class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'correctness_feedback_enabled' as allowed value.
+    """
+
+    property_name: Literal['correctness_feedback_enabled']
+    new_value: bool
+    old_value: bool
+
+
+class EditExplorationPropertyEditsAllowedCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_EXPLORATION_PROPERTY command with
+    'edits_allowed' as allowed value.
+    """
+
+    property_name: Literal['edits_allowed']
+    new_value: bool
+    old_value: bool
+
+
+class MigrateStatesSchemaToLatestVersionCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class RevertExplorationCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_REVERT_COMMIT command.
+    """
+
+    version_number: int
 
 
 class TransientCheckpointUrlDict(TypedDict):

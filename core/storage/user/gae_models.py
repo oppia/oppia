@@ -28,15 +28,15 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
-        Dict, List, Literal, Optional, Sequence, Tuple, TypedDict, Union, cast,
-        overload)
+        Dict, Final, List, Literal, Optional, Sequence, Tuple, TypedDict, Union,
+        cast, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -242,7 +242,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(
-            user_id: str
+        user_id: str
     ) -> Dict[str, Union[str, float, bool, List[str], None]]:
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
@@ -2017,19 +2017,19 @@ class StoryProgressModel(base_models.BaseModel):
     @overload
     @classmethod
     def get(
-        cls, user_id: str, story_id: str, strict: Literal[True]
+        cls, user_id: str, story_id: str, *, strict: Literal[True]
     ) -> StoryProgressModel: ...
 
     @overload
     @classmethod
     def get(
-        cls, user_id: str, story_id: str, strict: Literal[False]
+        cls, user_id: str, story_id: str, *, strict: Literal[False]
     ) -> Optional[StoryProgressModel]: ...
 
     @overload
     @classmethod
     def get(
-        cls, user_id: str, story_id: str, strict: bool = False
+        cls, user_id: str, story_id: str, *, strict: bool = ...
     ) -> Optional[StoryProgressModel]: ...
 
     # We have ignored [override] here because the signature of this method
@@ -2136,8 +2136,8 @@ class UserQueryModel(base_models.BaseModel):
     shown after each UserQueryOneOffJob.
     """
 
-    _use_cache = False
-    _use_memcache = False
+    _use_cache: bool = False
+    _use_memcache: bool = False
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever
@@ -2486,8 +2486,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> Dict[str, Dict[str, Union[float, bool]]]:
         """(Takeout) Exports the data from UserContributionProficiencyModel
         into dict format.
@@ -2532,8 +2532,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def get_all_categories_where_user_can_review(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> List[str]:
         """Gets all the score categories where the user has a score above the
         threshold.
@@ -2704,8 +2704,8 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(
-            cls,
-            user_id: str
+        cls,
+        user_id: str
     ) -> Dict[str, Union[bool, List[str], None]]:
         """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
@@ -2750,8 +2750,8 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_reviewer_user_ids(
-            cls,
-            language_code: str
+        cls,
+        language_code: str
     ) -> List[str]:
         """Returns the IDs of the users who have rights to review translations
         in the given language code.
@@ -2835,7 +2835,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (e.g. config, feedback, story, skill,
-    # question), the keys need to be from the core.platform.models.NAMES enum.
+    # question), the keys need to be from the core.platform.models.Names enum.
     # For each entity, we use a different pseudonymous user ID. Note that all
     # these pseudonymous user IDs originate from the same about-to-be-deleted
     # user. If a key is absent from the pseudonymizable_entity_mappings dict,
@@ -3001,7 +3001,7 @@ class DeletedUsernameModel(base_models.BaseModel):
     in the ID of this model.
     """
 
-    ID_LENGTH = 32
+    ID_LENGTH: Final = 32
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

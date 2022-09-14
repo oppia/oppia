@@ -28,7 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Final, List, Optional, TypedDict, overload
+from typing import Final, List, Literal, Optional, TypedDict, overload
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -194,6 +194,196 @@ class StoryChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class CreateNewStoryCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_CREATE_NEW command.
+    """
+
+    title: str
+
+
+class MigrateSchemaToLatestVersionCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: str
+    to_version: str
+
+
+class UpdateStoryNodeOutlineStatusCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_OUTLINE_STATUS command.
+    """
+
+    node_id: str
+    old_value: bool
+    new_value: bool
+
+
+class DeleteStoryNodeCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_DELETE_STORY_NODE command.
+    """
+
+    node_id: str
+
+
+class AddStoryNodeCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_ADD_STORY_NODE command.
+    """
+
+    node_id: str
+    title: str
+
+
+class UpdateStoryContentsPropertyInitialNodeIdCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_CONTENTS_PROPERTY command with
+    INITIAL_NODE_ID as allowed value.
+    """
+
+    property_name: Literal['initial_node_id']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryContentsPropertyNodeCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_CONTENTS_PROPERTY command with
+    NODE as allowed value.
+    """
+
+    property_name: Literal['node']
+    new_value: int
+    old_value: int
+
+
+class UpdateStoryNodePropertyDestinationNodeIdsCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_DESTINATION_NODE_IDS as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['destination_node_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateStoryNodePropertyAcquiredSkillIdsCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['acquired_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateStoryNodePropertyPrerequisiteSkillIdsCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['prerequisite_skill_ids']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class UpdateStoryNodePropertyOutlineCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_OUTLINE as allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['outline']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyExplorationIdCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_EXPLORATION_ID as allowed
+    value.
+    """
+
+    node_id: str
+    property_name: Literal['exploration_id']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyTitleCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_TITLE as allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['title']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyDescriptionCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_DESCRIPTION as allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['description']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyThumbnailBGColorCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['thumbnail_bg_color']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryNodePropertyThumbnailFilenameCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_NODE_PROPERTY command with
+    STORY_NODE_PROPERTY_THUMBNAIL_FILENAME as
+    allowed value.
+    """
+
+    node_id: str
+    property_name: Literal['thumbnail_filename']
+    new_value: str
+    old_value: str
+
+
+class UpdateStoryPropertyCmd(StoryChange):
+    """Class representing the StoryChange's
+    CMD_UPDATE_STORY_PROPERTY command.
+    """
+
+    property_name: str
+    new_value: str
+    old_value: str
 
 
 class StoryNodeDict(TypedDict):
@@ -613,15 +803,22 @@ class StoryContents:
 
     @overload
     def get_node_index(
-        self,
-        node_id: str,
+        self, node_id: str,
     ) -> int: ...
 
     @overload
     def get_node_index(
-        self,
-        node_id: str,
-        strict: bool = False
+        self, node_id: str, *, strict: Literal[True]
+    ) -> int: ...
+
+    @overload
+    def get_node_index(
+        self, node_id: str, *, strict: Literal[False]
+    ) -> Optional[int]: ...
+
+    @overload
+    def get_node_index(
+        self, node_id: str, *, strict: bool = ...
     ) -> Optional[int]: ...
 
     def get_node_index(

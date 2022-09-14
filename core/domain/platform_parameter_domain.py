@@ -100,6 +100,14 @@ class PlatformParameterChange(change_domain.BaseChange):
     }]
 
 
+class EditRulesPlatformParameterCmd(PlatformParameterChange):
+    """Class representing the PlatformParameterChange's
+    CMD_EDIT_RULES command.
+    """
+
+    new_rules: List[str]
+
+
 class ClientSideContextDict(TypedDict):
     """Dictionary representing the client's side Context object."""
 

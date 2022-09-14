@@ -42,6 +42,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import auth_domain
+from core.domain import blog_services
 from core.domain import caching_domain
 from core.domain import classifier_domain
 from core.domain import collection_domain
@@ -108,9 +109,9 @@ if MYPY:  # pragma: no cover
     feedback_models, question_models, skill_models,
     story_models, suggestion_models, topic_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.base_model, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic
+    models.Names.AUTH, models.Names.BASE_MODEL, models.Names.EXPLORATION,
+    models.Names.FEEDBACK, models.Names.QUESTION, models.Names.SKILL,
+    models.Names.STORY, models.Names.SUGGESTION, models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -276,11 +277,11 @@ def check_image_png_or_webp(image_string: str) -> bool:
     return image_string.startswith(('data:image/png', 'data:image/webp'))
 
 
-def get_storage_model_module_names() -> Iterator[models.NAMES]:
+def get_storage_model_module_names() -> Iterator[models.Names]:
     """Get all module names in storage."""
-    # As models.NAMES is an enum, it cannot be iterated over. So we use the
+    # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.NAMES:
+    for name in models.Names:
         yield name
 
 
@@ -592,8 +593,25 @@ class ElasticSearchStub:
         terms = body['query']['bool']['must']
 
         for f in filters:
-            for k, v in f['match'].items():
-                result_docs = [doc for doc in result_docs if doc[k] in v]
+            # For processing 'doc[k] in v', doc[k] can only be of type string if
+            # v is a string.
+            if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
+                for k, v in f['match'].items():
+                    # Tags field in 'doc' in blog post search index is
+                    # of type list(str) under which the blog post can be
+                    # classified. 'v' is a single tag which if present in the
+                    # tags field list, the 'doc' should be returned. Therefore,
+                    # we check using 'v in doc[k]'.
+                    result_docs = [doc for doc in result_docs if v in doc[k]]
+            else:
+                for k, v in f['match'].items():
+                    # In explorations and collections, 'doc[k]' is a single
+                    # language or category to which the exploration or
+                    # collection belongs, 'v' is a string of all the languages
+                    # or categories (separated by space eg. 'en hi') in which if
+                    # doc[k] is present, the 'doc' should be returned.
+                    # Therefore, we check using 'doc[k] in v'.
+                    result_docs = [doc for doc in result_docs if doc[k] in v]
 
         if terms:
             filtered_docs = []
@@ -3384,9 +3402,9 @@ title: Title
 
         story.language_code = 'en'
         story_services.save_new_story(owner_id, story)
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             owner_id, topic_id, story.id)
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             topic_id, story.id, admin_id)
         story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
@@ -3698,7 +3716,7 @@ title: Title
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
             page_title_fragment_for_web, skill_ids_for_diagnostic_test)
-        topic_services.save_new_topic(owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(owner_id, topic)
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(

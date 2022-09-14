@@ -33,7 +33,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Dict, Final, List, Optional, TypedDict
+from typing import Dict, Final, List, Literal, Optional, TypedDict
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -188,6 +188,149 @@ class CollectionChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class CreateNewCollectionCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_CREATE_NEW command.
+    """
+
+    category: str
+    title: str
+
+
+class AddCollectionNodeCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_ADD_COLLECTION_NODE command.
+    """
+
+    exploration_id: str
+
+
+class DeleteCollectionNodeCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_DELETE_COLLECTION_NODE command.
+    """
+
+    exploration_id: str
+
+
+class SwapCollectionNodesCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_SWAP_COLLECTION_NODES command.
+    """
+
+    first_index: int
+    second_index: int
+
+
+class EditCollectionPropertyTitleCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_TITLE as allowed value.
+    """
+
+    property_name: Literal['title']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyCategoryCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_CATEGORY as allowed value.
+    """
+
+    property_name: Literal['category']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyObjectiveCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_OBJECTIVE as allowed value.
+    """
+
+    property_name: Literal['objective']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyLanguageCodeCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_LANGUAGE_CODE as allowed value.
+    """
+
+    property_name: Literal['language_code']
+    new_value: str
+    old_value: str
+
+
+class EditCollectionPropertyTagsCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_PROPERTY command with
+    COLLECTION_PROPERTY_TAGS as allowed value.
+    """
+
+    property_name: Literal['tags']
+    new_value: List[str]
+    old_value: List[str]
+
+
+class EditCollectionNodePropertyCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_EDIT_COLLECTION_NODE_PROPERTY command.
+    """
+
+    exploration_id: str
+    property_name: str
+    new_value: str
+    old_value: str
+
+
+class MigrateSchemaToLatestVersionCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION command.
+    """
+
+    from_version: int
+    to_version: int
+
+
+class AddCollectionSkillCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_ADD_COLLECTION_SKILL command.
+    """
+
+    name: str
+
+
+class DeleteCollectionSkillCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_DELETE_COLLECTION_SKILL command.
+    """
+
+    skill_id: str
+
+
+class AddQuestionIdToSkillCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_ADD_QUESTION_ID_TO_SKILL command.
+    """
+
+    question_id: str
+    skill_id: str
+
+
+class RemoveQuestionIdFromSkillCmd(CollectionChange):
+    """Class representing the CollectionChange's
+    CMD_ADD_QUESTION_ID_TO_SKILL command.
+    """
+
+    question_id: str
+    skill_id: str
 
 
 class CollectionNodeDict(TypedDict):

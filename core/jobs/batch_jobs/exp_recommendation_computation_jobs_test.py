@@ -35,7 +35,7 @@ if MYPY:
     from mypy_imports import recommendations_models
 
 (exp_models, recommendations_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendations
+    models.Names.EXPLORATION, models.Names.RECOMMENDATIONS
 ])
 
 StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]

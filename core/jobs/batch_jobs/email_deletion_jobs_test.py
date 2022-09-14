@@ -35,7 +35,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (email_models, feedback_models, user_models) = models.Registry.import_models([
-    models.NAMES.email, models.NAMES.feedback, models.NAMES.user
+    models.Names.EMAIL, models.Names.FEEDBACK, models.Names.USER
 ])
 
 

@@ -33,7 +33,7 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, overload
+from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -41,7 +41,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+    [models.Names.STORY, models.Names.USER])
 
 
 def _migrate_story_contents_to_latest_schema(
@@ -281,22 +281,53 @@ def get_story_summary_by_id(
         return None
 
 
+@overload
+def get_stories_by_ids(
+    story_ids: List[str], *, strict: Literal[True]
+) -> List[story_domain.Story]: ...
+
+
+@overload
 def get_stories_by_ids(
     story_ids: List[str]
-) -> List[Optional[story_domain.Story]]:
+) -> List[Optional[story_domain.Story]]: ...
+
+
+@overload
+def get_stories_by_ids(
+    story_ids: List[str], *, strict: Literal[False]
+) -> List[Optional[story_domain.Story]]: ...
+
+
+def get_stories_by_ids(
+    story_ids: List[str], strict: bool = False
+) -> Sequence[Optional[story_domain.Story]]:
     """Returns a list of stories matching the IDs provided.
 
     Args:
         story_ids: list(str). List of IDs to get stories for.
+        strict: bool. Whether to fail noisily if no story model exists
+            with a given ID exists in the datastore.
 
     Returns:
         list(Story|None). The list of stories corresponding to given ids.  If a
         Story does not exist, the corresponding returned list element is None.
+
+    Raises:
+        Exception. No story model exists for the given story_id.
     """
     all_story_models = story_models.StoryModel.get_multi(story_ids)
-    stories = [
-        get_story_from_model(story_model) if story_model is not None else None
-        for story_model in all_story_models]
+    stories: List[Optional[story_domain.Story]] = []
+    for index, story_model in enumerate(all_story_models):
+        if story_model is None:
+            if strict:
+                raise Exception(
+                    'No story model exists for the story_id: %s'
+                    % story_ids[index]
+                )
+            stories.append(story_model)
+        elif story_model is not None:
+            stories.append(get_story_from_model(story_model))
     return stories
 
 
@@ -518,11 +549,9 @@ def get_multi_users_progress_in_stories(
     topic_ids = list(
         {story.corresponding_topic_id for story in all_valid_stories}
     )
-    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
     topic_id_to_topic_map = {}
     for topic in topics:
-        # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
         topic_id_to_topic_map[topic.id] = topic
 
     story_id_to_story_map = {story.id: story for story in all_valid_stories}

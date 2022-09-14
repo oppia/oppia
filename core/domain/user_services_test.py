@@ -51,9 +51,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (auth_models, user_models, audit_models) = (models.Registry.import_models([
-    models.NAMES.auth,
-    models.NAMES.user,
-    models.NAMES.audit
+    models.Names.AUTH,
+    models.Names.USER,
+    models.Names.AUDIT
 ]))
 bulk_email_services = models.Registry.import_bulk_email_services()
 
@@ -4052,6 +4052,15 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_contributor_usernames(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
+
+    def test_raise_error_if_no_language_code_provided_with_translation_category(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'The language_code cannot be None'):
+            user_services.get_contributor_usernames(
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION
+            )
 
     def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
         self

@@ -163,6 +163,11 @@ describe('Contributor dashboard page', () => {
       fakeAsync(() => {
         getTranslatableTopicNamesAsyncSpy.and.returnValue(
           Promise.resolve([]));
+        // The `topicName` is set to undefined below since ngOnInit() does not
+        // initialize the variable as undefined. This means that if another
+        // frontend test is run before this test, the topicName will be set to
+        // the value of the previous test.
+        component.topicName = undefined;
 
         component.ngOnInit();
         tick();

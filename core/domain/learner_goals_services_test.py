@@ -33,7 +33,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 MAX_CURRENT_GOALS_COUNT: Final = feconf.MAX_CURRENT_GOALS_COUNT
 
@@ -90,28 +90,28 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_1], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_1, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_1, self.curriculum_admin_id)
         self.save_new_topic(
             self.TOPIC_ID_2, self.owner_id, name=self.TOPIC_NAME_2,
             url_fragment='topic-two',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_2], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_2, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_2, self.curriculum_admin_id)
         self.save_new_topic(
             self.TOPIC_ID_3, self.owner_id, name=self.TOPIC_NAME_3,
             url_fragment='topic-three',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_3], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_3, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_3, self.curriculum_admin_id)
         self.save_new_topic(
             self.TOPIC_ID_4, self.owner_id, name=self.TOPIC_NAME_4,
             url_fragment='topic-four',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_4], next_subtopic_id=1)
-        topic_services.publish_topic(self.TOPIC_ID_4, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_4, self.curriculum_admin_id)
 
     def _get_all_topic_ids_to_learn(self, user_id: str) -> List[str]:
         """Returns the list of all the topic ids to learn

@@ -46,7 +46,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 BASE_MODEL_ID_PATTERN: str = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS: Final = datetime.timedelta(seconds=1)
