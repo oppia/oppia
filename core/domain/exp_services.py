@@ -65,7 +65,7 @@ from core.domain import user_services
 from core.platform import models
 
 import deepdiff
-from typing import Dict, List, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Type, Union, cast
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -77,9 +77,9 @@ if MYPY:  # pragma: no cover
 
 (base_models, exp_models, user_models) = (
     models.Registry.import_models([
-        models.NAMES.base_model,
-        models.NAMES.exploration,
-        models.NAMES.user
+        models.Names.BASE_MODEL,
+        models.Names.EXPLORATION,
+        models.Names.USER
     ])
 )
 
@@ -455,38 +455,65 @@ def apply_change_list(
 
     Raises:
         Exception. Any entries in the changelist are invalid.
+        Exception. Solution cannot exist with None interaction id.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
         to_param_domain = param_domain.ParamChange.from_dict
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
-                exploration.add_states([change.state_name])
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                add_state_cmd = cast(
+                    exp_domain.AddExplorationStateCmd,
+                    change
+                )
+                exploration.add_states([add_state_cmd.state_name])
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                rename_state_cmd = cast(
+                    exp_domain.RenameExplorationStateCmd,
+                    change
+                )
                 exploration.rename_state(
-                    change.old_state_name, change.new_state_name)
+                    rename_state_cmd.old_state_name,
+                    rename_state_cmd.new_state_name
+                )
             elif change.cmd == exp_domain.CMD_DELETE_STATE:
-                exploration.delete_state(change.state_name)
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                delete_state_cmd = cast(
+                    exp_domain.DeleteExplorationStateCmd,
+                    change
+                )
+                exploration.delete_state(delete_state_cmd.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state: state_domain.State = exploration.states[
                     change.state_name]
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to list, we have used assert here.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExpStatePropertyParamChangesCmd.
+                    edit_param_changes_cmd = cast(
+                        exp_domain.EditExpStatePropertyParamChangesCmd,
+                        change
+                    )
                     state.update_param_changes(list(map(
-                            to_param_domain, change.new_value)))
+                        to_param_domain, edit_param_changes_cmd.new_value
+                    )))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to dict, we have used assert here.
-                    assert isinstance(change.new_value, dict)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExpStatePropertyContentCmd.
+                    edit_content_cmd = cast(
+                        exp_domain.EditExpStatePropertyContentCmd,
+                        change
+                    )
                     content = (
-                        state_domain.SubtitledHtml.from_dict(change.new_value))
+                        state_domain.SubtitledHtml.from_dict(
+                            edit_content_cmd.new_value
+                        )
+                    )
                     content.validate()
                     state.update_content(content)
                 elif (change.property_name ==
@@ -494,39 +521,56 @@ def apply_change_list(
                     state.update_interaction_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to int, we have used assert here.
-                    assert isinstance(change.new_value, int)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyNextContentIdIndexCmd.
+                    edit_next_content_id_index_cmd = cast(
+                        exp_domain.EditExpStatePropertyNextContentIdIndexCmd,
+                        change
+                    )
                     next_content_id_index = max(
-                        change.new_value, state.next_content_id_index)
+                        edit_next_content_id_index_cmd.new_value,
+                        state.next_content_id_index
+                    )
                     state.update_next_content_id_index(next_content_id_index)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
-                    state.update_linked_skill_id(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyLinkedSkillIdCmd.
+                    edit_linked_skill_id_cmd = cast(
+                        exp_domain.EditExpStatePropertyLinkedSkillIdCmd,
+                        change
+                    )
+                    state.update_linked_skill_id(
+                        edit_linked_skill_id_cmd.new_value
+                    )
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to dict, we have used assert here.
-                    assert isinstance(change.new_value, dict)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionCustArgsCmd.
+                    edit_interaction_cust_arg_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
+                        change
+                    )
                     state.update_interaction_customization_args(
-                        change.new_value)
+                        edit_interaction_cust_arg_cmd.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to list, we have used assert here.
-                    assert isinstance(change.new_value, list)
-                    answer_groups: List[state_domain.AnswerGroup] = (
-                        change.new_value
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionAnswerGroupsCmd.
+                    edit_interaction_answer_group_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionAnswerGroupsCmd,  # pylint: disable=line-too-long
+                        change
+                    )
+                    answer_groups = (
+                        edit_interaction_answer_group_cmd.new_value
                     )
                     new_answer_groups = [
                         state_domain.AnswerGroup.from_dict(answer_group)
@@ -537,48 +581,69 @@ def apply_change_list(
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
-                        # Here change is an instance of ExplorationChange and
-                        # every attribute on ExplorationChange is defined
-                        # dynamically, and every dynamically defined attribute
-                        # have str type. Thus to convert the type to dict, we
-                        # have used assert here.
-                        assert isinstance(change.new_value, dict)
+                        # Here we use cast because this 'elif'
+                        # condition forces change to have type
+                        # EditExpStatePropertyInteractionDefaultOutcomeCmd.
+                        edit_interaction_default_outcome_cmd = cast(
+                            exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,  # pylint: disable=line-too-long
+                            change
+                        )
                         new_outcome = state_domain.Outcome.from_dict(
-                            change.new_value
+                            edit_interaction_default_outcome_cmd.new_value
                         )
                     state.update_interaction_default_outcome(new_outcome)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
-                    # Here change is an instance of ExplorationChange and every
-                    # attribute on ExplorationChange is defined dynamically, and
-                    # every dynamically defined attribute have str type. Thus to
-                    # convert the type to list, we have used assert here.
-                    assert isinstance(change.new_value, list)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyUnclassifiedAnswersCmd.
+                    edit_unclassified_answers_cmd = cast(
+                        exp_domain.EditExpStatePropertyUnclassifiedAnswersCmd,
+                        change
+                    )
                     state.update_interaction_confirmed_unclassified_answers(
-                        change.new_value)
+                        edit_unclassified_answers_cmd.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                    if not isinstance(change.new_value, list):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionHintsCmd.
+                    edit_state_interaction_hints_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionHintsCmd,
+                        change
+                    )
+                    hint_dicts = (
+                        edit_state_interaction_hints_cmd.new_value
+                    )
+                    if not isinstance(hint_dicts, list):
                         raise Exception(
                             'Expected hints_list to be a list,'
-                            ' received %s' % change.new_value)
+                            ' received %s' % hint_dicts)
                     new_hints_list = [
                         state_domain.Hint.from_dict(hint_dict)
-                        for hint_dict in change.new_value
+                        for hint_dict in hint_dicts
                     ]
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     new_solution = None
-                    if change.new_value is not None:
-                        # Here change is an instance of ExplorationChange and
-                        # every attribute on ExplorationChange is defined
-                        # dynamically, and every dynamically defined attribute
-                        # have str type. Thus to convert the type to dict, we
-                        # have used assert here.
-                        assert isinstance(change.new_value, dict)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionSolutionCmd.
+                    edit_interaction_solution_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionSolutionCmd,
+                        change
+                    )
+                    if edit_interaction_solution_cmd.new_value is not None:
+                        if state.interaction.id is None:
+                            raise Exception(
+                                'solution cannot exist with None '
+                                'interaction id.'
+                            )
                         new_solution = state_domain.Solution.from_dict(
-                            state.interaction.id, change.new_value)
+                            state.interaction.id,
+                            edit_interaction_solution_cmd.new_value
+                        )
                     state.update_interaction_solution(new_solution)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
@@ -586,14 +651,32 @@ def apply_change_list(
                         raise Exception(
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
-                    state.update_solicit_answer_details(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertySolicitAnswerDetailsCmd.
+                    edit_solicit_answer_details_cmd = cast(
+                        exp_domain.EditExpStatePropertySolicitAnswerDetailsCmd,
+                        change
+                    )
+                    state.update_solicit_answer_details(
+                        edit_solicit_answer_details_cmd.new_value
+                    )
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
                             'Expected card_is_checkpoint to be a ' +
                             'bool, received %s' % change.new_value)
-                    state.update_card_is_checkpoint(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyCardIsCheckpointCmd.
+                    edit_card_is_checkpoint_cmd = cast(
+                        exp_domain.EditExpStatePropertyCardIsCheckpointCmd,
+                        change
+                    )
+                    state.update_card_is_checkpoint(
+                        edit_card_is_checkpoint_cmd.new_value
+                    )
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
@@ -607,8 +690,18 @@ def apply_change_list(
                     # treats any number that can be float and int as
                     # int (no explicit types). For example,
                     # 10.000 is not 10.000 it is 10.
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyRecordedVoiceoversCmd.
+                    edit_recorded_voiceovers_cmd = cast(
+                        exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
+                        change
+                    )
                     new_voiceovers_mapping = (
-                        change.new_value['voiceovers_mapping'])
+                        edit_recorded_voiceovers_cmd.new_value[
+                            'voiceovers_mapping'
+                        ]
+                    )
                     language_codes_to_audio_metadata = (
                         new_voiceovers_mapping.values())
                     for language_codes in language_codes_to_audio_metadata:
@@ -626,10 +719,20 @@ def apply_change_list(
                         raise Exception(
                             'Expected written_translations to be a dict, '
                             'received %s' % change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyWrittenTranslationsCmd.
+                    edit_written_translations_cmd = cast(
+                        exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
+                        change
+                    )
                     cleaned_written_translations_dict = (
                         state_domain.WrittenTranslations
                         .convert_html_in_written_translations(
-                            change.new_value, html_cleaner.clean))
+                            edit_written_translations_cmd.new_value,
+                            html_cleaner.clean
+                        )
+                    )
                     written_translations = (
                         state_domain.WrittenTranslations.from_dict(
                             cleaned_written_translations_dict))
@@ -641,64 +744,168 @@ def apply_change_list(
                     change.content_id, change.language_code,
                     change.translation_html)
             elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                exploration.states[change.state_name].add_written_translation(
-                    change.content_id, change.language_code,
-                    change.translation_html, change.data_format)
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                add_written_translation_cmd = cast(
+                    exp_domain.AddWrittenTranslationCmd,
+                    change
+                )
+                exploration.states[
+                    add_written_translation_cmd.state_name
+                ].add_written_translation(
+                    add_written_translation_cmd.content_id,
+                    add_written_translation_cmd.language_code,
+                    add_written_translation_cmd.translation_html,
+                    add_written_translation_cmd.data_format
+                )
             elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                written_translation_as_needing_update_cmd = cast(
+                    exp_domain.MarkWrittenTranslationAsNeedingUpdateCmd,
+                    change
+                )
                 exploration.states[
-                    change.state_name
+                    written_translation_as_needing_update_cmd.state_name
                 ].mark_written_translation_as_needing_update(
-                    change.content_id,
-                    change.language_code
+                    written_translation_as_needing_update_cmd.content_id,
+                    written_translation_as_needing_update_cmd.language_code
                 )
             elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                written_translations_as_needing_update_cmd = cast(
+                    exp_domain.MarkWrittenTranslationsAsNeedingUpdateCmd,
+                    change
+                )
                 exploration.states[
-                    change.state_name
-                ].mark_written_translations_as_needing_update(change.content_id)
+                    written_translations_as_needing_update_cmd.state_name
+                ].mark_written_translations_as_needing_update(
+                    written_translations_as_needing_update_cmd.content_id
+                )
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
-                    exploration.update_title(change.new_value)
+                    # Here we use cast because this 'if' condition forces
+                    # change to have type EditExplorationPropertyTitleCmd.
+                    edit_title_cmd = cast(
+                        exp_domain.EditExplorationPropertyTitleCmd,
+                        change
+                    )
+                    exploration.update_title(edit_title_cmd.new_value)
                 elif change.property_name == 'category':
-                    exploration.update_category(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyCategoryCmd.
+                    edit_category_cmd = cast(
+                        exp_domain.EditExplorationPropertyCategoryCmd,
+                        change
+                    )
+                    exploration.update_category(edit_category_cmd.new_value)
                 elif change.property_name == 'objective':
-                    exploration.update_objective(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyObjectiveCmd.
+                    edit_objective_cmd = cast(
+                        exp_domain.EditExplorationPropertyObjectiveCmd,
+                        change
+                    )
+                    exploration.update_objective(edit_objective_cmd.new_value)
                 elif change.property_name == 'language_code':
-                    exploration.update_language_code(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyLanguageCodeCmd.
+                    edit_language_code_cmd = cast(
+                        exp_domain.EditExplorationPropertyLanguageCodeCmd,
+                        change
+                    )
+                    exploration.update_language_code(
+                        edit_language_code_cmd.new_value
+                    )
                 elif change.property_name == 'tags':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    exploration.update_tags(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyTagsCmd.
+                    edit_tags_cmd = cast(
+                        exp_domain.EditExplorationPropertyTagsCmd,
+                        change
+                    )
+                    exploration.update_tags(edit_tags_cmd.new_value)
                 elif change.property_name == 'blurb':
-                    exploration.update_blurb(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyBlurbCmd.
+                    edit_blurb_cmd = cast(
+                        exp_domain.EditExplorationPropertyBlurbCmd,
+                        change
+                    )
+                    exploration.update_blurb(edit_blurb_cmd.new_value)
                 elif change.property_name == 'author_notes':
-                    exploration.update_author_notes(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyAuthorNotesCmd.
+                    edit_author_notes_cmd = cast(
+                        exp_domain.EditExplorationPropertyAuthorNotesCmd,
+                        change
+                    )
+                    exploration.update_author_notes(
+                        edit_author_notes_cmd.new_value
+                    )
                 elif change.property_name == 'param_specs':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, dict)
-                    exploration.update_param_specs(change.new_value)
+                    # Here we use cast because this 'elif' condition forces
+                    # change to have type EditExplorationPropertyParamSpecsCmd.
+                    edit_param_specs_cmd = cast(
+                        exp_domain.EditExplorationPropertyParamSpecsCmd,
+                        change
+                    )
+                    exploration.update_param_specs(
+                        edit_param_specs_cmd.new_value
+                    )
                 elif change.property_name == 'param_changes':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, list)
-                    exploration.update_param_changes(list(
-                        map(to_param_domain, change.new_value)))
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyParamChangesCmd.
+                    edit_exp_param_changes_cmd = cast(
+                        exp_domain.EditExplorationPropertyParamChangesCmd,
+                        change
+                    )
+                    exploration.update_param_changes(
+                        list(
+                            map(
+                                to_param_domain,
+                                edit_exp_param_changes_cmd.new_value
+                            )
+                        )
+                    )
                 elif change.property_name == 'init_state_name':
-                    exploration.update_init_state_name(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyInitStateNameCmd.
+                    edit_init_state_name_cmd = cast(
+                        exp_domain.EditExplorationPropertyInitStateNameCmd,
+                        change
+                    )
+                    exploration.update_init_state_name(
+                        edit_init_state_name_cmd.new_value
+                    )
                 elif change.property_name == 'auto_tts_enabled':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, bool)
-                    exploration.update_auto_tts_enabled(change.new_value)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyAutoTtsEnabledCmd.
+                    edit_auto_tts_enabled_cmd = cast(
+                        exp_domain.EditExplorationPropertyAutoTtsEnabledCmd,
+                        change
+                    )
+                    exploration.update_auto_tts_enabled(
+                        edit_auto_tts_enabled_cmd.new_value
+                    )
                 elif change.property_name == 'correctness_feedback_enabled':
-                    # Ruling out the possibility of any other type for mypy
-                    # type checking.
-                    assert isinstance(change.new_value, bool)
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExplorationPropertyCorrectnessFeedbackEnabledCmd.
+                    edit_correctness_feedback_enabled_cmd = cast(
+                        exp_domain.EditExplorationPropertyCorrectnessFeedbackEnabledCmd,  # pylint: disable=line-too-long
+                        change
+                    )
                     exploration.update_correctness_feedback_enabled(
-                        change.new_value)
+                        edit_correctness_feedback_enabled_cmd.new_value
+                    )
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
@@ -708,15 +915,22 @@ def apply_change_list(
                 # schema update. Thus, no action is needed here other than
                 # to make sure that the version that the user is trying to
                 # migrate to is the latest version.
+                # Here we use cast because we are narrowing down the type from
+                # ExplorationChange to a specific change command.
+                migrate_states_schema_cmd = cast(
+                    exp_domain.MigrateStatesSchemaToLatestVersionCmd,
+                    change
+                )
                 target_version_is_current_state_schema_version = (
-                    change.to_version ==
-                    str(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    migrate_states_schema_cmd.to_version ==
+                    str(feconf.CURRENT_STATE_SCHEMA_VERSION)
+                )
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '
                         'version %s, received %s' % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
-                            change.to_version))
+                            migrate_states_schema_cmd.to_version))
         return exploration
 
     except Exception as e:
@@ -1300,7 +1514,7 @@ def save_new_exploration(
         if exploration.title else 'New exploration created.')
     _create_exploration(
         committer_id, exploration, commit_message, [
-            exp_domain.ExplorationChange({
+            exp_domain.CreateNewExplorationCmd({
                 'cmd': exp_domain.CMD_CREATE_NEW,
                 'title': exploration.title,
                 'category': exploration.category,
@@ -2265,7 +2479,7 @@ def save_new_exploration_from_yaml_and_assets(
 
     _create_exploration(
         committer_id, exploration, create_commit_message, [
-            exp_domain.ExplorationChange({
+            exp_domain.CreateNewExplorationCmd({
                 'cmd': exp_domain.CMD_CREATE_NEW,
                 'title': exploration.title,
                 'category': exploration.category,
