@@ -27,11 +27,11 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
     """Tests for classroom services."""
 
     def setUp(self) -> None:
-        super(ClassroomServicesTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_can_get_classroom_by_url_fragment(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()

@@ -46,7 +46,7 @@ export class FractionEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.value !== null) {
+    if (this.value) {
       this.fractionString = Fraction.fromDict(this.value).toString();
     }
   }

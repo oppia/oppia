@@ -24,6 +24,7 @@ import { Subscription } from 'rxjs';
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
 import topicConstants from 'assets/constants';
+import cloneDeep from 'lodash/cloneDeep';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -70,28 +71,28 @@ angular.module('oppia').directive('topicEditorTab', [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
         'ImageUploadHelperService', 'NgbModal',
-        'PageTitleService', 'StoryCreationService',
-        'TopicEditorRoutingService', 'TopicEditorStateService',
-        'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
-        'UndoRedoService', 'UrlInterpolationService',
-        'WindowDimensionsService', 'WindowRef',
+        'PageTitleService', 'StoryCreationService', 'TopicEditorRoutingService',
+        'TopicEditorStateService', 'TopicUpdateService',
+        'TopicsAndSkillsDashboardBackendApiService', 'UndoRedoService',
+        'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
         'MAX_CHARS_IN_META_TAG_CONTENT',
         'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
+        'MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
             ImageUploadHelperService, NgbModal,
-            PageTitleService, StoryCreationService,
-            TopicEditorRoutingService, TopicEditorStateService,
-            TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
-            UndoRedoService, UrlInterpolationService,
-            WindowDimensionsService, WindowRef,
+            PageTitleService, StoryCreationService, TopicEditorRoutingService,
+            TopicEditorStateService, TopicUpdateService,
+            TopicsAndSkillsDashboardBackendApiService, UndoRedoService,
+            UrlInterpolationService, WindowDimensionsService, WindowRef,
             MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
             MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
-            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) {
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
+            MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -132,6 +133,74 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
             $scope.hostname = WindowRef.nativeWindow.location.hostname;
+
+            $scope.getEligibleSkillSummariesForDiagnosticTest = function() {
+              let availableSkillSummaries = (
+                $scope.topic.getAvailableSkillSummariesForDiagnosticTest());
+
+              return availableSkillSummaries.filter(skillSummary => {
+                return (
+                  $scope.skillQuestionCountDict[skillSummary.getId()] >=
+                  MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL
+                );
+              });
+            };
+            $scope.availableSkillSummariesForDiagnosticTest = (
+              $scope.getEligibleSkillSummariesForDiagnosticTest());
+            $scope.selectedSkillSummariesForDiagnosticTest = (
+              $scope.topic.getSkillSummariesForDiagnosticTest());
+            $scope.diagnosticTestSkillsDropdownIsShown = false;
+            $scope.selectedSkillForDiagnosticTest = null;
+
+            $scope.presentDiagnosticTestSkillDropdown = function() {
+              $scope.diagnosticTestSkillsDropdownIsShown = true;
+            };
+
+            $scope.removeDiagnosticTestSkillDropdown = function() {
+              $scope.diagnosticTestSkillsDropdownIsShown = false;
+            };
+
+            $scope.addSkillForDiagnosticTest = async function() {
+              let skillToAdd = $scope.selectedSkillForDiagnosticTest;
+              $scope.selectedSkillForDiagnosticTest = null;
+              $scope.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
+
+              let skillSummary = (
+                $scope.availableSkillSummariesForDiagnosticTest.find(
+                  skill => skill.getId() === skillToAdd.getId())
+              );
+              if (skillSummary) {
+                let index = $scope.availableSkillSummariesForDiagnosticTest
+                  .indexOf(skillSummary);
+                $scope.availableSkillSummariesForDiagnosticTest.splice(
+                  index, 1);
+              }
+
+              TopicUpdateService.updateDiagnosticTestSkills(
+                $scope.topic,
+                cloneDeep($scope.selectedSkillSummariesForDiagnosticTest));
+              $scope.diagnosticTestSkillsDropdownIsShown = false;
+            };
+
+            $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
+              let skillSummary = (
+                $scope.selectedSkillSummariesForDiagnosticTest.find(
+                  skill => skill.getId() === skillToRemove.getId())
+              );
+              if (skillSummary) {
+                let index = $scope.selectedSkillSummariesForDiagnosticTest
+                  .indexOf(skillSummary);
+                $scope.selectedSkillSummariesForDiagnosticTest.splice(
+                  index, 1);
+              }
+
+              $scope.availableSkillSummariesForDiagnosticTest.push(
+                skillToRemove);
+
+              TopicUpdateService.updateDiagnosticTestSkills(
+                $scope.topic,
+                cloneDeep($scope.selectedSkillSummariesForDiagnosticTest));
+            };
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -365,6 +434,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
             TopicUpdateService.removeUncategorizedSkill(
               $scope.topic, skillSummary);
+            $scope.removeSkillFromDiagnosticTest(skillSummary);
             ctrl.initEditor();
           };
 

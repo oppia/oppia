@@ -33,7 +33,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import question_models
 
 (base_models, question_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.question])
+    [models.Names.BASE_MODEL, models.Names.QUESTION])
 
 
 class ValidateQuestionSnapshotMetadataModelTests(
@@ -201,21 +201,21 @@ class ValidateQuestionSnapshotMetadataModelTests(
 class RelationshipsOfTests(test_utils.TestBase):
 
     def test_question_skill_link_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'QuestionSkillLinkModel', 'id'), ['QuestionModel'])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'QuestionSkillLinkModel', 'skill_id'), ['SkillModel'])
 
     def test_question_commit_log_entry_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'QuestionCommitLogEntryModel', 'question_id'),
             ['QuestionModel'])
 
     def test_question_summary_model_relationships(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'QuestionSummaryModel', 'id'), ['QuestionModel'])
 

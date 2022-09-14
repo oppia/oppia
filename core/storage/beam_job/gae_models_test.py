@@ -25,8 +25,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import beam_job_models
 
-(base_models, beam_job_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.beam_job])
+(base_models, beam_job_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.BEAM_JOB
+])
 
 
 class BeamJobRunModelTest(test_utils.GenericTestBase):
@@ -45,10 +46,11 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 RuntimeError,
-                r'Failed to generate a unique ID after \d+ attempts',
-                beam_job_models.BeamJobRunModel.get_new_id)
+                r'Failed to generate a unique ID after \d+ attempts'
+            ):
+                beam_job_models.BeamJobRunModel.get_new_id()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -88,10 +90,11 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 RuntimeError,
-                r'Failed to generate a unique ID after \d+ attempts',
-                beam_job_models.BeamJobRunResultModel.get_new_id)
+                r'Failed to generate a unique ID after \d+ attempts'
+            ):
+                beam_job_models.BeamJobRunResultModel.get_new_id()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(

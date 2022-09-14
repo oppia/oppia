@@ -26,6 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Sequence
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -33,19 +34,20 @@ if MYPY: # pragma: no cover
     from mypy_imports import email_models
     from mypy_imports import user_models  # pylint: disable=unused-import
 
-(base_models, email_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
+(base_models, email_models, user_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER
+])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
 
-    SENDER_ID = 'sender_id'
-    RECIPIENT_ID = 'recipient_id'
-    NONEXISTENT_USER_ID = 'id_x'
+    SENDER_ID: Final = 'sender_id'
+    RECIPIENT_ID: Final = 'recipient_id'
+    NONEXISTENT_USER_ID: Final = 'id_x'
 
     def setUp(self) -> None:
-        super(SentEmailModelUnitTests, self).setUp()
+        super().setUp()
 
         def mock_generate_hash(
             unused_cls: email_models.SentEmailModel,
@@ -169,7 +171,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 2)
 
         # Check that it accepts only DateTime objects.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected datetime, received Not a datetime object of type '
             '<class \'str\'>'
@@ -183,7 +185,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         # Test Exception for SentEmailModel.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The id generator for SentEmailModel is '
             'producing too many collisions.'
         ):
@@ -202,8 +204,8 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the BulkEmailModel class."""
 
-    SENDER_ID = 'sender_id'
-    NONEXISTENT_USER_ID = 'id_x'
+    SENDER_ID: Final = 'sender_id'
+    NONEXISTENT_USER_ID: Final = 'id_x'
 
     def setUp(self) -> None:
         super().setUp()

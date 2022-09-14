@@ -32,7 +32,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
 class BaseAuditError(job_run_result.JobRunResult):
@@ -86,7 +86,7 @@ class BaseAuditError(job_run_result.JobRunResult):
                 model_kind,
                 message
             )
-        super(BaseAuditError, self).__init__(stderr=error_message)
+        super().__init__(stderr=error_message)
 
 
 class InconsistentTimestampsError(BaseAuditError):
@@ -95,7 +95,7 @@ class InconsistentTimestampsError(BaseAuditError):
     def __init__(self, model: base_models.BaseModel) -> None:
         message = 'created_on=%r is later than last_updated=%r' % (
             model.created_on, model.last_updated)
-        super(InconsistentTimestampsError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class InvalidCommitStatusError(BaseAuditError):
@@ -103,7 +103,7 @@ class InvalidCommitStatusError(BaseAuditError):
 
     def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
         message = 'post_commit_status is %s' % model.post_commit_status
-        super(InvalidCommitStatusError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class InvalidPublicCommitStatusError(BaseAuditError):
@@ -113,7 +113,7 @@ class InvalidPublicCommitStatusError(BaseAuditError):
         message = (
             'post_commit_status=%s but post_commit_community_owned=%s' % (
                 model.post_commit_status, model.post_commit_community_owned))
-        super(InvalidPublicCommitStatusError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class InvalidPrivateCommitStatusError(BaseAuditError):
@@ -123,7 +123,7 @@ class InvalidPrivateCommitStatusError(BaseAuditError):
         message = (
             'post_commit_status=%s but post_commit_is_private=%r' % (
                 model.post_commit_status, model.post_commit_is_private))
-        super(InvalidPrivateCommitStatusError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class ModelMutatedDuringJobError(BaseAuditError):
@@ -133,7 +133,7 @@ class ModelMutatedDuringJobError(BaseAuditError):
         message = (
             'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
-        super(ModelMutatedDuringJobError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class ModelIdRegexError(BaseAuditError):
@@ -144,7 +144,7 @@ class ModelIdRegexError(BaseAuditError):
     ) -> None:
         message = 'id does not match the expected regex=%s' % (
             utils.quoted(regex_string))
-        super(ModelIdRegexError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class ModelDomainObjectValidateError(BaseAuditError):
@@ -155,7 +155,7 @@ class ModelDomainObjectValidateError(BaseAuditError):
     ) -> None:
         message = 'Entity fails domain validation with the error: %s' % (
             error_message)
-        super(ModelDomainObjectValidateError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class ModelExpiredError(BaseAuditError):
@@ -164,7 +164,7 @@ class ModelExpiredError(BaseAuditError):
     def __init__(self, model: base_models.BaseModel) -> None:
         message = 'deleted=True when older than %s days' % (
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
-        super(ModelExpiredError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class InvalidCommitTypeError(BaseAuditError):
@@ -178,7 +178,7 @@ class InvalidCommitTypeError(BaseAuditError):
         ]
     ) -> None:
         message = 'Commit type %s is not allowed' % model.commit_type
-        super(InvalidCommitTypeError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class ModelRelationshipError(BaseAuditError):
@@ -208,7 +208,7 @@ class ModelRelationshipError(BaseAuditError):
             '%s=%s should correspond to the ID of an existing %s, but no such '
             'model exists' % (
                 id_property, utils.quoted(target_id), target_kind))
-        super(ModelRelationshipError, self).__init__(
+        super().__init__(
             message, id_property.model_kind, model_id=model_id)
 
 
@@ -225,7 +225,7 @@ class CommitCmdsNoneError(BaseAuditError):
         message = (
             'No commit command domain object defined for entity with commands: '
             '%s' % model.commit_cmds)
-        super(CommitCmdsNoneError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class CommitCmdsValidateError(BaseAuditError):
@@ -243,4 +243,4 @@ class CommitCmdsValidateError(BaseAuditError):
         message = (
             'Commit command domain validation for command: %s failed with '
             'error: %s' % (commit_cmd_dict, e))
-        super(CommitCmdsValidateError, self).__init__(message, model)
+        super().__init__(message, model)

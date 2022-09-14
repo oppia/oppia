@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -79,7 +79,10 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
-            feconf.BULK_EMAIL_INTENT_TEST
+            feconf.BULK_EMAIL_INTENT_TEST,
+            (
+                feconf
+                .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)
@@ -184,15 +187,15 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            recipient_id: str,
-            recipient_email: str,
-            sender_id: str,
-            sender_email: str,
-            intent: str,
-            subject: str,
-            html_body: str,
-            sent_datetime: datetime.datetime
+        cls,
+        recipient_id: str,
+        recipient_email: str,
+        sender_id: str,
+        sender_email: str,
+        intent: str,
+        subject: str,
+        html_body: str,
+        sent_datetime: datetime.datetime
     ) -> None:
         """Creates a new SentEmailModel entry.
 
@@ -219,7 +222,7 @@ class SentEmailModel(base_models.BaseModel):
 
     def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
-        super(SentEmailModel, self)._pre_put_hook()
+        super()._pre_put_hook()
         self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
 
@@ -267,10 +270,10 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def _generate_hash(
-            cls,
-            recipient_id: str,
-            email_subject: str,
-            email_body: str
+        cls,
+        recipient_id: str,
+        email_subject: str,
+        email_body: str
     ) -> str:
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
@@ -291,10 +294,10 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def check_duplicate_message(
-            cls,
-            recipient_id: str,
-            email_subject: str,
-            email_body: str
+        cls,
+        recipient_id: str,
+        email_subject: str,
+        email_body: str
     ) -> bool:
         """Check for a given recipient_id, email_subject and cleaned
         email_body, whether a similar message has been sent in the last
@@ -427,14 +430,14 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            instance_id: str,
-            sender_id: str,
-            sender_email: str,
-            intent: str,
-            subject: str,
-            html_body: str,
-            sent_datetime: datetime.datetime
+        cls,
+        instance_id: str,
+        sender_id: str,
+        sender_email: str,
+        intent: str,
+        subject: str,
+        html_body: str,
+        sent_datetime: datetime.datetime
     ) -> None:
         """Creates a new BulkEmailModel entry.
 

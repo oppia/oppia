@@ -49,9 +49,9 @@ if MYPY:  # pragma: no cover
     exp_models, feedback_models, skill_models,
     story_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.user
+    models.Names.AUTH, models.Names.COLLECTION, models.Names.EMAIL,
+    models.Names.EXPLORATION, models.Names.FEEDBACK, models.Names.SKILL,
+    models.Names.STORY, models.Names.USER
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -66,7 +66,7 @@ class ValidateModelWithUserId(base_validation.ValidateBaseModelId):
     """Overload for models keyed by a user ID, which have a special format."""
 
     def __init__(self) -> None:
-        super(ValidateModelWithUserId, self).__init__()
+        super().__init__()
         # IMPORTANT: Only picklable objects can be stored on DoFns! This is
         # because DoFns are serialized with pickle when run on a pipeline (and
         # might be run on many different machines). Any other types assigned to

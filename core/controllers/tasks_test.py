@@ -31,9 +31,9 @@ from core.platform import models
 from core.tests import test_utils
 
 (job_models, email_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.email])
+    [models.Names.JOB, models.Names.EMAIL])
 (feedback_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.suggestion])
+    [models.Names.FEEDBACK, models.Names.SUGGESTION])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -44,7 +44,7 @@ class TasksTests(test_utils.EmailTestBase):
     MODERATOR_EMAIL = 'm@example.com'
 
     def setUp(self):
-        super(TasksTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, 'moderator')
         self.moderator_id = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
