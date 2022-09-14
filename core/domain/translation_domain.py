@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import enum
 
-from constants import constants
+from core.constants import constants
 from core.domain import translatable_object_registry
 from core import feconf
 from core import utils
