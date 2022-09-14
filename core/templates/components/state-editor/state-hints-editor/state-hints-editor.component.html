@@ -3,7 +3,7 @@
     <mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
       <div class="oppia-editor-card-body">
         <div class="state-hints-header-container oppia-mobile-collapsible-card-header" (click)="toggleHintCard()">
-          <div class="state-hints-header" *ngIf="editabilityService.isEditableOutsideTutorialMode()">
+          <div class="state-hints-header">
             <h3 class="oppia-exp-hints-card-header">Hints</h3>
             <i class="fa fa-caret-down" *ngIf="!hintCardIsShown" aria-hidden="true">
             </i>
@@ -148,16 +148,26 @@
   }
 
   @media screen and (max-width: 768px) {
+    .state-hints-content-container {
+      margin-top: 10px;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
     .state-hints-header-container {
       padding: 0;
     }
 
     .state-hints-header {
-      padding: 18px 15px;
+      padding: 0;
     }
 
     .state-hints-header i {
       display: block;
+    }
+
+    .oppia-editor-card-with-avatar, .oppia-mobile-collapsible-card {
+      margin-top: 20px;
     }
   }
 </style>

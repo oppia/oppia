@@ -14,10 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands for operating on the search status of activities."""
+"""Commands for operating on the search status of activities and blog posts."""
 
 from __future__ import annotations
 
+import math
+
+from core import utils
+from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import rights_domain
@@ -33,11 +37,26 @@ if MYPY: # pragma: no cover
 
 platform_search_services = models.Registry.import_search_services()
 
+# "NOTE TO DEVELOPERS: If you change any of these index names or add any new
+# indexes, please contact Sean to update permissions on the ElasticSearch
+# production servers, otherwise search operations will fail in production.
+# Please do this before merging the PR. Thanks!"
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS: Final = 'explorations'
 
+# "NOTE TO DEVELOPERS: If you change any of these index names or add any new
+# indexes, please contact Sean to update permissions on the ElasticSearch
+# production servers, otherwise search operations will fail in production.
+# Please do this before merging the PR. Thanks!"
 # Name for the collection search index.
 SEARCH_INDEX_COLLECTIONS: Final = 'collections'
+
+# "NOTE TO DEVELOPERS: If you change any of these index names or add any new
+# indexes, please contact Sean to update permissions on the ElasticSearch
+# production servers, otherwise search operations will fail in production.
+# Please do this before merging the PR. Thanks!"
+# Name for the blog post search index.
+SEARCH_INDEX_BLOG_POSTS: Final = 'blog-posts'
 
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
@@ -62,7 +81,7 @@ def index_exploration_summaries(
     """Adds the explorations to the search index.
 
     Args:
-        exp_summaries: list(ExpSummaryModel). List of Exp Summary domain
+        exp_summaries: list(ExplorationSummary). List of Exp Summary domain
             objects to be indexed.
     """
     # The argument `documents` of add_documents_to_index() is annotated
@@ -85,7 +104,7 @@ def _exp_summary_to_search_dict(
     be indexed for further queries or not.
 
     Args:
-        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary. ExplorationSummary domain object.
 
     Returns:
         dict. The representation of the given exploration, in a form that can
@@ -110,7 +129,7 @@ def _should_index_exploration(
     search queries.
 
     Args:
-        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary. ExplorationSummary domain object.
 
     Returns:
         bool. Whether the given exploration should be indexed for future
@@ -158,8 +177,8 @@ def index_collection_summaries(
     """Adds the collections to the search index.
 
     Args:
-        collection_summaries: list(CollectionSummaryModel). List of
-            Collection Summary domain objects to be indexed.
+        collection_summaries: list(CollectionSummary). List of collection
+            summary domain objects to be indexed.
     """
     # The argument `documents` of add_documents_to_index() is annotated
     # with List[Dict[str, Any]] because this method can accept any kind
@@ -180,7 +199,7 @@ def _collection_summary_to_search_dict(
     """Converts a collection domain object to a search dict.
 
     Args:
-        collection_summary: CollectionSummaryModel. The collection
+        collection_summary: CollectionSummary. The collection
             summary object to be converted.
 
     Returns:
@@ -204,7 +223,7 @@ def _should_index_collection(
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: CollectionSummaryModel. The collection summary model object.
+        collection: CollectionSummary. CollectionSummary domain object.
 
     Returns:
         bool. Whether a particular collection should be indexed.
@@ -346,3 +365,134 @@ def clear_collection_search_index() -> None:
     many entries in the index.
     """
     platform_search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
+
+
+class BlogPostSummaryDomainSearchDict(TypedDict):
+    """Dictionary representing the search dictionary of a blog post summary
+    domain object.
+    """
+
+    id: str
+    title: str
+    tags: List[str]
+    rank: int
+
+
+def index_blog_post_summaries(
+    blog_post_summaries: List[blog_domain.BlogPostSummary]
+) -> None:
+    """Adds the blog post summaries to the search index.
+
+    Args:
+        blog_post_summaries: list(BlogPostSummary). List of BlogPostSummary
+            domain objects to be indexed.
+    """
+
+    docs_to_index = [
+        _blog_post_summary_to_search_dict(blog_post_summary)
+        for blog_post_summary in blog_post_summaries
+    ]
+    # The argument `documents` of add_documents_to_index() is annotated
+    # with List[Dict[str, Any]] because this method can accept any kind
+    # of dictionaries, but here we are providing a strict type
+    # `List[DomainSearchDict]` which causes a conflict in type assignment
+    # and due to this MyPy throws an error. So, to silent the error, we used
+    # ignore here.
+    platform_search_services.add_documents_to_index([
+       doc for doc in docs_to_index if doc # type: ignore[misc]
+    ], SEARCH_INDEX_BLOG_POSTS)
+
+
+def _blog_post_summary_to_search_dict(
+    blog_post_summary: blog_domain.BlogPostSummary
+) -> Optional[BlogPostSummaryDomainSearchDict]:
+    """Updates the dict to be returned, whether the given blog post summary is
+    to be indexed for further queries or not.
+
+    Args:
+        blog_post_summary: BlogPostSummary. BlogPostSummary domain object.
+
+    Returns:
+        dict. The representation of the given blog post summary, in a form that
+        can be used by the search index.
+    """
+    if (
+        not blog_post_summary.deleted and
+        blog_post_summary.published_on is not None
+    ):
+        doc: BlogPostSummaryDomainSearchDict = {
+            'id': blog_post_summary.id,
+            'title': blog_post_summary.title,
+            'tags': blog_post_summary.tags,
+            'rank': math.floor(
+                utils.get_time_in_millisecs(blog_post_summary.published_on))
+        }
+        return doc
+    return None
+
+
+def search_blog_post_summaries(
+    query: str,
+    tags: List[str],
+    size: int,
+    offset: Optional[int] = None
+) -> Tuple[List[str], Optional[int]]:
+    """Searches through the available blog post summaries.
+
+    Args:
+        query: str. The query string to search for.
+        tags: list(str). The list of tags to query for. If it is
+            empty, no tags filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these tags.
+        size: int. The maximum number of results to return.
+        offset: int or None. A marker that is used to get the next page of
+            results. If there are more documents that match the query than
+            'size', this function will return an offset to get the next page.
+
+    Returns:
+        tuple. A 2-tuple consisting of:
+            - list(str). A list of blog post ids that match the query.
+            - int or None. An offset if there are more matching blog post
+              summaries to fetch, None otherwise. If an offset is returned, it
+              will be a web-safe string that can be used in URLs.
+    """
+    # The return type of 'platform_search_services.search()' method is
+    # tuple with 2 elements. For the first tuple element, it's return type
+    # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
+    # the type of first element is always an List[str]. So, to narrow down
+    # the type from Union to List, we used cast here.
+    result_ids, result_offset = cast(
+        Tuple[List[str], Optional[int]],
+        platform_search_services.blog_post_summaries_search(
+            query,
+            tags,
+            offset=offset,
+            size=size,
+            ids_only=True
+        )
+    )
+    return result_ids, result_offset
+
+
+def delete_blog_post_summary_from_search_index(blog_post_id: str) -> None:
+    """Deletes the documents corresponding to the blog_id from the
+    search index.
+
+    Args:
+        blog_post_id: str. Blog post id whose document are to be deleted from
+            the search index.
+    """
+    # The argument type of delete_documents_from_index() is List[str],
+    # therefore, we provide [blog_post_id] as argument.
+    platform_search_services.delete_documents_from_index(
+        [blog_post_id], SEARCH_INDEX_BLOG_POSTS)
+
+
+def clear_blog_post_summaries_search_index() -> None:
+    """Clears the blog post search index.
+
+    WARNING: This runs in-request, and may therefore fail if there are too
+    many entries in the index.
+    """
+    platform_search_services.clear_index(SEARCH_INDEX_BLOG_POSTS)

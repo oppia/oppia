@@ -46,7 +46,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+    models.Names.SUGGESTION, models.Names.FEEDBACK])
 
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
@@ -62,7 +62,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     NORMAL_USER_EMAIL = 'user@example.com'
 
     def setUp(self):
-        super(SuggestionUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1439,7 +1439,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
     SKILL_DESCRIPTION = 'skill to link question to'
 
     def setUp(self):
-        super(QuestionSuggestionTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -1822,7 +1822,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
     REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
-        super(SkillSuggestionTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
@@ -2080,7 +2080,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
 
     def setUp(self):
-        super(UserSubmittedSuggestionsHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -2388,7 +2388,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the ReviewableSuggestionsHandler."""
 
     def setUp(self):
-        super(ReviewableSuggestionsHandlerTest, self).setUp()
+        super().setUp()
         self.AUTHOR_EMAIL = 'author@example.com'
         self.REVIEWER_EMAIL = 'reviewer@example.com'
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

@@ -479,6 +479,13 @@ interface TopicPageTitleFragmentForWebChange {
   'old_value': string;
 }
 
+interface TopicSkillForDiagnosticTestChange {
+  'cmd': 'update_topic_property';
+  'property_name': 'skill_ids_for_diagnostic_test';
+  'new_value': string[];
+  'old_value': string[];
+}
+
 type TopicPropertyChange = (
   TopicNameChange |
   TopicAbbreviatedNameChange |
@@ -489,7 +496,8 @@ type TopicPropertyChange = (
   TopicUrlFragmentChange |
   TopicMetaTagContentChange |
   TopicLanguageCodeChange |
-  TopicPageTitleFragmentForWebChange);
+  TopicPageTitleFragmentForWebChange |
+  TopicSkillForDiagnosticTestChange);
 
 interface TopicSubtopicThumbnailFilenameChange {
   'cmd': 'update_subtopic_property';

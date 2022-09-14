@@ -24,9 +24,11 @@ from core import utils
 from core.platform import models
 
 from typing import Any, Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import Final, Literal
 
 SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
-    'SELF_REPORT_MODEL', bound='AppFeedbackReportModel')
+    'SELF_REPORT_MODEL', bound='AppFeedbackReportModel'
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,14 +37,15 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
 
 (base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user])
+    models.Names.BASE_MODEL, models.Names.USER
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
-PLATFORM_CHOICE_ANDROID = 'android'
-PLATFORM_CHOICE_WEB = 'web'
-PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
-GITHUB_REPO_CHOICES = PLATFORM_CHOICES
+PLATFORM_CHOICE_ANDROID: Final = 'android'
+PLATFORM_CHOICE_WEB: Final = 'web'
+PLATFORM_CHOICES: Final = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
+GITHUB_REPO_CHOICES: Final = PLATFORM_CHOICES
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -52,23 +55,23 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-class FILTER_FIELD_NAMES(enum.Enum): # pylint: disable=invalid-name
+class FilterFieldNames(enum.Enum):
     """Enum for the model field names that can be filtered"""
 
-    platform = 'platform' # pylint: disable=invalid-name
-    report_type = 'report_type' # pylint: disable=invalid-name
-    entry_point = 'entry_point' # pylint: disable=invalid-name
-    submitted_on = 'submitted_on' # pylint: disable=invalid-name
-    android_device_model = 'android_device_model' # pylint: disable=invalid-name
-    android_sdk_version = 'android_sdk_version' # pylint: disable=invalid-name
-    text_language_code = 'text_language_code' # pylint: disable=invalid-name
-    audio_language_code = 'audio_language_code' # pylint: disable=invalid-name
-    platform_version = 'platform_version' # pylint: disable=invalid-name
-    android_device_country_locale_code = 'android_device_country_locale_code' # pylint: disable=invalid-name
+    PLATFORM = 'platform'
+    REPORT_TYPE = 'report_type'
+    ENTRY_POINT = 'entry_point'
+    SUBMITTED_ON = 'submitted_on'
+    ANDROID_DEVICE_MODEL = 'android_device_model'
+    ANDROID_SDK_VERSION = 'android_sdk_version'
+    TEXT_LANGUAGE_CODE = 'text_language_code'
+    AUDIO_LANGUAGE_CODE = 'audio_language_code'
+    PLATFORM_VERSION = 'platform_version'
+    ANDROID_DEVICE_COUNTRY_LOCALE_CODE = 'android_device_country_locale_code'
 
 
 # An ID used for stats model entities tracking all unticketed reports.
-UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
+UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID: Final = (
     'unticketed_android_reports_stats_ticket_id')
 
 
@@ -85,7 +88,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     """
 
     # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
     # The platform (web or Android) that the report is sent from and that the
     # feedback corresponds to.
@@ -175,26 +178,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # objects/TypedDict to remove Any from type-annotation below.
     @classmethod
     def create(
-            cls,
-            entity_id: str,
-            platform: str,
-            submitted_on: datetime.datetime,
-            local_timezone_offset_hrs: int,
-            report_type: str,
-            category: str,
-            platform_version: str,
-            android_device_country_locale_code: Optional[str],
-            android_sdk_version: Optional[int],
-            android_device_model: Optional[str],
-            entry_point: str,
-            entry_point_topic_id: Optional[str],
-            entry_point_story_id: Optional[str],
-            entry_point_exploration_id: Optional[str],
-            entry_point_subtopic_id: Optional[str],
-            text_language_code: str,
-            audio_language_code: str,
-            android_report_info: Optional[Dict[str, Any]],
-            web_report_info: Optional[Dict[str, Any]]
+        cls,
+        entity_id: str,
+        platform: str,
+        submitted_on: datetime.datetime,
+        local_timezone_offset_hrs: int,
+        report_type: str,
+        category: str,
+        platform_version: str,
+        android_device_country_locale_code: Optional[str],
+        android_sdk_version: Optional[int],
+        android_device_model: Optional[str],
+        entry_point: str,
+        entry_point_topic_id: Optional[str],
+        entry_point_story_id: Optional[str],
+        entry_point_exploration_id: Optional[str],
+        entry_point_subtopic_id: Optional[str],
+        text_language_code: str,
+        audio_language_code: str,
+        android_report_info: Optional[Dict[str, Any]],
+        web_report_info: Optional[Dict[str, Any]]
     ) -> str:
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
@@ -271,9 +274,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def generate_id(
-            cls,
-            platform: str,
-            submitted_on_datetime: datetime.datetime
+        cls,
+        platform: str,
+        submitted_on_datetime: datetime.datetime
     ) -> str:
         """Generates key for the instance of AppFeedbackReportModel class in the
         required format with the arguments provided.
@@ -330,7 +333,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_filter_options_for_field(
-        cls, filter_field: FILTER_FIELD_NAMES
+        cls, filter_field: FilterFieldNames
     ) -> List[str]:
         """Fetches values that can be used to filter reports by.
 
@@ -341,28 +344,28 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_field.name], distinct=True)
+        query = cls.query(projection=[filter_field.value], distinct=True)
         filter_values = []
-        if filter_field == FILTER_FIELD_NAMES.report_type:
+        if filter_field == FilterFieldNames.REPORT_TYPE:
             filter_values = [model.report_type for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.platform:
+        elif filter_field == FilterFieldNames.PLATFORM:
             filter_values = [model.platform for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.entry_point:
+        elif filter_field == FilterFieldNames.ENTRY_POINT:
             filter_values = [model.entry_point for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.submitted_on:
+        elif filter_field == FilterFieldNames.SUBMITTED_ON:
             filter_values = [model.submitted_on.date() for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.android_device_model:
+        elif filter_field == FilterFieldNames.ANDROID_DEVICE_MODEL:
             filter_values = [model.android_device_model for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.android_sdk_version:
+        elif filter_field == FilterFieldNames.ANDROID_SDK_VERSION:
             filter_values = [model.android_sdk_version for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.text_language_code:
+        elif filter_field == FilterFieldNames.TEXT_LANGUAGE_CODE:
             filter_values = [model.text_language_code for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.audio_language_code:
+        elif filter_field == FilterFieldNames.AUDIO_LANGUAGE_CODE:
             filter_values = [model.audio_language_code for model in query]
-        elif filter_field == FILTER_FIELD_NAMES.platform_version:
+        elif filter_field == FilterFieldNames.PLATFORM_VERSION:
             filter_values = [model.platform_version for model in query]
         elif filter_field == (
-                FILTER_FIELD_NAMES.android_device_country_locale_code):
+                FilterFieldNames.ANDROID_DEVICE_COUNTRY_LOCALE_CODE):
             filter_values = [
                 model.android_device_country_locale_code for model in query]
         else:
@@ -513,14 +516,14 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            entity_id: str,
-            ticket_name: str,
-            platform: str,
-            github_issue_repo_name: Optional[str],
-            github_issue_number: Optional[int],
-            newest_report_timestamp: datetime.datetime,
-            report_ids: List[str]
+        cls,
+        entity_id: str,
+        ticket_name: str,
+        platform: str,
+        github_issue_repo_name: Optional[str],
+        github_issue_number: Optional[int],
+        newest_report_timestamp: datetime.datetime,
+        report_ids: List[str]
     ) -> str:
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
@@ -664,13 +667,13 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            entity_id: str,
-            platform: str,
-            ticket_id: str,
-            stats_tracking_date: datetime.date,
-            total_reports_submitted: int,
-            daily_param_stats: Dict[str, Dict[str, int]]
+        cls,
+        entity_id: str,
+        platform: str,
+        ticket_id: str,
+        stats_tracking_date: datetime.date,
+        total_reports_submitted: int,
+        daily_param_stats: Dict[str, Dict[str, int]]
     ) -> str:
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
@@ -704,10 +707,10 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def calculate_id(
-            cls,
-            platform: str,
-            ticket_id: Optional[str],
-            stats_tracking_date: datetime.date
+        cls,
+        platform: str,
+        ticket_id: Optional[str],
+        stats_tracking_date: datetime.date
     ) -> str:
         """Generates key for the instance of AppFeedbackReportStatsModel
         class in the required format with the arguments provided.

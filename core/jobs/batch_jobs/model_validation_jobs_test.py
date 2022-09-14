@@ -26,20 +26,34 @@ from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
 
-(auth_models, base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.auth, models.NAMES.base_model, models.NAMES.user])
+from typing import Type
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import auth_models
+    from mypy_imports import base_models
+    from mypy_imports import user_models
+
+(auth_models, base_models, user_models) = models.Registry.import_models([
+    models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER
+])
 
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = model_validation_jobs.AuditAllStorageModelsJob
+    JOB_CLASS: Type[
+        model_validation_jobs.AuditAllStorageModelsJob
+    ] = model_validation_jobs.AuditAllStorageModelsJob
 
-    VALID_USER_ID = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    VALID_USER_ID: Final = 'uid_%s' % (
+        'a' * feconf.USER_ID_RANDOM_PART_LENGTH
+    )
 
-    def test_empty_storage(self):
+    def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_base_validation(self):
+    def test_base_validation(self) -> None:
         base_model_with_invalid_id = self.create_model(
             base_models.BaseModel, id='123@?!*', deleted=False)
         base_model_with_invalid_timestamps = self.create_model(
@@ -72,7 +86,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
             base_validation_errors.ModelExpiredError(expired_base_model),
         ])
 
-    def test_user_audits(self):
+    def test_user_audits(self) -> None:
         user_settings_model_with_invalid_id = self.create_model(
             user_models.UserSettingsModel,
             id='128', email='a@a.com')
@@ -90,7 +104,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
                 user_settings_model_with_invalid_id, feconf.USER_ID_REGEX),
         ])
 
-    def test_reports_error_when_id_property_target_does_not_exist(self):
+    def test_reports_error_when_id_property_target_does_not_exist(self) -> None:
         self.put_multi([
             # UserEmailPreferencesModel.id -> UserSettingsModel.id.
             self.create_model(
@@ -106,7 +120,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
                 self.VALID_USER_ID, 'UserSettingsModel', self.VALID_USER_ID),
         ])
 
-    def test_empty_when_id_property_target_exists(self):
+    def test_empty_when_id_property_target_exists(self) -> None:
         self.put_multi([
             self.create_model(
                 user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
@@ -117,7 +131,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is_empty()
 
-    def test_empty_when_web_of_id_property_targets_exist(self):
+    def test_empty_when_web_of_id_property_targets_exist(self) -> None:
         self.put_multi([
             self.create_model(
                 auth_models.UserAuthDetailsModel,
@@ -132,7 +146,9 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is_empty()
 
-    def test_reports_missing_id_property_target_even_if_sibling_property_is_valid(self): # pylint: disable=line-too-long
+    def test_reports_missing_id_property_target_even_if_sibling_property_is_valid(  # pylint: disable=line-too-long
+        self
+    ) -> None:
         self.put_multi([
             self.create_model(
                 auth_models.UserAuthDetailsModel, id=self.VALID_USER_ID,

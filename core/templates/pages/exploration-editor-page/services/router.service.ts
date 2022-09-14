@@ -140,6 +140,10 @@ export class RouterService {
           '/gui/' + this.explorationInitStateNameService.savedMemento);
       }
     }
+
+    // Fire an event to center the Graph in the
+    // Editor Tabs, Translation Tab, History Tab.
+    this.centerGraphEventEmitter.emit();
   }
 
   _doNavigationWithState(path: string, pathType: string): void {
@@ -161,8 +165,6 @@ export class RouterService {
                   this._activeTabName === this.TABS.MAIN.name) {
                 this.windowRef.nativeWindow.location.hash = path;
                 this.stateEditorRefreshService.onRefreshStateEditor.emit();
-                // Fire an event to center the Graph in the Editor.
-                this.centerGraphEventEmitter.emit();
               }
             } else {
               this._changeTab(
@@ -309,7 +311,7 @@ export class RouterService {
     return this.refreshTranslationTabEventEmitter;
   }
 
-  get onRefreshVersionHistory(): EventEmitter<void> {
+  get onRefreshVersionHistory(): EventEmitter<void | {forceRefresh: boolean}> {
     return this.refreshVersionHistoryEventEmitter;
   }
 }

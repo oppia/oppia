@@ -56,6 +56,8 @@ export class ContextService {
   // Depending on this value, new images can be either saved in the localStorage
   // or uploaded directly to the datastore.
 
+  learnerGroupId!: string;
+
   init(editorName: string): void {
     this.editorContext = editorName;
   }
@@ -133,6 +135,10 @@ export class ContextService {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD;
+        } else if (pathnameArray[i] === 'edit-learner-group') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR);
+          return ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR;
         }
       }
 
@@ -264,6 +270,28 @@ export class ContextService {
     throw new Error(
       'ContextService should not be used outside the ' +
       'context of an exploration or a question.'
+    );
+  }
+
+  // Returns a string representing the learnerGroupId (obtained from the
+  // URL).
+  getLearnerGroupId(): string {
+    if (this.learnerGroupId) {
+      return this.learnerGroupId;
+    }
+    // The pathname should be one of /edit-learner-group/{group_id} or
+    // /learner-group/{group_id}.
+    let pathnameArray = this.urlService.getPathname().split('/');
+    for (let i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'edit-learner-group' ||
+          pathnameArray[i] === 'learner-groups') {
+        this.learnerGroupId = pathnameArray[i + 1];
+        return pathnameArray[i + 1];
+      }
+    }
+    throw new Error(
+      'ContextService should not be used outside the ' +
+      'context of a learner group.'
     );
   }
 

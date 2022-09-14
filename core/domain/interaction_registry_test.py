@@ -39,24 +39,24 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
     """Tests for the calculation of dependencies for interactions."""
 
     def setUp(self) -> None:
-        super(InteractionDependencyTests, self).setUp()
+        super().setUp()
 
         # Register and login as an editor.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
     def test_deduplication_of_dependency_ids(self) -> None:
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl']),
             ['skulpt', 'codemirror'])
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl', 'CodeRepl', 'CodeRepl']),
             ['skulpt', 'codemirror'])
 
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             interaction_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl', 'AlgebraicExpressionInput']),
             ['skulpt', 'codemirror', 'guppy', 'nerdamer'])
@@ -67,11 +67,11 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         exp_services.load_demo(exp_id)
 
         # Ensure that dependencies are added in the exploration reader page.
-        response = self.get_html_response('/explore/%s' % exp_id)  # type: ignore[no-untyped-call]
+        response = self.get_html_response('/explore/%s' % exp_id)
         response.mustcontain('dependency_html.html')
 
     def test_no_dependencies_in_non_exploration_pages(self) -> None:
-        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)  # type: ignore[no-untyped-call]
+        response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain(no=['dependency_html.html'])
 
     def test_dependencies_loaded_in_exploration_editor(self) -> None:
@@ -79,7 +79,7 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Ensure that dependencies are added in the exploration editor page.
-        response = self.get_html_response('/create/0')  # type: ignore[no-untyped-call]
+        response = self.get_html_response('/create/0')
         response.mustcontain('dependency_html.html')
 
         self.logout()
@@ -229,10 +229,18 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
     def test_get_all_specs_for_state_schema_version_for_unsaved_version(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             IOError, 'No specs JSON file found for state schema'
         ):
             (
                 interaction_registry.Registry
                 .get_all_specs_for_state_schema_version(10)
             )
+
+    def test_get_interaction_by_id_raises_error_for_none_interaction_id(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'No interaction exists for the None interaction_id.'
+        ):
+            interaction_registry.Registry.get_interaction_by_id(None)

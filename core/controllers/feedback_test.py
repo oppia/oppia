@@ -31,7 +31,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.suggestion])
+    [models.Names.FEEDBACK, models.Names.SUGGESTION])
 
 
 EXPECTED_THREAD_KEYS = [
@@ -48,7 +48,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
     EXP_ID = '0'
 
     def setUp(self):
-        super(FeedbackThreadPermissionsTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
@@ -122,7 +122,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
     EXP_ID = '0'
 
     def setUp(self):
-        super(FeedbackThreadIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.editor = user_services.get_user_actions_info(self.editor_id)
@@ -359,7 +359,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
     EXP_TITLE = 'Exploration title'
 
     def setUp(self):
-        super(FeedbackThreadTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
@@ -558,7 +558,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ThreadListHandlerForTopicsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_curriculum_admins([self.OWNER_USERNAME])
@@ -608,7 +608,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
 class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(FeedbackStatsHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'exp_id'
@@ -643,7 +643,7 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(RecentFeedbackMessagesHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])

@@ -1,59 +1,73 @@
-<div ng-show="$ctrl.isGraphShown()" class="oppia-state-graph-animate-show">
+<div [hidden]="!isGraphShown()" class="oppia-state-graph-animate-show">
   <div class="oppia-exp-graph-overview">
     <span class="oppia-exploration-overview-text">
       <strong>Exploration Overview</strong>
     </span>
     <div>
-      <span ng-if="!$ctrl.showCheckpointCountWarningSign()">&#11088;</span>
-      <span uib-tooltip="{{$ctrl.checkpointCountWarning}}"
-            tooltip-placement="top-right"
-            ng-if="$ctrl.showCheckpointCountWarningSign()">
+      <span *ngIf="!showCheckpointCountWarningSign()">&#11088;</span>
+      <span ngbTooltip="{{checkpointCountWarning}}"
+            placement="top-right"
+            *ngIf="showCheckpointCountWarningSign()">
         <strong class="clickable">⚠️</strong>
       </span>
-      <span ng-class="{'checkpoint-count-error': $ctrl.showCheckpointCountWarningSign()}">
-        {{$ctrl.getCheckpointCount()}}
-        <span ng-if="$ctrl.getCheckpointCount() <= 1">
+      <span [ngClass]="{'checkpoint-count-error': showCheckpointCountWarningSign()}">
+        {{ getCheckpointCount() }}
+        <span *ngIf="getCheckpointCount() <= 1">
           Checkpoint
         </span>
-        <span ng-if="$ctrl.getCheckpointCount() > 1">
+        <span *ngIf="getCheckpointCount() > 1">
           Checkpoints
         </span>
       </span>
-      <span uib-tooltip="Learners start at their last saved checkpoint when returning back from the lesson."
-            tooltip-placement="right-top"
+      <span ngbTooltip="Learners start at their last saved checkpoint when returning back from the lesson."
+            placement="right-top"
             class="clickable">
         <strong>&#x24D8;</strong>
       </span>
     </div>
-    <md-card class="oppia-state-graph-card">
+    <mat-card class="oppia-state-graph-card">
       <div class="oppia-state-graph-container e2e-test-exploration-graph">
-        <div state-graph-visualization graph-data="$ctrl.getGraphData()" current-state-id="$ctrl.getActiveStateName()" on-click-function="$ctrl.onClickStateInMinimap" on-delete-function="$ctrl.deleteState" on-maximize-function="$ctrl.openStateGraphModal" allow-panning="true" center-at-current-state="true" class="h-100" is-editable="$ctrl.isEditable()" show-warning-sign="true">
-        </div>
+        <state-graph-visualization class="h-100"
+                                   [currentStateId]="getActiveStateName()"
+                                   (onClickFunction)="onClickStateInMinimap($event)"
+                                   (onDeleteFunction)="deleteState($event)"
+                                   (onMaximizeFunction)="openStateGraphModal()"
+                                   [versionGraphData]="null"
+                                   [maximize]="true"
+                                   [allowPanning]="true"
+                                   [centerAtCurrentState]="true"
+                                   [isEditable]="isEditable()"
+                                   [showWarningSign]="true">
+        </state-graph-visualization>
       </div>
-    </md-card>
+    </mat-card>
   </div>
-  <div class="oppia-exp-graph-modal-icon-container" ng-click="$ctrl.openStateGraphModal()">
+  <div class="oppia-exp-graph-modal-icon-container" (click)="openStateGraphModal()">
     <span class="material-icons">settings_overscan</span>
   </div>
 </div>
 
 <style>
-  exploration-graph .oppia-exp-graph-modal-icon-container {
+  .oppia-exp-graph-modal-icon-container {
     display: none;
   }
-  exploration-graph .oppia-exploration-overview-text {
+
+  .oppia-exploration-overview-text {
     font-size: 16px;
   }
-  exploration-graph .oppia-state-graph-card {
+
+  .oppia-state-graph-card {
     background-color: #fff;
     margin: 20px 0;
     padding: 8px;
   }
+
   @media screen and (max-width: 768px) {
-    exploration-graph .oppia-exp-graph-overview {
+    .oppia-exp-graph-overview {
       display: none;
     }
-    exploration-graph .oppia-exp-graph-modal-icon-container {
+
+    .oppia-exp-graph-modal-icon-container {
       background-color: #fff;
       border: 2px solid #707070;
       display: block;
@@ -62,13 +76,16 @@
       right: 40px;
       top: 75px;
     }
-    exploration-graph .oppia-exp-graph-modal-icon-container span {
+
+    .oppia-exp-graph-modal-icon-container span {
       font-size: 26px;
     }
   }
-  exploration-graph .clickable {
+
+  .clickable {
     cursor: pointer;
   }
+
   exploration-graph span.checkpoint-count-error {
     color: #c55f45;
   }

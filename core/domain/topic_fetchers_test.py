@@ -32,7 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class MockTopicObject(topic_domain.Topic):
@@ -58,7 +58,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     skill_id_2: str = 'skill_2'
 
     def setUp(self) -> None:
-        super(TopicFetchersUnitTests, self).setUp()
+        super().setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
@@ -66,7 +66,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1,
             'url_fragment': 'sample-fragment'
         })]
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
             abbreviated_name='name', url_fragment='name-one',
             description='Description',
@@ -74,8 +74,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
+        self.save_new_story(
             self.story_id_3,
             self.user_id,
             self.TOPIC_ID,
@@ -85,18 +85,18 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
-        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
         self.topic: Optional[topic_domain.Topic] = (
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         )
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
-        self.set_topic_managers(  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
@@ -146,10 +146,10 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             self.assertIn(topic_key, topic_id_list)
 
     def test_get_canonical_story_dicts(self) -> None:
-        self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)
+        topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
-        topic_services.publish_story(  # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             self.TOPIC_ID, self.story_id_2, self.user_id_admin)
         topic: Optional[topic_domain.Topic] = (
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
@@ -203,7 +203,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     def test_cannot_get_topic_from_model_with_invalid_schema_version(
         self
     ) -> None:
-        topic_services.create_new_topic_rights('topic_id', self.user_id_a)  # type: ignore[no-untyped-call]
+        topic_services.create_new_topic_rights('topic_id', self.user_id_a)
         commit_cmd = topic_domain.TopicChange({
             'cmd': topic_domain.CMD_CREATE_NEW,
             'name': 'name'
@@ -231,13 +231,13 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
 
-        topic_services.create_new_topic_rights('topic_id_2', self.user_id_a)  # type: ignore[no-untyped-call]
+        topic_services.create_new_topic_rights('topic_id_2', self.user_id_a)
         model = topic_models.TopicModel(
             id='topic_id_2',
             name='name 2',
@@ -256,14 +256,14 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_a, 'topic model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
 
     def test_topic_model_migration_to_higher_version(self) -> None:
-        topic_services.create_new_topic_rights('topic_id', self.user_id_a)  # type: ignore[no-untyped-call]
+        topic_services.create_new_topic_rights('topic_id', self.user_id_a)
         commit_cmd = topic_domain.TopicChange({
             'cmd': topic_domain.CMD_CREATE_NEW,
             'name': 'name'
@@ -316,7 +316,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_by_version(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.user_id, name='topic name',
             abbreviated_name='topic-name', url_fragment='topic-name',
             description='Description', canonical_story_ids=[],
@@ -329,7 +329,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'old_value': 'en',
             'new_value': 'bn'
         })]
-        topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+        topic_services.update_topic_and_subtopic_pages(
             self.user_id, topic_id, changelist, 'Change language code')
 
         topic_v0: Optional[topic_domain.Topic] = (
@@ -365,6 +365,15 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topics[0].to_dict(), expected_topic)
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
+
+    def test_raises_error_if_topics_fetched_with_invalid_ids_and_strict(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'No topic model exists for the topic_id: invalid_id'
+        ):
+            topic_fetchers.get_topics_by_ids(['invalid_id'], strict=True)
 
     def test_get_all_topic_rights_of_user(self) -> None:
         topic_rights: List[topic_domain.TopicRights] = (
@@ -437,10 +446,10 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'old_value': old_value,
             'new_value': [self.skill_id_1]
         })]
-        topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+        topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
-        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
 
         topic_summaries = topic_fetchers.get_published_topic_summaries()
 
@@ -461,11 +470,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'new_subtopic_id': 1,
             'skill_id': self.skill_id_1
         })]
-        topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
+        topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, change_list,
             'Moved skill to subtopic.')
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.user_id, name='Name 2', description='Description',
             abbreviated_name='random', url_fragment='name-three',
             canonical_story_ids=[], additional_story_ids=[],

@@ -42,13 +42,14 @@
       <a *ngFor="let labeledRegion of value.labeledRegions; let idx = index"
          (click)="deleteRegion(idx)"
          target="_blank" rel="noopener">
-        <text font-family="Material Icons"
+        <text class="fas fa-trash"
+              font-family="Font Awesome 5 Free"
               font-size="20px"
               text-decoration="none"
               [attr.style]="getRegionTrashStyle(idx)"
-              [attr.x]="labeledRegion.region.area[1][0] * getImageWidth() - 25"
-              [attr.y]="labeledRegion.region.area[1][1] * getImageHeight() - 5">
-              &#xE872;
+              [attr.x]="labeledRegion.region.area[1][0] * getImageWidth() - 20"
+              [attr.y]="labeledRegion.region.area[1][1] * getImageHeight() - 6">
+              &#xF1F8;
         </text>
       </a>
       <text *ngFor="let labeledRegion of value.labeledRegions; let idx = index"
@@ -84,5 +85,9 @@
 
   .image-with-regions-editor .oppia-error-text {
     margin-bottom: 4px;
+  }
+
+  .oppia-image-with-regions-editor-svg {
+    user-select: none;
   }
 </style>

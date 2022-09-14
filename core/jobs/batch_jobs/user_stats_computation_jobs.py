@@ -28,6 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+
 from typing import Iterable
 
 MYPY = False
@@ -35,7 +36,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import user_models
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -108,6 +109,10 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
         )
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
     """DoFn to create empty user stats model."""
 
@@ -130,6 +135,10 @@ class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
         yield user_stats_model
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
     """DoFn to update weekly dashboard stats in the user stats model."""
 
@@ -150,10 +159,10 @@ class UpdateWeeklyCreatorStats(beam.DoFn): # type: ignore[misc]
         schema_version = model.schema_version
 
         if schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
-            user_services.migrate_dashboard_stats_to_latest_schema(model) # type: ignore[no-untyped-call]
+            user_services.migrate_dashboard_stats_to_latest_schema(model)
 
         weekly_creator_stats = {
-            user_services.get_current_date_as_string(): { # type: ignore[no-untyped-call]
+            user_services.get_current_date_as_string(): {
                 'num_ratings': model.num_ratings or 0,
                 'average_ratings': model.average_ratings,
                 'total_plays': model.total_plays or 0

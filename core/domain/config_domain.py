@@ -38,7 +38,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
 
 (config_models, suggestion_models,) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.suggestion])
+    [models.Names.CONFIG, models.Names.SUGGESTION])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
@@ -179,6 +179,14 @@ class ConfigPropertyChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }]
+
+
+class ChangePropertyValueCmd(ConfigPropertyChange):
+    """Class representing the ConfigPropertyChange's
+    CMD_CHANGE_PROPERTY_VALUE command.
+    """
+
+    new_value: str
 
 
 class ConfigProperty:
@@ -430,6 +438,9 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
 
+# Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
+# to add that classroom to learner group syllabus filter whenever a new
+# classroom is added.
 CLASSROOM_PAGES_DATA = ConfigProperty(
     'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The details for each classroom page.', [{
