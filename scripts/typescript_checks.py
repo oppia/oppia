@@ -393,7 +393,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/skill-editor-page/skill-editor-page.component.ts',
     'core/templates/pages/skill-editor-page/skill-editor-page.import.ts',
     'core/templates/pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts',
-    'core/templates/pages/skill-editor-page/skill-preview-tab/skill-preview-tab.controller.spec.ts',
+    'core/templates/pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.spec.ts',
     'core/templates/pages/splash-page/splash-page.module.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.spec.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts',

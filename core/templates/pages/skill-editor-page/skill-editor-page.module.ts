@@ -51,6 +51,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { SkillEditorNavabarComponent } from './navbar/skill-editor-navbar.component';
 import { SkillQuestionsTabComponent } from './questions-tab/skill-questions-tab.component';
+import { SkillPreviewTabComponent } from './skill-preview-tab/skill-preview-tab.component';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -81,7 +83,8 @@ import { SkillQuestionsTabComponent } from './questions-tab/skill-questions-tab.
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,
-    SkillQuestionsTabComponent
+    SkillQuestionsTabComponent,
+    SkillPreviewTabComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
@@ -99,7 +102,8 @@ import { SkillQuestionsTabComponent } from './questions-tab/skill-questions-tab.
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,
-    SkillQuestionsTabComponent
+    SkillQuestionsTabComponent,
+    SkillPreviewTabComponent
   ],
   providers: [
     {
