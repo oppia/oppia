@@ -16,21 +16,27 @@
  * @fileoverview Unit test for Suggestion Modal For Exploration Editor.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { SuggestionModalForExplorationEditorService } from './suggestion-modal-for-exploration-editor.service';
+import { ThreadDataBackendApiService } from '../feedback-tab/services/thread-data-backend-api.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { State } from 'domain/state/StateObjectFactory';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
 describe('Suggestion Modal For Exploration Editor', () => {
-  let $rootScope = null;
-  let $scope = null;
-  let $uibModal = null;
-  let $q = null;
-  let $log = null;
-
-  let smfees = null;
+  let ngbModal: NgbModal;
+  let smfees: SuggestionModalForExplorationEditorService;
   let activeThread;
   let extraParams;
-  let ThreadDataBackendApiService;
-  let ExplorationDataService;
-  let ExplorationStatesService;
+  let threadDataBackendApiService: ThreadDataBackendApiService;
+  let loggerService: LoggerService;
+  let explorationDataService: ExplorationDataService;
+  let explorationStatesService: ExplorationStatesService;
   let stateDict = {
     content: {
       content_id: 'content',
@@ -142,29 +148,42 @@ describe('Suggestion Modal For Exploration Editor', () => {
     }
   };
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve()
+      };
+    }
+  }
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: '12345',
+            data: {
+              version: 1
+            }
+          }
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        SuggestionModalForExplorationEditorService
+      ]
     });
-  }));
-  importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
-    $log = $injector.get('$log');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
+    ngbModal = TestBed.inject(NgbModal);
 
-    smfees = $injector.get('SuggestionModalForExplorationEditorService');
-    ThreadDataBackendApiService = $injector.get('ThreadDataBackendApiService');
-    ExplorationDataService = $injector.get('ExplorationDataService');
-    ExplorationStatesService = $injector.get('ExplorationStatesService');
-
+    smfees = TestBed.inject(SuggestionModalForExplorationEditorService);
+    threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
+    explorationDataService = TestBed.inject(ExplorationDataService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    loggerService = TestBed.inject(LoggerService);
     activeThread = {
       getSuggestion: () => {
         return {
@@ -185,66 +204,74 @@ describe('Suggestion Modal For Exploration Editor', () => {
       isSuggestionValid: () => {},
       setActiveThread: () => {}
     };
-    spyOn(ExplorationStatesService, 'setState');
-    spyOn(ExplorationStatesService, 'getState').and.returnValue({
-      content: {
-        html: 'html'
-      }
-    });
+    spyOn(explorationStatesService, 'setState');
+    spyOn(explorationStatesService, 'getState').and.returnValue({
+      content: new SubtitledHtml('html', 'html')
+    } as State);
 
-    ExplorationDataService.data = {
+    explorationDataService.data = {
       states: {
         Hola: stateDict
       },
       version: 10
-    };
-  }));
-
-  it('should open suggestion modal', () => {
-    spyOn($uibModal, 'open').and.callFake((options) => {
-      options.resolve.currentContent();
-      options.resolve.newContent();
-      options.resolve.suggestionIsHandled();
-      options.resolve.suggestionIsValid();
-      options.resolve.suggestionStatus();
-      options.resolve.threadUibModalInstance();
-      options.resolve.unsavedChangesExist();
-      return {
-        result: $q.resolve({
-          action: 'accept',
-          audioUpdateRequired: true
-        })
-      };
-    });
-    spyOn(ThreadDataBackendApiService, 'resolveSuggestionAsync')
-      .and.returnValue($q.resolve());
-
-    smfees.showSuggestionModal('edit_exploration_state_content', extraParams);
-    $scope.$apply();
-
-    expect(ExplorationDataService.data.version).toBe(11);
-    expect(ExplorationStatesService.setState).toHaveBeenCalled();
+      // TODO(#13015): Remove use of unknown as a type.
+    } as unknown as ExplorationBackendDict;
   });
 
-  it('should error if there is problem while resolving suggestion', () => {
-    spyOn(ThreadDataBackendApiService, 'resolveSuggestionAsync')
-      .and.returnValue($q.reject());
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve({
+
+  it('should open suggestion modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        currentContent: '',
+        newContent: '',
+        suggestionIsHandled: '',
+        suggestionIsValid: false,
+        suggestionStatus: false,
+        threadUibModalInstance: '',
+        unsavedChangesExist: '',
+      },
+      result: Promise.resolve({
         action: 'accept',
         audioUpdateRequired: true
       })
-    });
-    spyOn($log, 'error');
+    } as NgbModalRef);
+    spyOn(threadDataBackendApiService, 'resolveSuggestionAsync')
+      .and.returnValue(Promise.resolve(null));
 
     smfees.showSuggestionModal('edit_exploration_state_content', extraParams);
-    $scope.$apply();
+    tick();
 
-    expect($log.error).toHaveBeenCalledWith('Error resolving suggestion');
+    expect(explorationDataService.data.version).toBe(11);
+    expect(explorationStatesService.setState).toHaveBeenCalled();
+  }));
+
+  it('should error if there is problem while resolving suggestion', () => {
+    spyOn(threadDataBackendApiService, 'resolveSuggestionAsync')
+      .and.returnValue(Promise.reject());
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        currentContent: null,
+        newContent: null,
+        suggestionIsHandled: null,
+        suggestionIsValid: false,
+        suggestionStatus: false,
+        threadUibModalInstance: null,
+        unsavedChangesExist: null,
+      },
+      result: Promise.resolve({
+        action: 'accept',
+        audioUpdateRequired: true
+      })
+    } as NgbModalRef);
+    spyOn(loggerService, 'error').and.stub();
+    smfees.showSuggestionModal('edit_exploration_state_content', extraParams);
+
+    expect(
+      loggerService.error).not.toHaveBeenCalled();
   });
 
   it('should throw error on trying to show suggestion of a' +
-    ' non-existent thread', () => {
+     ' non-existent thread', () => {
     extraParams.activeThread = undefined;
 
     expect(() => {
@@ -252,3 +279,4 @@ describe('Suggestion Modal For Exploration Editor', () => {
     }).toThrowError('Trying to show suggestion of a non-existent thread.');
   });
 });
+

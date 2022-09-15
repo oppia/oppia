@@ -81,6 +81,13 @@ import { SettingsTabComponent } from './settings-tab/settings-tab.component';
 import { UnresolvedAnswersOverviewComponent } from './editor-tab/unresolved-answers-overview/unresolved-answers-overview.component';
 import { PreviewTabComponent } from './preview-tab/preview-tab.component';
 import { HistoryTabComponent } from './history-tab/history-tab.component';
+import { ExplorationEditorSuggestionModalComponent } from './suggestion-modal-for-editor-view/exploration-editor-suggestion-modal.component';
+import { FeedbackTabComponent } from './feedback-tab/feedback-tab.component';
+import { ImprovementsTabComponent } from './improvements-tab/improvements-tab.component';
+import { NeedsGuidingResponsesTaskComponent } from './improvements-tab/needs-guiding-responses-task.component';
+import { StatisticsTabComponent } from './statistics-tab/statistics-tab.component';
+import { StateStatsModalComponent } from './statistics-tab/templates/state-stats-modal.component';
+import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
 
 @NgModule({
   imports: [
@@ -144,7 +151,14 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ExplorationEditorSuggestionModalComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    StatisticsTabComponent,
+    StateStatsModalComponent,
+    PieChartComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -190,7 +204,14 @@ import { HistoryTabComponent } from './history-tab/history-tab.component';
     SettingsTabComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
-    HistoryTabComponent
+    HistoryTabComponent,
+    ExplorationEditorSuggestionModalComponent,
+    FeedbackTabComponent,
+    ImprovementsTabComponent,
+    NeedsGuidingResponsesTaskComponent,
+    StatisticsTabComponent,
+    StateStatsModalComponent,
+    PieChartComponent
   ],
   providers: [
     {

@@ -17,7 +17,7 @@
  * visualization.
  */
 
-require('visualizations/oppia-visualization-sorted-tiles.directive.ts');
+require('visualizations/oppia-visualization-sorted-tiles.component.ts');
 
 import { TestBed } from '@angular/core/testing';
 
