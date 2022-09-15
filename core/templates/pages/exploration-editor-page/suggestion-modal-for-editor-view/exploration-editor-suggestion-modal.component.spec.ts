@@ -23,15 +23,15 @@ import { EditabilityService } from 'services/editability.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { ExplorationEditorSuggestionModalComponent } from './exploration-editor-suggestion-modal.component';
 
- class MockActiveModal {
-   close(): void {
-     return;
-   }
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-   dismiss(): void {
-     return;
-   }
- }
+  dismiss(): void {
+    return;
+  }
+}
 
 describe('Exploration Editor Suggestion Modal Controller', () => {
   let component: ExplorationEditorSuggestionModalComponent;
@@ -69,7 +69,8 @@ describe('Exploration Editor Suggestion Modal Controller', () => {
       component.suggestionIsHandled = false;
       component.suggestionIsValid = true;
       component.threadUibModalInstance = {
-        close: () => {}
+        close: () => {},
+        dismiss: () => {}
       };
       component.unsavedChangesExist = true;
       component.suggestionStatus = 'rejected';
@@ -132,7 +133,8 @@ describe('Exploration Editor Suggestion Modal Controller', () => {
         component.suggestionIsHandled = true;
         component.suggestionIsValid = false;
         component.threadUibModalInstance = {
-          close: () => {}
+          close: () => {},
+          dismiss: () => {}
         };
         component.unsavedChangesExist = true;
         component.suggestionStatus = 'rejected';
@@ -167,7 +169,8 @@ describe('Exploration Editor Suggestion Modal Controller', () => {
       component.unsavedChangesExist = false;
       component.suggestionIsHandled = true;
       component.threadUibModalInstance = {
-        close: () => {}
+        close: () => {},
+        dismiss: () => {}
       };
       component.suggestionStatus = 'rejected';
 
@@ -201,7 +204,8 @@ describe('Exploration Editor Suggestion Modal Controller', () => {
       component.unsavedChangesExist = false;
       component.suggestionStatus = 'rejected';
       component.threadUibModalInstance = {
-        close: () => {}
+        close: () => {},
+        dismiss: () => {}
       };
 
       fixture.detectChanges();
@@ -222,7 +226,8 @@ describe('Exploration Editor Suggestion Modal Controller', () => {
       component.unsavedChangesExist = false;
       component.suggestionStatus = 'rejected';
       component.threadUibModalInstance = {
-        close: () => {}
+        close: () => {},
+        dismiss: () => {}
       };
 
       component.ngOnInit();
