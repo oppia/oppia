@@ -276,8 +276,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                     b'-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
                     b'+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
             return (
-                b'-  "ANALYTICS_ID": "",\n'
-                b'+  "ANALYTICS_ID": "change",\n')
+                b'-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",\n'
+                b'+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n')
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(

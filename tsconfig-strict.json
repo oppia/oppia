@@ -16,6 +16,9 @@
     "moduleResolution": "node",
     "outDir": "local_compiled_js_for_test",
     "paths": {
+      "analytics-constants": [
+        "assets/analytics-constants.json"
+      ],
       "app-events/*": [
         "core/templates/app-events/*"
       ],

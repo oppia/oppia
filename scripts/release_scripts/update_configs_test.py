@@ -603,7 +603,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'verify_config_files_gets_called': False,
             'update_app_yaml_gets_called': False,
             'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False
+            'mailchimp_api_key_is_to_be_verified': False,
+            'update_analytics_constants_based_on_config': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
@@ -613,7 +614,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'verify_config_files_gets_called': True,
             'update_app_yaml_gets_called': True,
             'mailgun_api_key_is_to_be_verified': True,
-            'mailchimp_api_key_is_to_be_verified': True
+            'mailchimp_api_key_is_to_be_verified': True,
+            'update_analytics_constants_based_on_config': True
         }
         def mock_check_updates(
                 unused_release_feconf_path, unused_personal_access_token):
@@ -645,6 +647,14 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         ):
             check_function_calls['update_app_yaml_gets_called'] = True
 
+        def mock_update_analytics_constants_based_on_config(
+            unused_webpack_config_path,
+            unused_release_constants_path
+        ):
+            check_function_calls[
+                'update_analytics_constants_based_on_config'
+            ] = True
+
         check_updates_swap = self.swap(
             update_configs, 'check_updates_to_terms_of_service',
             mock_check_updates)
@@ -658,17 +668,22 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'verify_config_files', mock_verify_config_files)
         update_app_yaml_swap = self.swap(
             update_configs, 'update_app_yaml', mock_update_app_yaml)
+        update_analytics_constants_based_on_config_swap = self.swap(
+            update_configs,
+            'update_analytics_constants_based_on_config',
+            mock_update_analytics_constants_based_on_config)
 
         with self.url_open_swap, check_updates_swap, add_mailgun_api_key_swap:
             with apply_changes_swap, verify_config_files_swap:
                 with add_mailchimp_api_key_swap, update_app_yaml_swap:
-                    update_configs.main(
-                        args=[
-                            '--release_dir_path', 'test-release-dir',
-                            '--deploy_data_path', 'test-deploy-dir',
-                            '--personal_access_token', 'test-token',
-                            '--prompt_for_mailgun_and_terms_update',
-                        ])
+                    with update_analytics_constants_based_on_config_swap:
+                        update_configs.main(
+                            args=[
+                                '--release_dir_path', 'test-release-dir',
+                                '--deploy_data_path', 'test-deploy-dir',
+                                '--personal_access_token', 'test-token',
+                                '--prompt_for_mailgun_and_terms_update',
+                            ])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
@@ -677,14 +692,16 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'verify_config_files_gets_called': False,
             'update_app_yaml_gets_called': False,
             'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False
+            'mailchimp_api_key_is_to_be_verified': False,
+            'update_analytics_constants_based_on_config': False
         }
         expected_check_function_calls = {
             'apply_changes_based_on_config_gets_called': True,
             'verify_config_files_gets_called': True,
             'update_app_yaml_gets_called': True,
             'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False
+            'mailchimp_api_key_is_to_be_verified': False,
+            'update_analytics_constants_based_on_config': True
         }
         def mock_apply_changes(
             unused_local_filepath,
@@ -711,18 +728,67 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         ):
             check_function_calls['update_app_yaml_gets_called'] = True
 
+        def mock_update_analytics_constants_based_on_config(
+            unused_webpack_config_path,
+            unused_release_constants_path
+        ):
+            check_function_calls[
+                'update_analytics_constants_based_on_config'
+            ] = True
+
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
         verify_config_files_swap = self.swap(
             update_configs, 'verify_config_files', mock_verify_config_files)
         update_app_yaml_swap = self.swap(
             update_configs, 'update_app_yaml', mock_update_app_yaml)
+        update_analytics_constants_based_on_config_swap = self.swap(
+            update_configs,
+            'update_analytics_constants_based_on_config',
+            mock_update_analytics_constants_based_on_config)
+
         with apply_changes_swap, verify_config_files_swap, update_app_yaml_swap:
-            update_configs.main(
-                args=[
-                    '--release_dir_path', 'test-release-dir',
-                    '--deploy_data_path', 'test-deploy-dir',
-                    '--personal_access_token', 'test-token'
-                ]
-            )
+            with update_analytics_constants_based_on_config_swap:
+                update_configs.main(
+                    args=[
+                        '--release_dir_path', 'test-release-dir',
+                        '--deploy_data_path', 'test-deploy-dir',
+                        '--personal_access_token', 'test-token'
+                    ]
+                )
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_update_analytics_ids(self):
+        temp_constants_path = tempfile.NamedTemporaryFile().name
+        temp_analytics_constants_config_path = (
+            tempfile.NamedTemporaryFile().name
+        )
+        constants_text = (
+            '  "UA_ANALYTICS_ID": "456"\n'
+            '  "GA_ANALYTICS_ID": "123"\n'
+            '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
+            '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
+        )
+        analytics_constants_config_text = (
+            '  "GA_ANALYTICS_ID": ""\n'
+            '  "UA_ANALYTICS_ID": ""\n'
+            '  "SITE_NAME_FOR_ANALYTICS": ""\n'
+            '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
+        )
+        expected_analytics_constants_config_text = (
+            '  "GA_ANALYTICS_ID": "123"\n'
+            '  "UA_ANALYTICS_ID": "456"\n'
+            '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
+            '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
+        )
+        with utils.open_file(temp_constants_path, 'w') as f:
+            f.write(constants_text)
+        with utils.open_file(temp_analytics_constants_config_path, 'w') as f:
+            f.write(analytics_constants_config_text)
+
+        update_configs.update_analytics_constants_based_on_config(
+            temp_analytics_constants_config_path,
+            temp_constants_path
+        )
+        with utils.open_file(temp_analytics_constants_config_path, 'r') as f:
+            self.assertEqual(f.read(), expected_analytics_constants_config_text)
