@@ -439,7 +439,10 @@ def main(args=None):
             servers.managed_cloud_datastore_emulator(clear_datastore=True))
         stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_target:
-            if parsed_args.test_target.endswith('_test'):
+            if (
+                    parsed_args.test_target.endswith('_test')
+                    or '_test.' in parsed_args.test_target
+                ):
                 all_test_targets = [parsed_args.test_target]
             else:
                 print('')
