@@ -1,5 +1,5 @@
 
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,57 +14,54 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the questions tab.
+ * @fileoverview Component for the questions tab.
  */
 
-require(
-  'components/question-directives/questions-list/' +
-  'questions-list.component.ts');
-
-require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require('services/questions-list.service.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Subscription } from 'rxjs';
+import { GroupedSkillSummaries, SkillEditorStateService } from '../services/skill-editor-state.service';
 
-angular.module('oppia').directive('questionsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/questions-tab/' +
-        'skill-questions-tab.component.html'),
-      controller: [
-        '$scope', 'SkillEditorStateService',
-        function(
-            $scope, SkillEditorStateService) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          var _init = function() {
-            $scope.skill = SkillEditorStateService.getSkill();
-            $scope.groupedSkillSummaries = (
-              SkillEditorStateService.getGroupedSkillSummaries());
-            $scope.skillIdToRubricsObject = {};
-            $scope.skillIdToRubricsObject[$scope.skill.getId()] =
-              $scope.skill.getRubrics();
-          };
-          ctrl.$onInit = function() {
-            if (SkillEditorStateService.getSkill()) {
-              _init();
-            }
-            ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.onSkillChange.subscribe(
-                () => _init())
-            );
-          };
+@Component({
+  selector: 'oppia-questions-tab',
+  templateUrl: './skill-questions-tab.component.html'
+})
+export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
+  skill: Skill;
+  groupedSkillSummaries: GroupedSkillSummaries;
+  skillIdToRubricsObject = {};
 
-          $scope.$on('$destroy', function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          });
-        }
-      ]
-    };
-  }]);
+  constructor(
+    private skillEditorStateService: SkillEditorStateService
+  ) {}
+
+  directiveSubscriptions = new Subscription();
+  _init(): void {
+    this.skill = this.skillEditorStateService.getSkill();
+    this.groupedSkillSummaries = (
+      this.skillEditorStateService.getGroupedSkillSummaries());
+    this.skillIdToRubricsObject = {};
+    this.skillIdToRubricsObject[this.skill.getId()] =
+      this.skill.getRubrics();
+  }
+
+  ngOnInit(): void {
+    if (this.skillEditorStateService.getSkill()) {
+      this._init();
+    }
+    this.directiveSubscriptions.add(
+      this.skillEditorStateService.onSkillChange.subscribe(
+        () => this._init())
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaQuestionsTab',
+  downgradeComponent({
+    component: SkillQuestionsTabComponent
+  }) as angular.IDirectiveFactory);

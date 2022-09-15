@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,89 +13,71 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Skill question tab directive.
+ * @fileoverview Unit tests for the Skill question tab Component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
-
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 import { EventEmitter } from '@angular/core';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { SkillQuestionsTabComponent } from './skill-questions-tab.component';
 
-
-describe('Skill question tab directive', function() {
-  let $scope = null;
-  let ctrl = null;
-  let $rootScope = null;
-  let directive = null;
-  let skillEditorStateService: SkillEditorStateService = null;
+describe('Skill question tab component', () => {
+  let component: SkillQuestionsTabComponent;
+  let fixture: ComponentFixture<SkillQuestionsTabComponent>;
+  let skillEditorStateService: SkillEditorStateService;
   let initEventEmitter = new EventEmitter();
   const sampleSkill = new Skill(
     null, 'Skill description loading',
     [], [], null, 'en', 1, 0, null, false, []);
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    directive = $injector.get('questionsTabDirective')[0];
-    skillEditorStateService = $injector.get('SkillEditorStateService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SkillQuestionsTabComponent);
+    component = fixture.componentInstance;
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
 
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(initEventEmitter);
+    component.ngOnDestroy();
+  });
 
-    ctrl = $injector.instantiate(directive.controller, {
-      $rootScope: $scope,
-      $scope: $scope
-    });
-    ctrl.$onInit();
-  }));
-
-  it('should fetch skill when initialized', function() {
+  it('should fetch skill when initialized', () => {
     const fetchSkillSpy = spyOn(
       skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
     initEventEmitter.emit();
-    $scope.$apply();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
     expect(
       skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
   });
 
-  it('should not initialize when skill is not available', function() {
+  it('should not initialize when skill is not available', () => {
     const fetchSkillSpy = spyOn(
       skillEditorStateService, 'getSkill').and.returnValue(undefined);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
 
-    ctrl.$onInit();
-    $scope.$apply();
+    component.ngOnInit();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
     expect(
       skillEditorStateService.getGroupedSkillSummaries).not.toHaveBeenCalled();
   });
 
-  it('should initialize when skill is available', function() {
+  it('should initialize when skill is available', () => {
     const fetchSkillSpy = spyOn(
       skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
 
-    ctrl.$onInit();
-    $scope.$apply();
+    component.ngOnInit();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
     expect(
