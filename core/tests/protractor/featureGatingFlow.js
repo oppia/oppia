@@ -98,7 +98,7 @@ describe('Feature Gating Flow', function() {
     async() => {
       await users.login(ADMIN_USER1_EMAIL, true);
 
-      // await adminPage.getFeaturesTab();
+      await adminPage.getFeaturesTab();
       var dummy = await adminPage.getDummyFeatureElement();
       await adminPage.enableFeatureForDev(dummy);
 
