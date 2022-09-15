@@ -854,5 +854,5 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'check_if_on_ci', lambda: True))
 
         with self.assertRaisesRegex(
-            SystemExit, 'The process exited with code 1'):
+            SystemError, 'The process exited with code 1'):
             run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
