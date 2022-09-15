@@ -2391,6 +2391,38 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services.get_translation_contribution_stats_models(
                 ['invalid_id'])
 
+    def test_get_translation_contribution_stats_for_strict_false(
+        self
+    ) -> None:
+        stats_models = suggestion_services.get_translation_contribution_stats_models(
+            ['invalid_id'], False)
+
+        self.assertEqual(stats_models, [None])
+
+    def test_get_translation_review_stats_for_strict_false(
+        self
+    ) -> None:
+        stats_models = suggestion_services.get_translation_review_stats_models(
+            ['invalid_id'], False)
+
+        self.assertEqual(stats_models, [None])
+
+    def test_get_question_contribution_stats_for_strict_false(
+        self
+    ) -> None:
+        stats_models = suggestion_services.get_question_contribution_stats_models(
+            ['invalid_id'], False)
+
+        self.assertEqual(stats_models, [None])
+
+    def test_get_question_review_stats_for_strict_false(
+        self
+    ) -> None:
+        stats_models = suggestion_services.get_question_review_stats_models(
+            ['invalid_id'], False)
+
+        self.assertEqual(stats_models, [None])
+
     def test_get_translation_review_stats_for_invalid_id_with_strict_true(
         self
     ) -> None:
