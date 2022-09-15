@@ -16,7 +16,7 @@
  * @fileoverview Component for the about foundation page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -31,6 +31,13 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   styleUrls: []
 })
 export class AndroidPageComponent implements OnInit, OnDestroy {
+  @ViewChild('feature1') featureRef1: ElementRef<Element>;
+  @ViewChild('feature2') featureRef2: ElementRef<Element>;
+  @ViewChild('feature3') featureRef3: ElementRef<Element>;
+  @ViewChild('feature4') featureRef4: ElementRef<Element>;
+
+  featuresShown = 0;
+
   directiveSubscriptions = new Subscription();
   constructor(
     private pageTitleService: PageTitleService,
@@ -44,6 +51,19 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+  }
+
+  ngAfterViewInit(): void {
+    this.setPageTitle();
+    const featuresSectionObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && this.featuresShown < 4) {
+        this.featuresShown++;
+      }
+    });
+    featuresSectionObserver.observe(this.featureRef1.nativeElement);
+    featuresSectionObserver.observe(this.featureRef2.nativeElement);
+    featuresSectionObserver.observe(this.featureRef3.nativeElement);
+    featuresSectionObserver.observe(this.featureRef4.nativeElement);
   }
 
   setPageTitle(): void {
