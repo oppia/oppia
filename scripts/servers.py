@@ -738,10 +738,8 @@ def managed_webdriverio_server(
         webdriverio_args, human_readable_name='WebdriverIO Server', shell=True,
         raise_on_nonzero_exit=False, **kwargs)
 
-    with managed_webdriverio_proc as proc:
-        yield proc
-
     try:
-        yield
+        with managed_webdriverio_proc as proc:
+            yield proc
     finally:
         del os.environ['MOBILE']
