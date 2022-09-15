@@ -16,7 +16,6 @@
  * @fileoverview Component for the improvements tab of the exploration editor.
  */
 
-
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
@@ -24,10 +23,10 @@ import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-res
 import { SupportingStateStats } from 'services/exploration-improvements-task-registry.service';
 import { RouterService } from '../services/router.service';
 
- @Component({
-   selector: 'oppia-needs-guiding-responses-task',
-   templateUrl: './needs-guiding-responses-task.component.html'
- })
+@Component({
+  selector: 'oppia-needs-guiding-responses-task',
+  templateUrl: './needs-guiding-responses-task.component.html'
+})
 export class NeedsGuidingResponsesTaskComponent implements OnInit {
    @Input() stats: SupportingStateStats;
    @Input() task: NeedsGuidingResponsesTask;

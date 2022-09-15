@@ -16,7 +16,6 @@
  * @fileoverview Service to display suggestion modal in editor view.
  */
 
-
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -32,27 +31,27 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 
 export interface ExtraParams {
-   activeThread: SuggestionThread;
-   isSuggestionHandled: boolean;
-   isSuggestionValid: boolean;
-   hasUnsavedChanges: boolean;
-   setActiveThread: (threadId: string) => Promise<void>;
- }
+  activeThread: SuggestionThread;
+  isSuggestionHandled: boolean;
+  isSuggestionValid: boolean;
+  hasUnsavedChanges: boolean;
+  setActiveThread: (threadId: string) => Promise<void>;
+}
 
- @Injectable({
-   providedIn: 'root'
- })
+@Injectable({
+  providedIn: 'root'
+})
 export class SuggestionModalForExplorationEditorService {
   constructor(
-     private ngbModal: NgbModal,
-     private explorationStatesService: ExplorationStatesService,
-     private threadDataBackendApiService: ThreadDataBackendApiService,
-     private explorationDataService: ExplorationDataService,
-     private stateObjectFactory: StateObjectFactory,
-     private routerService: RouterService,
-     private stateEditorRefreshService: StateEditorRefreshService,
-     private loggerService: LoggerService,
-  ) {}
+    private explorationDataService: ExplorationDataService,
+    private explorationStatesService: ExplorationStatesService,
+    private loggerService: LoggerService,
+    private ngbModal: NgbModal,
+    private routerService: RouterService,
+    private stateEditorRefreshService: StateEditorRefreshService,
+    private stateObjectFactory: StateObjectFactory,
+    private threadDataBackendApiService: ThreadDataBackendApiService,
+  ) { }
 
   showEditStateContentSuggestionModal(
       activeThread: SuggestionThread,

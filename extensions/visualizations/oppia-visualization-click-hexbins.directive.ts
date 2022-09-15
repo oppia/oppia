@@ -47,6 +47,14 @@ export interface ClickOnImageAnswer {
   frequency: number;
 }
 
+interface InteractionArgs {
+  imageAndRegions: {
+    value: {
+      imagePath: string;
+    };
+  };
+}
+
 export type Hexbin = HexbinBin<ClickOnImageAnswer>;
 
 @Component({
@@ -54,8 +62,9 @@ export type Hexbin = HexbinBin<ClickOnImageAnswer>;
   templateUrl: './oppia-visualization-click-hexbins.directive.html',
 })
 export class OppiaVisualizationClickHexbinsComponent implements OnInit {
-  @Input() data;
-  @Input() interactionArgs;
+  @Input() data: ClickOnImageAnswer[];
+  @Input() interactionArgs: InteractionArgs;
+
   tooltipTarget: Hexbin = null;
 
   imagePath: string;
@@ -69,9 +78,9 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   colorScale: ScaleLinear<RGBColor, RGBColor>;
 
   constructor(
-     private assetsBackendApiService: AssetsBackendApiService,
-     private contextService: ContextService,
-     private imagePreloaderService: ImagePreloaderService
+    private assetsBackendApiService: AssetsBackendApiService,
+    private contextService: ContextService,
+    private imagePreloaderService: ImagePreloaderService
   ) { }
 
   getTooltipStyle(): object {

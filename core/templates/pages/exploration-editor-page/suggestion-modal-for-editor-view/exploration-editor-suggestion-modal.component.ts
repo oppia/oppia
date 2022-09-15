@@ -35,7 +35,7 @@ export class ExplorationEditorSuggestionModalComponent
   commitMessage: string;
   reviewMessage: string;
   MAX_COMMIT_MESSAGE_LENGTH = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
-  isNotHandled;
+  isNotHandled: boolean;
   canReject: boolean;
   errorMessage: string;
   canAccept: boolean;

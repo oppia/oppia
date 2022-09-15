@@ -18,9 +18,9 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { EditabilityService } from 'services/editability.service';
@@ -35,10 +35,10 @@ import { SuggestionModalForExplorationEditorService } from '../suggestion-modal-
 import { FeedbackThread } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 
- @Component({
-   selector: 'oppia-feedback-tab',
-   templateUrl: './feedback-tab.component.html'
- })
+@Component({
+  selector: 'oppia-feedback-tab',
+  templateUrl: './feedback-tab.component.html'
+})
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   STATUS_CHOICES = this.threadStatusDisplayService.STATUS_CHOICES;
@@ -53,19 +53,19 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
    };
 
   constructor(
-     private alertsService: AlertsService,
-     private changeListService: ChangeListService,
-     private dateTimeFormatService: DateTimeFormatService,
-     private editabilityService: EditabilityService,
-     private explorationStatesService: ExplorationStatesService,
-     private focusManagerService: FocusManagerService,
-     private loaderService: LoaderService,
-     private ngbModal: NgbModal,
-     private suggestionModalForExplorationEditorService:
-       SuggestionModalForExplorationEditorService,
-     private threadDataBackendApiService: ThreadDataBackendApiService,
-     private threadStatusDisplayService: ThreadStatusDisplayService,
-     private userService: UserService,
+    private alertsService: AlertsService,
+    private changeListService: ChangeListService,
+    private dateTimeFormatService: DateTimeFormatService,
+    private editabilityService: EditabilityService,
+    private explorationStatesService: ExplorationStatesService,
+    private focusManagerService: FocusManagerService,
+    private loaderService: LoaderService,
+    private ngbModal: NgbModal,
+    private suggestionModalForExplorationEditorService:
+      SuggestionModalForExplorationEditorService,
+    private threadDataBackendApiService: ThreadDataBackendApiService,
+    private threadStatusDisplayService: ThreadStatusDisplayService,
+    private userService: UserService,
   ) { }
 
   _resetTmpMessageFields(): void {
