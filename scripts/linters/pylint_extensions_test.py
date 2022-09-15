@@ -2824,7 +2824,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(
             message1, message3, message2
         ):
-            self.checker_test_object.checker.visit_module(node_with_combined_types)
+            self.checker_test_object.checker.visit_module(
+                node_with_combined_types
+            )
         temp_file.close()
 
     def test_raises_error_if_any_type_used_in_function_signature(self):
@@ -2850,7 +2852,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             node=node_with_any_type_arg
         )
         with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(node_with_any_type_arg)
+            self.checker_test_object.checker.visit_module(
+                node_with_any_type_arg
+            )
         temp_file.close()
 
         node_with_any_type_return = astroid.scoped_nodes.Module(
@@ -2875,7 +2879,9 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             node=node_with_any_type_return
         )
         with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(node_with_any_type_return)
+            self.checker_test_object.checker.visit_module(
+                node_with_any_type_return
+            )
         temp_file.close()
 
         node_with_any_type_return_and_args = astroid.scoped_nodes.Module(
