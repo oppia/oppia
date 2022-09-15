@@ -2580,7 +2580,9 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-    def test_raises_error_if_gap_in_ignore_and_comment_is_more_than_ten(self):
+    def test_raises_error_if_gap_in_ignore_and_comment_is_more_than_fifteen(
+        self
+    ):
         node_with_ignore_and_more_than_ten_gap = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
@@ -2653,7 +2655,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.visit_module(
             node_with_ignore_having_todo
         )
-        with self.checker_test_object.assertAddsMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
     def test_raises_no_error_if_module_is_excluded(self):
@@ -2679,7 +2681,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.visit_module(
             node_with_ignore_having_todo
         )
-        with self.checker_test_object.assertAddsMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
 
@@ -2770,7 +2772,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_raises_error_if_exceptional_types_are_occurred_combined_in_module(
+    def test_raises_error_if_exceptional_types_are_combined_in_module(
         self
     ):
         node_with_combined_types = astroid.scoped_nodes.Module(
@@ -3102,7 +3104,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-    def test_raises_error_if_gap_between_type_and_comment_is_more_than_ten(
+    def test_raises_error_if_gap_between_type_and_comment_is_more_than_fifteen(
         self
     ):
         node_with_object_and_more_than_expected_gap = (
