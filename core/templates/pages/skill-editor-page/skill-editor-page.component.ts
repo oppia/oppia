@@ -33,7 +33,7 @@ require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require(
   'pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts');
 require(
-  'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
+  'pages/skill-editor-page/questions-tab/skill-questions-tab.component.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
