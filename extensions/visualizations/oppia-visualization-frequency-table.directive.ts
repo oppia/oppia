@@ -26,24 +26,23 @@ import './oppia-visualization-frequency-table.directive.css';
   templateUrl: './oppia-visualization-frequency-table.directive.html'
 })
 export class OppiaVisualizationFrequencyTableComponent {
-   @Input() data: {
-     answer: string;
-     frequency: string;
-     isAddressed: boolean;
-   } [] = [];
+  @Input() data: {
+    answer: string;
+    frequency: string;
+    isAddressed: boolean;
+  } [] = [];
 
-   @Input() options: {
-     title: string;
-     column_headers: string[];
-   } | null = null;
+  @Input() options: {
+    title: string;
+    column_headers: string[];
+  } | null = null;
 
-   @Input() addressedInfoIsSupported: boolean = false;
+  @Input() addressedInfoIsSupported: boolean = false;
 
-   constructor() {}
+  constructor() {}
 }
 
 angular.module('oppia').directive('oppiaVisualizationFrequencyTable',
    downgradeComponent({
      component: OppiaVisualizationFrequencyTableComponent
    }) as angular.IDirectiveFactory);
-

@@ -43,10 +43,22 @@ interface PieChartOpitons {
 })
 export class StateStatsModalComponent
    extends ConfirmOrCancelModal implements OnInit {
-  @Input() visualizationsInfo: string[];
+  @Input() visualizationsInfo: {
+    data: string;
+    options: string;
+    id: string;
+    addressed_info_is_supported: boolean;
+  } [];
+
   @Input() interactionArgs: InteractionCustomizationArgs;
   @Input() stateName: string;
-  @Input() stateStats;
+  @Input() stateStats: {
+    usefulFeedbackCount: number;
+    totalAnswersCount: number;
+    numTimesSolutionViewed: number;
+    totalHitCount: number;
+    numCompletions: number;
+  };
 
   solutionUsagePieChartOptions: PieChartOpitons;
   answerFeedbackPieChartOptions: PieChartOpitons;
@@ -115,5 +127,3 @@ export class StateStatsModalComponent
     ];
   }
 }
-
-

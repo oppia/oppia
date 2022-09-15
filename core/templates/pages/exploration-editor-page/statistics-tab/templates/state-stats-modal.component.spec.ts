@@ -13,82 +13,113 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for StateStatsModalController.
+ * @fileoverview Unit tests for StateStatsModalComponent.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// file is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { StateStatsModalComponent } from './state-stats-modal.component';
 
-describe('State Stats Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var RouterService = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  var stateName = 'State 1';
-  var stateStats = {
+  dismiss(): void {
+    return;
+  }
+}
+
+describe('State Stats Modal Component', () => {
+  let component: StateStatsModalComponent;
+  let fixture: ComponentFixture<StateStatsModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let routerService: RouterService;
+
+  let stateName = 'State 1';
+  let stateStats = {
     usefulFeedbackCount: 0,
     totalAnswersCount: 10,
     numTimesSolutionViewed: 4,
     totalHitCount: 13,
     numCompletions: 8
   };
-  var stateStatsModalIsOpen = true;
-  var visualizationsInfo = [{
+  let visualizationsInfo = [{
     data: 'Hola',
     options: 'Options',
     id: '1',
     addressed_info_is_supported: true
   }];
-  var interactionArgs = {
+  let interactionArgs = {
   };
 
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-    RouterService = $injector.get('RouterService');
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    $scope = $rootScope.$new();
-    $controller('StateStatsModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      interactionArgs: interactionArgs,
-      stateName: stateName,
-      stateStats: stateStats,
-      stateStatsModalIsOpen: stateStatsModalIsOpen,
-      visualizationsInfo: visualizationsInfo,
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        StateStatsModalComponent
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.stateName).toBe(stateName);
-      expect($scope.numEnters).toEqual(stateStats.totalHitCount);
-      expect($scope.numQuits)
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StateStatsModalComponent);
+    component = fixture.componentInstance;
+
+    routerService = TestBed.inject(RouterService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+
+    spyOn(ngbActiveModal, 'close').and.stub();
+
+    component.stateStats = stateStats;
+    component.visualizationsInfo = visualizationsInfo;
+    component.interactionArgs = interactionArgs;
+    component.stateName = stateName;
+
+    component.ngOnInit();
+    fixture.detectChanges();
+  });
+
+  it('should initialize component properties after component is initialized',
+    () => {
+      expect(component.stateName).toBe(stateName);
+      expect(component.numEnters).toEqual(stateStats.totalHitCount);
+      expect(component.numQuits)
         .toEqual(stateStats.totalHitCount - stateStats.numCompletions);
-      expect($scope.interactionArgs).toBe(interactionArgs);
-      expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
+      expect(component.interactionArgs).toBe(interactionArgs);
+      expect(component.visualizationsInfo).toEqual(visualizationsInfo);
     });
 
-  it('should navigate to state editor', function() {
-    spyOn(RouterService, 'navigateToMainTab').and.callThrough();
-    $scope.navigateToStateEditor();
+  it('should navigate to state editor', () => {
+    spyOn(ngbActiveModal, 'dismiss').and.stub();
+    spyOn(routerService, 'navigateToMainTab').and.stub();
 
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    expect(RouterService.navigateToMainTab).toHaveBeenCalledWith(stateName);
+    component.stateName = stateName;
+    component.navigateToStateEditor();
+
+    expect(component.makeCompletionRatePieChartOptions('title')).toEqual({
+      left: 20,
+      pieHole: 0.6,
+      pieSliceTextStyleColor: 'black',
+      pieSliceBorderColor: 'black',
+      chartAreaWidth: 240,
+      colors: ['#d8d8d8', '#008808', 'blue'],
+      height: 270,
+      legendPosition: 'right',
+      title: 'title',
+      width: 240
+    });
+    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+    expect(routerService.navigateToMainTab).toHaveBeenCalledWith(stateName);
   });
 });

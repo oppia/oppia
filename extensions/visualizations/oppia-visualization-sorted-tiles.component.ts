@@ -31,61 +31,60 @@ import './oppia-visualization-sorted-tiles.component.css';
   templateUrl: './oppia-visualization-sorted-tiles.component.html'
 })
 export class VisualizationSortedTilesComponent implements OnInit {
-   @Input() data: AnswerStats[];
-   @Input() totalFrequency: number;
-   @Input() options: {
-     use_percentages: number;
-   };
+  @Input() data: AnswerStats[];
+  @Input() totalFrequency: number;
+  @Input() options: {
+    use_percentages: boolean;
+  };
 
-   isSelected: boolean[];
-   percentages: number[];
+  isSelected: boolean[];
+  percentages: number[];
 
-   constructor(
+  constructor(
      private utilsService: UtilsService,
      private ngbModal: NgbModal,
-   ) {}
+  ) {}
 
-   isAnswerTooLong(index: number): boolean {
-     return this.utilsService.isOverflowing(
-       $('.oppia-visualization-sorted-tile-answer.answer-' + index).get(0)
-     );
-   }
+  isAnswerTooLong(index: number): boolean {
+    return this.utilsService.isOverflowing(
+      $('.oppia-visualization-sorted-tile-answer.answer-' + index).get(0)
+    );
+  }
 
-   select(index: number): void {
-     this.isSelected[index] = true;
-   }
+  select(index: number): void {
+    this.isSelected[index] = true;
+  }
 
-   unselect(index: number): void {
-     this.isSelected[index] = false;
-   }
+  unselect(index: number): void {
+    this.isSelected[index] = false;
+  }
 
-   openAnswerContentModal(index: number): void {
-     const modalRef = this.ngbModal.open(AnswerContentModalComponent, {
-       backdrop: false,
-     });
+  openAnswerContentModal(index: number): void {
+    const modalRef = this.ngbModal.open(AnswerContentModalComponent, {
+      backdrop: false,
+    });
 
-     modalRef.componentInstance.answerHtml = this.data[index].answer;
+    modalRef.componentInstance.answerHtml = this.data[index].answer;
 
-     modalRef.result.then(() => {}, () => {});
-   }
+    modalRef.result.then(() => {}, () => {});
+  }
 
-   ngOnInit(): void {
-     const data = this.data as AnswerStats[];
-     const totalFrequency = (
-       this.totalFrequency || sum(data, a => a.frequency));
+  ngOnInit(): void {
+    const data = this.data as AnswerStats[];
+    const totalFrequency = (
+      this.totalFrequency || sum(data, a => a.frequency));
 
-     this.isSelected = Array<boolean>(this.data.length).fill(false);
+    this.isSelected = Array<boolean>(this.data.length).fill(false);
 
-     if (this.options.use_percentages) {
-       this.percentages = (
-         this.data.map(
-           d => Math.round(100.0 * d.frequency / totalFrequency)));
-     }
-   }
+    if (this.options.use_percentages) {
+      this.percentages = (
+        this.data.map(
+          d => Math.round(100.0 * d.frequency / totalFrequency)));
+    }
+  }
 }
 
 angular.module('oppia').directive('oppiaVisualizationSortedTiles',
    downgradeComponent({
      component: VisualizationSortedTilesComponent
    }) as angular.IDirectiveFactory);
-

@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,24 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for "enumerated frequency table" visualization.
+ * @fileoverview Component unit tests for the "enumerated sorted tiles"
+ * visualization.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { OppiaVisualizationEnumeratedFrequencyTableComponent } from './oppia-visualization-enumerated-frequency-table.directive';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { OppiaVisualizationFrequencyTableComponent } from './oppia-visualization-frequency-table.directive';
 
-describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
-  let component: OppiaVisualizationEnumeratedFrequencyTableComponent;
-  let fixture: ComponentFixture<
-  OppiaVisualizationEnumeratedFrequencyTableComponent>;
+describe('Oppia visualization frequency table', () => {
+  let component: OppiaVisualizationFrequencyTableComponent;
+  let fixture: ComponentFixture<OppiaVisualizationFrequencyTableComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        OppiaVisualizationEnumeratedFrequencyTableComponent
+        OppiaVisualizationFrequencyTableComponent
       ],
       providers: [
       ],
@@ -40,18 +40,20 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      OppiaVisualizationEnumeratedFrequencyTableComponent);
+      OppiaVisualizationFrequencyTableComponent);
     component = fixture.componentInstance;
 
-    component.data = [1, 0, 0];
+    component.options = {
+      title: 'options',
+      column_headers: ['column_headers0', 'column_headers1']
+    };
+
+    fixture.detectChanges();
   });
 
-  it('should intialize component properly', fakeAsync(() => {
-    tick();
-    component.ngOnInit();
-
-    component.toggleAnswerVisibility(0);
-
-    expect(component.answerVisible[0]).toEqual(false);
-  }));
+  it('should intialize component', () => {
+    expect(component).toBeDefined();
+    expect(component.data).toEqual([]);
+    expect(component.addressedInfoIsSupported).toEqual(false);
+  });
 });

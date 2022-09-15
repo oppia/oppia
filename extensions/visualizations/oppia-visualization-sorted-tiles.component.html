@@ -5,7 +5,7 @@
 <ol class="oppia-visualization-sorted-tiles">
   <li tabindex="-1"
       *ngFor="let datum of data; index as index"
-      [ngClass]="['oppia-visualization-sorted-tile', {'selected': isSelected[index]}]">
+      [ngClass]="{'selected': isSelected[index]}">
     <div class="oppia-visualization-sorted-tile-content"
          (mouseover)="select(index)" (mouseleave)="unselect(index)">
       <div class="oppia-visualization-sorted-tile-answer answer-{{ index }}">

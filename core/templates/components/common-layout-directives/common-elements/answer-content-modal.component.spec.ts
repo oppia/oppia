@@ -13,30 +13,62 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AnswerContentModalController.
+ * @fileoverview Unit tests for AnswerContentModalComponent.
  */
 
-describe('Improvement Confirmation Modal', function() {
-  let $scope = null;
-  let $uibModalInstance = null;
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AnswerContentModalComponent } from './answer-content-modal.component';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    let $rootScope = $injector.get('$rootScope');
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-    $uibModalInstance = (
-      jasmine.createSpyObj('$uibModalInstance', ['close', 'dismiss']));
+  dismiss(): void {
+    return;
+  }
+}
 
-    $scope = $rootScope.$new();
-    $controller('AnswerContentModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      answerHtml: '<div>Lorem ipsum dolor sit amet.</div>',
-    });
+describe('Improvement Confirmation Modal', () => {
+  let component: AnswerContentModalComponent;
+  let fixture: ComponentFixture<AnswerContentModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        AnswerContentModalComponent
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should evalute scope letiables values correctly', function() {
-    expect($scope.answerHtml).toEqual('<div>Lorem ipsum dolor sit amet.</div>');
-    expect($scope.close).toBe($uibModalInstance.close);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AnswerContentModalComponent);
+    component = fixture.componentInstance;
+
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+
+    spyOn(ngbActiveModal, 'close').and.stub();
+    fixture.detectChanges();
   });
+
+  it('should evalute scope letiables values correctly', fakeAsync(() => {
+    expect(component.answerHtml).toEqual('');
+
+    component.close();
+    tick();
+
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  }));
 });

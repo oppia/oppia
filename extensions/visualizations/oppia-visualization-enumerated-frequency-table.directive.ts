@@ -27,25 +27,25 @@ import './oppia-visualization-enumerated-frequency-table.directive.css';
 })
 export class OppiaVisualizationEnumeratedFrequencyTableComponent
    implements OnInit {
-   @Input() data: number[];
-   @Input() addressedInfoIsSupported: string[];
-   @Input() options: {
-     title: string;
-     column_headers: string;
-   };
+  @Input() data: number[];
+  @Input() addressedInfoIsSupported: string[];
+  @Input() options: {
+    title: string;
+    column_headers: string;
+  };
 
-   answerVisible: boolean[];
+  answerVisible: boolean[];
 
-   constructor() { }
+  constructor() { }
 
-   toggleAnswerVisibility(i: number): void {
-     this.answerVisible[i] = !this.answerVisible[i];
-   }
+  toggleAnswerVisibility(i: number): void {
+    this.answerVisible[i] = !this.answerVisible[i];
+  }
 
-   ngOnInit(): void {
-     // By default only the first element is shown, the rest are hidden.
-     this.answerVisible = this.data.map((_, i) => i === 0);
-   }
+  ngOnInit(): void {
+    // By default only the first element is shown, the rest are hidden.
+    this.answerVisible = this.data.map((_, i) => i === 0);
+  }
 }
 
 angular.module('oppia').directive('oppiaVisualizationEnumeratedFrequencyTable',

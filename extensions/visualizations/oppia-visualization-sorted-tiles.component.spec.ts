@@ -13,135 +13,75 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive unit tests for the "enumerated sorted tiles"
+ * @fileoverview Component unit tests for the "enumerated sorted tiles"
  * visualization.
  */
 
-require('visualizations/oppia-visualization-sorted-tiles.component.ts');
-
-import { TestBed } from '@angular/core/testing';
-
-import { AnswerStatsBackendDict, AnswerStats } from
-  'domain/exploration/answer-stats.model';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AnswerContentModalComponent } from 'components/common-layout-directives/common-elements/answer-content-modal.component';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { UtilsService } from 'services/utils.service';
+import { VisualizationSortedTilesComponent } from './oppia-visualization-sorted-tiles.component';
 
 describe('Oppia sorted tiles visualization', function() {
-  let $compile, $rootScope, $uibModal;
+  let component: VisualizationSortedTilesComponent;
+  let fixture: ComponentFixture<VisualizationSortedTilesComponent>;
   let utilsService: UtilsService;
+  let ngbModal: NgbModal;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    utilsService = TestBed.get(UtilsService);
-    $provide.value('UtilsService', utilsService);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        VisualizationSortedTilesComponent,
+        AnswerContentModalComponent
+      ],
+      providers: [
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
-  beforeEach(angular.mock.inject(function($injector) {
-    $compile = $injector.get('$compile');
-    $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(VisualizationSortedTilesComponent);
+    component = fixture.componentInstance;
+
+    utilsService = TestBed.inject(UtilsService);
+    ngbModal = TestBed.inject(NgbModal);
+
+    spyOn(ngbModal, 'open').and.returnValue(
+      {
+        componentInstance: {
+          answerHtml: null,
+        },
+        result: Promise.resolve()
+      } as NgbModalRef);
+
+    component.options = {
+      use_percentages: true
+    };
+    component.data = [new AnswerStats(null, 'answerHtml', 0, true)];
+    component.ngOnInit();
+    fixture.detectChanges();
+  });
+
+  it('should intialize component', fakeAsync(() => {
+    spyOn(utilsService, 'isOverflowing').and.returnValue(true);
+
+    component.isSelected = [false, true];
+    component.select(0);
+    component.unselect(1);
+    tick();
+
+    expect(component.isAnswerTooLong(0)).toBe(true);
+    expect(component.isSelected).toEqual([true, false]);
+
+    component.openAnswerContentModal(0);
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
   }));
-
-  const newDirective = (
-    (data: AnswerStatsBackendDict[], options: Object): JQLite => {
-      const elementHtml = (
-        '<oppia-visualization-sorted-tiles data="data" options="options">' +
-        '</oppia-visualization-sorted-tiles>');
-      const scope = $rootScope.$new();
-      scope.data = (
-        data.map(d => AnswerStats.createFromBackendDict(d)));
-      scope.options = options;
-      const element = $compile(elementHtml)(scope);
-      $rootScope.$digest();
-      return element;
-    });
-
-  describe('Without percentages', () => {
-    let element: JQLite;
-
-    beforeEach(() => {
-      element = newDirective(
-        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
-        {header: 'Pretty Tiles!', use_percentages: false});
-    });
-
-    it('should render the provided data and their frequencies', () => {
-      expect(element.find('strong').text()).toEqual('Pretty Tiles!');
-      expect(
-        element.find('div.oppia-visualization-sorted-tile-content > div')
-          .map((_, el) => el.textContent.trim()).toArray())
-        .toEqual(['foo', '3 times', 'bar', '1 time']);
-    });
-  });
-
-  describe('With percentages', () => {
-    let element: JQLite;
-
-    beforeEach(() => {
-      element = newDirective(
-        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
-        {header: 'Pretty Tiles!', use_percentages: true});
-    });
-
-    it('should render the provided data with percentages', () => {
-      expect(
-        element.find('div.oppia-visualization-sorted-tile-content > div')
-          .map((_, el) => el.textContent.trim()).toArray())
-        .toEqual(['foo', '75%', 'bar', '25%']);
-    });
-
-    describe('Tooltip behavior', () => {
-      it('should not show frequency tooltip by default', () => {
-        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-          .toEqual(0);
-      });
-
-      it('should show and hide tooltip when hovering the percentage', () => {
-        element.find('.oppia-visualization-sorted-tile-content:first')
-          .trigger('mouseover');
-
-        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-          .toEqual(1);
-        expect(
-          element.find('.oppia-visualization-sorted-tile-tooltip')
-            .get(0).innerText.trim())
-          .toEqual('3 times');
-
-        element.find('.oppia-visualization-sorted-tile-content:first')
-          .trigger('mouseleave');
-        expect(element.find('.oppia-visualization-sorted-tile-tooltip').length)
-          .toEqual(0);
-      });
-    });
-  });
-
-  describe('Very long content', () => {
-    const veryLongAnswer = (
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ' +
-      'eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ' +
-      'ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut ' +
-      'aliquip ex ea commodo consequat. Duis aute irure dolor in ' +
-      'reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla ' +
-      'pariatur. Excepteur sint occaecat cupidatat non proident, sunt in ' +
-      'culpa qui officia deserunt mollit anim id est laborum.');
-    let element: JQLite;
-
-    beforeEach(() => {
-      spyOn(utilsService, 'isOverflowing').and.returnValue(true);
-
-      element = newDirective(
-        [{answer: veryLongAnswer, frequency: 3}],
-        {header: 'Pretty Tiles!', use_percentages: true});
-    });
-
-    it('should respect that the answer is too long', () => {
-      expect(element.find('.answer-0 > .more').length).toEqual(1);
-    });
-
-    it('should open the answer content modal when prompted for more', () => {
-      const openModalSpy = spyOn($uibModal, 'open').and.callThrough();
-
-      element.find('.more > a').click();
-      expect(openModalSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-        controller: 'AnswerContentModalController'
-      }));
-    });
-  });
 });

@@ -32,14 +32,14 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { hexbin, HexbinBin } from 'd3-hexbin';
 import { max, sum } from 'd3-array';
 import { RGBColor, rgb } from 'd3-color';
-import { scaleLinear } from 'd3-scale';
+import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 
 import './oppia-visualization-click-hexbins.directive.css';
 
-interface ClickOnImageAnswer {
+export interface ClickOnImageAnswer {
   answer: {
     clickPosition: [number, number];
     clickedRegions: string[];
@@ -47,95 +47,100 @@ interface ClickOnImageAnswer {
   frequency: number;
 }
 
-type Hexbin = HexbinBin<ClickOnImageAnswer>;
+export type Hexbin = HexbinBin<ClickOnImageAnswer>;
 
 @Component({
   selector: 'oppia-visualization-click-hexbins',
   templateUrl: './oppia-visualization-click-hexbins.directive.html',
 })
 export class OppiaVisualizationClickHexbinsComponent implements OnInit {
-   @Input() data;
-   @Input() interactionArgs;
-   tooltipTarget: Hexbin = null;
+  @Input() data;
+  @Input() interactionArgs;
+  tooltipTarget: Hexbin = null;
 
-   imagePath: string;
-   imageSize: ImageDimensions;
-   imageUrl: string;
-   wrapperWidth: number;
-   wrapperHeight: number;
-   hexbins: HexbinBin<ClickOnImageAnswer>[];
-   hexagon: string;
-   hexagonMesh: string;
-   getFillColor: (b: Hexbin) => RGBColor;
-   isTooltipVisible: () => void;
-   getTooltipNumClicks: () => void;
+  imagePath: string;
+  imageSize: ImageDimensions;
+  imageUrl: string;
+  wrapperWidth: number;
+  wrapperHeight: number;
+  hexbins: HexbinBin<ClickOnImageAnswer>[];
+  hexagon: string;
+  hexagonMesh: string;
+  colorScale: ScaleLinear<RGBColor, RGBColor>;
 
-   constructor(
+  constructor(
      private assetsBackendApiService: AssetsBackendApiService,
      private contextService: ContextService,
      private imagePreloaderService: ImagePreloaderService
-   ) { }
+  ) { }
 
-   getTooltipStyle(): object {
-     return {
-       left: this.tooltipTarget.x + 'px',
-       top: this.tooltipTarget.y + 'px'
-     };
-   }
+  getTooltipStyle(): object {
+    return {
+      left: this.tooltipTarget.x + 'px',
+      top: this.tooltipTarget.y + 'px'
+    };
+  }
 
-   showTooltip(bin: Hexbin): void {
-     if (this.tooltipTarget === null && bin.length > 0) {
-       this.tooltipTarget = bin;
-     }
-   }
+  showTooltip(bin: Hexbin): void {
+    if (this.tooltipTarget && bin.length > 0) {
+      this.tooltipTarget = bin;
+    }
+  }
 
-   hideTooltip(bin: Hexbin): void {
-     if (this.tooltipTarget === bin) {
-       this.tooltipTarget = null;
-     }
-   }
+  hideTooltip(bin: Hexbin): void {
+    if (this.tooltipTarget === bin) {
+      this.tooltipTarget = null;
+    }
+  }
 
-   ngOnInit(): void {
-     this.imagePath = this.interactionArgs.imageAndRegions.value.imagePath;
-     this.imageSize = this.imagePreloaderService.getDimensionsOfImage(
-       this.imagePath);
-     const imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-       this.contextService.getEntityType(), this.contextService.getEntityId(),
-       this.imagePath);
+  getFillColor(b: Hexbin): RGBColor {
+    return this.colorScale(this.getNumClicks(b));
+  }
 
-     const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
-     const wrapperHeight = this.imageSize.width === 0 ?
+  isTooltipVisible(): void {
+    this.tooltipTarget !== null;
+  }
+
+  getTooltipNumClicks(): number {
+    return this.getNumClicks(this.tooltipTarget);
+  }
+
+  getNumClicks(bin: Hexbin): number {
+    return sum(bin, a => a.frequency);
+  }
+
+  ngOnInit(): void {
+    this.imagePath = this.interactionArgs.imageAndRegions.value.imagePath;
+    this.imageSize = this.imagePreloaderService.getDimensionsOfImage(
+      this.imagePath);
+    const imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+      this.contextService.getEntityType(), this.contextService.getEntityId(),
+      this.imagePath);
+
+    const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
+    const wrapperHeight = this.imageSize.width === 0 ?
      this.imageSize.height :
        Math.round(wrapperWidth * this.imageSize.height / this.imageSize.width);
 
-     const getNumClicks = (bin: Hexbin) => sum(bin, a => a.frequency);
+    const hexbinGenerator = hexbin<ClickOnImageAnswer>()
+      .x(a => a.answer.clickPosition[0] * wrapperWidth)
+      .y(a => a.answer.clickPosition[1] * wrapperHeight)
+      .size([wrapperWidth, wrapperHeight])
+      .radius(16);
 
-     const hexbinGenerator = hexbin<ClickOnImageAnswer>()
-       .x(a => a.answer.clickPosition[0] * wrapperWidth)
-       .y(a => a.answer.clickPosition[1] * wrapperHeight)
-       .size([wrapperWidth, wrapperHeight])
-       .radius(16);
-     const hexbins = hexbinGenerator(this.data);
-     const colorScale = scaleLinear<RGBColor>()
-       .domain([0, max(hexbins, getNumClicks)])
-       .range([rgb(255, 255, 255, 0.25), rgb(255, 255, 255, 0.75)]);
-
-     this.imageUrl = imageUrl;
-     this.wrapperWidth = wrapperWidth;
-     this.wrapperHeight = wrapperHeight;
-
-     this.hexbins = hexbins;
-     this.hexagon = hexbinGenerator.hexagon();
-     this.hexagonMesh = hexbinGenerator.mesh();
-     this.getFillColor = (b: Hexbin) => colorScale(getNumClicks(b));
-
-     this.isTooltipVisible = () => this.tooltipTarget !== null;
-     this.getTooltipNumClicks = () => getNumClicks(this.tooltipTarget);
-   }
+    this.hexbins = hexbinGenerator(this.data);
+    this.colorScale = scaleLinear<RGBColor>()
+      .domain([0, max(this.hexbins, this.getNumClicks)])
+      .range([rgb(255, 255, 255, 0.25), rgb(255, 255, 255, 0.75)]);
+    this.imageUrl = imageUrl;
+    this.wrapperWidth = wrapperWidth;
+    this.wrapperHeight = wrapperHeight;
+    this.hexagon = hexbinGenerator.hexagon();
+    this.hexagonMesh = hexbinGenerator.mesh();
+  }
 }
 
 angular.module('oppia').directive('oppiaVisualizationClickHexbins',
    downgradeComponent({
      component: OppiaVisualizationClickHexbinsComponent
    }) as angular.IDirectiveFactory);
-
