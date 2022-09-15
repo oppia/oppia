@@ -2538,6 +2538,7 @@ def update_translation_contribution_stats_at_review(
         accepted_translation_word_count = 0
         rejected_translations_count = 0
         rejected_translation_word_count = 0
+        accepted_translations_without_reviewer_edits_count = 0
 
         if suggestion_is_accepted:
             accepted_translations_count += 1
@@ -2545,6 +2546,8 @@ def update_translation_contribution_stats_at_review(
         else:
             rejected_translations_count += 1
             rejected_translation_word_count += content_word_count
+        if suggestion_is_accepted and not suggestion.edited_by_reviewer:
+            accepted_translations_without_reviewer_edits_count += 1
 
         suggestion_models.TranslationContributionStatsModel.create(
             language_code=suggestion.change.language_code,
@@ -2553,7 +2556,8 @@ def update_translation_contribution_stats_at_review(
             submitted_translations_count=1,
             submitted_translation_word_count=content_word_count,
             accepted_translations_count=accepted_translations_count,
-            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
             accepted_translation_word_count=accepted_translation_word_count,
             rejected_translations_count=rejected_translations_count,
             rejected_translation_word_count=rejected_translation_word_count,
@@ -2623,7 +2627,7 @@ def update_translation_review_stats(
         if suggestion_is_accepted:
             accepted_translations_count += 1
             accepted_translation_word_count = content_word_count
-        if suggestion.edited_by_reviewer:
+        if suggestion_is_accepted and suggestion.edited_by_reviewer:
             accepted_translations_with_reviewer_edits_count += 1
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=suggestion.change.language_code,
@@ -2718,7 +2722,7 @@ def update_question_contribution_stats_at_review(
             accepted_questions_without_reviewer_edits_count = 0
             if suggestion_is_accepted:
                 accepted_questions_count += 1
-            if not suggestion.edited_by_reviewer:
+            if suggestion_is_accepted and not suggestion.edited_by_reviewer:
                 accepted_questions_without_reviewer_edits_count += 1
             suggestion_models.QuestionContributionStatsModel.create(
                 contributor_user_id=suggestion.author_id,
@@ -2738,7 +2742,7 @@ def update_question_contribution_stats_at_review(
 
         if suggestion_is_accepted:
             question_contribution_stat.accepted_questions_count += 1
-        if not suggestion.edited_by_reviewer:
+        if suggestion_is_accepted and not suggestion.edited_by_reviewer:
             (
                 question_contribution_stat
                 .accepted_questions_without_reviewer_edits_count
@@ -2786,7 +2790,7 @@ def update_question_review_stats(
             accepted_questions_with_reviewer_edits_count = 0
             if suggestion_is_accepted:
                 accepted_questions_count += 1
-            if suggestion.edited_by_reviewer:
+            if suggestion_is_accepted and suggestion.edited_by_reviewer:
                 accepted_questions_with_reviewer_edits_count += 1
             suggestion_models.QuestionReviewStatsModel.create(
                 reviewer_user_id=suggestion.final_reviewer_id,
@@ -2839,7 +2843,7 @@ def increment_translation_contribution_stats_at_review(
         translation_contribution_stat.rejected_translations_count += 1
         translation_contribution_stat.rejected_translation_word_count += (
             content_word_count)
-    if not edited_by_reviewer:
+    if suggestion_is_accepted and not edited_by_reviewer:
         (
             translation_contribution_stat
             .accepted_translations_without_reviewer_edits_count
@@ -2872,7 +2876,7 @@ def increment_translation_review_stats(
         translation_review_stat.accepted_translations_count += 1
         translation_review_stat.accepted_translation_word_count += (
             content_word_count)
-    if edited_by_reviewer:
+    if suggestion_is_accepted and edited_by_reviewer:
         (
             translation_review_stat
             .accepted_translations_with_reviewer_edits_count
@@ -2900,7 +2904,7 @@ def increment_question_review_stats(
     question_review_stat.reviewed_questions_count += 1
     if suggestion_is_accepted:
         question_review_stat.accepted_questions_count += 1
-    if edited_by_reviewer:
+    if suggestion_is_accepted and edited_by_reviewer:
         question_review_stat.accepted_questions_with_reviewer_edits_count += 1
     question_review_stat.last_contribution_date = (
         last_contribution_date.date())

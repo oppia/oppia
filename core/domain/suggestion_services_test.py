@@ -2394,24 +2394,32 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_get_translation_contribution_stats_for_strict_false(
         self
     ) -> None:
-        stats_models = suggestion_services.get_translation_contribution_stats_models(
-            ['invalid_id'], False)
+        stats_models = (
+            suggestion_services
+            .get_translation_contribution_stats_models
+        )(
+            ['invalid_id'], strict=False)
 
         self.assertEqual(stats_models, [None])
 
     def test_get_translation_review_stats_for_strict_false(
         self
     ) -> None:
-        stats_models = suggestion_services.get_translation_review_stats_models(
-            ['invalid_id'], False)
+        stats_models = (
+            suggestion_services
+            .get_translation_review_stats_models
+        )(
+            ['invalid_id'], strict=False)
 
         self.assertEqual(stats_models, [None])
 
     def test_get_question_contribution_stats_for_strict_false(
         self
     ) -> None:
-        stats_models = suggestion_services.get_question_contribution_stats_models(
-            ['invalid_id'], False)
+        stats_models = (
+            suggestion_services.get_question_contribution_stats_models
+        )(
+            ['invalid_id'], strict=False)
 
         self.assertEqual(stats_models, [None])
 
@@ -2419,7 +2427,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self
     ) -> None:
         stats_models = suggestion_services.get_question_review_stats_models(
-            ['invalid_id'], False)
+            ['invalid_id'], strict=False)
 
         self.assertEqual(stats_models, [None])
 
@@ -2986,14 +2994,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         topic_id = self._create_topic(skill_id_1, skill_id_2)
         initial_suggestion = self._create_question_suggestion(skill_id_1)
         latest_suggestion = self._create_question_suggestion(skill_id_2)
-        # Contributor's stats are updated manually since contributor's stats are
-        # checked later.
-        suggestion_services.update_question_contribution_stats_at_submission(
-            initial_suggestion
-        )
-        suggestion_services.update_question_contribution_stats_at_submission(
-            latest_suggestion
-        )
         suggestion_services.reject_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Rejected')
         suggestion_services.reject_suggestion(
@@ -3042,11 +3042,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
         assert question_contribution_stats_model is not None
         self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,
-            2
+            question_contribution_stats_model.accepted_questions_count,
+            0
         )
         self.assertEqual(
-            question_contribution_stats_model.accepted_questions_count,
+            (
+                question_contribution_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
             0
         )
 
@@ -3066,14 +3069,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         latest_suggestion = self._create_question_suggestion(skill_id_2)
         question_state_data = self._create_valid_question_data(
             'default_state').to_dict()
-        # Contributor's stats are updated manually since contributor's stats are
-        # checked later.
-        suggestion_services.update_question_contribution_stats_at_submission(
-            initial_suggestion
-        )
-        suggestion_services.update_question_contribution_stats_at_submission(
-            latest_suggestion
-        )
         suggestion_services.accept_suggestion(
             initial_suggestion.suggestion_id, self.reviewer_id, 'Accepted',
             'Accepted')
@@ -3127,10 +3122,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             2
         )
         assert question_contribution_stats_model is not None
-        self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,
-            2
-        )
         self.assertEqual(
             question_contribution_stats_model.accepted_questions_count,
             2
