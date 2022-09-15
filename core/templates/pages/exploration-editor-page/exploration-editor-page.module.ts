@@ -156,9 +156,9 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     FeedbackTabComponent,
     ImprovementsTabComponent,
     NeedsGuidingResponsesTaskComponent,
-    StatisticsTabComponent,
+    PieChartComponent,
     StateStatsModalComponent,
-    PieChartComponent
+    StatisticsTabComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -209,9 +209,9 @@ import { PieChartComponent } from './statistics-tab/charts/pie-chart.component';
     FeedbackTabComponent,
     ImprovementsTabComponent,
     NeedsGuidingResponsesTaskComponent,
-    StatisticsTabComponent,
+    PieChartComponent,
     StateStatsModalComponent,
-    PieChartComponent
+    StatisticsTabComponent,
   ],
   providers: [
     {
