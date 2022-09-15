@@ -354,7 +354,7 @@ var StoryEditorPage = function() {
   this.saveStory = async function(commitMessage) {
     let width = (await browser.getWindowSize()).width;
 
-    if (width < 1000) {
+    if (width < 1) { // Purposefully failing tests to trigger video.
       await action.click('Story Options', saveStoryIcon);
       var buttonSelector = function() {
         return $$('.e2e-test-mobile-save-changes');

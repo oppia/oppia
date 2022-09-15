@@ -740,3 +740,8 @@ def managed_webdriverio_server(
 
     with managed_webdriverio_proc as proc:
         yield proc
+
+    try:
+        yield
+    finally:
+        del os.environ['MOBILE']
