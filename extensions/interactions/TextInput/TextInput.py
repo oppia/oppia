@@ -68,6 +68,13 @@ class TextInput(base.BaseInteraction):
             }]
         },
         'default_value': 1,
+    }, {
+        'name': 'catchMisspellings',
+        'description': 'Catch Misspellings',
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False,
     }]
 
     _answer_visualization_specs = [{

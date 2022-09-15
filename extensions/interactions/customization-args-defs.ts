@@ -379,6 +379,9 @@ export interface TextInputCustomizationArgsBackendDict {
   rows: {
     value: number;
   };
+  catchMisspellings: {
+    value: boolean;
+  };
 }
 export interface TextInputCustomizationArgs {
   placeholder: {
@@ -386,6 +389,9 @@ export interface TextInputCustomizationArgs {
   };
   rows: {
     value: number;
+  };
+  catchMisspellings: {
+    value: boolean;
   };
 }
 

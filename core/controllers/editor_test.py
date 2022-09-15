@@ -354,6 +354,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: False
   default_outcome:
     dest: State A
     dest_if_really_stuck: null
@@ -398,6 +400,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: False
   default_outcome:
     dest: State B
     dest_if_really_stuck: null
@@ -442,6 +446,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: False
   default_outcome:
     dest: %s
     dest_if_really_stuck: null
@@ -488,6 +494,8 @@ interaction:
         unicode_str: ''
     rows:
       value: 1
+    catchMisspellings:
+      value: False
   default_outcome:
     dest: State A
     dest_if_really_stuck: null
@@ -574,7 +582,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -602,7 +613,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -630,7 +644,10 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {
+                            'value': False
+                        }
                     }
                 }),
                 exp_domain.ExplorationChange({

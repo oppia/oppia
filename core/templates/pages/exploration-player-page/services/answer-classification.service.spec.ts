@@ -100,7 +100,10 @@ describe('Answer Classification Service', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             outcome: {
@@ -381,7 +384,10 @@ describe('Answer Classification Service', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             outcome: {
@@ -562,7 +568,10 @@ describe('Answer Classification Service', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             outcome: {

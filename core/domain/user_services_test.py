@@ -2287,6 +2287,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: False
       default_outcome:
         dest: Introduction
         feedback:

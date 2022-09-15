@@ -97,7 +97,10 @@ describe('Exploration Improvements Service', () => {
             unicode_str: '',
           },
         },
-        rows: { value: 1 }
+        rows: { value: 1 },
+        catchMisspellings: {
+          value: false
+        }
       },
       default_outcome: {
         dest: 'new state',

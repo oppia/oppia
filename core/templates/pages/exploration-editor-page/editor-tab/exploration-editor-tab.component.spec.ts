@@ -194,7 +194,10 @@ describe('Exploration editor tab component', function() {
               content_id: 'ca_placeholder',
               unicode_str: ''
             }},
-            rows: {value: 1}
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             rule_specs: [],
@@ -282,7 +285,10 @@ describe('Exploration editor tab component', function() {
               content_id: 'ca_placeholder',
               unicode_str: ''
             }},
-            rows: {value: 1}
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             rule_specs: [],
@@ -549,7 +555,10 @@ describe('Exploration editor tab component', function() {
 
     expect(stateEditorService.interaction.customizationArgs).toEqual({
       rows: { value: 1 },
-      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') }
+      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') },
+      catchMisspellings: {
+        value: false
+      }
     });
 
     var displayedValue = {
@@ -558,6 +567,9 @@ describe('Exploration editor tab component', function() {
       },
       rows: {
         value: 2
+      },
+      catchMisspellings: {
+        value: false
       }
     };
     ctrl.saveInteractionCustomizationArgs(displayedValue);

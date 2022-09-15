@@ -68,7 +68,10 @@ describe('Learner answer info service', () =>{
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         answer_groups: [{
           outcome: {

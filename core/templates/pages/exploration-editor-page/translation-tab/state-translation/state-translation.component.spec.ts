@@ -112,6 +112,9 @@ describe('State translation component', function() {
           },
           rows: {
             value: 1
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         answer_groups: [{
@@ -219,6 +222,9 @@ describe('State translation component', function() {
           },
           rows: {
             value: 1
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         answer_groups: [],
@@ -352,6 +358,9 @@ describe('State translation component', function() {
           },
           rows: {
             value: 1
+          },
+          catchMisspellings: {
+            value: false
           }
         },
         answer_groups: [],
@@ -997,6 +1006,9 @@ describe('State translation component', function() {
               },
               rows: {
                 value: 1
+              },
+              catchMisspellings: {
+                value: false
               }
             },
             // This simulates the case where there are no rule specs.

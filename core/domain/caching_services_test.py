@@ -106,6 +106,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                                 'content_id': 'ca_placeholder_0',
                                 'unicode_str': '😍😍😍😍'
                             }
+                        },
+                        'catchMisspellings': {
+                            'value': False
                         }
                     },
                     'default_outcome': {

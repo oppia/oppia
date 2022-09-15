@@ -248,6 +248,9 @@ describe('Audio preloader service', () => {
             },
             placeholder: {
               value: ''
+            },
+            catchMisspellings: {
+              value: false
             }
           },
           solution: null,

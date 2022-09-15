@@ -82,6 +82,9 @@ describe('Teach Oppia Modal Controller', function() {
         },
         placeholder: {
           value: 'Type your answer here.'
+        },
+        catchMisspellings: {
+          value: false
         }
       },
       answer_groups: [{
