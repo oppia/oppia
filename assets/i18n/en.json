@@ -88,7 +88,7 @@
     "I18N_BLOG_DASHBOARD_TAB_DRAFTS": "Drafts",
     "I18N_BLOG_DASHBOARD_TAB_PUBLISHED": "Published",
     "I18N_BLOG_HOME_PAGE_BREADCRUMB": "Blog",
-    "I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND": "Sorry, No results found currently!",
+    "I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND": "Sorry, there are no blog posts to show.",
     "I18N_BLOG_HOME_PAGE_OPPIA_DESCRIPTION": "Building a community to provide quality education for those who lack access to it.",
     "I18N_BLOG_HOME_PAGE_POSTS_HEADING": "Latest Posts",
     "I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY": "Displaying <[startingNumber]> - <[endingNumber]> of <[totalNumber]> posts",
