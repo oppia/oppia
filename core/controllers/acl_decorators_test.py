@@ -26,7 +26,6 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import incoming_app_feedback_report
-from core.domain import app_feedback_report_domain
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
@@ -6877,9 +6876,48 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = (
-            incoming_app_feedback_report.IncomingAndroidFeedbackReportHandler.HANDLER_ARGS_SCHEMAS  # pylint: disable=line-too-long
-        )
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'report': {
+                    'schema': {
+                        'type': 'dict',
+                        'properties': [{
+                            'name': 'platform_type',
+                            'schema': {
+                                'type': 'unicode'
+                            }
+                        }, {
+                            'name': 'android_report_info_schema_version',
+                            'schema': {
+                                'type': 'int'
+                            }
+                        }, {
+                            'name': 'app_context',
+                            'schema': incoming_app_feedback_report.ANDROID_APP_CONTEXT_DICT_SCHEMA  # pylint: disable=line-too-long
+                        }, {
+                            'name': 'device_context',
+                            'schema': incoming_app_feedback_report.ANDROID_DEVICE_CONTEXT_DICT_SCHEMA  # pylint: disable=line-too-long
+                        }, {
+                            'name': 'report_submission_timestamp_sec',
+                            'schema': {
+                                'type': 'int'
+                            }
+                        }, {
+                            'name': 'report_submission_utc_offset_hrs',
+                            'schema': {
+                                'type': 'int'
+                            }
+                        }, {
+                            'name': 'system_context',
+                            'schema': incoming_app_feedback_report.ANDROID_SYSTEM_CONTEXT_DICT_SCHEMA  # pylint: disable=line-too-long
+                        }, {
+                            'name': 'user_supplied_feedback',
+                            'schema': incoming_app_feedback_report.USER_SUPPLIED_FEEDBACK_DICT_SCHEMA  # pylint: disable=line-too-long
+                        }]
+                    }
+                }
+            }
+        }
 
         @acl_decorators.is_from_oppia_android
         def post(self):
