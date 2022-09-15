@@ -27,6 +27,8 @@ import re
 from typing import Any, Dict
 
 
+# Here we use type Any because we need to parse and return the generic JSON
+# objects and these JSON objects are of type Dict[str, Any].
 def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
     """Extracts JSON object from TS file.
 
