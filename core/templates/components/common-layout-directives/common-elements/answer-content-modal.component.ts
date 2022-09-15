@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview component for AnswerContentModal.
+ * @fileoverview Component for answer content modal.
  */
 
 import { Component, Input } from '@angular/core';

@@ -64,17 +64,17 @@ export class StatisticsTabComponent implements
   expId: string;
 
   constructor(
-     private alertsService: AlertsService,
-     private computeGraphService: ComputeGraphService,
-     private explorationDataService: ExplorationDataService,
-     private explorationStatsService: ExplorationStatsService,
-     private readOnlyExplorationBackendApiService:
-       ReadOnlyExplorationBackendApiService,
-     private routerService: RouterService,
-     private stateInteractionStatsService: StateInteractionStatsService,
-     private statesObjectFactory: StatesObjectFactory,
-     private urlInterpolationService: UrlInterpolationService,
-     private ngbModal: NgbModal
+    private alertsService: AlertsService,
+    private computeGraphService: ComputeGraphService,
+    private explorationDataService: ExplorationDataService,
+    private explorationStatsService: ExplorationStatsService,
+    private ngbModal: NgbModal,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private routerService: RouterService,
+    private stateInteractionStatsService: StateInteractionStatsService,
+    private statesObjectFactory: StatesObjectFactory,
+    private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   refreshExplorationStatistics(): void {

@@ -168,7 +168,7 @@ describe('Feedback Tab Component', () => {
     tick();
 
     expect(component.activeThread).toEqual(thread);
-    expect(component.tmpMessage.status).toBe('review');
+    expect(component.feedbackMessage.status).toBe('review');
   }));
 
   it('should add warning when trying to add a message in a thread with id' +
@@ -239,8 +239,8 @@ describe('Feedback Tab Component', () => {
 
     expect(component.messageSendingInProgress).toBe(false);
     expect(component.messageSendingInProgress).toBe(false);
-    expect(component.tmpMessage.status).toBe('Open');
-    expect(component.tmpMessage.text).toBe('');
+    expect(component.feedbackMessage.status).toBe('Open');
+    expect(component.feedbackMessage.text).toBe('');
 
     component.onBackButtonClicked();
     tick();
@@ -518,8 +518,8 @@ describe('Feedback Tab Component', () => {
       expect(
         suggestionModalForExplorationEditorService.showSuggestionModal)
         .toHaveBeenCalled();
-      expect(component.tmpMessage.status).toBe(null);
-      expect(component.tmpMessage.text).toBe('');
+      expect(component.feedbackMessage.status).toBe(null);
+      expect(component.feedbackMessage.text).toBe('');
     }));
 
   it('should create a new thread when closing create new thread modal',
@@ -544,8 +544,8 @@ describe('Feedback Tab Component', () => {
         .toHaveBeenCalledWith('New subject', 'New text');
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Feedback thread created.');
-      expect(component.tmpMessage.status).toBe(null);
-      expect(component.tmpMessage.text).toBe('');
+      expect(component.feedbackMessage.status).toBe(null);
+      expect(component.feedbackMessage.text).toBe('');
     }));
 
   it('should not create a new thread when dismissing create new thread modal',

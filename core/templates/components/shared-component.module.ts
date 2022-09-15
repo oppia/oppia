@@ -331,12 +331,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent,
     AnswerContentModalComponent,
-    VisualizationSortedTilesComponent,
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    VisualizationSortedTilesComponent,
   ],
 
   entryComponents: [
@@ -457,12 +457,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent,
     AnswerContentModalComponent,
-    VisualizationSortedTilesComponent,
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    VisualizationSortedTilesComponent,
   ],
 
   exports: [
@@ -594,12 +594,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
-    ReviewTestPageComponent,
     AnswerContentModalComponent,
-    VisualizationSortedTilesComponent,
     OppiaVisualizationClickHexbinsComponent,
     OppiaVisualizationEnumeratedFrequencyTableComponent,
-    OppiaVisualizationFrequencyTableComponent
+    OppiaVisualizationFrequencyTableComponent,
+    ReviewTestPageComponent,
+    VisualizationSortedTilesComponent,
   ],
 })
 

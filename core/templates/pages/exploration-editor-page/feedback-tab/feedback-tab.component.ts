@@ -47,10 +47,10 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   threadIsStale: boolean;
   threadData: FeedbackThread[];
   messageSendingInProgress: boolean;
-  tmpMessage: {
-     status: string;
-     text: string;
-   };
+  feedbackMessage: {
+    status: string;
+    text: string;
+  };
 
   constructor(
     private alertsService: AlertsService,
@@ -69,9 +69,9 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   ) { }
 
   _resetTmpMessageFields(): void {
-    this.tmpMessage.status =
+    this.feedbackMessage.status =
        this.activeThread && this.activeThread.status;
-    this.tmpMessage.text = '';
+    this.feedbackMessage.text = '';
   }
 
   clearActiveThread(): void {
@@ -207,7 +207,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     this.threadDataBackendApiService.getMessagesAsync(thread).then(() => {
       this.activeThread = thread as SuggestionThread;
       this.threadDataBackendApiService.markThreadAsSeenAsync(this.activeThread);
-      this.tmpMessage.status = this.activeThread.status;
+      this.feedbackMessage.status = this.activeThread.status;
       this.focusManagerService.setFocus('tmpMessageText');
     });
   }
@@ -236,7 +236,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     this.loaderService.showLoadingScreen('Loading');
 
     // Initial load of the thread list on page load.
-    this.tmpMessage = {
+    this.feedbackMessage = {
       status: null,
       text: ''
     };
