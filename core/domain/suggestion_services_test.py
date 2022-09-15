@@ -2530,11 +2530,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             6
         )
-        # Assert translation contribution stats after the review.
-        # At this point we can confirm that there should be an associated
-        # translation contribution stat object for the given IDs since we have
-        # called update_translation_contribution_stats_at_submission function
-        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             (
@@ -2615,11 +2610,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             6
         )
-        # Assert translation contribution stats after the review.
-        # At this point we can confirm that there should be an associated
-        # translation contribution stat object for the given IDs since we have
-        # called update_translation_contribution_stats_at_submission function
-        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.rejected_translations_count,
@@ -2750,11 +2740,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             .accepted_translations_with_reviewer_edits_count,
             2
         )
-        # Assert translation contribution stats after the review.
-        # At this point we can confirm that there should be an associated
-        # translation contribution stat object for the given IDs since we have
-        # called update_translation_contribution_stats_at_submission function
-        # to create/update translation contribution stats.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.submitted_translations_count,
@@ -2943,11 +2928,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             2
         )
-        # Assert question contribution stats after the review.
-        # At this point we can confirm that there should be an associated
-        # question contribution stat object for the given IDs since we have
-        # called update_question_contribution_stats_at_submission function to
-        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.accepted_questions_count,
@@ -3028,11 +3008,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             2
         )
-        # Assert question contribution stats after the review.
-        # At this point we can confirm that there should be an associated
-        # question contribution stat object for the given IDs since we have
-        # called update_question_contribution_stats_at_submission function to
-        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
@@ -3119,11 +3094,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             ),
             2
         )
-        # Assert question contribution stats after the review.
-        # At this point we can confirm that there should be an associated
-        # question contribution stat object for the given IDs since we have
-        # called update_question_contribution_stats_at_submission function to
-        # create/update question contribution stats.
         assert question_contribution_stats_model is not None
         self.assertEqual(
             question_contribution_stats_model.submitted_questions_count,
