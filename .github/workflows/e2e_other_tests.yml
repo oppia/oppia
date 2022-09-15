@@ -48,34 +48,34 @@ jobs:
         run: python -m scripts.build --prod_env
       - name: Run e2e Collections Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
+        run: xvfb-run -a  python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Accessibility Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+        run: xvfb-run -a  python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Classroom Page Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
+        run: xvfb-run -a  python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Navigation Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="navigation"
+        run: xvfb-run -a  python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="navigation"
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Admin Page Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="adminPage"
+        run: xvfb-run -a  python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="adminPage"
         env: 
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run e2e Checkpoint Features Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="checkpointFeatures" --prod_env
+        run: xvfb-run -a  python -m scripts.run_e2e_tests --skip-build --skip-install --suite="checkpointFeatures" --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2

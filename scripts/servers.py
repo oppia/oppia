@@ -24,6 +24,7 @@ import shutil
 import signal
 import subprocess
 import threading
+from tkinter import Y
 
 from core import feconf
 from core import utils
@@ -669,8 +670,12 @@ def managed_protractor_server(
     managed_protractor_proc = managed_process(
         protractor_args, human_readable_name='Protractor Server', shell=True,
         raise_on_nonzero_exit=False, **kwargs)
-    with managed_protractor_proc as proc:
-        yield proc
+
+    try:
+        with managed_protractor_proc as proc:
+            yield proc
+    finally:
+        del os.environ['MOBILE']
 
 
 @contextlib.contextmanager
@@ -742,5 +747,4 @@ def managed_webdriverio_server(
         with managed_webdriverio_proc as proc:
             yield proc
     finally:
-        if os.environ['MOBILE']:
-            del os.environ['MOBILE']
+        del os.environ['MOBILE']

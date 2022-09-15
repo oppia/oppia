@@ -1031,27 +1031,10 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertNotIn('--inspect-brk', program_args)
         self.assertIn('--params.devMode=True', program_args)
         self.assertIn('--suite full', program_args)
-        self.assertEqual(os.environ['MOBILE'], 'false')
 
     def test_managed_protractor_mobile(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        self.exit_stack.enter_context(servers.managed_protractor_server(
-            mobile=True))
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-        program_args = popen_calls[0].program_args
-        self.assertIn(
-            '%s --unhandled-rejections=strict %s %s' % (
-                common.NODE_BIN_PATH, common.PROTRACTOR_BIN_PATH,
-                common.PROTRACTOR_CONFIG_FILE_PATH),
-            program_args)
-        self.assertNotIn('--inspect-brk', program_args)
-        self.assertIn('--params.devMode=True', program_args)
-        self.assertIn('--suite full', program_args)
-        self.assertEqual(os.environ['MOBILE'], 'true')
+        with servers.managed_protractor_server(mobile=True):
+            self.assertEqual(os.getenv('MOBILE'), 'true')
 
     def test_managed_protractor_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1109,24 +1092,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn('--params.devMode=True', program_args)
 
     def test_managed_webdriverio_mobile(self):
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-
-        self.exit_stack.enter_context(servers.managed_webdriverio_server(
-            mobile=True))
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-        program_args = popen_calls[0].program_args
-        self.assertIn(
-            '%s --unhandled-rejections=strict %s %s' % (
-                common.NPX_BIN_PATH, common.NODEMODULES_WDIO_BIN_PATH,
-                common.WEBDRIVERIO_CONFIG_FILE_PATH),
-            program_args)
-        self.assertNotIn('DEBUG=true', program_args)
-        self.assertIn('--suite full', program_args)
-        self.assertIn('--params.devMode=True', program_args)
-        self.assertEqual(os.environ['MOBILE'], 'true')
+        with servers.managed_webdriverio_server(mobile=True):
+            self.assertEqual(os.getenv('MOBILE'), 'true')
 
     def test_managed_webdriverio_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
