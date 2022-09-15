@@ -997,6 +997,9 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             'Exploration with id invalid_exploration is not part of story '
             'with id')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_exploration_id_not_a_stringfails(self) -> None:
         self.entry_point.topic_id = 'valid_topic1'
         self.entry_point.story_id = 'valid_story1'
@@ -1056,6 +1059,9 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
             self.entry_point,
             'No entry point name supplied.')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validation_name_not_a_string_fails(self) -> None:
         self.entry_point.entry_point_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
