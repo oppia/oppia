@@ -949,6 +949,120 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 'explorations more than 3'
             )
 
+    def _set_lower_and_upper_bounds(
+        self, range_var, lower_bound, upper_bound,
+        lb_inclusive, ub_inclusive
+    ) -> None:
+        """Helper function for NumericInput and FractionInput interaction,
+        Sets the lower and upper bounds for the range_var, mainly
+        we need to set the range so to keep track if any other rule's
+        range lies in between or not to prevent redundancy
+
+        Args:
+            range_var: dict[str, Any]. To keep track of each rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive.
+            lower_bound: float. The lower bound.
+            upper_bound: float. The upper bound.
+            lb_inclusive: bool. If lower bound is inclusive.
+            ub_inclusive: bool. If upper bound is inclusive.
+        """
+        range_var['lower_bound'] = lower_bound
+        range_var['upper_bound'] = upper_bound
+        range_var['lb_inclusive'] = lb_inclusive
+        range_var['ub_inclusive'] = ub_inclusive
+
+    def _is_enclosed_by(self, range_compare_to, range_compare_with) -> bool:
+        """Helper function for NumericInput and FractionInput interaction,
+        Checks whether the ranges of rules enclosed or not
+
+        Args:
+            range_compare_to: dict[str, Any]. To keep track of each rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive, It represents the variable for
+                which we have to check the range.
+            range_compare_with: dict[str, Any]. To keep track of other rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive, It is the variable to which the
+                range is compared.
+
+        Returns:
+            is_enclosed: bool. Returns True if both rule's ranges are enclosed.
+        """
+        if (
+            range_compare_with['lower_bound'] is None or
+            range_compare_to['lower_bound'] is None or
+            range_compare_with['upper_bound'] is None or
+            range_compare_to['upper_bound'] is None
+        ):
+            return False
+        lb_satisfied = (
+            range_compare_with['lower_bound'] < range_compare_to[
+                'lower_bound'] or
+            (
+                range_compare_with['lower_bound'] == range_compare_to[
+                    'lower_bound'] and
+                (
+                    not range_compare_to['lb_inclusive'] or
+                    range_compare_with['lb_inclusive']
+                )
+            )
+        )
+        ub_satisfied = (
+            range_compare_with['upper_bound'] > range_compare_to[
+                'upper_bound'] or
+            (
+                range_compare_with['upper_bound'] == range_compare_to[
+                    'upper_bound'] and
+                (
+                    not range_compare_to['ub_inclusive'] or
+                    range_compare_with['ub_inclusive']
+                )
+            )
+        )
+        is_enclosed = lb_satisfied and ub_satisfied
+        return is_enclosed
+
+    def _should_check_range_criteria(self, earlier_rule, later_rule) -> bool:
+        """Checks the range criteria between two rules by comparing their
+        rule type
+
+        Args:
+            earlier_rule: state_domain.RuleSpec. Previous rule.
+            later_rule: state_domain.RuleSpec. Current rule.
+
+        Returns:
+            bool. Returns True if the rules passes the range criteria check.
+        """
+        if earlier_rule.rule_type != 'IsExactlyEqualTo':
+            return True
+        return later_rule.rule_type in (
+            'IsExactlyEqualTo', 'IsEquivalentTo',
+            'IsEquivalentToAndInSimplestForm'
+        )
+
+    def _get_rule_value_f(self, rule_spec):
+        """Return rule values from the rule_spec
+
+        Args:
+            rule_spec: (state_domain.RuleSpec). Rule spec of an answer group.
+
+        Returns:
+            rule_value_f: float. The value of the rule spec.
+        """
+        rule_value_f = rule_spec.inputs['f']
+        if rule_value_f['wholeNumber'] == 0:
+            rule_value_f = float(
+                rule_value_f['numerator'] / rule_value_f['denominator']
+            )
+        else:
+            rule_value_f = float(
+                rule_value_f['wholeNumber'] +
+                rule_value_f['numerator'] / rule_value_f['denominator']
+            )
+
+        return rule_value_f
+
     def _validate_numeric_input(self):
         """Validates NumericInput interaction
 
@@ -956,30 +1070,166 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. One or more attributes of the InteractionInstance
                 are invalid.
         """
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        ranges = []
         for ans_group_index, answer_group in enumerate(self.answer_groups):
             for rule_spec_index, rule_spec in enumerate(
                 answer_group.rule_specs):
-                # Validates x in [a-b, a+b], b must be a positive value.
-                if rule_spec.rule_type == 'IsWithinTolerance':
-                    if rule_spec.inputs['tol'] <= 0:
+                # All rules should have solutions that is not subset of
+                # previous rules' solutions.
+                range_var = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                if rule_spec.rule_type == 'IsLessThanOrEqualTo':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        self._set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, True
+                        )
+                    except Exception:
+                        rule_value = rule_spec.inputs['x']
                         raise utils.ValidationError(
-                            f'The rule {rule_spec_index} of answer '
-                            f'group {ans_group_index} having '
-                            f'rule type IsWithinTolerance '
-                            f'have tol value less than zero '
-                            f'in NumericInput interaction.'
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type IsLessThanOrEqualTo contains '
+                            f'string value - {rule_value}'
                         )
 
-                # Validates x in [a, b], a must not be greater than b.
-                if rule_spec.rule_type == 'IsInclusivelyBetween':
-                    if rule_spec.inputs['a'] > rule_spec.inputs['b']:
-                        raise utils.ValidationError(
-                            f'The rule {rule_spec_index} of answer '
-                            f'group {ans_group_index} having '
-                            f'rule type IsInclusivelyBetween '
-                            f'have a value greater than b value '
-                            f'in NumericInput interaction.'
+                if rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        self._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, True, False
                         )
+                    except Exception:
+                        rule_value = rule_spec.inputs['x']
+                        raise utils.ValidationError(
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type IsGreaterThanOrEqualTo contains '
+                            f'string value - {rule_value}'
+                        )
+
+                if rule_spec.rule_type == 'Equals':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        self._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            rule_value, True, True
+                        )
+                    except Exception:
+                        rule_value = rule_spec.inputs['x']
+                        raise utils.ValidationError(
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type equals contains string '
+                            f'value - {rule_value}'
+                        )
+
+                if rule_spec.rule_type == 'IsLessThan':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        self._set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, False
+                        )
+                    except Exception:
+                        rule_value = rule_spec.inputs['x']
+                        raise utils.ValidationError(
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type IsLessThan contains string '
+                            f'value - {rule_value}'
+                        )
+
+                if rule_spec.rule_type == 'IsWithinTolerance':
+                    rule_value_x = rule_spec.inputs['x']
+                    rule_value_tol = rule_spec.inputs['tol']
+                    try:
+                        rule_value_x = float(rule_value_x)
+                        rule_value_tol = float(rule_value_tol)
+                        # Validates x in [a-b, a+b], b must be a positive value.
+                        if rule_value_tol <= 0.0:
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} having '
+                                f'rule type IsWithinTolerance '
+                                f'have tol value less than or equal to zero '
+                                f'in NumericInput interaction.'
+                            )
+                        self._set_lower_and_upper_bounds(
+                            range_var, rule_value_x - rule_value_tol,
+                            rule_value_x + rule_value_tol, True, True
+                        )
+                    except Exception:
+                        raise utils.ValidationError(
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type IsWithinTolerance contains string '
+                            f'value - {rule_value_x}, {rule_value_tol}'
+                        )
+
+                if rule_spec.rule_type == 'IsGreaterThan':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        self._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, False, False
+                        )
+                    except Exception:
+                        rule_value = rule_spec.inputs['x']
+                        raise utils.ValidationError(
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type IsGreaterThan contains string '
+                            f'value - {rule_value}'
+                        )
+
+                if rule_spec.rule_type == 'IsInclusivelyBetween':
+                    rule_value_a = rule_spec.inputs['a']
+                    rule_value_b = rule_spec.inputs['b']
+                    try:
+                        rule_value_a = float(rule_value_a)
+                        rule_value_b = float(rule_value_b)
+                        # Validates x in [a, b], a must not be greater than b.
+                        if rule_value_a > rule_value_b:
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} having '
+                                f'rule type IsInclusivelyBetween '
+                                f'have `a` value greater than `b` value '
+                                f'in NumericInput interaction.'
+                            )
+                        self._set_lower_and_upper_bounds(
+                            range_var, rule_value_a,
+                            rule_value_b, True, True
+                        )
+                    except Exception:
+                        raise utils.ValidationError(
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type IsInclusivelyBetween contains string '
+                            f'value - {rule_value_a}, {rule_value_b}'
+                        )
+
+                for range_ele in ranges:
+                    if self._is_enclosed_by(range_var, range_ele):
+                        raise utils.ValidationError(
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} will never be '
+                            f'matched because it is made redundant '
+                            f'by the above rules'
+                        )
+
+                ranges.append(range_var)
 
     def _validate_fraction_input(self):
         """Validates FractionInput interaction
@@ -988,23 +1238,26 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. One or more attributes of the InteractionInstance
                 are invalid.
         """
+        ranges = []
+        matched_denominator_list = []
+        inputs_with_whole_nums = [
+            'HasDenominatorEqualTo',
+            'HasNumeratorEqualTo',
+            'HasIntegerPartEqualTo',
+            'HasNoFractionalPart'
+        ]
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        allow_non_zero_integ_part = (
+            self.customization_args[
+                'allowNonzeroIntegerPart'].value)
+        allow_imp_frac = (
+            self.customization_args[
+                'allowImproperFraction'].value)
+        require_simple_form = (
+            self.customization_args[
+                'requireSimplestForm'].value)
         for ans_group_index, answer_group in enumerate(self.answer_groups):
-            inputs_with_whole_nums = [
-                'HasDenominatorEqualTo',
-                'HasNumeratorEqualTo',
-                'HasIntegerPartEqualTo',
-                'HasNoFractionalPart'
-            ]
-            allow_non_zero_integ_part = (
-                self.customization_args[
-                    'allowNonzeroIntegerPart'].value)
-            allow_imp_frac = (
-                self.customization_args[
-                    'allowImproperFraction'].value)
-            require_simple_form = (
-                self.customization_args[
-                    'requireSimplestForm'].value)
-
             for rule_spec_index, rule_spec in enumerate(
                 answer_group.rule_specs):
 
@@ -1048,6 +1301,40 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     f'in FractionInput interaction.'
                                 )
 
+                # Validates if the solution is without integ part.
+                if rule_spec.rule_type == 'HasIntegerPartEqualTo':
+                    if (
+                        not allow_non_zero_integ_part and
+                        rule_spec.inputs['x'] != 0
+                    ):
+                        raise utils.ValidationError(
+                            f'The rule {rule_spec_index} of answer '
+                            f'group {ans_group_index} has '
+                            f'non zero integer part having '
+                            f'rule type HasIntegerPartEqualTo '
+                            f'in FractionInput interaction.'
+                        )
+
+                # All rules should have solutions that is not subset of
+                # previous rules' solutions.
+                range_var = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                matched_denominator = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'denominator': 0
+                }
+
+                if rule_spec.rule_type in (
+                    'IsEquivalentTo', 'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm'
+                ):
                     # Validates rule exactly equal is without integ part.
                     if rule_spec.rule_type == 'IsExactlyEqualTo':
                         if not allow_non_zero_integ_part:
@@ -1058,31 +1345,86 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                                     f'non zero integer part '
                                     f'in FractionInput interaction.'
                                 )
+                    rule_value_f = self._get_rule_value_f(rule_spec)
+                    self._set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        rule_value_f, True, True
+                    )
 
-                # Validates if the frac den is > 0.
+                if rule_spec.rule_type == 'IsGreaterThan':
+                    rule_value_f = self._get_rule_value_f(rule_spec)
+                    self._set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        upper_infinity, False, False
+                    )
+
+                if rule_spec.rule_type == 'IsLessThan':
+                    rule_value_f = self._get_rule_value_f(rule_spec)
+                    self._set_lower_and_upper_bounds(
+                        range_var, lower_infinity,
+                        rule_value_f, False, False
+                    )
+
                 if rule_spec.rule_type == 'HasDenominatorEqualTo':
-                    if rule_spec.inputs['x'] <= 0:
+                    try:
+                        rule_value_x = int(rule_spec.inputs['x'])
+                        matched_denominator['denominator'] = rule_value_x
+                        # Validates if the frac den is > 0.
+                        if rule_value_x <= 0:
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} has '
+                                f'denominator less than or equal to zero '
+                                f'having rule type HasDenominatorEqualTo '
+                                f'in FractionInput interaction.'
+                            )
+                    except Exception:
+                        rule_value_x = rule_spec.inputs['x']
                         raise utils.ValidationError(
-                            f'The rule {rule_spec_index} of answer '
-                            f'group {ans_group_index} has '
-                            f'denominator less than or equal to zero '
-                            f'having rule type HasDenominatorEqualTo '
-                            f'in FractionInput interaction.'
+                            f'Rule {rule_spec_index} from answer '
+                            f'group {ans_group_index} having rule '
+                            f'type HasDenominatorEqualTo contains '
+                            f'string value - {rule_value_x}'
                         )
 
-                # Validates if the solution is without integ part.
-                if rule_spec.rule_type == 'HasIntegerPartEqualTo':
-                    if (
-                            not allow_non_zero_integ_part and
-                            rule_spec.inputs['x'] != 0
+                for range_ele in ranges:
+                    earlier_rule = (
+                        self.answer_groups[range_ele['ans_group_index']]
+                        .rule_specs[range_ele['rule_spec_index']]
+                    )
+                    if self._should_check_range_criteria(
+                        earlier_rule, rule_spec
                     ):
-                        raise utils.ValidationError(
-                            f'The rule {rule_spec_index} of answer '
-                            f'group {ans_group_index} has '
-                            f'non zero integer part having '
-                            f'rule type HasIntegerPartEqualTo '
-                            f'in FractionInput interaction.'
-                        )
+                        if self._is_enclosed_by(range_var, range_ele):
+                            raise utils.ValidationError(
+                                f'Rule {rule_spec_index} from answer '
+                                f'group {ans_group_index} of '
+                                f'FractionInput interaction will '
+                                f'never be matched because it is '
+                                f'made redundant by the above rules'
+                            )
+
+                for den in matched_denominator_list:
+                    if (
+                        den is not None and rule_spec.rule_type ==
+                        'HasFractionalPartExactlyEqualTo'
+                    ):
+                        if (
+                            den['denominator'] ==
+                            rule_spec.inputs['f']['denominator']
+                        ):
+                            raise utils.ValidationError(
+                                f'Rule {rule_spec_index} from answer '
+                                f'group {ans_group_index} of '
+                                f'FractionInput interaction having '
+                                f'rule type HasFractionalPart'
+                                f'ExactlyEqualTo will '
+                                f'never be matched because it is '
+                                f'made redundant by the above rules'
+                            )
+
+                ranges.append(range_var)
+                matched_denominator_list.append(matched_denominator)
 
     def _validate_number_with_units_input(self):
         """Validates NumberWithUnitsInput interaction
@@ -1137,6 +1479,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
                 rule_spec_list.append(rule_spec.inputs['x'])
         choices = self.customization_args['choices'].value
+
         # Validates answer choices should be non-empty and unique.
         seen_choices = []
         choice_empty = False
