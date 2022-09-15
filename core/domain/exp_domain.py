@@ -1828,7 +1828,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'The outcome for answer group %s in state %s has '
                         'tagged skill misconception id, which '
-                        'should be None' % (str(group_idx+1), state_name)
+                        'should be None' % (str(group_idx + 1), state_name)
                     )
 
                 # Check if the answergroup has atleast one rulespec.
@@ -1836,7 +1836,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'The outcome for answer group %s in state %s has '
                         'no rule specs, atleast one is required ' % (
-                            str(group_idx+1), state_name)
+                            str(group_idx + 1), state_name)
                     )
 
         if strict:
