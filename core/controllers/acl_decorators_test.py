@@ -25,6 +25,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import incoming_app_feedback_report
 from core.domain import app_feedback_report_domain
 from core.domain import blog_services
 from core.domain import classifier_domain
@@ -6876,17 +6877,9 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'report': {
-                    'schema': {
-                        'type': 'object_dict',
-                        'object_class': (
-                            app_feedback_report_domain.AppFeedbackReport)
-                    }
-                }
-            }
-        }
+        HANDLER_ARGS_SCHEMAS = (
+            incoming_app_feedback_report.IncomingAndroidFeedbackReportHandler.HANDLER_ARGS_SCHEMAS  # pylint: disable=line-too-long
+        )
 
         @acl_decorators.is_from_oppia_android
         def post(self):
