@@ -238,6 +238,11 @@ describe('Customize Interaction Modal Component', () => {
       .returnValue([]);
 
     expect(component.isSaveInteractionButtonEnabled()).toBe(true);
+
+    spyOn(component, 'getTitle').and
+      .returnValue('End Exploration');
+
+    expect(component.isSaveInteractionButtonEnabled()).toBe(true);
   });
 
   it('should open intreaction when user click on it', () => {
