@@ -26,7 +26,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import feedback_models
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 datastore_services = models.Registry.import_datastore_services()
 
