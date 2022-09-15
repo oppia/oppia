@@ -1,4 +1,9 @@
 <% if (CAN_SEND_ANALYTICS_EVENTS) { %>
+  <!--
+    Note that gtag.js is downloaded for each script tag. However, the
+    downloaded files are different because we use different IDs in the
+    query parameters to download them.
+  -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=<%= GA_ANALYTICS_ID %>"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=<%= UA_ANALYTICS_ID %>"></script>
 <% } %>
