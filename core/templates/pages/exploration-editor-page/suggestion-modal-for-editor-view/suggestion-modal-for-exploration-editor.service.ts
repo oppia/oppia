@@ -151,4 +151,3 @@ angular.module('oppia').factory(
   downgradeInjectable(
     SuggestionModalForExplorationEditorService
   ));
-

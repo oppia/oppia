@@ -250,4 +250,3 @@ describe('Statistics Tab Component', () => {
     expect(alertsService.clearWarnings).toHaveBeenCalled();
   }));
 });
-

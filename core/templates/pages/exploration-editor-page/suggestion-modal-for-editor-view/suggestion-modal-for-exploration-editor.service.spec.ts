@@ -279,4 +279,3 @@ describe('Suggestion Modal For Exploration Editor', () => {
     }).toThrowError('Trying to show suggestion of a non-existent thread.');
   });
 });
-

@@ -237,4 +237,3 @@ describe('Exploration Editor Suggestion Modal Controller', () => {
     });
   });
 });
-

@@ -267,4 +267,3 @@ angular.module('oppia').directive('oppiaFeedbackTab',
    downgradeComponent({
      component: FeedbackTabComponent
    }) as angular.IDirectiveFactory);
-

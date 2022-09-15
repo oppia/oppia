@@ -596,4 +596,3 @@ describe('Feedback Tab Component', () => {
     expect(component.isExplorationEditable()).toBe(false);
   });
 });
-

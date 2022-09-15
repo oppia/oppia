@@ -90,4 +90,3 @@ describe('NeedsGuidingResponsesTask component', function() {
     expect(navigateSpy).toHaveBeenCalledWith(stateName);
   });
 });
-

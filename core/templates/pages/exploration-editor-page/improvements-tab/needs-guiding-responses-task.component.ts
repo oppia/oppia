@@ -59,4 +59,3 @@ angular.module('oppia').directive('oppiaNeedsGuidingResponsesTask',
    downgradeComponent({
      component: NeedsGuidingResponsesTaskComponent
    }) as angular.IDirectiveFactory);
-

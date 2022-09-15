@@ -353,4 +353,3 @@ describe('Improvements tab', () => {
     });
   });
 });
-

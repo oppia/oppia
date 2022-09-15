@@ -141,4 +141,3 @@ describe('Pie Chart component', () => {
     expect(component.redrawChart).toHaveBeenCalled();
   }));
 });
-

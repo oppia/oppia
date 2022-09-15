@@ -119,4 +119,3 @@ angular.module('oppia').directive('oppiaExplorationEditorSuggestionModal',
    downgradeComponent({
      component: ExplorationEditorSuggestionModalComponent
    }) as angular.IDirectiveFactory);
-

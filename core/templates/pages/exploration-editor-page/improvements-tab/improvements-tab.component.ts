@@ -169,4 +169,3 @@ angular.module('oppia').directive('oppiaImprovementsTab',
     downgradeComponent({
       component: ImprovementsTabComponent
     }) as angular.IDirectiveFactory);
-
