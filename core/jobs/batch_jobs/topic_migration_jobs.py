@@ -145,7 +145,7 @@ class MigrateTopicJob(base_jobs.JobBase):
         topic_rights_model = topic_models.TopicRightsModel.get(
             migrated_topic.id
         )
-        change_dicts = [[change.to_dict() for change in topic_changes]]
+        change_dicts = [change.to_dict() for change in topic_changes]
         with datastore_services.get_ndb_context():
             models_to_put = updated_topic_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USER_ID,
@@ -154,9 +154,14 @@ class MigrateTopicJob(base_jobs.JobBase):
                     feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION),
                 change_dicts,
                 additional_models={'rights_model': topic_rights_model}
-            ).values()
-        datastore_services.update_timestamps_multi(list(models_to_put))
-        return models_to_put
+            )
+        models_to_put_values = []
+        for model in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model, base_models.BaseModel)
+            models_to_put_values.append(model)
+        datastore_services.update_timestamps_multi(list(models_to_put_values))
+        return models_to_put_values
 
     @staticmethod
     def _update_topic_summary(
