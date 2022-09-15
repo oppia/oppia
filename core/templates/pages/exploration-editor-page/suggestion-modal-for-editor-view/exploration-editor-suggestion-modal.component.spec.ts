@@ -33,7 +33,7 @@ class MockActiveModal {
   }
 }
 
-describe('Exploration Editor Suggestion Modal Controller', () => {
+describe('Exploration Editor Suggestion Modal Component', () => {
   let component: ExplorationEditorSuggestionModalComponent;
   let fixture: ComponentFixture<ExplorationEditorSuggestionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
