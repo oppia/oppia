@@ -1850,6 +1850,12 @@ def enqueue_contributor_ranking_notification_email_task(
         Exception. The contribution subtype must be offered on the Contributor
             Dashboard.
     """
+    # contributor_user_id is alrerady validated in the controller layer.
+    # TODO(#16062): rank_name should be valid to send notification emails.
+    if language_code not in [language['id'] for language in (
+            constants.SUPPORTED_AUDIO_LANGUAGES)]:
+        raise Exception(
+            'Not supported language code: %s' % language_code)
     if contribution_type not in [
         feconf.CONTRIBUTION_TYPE_TRANSLATION,
         feconf.CONTRIBUTION_TYPE_QUESTION
