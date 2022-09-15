@@ -4895,7 +4895,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
                 'Initial Contributor'
             )
 
-    def test_create_email_task_raises_exception_for_invalid_contribution_subtype(
+    def test_create_email_task_raises_exception_for_wrong_contribution_subtype(
         self
     ) -> None:
         user_id = 'user'

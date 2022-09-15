@@ -1851,7 +1851,7 @@ def enqueue_contributor_ranking_notification_email_task(
             Dashboard.
     """
     # contributor_user_id is alrerady validated in the controller layer.
-    # TODO(#16062): rank_name should be valid to send notification emails.
+    # TODO(#16062): Rank name should be valid to send notification emails.
     if language_code not in [language['id'] for language in (
             constants.SUPPORTED_AUDIO_LANGUAGES)]:
         raise Exception(
