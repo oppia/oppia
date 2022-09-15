@@ -52,6 +52,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { SkillEditorNavabarComponent } from './navbar/skill-editor-navbar.component';
 import { SkillQuestionsTabComponent } from './questions-tab/skill-questions-tab.component';
 import { SkillPreviewTabComponent } from './skill-preview-tab/skill-preview-tab.component';
+import { SkillEditorMainTabComponent } from './editor-tab/skill-editor-main-tab.component';
 
 @NgModule({
   imports: [
@@ -84,7 +85,8 @@ import { SkillPreviewTabComponent } from './skill-preview-tab/skill-preview-tab.
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,
     SkillQuestionsTabComponent,
-    SkillPreviewTabComponent
+    SkillPreviewTabComponent,
+    SkillEditorMainTabComponent
   ],
   entryComponents: [
     DeleteMisconceptionModalComponent,
@@ -103,7 +105,8 @@ import { SkillPreviewTabComponent } from './skill-preview-tab/skill-preview-tab.
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,
     SkillQuestionsTabComponent,
-    SkillPreviewTabComponent
+    SkillPreviewTabComponent,
+    SkillEditorMainTabComponent
   ],
   providers: [
     {
