@@ -23,6 +23,7 @@ const WebpackRTLPlugin = require('webpack-rtl-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
+const analyticsConstants = require('./assets/analytics-constants.json');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
@@ -140,6 +141,11 @@ module.exports = {
   * once angularjs is removed from corresponding pages.
   */
   plugins: [
+    new webpack.DefinePlugin({
+      CAN_SEND_ANALYTICS_EVENTS: (
+        analyticsConstants.CAN_SEND_ANALYTICS_EVENTS
+      )
+    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',

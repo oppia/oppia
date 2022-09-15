@@ -18,10 +18,6 @@
  */
 
 export default {
-  // Whether to allow custom event reporting to Google Analytics.
-  // Mock gtag function is used when disabled.
-  "CAN_SEND_ANALYTICS_EVENTS": false,
-
   // The term 'staging' is used instead of the classroom url fragment field
   // in the URL for topics that are not yet attached to a classroom.
   "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
@@ -6005,10 +6001,6 @@ export default {
       }
     }
   },
-
-  // Data required for Google Analytics.
-  "ANALYTICS_ID": "",
-  "SITE_NAME_FOR_ANALYTICS": "",
 
   // Data required for Firebase authentication.
   //
