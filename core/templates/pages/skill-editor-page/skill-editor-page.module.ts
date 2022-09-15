@@ -49,6 +49,7 @@ import { SkillPreviewModalComponent } from './editor-tab/skill-preview-modal.com
 import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card-editor/skill-concept-card-editor.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { SkillEditorNavabarComponent } from './navbar/skill-editor-navbar.component';
 
 @NgModule({
   imports: [
@@ -67,6 +68,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   declarations: [
     DeleteMisconceptionModalComponent,
     SkillConceptCardEditorComponent,
+    SkillEditorNavabarComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillPrerequisiteSkillsEditorComponent,
@@ -83,6 +85,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
   entryComponents: [
     DeleteMisconceptionModalComponent,
     SkillConceptCardEditorComponent,
+    SkillEditorNavabarComponent,
     SkillEditorNavbarBreadcrumbComponent,
     SkillDescriptionEditorComponent,
     SkillPrerequisiteSkillsEditorComponent,

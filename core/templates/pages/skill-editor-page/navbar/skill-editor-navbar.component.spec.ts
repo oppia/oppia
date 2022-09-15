@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,25 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Skill Editor Navbar Directive.
+ * @fileoverview Unit tests for the Skill Editor Navbar Component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { SkillEditorNavabarComponent } from './skill-editor-navbar.component';
+import { SkillEditorRoutingService } from '../services/skill-editor-routing.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -39,56 +38,44 @@ class MockNgbModalRef {
   };
 }
 
-describe('Skill Editor Navbar Directive', function() {
-  let $scope = null;
-  let ctrl = null;
-  let $rootScope = null;
-  let directive = null;
-  let $uibModal = null;
-  let $q = null;
-  let ngbModal: NgbModal = null;
-  let skillEditorRoutingService = null;
-  let skillEditorStateService: SkillEditorStateService = null;
-  let undoRedoService: UndoRedoService = null;
-  let urlService: UrlService = null;
-  let skillUpdateService: SkillUpdateService = null;
-
-  let sampleSkill: Skill = null;
+describe('Skill Editor Navbar Directive', () => {
+  let component: SkillEditorNavabarComponent;
+  let fixture: ComponentFixture<SkillEditorNavabarComponent>;
+  let ngbModal: NgbModal;
+  let skillEditorRoutingService: SkillEditorRoutingService;
+  let skillEditorStateService: SkillEditorStateService;
+  let undoRedoService: UndoRedoService;
+  let urlService: UrlService;
+  let skillUpdateService: SkillUpdateService;
+  let sampleSkill: Skill;
   let mockEventEmitter = new EventEmitter();
   let mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
 
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+      imports: [HttpClientTestingModule, NgbModule],
+      declarations: [SkillEditorNavabarComponent],
+      providers: [
+        SkillEditorStateService,
+        UndoRedoService,
+        UrlService,
+        SkillEditorStateService,
+        SkillUpdateService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
-    ngbModal = $injector.get('NgbModal');
-    $q = $injector.get('$q');
-    ngbModal = $injector.get('NgbModal');
-    directive = $injector.get('skillEditorNavbarDirective')[0];
-    skillEditorStateService = $injector.get('SkillEditorStateService');
-    skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
-    undoRedoService = $injector.get('UndoRedoService');
-    urlService = $injector.get('UrlService');
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SkillEditorNavabarComponent);
+    component = fixture.componentInstance;
+    ngbModal = TestBed.inject(NgbModal);
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    skillEditorRoutingService = TestBed.inject(SkillEditorRoutingService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    urlService = TestBed.inject(UrlService);
     skillUpdateService = TestBed.inject(SkillUpdateService);
 
     const conceptCard = new ConceptCard(
@@ -110,68 +97,61 @@ describe('Skill Editor Navbar Directive', function() {
       .and.returnValue(mockEventEmitter);
     spyOnProperty(skillUpdateService, 'onPrerequisiteSkillChange').and.
       returnValue(mockPrerequisiteSkillChangeEventEmitter);
+  });
 
-    ctrl = $injector.instantiate(directive.controller, {
-      $rootScope: $scope,
-      $scope: $scope
-    });
-  }));
+  it('should set properties when initialized', () => {
+    expect(component.activeTab).toBeUndefined();
 
-  it('should set properties when initialized', function() {
-    expect($scope.activeTab).toBe(undefined);
-    spyOn($scope, '$applyAsync').and.callThrough();
-
-    ctrl.$onInit();
+    component.ngOnInit();
     mockEventEmitter.emit();
     mockPrerequisiteSkillChangeEventEmitter.emit();
     undoRedoService._undoRedoChangeEventEmitter.emit();
 
-    expect($scope.activeTab).toBe('Editor');
-    expect($scope.$applyAsync).toHaveBeenCalled();
+    expect(component.activeTab).toBe('Editor');
   });
 
   it('should get current active tab name when ' +
-    'calling \'getActiveTabName\'', function() {
+    'calling \'getActiveTabName\'', () => {
     spyOn(skillEditorRoutingService, 'getActiveTabName')
       .and.returnValue('activeTab');
 
-    let result = $scope.getActiveTabName();
+    let result = component.getActiveTabName();
 
     expect(result).toBe('activeTab');
   });
 
   it('should check whether the skill is still loading when ' +
-    'calling \'isLoadingSkill\'', function() {
+    'calling \'isLoadingSkill\'', () => {
     spyOn(skillEditorStateService, 'isLoadingSkill')
       .and.returnValue(false);
 
-    let result = $scope.isLoadingSkill();
+    let result = component.isLoadingSkill();
 
     expect(result).toBe(false);
   });
 
   it('should check whether the skill is being saved when ' +
-    'calling \'isSaveInProgress \'', function() {
+    'calling \'isSaveInProgress \'', () => {
     spyOn(skillEditorStateService, 'isSavingSkill')
       .and.returnValue(false);
 
-    let result = $scope.isSaveInProgress();
+    let result = component.isSaveInProgress();
 
     expect(result).toBe(false);
   });
 
   it('should get change list count when calling ' +
-    '\'getChangeListCount\'', function() {
+    '\'getChangeListCount\'', () => {
     spyOn(undoRedoService, 'getChangeCount')
       .and.returnValue(2);
 
-    let result = $scope.getChangeListCount();
+    let result = component.getChangeListCount();
 
     expect(result).toBe(2);
   });
 
   it('should discard changes when calling ' +
-    '\'discardChanges\'', function() {
+    '\'discardChanges\'', () => {
     let discardSpy = spyOn(undoRedoService, 'clearChanges')
       .and.returnValue(null);
     let loadSkillSpy = spyOn(skillEditorStateService, 'loadSkill')
@@ -179,8 +159,8 @@ describe('Skill Editor Navbar Directive', function() {
     let urlSpy = spyOn(urlService, 'getSkillIdFromUrl')
       .and.returnValue('');
 
-    ctrl.$onInit();
-    $scope.discardChanges();
+    component.ngOnInit();
+    component.discardChanges();
 
     expect(discardSpy).toHaveBeenCalled();
     expect(loadSkillSpy).toHaveBeenCalled();
@@ -188,112 +168,116 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should get change list count when calling ' +
-    '\'getChangeListCount\'', function() {
+    '\'getChangeListCount\'', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(3);
 
-    expect($scope.getChangeListCount()).toBe(3);
+    expect(component.getChangeListCount()).toBe(3);
   });
 
   it('should get number of warnings when calling ' +
-    '\'getWarningsCount\'', function() {
+    '\'getWarningsCount\'', () => {
     spyOn(skillEditorStateService, 'getSkillValidationIssues')
       .and.returnValue(['issue 1', 'issue 2', 'issue 3']);
 
-    expect($scope.getWarningsCount()).toBe(3);
+    expect(component.getWarningsCount()).toBe(3);
   });
 
   it('should check whether the skill is saveable when ' +
-    'calling \'isSkillSaveable\'', function() {
+    'calling \'isSkillSaveable\'', () => {
     spyOn(skillEditorStateService, 'isSavingSkill')
       .and.returnValue(false);
 
-    let result = $scope.isSkillSaveable();
+    let result = component.isSkillSaveable();
 
     expect(result).toBe(false);
   });
 
   it('should toggle navigation options when calling ' +
-    '\'toggleNavigationOptions\'', function() {
-    $scope.showNavigationOptions = true;
+    '\'toggleNavigationOptions\'', () => {
+    component.showNavigationOptions = true;
 
-    $scope.toggleNavigationOptions();
-    expect($scope.showNavigationOptions).toBe(false);
+    component.toggleNavigationOptions();
+    expect(component.showNavigationOptions).toBe(false);
 
-    $scope.toggleNavigationOptions();
-    expect($scope.showNavigationOptions).toBe(true);
+    component.toggleNavigationOptions();
+    expect(component.showNavigationOptions).toBe(true);
   });
 
   it('should navigate to main tab when ' +
-    'calling \'selectMainTab\'', function() {
+    'calling \'selectMainTab\'', () => {
     let navigateToMainTabSpy = spyOn(
       skillEditorRoutingService, 'navigateToMainTab')
       .and.returnValue(null);
 
-    $scope.selectMainTab();
+    component.selectMainTab();
 
     expect(navigateToMainTabSpy).toHaveBeenCalled();
   });
 
   it('should navigate to main tab when ' +
-    'calling \'selectPreviewTab\'', function() {
+    'calling \'selectPreviewTab\'', () => {
     let navigateToPreviewTabSpy = spyOn(
       skillEditorRoutingService, 'navigateToPreviewTab')
       .and.returnValue(null);
 
-    $scope.selectPreviewTab();
+    component.selectPreviewTab();
 
     expect(navigateToPreviewTabSpy).toHaveBeenCalled();
   });
 
   it('should toggle skill edit options when calling ' +
-    '\'toggleSkillEditOptions\'', function() {
-    $scope.showSkillEditOptions = true;
+    '\'toggleSkillEditOptions\'', () => {
+    component.showSkillEditOptions = true;
 
-    $scope.toggleSkillEditOptions();
-    expect($scope.showSkillEditOptions).toBe(false);
+    component.toggleSkillEditOptions();
+    expect(component.showSkillEditOptions).toBe(false);
 
-    $scope.toggleSkillEditOptions();
-    expect($scope.showSkillEditOptions).toBe(true);
+    component.toggleSkillEditOptions();
+    expect(component.showSkillEditOptions).toBe(true);
   });
 
   it('should save changes if save changes modal is opened and confirm ' +
-    'button is clicked', fakeAsync(function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve('commitMessage')
+    'button is clicked', fakeAsync(() => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return ({
+        result: Promise.resolve('success')
+      } as NgbModalRef);
     });
+
     let saveSkillSpy = spyOn(skillEditorStateService, 'saveSkill')
       .and.callFake((message, cb) => {
         cb();
         return true;
       });
 
-    $scope.saveChanges();
+    component.saveChanges();
     tick();
-    $scope.$apply();
 
+    expect(modalSpy).toHaveBeenCalled();
     expect(saveSkillSpy).toHaveBeenCalled();
   }));
 
   it('should not save changes if save changes modal is opened and cancel ' +
-    'button is clicked', fakeAsync(function() {
-    spyOn(ngbModal, 'open').and.returnValue(
-      {
-        result: $q.reject()
-      } as NgbModalRef
-    );
+    'button is clicked', fakeAsync(() => {
+    let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (modal, modalOptions) => {
+        return ({
+          result: Promise.resolve()
+        } as NgbModalRef);
+      });
     let saveSkillSpy = spyOn(skillEditorStateService, 'saveSkill')
       .and.returnValue(null);
 
-    $scope.saveChanges();
+    component.saveChanges();
     tick();
-    $scope.$apply();
 
     expect(saveSkillSpy).not.toHaveBeenCalled();
+    expect(ngbModalSpy).not.toHaveBeenCalled();
   }));
 
-  describe('on navigating to questions tab ', function() {
+  describe('on navigating to questions tab ', () => {
     it('should open undo changes modal if there are unsaved ' +
-      'changes', fakeAsync(function() {
+      'changes', fakeAsync(() => {
       // Setting unsaved changes to be two.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(2);
@@ -307,16 +291,15 @@ describe('Skill Editor Navbar Directive', function() {
         skillEditorRoutingService, 'navigateToQuestionsTab')
         .and.returnValue(null);
 
-      $scope.selectQuestionsTab();
+      component.selectQuestionsTab();
       tick();
-      $scope.$apply();
 
       expect(ngbModalSpy).toHaveBeenCalled();
       expect(navigateToQuestionsTabSpy).not.toHaveBeenCalled();
     }));
 
     it('should navigate to questions tab if there are no unsaved ' +
-      'changes', function() {
+      'changes', () => {
       // Setting unsaved changes to be zero.
       spyOn(undoRedoService, 'getChangeCount')
         .and.returnValue(0);
@@ -324,7 +307,7 @@ describe('Skill Editor Navbar Directive', function() {
         skillEditorRoutingService, 'navigateToQuestionsTab')
         .and.returnValue(null);
 
-      $scope.selectQuestionsTab();
+      component.selectQuestionsTab();
 
       expect(navigateToQuestionsTabSpy).toHaveBeenCalled();
     });
