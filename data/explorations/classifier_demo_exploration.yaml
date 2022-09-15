@@ -108,7 +108,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 5
+    next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
