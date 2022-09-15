@@ -352,8 +352,6 @@ class Normalizers:
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
-        # Here we use cast because the return value of getattr() method is
-        # dynamic and mypy will assume it to be Any otherwise.
         return cast(Callable[..., str], getattr(cls, normalizer_id))
 
     @staticmethod
