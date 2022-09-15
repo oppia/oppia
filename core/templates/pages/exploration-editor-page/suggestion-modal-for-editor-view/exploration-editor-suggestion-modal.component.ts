@@ -24,13 +24,20 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { EditabilityService } from 'services/editability.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 
- @Component({
-   selector: 'oppia-exploration-editor-suggestion-modal',
-   templateUrl: './exploration-editor-suggestion-modal.component.html'
- })
-
+@Component({
+  selector: 'oppia-exploration-editor-suggestion-modal',
+  templateUrl: './exploration-editor-suggestion-modal.component.html'
+})
 export class ExplorationEditorSuggestionModalComponent
    extends ConfirmOrCancelModal implements OnInit {
+  @Input() currentContent: string;
+  @Input() newContent: string;
+  @Input() suggestionIsHandled: boolean;
+  @Input() suggestionIsValid: boolean;
+  @Input() suggestionStatus: string;
+  @Input() threadUibModalInstance: NgbActiveModal;
+  @Input() unsavedChangesExist: boolean;
+
   canEdit: boolean;
   commitMessage: string;
   reviewMessage: string;
@@ -40,79 +47,71 @@ export class ExplorationEditorSuggestionModalComponent
   errorMessage: string;
   canAccept: boolean;
 
-   @Input() currentContent;
-   @Input() newContent;
-   @Input() suggestionIsHandled;
-   @Input() suggestionIsValid;
-   @Input() suggestionStatus;
-   @Input() threadUibModalInstance;
-   @Input() unsavedChangesExist;
+  constructor(
+    private editabilityService: EditabilityService,
+    private ngbActiveModal: NgbActiveModal,
+    private suggestionModalService: SuggestionModalService,
+  ) {
+    super(ngbActiveModal);
+  }
 
-   constructor(
-     private ngbActiveModal: NgbActiveModal,
-     private suggestionModalService: SuggestionModalService,
-     private editabilityService: EditabilityService,
-   ) {
-     super(ngbActiveModal);
-   }
+  acceptSuggestion(): void {
+    if (this.threadUibModalInstance !== null) {
+      this.threadUibModalInstance.close();
+    }
+    this.suggestionModalService.acceptSuggestion(this.ngbActiveModal, {
+      action: AppConstants.ACTION_ACCEPT_SUGGESTION,
+      commitMessage: this.commitMessage,
+      reviewMessage: this.reviewMessage,
+      // TODO(sll): If audio files exist for the content being
+      // replaced, implement functionality in the modal for the
+      // exploration creator to indicate whether this change
+      // requires the corresponding audio subtitles to be updated.
+      // For now, we default to assuming that the changes are
+      // sufficiently small as to warrant no updates.
+      audioUpdateRequired: false
+    });
+  }
 
-   acceptSuggestion(): void {
-     if (this.threadUibModalInstance !== null) {
-       this.threadUibModalInstance.close();
-     }
-     this.suggestionModalService.acceptSuggestion(this.ngbActiveModal, {
-       action: AppConstants.ACTION_ACCEPT_SUGGESTION,
-       commitMessage: this.commitMessage,
-       reviewMessage: this.reviewMessage,
-       // TODO(sll): If audio files exist for the content being
-       // replaced, implement functionality in the modal for the
-       // exploration creator to indicate whether this change
-       // requires the corresponding audio subtitles to be updated.
-       // For now, we default to assuming that the changes are
-       // sufficiently small as to warrant no updates.
-       audioUpdateRequired: false
-     });
-   }
+  rejectSuggestion(): void {
+    if (this.threadUibModalInstance !== null) {
+      this.threadUibModalInstance.close();
+    }
 
-   rejectSuggestion(): void {
-     if (this.threadUibModalInstance !== null) {
-       this.threadUibModalInstance.close();
-     }
+    return this.suggestionModalService.rejectSuggestion(
+      this.ngbActiveModal, {
+        action: AppConstants.ACTION_REJECT_SUGGESTION,
+        reviewMessage: this.reviewMessage
+      });
+  }
 
-     return this.suggestionModalService.rejectSuggestion(
-       this.ngbActiveModal, {
-         action: AppConstants.ACTION_REJECT_SUGGESTION,
-         reviewMessage: this.reviewMessage
-       });
-   }
-
-   ngOnInit(): void {
-     this.isNotHandled = !this.suggestionIsHandled;
-     this.canEdit = this.editabilityService.isEditable();
-     this.commitMessage = '';
-     this.reviewMessage = '';
-     this.canReject = this.canEdit && this.isNotHandled;
-     this.canAccept = this.canEdit && this.isNotHandled &&
+  ngOnInit(): void {
+    this.isNotHandled = !this.suggestionIsHandled;
+    this.canEdit = this.editabilityService.isEditable();
+    this.commitMessage = '';
+    this.reviewMessage = '';
+    this.canReject = this.canEdit && this.isNotHandled;
+    this.canAccept = this.canEdit && this.isNotHandled &&
      this.suggestionIsValid && !this.unsavedChangesExist;
 
-     if (!this.isNotHandled) {
-       this.errorMessage =
+    if (!this.isNotHandled) {
+      this.errorMessage =
          ['accepted', 'fixed'].includes(this.suggestionStatus) ?
            this.suggestionModalService.SUGGESTION_ACCEPTED_MSG :
            this.suggestionModalService.SUGGESTION_REJECTED_MSG;
-     } else if (!this.suggestionIsValid) {
-       this.errorMessage =
+    } else if (!this.suggestionIsValid) {
+      this.errorMessage =
          this.suggestionModalService.SUGGESTION_INVALID_MSG;
-     } else if (this.unsavedChangesExist) {
-       this.errorMessage = this.suggestionModalService.UNSAVED_CHANGES_MSG;
-     } else {
-       this.errorMessage = '';
-     }
-   }
+    } else if (this.unsavedChangesExist) {
+      this.errorMessage = this.suggestionModalService.UNSAVED_CHANGES_MSG;
+    } else {
+      this.errorMessage = '';
+    }
+  }
 
-   cancelReview(): void {
-     this.suggestionModalService.cancelSuggestion(this.ngbActiveModal);
-   }
+  cancelReview(): void {
+    this.suggestionModalService.cancelSuggestion(this.ngbActiveModal);
+  }
 }
 
 angular.module('oppia').directive('oppiaExplorationEditorSuggestionModal',
