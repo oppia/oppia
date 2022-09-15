@@ -10,9 +10,8 @@
               [disabled]="!isSkillSaveable()">
         <span *ngIf="!isSaveInProgress()">
           <span title="Publish Changes">
-            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+            <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish Changes">
-              &#xE161;
             </i>
             <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
             <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
@@ -56,24 +55,24 @@
              *ngIf="showNavigationOptions">
           <div class="skill-nav-dropdown-option"
                (click)="selectMainTab()">
-            <i class="material-icons">&#xE254;</i>
+              <i class="fas fa-pen navbar-tab-icon"></i>
             <span>Editor</span>
           </div>
           <div class="skill-nav-dropdown-option"
                (click)="selectQuestionsTab()">
-            <i class="material-icons">&#xE254;</i>
+              <i class="fas fa-book-open navbar-tab-icon"></i>
             <span>Questions</span>
           </div>
           <div class="skill-nav-dropdown-option"
                (click)="selectPreviewTab()">
-            <i class="material-icons">&#xE037;</i>
+              <i class="fas fa-play navbar-tab-icon"></i>
             <span>Preview</span>
           </div>
         </div>
         <div class="skill-nav-dropdown-content">
           <div class="skill-nav-dropdown-text"
                (click)="toggleWarningText()">
-            <i class="material-icons">&#xE254;</i>
+            <i class="fas fa-pen"></i>
             <span>{{activeTab}}</span>
           </div>
           <div class="skill-nav-dropdown-icon"
@@ -87,7 +86,7 @@
              *ngIf="showSkillEditOptions">
           <div class="skill-nav-dropdown-option"
                (click)="saveChanges()">
-            <i class="material-icons">&#xE254;</i>
+              <i class="fas fa-save navbar-tab-icon"></i>
             <span>Save Changes</span>
           </div>
         </div>
@@ -132,7 +131,7 @@
   }
   .oppia-save-publish-changes-button {
     float: left;
-    width: 158px;
+    width: 180px;
   }
 
   @media screen and (max-width: 768px) {
@@ -191,7 +190,9 @@
       flex-wrap: wrap;
       justify-content: space-between;
     }
-
+    .skill-editor-nav-mobile .navbar-tab-icon {
+      padding: 5px;
+    }
      .right-container {
       background-color: #419889;
       color: #fff;
