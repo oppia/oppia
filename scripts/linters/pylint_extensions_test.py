@@ -2397,16 +2397,16 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function_with_type_ignore_only.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_function_with_type_ignore_only
-        )
         message = testutils.Message(
             msg_id='mypy-ignore-used',
             line=2,
             node=node_function_with_type_ignore_only
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_function_with_type_ignore_only
+            )
+        temp_file.close()
 
     def test_extra_type_ignore_comment_used_in_a_module_raises_error(self):
         node_function_with_extra_comment = astroid.scoped_nodes.Module(
@@ -2441,9 +2441,6 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function_with_extra_comment.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_function_with_extra_comment
-        )
         message1 = testutils.Message(
             msg_id='redundant-type-comment',
             line=7,
@@ -2454,7 +2451,10 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             line=15
         )
         with self.checker_test_object.assertAddsMessages(message1, message2):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_function_with_extra_comment
+            )
+        temp_file.close()
 
         node_function_with_extra_comment2 = astroid.scoped_nodes.Module(
             name='test',
@@ -2483,16 +2483,16 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function_with_extra_comment2.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_function_with_extra_comment2
-        )
         message = testutils.Message(
             msg_id='redundant-type-comment',
             line=7,
             node=node_function_with_extra_comment2
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_function_with_extra_comment2
+            )
+        temp_file.close()
 
     def test_raises_error_if_type_ignore_is_in_second_place(self):
         node_with_type_ignore = astroid.scoped_nodes.Module(
@@ -2513,16 +2513,16 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_with_type_ignore.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_type_ignore
-        )
         message = testutils.Message(
             msg_id='mypy-ignore-used',
             line=2,
             node=node_with_type_ignore
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_type_ignore
+            )
+        temp_file.close()
 
     def test_type_ignores_with_comments_should_not_raises_error(self):
         node_function = astroid.scoped_nodes.Module(
@@ -2550,9 +2550,9 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function.file = filename
 
-        self.checker_test_object.checker.visit_module(node_function)
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_function)
+        temp_file.close()
 
     def test_untyped_call_type_ignores_should_not_raise_error(self):
         node_function = astroid.scoped_nodes.Module(
@@ -2576,9 +2576,9 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_function.file = filename
 
-        self.checker_test_object.checker.visit_module(node_function)
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_function)
+        temp_file.close()
 
     def test_raises_error_if_gap_in_ignore_and_comment_is_more_than_fifteen(
         self
@@ -2615,9 +2615,6 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_with_ignore_and_more_than_ten_gap.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_ignore_and_more_than_ten_gap
-        )
         message1 = testutils.Message(
             msg_id='mypy-ignore-used',
             line=18,
@@ -2630,7 +2627,10 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(
             message1, message2
         ):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_ignore_and_more_than_ten_gap
+            )
+        temp_file.close()
 
     def test_raises_no_error_if_todo_is_present_initially(self):
         node_with_ignore_having_todo = astroid.scoped_nodes.Module(
@@ -2652,11 +2652,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             )
         node_with_ignore_having_todo.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_ignore_having_todo
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_ignore_having_todo
+            )
+        temp_file.close()
 
     def test_raises_no_error_if_module_is_excluded(self):
         node_with_ignore_having_todo = astroid.scoped_nodes.Module(
@@ -2678,11 +2678,11 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.EXCLUDED_DIRS_HAVING_IGNORE_TYPE_COMMENTS = (   # pylint: disable=line-too-long
             [filename]
         )
-        self.checker_test_object.checker.visit_module(
-            node_with_ignore_having_todo
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_ignore_having_todo
+            )
+        temp_file.close()
 
 
 class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
@@ -2713,14 +2713,14 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type.file = filename
 
-        self.checker_test_object.checker.visit_module(node_with_any_type)
         message = testutils.Message(
             msg_id='any-type-used',
             line=2,
             node=node_with_any_type
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_with_any_type)
+        temp_file.close()
 
         # Checking for object class.
         node_with_object_type = astroid.scoped_nodes.Module(
@@ -2738,14 +2738,14 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_type.file = filename
 
-        self.checker_test_object.checker.visit_module(node_with_object_type)
         message = testutils.Message(
             msg_id='object-class-used',
             line=2,
             node=node_with_object_type
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_with_object_type)
+        temp_file.close()
 
         # Checking for cast method.
         node_with_cast_method = astroid.scoped_nodes.Module(
@@ -2763,14 +2763,14 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_cast_method.file = filename
 
-        self.checker_test_object.checker.visit_module(node_with_cast_method)
         message = testutils.Message(
             msg_id='cast-func-used',
             line=2,
             node=node_with_cast_method
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_with_cast_method)
+        temp_file.close()
 
     def test_raises_error_if_exceptional_types_are_combined_in_module(
         self
@@ -2806,7 +2806,6 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_combined_types.file = filename
 
-        self.checker_test_object.checker.visit_module(node_with_combined_types)
         message1 = testutils.Message(
             msg_id='any-type-used',
             line=2,
@@ -2825,7 +2824,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(
             message1, message3, message2
         ):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_with_combined_types)
+        temp_file.close()
 
     def test_raises_error_if_any_type_used_in_function_signature(self):
         node_with_any_type_arg = astroid.scoped_nodes.Module(
@@ -2844,14 +2844,14 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_arg.file = filename
 
-        self.checker_test_object.checker.visit_module(node_with_any_type_arg)
         message = testutils.Message(
             msg_id='any-type-used',
             line=2,
             node=node_with_any_type_arg
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_with_any_type_arg)
+        temp_file.close()
 
         node_with_any_type_return = astroid.scoped_nodes.Module(
             name='test',
@@ -2869,15 +2869,14 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_return.file = filename
 
-        self.checker_test_object.checker.visit_module(node_with_any_type_return)
-
         message = testutils.Message(
             msg_id='any-type-used',
             line=2,
             node=node_with_any_type_return
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(node_with_any_type_return)
+        temp_file.close()
 
         node_with_any_type_return_and_args = astroid.scoped_nodes.Module(
             name='test',
@@ -2895,16 +2894,16 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_return_and_args.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_any_type_return_and_args
-        )
         message = testutils.Message(
             msg_id='any-type-used',
             line=2,
             node=node_with_any_type_return_and_args
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_any_type_return_and_args
+            )
+        temp_file.close()
 
         node_with_multiple_any_type_functions = astroid.scoped_nodes.Module(
             name='test',
@@ -2928,9 +2927,6 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_multiple_any_type_functions.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_multiple_any_type_functions
-        )
         message = testutils.Message(
             msg_id='any-type-used',
             line=2,
@@ -2944,7 +2940,10 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(
             message, message2
         ):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_multiple_any_type_functions
+            )
+        temp_file.close()
 
     def test_any_and_cast_will_not_raise_error_in_import(self):
         node_with_any_and_cast_imported = astroid.scoped_nodes.Module(
@@ -2962,11 +2961,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_and_cast_imported.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_any_and_cast_imported
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_any_and_cast_imported
+            )
+        temp_file.close()
 
         node_with_any_and_cast_in_multi_line_import = (
             astroid.scoped_nodes.Module(
@@ -2987,11 +2986,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_and_cast_in_multi_line_import.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_any_and_cast_in_multi_line_import
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_any_and_cast_in_multi_line_import
+            )
+        temp_file.close()
 
     def test_exceptional_types_with_comments_should_not_raise_error(self):
         node_with_any_type_and_comment = astroid.scoped_nodes.Module(
@@ -3028,11 +3027,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_any_type_and_comment.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_any_type_and_comment
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_any_type_and_comment
+            )
+        temp_file.close()
 
         node_with_cast_method_and_comment = astroid.scoped_nodes.Module(
             name='test',
@@ -3073,11 +3072,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_cast_method_and_comment.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_cast_method_and_comment
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_cast_method_and_comment
+            )
+        temp_file.close()
 
     def test_no_error_raised_if_objects_are_present_with_comment(self):
         node_with_multiple_objects_in_func = astroid.scoped_nodes.Module(
@@ -3098,11 +3097,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_multiple_objects_in_func.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_multiple_objects_in_func
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_multiple_objects_in_func
+            )
+        temp_file.close()
 
     def test_raises_error_if_gap_between_type_and_comment_is_more_than_fifteen(
         self
@@ -3141,16 +3140,16 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_and_more_than_expected_gap.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_object_and_more_than_expected_gap
-        )
         message = testutils.Message(
             msg_id='object-class-used',
             line=18,
             node=node_with_object_and_more_than_expected_gap
         )
         with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_object_and_more_than_expected_gap
+            )
+        temp_file.close()
 
         node_with_object_and_less_than_ten_gap = astroid.scoped_nodes.Module(
             name='test',
@@ -3177,11 +3176,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_and_less_than_ten_gap.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_object_and_less_than_ten_gap
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_object_and_less_than_ten_gap
+            )
+        temp_file.close()
 
     def test_no_error_raised_if_objects_are_present_with_todo_comment(self):
         node_with_object_and_todo_comment = astroid.scoped_nodes.Module(
@@ -3203,11 +3202,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         node_with_object_and_todo_comment.file = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_with_object_and_todo_comment
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_object_and_todo_comment
+            )
+        temp_file.close()
 
     def test_no_error_raised_if_module_is_excluded(self):
         node_with_object_and_todo_comment = astroid.scoped_nodes.Module(
@@ -3229,11 +3228,11 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         self.checker_test_object.checker.EXCLUDED_DIRS_HAVING_EXCEPTIONAL_TYPE_COMMENTS = (   # pylint: disable=line-too-long
             [filename]
         )
-        self.checker_test_object.checker.visit_module(
-            node_with_object_and_todo_comment
-        )
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_module(
+                node_with_object_and_todo_comment
+            )
+        temp_file.close()
 
 
 class SingleLineCommentCheckerTests(unittest.TestCase):
