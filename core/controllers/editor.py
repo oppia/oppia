@@ -24,7 +24,7 @@ import logging
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.controllers import acl_decorators
+from core.controllers import acl_decorators, domain_objects_validator
 from core.controllers import base
 from core.controllers import domain_objects_validator as objects_validator
 from core.domain import email_manager
@@ -137,7 +137,9 @@ class ExplorationHandler(EditorHandler):
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'object_class': exp_domain.ExplorationChange
+                        'validation_method': (
+                            domain_objects_validator.validate_exploration_change
+                        )
                     }
                 }
             }
