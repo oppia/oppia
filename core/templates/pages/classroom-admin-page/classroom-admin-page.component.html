@@ -134,14 +134,118 @@
             </textarea>
           </div>
 
+          <div>
+            <hr>
+            <p><strong>Topics and its prerequisites</strong></p>
+            <p class="topic-dependency-description">
+              The below dependencies between the topics will be used to generate
+              the diagnostic test and based on the performance topics are
+              recommended to the new learners.
+            </p>
+
+            <p *ngIf="topicsCountInClassroom == 0">
+              <em>No topics are currently added in a classroom</em>
+            </p>
+
+            <div *ngFor="let topic of topicNameToPrerequisiteTopicNames | keyvalue"
+                 class="topic-dependency-container">
+              <div>
+                <span class="topics-name">
+                  <strong>{{ topic.key }}</strong>
+                </span>
+
+                <div class="prerequisite-topics-container">
+                  <span *ngIf="topic.value.length === 0">
+                    <em>No prerequisites selected</em>
+                  </span>
+
+                  <div *ngIf="topic.value.length > 0">
+                    <ul class="prerequisite-topics"
+                         *ngFor="let prerequisiteTopic of topic.value">
+                      <li class="prerequisite-topic-name">
+                        {{ prerequisiteTopic }}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <button *ngIf="classroomEditorMode"
+                          (click)="showDependencyGraphDropdown(topic.key)"
+                          mat-button matSuffix mat-icon-button
+                          aria-label="Edit topic dependencies">
+                    <mat-icon class="edit-topic-dependencies">edit</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div ngbDropdown
+                   *ngIf="dependencyGraphDropdownIsShown && currentTopicOnEdit === topic.key">
+                <button ngbDropdownToggle mat-button
+                        (click)="getAvailablePrerequisiteTopicNamesForDropdown(topic.key)"
+                        class="dropdown-toggle">
+                  Select Prerequisite
+                </button>
+
+                <button (click)="closeDependencyGraphDropdown()"
+                        mat-button matSuffix mat-icon-button
+                        aria-label="Clear">
+                  <mat-icon matListIcon>close</mat-icon>
+                </button>
+
+                <ul ngbDropdownMenu
+                    class="oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu">
+                  <ng-container *ngFor="let topicName of eligibleTopicNames">
+                    <li ngbDropdownItem class="topic-dropdown-options"
+                        (click)="modifyDependencyForTopic(topic.key, topicName)">
+                      <span>{{topicName}}</span>
+                      <i class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"
+                          *ngIf="selectedTopics.indexOf(topicName) !== -1">
+                      </i>
+                    </li>
+                  </ng-container>
+                </ul>
+              </div>
+            </div>
+
+            <div *ngIf="classroomEditorMode">
+              <input *ngIf="addNewTopicInputIsShown"
+                     [(ngModel)]="newTopicId"
+                     class="form-control new-topic-input"
+                     (ngModelChange)="onNewTopicInputModelChange()">
+              <button *ngIf="addNewTopicInputIsShown"
+                      (click)="removeNewTopicInputField()"
+                      class="btn btn-secondary">
+                Cancel
+              </button>
+              <button *ngIf="addNewTopicInputIsShown"
+                      (click)="addTopicId(newTopicId)"
+                      class="btn btn-success"
+                      [disabled]="newTopicId.length === 0">
+                Submit
+              </button>
+
+              <button (click)="showNewTopicInputField()"
+                      *ngIf="!addNewTopicInputIsShown"
+                      class="btn btn-secondary add-new-topic">
+                Add Topic
+              </button>
+              <p *ngIf="!topicWithGivenIdExists" class="oppia-warning-text" >
+                Topic with given ID does not exist.
+              </p>
+            </div>
+
+            <p *ngIf="cyclicCheckError" class="oppia-warning-text">
+              Cyclic dependency detected.
+            </p>
+          </div>
+
           <div *ngIf="classroomEditorMode" class="action-buttons">
             <button class="btn btn-secondary cancel-classroom-changes"
                     (click)="closeClassroomConfigEditor()"
                     [disabled]="savingClassroomData">
               Cancel
             </button>
+
             <button class="btn btn-success save-classroom-changes"
-                    [disabled]="(!classroomDataIsChanged) || !(classroomNameIsValid && classroomUrlFragmentIsValid)"
+                    [disabled]="(!classroomDataIsChanged) || !(classroomNameIsValid && classroomUrlFragmentIsValid && topicsGraphIsCorrect)"
                     (click)="saveClassroomData(classroom.key)">
               <span *ngIf="!savingClassroomData">Save</span>
               <mat-spinner *ngIf="savingClassroomData"
@@ -169,6 +273,58 @@
 </mat-card>
 
 <style>
+  .add-new-topic {
+    margin-top: 10px;
+  }
+  .new-topic-input {
+    display: inline;
+    margin-right: 10px;
+    width: 200px;
+  }
+  .prerequisite-topics {
+    display: contents;
+  }
+  .topics-name {
+    padding: 10px;
+    width: 200px;
+  }
+  .edit-topic-dependencies {
+    transform: scale(0.7);
+  }
+  .topic-dependency-description {
+    margin: 10px 0;
+  }
+  .topic-dropdown-options {
+    cursor: pointer;
+    margin: 10px;
+  }
+  .topic-dropdown-options:hover {
+    background: #e8e7e3;
+  }
+  .topic-prerequisites-header .topics-header {
+    text-align: center;
+    width: 300px;
+  }
+  .prerequisite-topic-name {
+    background-color: #e8e7e3;
+    border-radius: 10px;
+    display: inline-block;
+    list-style: none;
+    margin: 5px;
+    padding: 0 10px;
+  }
+  .prerequisite-topics-container {
+    display: -webkit-inline-box;
+    padding: 10px;
+    width: 400px;
+  }
+  .topic-dependency-container-header {
+    display: flex;
+    justify-content: space-around;
+  }
+  .topic-dependency-container:hover {
+    background: #eee;
+  }
   :host /deep/ .oppia-save-classroom-spinning-button circle {
     stroke: #fff;
   }
@@ -179,7 +335,6 @@
     width: fit-content;
   }
   .save-classroom-changes {
-    margin-left: 5px;
     margin-top: 5px;
   }
   .cancel-classroom-changes {
@@ -204,8 +359,8 @@
     margin-top: 20px;
   }
   .action-buttons {
-    margin-left: 70%;
-    margin-top: 5px;
+    float: right;
+    margin: 10px;
   }
   .oppia-edit-icon {
     cursor: pointer;
@@ -223,11 +378,13 @@
     justify-content: space-between;
     margin: 10px 20px;
     padding: 10px;
+    width: 94%;
   }
   .card-content {
     padding: 20px
   }
   .oppia-editor-card-with-avatar {
+    margin-bottom: 200px;
     margin-top: 200px;
   }
   .oppia-editor-card-section {

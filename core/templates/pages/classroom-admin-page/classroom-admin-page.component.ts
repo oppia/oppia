@@ -27,6 +27,17 @@ import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
+
+interface TopicIdToPrerequisiteTopicIds {
+  [topicId: string]: string[];
+}
+
+
+interface TopicNameToPrerequisiteTopicNames {
+  [topicName: string]: string[];
+}
+
+
 @Component({
   selector: 'oppia-classroom-admin-page',
   templateUrl: './classroom-admin-page.component.html',
@@ -52,8 +63,12 @@ export class ClassroomAdminPageComponent implements OnInit {
   courseDetails: string = '';
   topicListIntro: string = '';
   topicIds: string[] = [];
-  topicIdToPrerequisiteTopicIds: {[topicId: string]: string[]} = {};
-  topicNameToPrerequisiteTopicNames: {[topicName: string]: string[]} = {};
+  eligibleTopicNames = [];
+  topicIdsToTopicName = {};
+  newTopicId: string = '';
+  topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds = {};
+  topicNameToPrerequisiteTopicNames: TopicNameToPrerequisiteTopicNames = {};
+  topicsCountInClassroom: number = 0;
 
   pageIsInitialized: boolean = false;
   classroomDataIsChanged: boolean = false;
@@ -72,6 +87,14 @@ export class ClassroomAdminPageComponent implements OnInit {
   duplicateClassroomUrlFragment: boolean = false;
   urlFragmentRegexMatched: boolean = true;
   classroomUrlFragmentIsValid: boolean = true;
+  cyclicCheckError: boolean = false;
+  topicsGraphIsCorrect = true;
+  addNewTopicInputIsShown: boolean = false;
+  topicWithGivenIdExists: boolean = true;
+
+  dependencyGraphDropdownIsShown: boolean = false;
+  currentTopicOnEdit: string;
+  selectedTopics: string[] = [];
 
   getClassroomData(classroomId: string): void {
     if (this.classroomId === classroomId && this.classroomViewerMode) {
@@ -94,6 +117,8 @@ export class ClassroomAdminPageComponent implements OnInit {
           cloneDeep(this.selectedClassroomDict));
 
         this.getTopicDependencyByTopicName(this.topicIdToPrerequisiteTopicIds);
+        this.topicsCountInClassroom = Object.keys(
+          this.topicIdToPrerequisiteTopicIds).length;
 
         this.classroomDataIsChanged = false;
       }
@@ -330,56 +355,149 @@ export class ClassroomAdminPageComponent implements OnInit {
     }
   }
 
-  getTopicDependencyByTopicName(topicIdToPrerequisiteTopicIds) {
+  getTopicDependencyByTopicName(
+      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+  ): void {
     let topicIds = Object.keys(topicIdToPrerequisiteTopicIds);
     this.topicNameToPrerequisiteTopicNames = {};
 
     this.editableTopicBackendApiService.getTopicIdToTopicNameAsync(
       topicIds).then(topicIdsToTopicName => {
+      for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
+        let currentTopicName = topicIdsToTopicName[currentTopicId];
 
-        for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
-          let currentTopicName = topicIdsToTopicName[currentTopicId];
+        let prerequisiteTopicIds = (
+          topicIdToPrerequisiteTopicIds[currentTopicId]);
+        let prerequisiteTopicNames = [];
 
-          let prerequisiteTopicIds = (
-            topicIdToPrerequisiteTopicIds[currentTopicId]);
-          let prerequisiteTopicNames = [];
-
-          for (let topicId of prerequisiteTopicIds) {
-            prerequisiteTopicNames.push(
-              topicIdsToTopicName[topicId]);
-          }
-
-          this.topicNameToPrerequisiteTopicNames[currentTopicName] = (
-            prerequisiteTopicNames);
+        for (let topicId of prerequisiteTopicIds) {
+          prerequisiteTopicNames.push(
+            topicIdsToTopicName[topicId]);
         }
-      });
+
+        this.topicNameToPrerequisiteTopicNames[currentTopicName] = (
+          prerequisiteTopicNames);
+        this.topicIdsToTopicName = topicIdsToTopicName;
+      }
+    });
   }
-  // Test with random values.
-  addTopicId(topicId: string) {
+
+  addTopicId(topicId: string): void {
     this.editableTopicBackendApiService.getTopicIdToTopicNameAsync(
       [topicId]).then(topicIdToTopicName => {
-        console.log(topicIdToTopicName);
-        let topicName = topicIdToTopicName[topicId];
-        this.updatedClassroomDict.topicIdToPrerequisiteTopicIds[topicId] = [];
-        this.topicIdToPrerequisiteTopicIds[topicId] = [];
-        this.topicNameToPrerequisiteTopicNames[topicName] = [];
-      });
+      const topicName = topicIdToTopicName[topicId];
+      this.updatedClassroomDict.topicIdToPrerequisiteTopicIds[topicId] = [];
+      this.topicIdToPrerequisiteTopicIds[topicId] = [];
+      this.topicNameToPrerequisiteTopicNames[topicName] = [];
+      this.classroomDataIsChanged = true;
+      this.addNewTopicInputIsShown = false;
+      this.topicsCountInClassroom += 1;
+    }, () => {
+      this.topicWithGivenIdExists = false;
+    });
   }
 
-  normalizeTopicDependencyGraph() {
-
+  showNewTopicInputField(): void {
+    this.addNewTopicInputIsShown = true;
   }
 
-  viewGraph() {
-
+  removeNewTopicInputField(): void {
+    this.topicWithGivenIdExists = true;
+    this.addNewTopicInputIsShown = false;
   }
 
-  validateDependencyGraph() {
-
+  onNewTopicInputModelChange(): void {
+    if (!this.topicWithGivenIdExists) {
+      this.topicWithGivenIdExists = true;
+    }
   }
 
-  modifyDependencyForTopic() {
 
+  getTopicIdFromTopicName(topicName: string): string {
+    for (let topicId in this.topicIdsToTopicName) {
+      if (this.topicIdsToTopicName[topicId] === topicName) {
+        return topicId;
+      }
+    }
+  }
+
+  validateDependencyGraph(): void {
+    this.topicsGraphIsCorrect = true;
+    this.cyclicCheckError = false;
+    for (let currentTopicId in this.topicIdToPrerequisiteTopicIds) {
+      let ancestors = cloneDeep(
+        this.topicIdToPrerequisiteTopicIds[currentTopicId]);
+
+      let visitedTopicIdsForCurrentTopic = [];
+      while (ancestors.length > 0) {
+        if (ancestors.indexOf(currentTopicId) !== -1) {
+          this.cyclicCheckError = true;
+          this.topicsGraphIsCorrect = false;
+          return;
+        }
+
+        let lengthOfAncestor = ancestors.length;
+        let lastTopicIdInAncestor = ancestors[lengthOfAncestor - 1];
+        ancestors.splice(lengthOfAncestor - 1, 1);
+
+        if (
+          visitedTopicIdsForCurrentTopic.indexOf(
+            lastTopicIdInAncestor) !== -1
+        ) {
+          continue;
+        }
+
+        ancestors = ancestors.concat(
+          this.topicIdToPrerequisiteTopicIds[lastTopicIdInAncestor]);
+        visitedTopicIdsForCurrentTopic.push(lastTopicIdInAncestor);
+      }
+    }
+  }
+
+  modifyDependencyForTopic(
+      currentTopicName: string, prerequisiteTopicName: string
+  ): void {
+    let prerequisiteTopicNames = (
+      this.topicNameToPrerequisiteTopicNames[currentTopicName]);
+    let currentTopicId = this.getTopicIdFromTopicName(currentTopicName);
+    let prerequisiteTopicId = this.getTopicIdFromTopicName(
+      prerequisiteTopicName);
+
+    if (prerequisiteTopicNames.indexOf(prerequisiteTopicName) === -1) {
+      prerequisiteTopicNames.push(prerequisiteTopicName);
+      prerequisiteTopicNames.sort();
+      this.topicIdToPrerequisiteTopicIds[currentTopicId].push(
+        prerequisiteTopicId);
+    } else {
+      let index = prerequisiteTopicNames.indexOf(prerequisiteTopicName);
+      prerequisiteTopicNames.splice(index, 1);
+
+      index = this.topicIdToPrerequisiteTopicIds[currentTopicId].indexOf(
+        prerequisiteTopicId);
+      this.topicIdToPrerequisiteTopicIds[currentTopicId].splice(index, 1);
+    }
+
+    this.updatedClassroomDict.topicIdToPrerequisiteTopicIds = (
+      this.topicIdToPrerequisiteTopicIds);
+    this.validateDependencyGraph();
+    this.classroomDataIsChanged = true;
+  }
+
+  showDependencyGraphDropdown(topicName: string): void {
+    this.dependencyGraphDropdownIsShown = true;
+    this.currentTopicOnEdit = topicName;
+  }
+
+  closeDependencyGraphDropdown(): void {
+    this.dependencyGraphDropdownIsShown = false;
+  }
+
+  getAvailablePrerequisiteTopicNamesForDropdown(topicName: string): void {
+    this.eligibleTopicNames = Object.keys(
+      this.topicNameToPrerequisiteTopicNames);
+    const index = this.eligibleTopicNames.indexOf(topicName);
+    this.eligibleTopicNames.splice(index, 1);
+    this.selectedTopics = this.topicNameToPrerequisiteTopicNames[topicName];
   }
 }
 

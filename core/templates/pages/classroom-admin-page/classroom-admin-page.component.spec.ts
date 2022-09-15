@@ -21,6 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ClassroomAdminPageComponent } from 'pages/classroom-admin-page/classroom-admin-page.component';
 import { ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
@@ -39,6 +40,7 @@ describe('Classroom Admin Page component ', () => {
   let fixture: ComponentFixture<ClassroomAdminPageComponent>;
 
   let classroomBackendApiService: ClassroomBackendApiService;
+  let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
 
   beforeEach(() => {
@@ -50,6 +52,7 @@ describe('Classroom Admin Page component ', () => {
       declarations: [ClassroomAdminPageComponent],
       providers: [
         ClassroomBackendApiService,
+        EditableTopicBackendApiService,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -63,6 +66,8 @@ describe('Classroom Admin Page component ', () => {
 
   beforeEach(() => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    editableTopicBackendApiService = TestBed.inject(
+      EditableTopicBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
   });
 
@@ -704,4 +709,278 @@ describe('Classroom Admin Page component ', () => {
 
       expect(component.duplicateClassroomUrlFragment).toBeFalse();
     });
+
+  it(
+    'should convert the topic dependencies from topic ID form to topic name',
+    fakeAsync(() => {
+      const topicIdTotopicName = {
+        topicId1: 'Dummy topic 1',
+        topicId2: 'Dummy topic 2',
+        topicId3: 'Dummy topic 3'
+      };
+      const topicIdToPrerequisiteTopicIds = {
+        topicId1: [],
+        topicId2: ['topicId1'],
+        topicId3: ['topicId1']
+      };
+      const topicNameToPrerequisiteTopicNames = {
+        'Dummy topic 1': [],
+        'Dummy topic 2': ['Dummy topic 1'],
+        'Dummy topic 3': ['Dummy topic 1']
+      };
+
+      spyOn(editableTopicBackendApiService, 'getTopicIdToTopicNameAsync')
+        .and.returnValue(Promise.resolve(topicIdTotopicName));
+
+      component.getTopicDependencyByTopicName(topicIdToPrerequisiteTopicIds);
+
+      tick();
+
+      expect(component.topicNameToPrerequisiteTopicNames).toEqual(
+        topicNameToPrerequisiteTopicNames);
+    }));
+
+  it(
+    'should be able to add new topic ID to classroom', fakeAsync(() => {
+      component.updatedClassroomDict = {
+        classroomId: 'classroomId',
+        name: 'math',
+        urlFragment: 'math',
+        courseDetails: '',
+        topicListIntro: '',
+        topicIdToPrerequisiteTopicIds: {}
+      };
+      expect(component.topicsCountInClassroom).toEqual(0);
+      expect(component.topicIdToPrerequisiteTopicIds).toEqual({});
+      expect(component.topicNameToPrerequisiteTopicNames).toEqual({});
+      const topicIdToTopicName = {
+        topicId1: 'Dummy topic 1'
+      };
+
+      spyOn(editableTopicBackendApiService, 'getTopicIdToTopicNameAsync')
+        .and.returnValue(Promise.resolve(topicIdToTopicName));
+
+      component.addTopicId('topicId1');
+
+      tick();
+
+      expect(component.topicIdToPrerequisiteTopicIds).toEqual({
+        topicId1: []
+      });
+      expect(component.topicNameToPrerequisiteTopicNames).toEqual({
+        'Dummy topic 1': []
+      });
+      expect(component.topicsCountInClassroom).toEqual(1);
+    }));
+
+  it(
+    'should be able to show error when new topic ID does not exist',
+    fakeAsync(() => {
+      component.topicWithGivenIdExists = true;
+
+      spyOn(editableTopicBackendApiService, 'getTopicIdToTopicNameAsync')
+        .and.returnValue(Promise.reject());
+
+      component.addTopicId('topicId1');
+
+      tick();
+
+      expect(component.topicWithGivenIdExists).toBeFalse();
+    }));
+
+  it('should be able to show and remove new topic input field', () => {
+    expect(component.addNewTopicInputIsShown).toBeFalse();
+
+    component.showNewTopicInputField();
+
+    expect(component.addNewTopicInputIsShown).toBeTrue();
+
+    component.removeNewTopicInputField();
+
+    expect(component.addNewTopicInputIsShown).toBeFalse();
+  });
+
+  it('should remove existing error for topic ID model change', () => {
+    component.topicWithGivenIdExists = false;
+
+    component.onNewTopicInputModelChange();
+
+    expect(component.topicWithGivenIdExists).toBeTrue();
+  });
+
+  it('should not present error for valid dependency graph', () => {
+    component.cyclicCheckError = false;
+    component.topicsGraphIsCorrect = true;
+
+    component.topicIdToPrerequisiteTopicIds = {
+      topic_id_1: ['topic_id_2', 'topic_id_3'],
+      topic_id_2: [],
+      topic_id_3: ['topic_id_2']
+    };
+
+    component.validateDependencyGraph();
+
+    expect(component.cyclicCheckError).toBeFalse();
+    expect(component.topicsGraphIsCorrect).toBeTrue();
+
+    component.topicIdToPrerequisiteTopicIds = {
+      topic_id_1: [],
+      topic_id_2: ['topic_id_1'],
+      topic_id_3: ['topic_id_2']
+    };
+
+    component.validateDependencyGraph();
+
+    expect(component.cyclicCheckError).toBeFalse();
+    expect(component.topicsGraphIsCorrect).toBeTrue();
+
+    component.topicIdToPrerequisiteTopicIds = {
+      topic_id_1: [],
+      topic_id_2: ['topic_id_1'],
+      topic_id_3: ['topic_id_2', 'topic_id_1']
+    };
+
+    component.validateDependencyGraph();
+
+    expect(component.cyclicCheckError).toBeFalse();
+    expect(component.topicsGraphIsCorrect).toBeTrue();
+  });
+
+  it('should be able to present error for invalid dependency graph', () => {
+    component.cyclicCheckError = false;
+    component.topicsGraphIsCorrect = true;
+
+    component.topicIdToPrerequisiteTopicIds = {
+      topic_id_1: ['topic_id_3'],
+      topic_id_2: ['topic_id_1'],
+      topic_id_3: ['topic_id_2']
+    };
+
+    component.validateDependencyGraph();
+
+    expect(component.cyclicCheckError).toBeTrue();
+    expect(component.topicsGraphIsCorrect).toBeFalse();
+  });
+
+  it('should be able to add prerequisite for a topic', () => {
+    component.topicIdsToTopicName = {
+      topicId1: 'Dummy topic 1',
+      topicId2: 'Dummy topic 2',
+      topicId3: 'Dummy topic 3'
+    };
+
+    component.topicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2']
+    };
+    component.topicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 2']
+    };
+
+    component.updatedClassroomDict = {
+      classroomId: 'classroomId',
+      name: 'math',
+      urlFragment: 'math',
+      courseDetails: '',
+      topicListIntro: '',
+      topicIdToPrerequisiteTopicIds: component.topicNameToPrerequisiteTopicNames
+    };
+
+    component.modifyDependencyForTopic('Dummy topic 3', 'Dummy topic 1');
+
+    const expectedTopicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 1', 'Dummy topic 2']
+    };
+
+    const expectedTopicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2', 'topicId1']
+    };
+
+    expect(component.topicIdToPrerequisiteTopicIds).toEqual(
+      expectedTopicIdToPrerequisiteTopicIds);
+    expect(component.topicNameToPrerequisiteTopicNames).toEqual(
+      expectedTopicNameToPrerequisiteTopicNames);
+  });
+
+  it('should be able to remove prerequisite from a topic', () => {
+    component.topicIdsToTopicName = {
+      topicId1: 'Dummy topic 1',
+      topicId2: 'Dummy topic 2',
+      topicId3: 'Dummy topic 3'
+    };
+
+    component.topicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2', 'topicId1']
+    };
+    component.topicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 2', 'Dummy topic 1']
+    };
+
+    component.updatedClassroomDict = {
+      classroomId: 'classroomId',
+      name: 'math',
+      urlFragment: 'math',
+      courseDetails: '',
+      topicListIntro: '',
+      topicIdToPrerequisiteTopicIds: component.topicNameToPrerequisiteTopicNames
+    };
+
+    component.modifyDependencyForTopic('Dummy topic 3', 'Dummy topic 1');
+
+    const expectedTopicIdToPrerequisiteTopicIds = {
+      topicId1: [],
+      topicId2: ['topicId1'],
+      topicId3: ['topicId2']
+    };
+    const expectedTopicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 2']
+    };
+
+    expect(component.topicIdToPrerequisiteTopicIds).toEqual(
+      expectedTopicIdToPrerequisiteTopicIds);
+    expect(component.topicNameToPrerequisiteTopicNames).toEqual(
+      expectedTopicNameToPrerequisiteTopicNames);
+  });
+
+  it('should correctly display dependency dropdown input field', () => {
+    component.dependencyGraphDropdownIsShown = false;
+    component.currentTopicOnEdit = '';
+
+    component.showDependencyGraphDropdown('Dummy topic 1');
+
+    expect(component.dependencyGraphDropdownIsShown).toBeTrue();
+    expect(component.currentTopicOnEdit).toEqual('Dummy topic 1');
+
+    component.closeDependencyGraphDropdown();
+
+    expect(component.dependencyGraphDropdownIsShown).toBeFalse();
+  });
+
+  it('should be able to get available prerequisite for topic names', () => {
+    component.topicNameToPrerequisiteTopicNames = {
+      'Dummy topic 1': [],
+      'Dummy topic 2': ['Dummy topic 1'],
+      'Dummy topic 3': ['Dummy topic 2']
+    };
+    component.selectedTopics = [];
+
+    component.getAvailablePrerequisiteTopicNamesForDropdown('Dummy topic 2');
+
+    expect(component.eligibleTopicNames).toEqual(
+      ['Dummy topic 1', 'Dummy topic 3']);
+    expect(component.selectedTopics).toEqual(['Dummy topic 1']);
+  });
 });
