@@ -20,13 +20,16 @@ starting an exploration.
 
 from __future__ import annotations
 
+from extensions import domain
 from extensions.actions import base
+
+from typing import List
 
 
 class ExplorationStart(base.BaseLearnerActionSpec):
     """Learner action that's recorded when a learner starts an exploration."""
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'state_name',
         'description': 'Initial state name',
         'schema': {

@@ -20,13 +20,16 @@ submitting an answer.
 
 from __future__ import annotations
 
+from extensions import domain
 from extensions.actions import base
+
+from typing import List
 
 
 class AnswerSubmit(base.BaseLearnerActionSpec):
     """Learner action that's recorded when an answer is submitted."""
 
-    _customization_arg_specs = [{
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'state_name',
         'description': 'State name',
         'schema': {

@@ -18,17 +18,49 @@
 
 from __future__ import annotations
 
+from typing import Any, Dict, List, Union
+from typing_extensions import TypedDict
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from core.domain import state_domain
+
+    AllowedDefaultValueTypes = Union[
+        str,
+        int,
+        state_domain.SubtitledUnicodeDict,
+        List[state_domain.SubtitledHtmlDict],
+        None
+    ]
+
+
+class CustomizationArgSpecsDict(TypedDict):
+    """Dictionary representing the CustomizationArgSpec object."""
+
+    name: str
+    description: str
+    # Here we used Any because values in schema dictionary can be of type str,
+    # List, Dict and other types too.
+    schema: Dict[str, Any]
+    default_value: AllowedDefaultValueTypes
+
 
 class CustomizationArgSpec:
     """Value object for a customization arg specification."""
 
-    def __init__(self, name, description, schema, default_value):
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        schema: Dict[str, Any],
+        default_value: AllowedDefaultValueTypes
+    ) -> None:
         self.name = name
         self.description = description
         self.schema = schema
         self.default_value = default_value
 
-    def to_dict(self):
+    def to_dict(self) -> CustomizationArgSpecsDict:
         """Returns a dict representing this CustomizationArgSpec domain object.
 
         Returns:
